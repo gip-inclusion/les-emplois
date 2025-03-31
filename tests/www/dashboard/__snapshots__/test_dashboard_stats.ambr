@@ -804,7 +804,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Données IAE de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -824,7 +823,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -898,7 +896,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Données IAE de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -918,7 +915,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -985,7 +981,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Données IAE de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -1005,7 +1000,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -1079,7 +1073,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Données IAE de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -1099,7 +1092,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -2301,7 +2293,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2386,7 +2377,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2471,7 +2461,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2556,7 +2545,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2641,7 +2629,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2726,7 +2713,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3370,7 +3356,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3416,7 +3401,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           
@@ -3556,7 +3540,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3602,7 +3585,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           
@@ -3742,7 +3724,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3788,7 +3769,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           
@@ -4299,7 +4279,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -4473,7 +4452,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -4647,7 +4625,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5111,7 +5088,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5157,7 +5133,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5289,7 +5264,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5335,7 +5309,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5467,7 +5440,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5513,7 +5485,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5583,7 +5554,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5650,7 +5620,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5717,7 +5686,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Prescriptions des acteurs AHI de ma région</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5785,7 +5753,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5852,7 +5819,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       
@@ -5919,7 +5885,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
                               </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
                           </li>
                       

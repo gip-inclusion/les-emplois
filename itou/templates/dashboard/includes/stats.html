@@ -38,7 +38,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_siae_hiring' %}" class="btn-link btn-ico">
@@ -65,7 +65,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Données IAE de mon département</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_cd_hiring' %}" class="btn-link btn-ico">
@@ -84,7 +84,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                     {% endif %}
                     {% if can_view_stats_cd_aci %}
@@ -151,7 +151,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_ddets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
@@ -196,7 +196,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                         {% if can_view_stats_ddets_iae_aci %}
                             <li class="d-flex justify-content-between align-items-center mb-3">
@@ -227,7 +227,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_dreets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
@@ -272,7 +272,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivre les effectifs annuels et mensuels en ETP des structures de ma région</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                     {% endif %}
                     {% if can_view_stats_dgefp_iae %}
@@ -329,7 +329,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                     {% endif %}
                     {% if can_view_stats_dihal %}
@@ -346,7 +346,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Prescriptions des acteurs AHI de ma région</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                     {% endif %}
                     {% if can_view_stats_iae_network %}
@@ -355,7 +355,7 @@
                                 <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
                                 <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
+
                         </li>
                     {% endif %}
                     {% if can_view_stats_convergence %}
