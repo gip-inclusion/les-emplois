@@ -465,14 +465,6 @@ def stats_ft_state_raw(request):
     )
 
 
-def stats_ft_tension(request):
-    return render_stats_ft(
-        request=request,
-        page_title="Fiches de poste en tension",
-        # No additional locked filter is needed for these PE stats.
-    )
-
-
 def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied

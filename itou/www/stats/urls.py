@@ -30,7 +30,6 @@ urlpatterns = [
     path("pe/conversion/raw", views.stats_ft_conversion_raw, name="stats_ft_conversion_raw"),
     path("pe/state/main", views.stats_ft_state_main, name="stats_ft_state_main"),
     path("pe/state/raw", views.stats_ft_state_raw, name="stats_ft_state_raw"),
-    path("pe/tension", views.stats_ft_tension, name="stats_ft_tension"),
     # Authorized prescribers' stats
     path("ph/state/main", views.stats_ph_state_main, name="stats_ph_state_main"),
     # Institution stats - DDETS IAE - department level.
