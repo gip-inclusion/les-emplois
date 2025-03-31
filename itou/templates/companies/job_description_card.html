@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load matomo %}
 {% load static %}
@@ -25,29 +26,32 @@
     {% if job_app_to_transfer %}
         {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=1 only %}
     {% endif %}
-
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">{{ job.display_name }}</h1>
-            {% if job.is_active %}
-                <span class="badge rounded-pill bg-success">
-                    {{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement
-                </span>
-            {% endif %}
-        </div>
-        {% if can_update_job_description %}
-            <div>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ job.display_name }}
+                {% if job.is_active %}
+                    <span class="badge badge-base rounded-pill bg-success">
+                        {{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement
+                    </span>
+                {% endif %}
+            </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if can_update_job_description %}
                 <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}"
-                   class="btn btn-lg btn-block btn-primary btn-ico"
+                   class="btn btn-lg btn-primary btn-ico"
                    aria-label="Modifier la fiche de poste"
                    {% matomo_event "employeurs" "clic" "edit-fiche-de-poste" %}>
                     <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                     <span>Modifier</span>
                 </a>
-            </div>
-        {% endif %}
-    </div>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
+{% block title_extra %}
     {% if not can_update_job_description %}
         <div class="c-box c-box--action">
             <h2 class="visually-hidden">Actions rapides</h2>

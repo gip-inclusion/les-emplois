@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load markdownify %}
 {% load matomo %}
 {% load static %}
@@ -22,8 +23,15 @@
     {% if job_app_to_transfer %}
         {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=1 only %}
     {% endif %}
-    <h1>{{ siae.display_name }}</h1>
-    <h2>{{ siae.get_kind_display }}</h2>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ siae.display_name }}</h1>
+            <p>{{ siae.get_kind_display }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
     <div class="c-box c-box--action">
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
