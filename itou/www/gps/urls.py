@@ -14,8 +14,6 @@ urlpatterns = [
     path("groups/<int:group_id>/beneficiary", views.GroupBeneficiaryView.as_view(), name="group_beneficiary"),
     path("groups/<int:group_id>/contribution", views.GroupContributionView.as_view(), name="group_contribution"),
     path("groups/<int:group_id>/edition", views.GroupEditionView.as_view(), name="group_edition"),
-    # FIXME Old view to delete in a few days
-    path("details/<uuid:public_id>", views.user_details, name="user_details"),
     path(
         "display/<int:group_id>/<uuid:target_participant_public_id>/<str:mode>",
         views.display_contact_info,
