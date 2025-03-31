@@ -407,16 +407,6 @@ def render_stats_ft(request, page_title, extra_params=None):
     return render_stats(request=request, context=context, params=params)
 
 
-def stats_ft_delay_main(request):
-    return render_stats_ft(
-        request=request,
-        page_title="Délai d'entrée en IAE",
-        extra_params={
-            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
-        },
-    )
-
-
 def stats_ft_delay_raw(request):
     return render_stats_ft(
         request=request,
