@@ -38,6 +38,7 @@ from tests.geiq.factories import ImplementationAssessmentCampaignFactory, Implem
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers import factories as prescribers_factories
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -973,3 +974,17 @@ def test_prolongation_requests_badge(client):
         f"""a[href^='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
     )
     assert soup.text == "3"
+
+
+def test_stalled_job_seekers_box(client):
+    prescriber = PrescriberMembershipFactory(organization__authorized=True).user
+    client.force_login(prescriber)
+    JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__jobseeker_profile__is_stalled=True,
+    )
+    JobApplicationFactory(sender=prescriber)
+
+    response = client.get(reverse("dashboard:index"))
+    assert response.context["stalled_job_seekers_count"] == 1
+    assertContains(response, "Candidat sans solution", count=1)
