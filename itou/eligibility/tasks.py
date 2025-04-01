@@ -91,6 +91,9 @@ def certify_criteria(eligibility_diagnosis):
             "data_returned_by_api",
         ],
     )
+    if any(c.certified is not None for c in criteria):
+        job_seeker.jobseeker_profile.identity_certified = True
+        job_seeker.jobseeker_profile.save(update_fields=["identity_certified"])
 
 
 @task(retries=24 * 6, retry_delay=10 * 60)  # Retry every 10 minutes for 24h.

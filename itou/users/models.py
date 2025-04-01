@@ -906,6 +906,10 @@ class JobSeekerProfile(models.Model):
         blank=True,
     )
 
+    # Denormalized field, set to True when a job seeker has been recognized by
+    # the API particulier.
+    identity_certified = models.BooleanField(editable=False, db_default=False)
+
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
     # They depend on each other: one or the other must be filled but not both.

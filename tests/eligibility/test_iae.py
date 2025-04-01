@@ -20,6 +20,7 @@ from itou.eligibility.models.common import (
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.models import JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
     aah_certified_mocker,
     asf_certified_mocker,
@@ -599,6 +600,8 @@ def test_eligibility_diagnosis_certify_criteria(
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == api_returned_payload
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
+    jobseeker_profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile)
+    assert jobseeker_profile.identity_certified is True
 
 
 @pytest.mark.parametrize(
@@ -625,14 +628,17 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     )
     eligibility_diagnosis.certify_criteria()
     assert len(respx_mock.calls) == 0
+    jobseeker_profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile)
+    assert jobseeker_profile.identity_certified is False
 
 
 @freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory,expected,response_status,response",
+    "EligibilityDiagnosisFactory,identity_certified,expected,response_status,response",
     [
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            True,
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -645,6 +651,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            True,
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -657,6 +664,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            True,
             {
                 "certification_period": None,
                 "certified": False,
@@ -669,6 +677,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            True,
             {
                 "certification_period": None,
                 "certified": False,
@@ -681,6 +690,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            False,
             {
                 "certification_period": None,
                 "certified": None,
@@ -693,6 +703,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            False,
             {
                 "certification_period": None,
                 "certified": None,
@@ -706,7 +717,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     ],
 )
 def test_selected_administrative_criteria_certified(
-    expected, response, response_status, respx_mock, EligibilityDiagnosisFactory
+    expected, identity_certified, response, response_status, respx_mock, EligibilityDiagnosisFactory
 ):
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         certifiable=True,
@@ -726,6 +737,8 @@ def test_selected_administrative_criteria_certified(
     for attrname, value in expected.items():
         assert getattr(criterion, attrname) == value
     assert len(respx_mock.calls) == 1
+    jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+    assert jobseeker_profile.identity_certified is identity_certified
 
 
 def test_with_is_considered_certified():
