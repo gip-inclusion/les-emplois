@@ -1,0 +1,88 @@
+{% load pilotage %}
+
+<section class="s-section mb-3 mb-lg-5">
+    <div class="s-section__container">
+        <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                <h3>Mes données</h3>
+                <div class="c-box p-0 flex-grow-1">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Conventionnement</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            {% if can_view_stats_siae_etp %}
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_siae_etp" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                        <span>Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_siae_orga_etp' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Suivre les effectifs annuels et mensuels (ETP) de ma structure</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="c-box p-0 mt-3 mt-lg-4">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Recrutement</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:stats_siae_hiring" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Analyse des candidatures reçues et de leur traitement</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:stats_siae_auto_prescription" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Suivi de l’activité d’auto-prescription et du contrôle à posteriori</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                <h3>Données nationales publiques</h3>
+                <div class="c-box p-0 flex-grow-1">
+                    <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% pilotage_public_dashboard "conventionnements-iae" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Cartographie du conventionnement IAE</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% pilotage_public_dashboard "cartographies-iae" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Bilan territorial des orientations</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% pilotage_public_dashboard "auto-prescription" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Pratiques d'auto-prescription en SIAE</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% pilotage_public_dashboard "zoom-prescripteurs" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Profil des prescripteurs</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
