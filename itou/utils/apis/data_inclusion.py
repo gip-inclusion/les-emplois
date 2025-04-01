@@ -10,11 +10,10 @@ logger = logging.getLogger(__name__)
 API_TIMEOUT_SECONDS = 1.0
 API_THEMATIQUES = [
     "acces-aux-droits-et-citoyennete",
-    "accompagnement-social-et-professionnel-personnalise",
-    "apprendre-francais",
-    "choisir-un-metier",
-    "mobilite",
-    "trouver-un-emploi",
+    "equipement-et-alimentation",
+    "logement-hebergementmobilite",
+    "numerique",
+    "remobilisation",
 ]
 
 
