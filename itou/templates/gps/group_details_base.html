@@ -18,6 +18,14 @@
                 {% endif %}
             </div>
         </div>
+        {% if not can_view_personal_information %}
+            <div class="c-title__cta" role="group" aria-label="Actions sur les groupes de suivi">
+                <button class="btn btn-lg btn-secondary btn-ico" data-bs-toggle="modal" data-bs-target="#ask_access_modal">
+                    <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
+                    <span>Demander l’accès complet à la fiche</span>
+                </button>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 
@@ -42,4 +50,32 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js' %}"></script>
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% if not can_view_personal_information %}
+        <div class="modal fade" id="ask_access_modal" tabindex="-1" aria-labelledby="ask_access" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="ask_access" class="modal-title">Votre organisation n’est pas habilitée</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Pour consulter les informations de ce bénéficiaire, vous avez besoin de l’autorisation d’un administrateur.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form>
+                            {% csrf_token %}
+                            <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
+                            <button hx-post="{% url 'gps:ask_access' group_id=group.id %}" hx-swap="outerHTML" class="btn btn-sm btn-primary" data-bs-dismiss="modal">
+                                Demander l’autorisation d’un administrateur
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

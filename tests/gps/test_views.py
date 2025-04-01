@@ -457,6 +457,51 @@ class TestGroupDetailsMembershipTab:
             ((prescriber, group, target_participant, "email"),),
         ]
 
+    def test_ask_access(self, client, mocker, snapshot):
+        user = PrescriberFactory()
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=job_seeker, memberships=1, memberships__member=user)
+        membership = group.memberships.get()
+        slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
+
+        ask_access_str = "Demander l’accès complet à la fiche"
+
+        client.force_login(user)
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        assertContains(response, ask_access_str)
+
+        ask_access_url = reverse("gps:ask_access", args=(group.pk,))
+        ask_access_url_for_snapshot = ask_access_url.replace(str(group.pk), "[PK of FollowUpGroup]")
+        page_soup = parse_response_to_soup(response, selector="#ask_access_modal")
+        assert str(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(name="enabled_button")
+
+        htmx_response = client.post(ask_access_url)
+        update_page_with_htmx(page_soup, f'button[hx-post="{ask_access_url}"]', htmx_response)
+        assert str(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(name="disabled_button")
+
+        job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
+        user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(user.pk,)))
+        membership_url = get_absolute_url(reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,)))
+
+        expected_calls = [
+            (
+                (
+                    f":mag: *Demande d’accès à la fiche*\n"
+                    f"<{user_admin_url}|{user.get_full_name()}> veut avoir accès aux informations de "
+                    f"<{job_seeker_admin_url}|{mask_unless(group.beneficiary.get_full_name(), False)}> "
+                    f"(<{membership_url}|relation>).",
+                ),
+            )
+        ]
+        assert slack_mock.mock_calls == expected_calls
+        slack_mock.reset_mock()
+
+        membership.can_view_personal_information = True
+        membership.save()
+        client.post(ask_access_url)
+        assert slack_mock.mock_calls == []
+
 
 class TestGroupDetailsBeneficiaryTab:
     @pytest.mark.parametrize(
