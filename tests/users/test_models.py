@@ -22,8 +22,15 @@ from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, Commune, EducationLevel
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
-from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
-from itou.users.models import JobSeekerProfile, User
+from itou.users.enums import (
+    IdentityCertificationAuthorities,
+    IdentityProvider,
+    LackOfNIRReason,
+    LackOfPoleEmploiId,
+    Title,
+    UserKind,
+)
+from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -1292,6 +1299,14 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
         user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
         user.jobseeker_profile.pe_obfuscated_nir = "XXX_1234567890123_YYY"
         user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
+        IdentityCertification.objects.upsert_certifications(
+            [
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
+                    jobseeker_profile=user.jobseeker_profile,
+                )
+            ]
+        )
 
     reset_profile()
     profile = JobSeekerProfile.objects.get(user__email="foobar@truc.com")
@@ -1300,6 +1315,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     profile.refresh_from_db()
     assert profile.pe_obfuscated_nir is None
     assert profile.pe_last_certification_attempt_at is None
+    assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
@@ -1308,6 +1324,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+    assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
@@ -1316,6 +1333,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+    assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
@@ -1324,6 +1342,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+    assertQuerySetEqual(profile.identity_certifications.all(), [])
 
     reset_profile()
     # then reload the user, and don't change anything in the monitored fields
@@ -1338,6 +1357,10 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     assert user.jobseeker_profile.pe_obfuscated_nir == "XXX_1234567890123_YYY"
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.UTC
+    )
+    assertQuerySetEqual(
+        profile.identity_certifications.values_list("certifier", flat=True),
+        [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],
     )
 
 

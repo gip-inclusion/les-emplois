@@ -39,7 +39,14 @@ from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
+from itou.users.enums import (
+    IdentityCertificationAuthorities,
+    IdentityProvider,
+    LackOfNIRReason,
+    LackOfPoleEmploiId,
+    Title,
+    UserKind,
+)
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils.db import or_queries
 from itou.utils.templatetags.str_filters import mask_unless
@@ -424,6 +431,9 @@ class User(AbstractUser, AddressMixin):
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
                 self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
+                self.jobseeker_profile.identity_certifications.filter(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
+                ).delete()
 
         self.set_old_values()
 
@@ -1177,6 +1187,9 @@ class JobSeekerProfile(models.Model):
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
                 update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
+            self.identity_certifications.filter(
+                certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
+            ).delete()
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         self.set_old_values()
@@ -1391,3 +1404,30 @@ class JobSeekerProfile(models.Model):
             return result
 
         return "Adresse HEXA incomplète"
+
+
+class IdentityCertificationManager(models.Manager):
+    def upsert_certifications(self, certifications):
+        IdentityCertification.objects.bulk_create(
+            certifications,
+            update_conflicts=True,
+            update_fields=["certified_at"],
+            unique_fields=["certifier", "jobseeker_profile"],
+        )
+
+
+class IdentityCertification(models.Model):
+    jobseeker_profile = models.ForeignKey(
+        JobSeekerProfile,
+        related_name="identity_certifications",
+        on_delete=models.CASCADE,
+    )
+    certifier = models.CharField(max_length=32, choices=IdentityCertificationAuthorities)
+    certified_at = models.DateTimeField(default=timezone.now)
+
+    objects = IdentityCertificationManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("jobseeker_profile", "certifier", name="uniq_jobseeker_profile_certifier"),
+        ]

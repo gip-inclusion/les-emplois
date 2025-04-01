@@ -8,11 +8,14 @@ import respx
 from django.core import management
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, siae_kind_to_ft_type_siae
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification
 from itou.utils.apis import enums as api_enums
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
@@ -104,6 +107,11 @@ class TestApprovalNotifyPoleEmploiIntegration:
         assert approval.user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
             2021, 6, 21, 0, 0, 0, tzinfo=datetime.UTC
         )
+        assertQuerySetEqual(
+            approval.user.jobseeker_profile.identity_certifications.all(),
+            [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],
+            transform=lambda certification: certification.certifier,
+        )
 
     @respx.mock
     def test_notification_accepted_with_id_national(self):
@@ -114,6 +122,10 @@ class TestApprovalNotifyPoleEmploiIntegration:
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
+        IdentityCertification.objects.create(
+            jobseeker_profile=approval.user.jobseeker_profile,
+            certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
+        )
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.SUCCESS

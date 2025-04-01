@@ -12,8 +12,8 @@ from django.db.models import F, Q
 from django.utils import timezone
 from httpx import RequestError
 
-from itou.users.enums import UserKind
-from itou.users.models import JobSeekerProfile, User
+from itou.users.enums import IdentityCertificationAuthorities, UserKind
+from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.apis import pole_emploi_api_client
 from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
@@ -69,10 +69,18 @@ class Command(BaseCommand):
 
         examined_profiles = []
         certified_profiles = []
+        identity_certifications = []
         swapped_users = []
 
         def certify_user(user, id_certifie):
             user.jobseeker_profile.pe_obfuscated_nir = id_certifie
+            identity_certifications.append(
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
+                    jobseeker_profile=user.jobseeker_profile,
+                    certified_at=timezone.now(),
+                )
+            )
             certified_profiles.append(user.jobseeker_profile)
             self.logger.info("certified user pk=%d", user.pk)
 
@@ -103,9 +111,16 @@ class Command(BaseCommand):
             self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
             JobSeekerProfile.objects.bulk_update(
-                certified_profiles, ["pe_obfuscated_nir", "pe_last_certification_attempt_at"], batch_size=1000
+                certified_profiles,
+                [
+                    "pe_obfuscated_nir",
+                    "pe_last_certification_attempt_at",
+                ],
+                batch_size=1000,
             )
             self.logger.info("count=%d users have been certified", len(certified_profiles))
+            IdentityCertification.objects.upsert_certifications(identity_certifications)
+            self.logger.info("count=%d identity certifications recorded.", len(identity_certifications))
 
             not_certified = set(examined_profiles) - set(certified_profiles)
             JobSeekerProfile.objects.bulk_update(
