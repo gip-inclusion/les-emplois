@@ -14,6 +14,8 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
+import re
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
@@ -30,6 +32,8 @@ from itou.common_apps.address.departments import (
     format_region_for_matomo,
 )
 from itou.companies import models as companies_models
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -39,6 +43,9 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.stats import utils
+
+
+DGEFP_SHOWROOM_DEPARTMENT = "69"
 
 
 def get_stats_siae_current_org(request):
@@ -105,31 +112,28 @@ def get_params_aci_asp_ids_for_department(department):
     }
 
 
-def render_stats(request, context, params=None, template_name="stats/stats.html"):
+def render_stats(
+    *, request, context, params=None, template_name="stats/stats.html", view_name=None, show_tally=settings.TALLY_URL
+):
     if params is None:
         params = {}
-    view_name = mb.get_view_name(request)
-    metabase_dashboard = mb.METABASE_DASHBOARDS.get(view_name)
+
+    view_name = view_name or mb.get_view_name(request)
+    metabase_dashboard = mb.METABASE_DASHBOARDS[view_name]
     dashboard_id = metabase_dashboard["dashboard_id"]
-    tally_popup_form_id = None
-    tally_embed_form_id = None
-    if settings.TALLY_URL and metabase_dashboard:
-        tally_popup_form_id = metabase_dashboard.get("tally_popup_form_id")
-        tally_embed_form_id = metabase_dashboard.get("tally_embed_form_id")
-    tally_suspension_form = (
-        f"https://tally.so/r/wkOxRR?URLTB={dashboard_id}" if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS else None
-    )
 
     base_context = {
         "back_url": None,
-        "iframeurl": mb.metabase_embedded_url(request=request, params=params),
+        "iframeurl": mb.metabase_embedded_url(dashboard_id=dashboard_id, params=params),
         "is_stats_public": False,
         "show_siae_evaluation_message": False,
         "stats_base_url": settings.METABASE_SITE_URL,
-        "tally_popup_form_id": tally_popup_form_id,
-        "tally_embed_form_id": tally_embed_form_id,
+        "tally_popup_form_id": metabase_dashboard.get("tally_popup_form_id") if show_tally else None,
+        "tally_embed_form_id": metabase_dashboard.get("tally_embed_form_id") if show_tally else None,
         "PILOTAGE_HELP_CENTER_URL": global_constants.PILOTAGE_HELP_CENTER_URL,
-        "tally_suspension_form": tally_suspension_form,
+        "tally_suspension_form": f"https://tally.so/r/wkOxRR?URLTB={dashboard_id}"
+        if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS
+        else None,
         "tally_hidden_fields": {},
     }
 
@@ -775,6 +779,67 @@ def stats_dgefp_iae_orga_etp(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
+def stats_dgefp_iae_showroom(request, dashboard_full_name):
+    if not utils.can_view_stats_dgefp_iae(request):
+        raise PermissionDenied
+
+    if f"stats_{dashboard_full_name}" not in mb.METABASE_DASHBOARDS:
+        return HttpResponseNotFound()
+
+    [kind, name] = re.match(r"(cd|convergence|ft|iae_network|ph|siae)_(\w+)", dashboard_full_name).groups()
+    if kind == "ft":
+        params = {
+            **get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT),
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
+        }
+    elif kind == "cd":
+        params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+    elif kind == "ph":
+        # FIXME: Can we use multiple label? Will it already be a too big URL?
+        # FIXME: Need to compute allowed_org_pks for department, URL probably too big?
+        # params={
+        #     mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
+        #     mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
+        # },
+        pass
+    elif kind == "siae":
+        # siae_etp
+        # params={
+        #     mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
+        #         str(membership.company.convention.asp_id)
+        #         for membership in request.user.active_or_in_grace_period_company_memberships()
+        #         if membership.is_admin and membership.company.convention is not None
+        #     ]
+        # },
+        # siae_hiring + siae_auto_prescription
+        # params={
+        #     mb.C1_SIAE_FILTER_KEY: [
+        #         str(membership.company_id)
+        #         for membership in request.user.active_or_in_grace_period_company_memberships()
+        #     ]
+        # },
+        pass
+    elif kind == "iae_network":
+        params = {
+            mb.IAE_NETWORK_FILTER_KEY: Institution.objects.filter(kind=InstitutionKind.IAE_NETWORK)
+            .order_by("?")
+            .values("pk")
+            .first()
+            .get("pk")
+        }
+    elif kind == "convergence":
+        # FIXME: Can we filter by region?
+        pass
+
+    return render_stats(
+        request=request,
+        context={"department": DGEFP_SHOWROOM_DEPARTMENT},
+        params=params,
+        view_name=f"stats_{dashboard_full_name}",
+        show_tally=False,
     )
 
 
