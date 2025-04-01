@@ -6,9 +6,12 @@ import pytest
 from django.conf import settings
 from freezegun import freeze_time
 from huey.exceptions import RetryTask
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import JobSeekerProfile
 from itou.utils.mocks.api_particulier import aah_certified_mocker, asf_certified_mocker, rsa_certified_mocker
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -64,6 +67,12 @@ class TestCertifyCriteria:
         assert criterion.certification_period == InclusiveDateRange(
             datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(
+            jobseeker_profile.identity_certifications.all(),
+            [IdentityCertificationAuthorities.API_PARTICULIER],
+            transform=lambda certification: certification.certifier,
+        )
 
     # The API returns the same error messages for each endpoint called by us.
     # It would be useless to test them all.
@@ -88,6 +97,8 @@ class TestCertifyCriteria:
             assert criterion.certified_at is None
             assert criterion.data_returned_by_api is None
             assert criterion.certification_period is None
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
     @pytest.mark.parametrize(
         "data,exception",
@@ -102,6 +113,8 @@ class TestCertifyCriteria:
         with pytest.raises(exception):
             async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
         # Huey catches the exception and retries the task.
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
     def test_no_retry_on_exception(self, caplog, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
@@ -110,3 +123,5 @@ class TestCertifyCriteria:
         )
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
         assert "TypeError: Programming error" in caplog.text
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
