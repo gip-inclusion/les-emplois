@@ -122,12 +122,18 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
+        "stalled_job_seekers_count": None,
     }
 
     if request.user.is_employer:
         context.update(_employer_dashboard_context(request))
     elif request.user.is_prescriber:
         if current_org := request.current_organization:
+            context["stalled_job_seekers_count"] = User.objects.linked_job_seeker_ids(
+                request.user,
+                request.current_organization,
+                stalled=True,
+            ).count()
             if current_org.is_authorized:
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
