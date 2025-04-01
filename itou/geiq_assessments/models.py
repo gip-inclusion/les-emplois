@@ -9,6 +9,7 @@ from itou.companies.models import Company
 from itou.files.models import File
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.users.enums import Title
 
 
 class AssessmentCampaign(models.Model):
@@ -95,6 +96,10 @@ class Assessment(models.Model):
         blank=True,
         on_delete=models.PROTECT,
     )
+    contracts_synced_at = models.DateTimeField("données de contrats label récupérées le", blank=True, null=True)
+    contracts_selection_validated_at = models.DateTimeField(
+        "données de contrats label récupérées le", blank=True, null=True
+    )
     geiq_comment = models.TextField("commentaire général du GEIQ", blank=True)
 
     submitted_at = models.DateTimeField("transmis le", blank=True, null=True)
@@ -128,7 +133,7 @@ class Assessment(models.Model):
             actions.append("Récupérer le bilan financier de la structure de label")
         if not self.action_financial_assessment_file:
             actions.append("Transmettre le bilan financier de l’action")
-        if True:
+        if not self.contracts_selection_validated_at:
             actions.append("Détail et sélection des contrats à présenter")
         if not self.geiq_comment:
             actions.append("Commentaire")
@@ -156,3 +161,66 @@ class AssessmentInstitutionLink(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["assessment", "institution"], name="assessment_institution_unique"),
         ]
+
+
+class Employee(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, related_name="employees")
+    label_id = models.IntegerField(verbose_name="ID label")
+    last_name = models.CharField(verbose_name="nom de famille")
+    first_name = models.CharField(verbose_name="prénom")
+    birthdate = models.DateField(verbose_name="date de naissance")
+    title = models.CharField(
+        max_length=3,
+        verbose_name="civilité",
+        blank=True,
+        default="",
+        choices=Title.choices,
+    )
+
+    other_data = models.JSONField(verbose_name="autres données")
+
+    class Meta:
+        verbose_name = "employé"
+        unique_together = [
+            ("assessment", "label_id"),
+        ]
+
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = f"{self.first_name.strip().title()} {self.last_name.upper().strip()}"
+        return full_name.strip()
+
+    def __str__(self):
+        return self.get_full_name()
+
+
+class EmployeeContract(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label_id = models.IntegerField(verbose_name="ID label")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="contracts")
+
+    start_at = models.DateField(verbose_name="date de début")
+    planned_end_at = models.DateField(verbose_name="date de fin prévisionnelle")
+    end_at = models.DateField(verbose_name="date de fin", null=True)
+
+    other_data = models.JSONField(verbose_name="autres données")
+
+    class Meta:
+        verbose_name = "contrat"
+
+
+class EmployeePrequalification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    label_id = models.IntegerField(verbose_name="ID label")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="prequalifications")
+
+    start_at = models.DateField(verbose_name="date de début")
+    end_at = models.DateField(verbose_name="date de fin")
+
+    other_data = models.JSONField(verbose_name="autres données")
+
+    class Meta:
+        verbose_name = "préqualification"

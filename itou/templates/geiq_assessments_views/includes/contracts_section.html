@@ -1,0 +1,39 @@
+<div id="contracts-section" class="d-flex flex-column justify-content-between mb-3">
+    <div class="d-flex justify-content-between flex-row mb-3">
+        <h3 class="mb-0">Détail et sélection des parcours</h3>
+        {% if assessment.contracts_selection_validated_at %}
+            {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+        {% else %}
+            {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+        {% endif %}
+    </div>
+    <div>
+        {% if assessment.contracts_selection_validated_at %}
+            <a href="{{ download_url }}" class="btn btn-ico btn-outline-primary" rel="noopener" target="_blank">
+                <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                <span>Consulter ma sélection</span>
+            </a>
+        {% elif assessment.label_contracts_synced_at %}
+            <a href="{{ download_url }}" class="btn btn-primary" rel="noopener" target="_blank">
+                <span>Compléter</span>
+            </a>
+        {% else %}
+            {% if error %}
+                <p>
+                    <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Les contrats n’ont pas pu être importés, merci de réessayer
+                </p>
+            {% endif %}
+            <button type="button"
+                    class="btn btn-ico btn-primary"
+                    hx-post="{% url "geiq_assessments_views:assessment_contracts_sync" pk=assessment.pk %}"
+                    hx-swap="outerHTML"
+                    hx-trigger="{{ error|yesno:"click,load" }}"
+                    hx-include="#label-sync-form"
+                    hx-target="#contracts-section">
+                <i class="ri-refresh-line" aria-hidden="true"></i>
+                <span class="stable-text">{{ error|yesno:"Réessayer,Récupérer de Label" }}</span>
+                <span class="loading-text">Récupération en cours</span>
+            </button>
+        {% endif %}
+    </div>
+</div>
