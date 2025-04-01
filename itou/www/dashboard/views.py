@@ -1,3 +1,4 @@
+import enum
 import uuid
 
 from allauth.account.views import PasswordChangeView
@@ -42,6 +43,21 @@ from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
+
+
+class DashboardStatsLayoutKind(enum.StrEnum):
+    EMPLOYER = "employer"
+    PRESCRIBER = "prescriber"
+    PRESCRIBER_FT = "prescriber_ft"
+    PRESCRIBER_DEPT = "prescriber_dept"
+
+    LEGACY = "legacy"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
 
 
 def _employer_dashboard_context(request):
@@ -167,26 +183,11 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
         return HttpResponseForbidden()
 
     context = {
-        # FIXME(vperron): I think there's a rising need for a revamped permission system.
-        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
-        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
-        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
-        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
-        "can_view_stats_cd_aci": stats_utils.can_view_stats_cd_aci(request),
-        "can_view_stats_ft": stats_utils.can_view_stats_ft(request),
-        "can_view_stats_ph": stats_utils.can_view_stats_ph(request),
-        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
-        "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
-        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
-        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
-        "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
-        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
-        "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
-        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
-        "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
+        "layout_kind": DashboardStatsLayoutKind.LEGACY,
+        "DashboardStatsLayoutKind": DashboardStatsLayoutKind,
         "stats_kpi": None,
     }
-    context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
+
     if request.user.is_employer:
         context["siae_suspension_text_with_dates"] = (
             request.current_organization.get_active_suspension_text_with_dates()
@@ -194,7 +195,22 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
             if request.current_organization.is_subject_to_eligibility_rules
             else None
         )
-    if request.user.is_labor_inspector:
+        if stats_utils.can_view_stats_siae(request):
+            context.update(
+                {
+                    "layout_kind": DashboardStatsLayoutKind.EMPLOYER,
+                    "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
+                    "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+                }
+            )
+    elif request.user.is_prescriber:
+        if stats_utils.can_view_stats_cd(request):
+            context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER_DEPT
+        elif stats_utils.can_view_stats_ft(request):
+            context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER_FT
+        elif stats_utils.can_view_stats_ph(request):
+            context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER
+    elif request.user.is_labor_inspector:
         if request.current_organization.kind in [
             InstitutionKind.DGEFP_IAE,
             InstitutionKind.DREETS_IAE,
@@ -214,6 +230,24 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                     is_percentage=True,
                 ),
             }
+
+    if context["layout_kind"] is DashboardStatsLayoutKind.LEGACY:
+        context.update(
+            {
+                # FIXME(vperron): I think there's a rising need for a revamped permission system.
+                "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
+                "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
+                "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
+                "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
+                "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
+                "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
+                "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
+                "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
+                "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
+            }
+        )
+    context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
+
     return render(request, template_name, context)
 
 

@@ -15,7 +15,7 @@ def test_index_stats_for_employer(snapshot, client, kind, department):
     client.force_login(
         EmployerFactory(
             with_company=True,
-            with_company__company__department__kind=kind,
+            with_company__company__kind=kind,
             with_company__company__department=department,
         )
     )
