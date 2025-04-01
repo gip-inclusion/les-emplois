@@ -16,11 +16,12 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.files.models import File
 from itou.geiq import sync
-from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
+from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, EmployeeContract, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
+from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
 from itou.www.geiq_assessments_views.forms import ActionFinancialAssessmentForm, CreateForm, GeiqCommentForm
 
@@ -256,7 +257,17 @@ def assessment_contracts_sync(request, pk):
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
-    context = {"assessment": assessment}
+    contracts_page = pager(
+        EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
+            "employee__first_name", "employee__last_name"
+        ),
+        request.GET.get("page"),
+        items_per_page=10,
+    )
+    context = {
+        "assessment": assessment,
+        "contracts_page": contracts_page,
+    }
     return render(request, template_name, context)
 
 
