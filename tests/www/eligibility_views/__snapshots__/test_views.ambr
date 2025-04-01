@@ -12,18 +12,23 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>
-          
-              Valider
-          
-          l'éligibilité de Jane DOE
-      </h1>
+      
+          <h1>
+              
+                  Valider
+              
+              l'éligibilité de Jane DOE
+          </h1>
+      
   
                               
+      
                                   
   
   
                               
+      
+  
                               
                           </div>
                       </div>
@@ -33,15 +38,20 @@
               
       <section class="s-section">
           <div class="container">
+              
               <div class="row">
                   <div class="col-12 col-lg-8">
                       <div class="c-form">
   
                           
+  
+                          
+  
                           
   
                           
   
+                          
                           <div class="c-info mb-3">
                               <button class="c-info__summary">
                                   <span>Pour valider l'éligibilité IAE du candidat</span>
@@ -191,6 +201,7 @@
                               </div>
   
                               
+                                  
   
   <div class="row">
       <div class="col-12">
@@ -219,6 +230,7 @@
   
   
   
+                              
                           </form>
                       </div>
                   </div>
@@ -242,18 +254,23 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>
-          
-              Mettre à jour
-          
-          l'éligibilité de Jane DOE
-      </h1>
+      
+          <h1>
+              
+                  Mettre à jour
+              
+              l'éligibilité de Jane DOE
+          </h1>
+      
   
                               
+      
                                   
   
   
                               
+      
+  
                               
                           </div>
                       </div>
@@ -263,16 +280,20 @@
               
       <section class="s-section">
           <div class="container">
+              
               <div class="row">
                   <div class="col-12 col-lg-8">
                       <div class="c-form">
   
                           
+  
                           
-                              <div class="mb-5">
-                                  <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
-                                  <p class="text-tertiary fw-bold">Pres. Org.</p>
-                              </div>
+                              
+                                  <div class="mb-5">
+                                      <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                                      <p class="text-tertiary fw-bold">Pres. Org.</p>
+                                  </div>
+                              
   
                               <div class="alert alert-info mb-5" role="status">
                                   <div class="row">
@@ -294,6 +315,9 @@
   
                           
   
+                          
+  
+                          
                           <div class="c-info mb-3">
                               <button class="c-info__summary">
                                   <span>Pour valider l'éligibilité IAE du candidat</span>
@@ -443,6 +467,7 @@
                               </div>
   
                               
+                                  
   
   <div class="row">
       <div class="col-12">
@@ -471,6 +496,7 @@
   
   
   
+                              
                           </form>
                       </div>
                   </div>
