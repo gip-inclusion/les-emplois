@@ -45,10 +45,14 @@
                                 <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
                             </div>
                             {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
-                                {% if stats_kpi %}
-                                    {% include "dashboard/includes/stats_kpi_labor_inspector_iae.html" %}
-                                {% endif %}
-                                <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                                <section class="s-section mb-3 mb-md-5">
+                                    <div class="s-section__container">
+                                        {% if stats_kpi %}
+                                            {% include "dashboard/includes/stats/_institution_kpi.html" %}
+                                        {% endif %}
+                                        <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                                    </div>
+                                </section>
                             {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
                                 {% include "dashboard/includes/stats/employer.html" %}
                             {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
@@ -57,6 +61,8 @@
                                 {% include "dashboard/includes/stats/prescriber_ft.html" %}
                             {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
                                 {% include "dashboard/includes/stats/prescriber_dept.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
+                                {% include "dashboard/includes/stats/dgefp.html" %}
                             {% endif %}
                         </div>
                         {% if user.is_employer or user.is_prescriber %}

@@ -50,6 +50,7 @@ class DashboardStatsLayoutKind(enum.StrEnum):
     PRESCRIBER = "prescriber"
     PRESCRIBER_FT = "prescriber_ft"
     PRESCRIBER_DEPT = "prescriber_dept"
+    DGEFP = "dgefp"
 
     LEGACY = "legacy"
 
@@ -229,6 +230,8 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                     is_percentage=True,
                 ),
             }
+        if stats_utils.can_view_stats_dgefp_iae(request):
+            context["layout_kind"] = DashboardStatsLayoutKind.DGEFP
 
     if context["layout_kind"] is DashboardStatsLayoutKind.LEGACY:
         context.update(
