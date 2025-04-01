@@ -58,6 +58,27 @@
                         <br>
                         Par défaut, tous les contrats dont la durée est inférieure à 3 mois sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                     </p>
+                    <div class="table-responsive mt-3 mt-md-4">
+                        <table class="table table-hover">
+                            <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Prénom NOM</th>
+                                    <th scope="col">Date de début</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contract in contracts_page %}
+                                    <tr>
+                                        <td>
+                                            <a class="btn btn-link" href="{% url "geiq_assessments_views:details" pk=assessment.pk %}">{{ contract.employee }}</a>
+                                        </td>
+                                        <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
