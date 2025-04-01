@@ -19,6 +19,7 @@ urlpatterns = [
         views.display_contact_info,
         name="display_contact_info",
     ),
+    path("groups/<int:group_id>/ask-access", views.ask_access, name="ask_access"),
     path("groups/join", views.join_group, name="join_group"),
     path("groups/join/from-coworker", views.join_group_from_coworker, name="join_group_from_coworker"),
     path("groups/join/from-nir", views.join_group_from_nir, name="join_group_from_nir"),

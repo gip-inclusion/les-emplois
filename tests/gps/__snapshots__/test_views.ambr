@@ -38,6 +38,14 @@
                   
               </div>
           </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
   
                               
@@ -138,6 +146,7 @@
                   
               </div>
           </div>
+          
       </div>
   
                               
@@ -286,6 +295,7 @@
                   
               </div>
           </div>
+          
       </div>
   
                               
@@ -441,6 +451,7 @@
                   
               </div>
           </div>
+          
       </div>
   
                               
@@ -616,6 +627,7 @@
                   
               </div>
           </div>
+          
       </div>
   
                               
@@ -798,6 +810,14 @@
                   
               </div>
           </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
   
                               
@@ -918,6 +938,14 @@
                   
               </div>
           </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
   
                               
@@ -1034,6 +1062,14 @@
                   
               </div>
           </div>
+          
+              <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                  <button class="btn btn-lg btn-secondary btn-ico" data-bs-target="#ask_access_modal" data-bs-toggle="modal">
+                      <i aria-hidden="true" class="ri-user-unfollow-line fw-medium"></i>
+                      <span>Demander l’accès complet à la fiche</span>
+                  </button>
+              </div>
+          
       </div>
   
                               
@@ -1122,6 +1158,56 @@
       </section>
   
           </main>
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_ask_access[disabled_button]
+  '''
+  <div aria-hidden="true" aria-labelledby="ask_access" class="modal fade" id="ask_access_modal" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h3 class="modal-title" id="ask_access">Votre organisation n’est pas habilitée</h3>
+                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Pour consulter les informations de ce bénéficiaire, vous avez besoin de l’autorisation d’un administrateur.</p>
+                      </div>
+                      <div class="modal-footer">
+                          <form>
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-sm btn-link" data-bs-dismiss="modal" type="button">Annuler</button>
+                              <button class="btn btn-sm btn-primary" disabled="">Demander l’autorisation d’un administrateur</button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_ask_access[enabled_button]
+  '''
+  <div aria-hidden="true" aria-labelledby="ask_access" class="modal fade" id="ask_access_modal" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h3 class="modal-title" id="ask_access">Votre organisation n’est pas habilitée</h3>
+                          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                      </div>
+                      <div class="modal-body">
+                          <p>Pour consulter les informations de ce bénéficiaire, vous avez besoin de l’autorisation d’un administrateur.</p>
+                      </div>
+                      <div class="modal-footer">
+                          <form>
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-sm btn-link" data-bs-dismiss="modal" type="button">Annuler</button>
+                              <button class="btn btn-sm btn-primary" data-bs-dismiss="modal" hx-post="/gps/groups/[PK of FollowUpGroup]/ask-access" hx-swap="outerHTML">
+                                  Demander l’autorisation d’un administrateur
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
   '''
 # ---
 # name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
@@ -1239,6 +1325,7 @@
                   
               </div>
           </div>
+          
       </div>
   
                               
