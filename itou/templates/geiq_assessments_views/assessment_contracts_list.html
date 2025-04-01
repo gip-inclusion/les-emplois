@@ -1,0 +1,34 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Détail et sélection des parcours {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Détail et sélection des parcours</h1>
+            <span class="badge badge-base rounded-pill text-nowrap bg-info">À compléter</span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
+                    <p>
+                        Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                        <br>
+                        Par défaut, tous les contrats dont la durée est inférieure à 3 mois sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
