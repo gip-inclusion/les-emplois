@@ -9,12 +9,12 @@
     </div>
     <div>
         {% if assessment.contracts_selection_validated_at %}
-            <a href="{{ download_url }}" class="btn btn-ico btn-outline-primary" rel="noopener" target="_blank">
+            <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-ico btn-outline-primary">
                 <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
                 <span>Consulter ma sélection</span>
             </a>
         {% elif assessment.contracts_synced_at %}
-            <a href="{{ download_url }}" class="btn btn-primary" rel="noopener" target="_blank">
+            <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
                 <span>Compléter</span>
             </a>
         {% else %}

@@ -253,8 +253,10 @@ def assessment_contracts_sync(request, pk):
 
 
 @check_user(lambda user: user.is_employer)
-def assessment_contracts_list(request, pk, template_name=""):
-    context = {}
+def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    context = {"assessment": assessment}
     return render(request, template_name, context)
 
 
