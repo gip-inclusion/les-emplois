@@ -44,10 +44,20 @@
                             <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
                                 <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
                             </div>
-                            {% if stats_kpi %}
-                                {% include "dashboard/includes/stats_kpi_labor_inspector_iae.html" %}
+                            {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
+                                {% if stats_kpi %}
+                                    {% include "dashboard/includes/stats_kpi_labor_inspector_iae.html" %}
+                                {% endif %}
+                                <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                            {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
+                                {% include "dashboard/includes/stats/employer.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
+                                {% include "dashboard/includes/stats/prescriber.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_FT %}
+                                {% include "dashboard/includes/stats/prescriber_ft.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
+                                {% include "dashboard/includes/stats/prescriber_dept.html" %}
                             {% endif %}
-                            <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
                         </div>
                         {% if user.is_employer or user.is_prescriber %}
                             <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
