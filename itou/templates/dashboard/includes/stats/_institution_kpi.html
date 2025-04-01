@@ -1,0 +1,56 @@
+{% load humanize %}
+
+<div class="row mt-3 mt-md-4">
+    <h3>Indicateurs clés</h3>
+    <p class="fs-sm mb-3">
+        Dernière mise à jour des données du flux IAE : {{ stats_kpi.flux_iae_data_updated_at|date:"d F Y"|default:"Jamais" }}
+    </p>
+    <div class="col-12">
+        <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
+            {# job_seeker_still_seeking_after_30_days #}
+            <div class="d-flex flex-column w-100">
+                <div class="flex-grow-1">
+                    <p class="mb-0 mb-lg-3">
+                        <i class="ri-bar-chart-line ri-2x text-pilotage" aria-hidden="true"></i>
+                        <span class="h1">{{ stats_kpi.job_seeker_still_seeking_after_30_days|default:"N/A"|intcomma }}</span>
+                    </p>
+                    <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
+                </div>
+                <div>
+                    <a href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)"
+                       class="btn btn-link ps-0 has-external-link">Consulter ces données</a>
+                </div>
+            </div>
+            {# job_application_with_hiring_difficulty #}
+            <div class="d-flex flex-column w-100">
+                <div class="flex-grow-1">
+                    <p class="mb-0 mb-lg-3">
+                        <i class="ri-bar-chart-line ri-2x text-pilotage" aria-hidden="true"></i>
+                        <span class="h1">{{ stats_kpi.job_application_with_hiring_difficulty|default:"N/A"|intcomma }}</span>
+                    </p>
+                    <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
+                </div>
+            </div>
+            {# rate_of_auto_prescription #}
+            <div class="d-flex flex-column w-100">
+                <div class="flex-grow-1">
+                    <p class="mb-0 mb-lg-3">
+                        <i class="ri-bar-chart-line ri-2x text-pilotage" aria-hidden="true"></i>
+                        <span class="h1">{{ stats_kpi.rate_of_auto_prescription|floatformat:-2|default:"N/A" }}%</span>
+                    </p>
+                    <p>C'est le taux d'embauches en auto prescription.</p>
+                </div>
+                <div>
+                    <a href="{% url "stats:redirect" "auto_prescription" %}"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)"
+                       class="btn btn-link ps-0 has-external-link">Consulter ces données</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

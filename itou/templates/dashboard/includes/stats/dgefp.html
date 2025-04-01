@@ -1,0 +1,84 @@
+<section class="s-section mb-3 mb-lg-5">
+    <div class="s-section__container">
+        {% include "dashboard/includes/stats/_institution_kpi.html" %}
+        <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                <h3>Mes données</h3>
+                <div class="c-box p-0 flex-grow-1">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Données personnalisées</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_auto_prescription' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Focus auto-prescription</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Suivi du contrôle à posteriori</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_follow_prolongation' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Suivi des demandes de prolongation</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_siae_evaluation' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Voir les données du contrôle a posteriori (version bêta)</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_hiring' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Données facilitation à l'embauche</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_state' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Prescriptions des acteurs AHI</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_ph_prescription' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'stats:stats_dgefp_iae_orga_etp' %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
+                                </a>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                <h3>Données publiques</h3>
+                <div class="c-box p-0 flex-grow-1">
+                    <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
+                                    <i class="ri-dashboard-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                    <span>Accéder aux tableaux de bord publics</span>
+                                    <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

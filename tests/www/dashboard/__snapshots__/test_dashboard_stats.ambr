@@ -726,8 +726,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -762,6 +764,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -774,8 +778,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -783,7 +789,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -828,6 +833,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -840,8 +847,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -876,6 +885,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -888,64 +899,60 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                      
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                              
   
-  <section class="s-section mb-3 mb-md-5">
-      <div class="s-section__container">
-          <div class="row mb-1 mb-md-3">
-              <div class="col-12">
-                  <h2 class="mb-0">Chiffres clés</h2>
-                  <p class="fs-sm mb-3">
-                      Dernière mise à jour des données du flux IAE : Jamais
-                  </p>
+  <div class="row mt-3 mt-md-4">
+      <h3>Indicateurs clés</h3>
+      <p class="fs-sm mb-3">
+          Dernière mise à jour des données du flux IAE : Jamais
+      </p>
+      <div class="col-12">
+          <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
+                  </div>
               </div>
-              <div class="col-12">
-                  <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
-                      </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
-                          </div>
-                      </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A%</span>
-                              </p>
-                              <p>C'est le taux d'embauches en auto prescription.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
-                      </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
+                  </div>
+              </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A%</span>
+                      </p>
+                      <p>C'est le taux d'embauches en auto prescription.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
                   </div>
               </div>
           </div>
       </div>
-  </section>
+  </div>
   
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1007,7 +1014,6 @@
                       
                       
                       
-                      
                   </ul>
               
           </div>
@@ -1032,6 +1038,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1044,8 +1052,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1067,7 +1077,6 @@
                       
                       
                       
-                      
                   </ul>
               
           </div>
@@ -1092,6 +1101,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1104,8 +1115,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1140,6 +1153,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1152,55 +1167,132 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                      
-  
-  <section class="s-section mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-lg-5">
       <div class="s-section__container">
-          <div class="row mb-1 mb-md-3">
-              <div class="col-12">
-                  <h2 class="mb-0">Chiffres clés</h2>
-                  <p class="fs-sm mb-3">
-                      Dernière mise à jour des données du flux IAE : Jamais
-                  </p>
+          
+  
+  <div class="row mt-3 mt-md-4">
+      <h3>Indicateurs clés</h3>
+      <p class="fs-sm mb-3">
+          Dernière mise à jour des données du flux IAE : Jamais
+      </p>
+      <div class="col-12">
+          <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
+                  </div>
               </div>
-              <div class="col-12">
-                  <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
+                  </div>
+              </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A%</span>
+                      </p>
+                      <p>C'est le taux d'embauches en auto prescription.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+          <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+              <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                  <h3>Mes données</h3>
+                  <div class="c-box p-0 flex-grow-1">
+                      <div class="p-3 p-lg-4">
+                          <h4 class="mb-0">Données personnalisées</h4>
                       </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
-                          </div>
+                      <div class="px-3 px-lg-4">
+                          <ul class="list-unstyled mb-lg-5">
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Focus auto-prescription</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/follow_siae_evaluation">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Suivi du contrôle à posteriori</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/follow_prolongation">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Suivi des demandes de prolongation</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Voir les données du contrôle a posteriori (version bêta)</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/hiring">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Données facilitation à l'embauche</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/state">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Prescriptions des acteurs AHI</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/ph_prescription">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
+                                  </a>
+                              </li>
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/dgefp/orga_etp">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
+                                  </a>
+  
+                              </li>
+                          </ul>
                       </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A%</span>
-                              </p>
-                              <p>C'est le taux d'embauches en auto prescription.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
+                  </div>
+              </div>
+              <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                  <h3>Données publiques</h3>
+                  <div class="c-box p-0 flex-grow-1">
+                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                          <ul class="list-unstyled mb-lg-5">
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                      <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
+                                      <span>Accéder aux tableaux de bord publics</span>
+                                      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2"></i>
+                                  </a>
+                              </li>
+                          </ul>
                       </div>
                   </div>
               </div>
@@ -1208,97 +1300,6 @@
       </div>
   </section>
   
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données personnalisées</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              
-                  <ul class="list-unstyled mb-lg-5">
-                      
-                      
-                      
-                      
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/auto_prescription">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Focus auto-prescription</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/follow_prolongation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi des demandes de prolongation</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Voir les données du contrôle a posteriori (version bêta)</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/hiring">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Données facilitation à l'embauche</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/state">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Prescriptions des acteurs AHI</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/ph_prescription">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dgefp/orga_etp">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivre les effectifs annuels et mensuels en ETP des structures</span>
-                              </a>
-  
-                          </li>
-                      
-                      
-                      
-                      
-                      
-                  </ul>
-              
-          </div>
-      </div>
-  </div>
-  <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 mb-0">Données publiques</span>
-          </div>
-          <div class="px-3 px-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
-                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start"></i>
-                          <span>Accéder aux tableaux de bord publics</span>
-                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  </div>
                               
                           </div>
   '''
@@ -1311,8 +1312,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1320,7 +1323,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1359,6 +1361,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1371,8 +1375,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1407,6 +1413,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1419,64 +1427,60 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                      
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                              
   
-  <section class="s-section mb-3 mb-md-5">
-      <div class="s-section__container">
-          <div class="row mb-1 mb-md-3">
-              <div class="col-12">
-                  <h2 class="mb-0">Chiffres clés</h2>
-                  <p class="fs-sm mb-3">
-                      Dernière mise à jour des données du flux IAE : Jamais
-                  </p>
+  <div class="row mt-3 mt-md-4">
+      <h3>Indicateurs clés</h3>
+      <p class="fs-sm mb-3">
+          Dernière mise à jour des données du flux IAE : Jamais
+      </p>
+      <div class="col-12">
+          <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
+                  </div>
               </div>
-              <div class="col-12">
-                  <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
-                      </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A</span>
-                              </p>
-                              <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
-                          </div>
-                      </div>
-                      
-                      <div class="d-flex flex-column w-100">
-                          <div class="flex-grow-1">
-                              <p class="mb-0 mb-lg-3">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
-                                  <span class="h1">N/A%</span>
-                              </p>
-                              <p>C'est le taux d'embauches en auto prescription.</p>
-                          </div>
-                          <div>
-                              <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
-                          </div>
-                      </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A</span>
+                      </p>
+                      <p>C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.</p>
+                  </div>
+              </div>
+              
+              <div class="d-flex flex-column w-100">
+                  <div class="flex-grow-1">
+                      <p class="mb-0 mb-lg-3">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage"></i>
+                          <span class="h1">N/A%</span>
+                      </p>
+                      <p>C'est le taux d'embauches en auto prescription.</p>
+                  </div>
+                  <div>
+                      <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">Consulter ces données</a>
                   </div>
               </div>
           </div>
       </div>
-  </section>
+  </div>
   
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1538,7 +1542,6 @@
                       
                       
                       
-                      
                   </ul>
               
           </div>
@@ -1563,6 +1566,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1575,8 +1580,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1584,7 +1591,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1624,6 +1630,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1636,8 +1644,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1645,7 +1655,6 @@
           <div class="px-3 px-lg-4">
               
                   <ul class="list-unstyled mb-lg-5">
-                      
                       
                       
                       
@@ -1685,6 +1694,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
@@ -1697,8 +1708,10 @@
                                   <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
                               </div>
                               
-                                  
-                                  <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
+                                  <section class="s-section mb-3 mb-md-5">
+                                      <div class="s-section__container">
+                                          
+                                          <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4"><div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">Données personnalisées</span>
@@ -1733,6 +1746,8 @@
       </div>
   </div>
   </div>
+                                      </div>
+                                  </section>
                               
                           </div>
   '''
