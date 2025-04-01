@@ -180,7 +180,6 @@ def test_companies_export(admin_client, snapshot):
         BASE_NUM_QUERIES
         + 1  # Load Django session
         + 1  # Load user
-        + 1  # Check if user is verified
         + 2  # count companies in admin list
         + 1  # select companies and created_by relation
     ):

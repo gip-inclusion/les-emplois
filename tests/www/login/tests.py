@@ -528,7 +528,6 @@ class TestItouStaffLogin:
         user = ItouStaffFactory(with_verified_email=True, is_superuser=True)
         login_url = reverse("login:itou_staff")
         admin_url = reverse("admin:users_user_change", args=(user.pk,))
-        verify_otp_url = reverse("login:verify_otp")
 
         response = client.get(admin_url)
         next_url = add_url_params(login_url, {"next": admin_url})
@@ -542,14 +541,7 @@ class TestItouStaffLogin:
         response = client.post(next_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
 
-        # Same with an unconfirmed device
-        device = TOTPDevice.objects.create(user=user, confirmed=False)
+        # Same with an device
+        TOTPDevice.objects.create(user=user)
         response = client.post(next_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
-
-        # With a confirmed device the user is redirected to the OTP code form
-        device.confirmed = True
-        device.save()
-        response = client.post(next_url, data=form_data, follow=True)
-        next_url = add_url_params(verify_otp_url, {"next": admin_url})
-        assertRedirects(response, next_url)

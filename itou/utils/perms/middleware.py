@@ -166,13 +166,18 @@ class ItouCurrentOrganizationMiddleware:
             )
 
         # Force OTP for staff users
-        if user.is_authenticated and user.kind == UserKind.ITOU_STAFF and not user.is_verified():
+        if (
+            settings.REQUIRE_OTP_FOR_STAFF
+            and user.is_authenticated
+            and user.kind == UserKind.ITOU_STAFF
+            and not user.is_verified()
+        ):
             login_verify_otp_url = reverse("login:verify_otp")
             if user_has_device(user) and request.path != login_verify_otp_url:
                 return HttpResponseRedirect(
                     add_url_params(login_verify_otp_url, {REDIRECT_FIELD_NAME: request.get_full_path()})
                 )
-            if settings.REQUIRE_OTP_FOR_STAFF and not request.path.startswith("/staff/otp"):
+            if not request.path.startswith("/staff/otp"):
                 return HttpResponseRedirect(reverse("itou_staff_views:otp_devices"))
 
         if logout_warning is not None:
