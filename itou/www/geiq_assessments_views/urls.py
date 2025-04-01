@@ -50,6 +50,11 @@ urlpatterns = [
         name="assessment_comment",
     ),
     path(
+        "details/<uuid:pk>/contracts/sync",
+        views.assessment_contracts_sync,
+        name="assessment_contracts_sync",
+    ),
+    path(
         "details/<uuid:pk>/contracts",
         views.assessment_contracts_list,
         name="assessment_contracts_list",

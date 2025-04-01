@@ -182,7 +182,7 @@ def assessment_sync_file(request, pk, *, file_field):
         assessment.save(update_fields=(file_field,))
     except Exception as e:
         # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
-        # but letting other exceptions slip break the interface
+        # but letting other exceptions slip breaks the interface so better catch them all
         logger.exception(
             "Exception while trying to retrieve a pdf from label API - field=%s exception=%s", file_field, e
         )
@@ -231,6 +231,24 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
         form.save()
         return HttpResponseRedirect(back_url)
     return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def assessment_contracts_sync(request, pk):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+
+    context = {"assessment": assessment}
+    try:
+        geiq_label.get_client()
+        # TODO: sync label data to db & update assessment.label_contracts_synced_at
+    except Exception as e:
+        # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
+        # but letting other exceptions slip breaks the interface so better catch them all
+        logger.exception("Exception while trying to retrieve contracts infos from label API - exception=%s", e)
+        context["error"] = True
+    return render(request, "geiq_assessments_views/includes/contracts_section.html", context)
 
 
 @check_user(lambda user: user.is_employer)
