@@ -33,11 +33,10 @@ def test_data_inclusion_client(settings, respx_mock):
         "score_qualite_minimum": ["0.6"],
         "thematiques": [
             "acces-aux-droits-et-citoyennete",
-            "accompagnement-social-et-professionnel-personnalise",
-            "apprendre-francais",
-            "choisir-un-metier",
-            "mobilite",
-            "trouver-un-emploi",
+            "equipement-et-alimentation",
+            "logement-hebergementmobilite",
+            "numerique",
+            "remobilisation",
         ],
     }
     assert api_mock.calls[0].request.headers["authorization"] == "Bearer fake-token"
