@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST, require_safe
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.files.models import File
+from itou.geiq import sync
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -241,7 +242,7 @@ def assessment_contracts_sync(request, pk):
 
     context = {"assessment": assessment}
     try:
-        geiq_label.get_client()
+        sync.sync_employee_and_contracts(assessment, new_mode=True)
         # TODO: sync label data to db & update assessment.label_contracts_synced_at
     except Exception as e:
         # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
