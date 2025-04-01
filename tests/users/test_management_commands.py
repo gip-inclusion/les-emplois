@@ -19,7 +19,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.management.commands.send_users_to_brevo import (
     BREVO_API_URL,
@@ -1051,6 +1051,11 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
         2022, 9, 13, 0, 0, tzinfo=datetime.UTC
     )
     assert user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+    assertQuerySetEqual(
+        user.jobseeker_profile.identity_certifications.all(),
+        [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],
+        transform=lambda certification: certification.certifier,
+    )
 
 
 @freeze_time("2022-09-13")
@@ -1099,6 +1104,11 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
         2022, 9, 13, 0, 0, tzinfo=datetime.UTC
     )
     assert user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+    assertQuerySetEqual(
+        user.jobseeker_profile.identity_certifications.all(),
+        [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE],
+        transform=lambda certification: certification.certifier,
+    )
 
     user.refresh_from_db()
     assert user.first_name == "Durand"

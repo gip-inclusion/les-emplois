@@ -60,6 +60,14 @@ IDENTITY_PROVIDER_SUPPORTED_USER_KIND = {
 }
 
 
+class IdentityCertificationAuthorities(models.TextChoices):
+    API_FT_RECHERCHE_INDIVIDU_CERTIFIE = (
+        "api_recherche_individu_certifie",
+        "API France Travail recherche individu certifié",
+    )
+    API_PARTICULIER = "api_particulier", "API Particulier"
+
+
 class LackOfNIRReason(models.TextChoices):
     TEMPORARY_NUMBER = "TEMPORARY_NUMBER", "Numéro temporaire (NIA/NTT)"
     NO_NIR = "NO_NIR", "Pas de numéro de sécurité sociale"

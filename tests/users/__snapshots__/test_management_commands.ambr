@@ -118,6 +118,7 @@
     'no match found either for pk=424242 when swapping last and first names exc=PoleEmploiAPIBadResponse(code=R010)',
     'count=1 users have been examined.',
     'count=0 users have been certified',
+    'count=0 identity certifications recorded.',
     'count=1 users could not be certified.',
     'count=0 users have been swapped',
   ])
@@ -130,6 +131,7 @@
     'certified user pk=424242',
     'count=1 users have been examined.',
     'count=1 users have been certified',
+    'count=1 identity certifications recorded.',
     'count=0 users could not be certified.',
     'count=0 users have been swapped',
   ])
@@ -146,6 +148,7 @@
     'certified user pk=424243',
     'count=1 users have been examined.',
     'count=1 users have been certified',
+    'count=1 identity certifications recorded.',
     'count=0 users could not be certified.',
     'count=1 users have been swapped',
   ])

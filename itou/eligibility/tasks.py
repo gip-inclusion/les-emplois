@@ -10,6 +10,8 @@ from huey.contrib.djhuey import task
 from huey.exceptions import RetryTask
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
 from itou.utils.types import InclusiveDateRange
 
@@ -91,6 +93,16 @@ def certify_criteria(eligibility_diagnosis):
             "data_returned_by_api",
         ],
     )
+    if any(c.certified is not None for c in criteria):
+        IdentityCertification.objects.upsert_certifications(
+            [
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+                    jobseeker_profile=job_seeker.jobseeker_profile,
+                    certified_at=max(c.certified_at for c in criteria),
+                ),
+            ]
+        )
 
 
 @task(retries=24 * 6, retry_delay=10 * 60)  # Retry every 10 minutes for 24h.
