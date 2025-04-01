@@ -6,19 +6,18 @@
         {% else %}
             <h3>Critères d'éligibilité</h3>
         {% endif %}
-        <p>
-            {% if is_sent_by_authorized_prescriber %}
-                Confirmée par
-            {% else %}
-                Validés par
-            {% endif %}
+        <p class="text-success">
+            {{ is_sent_by_authorized_prescriber|yesno:"Confirmés,Validés" }}
+            le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
             <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
             {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
             {% if eligibility_diagnosis.author_prescriber_organization %}
                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
             {% endif %}
-            le
-            <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span>.
+            .
+        </p>
+        <p class="fs-sm">
+            <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
         </p>
 
         {% if eligibility_diagnosis.criteria_display %}
