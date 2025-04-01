@@ -20,7 +20,7 @@
                     <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Le document n’a pas été importé, merci de réessayer
                 </p>
             {% endif %}
-            <button type="button" class="btn btn-ico btn-primary" hx-post="{{ sync_url }}" hx-swap="outerHTML" hx-trigger="{{ error|yesno:"click,load" }}" hx-include="#file-sync-form" hx-target="#{{ section_id }}">
+            <button type="button" class="btn btn-ico btn-primary" hx-post="{{ sync_url }}" hx-swap="outerHTML" hx-trigger="{{ error|yesno:"click,load" }}" hx-include="#label-sync-form" hx-target="#{{ section_id }}">
                 <i class="ri-refresh-line" aria-hidden="true"></i>
                 <span class="stable-text">{{ error|yesno:"Réessayer,Récupérer de Label" }}</span>
                 <span class="loading-text">Récupération en cours</span>
