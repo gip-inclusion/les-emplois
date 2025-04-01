@@ -7,33 +7,65 @@
 {% block title %}Éligibilité IAE - {{ job_seeker.get_full_name }}{{ block.super }}{% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
-        {% fragment as c_title__main %}
-            <h1>
-                {% if eligibility_diagnosis %}
-                    Mettre à jour
-                {% else %}
-                    Valider
-                {% endif %}
-                l'éligibilité de {{ job_seeker.get_full_name }}
-            </h1>
-        {% endfragment %}
-    {% endcomponent_title %}
+    {% if prescription_process %}
+        {% include "apply/includes/submit_title_content.html" %}
+    {% else %}
+        {% component_title c_title__main=c_title__main %}
+            {% fragment as c_title__main %}
+                <h1>
+                    {% if eligibility_diagnosis %}
+                        Mettre à jour
+                    {% else %}
+                        Valider
+                    {% endif %}
+                    l'éligibilité de {{ job_seeker.get_full_name }}
+                </h1>
+            {% endfragment %}
+        {% endcomponent_title %}
+    {% endif %}
 {% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% if prescription_process and new_check_needed %}
+        {% include "apply/includes/submit_new_check_needed.html" %}
+    {% endif %}
+{% endblock %}
+
+
 
 {% block content %}
     <section class="s-section">
         <div class="container">
+            {% if prescription_process %}
+                {#  we cannot easily use the div from apply/submit/application/base.html since it contains a block, and we cannot override a included template block #}
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <div class="c-stepper mb-3 mb-lg-5">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p>Postuler - Éligibilité IAE</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             <div class="row">
                 <div class="col-12 col-lg-8">
                     <div class="c-form">
 
-                        {# FIXME: almost the same as itou/template/apply/submit/application/eligibility.html form_content block #}
+                        {% if prescription_process %}
+                            {% include "companies/includes/_company_info.html" with company=company show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
+                        {% endif %}
+
                         {% if eligibility_diagnosis %}
-                            <div class="mb-5">
-                                <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
-                                <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
-                            </div>
+                            {% if eligibility_diagnosis.author_organization %}
+                                <div class="mb-5">
+                                    <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
+                                    <p class="text-tertiary fw-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
+                                </div>
+                            {% endif %}
 
                             <div class="alert alert-info mb-5" role="status">
                                 <div class="row">
@@ -57,6 +89,12 @@
                             {% include "apply/includes/known_criteria.html" %}
                         {% endif %}
 
+                        {% if prescription_process %}
+                            <h2>Préciser la situation administrative du candidat (facultatif)</h2>
+                            <hr class="mt-5">
+                        {% endif %}
+
+                        {# Only display this div in standalone and prescription_process (if we ever add more channels) #}
                         <div class="c-info mb-3">
                             <button class="c-info__summary">
                                 <span>Pour valider l'éligibilité IAE du candidat</span>
@@ -101,7 +139,11 @@
                                 <input type="hidden" name="shrouded" value="1" data-shroud-input>
                             </div>
 
-                            {% itou_buttons_form primary_label="Valider" reset_url=back_url %}
+                            {% if prescription_process %}
+                                {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                            {% else %}
+                                {% itou_buttons_form primary_label="Valider" reset_url=back_url %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>

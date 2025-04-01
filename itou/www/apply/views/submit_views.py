@@ -313,8 +313,8 @@ class ApplicationBaseView(ApplyStepBaseView):
             ]
             if not any(bypass_eligibility_conditions):
                 return reverse(
-                    "apply:application_eligibility",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                    "eligibility_views:update",
+                    kwargs={"job_seeker_public_id": self.job_seeker.public_id, "company_pk": self.company.pk},
                 )
 
     def get_context_data(self, **kwargs):

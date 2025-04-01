@@ -1615,8 +1615,8 @@ class TestApplyAsAuthorizedPrescriber:
         }
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": new_job_seeker.public_id, "company_pk": company.pk},
         )
         assertRedirects(response, next_url)
 
@@ -1641,8 +1641,8 @@ class TestApplyAsAuthorizedPrescriber:
                 replace_in_attr=[
                     (
                         "href",
-                        f"apply%2F{company.pk}%2Fcreate%2F{new_job_seeker.public_id}",
-                        "apply%2F[PK of Company]%2Fcreate%2F[Public ID of JobSeeker]",
+                        f"eligibility%2Fupdate%2F{new_job_seeker.public_id}%2F{company.pk}",
+                        "eligibility%2Fupdate%2F[Public ID of JobSeeker]%2F[PK of Company]",
                     ),
                     (
                         "href",

@@ -133,8 +133,8 @@ class TestApplyAsPrescriber:
         }
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id, "company_pk": guerande_company.pk},
         )
         assertRedirects(response, next_url)
 
@@ -146,7 +146,11 @@ class TestApplyAsPrescriber:
                 response,
                 "#main",
                 replace_in_attr=[
-                    ("href", f"apply%2F{guerande_company.pk}", "apply%2F[PK of Company]"),
+                    (
+                        "href",
+                        f"eligibility%2Fupdate%2F{job_seeker.public_id}%2F{guerande_company.pk}",
+                        "eligibility%2Fupdate%2F[Public ID of JobSeeker]%2F[PK of Company]",
+                    ),
                     ("href", f"apply/{guerande_company.pk}", "apply/[PK of Company]"),
                     ("href", f"/company/{guerande_company.pk}", "company/[PK of Company]"),
                 ],

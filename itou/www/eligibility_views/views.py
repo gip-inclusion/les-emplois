@@ -2,12 +2,18 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import FormView
 
+from itou.companies.models import Company
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, JOB_SEEKER_INFOS_CHECK_PERIOD
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -15,11 +21,13 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
     template_name = "eligibility/update.html"
     form_class = AdministrativeCriteriaForm
     standalone_process = None
+    prescription_process = None
+    prescription_session = None
 
-    def setup(self, request, *args, job_seeker_public_id, tunnel=None, **kwargs):
+    def setup(self, request, *args, job_seeker_public_id, tunnel=None, company_pk=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if tunnel not in ("standalone_process"):
+        if tunnel not in ("standalone_process", "prescription_process"):
             raise Http404
         setattr(self, tunnel, True)
 
@@ -27,19 +35,30 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
             User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
         )
 
-        # FIXME: in other tunnels we need the company
         self.company = None
+        if self.prescription_process:
+            # FIXME change submit views to use a uuid session instead and store the company pk
+            self.prescription_session = SessionNamespace(
+                request.session, APPLY_SESSION_KIND, f"job_application-{company_pk}"
+            )
+            self.company = get_object_or_404(Company.objects, pk=company_pk)
 
         self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, self.company)
 
     def test_func(self):
         if self.standalone_process:
             return self.request.from_authorized_prescriber
+        if self.prescription_process:
+            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+            return self.company.is_subject_to_eligibility_rules and self.request.from_authorized_prescriber
         return False
 
     def dispatch(self, request, *args, **kwargs):
         # No need for eligibility diagnosis if the job seeker already has a PASS IAE
         if self.job_seeker.approvals.valid().exists():
+            return HttpResponseRedirect(self.get_success_url())
+        if self.company and not self.company.is_subject_to_eligibility_rules:
+            # We should not have arrived here, but just dispatch to next url
             return HttpResponseRedirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)
 
@@ -83,15 +102,24 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
         back_url = None
         if self.standalone_process:
             back_url = get_safe_url(self.request, "back_url")
+        if self.prescription_process:
+            back_url = reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            )
         # Force developpers to always provide a proper back_url
         if back_url:
             return back_url
         raise Http404
 
     def get_success_url(self):
-        # FIXME: it depends on the tunnel
         if self.standalone_process:
             return self.get_back_url()
+        if self.prescription_process:
+            return reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,9 +128,27 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
                 "back_url": self.get_back_url(),
                 "job_seeker": self.job_seeker,
                 "eligibility_diagnosis": self.eligibility_diagnosis,
+                "standalone_process": self.standalone_process,
+                "prescription_process": self.prescription_process,
+                "company": self.company,
+                "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
             }
         )
-
         if self.eligibility_diagnosis:
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
+        if self.prescription_process:
+            context.update(
+                {
+                    "progress": 50,
+                    "full_content_width": True,
+                    "reset_url": self.prescription_session.get("reset_url", reverse("dashboard:index")),
+                    "is_subject_to_eligibility_rules": True,  # Used to display the eligibility badge in the title
+                    "new_check_needed": (
+                        self.job_seeker.last_checked_at < timezone.now() - JOB_SEEKER_INFOS_CHECK_PERIOD
+                    ),
+                    "hire_process": None,  # because of "apply/includes/_submit_title.html"
+                    "auto_prescription_process": None,  # because of "apply/includes/_submit_title.html"
+                }
+            )
+            # Do we need new_check_needed alert ?
         return context
