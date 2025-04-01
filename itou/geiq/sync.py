@@ -9,6 +9,7 @@ from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCr
 from itou.eligibility.models import GEIQAdministrativeCriteria
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.geiq import models
+from itou.geiq_assessments import models as geiq_assessments_models
 from itou.users.enums import Title
 from itou.utils.apis import geiq_label
 from itou.utils.sync import DiffItemKind, yield_sync_diff
@@ -141,12 +142,16 @@ def sync_assessments(campaign):
     )
 
 
-EMPLOYEE_MAPPING = {
+SIMPLE_EMPLOYEE_MAPPING = {
     "label_id": "id",
     "last_name": "nom",
     "first_name": "prenom",
     "title": "sexe",
     "birthdate": "date_naissance",
+}
+
+
+EMPLOYEE_MAPPING = SIMPLE_EMPLOYEE_MAPPING | {
     # Those are computed locally
     # based on statuts_prioritaire field & GEIQAdministrativeCriteria objects
     "annex1_nb": "annex1_nb",
@@ -290,10 +295,20 @@ def _nb_days(periods: list[tuple[datetime.date, datetime.date]], *, year: int):
     return nb_days
 
 
-def sync_employee_and_contracts(assessment):
-    assert not assessment.submitted_at
+def sync_employee_and_contracts(assessment, new_mode=False):
+    if new_mode:
+        assert not assessment.contracts_synced_at
+        geiq_id = assessment.label_geiq_id
+        Employee = geiq_assessments_models.Employee
+        EmployeeContract = geiq_assessments_models.EmployeeContract
+        EmployeePrequalification = geiq_assessments_models.EmployeePrequalification
+    else:
+        assert not assessment.submitted_at
+        geiq_id = assessment.label_id
+        Employee = models.Employee
+        EmployeeContract = models.EmployeeContract
+        EmployeePrequalification = models.EmployeePrequalification
     client = geiq_label.get_client()
-    geiq_id = assessment.label_id
 
     contract_infos = []
     prequalification_infos = []
@@ -350,19 +365,20 @@ def sync_employee_and_contracts(assessment):
             (prequalification_info["date_debut"], prequalification_info["date_fin"])
         )
 
-    code_to_criteria = {
-        criteria.api_code: criteria for criteria in GEIQAdministrativeCriteria.objects.exclude(api_code="")
-    }
-    for employee_info in employee_infos.values():
-        support_days_nb = _nb_days(employee_support_periods[employee_info["id"]], year=assessment.campaign.year)
-        employee_info.update(
-            _compute_eligibility_fields(
-                {statut["libelle_abr"] for statut in employee_info["statuts_prioritaire"]},
-                code_to_criteria,
-                support_days_nb,
+    if not new_mode:
+        code_to_criteria = {
+            criteria.api_code: criteria for criteria in GEIQAdministrativeCriteria.objects.exclude(api_code="")
+        }
+        for employee_info in employee_infos.values():
+            support_days_nb = _nb_days(employee_support_periods[employee_info["id"]], year=assessment.campaign.year)
+            employee_info.update(
+                _compute_eligibility_fields(
+                    {statut["libelle_abr"] for statut in employee_info["statuts_prioritaire"]},
+                    code_to_criteria,
+                    support_days_nb,
+                )
             )
-        )
-        employee_info["support_days_nb"] = support_days_nb
+            employee_info["support_days_nb"] = support_days_nb
 
     # Sync data to DB
 
@@ -373,9 +389,9 @@ def sync_employee_and_contracts(assessment):
 
     sync_to_db(
         employee_infos.values(),
-        models.Employee.objects.filter(assessment=assessment).all(),
-        model=models.Employee,
-        mapping=EMPLOYEE_MAPPING,
+        Employee.objects.filter(assessment=assessment).all(),
+        model=Employee,
+        mapping=SIMPLE_EMPLOYEE_MAPPING if new_mode else EMPLOYEE_MAPPING,
         data_to_django_obj=employee_data_to_django,
         with_delete=True,
     )
@@ -389,8 +405,8 @@ def sync_employee_and_contracts(assessment):
 
     sync_to_db(
         contract_infos,
-        models.EmployeeContract.objects.filter(employee__assessment=assessment).all(),
-        model=models.EmployeeContract,
+        EmployeeContract.objects.filter(employee__assessment=assessment).all(),
+        model=EmployeeContract,
         mapping=CONTRACT_MAPPING,
         data_to_django_obj=contract_data_to_django,
         with_delete=True,
@@ -403,12 +419,16 @@ def sync_employee_and_contracts(assessment):
 
     sync_to_db(
         prequalification_infos,
-        models.EmployeePrequalification.objects.filter(employee__assessment=assessment).all(),
-        model=models.EmployeePrequalification,
+        EmployeePrequalification.objects.filter(employee__assessment=assessment).all(),
+        model=EmployeePrequalification,
         mapping=PREQUALIFICATION_MAPPING,
         data_to_django_obj=prequalification_data_to_django,
         with_delete=True,
     )
 
-    assessment.last_synced_at = timezone.now()
-    assessment.save(update_fields={"last_synced_at"})
+    if new_mode:
+        assessment.contracts_synced_at = timezone.now()
+        assessment.save(update_fields={"contracts_synced_at"})
+    else:
+        assessment.last_synced_at = timezone.now()
+        assessment.save(update_fields={"last_synced_at"})
