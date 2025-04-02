@@ -2307,7 +2307,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2321,14 +2321,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
@@ -2400,7 +2392,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2414,14 +2406,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
@@ -2493,7 +2477,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2507,14 +2491,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
@@ -2586,7 +2562,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2600,14 +2576,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
@@ -2679,7 +2647,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2693,14 +2661,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
@@ -2772,7 +2732,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/hiring">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
+                                  <span>Analyse des candidatures émises et de leur traitement</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -2786,14 +2746,6 @@
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
                                   <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                               </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/hiring_report">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
-                              </a>
-                              <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
-  
                           </li>
                       
                       
