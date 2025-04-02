@@ -3326,7 +3326,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Focus auto-prescription des structures de mon département</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de mon département</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3336,12 +3336,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori pour les structures de mon département</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/follow_prolongation">
@@ -3512,7 +3506,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Focus auto-prescription des structures de mon département</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de mon département</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3522,12 +3516,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori pour les structures de mon département</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/follow_prolongation">
@@ -3698,7 +3686,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Focus auto-prescription des structures de mon département</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de mon département</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -3708,12 +3696,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/ddets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori pour les structures de mon département</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/ddets/follow_prolongation">
@@ -5067,7 +5049,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Les auto-prescription des structures de ma région</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de ma région</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5077,12 +5059,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori des structures de ma région</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/follow_prolongation">
@@ -5245,7 +5221,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Les auto-prescription des structures de ma région</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de ma région</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5255,12 +5231,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori des structures de ma région</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/follow_prolongation">
@@ -5423,7 +5393,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Les auto-prescription des structures de ma région</span>
+                                  <span>Les auto-prescription et suivi du contrôle à posteriori des structures de ma région</span>
                               </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
@@ -5433,12 +5403,6 @@
                               </a>
                               <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
   
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/dreets/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle à posteriori des structures de ma région</span>
-                              </a>
                           </li>
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/dreets/follow_prolongation">
