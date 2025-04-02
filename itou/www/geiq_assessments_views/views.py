@@ -314,13 +314,41 @@ def assessment_contracts_details(
 
 @require_POST
 @check_user(lambda user: user.is_employer)
-def assessment_contracts_include(request, pk, contract_pk, template_name=""):
-    context = {}
+def assessment_contracts_include(
+    request, pk, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
+):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    contract = get_object_or_404(
+        EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
+        pk=contract_pk,
+    )
+    if not assessment.contracts_selection_validated_at and not contract.allowance_requested:
+        contract.allowance_requested = True
+        contract.save(update_fields=("allowance_requested",))
+    context = {
+        "assessment": assessment,
+        "contract": contract,
+    }
     return render(request, template_name, context)
 
 
 @require_POST
 @check_user(lambda user: user.is_employer)
-def assessment_contracts_exclude(request, pk, contract_pk, template_name=""):
-    context = {}
+def assessment_contracts_exclude(
+    request, pk, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
+):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    contract = get_object_or_404(
+        EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
+        pk=contract_pk,
+    )
+    if not assessment.contracts_selection_validated_at and contract.allowance_requested:
+        contract.allowance_requested = False
+        contract.save(update_fields=("allowance_requested",))
+    context = {
+        "assessment": assessment,
+        "contract": contract,
+    }
     return render(request, template_name, context)

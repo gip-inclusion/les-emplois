@@ -86,7 +86,9 @@
                                             {% endif %}
                                         </td>
                                         <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>
-                                        <td>{{ contract.allowance_requested }}</td>
+                                        <td>
+                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token only %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
