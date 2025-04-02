@@ -16,3 +16,6 @@
         <label class="form-check-label visually-hidden" for="allowance_requested_for_contract_{{ contract.pk }}"></label>
     </div>
 </form>
+{% if request.htmx %}
+    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=assessment hx_swap_oob=True only %}
+{% endif %}

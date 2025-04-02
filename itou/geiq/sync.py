@@ -143,7 +143,7 @@ def sync_assessments(campaign):
     )
 
 
-SIMPLE_EMPLOYEE_MAPPING = {
+_COMMON_EMPLOYEE_MAPPING = {
     "label_id": "id",
     "last_name": "nom",
     "first_name": "prenom",
@@ -151,8 +151,12 @@ SIMPLE_EMPLOYEE_MAPPING = {
     "birthdate": "date_naissance",
 }
 
+NEW_MODE_EMPLOYEE_MAPPING = _COMMON_EMPLOYEE_MAPPING | {
+    "allowance_amount": "montant_aide",
+}
 
-EMPLOYEE_MAPPING = SIMPLE_EMPLOYEE_MAPPING | {
+
+EMPLOYEE_MAPPING = _COMMON_EMPLOYEE_MAPPING | {
     # Those are computed locally
     # based on statuts_prioritaire field & GEIQAdministrativeCriteria objects
     "annex1_nb": "annex1_nb",
@@ -405,7 +409,7 @@ def sync_employee_and_contracts(assessment, new_mode=False):
         employee_infos.values(),
         Employee.objects.filter(assessment=assessment).all(),
         model=Employee,
-        mapping=SIMPLE_EMPLOYEE_MAPPING if new_mode else EMPLOYEE_MAPPING,
+        mapping=NEW_MODE_EMPLOYEE_MAPPING if new_mode else EMPLOYEE_MAPPING,
         data_to_django_obj=employee_data_to_django,
         with_delete=True,
     )

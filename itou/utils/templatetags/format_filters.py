@@ -91,6 +91,14 @@ def formatfloat_with_unit(number, unit):
     return None
 
 
+@register.filter(is_safe=True)
+def format_int_euros(number):
+    if number is None:
+        return
+    number_str = f"{number:_}".replace("_", " ")
+    return f"{number_str} €"
+
+
 @register.filter
 def label_object_format(data):
     if data is None:

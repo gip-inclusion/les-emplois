@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
@@ -141,6 +142,19 @@ class Assessment(models.Model):
             actions.append("Envoi du bilan d’exécution")
         return actions
 
+    def get_allowance_stats(self):
+        return (
+            EmployeeContract.objects.filter(employee__assessment=self)
+            .filter(allowance_requested=True)
+            .aggregate(
+                contracts_nb=Count("pk"),
+                aid_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0)),
+                aid_of_814_nb=Count("pk", filter=Q(employee__allowance_amount=814)),
+                aid_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400)),
+                potential_aid_amount=Sum("employee__allowance_amount"),
+            )
+        )
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
@@ -177,6 +191,7 @@ class Employee(models.Model):
         default="",
         choices=Title.choices,
     )
+    allowance_amount = models.IntegerField(verbose_name="aide potentielle")
 
     other_data = models.JSONField(verbose_name="autres données")
 
