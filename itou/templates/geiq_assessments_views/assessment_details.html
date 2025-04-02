@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
-                    {% include "geiq_assessments_views/includes/assessment_status_box.html" with assessment=assessment request=request only %}
+                    {% include "geiq_assessments_views/includes/assessment_status_box.html" with assessment=assessment csrf_token=csrf_token request=request only %}
                     <div class="c-box mb-3 mb-md-4">
                         <h4>Informations générales</h4>
                         <h5>Structures concernées par la convention</h5>

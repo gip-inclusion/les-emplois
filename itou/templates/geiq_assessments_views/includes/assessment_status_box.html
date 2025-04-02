@@ -1,14 +1,38 @@
-<div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
-    <h4>Votre dossier n’est pas encore complet</h4>
-    <p class="mb-0">Actions restantes :</p>
-    <ul>
-        {% for action in assessment.missing_actions_to_submit %}
-            <li>
-                <strong>{{ action }}</strong>
-            </li>
-        {% endfor %}
-    </ul>
-    <button type="submit" class="btn btn-primary btn-block" disabled>
-        <span>Envoyer le bilan d’exécution</span>
-    </button>
-</div>
+{% if not assessment.submitted_at %}
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+        {% if assessment.missing_actions_to_submit %}
+            <h4>Votre dossier n’est pas encore complet</h4>
+            <p class="mb-0">Actions restantes :</p>
+            <ul>
+                {% for action in assessment.missing_actions_to_submit %}
+                    <li>
+                        <strong>{{ action }}</strong>
+                    </li>
+                {% endfor %}
+                <li>
+                    <strong>Envoi du bilan d’exécution</strong>
+                </li>
+            </ul>
+            <button type="button" class="btn btn-primary btn-block" disabled>
+                <span>Envoyer le bilan d’exécution</span>
+            </button>
+        {% else %}
+            <h4>Votre dossier est en attente d’envoi</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Envoyer le bilan d’exécution</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+{% else %}
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+        <h4>Votre dossier a été transmis le {{ assessment.submitted_at|date:"d/m/Y" }}</h4>
+        <p>
+            Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter la TODO:XXXX.
+            <br>
+            Vous serez notifié par mail de la décision suite à l’exam de votre bilan.
+        </p>
+    </div>
+{% endif %}

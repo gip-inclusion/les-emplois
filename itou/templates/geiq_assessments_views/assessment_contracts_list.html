@@ -67,7 +67,7 @@
                     </div
                     {% include "includes/pagination.html" with page=contracts_page boost=True %}
 
-                    {% if not assessment.contracts_selection_validated_at %}
+                    {% if not assessment.submitted_at %}
 
                         <form method="POST" class="js-prevent-multiple-submit">
                             {% csrf_token %}

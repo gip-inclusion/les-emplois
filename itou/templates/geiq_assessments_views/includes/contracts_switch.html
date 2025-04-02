@@ -12,7 +12,7 @@
                name="allowance_requested"
                id="allowance_requested_for_contract_{{ contract.pk }}"
                {% if contract.allowance_requested %}checked{% endif %}
-               {% if assessment.contracts_selection_validated_at %}disabled{% endif %} />
+               {% if assessment.submitted_at %}disabled{% endif %} />
         <label class="form-check-label visually-hidden" for="allowance_requested_for_contract_{{ contract.pk }}"></label>
     </div>
 </form>
