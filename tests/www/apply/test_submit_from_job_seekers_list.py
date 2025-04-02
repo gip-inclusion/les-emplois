@@ -287,23 +287,12 @@ class TestApplyAsPrescriber:
         assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility
-        # ----------------------------------------------------------------------
-
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
@@ -456,22 +445,12 @@ class TestApplyAsCompany:
         assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
