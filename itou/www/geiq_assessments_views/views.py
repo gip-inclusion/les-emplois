@@ -130,6 +130,13 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
             queryset=AssessmentInstitutionLink.objects.select_related("institution").order_by("institution__kind"),
         )
     ).get(companies=request.current_organization.pk, pk=pk)
+
+    if request.method == "POST":
+        assessment.submitted_at = timezone.now()
+        assessment.submitted_by = request.user
+        assessment.save(update_fields=("submitted_at", "submitted_by"))
+        return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
+
     context = {
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_geiq"),
@@ -329,9 +336,12 @@ def assessment_contracts_include(
         EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
         pk=contract_pk,
     )
-    if not assessment.contracts_selection_validated_at and not contract.allowance_requested:
+    if not assessment.submitted_at and not contract.allowance_requested:
         contract.allowance_requested = True
         contract.save(update_fields=("allowance_requested",))
+        if assessment.contracts_selection_validated_at:
+            assessment.contracts_selection_validated_at = None
+            assessment.save(update_fields=("contracts_selection_validated_at",))
     context = {
         "assessment": assessment,
         "contract": contract,
@@ -350,9 +360,12 @@ def assessment_contracts_exclude(
         EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
         pk=contract_pk,
     )
-    if not assessment.contracts_selection_validated_at and contract.allowance_requested:
+    if not assessment.submitted_at and contract.allowance_requested:
         contract.allowance_requested = False
         contract.save(update_fields=("allowance_requested",))
+        if assessment.contracts_selection_validated_at:
+            assessment.contracts_selection_validated_at = None
+            assessment.save(update_fields=("contracts_selection_validated_at",))
     context = {
         "assessment": assessment,
         "contract": contract,

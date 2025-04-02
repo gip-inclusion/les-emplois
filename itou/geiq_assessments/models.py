@@ -138,8 +138,6 @@ class Assessment(models.Model):
             actions.append("Détail et sélection des contrats à présenter")
         if not self.geiq_comment:
             actions.append("Commentaire")
-        if not self.submitted_at:
-            actions.append("Envoi du bilan d’exécution")
         return actions
 
     def get_allowance_stats(self):
