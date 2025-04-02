@@ -126,6 +126,7 @@ class FollowUpGroupMembership(models.Model):
                 ),
             ),
         ]
+        unique_together = ["follow_up_group", "member"]
 
     is_referent = models.BooleanField(default=False, verbose_name="référent")
     is_referent_certified = models.BooleanField(db_default=False, verbose_name="référent certifié")
