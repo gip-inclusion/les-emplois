@@ -1,0 +1,44 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Détail du contrat : {{ contract.employee.get_full_name }} - {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div class="d-xl-flex align-items-xl-center">
+            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Détail du contrat : {{ contract.employee.get_full_name }}</h1>
+        </div>
+        <button class="btn btn-lg btn-ico-only btn-link justify-content-lg-end" type="button" data-it-action="print" aria-label="Imprimer la page">
+            <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+        </button>
+    </div>
+{% endblock %}
+
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
+        {% for tab in AssessmentContractDetailsTab %}
+            <li class="nav-item">
+                <a class="nav-link{% if active_tab == tab %} active{% endif %}"
+                   id="{{ tab.value }}-tab"
+                   href="{% url "geiq_assessments_views:assessment_contracts_detail" pk=assessment.pk contract_pk=contract.pk tab=tab.value %}">{{ tab.label }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <h2>{{ active_tab.label }}</h2>
+                    {{ contract }}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
