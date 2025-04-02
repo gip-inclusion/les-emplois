@@ -33,6 +33,7 @@ from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, Ad
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -1568,7 +1569,12 @@ class TestProcessViews:
         )
         employer = job_application.to_company.members.first()
         # Add a blocking employee record
-        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
+        EmployeeRecordTransitionLog.log_transition(
+            transition=factory.fuzzy.FuzzyChoice(EmployeeRecordTransition.without_asp_exchange()),
+            from_state=factory.fuzzy.FuzzyChoice(Status),
+            to_state=factory.fuzzy.FuzzyChoice(Status),
+            modified_object=EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED),
+        )
 
         client.force_login(employer)
         detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})

@@ -101,6 +101,16 @@ class EmployeeRecordTransition(enum.StrEnum):
     UNARCHIVE_PROCESSED = "unarchive_processed"
     UNARCHIVE_REJECTED = "unarchive_rejected"
 
+    @classmethod
+    def without_asp_exchange(cls):
+        return {
+            cls.READY,
+            cls.DISABLE,
+            cls.ENABLE,
+            cls.ARCHIVE,
+            cls.UNARCHIVE_NEW,
+        }
+
 
 class EmployeeRecordWorkflow(xwf_models.Workflow):
     states = Status.choices

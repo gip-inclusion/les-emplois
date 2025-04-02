@@ -4,7 +4,10 @@ import factory
 
 from itou.asp import models as asp_models
 from itou.employee_record.enums import NotificationStatus, Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.employee_record.models import (
+    EmployeeRecord,
+    EmployeeRecordUpdateNotification,
+)
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationWithApprovalNotCancellableFactory,

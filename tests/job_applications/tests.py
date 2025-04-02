@@ -1,6 +1,7 @@
 import datetime
 import json
 
+import factory.fuzzy
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -18,6 +19,7 @@ from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
@@ -201,6 +203,46 @@ def test_can_be_cancelled_when_origin_is_ai_stock():
     assert JobApplicationFactory(origin=Origin.AI_STOCK).can_be_cancelled is False
 
 
+def test_can_be_cancelled_when_an_employee_record_without_logs_exists():
+    employee_record = BareEmployeeRecordFactory(
+        job_application=JobApplicationFactory(),
+        status=factory.fuzzy.FuzzyChoice(Status),
+    )
+    assert employee_record.job_application.can_be_cancelled is True
+
+
+@pytest.mark.parametrize("transition", EmployeeRecordTransition.without_asp_exchange())
+def test_can_be_cancelled_when_an_employee_record_with_non_blocking_logs_exists(transition):
+    employee_record = BareEmployeeRecordFactory(
+        job_application=JobApplicationFactory(),
+        status=factory.fuzzy.FuzzyChoice(Status),
+    )
+
+    EmployeeRecordTransitionLog.log_transition(
+        transition=transition,
+        from_state=factory.fuzzy.FuzzyChoice(Status),
+        to_state=factory.fuzzy.FuzzyChoice(Status),
+        modified_object=employee_record,
+    )
+    assert employee_record.job_application.can_be_cancelled is True
+
+
+@pytest.mark.parametrize("transition", set(Status) - EmployeeRecordTransition.without_asp_exchange())
+def test_can_be_cancelled_when_an_employee_record_with_blocking_logs_exists(transition):
+    employee_record = BareEmployeeRecordFactory(
+        job_application=JobApplicationFactory(),
+        status=factory.fuzzy.FuzzyChoice(Status),
+    )
+
+    EmployeeRecordTransitionLog.log_transition(
+        transition=transition,
+        from_state=factory.fuzzy.FuzzyChoice(Status),
+        to_state=factory.fuzzy.FuzzyChoice(Status),
+        modified_object=employee_record,
+    )
+    assert employee_record.job_application.can_be_cancelled is False
+
+
 def test_diagnoses_coherence_contraint():
     job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
     job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -283,13 +325,6 @@ def test_geiq_qualification_fields_contraint():
             qualification_type=qualification_type,
             qualification_level=QualificationLevel.NOT_RELEVANT,
         )
-
-
-@pytest.mark.parametrize("status", Status)
-def test_can_be_cancelled_when_an_employee_record_exists(status):
-    job_application = JobApplicationFactory()
-    BareEmployeeRecordFactory(job_application=job_application, status=status)
-    assert job_application.can_be_cancelled is False
 
 
 def test_can_have_prior_action():
@@ -1700,7 +1735,12 @@ class TestJobApplicationWorkflow:
         # Linked employee record with blocking status
         job_application = JobApplicationFactory(with_approval=True, hiring_start_at=(today - relativedelta(days=365)))
         cancellation_user = job_application.to_company.active_members.first()
-        EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
+        EmployeeRecordTransitionLog.log_transition(
+            transition=factory.fuzzy.FuzzyChoice(EmployeeRecordTransition.without_asp_exchange()),
+            from_state=factory.fuzzy.FuzzyChoice(Status),
+            to_state=factory.fuzzy.FuzzyChoice(Status),
+            modified_object=EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED),
+        )
 
         # xworkflows.base.AbortTransition
         with pytest.raises(xwf_models.AbortTransition):
