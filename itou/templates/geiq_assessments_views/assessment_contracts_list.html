@@ -66,6 +66,7 @@
                                 <tr>
                                     <th scope="col">Prénom NOM</th>
                                     <th scope="col">Date de début</th>
+                                    <th scope="col">Date de fin</th>
                                     <th scope="col">Aide potentielle</th>
                                 </tr>
                             </thead>
@@ -76,6 +77,13 @@
                                             <a class="btn btn-link" href="{% url "geiq_assessments_views:assessment_contracts_detail" pk=assessment.pk contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee }}</a>
                                         </td>
                                         <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                                        <td>
+                                            {% if contract.end_at %}
+                                                {{ contract.end_at|date:"d/m/Y" }}
+                                            {% else %}
+                                                {{ contract.end_at|date:"d/m/Y"|default:"-" }}
+                                            {% endif %}
+                                        </td>
                                         <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>
                                     </tr>
                                 {% endfor %}
