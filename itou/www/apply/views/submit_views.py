@@ -292,6 +292,27 @@ class ApplicationBaseView(ApplyStepBaseView):
                 self.job_seeker, for_company
             )
 
+    def get_eligibility_step_url(self):
+        if self.company.kind == CompanyKind.GEIQ and self.request.from_authorized_prescriber:
+            return reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            )
+        if self.company.kind != CompanyKind.GEIQ:
+            bypass_eligibility_conditions = [
+                # Don't perform an eligibility diagnosis if the SIAE doesn't need it
+                not self.company.is_subject_to_eligibility_rules,
+                # Only "authorized prescribers" can perform an eligibility diagnosis
+                not self.request.from_authorized_prescriber,
+                # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+                self.job_seeker.has_valid_approval,
+            ]
+            if not any(bypass_eligibility_conditions):
+                return reverse(
+                    "apply:application_eligibility",
+                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                )
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
@@ -441,12 +462,8 @@ class ApplicationJobsView(ApplicationBaseView):
         )
 
     def get_next_url(self):
-        # dispatching to IAE or GEIQ eligibility
-        path_name = (
-            "application_geiq_eligibility" if self.company.kind == CompanyKind.GEIQ else "application_eligibility"
-        )
-        return reverse(
-            "apply:" + path_name,
+        return self.get_eligibility_step_url() or reverse(
+            "apply:application_resume",
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
 
@@ -747,27 +764,8 @@ class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_back_url(self):
-        view_name = "apply:application_jobs"
-        if self.company.kind == CompanyKind.GEIQ and self.request.from_authorized_prescriber:
-            view_name = "apply:application_geiq_eligibility"
-        elif self.company.kind != CompanyKind.GEIQ:
-            bypass_eligibility_conditions = [
-                # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-                not self.company.is_subject_to_eligibility_rules,
-                # Only "authorized prescribers" can perform an eligibility diagnosis.
-                not (
-                    self.request.user.is_prescriber
-                    and self.request.current_organization
-                    and self.request.current_organization.is_authorized
-                ),
-                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
-                self.job_seeker.has_valid_approval,
-            ]
-            if not any(bypass_eligibility_conditions):
-                view_name = "apply:application_eligibility"
-
-        return reverse(
-            view_name,
+        return self.get_eligibility_step_url() or reverse(
+            "apply:application_jobs",
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
 

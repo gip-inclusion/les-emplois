@@ -691,20 +691,11 @@ class TestApplyAsJobSeeker:
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility.
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (skip eligibility step as the user is not a authorized prescriber)
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Envoyer la candidature")
@@ -1333,22 +1324,12 @@ class TestApplyAsAuthorizedPrescriber:
         }
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility.
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (skip eligibility step as the user in not an authorized prescriber)
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
@@ -2142,22 +2123,12 @@ class TestApplyAsPrescriber:
         }
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility.
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (skip eligibility step as the user is not an authorized prescriber)
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Postuler")
@@ -2730,22 +2701,12 @@ class TestApplyAsCompany:
         }
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility.
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (skip eligibility step as the user is not an authorzed prescriber)
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertContains(response, "Enregistrer" if user in company.members.all() else "Postuler")
