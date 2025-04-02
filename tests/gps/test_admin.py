@@ -69,3 +69,9 @@ def test_create_follow_up_membership(admin_client):
     assert membership.created_at == datetime.datetime(2025, 1, 1, 11, 34, 56, tzinfo=datetime.UTC)
     assert membership.last_contact_at == datetime.datetime(2025, 1, 1, 11, 34, 57, tzinfo=datetime.UTC)
     assert membership.started_at == datetime.date(2025, 1, 1)
+
+    # A second membership with the same member and follow_up_group won't work
+    response = admin_client.post(url, data=post_data)
+    assertContains(
+        response, "Un objet Relation avec ces champs Groupe de suivi et Membre du groupe de suivi existe déjà."
+    )
