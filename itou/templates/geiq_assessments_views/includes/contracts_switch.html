@@ -1,0 +1,18 @@
+{% if contract.allowance_requested %}
+    {% url "geiq_assessments_views:assessment_contracts_exclude" pk=assessment.pk contract_pk=contract.pk as post_url %}
+{% else %}
+    {% url "geiq_assessments_views:assessment_contracts_include" pk=assessment.pk contract_pk=contract.pk as post_url %}
+{% endif %}
+
+<form hx-post="{{ post_url }}" hx-trigger="change" id="toggle_allowance_requested_for_contract_{{ contract.pk }}" hx-target="this" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+    {% csrf_token %}
+    <div class="form-check form-switch">
+        <input type="checkbox"
+               class="form-check-input"
+               name="allowance_requested"
+               id="allowance_requested_for_contract_{{ contract.pk }}"
+               {% if contract.allowance_requested %}checked{% endif %}
+               {% if assessment.contracts_selection_validated_at %}disabled{% endif %} />
+        <label class="form-check-label visually-hidden" for="allowance_requested_for_contract_{{ contract.pk }}"></label>
+    </div>
+</form>
