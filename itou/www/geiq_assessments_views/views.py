@@ -4,6 +4,7 @@ import operator
 import uuid
 
 from django.core.files.storage import default_storage
+from django.db import models
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -267,13 +268,42 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     context = {
         "assessment": assessment,
         "contracts_page": contracts_page,
+        "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
     }
     return render(request, template_name, context)
 
 
+class AssessmentContractDetailsTab(models.TextChoices):
+    EMPLOYEE = "employee", "Informations salarié"
+    CONTRACT = "contract", "Contrat"
+    SUPPORT_AND_TRAINING = "support-and-training", "Accompagnement et formation"
+    EXIT = "exit", "Sortie"
+
+
 @check_user(lambda user: user.is_employer)
-def assessment_contracts_details(request, pk, contract_pk, template_name=""):
-    context = {}
+def assessment_contracts_details(
+    request, pk, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
+):
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    contract = get_object_or_404(EmployeeContract.objects.filter(employee__assessment=assessment), pk=contract_pk)
+    try:
+        details_tab = AssessmentContractDetailsTab(tab)
+    except ValueError:
+        raise Http404
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk}),
+    )
+    context = {
+        "back_url": back_url,
+        "assessment": assessment,
+        "contract": contract,
+        "matomo_custom_title": "Bilan d’exécution - page de detail d’un contrat",
+        "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
+        "active_tab": details_tab,
+    }
     return render(request, template_name, context)
 
 
