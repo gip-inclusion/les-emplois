@@ -208,6 +208,8 @@ class EmployeeContract(models.Model):
     planned_end_at = models.DateField(verbose_name="date de fin prévisionnelle")
     end_at = models.DateField(verbose_name="date de fin", null=True)
 
+    allowance_requested = models.BooleanField(verbose_name="Aide demandée par le GEIQ")
+
     other_data = models.JSONField(verbose_name="autres données")
 
     class Meta:
