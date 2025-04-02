@@ -68,6 +68,7 @@
                                     <th scope="col">Date de début</th>
                                     <th scope="col">Date de fin</th>
                                     <th scope="col">Aide potentielle</th>
+                                    <th scope="col">Obtenir l’aide</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,10 +82,11 @@
                                             {% if contract.end_at %}
                                                 {{ contract.end_at|date:"d/m/Y" }}
                                             {% else %}
-                                                {{ contract.end_at|date:"d/m/Y"|default:"-" }}
+                                                {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
                                             {% endif %}
                                         </td>
                                         <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>
+                                        <td>{{ contract.allowance_requested }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

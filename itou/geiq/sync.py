@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone
 
@@ -295,6 +296,19 @@ def _nb_days(periods: list[tuple[datetime.date, datetime.date]], *, year: int):
     return nb_days
 
 
+def _more_than_3_months_in_year(start: datetime.date, end: datetime.date, *, year: int):
+    if start.year < year:
+        start = datetime.date(year, 1, 1)
+    elif start.year > year:
+        # This shouldn't happen
+        return False
+    if end.year < year:
+        return False
+    elif end.year > year:
+        end = datetime.date(year, 12, 31)
+    return start - datetime.timedelta(days=1) + relativedelta(months=3) <= end
+
+
 def sync_employee_and_contracts(assessment, new_mode=False):
     if new_mode:
         assert not assessment.contracts_synced_at
@@ -401,6 +415,10 @@ def sync_employee_and_contracts(assessment, new_mode=False):
     def contract_data_to_django(data, *, mapping, model):
         contract = label_data_to_django(data, mapping=mapping, model=model)
         contract.employee = label_id_to_employee[data["salarie"]]
+        if new_mode:
+            contract.allowance_requested = _more_than_3_months_in_year(
+                contract.start_at, contract.end_at or contract.planned_end_at, year=assessment.campaign.year
+            )
         return contract
 
     sync_to_db(
