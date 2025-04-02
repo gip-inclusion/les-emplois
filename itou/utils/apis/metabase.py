@@ -138,11 +138,6 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "wbWKEo",
         "tally_embed_form_id": "wvPEvQ",
     },
-    "stats_ddets_iae_follow_siae_evaluation": {
-        "dashboard_id": 265,
-        "tally_popup_form_id": "w2XZxV",
-        "tally_embed_form_id": "n9Ba6G",
-    },
     "stats_ddets_iae_follow_prolongation": {
         "dashboard_id": 357,
         "tally_popup_form_id": "nG0lDp",
@@ -199,11 +194,6 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 289,
         "tally_popup_form_id": "wbWKEo",
         "tally_embed_form_id": "wvPEvQ",
-    },
-    "stats_dreets_iae_follow_siae_evaluation": {
-        "dashboard_id": 265,
-        "tally_popup_form_id": "w2XZxV",
-        "tally_embed_form_id": "n9Ba6G",
     },
     "stats_dreets_iae_follow_prolongation": {
         "dashboard_id": 357,
