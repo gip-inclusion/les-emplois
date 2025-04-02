@@ -40,7 +40,7 @@ class TestUpdateEligibilityView:
         job_seeker = user if user.is_job_seeker else JobSeekerFactory()
         client.force_login(user)
         url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"public_id": job_seeker.public_id}),
+            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             {"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
@@ -54,7 +54,7 @@ class TestUpdateEligibilityView:
 
         # Without a eligibility diagnosis
         url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"public_id": job_seeker.public_id}),
+            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             {"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
@@ -82,7 +82,7 @@ class TestUpdateEligibilityView:
 
         client.force_login(prescriber)
         url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"public_id": job_seeker.public_id}),
+            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             {"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
@@ -113,7 +113,7 @@ class TestUpdateEligibilityView:
 
         client.force_login(prescriber)
         url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"public_id": job_seeker.public_id}),
+            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
             {"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
