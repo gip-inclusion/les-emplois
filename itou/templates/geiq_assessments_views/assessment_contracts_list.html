@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load format_filters %}
 
 {% block title %}Détail et sélection des parcours {{ block.super }}{% endblock %}
 
@@ -65,6 +66,7 @@
                                 <tr>
                                     <th scope="col">Prénom NOM</th>
                                     <th scope="col">Date de début</th>
+                                    <th scope="col">Aide potentielle</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,11 +76,13 @@
                                             <a class="btn btn-link" href="{% url "geiq_assessments_views:details" pk=assessment.pk %}">{{ contract.employee }}</a>
                                         </td>
                                         <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                                        <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    {% include "includes/pagination.html" with page=contracts_page boost=True %}
                 </div>
             </div>
         </div>
