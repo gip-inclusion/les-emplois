@@ -96,6 +96,49 @@
                                 </li>
                             </ul>
                         </div>
+                    {% elif active_tab == AssessmentContractDetailsTab.EXIT %}
+                        <div class="c-box mb-3">
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision_text|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Précision sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Métier correspondant</small>
+                                    <strong>{{ contract.other_data.metier_correspondant|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>CDD/CDI refusé</small>
+                                    <strong>{{ contract.other_data.is_refus_cdd_cdi|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Date de rupture anticipée</small>
+                                    <strong>
+                                        {% if contract.end_at and contract.end_at != contract.planned_end_at %}
+                                            {{ contract.end_at|date:"d/m/Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </strong>
+                                </li>
+                                <li>
+                                    <small>Type de rupture anticipée</small>
+                                    <strong>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Situation post-contrat</small>
+                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
                     {% endif %}
                 </div>
             </div>
