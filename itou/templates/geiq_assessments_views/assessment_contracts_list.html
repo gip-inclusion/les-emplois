@@ -73,7 +73,7 @@
                                 {% for contract in contracts_page %}
                                     <tr>
                                         <td>
-                                            <a class="btn btn-link" href="{% url "geiq_assessments_views:details" pk=assessment.pk %}">{{ contract.employee }}</a>
+                                            <a class="btn btn-link" href="{% url "geiq_assessments_views:assessment_contracts_detail" pk=assessment.pk contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee }}</a>
                                         </td>
                                         <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
                                         <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>

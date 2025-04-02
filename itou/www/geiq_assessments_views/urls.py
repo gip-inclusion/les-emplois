@@ -60,7 +60,7 @@ urlpatterns = [
         name="assessment_contracts_list",
     ),
     path(
-        "details/<uuid:pk>/contracts/<uuid:contract_pk>",
+        "details/<uuid:pk>/contracts/<uuid:contract_pk>/<str:tab>",
         views.assessment_contracts_details,
         name="assessment_contracts_detail",
     ),
