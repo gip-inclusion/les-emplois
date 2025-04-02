@@ -223,6 +223,10 @@ class EmployeeContract(models.Model):
         else:
             start = self.start_at
         end = self.end_at or self.planned_end_at
+        if end.year < assessment_year:
+            return False
+        elif end.year > assessment_year:
+            end = datetime.date(assessment_year, 12, 31)
         return start - datetime.timedelta(days=1) + relativedelta(months=3) <= end
 
 
