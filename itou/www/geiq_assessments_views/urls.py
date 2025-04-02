@@ -60,11 +60,6 @@ urlpatterns = [
         name="assessment_contracts_list",
     ),
     path(
-        "details/<uuid:pk>/contracts/<uuid:contract_pk>/<str:tab>",
-        views.assessment_contracts_details,
-        name="assessment_contracts_detail",
-    ),
-    path(
         "details/<uuid:pk>/contracts/<uuid:contract_pk>/include",
         views.assessment_contracts_include,
         name="assessment_contracts_include",
@@ -73,5 +68,10 @@ urlpatterns = [
         "details/<uuid:pk>/contracts/<uuid:contract_pk>/exclude",
         views.assessment_contracts_exclude,
         name="assessment_contracts_exclude",
+    ),
+    path(
+        "details/<uuid:pk>/contracts/<uuid:contract_pk>/<str:tab>",
+        views.assessment_contracts_details,
+        name="assessment_contracts_detail",
     ),
 ]
