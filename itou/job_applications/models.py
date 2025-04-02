@@ -17,7 +17,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
@@ -838,11 +838,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def can_be_cancelled(self):
         if self.origin == Origin.AI_STOCK:
             return False
-        if not self.employee_record.exists():
-            # A job application can be canceled provided that there is no employee record linked to it,
-            # as it is possible that some information were already sent to the ASP.
-            return True
-        return False
+
+        # If a job application is linked to an employee record then it can only be cancelled if we didn't send any data
+        employee_record_is_blocking_cancellation = any(
+            er.logs.exclude(transition__in=EmployeeRecordTransition.without_asp_exchange()).exists()
+            for er in self.employee_record.all()
+        )
+        if employee_record_is_blocking_cancellation:
+            return False
+
+        return True
 
     @property
     def can_be_archived(self):
