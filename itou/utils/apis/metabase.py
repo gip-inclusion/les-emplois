@@ -57,11 +57,6 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "nW0zPj",
         "tally_embed_form_id": "waGd0v",
     },
-    "stats_siae_follow_siae_evaluation": {
-        "dashboard_id": 298,
-        "tally_popup_form_id": "mK01LA",
-        "tally_embed_form_id": "wL0pXj",
-    },
     #
     # Prescriber stats - CD.
     #

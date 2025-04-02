@@ -2313,13 +2313,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
@@ -2398,13 +2392,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
@@ -2483,13 +2471,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
@@ -2568,13 +2550,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
@@ -2653,13 +2629,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
@@ -2738,13 +2708,7 @@
                           <li class="d-flex justify-content-between align-items-center mb-3">
                               <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
                                   <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Auto-prescription réalisées par ma ou mes structures</span>
-                              </a>
-                          </li>
-                          <li class="d-flex justify-content-between align-items-center mb-3">
-                              <a class="btn-link btn-ico" href="/stats/siae/follow_siae_evaluation">
-                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                                  <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
+                                  <span>Auto-prescription réalisées par ma ou mes structures et suivi du contrôle à posteriori</span>
                               </a>
                           </li>
                       
