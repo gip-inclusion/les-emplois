@@ -286,7 +286,12 @@ def assessment_contracts_details(
 ):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
-    contract = get_object_or_404(EmployeeContract.objects.filter(employee__assessment=assessment), pk=contract_pk)
+    contract = get_object_or_404(
+        EmployeeContract.objects.filter(employee__assessment=assessment).select_related(
+            "employee__assessment__campaign"
+        ),
+        pk=contract_pk,
+    )
     try:
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
