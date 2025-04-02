@@ -1358,7 +1358,7 @@
                   <div class="col-12" id="gps_intervenants">
                       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
                           <h2 class="mb-0">Intervenants</h2>
-                          <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fgroups%2F[PK of FollowUpGroup]%2Fmemberships" id="request-new-participant-link">
+                          <a class="btn btn-ico btn-primary" href="https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?user_name=Pierre+DUPONT&amp;user_id=[PK of user]&amp;user_email=pierre.dupont%40test.local&amp;user_organization_name=Les+Olivades&amp;user_organization_id=[PK of organization]&amp;user_type=prescriber&amp;beneficiary_name=Jane+DOE&amp;beneficiary_id=[PK of beneficiary]&amp;beneficiary_email=jane.doe%40test.local&amp;success_url=http%3A%2F%2Ftestserver%2Fgps%2Fgroups%2F[PK of FollowUpGroup]%2Fmemberships&amp;followupgroup_id=[PK of FollowUpGroup]" id="request-new-participant-link">
                               <i aria-hidden="true" class="ri-user-add-line"></i>
                               <span>Ajouter un intervenant existant</span>
                           </a>

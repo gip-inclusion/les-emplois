@@ -365,6 +365,7 @@ class TestGroupDetailsMembershipTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
                 ("href", f"user_id={prescriber.pk}", "user_id=[PK of user]"),
+                ("href", f"followupgroup_id={group.pk}", "followupgroup_id=[PK of FollowUpGroup]"),
                 (
                     "href",
                     f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",

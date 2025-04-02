@@ -141,6 +141,7 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
                 "beneficiary_id": self.group.beneficiary.pk,
                 "beneficiary_email": self.group.beneficiary.email,
                 "success_url": self.request.build_absolute_uri(),
+                "followupgroup_id": self.group.pk,
             },
         )
 
