@@ -64,7 +64,7 @@
                                     </button>
                                     {% if not job_seeker.has_valid_approval %}
                                         <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                            <a href=" {% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
+                                            <a href=" {% url 'eligibility_views:update' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
                                                 {% if job_seeker.valid_eligibility_diagnosis %}
                                                     Mettre à jour son éligibilité IAE
                                                 {% else %}
