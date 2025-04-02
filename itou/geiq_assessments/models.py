@@ -1,5 +1,7 @@
+import datetime
 import uuid
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -210,6 +212,18 @@ class EmployeeContract(models.Model):
 
     class Meta:
         verbose_name = "contrat"
+
+    def with_3_months_in_assessment_year(self):
+        assessment_year = self.employee.assessment.campaign.year
+        if self.start_at.year < assessment_year:
+            start = datetime.date(assessment_year, 1, 1)
+        elif self.start_at.year > assessment_year:
+            # This shouldn't happen
+            return False
+        else:
+            start = self.start_at
+        end = self.end_at or self.planned_end_at
+        return start - datetime.timedelta(days=1) + relativedelta(months=3) <= end
 
 
 class EmployeePrequalification(models.Model):
