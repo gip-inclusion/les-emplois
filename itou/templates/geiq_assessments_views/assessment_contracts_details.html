@@ -246,11 +246,11 @@
                                 </li>
                                 <li>
                                     <small>Niveau de qualification obtenue</small>
-                                    <strong>{{ contract.other_data.qualification_obtenu|label_object_format|default:"-" }}</strong>
+                                    <strong>{{ contract.other_data.qualification_obtenu.libelle|default:"-" }}</strong>
                                 </li>
                                 <li>
                                     <small>Type de qualification obtenu</small>
-                                    <strong>{{ contract.other_data.type_qualification_obtenu|label_object_format }}</strong>
+                                    <strong>{{ contract.other_data.type_qualification_obtenu.libelle|default:"-" }}</strong>
                                 </li>
                                 <li>
                                     <small>Formation complémentaire</small>
@@ -291,7 +291,7 @@
                                 </li>
                                 <li>
                                     <small>Précision sur l’emploi de sortie</small>
-                                    <strong>{{ contract.other_data.emploi_sorti_precision|label_object_format }}</strong>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision.libelle|default:"-" }}</strong>
                                 </li>
                                 <li>
                                     <small>Métier correspondant</small>
