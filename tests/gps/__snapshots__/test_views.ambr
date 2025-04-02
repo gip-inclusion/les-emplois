@@ -2072,11 +2072,6 @@
               <p>Guide de partage et de suivi</p>
           </div>
           <div aria-label="Actions sur les groupes de suivi" class="d-flex flex-column flex-md-row gap-md-3" role="group">
-              <a aria-label="Inviter un partenaire" class="btn btn-lg btn-ico btn-secondary mt-3 mt-md-0" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="liste_benef_inviter_partenaire" href="None/r/w5kLqM?user_public_id=03580247-b036-4578-bf9d-f92c9c2f68cd&amp;user_first_name=Pierre&amp;user_last_name=Dupont&amp;&amp;user_organization_uid=0260ad4f-2008-48bd-88cc-b41c0211e219&amp;user_organization_name=Pres. Org." rel="noopener" target="_blank">
-                  <i aria-hidden="true" class="ri-mail-send-line"></i>
-                  <span>Inviter un partenaire</span>
-              </a>
-  
               <a class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0" href="/gps/groups/join?back_url=/gps/groups/list">
                   <i aria-hidden="true" class="ri-user-add-line"></i>
                   <span>Ajouter un bénéficiaire</span>

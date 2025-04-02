@@ -15,16 +15,6 @@
             <p>Guide de partage et de suivi</p>
         </div>
         <div class="d-flex flex-column flex-md-row gap-md-3" role="group" aria-label="Actions sur les groupes de suivi">
-            <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
-               rel="noopener"
-               target="_blank"
-               class="btn btn-lg btn-ico btn-secondary mt-3 mt-md-0"
-               aria-label="Inviter un partenaire"
-               {% matomo_event "gps" "clic" "liste_benef_inviter_partenaire" %}>
-                <i class="ri-mail-send-line" aria-hidden="true"></i>
-                <span>Inviter un partenaire</span>
-            </a>
-
             <a href="{% url 'gps:join_group' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0">
                 <i class="ri-user-add-line" aria-hidden="true"></i>
                 <span>Ajouter un bénéficiaire</span>
