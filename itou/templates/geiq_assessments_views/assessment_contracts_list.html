@@ -17,42 +17,12 @@
     </div>
 {% endblock %}
 
-
-{% block title_extra %}
-    <div class="c-box">
-        <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-            <div class="d-flex flex-column">
-                <strong>85</strong>
-                Contrats présentés
-            </div>
-            <div class="d-flex flex-column">
-                <strong>52</strong>
-                Aides à 814€
-            </div>
-            <div class="d-flex flex-column">
-                <strong>20</strong>
-                Aides à 1400€
-            </div>
-            <div class="d-flex flex-column">
-                <strong>13</strong>
-                Aides à 0€
-            </div>
-            <div class="d-flex flex-column">
-                <strong>70 238€</strong>
-                Montant total potentiel
-            </div>
-        </div>
-        <div class="c-info">
-            <span class="c-info__summary">Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible</span>
-        </div>
-    </div>
-{% endblock %}
-
 {% block content %}
     <section class="s-section">
-        <div class="s-section__container container">
+        <div class="s-section__container container"> 
             <div class="row">
                 <div class="col-12 col-lg-8">
+                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=assessment hx_swap_oob=False only %}
                     <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
                     <p>
                         Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
@@ -85,7 +55,7 @@
                                                 {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
                                             {% endif %}
                                         </td>
-                                        <td>{{ contract.employee.other_data.montant_aide|default:0|formatfloat_with_unit:"€" }}</td>
+                                        <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
                                             {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token only %}
                                         </td>
