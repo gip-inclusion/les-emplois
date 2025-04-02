@@ -100,7 +100,7 @@ class TestGroupLists:
     @freezegun.freeze_time("2024-06-21", tick=True)
     def test_group_list(self, snapshot, client):
         user = PrescriberFactory(
-            membership__organization__authorized=True, membership__organization__for_snapshot=True, for_snapshot=True
+            membership__organization__authorized=True, membership__organization__for_snapshot=True
         )
         client.force_login(user)
 
