@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load format_filters %}
 
 {% block title %}Détail du contrat : {{ contract.employee.get_full_name }} - {{ block.super }}{% endblock %}
 
@@ -36,7 +37,66 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     <h2>{{ active_tab.label }}</h2>
-                    {{ contract }}
+                    {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
+                        <div class="c-box mb-3">
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Prénom</small>
+                                    <strong>{{ contract.employee.first_name|title }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nom</small>
+                                    <strong>{{ contract.employee.last_name|upper }}</strong>
+                                </li>
+                                <li>
+                                    <small>Sexe</small>
+                                    <strong>
+                                        {% if employee.title == "MME" %}
+                                            F
+                                        {% elif employee.title == "M" %}
+                                            H
+                                        {% endif %}
+                                    </strong>
+                                </li>
+                                <li>
+                                    <small>Date de naissance</small>
+                                    <strong>{{ contract.employee.birthdate|date:"d/m/Y" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Commune de résidence</small>
+                                    <strong>{{ contract.employee.other_data.adresse_ville|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="c-box">
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Prescripteur</small>
+                                    <strong>{{ contract.employee.other_data.prescripteur.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Autre prescripteur</small>
+                                    <strong>{{ contract.employee.other_data.autre_prescripteur|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Auteur du diagnostic</small>
+                                    <strong>-</strong>
+                                </li>
+                                <li>
+                                    <small>Critères public prioritaire</small>
+                                    <strong>
+                                        <ul>
+                                            {% for item in contract.employee.other_data.statuts_prioritaire %}<li>{{ item.libelle }}</li>{% endfor %}
+                                        </ul>
+                                    </strong>
+                                </li>
+                                <li>
+                                    <small>Précisions critères public prioritaire très important</small>
+                                    <strong>{{ contract.employee.other_data.precision_status_prio|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
