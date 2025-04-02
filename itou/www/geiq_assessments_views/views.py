@@ -258,6 +258,11 @@ def assessment_contracts_sync(request, pk):
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
+    back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+    if request.method == "POST":
+        assessment.contracts_selection_validated_at = timezone.now()
+        assessment.save(update_fields=("contracts_selection_validated_at",))
+        return HttpResponseRedirect(back_url)
     contracts_page = pager(
         EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
             "employee__first_name", "employee__last_name"
@@ -267,6 +272,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     )
     context = {
         "assessment": assessment,
+        "back_url": back_url,
         "contracts_page": contracts_page,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
     }
