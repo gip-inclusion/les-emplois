@@ -54,7 +54,6 @@ from tests.companies.factories import (
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
-from tests.gps.test import mock_advisor_list
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -1168,14 +1167,10 @@ class TestApplyAsAuthorizedPrescriber:
         response = client.get(next_url)
         assertContains(response, "Créer le compte candidat")
 
-        mock_advisor_list(dummy_job_seeker.jobseeker_profile.nir)
         response = client.post(next_url)
 
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-
-        assert new_job_seeker.jobseeker_profile.advisor_information.name == "Jean BON"
-        assert new_job_seeker.jobseeker_profile.advisor_information.email == "jean.bon@francetravail.fr"
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
         next_url = reverse(

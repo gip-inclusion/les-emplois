@@ -339,9 +339,6 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
-    advisor_information = factory.Maybe(
-        "with_contact", factory.RelatedFactory("tests.gps.factories.FranceTravailContactFactory", "jobseeker_profile")
-    )
     # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 
@@ -365,10 +362,3 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         nir = f"{incomplete_nir}{control_key}"
         validate_nir(nir)
         return nir
-
-    @factory.post_generation
-    def with_contact(self, create, extracted, **kwargs):
-        from tests.gps.factories import FranceTravailContactFactory
-
-        if extracted:
-            FranceTravailContactFactory(jobseeker_profile=self)
