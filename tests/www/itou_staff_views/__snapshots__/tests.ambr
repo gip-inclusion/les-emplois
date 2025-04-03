@@ -469,6 +469,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -1099,6 +1100,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -1729,6 +1731,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -2474,7 +2477,8 @@
                  "users_jobseekerprofile"."pe_obfuscated_nir",
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled"
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")

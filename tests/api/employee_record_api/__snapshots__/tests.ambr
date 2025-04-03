@@ -396,6 +396,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."fields_history",
                  "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
