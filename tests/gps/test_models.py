@@ -63,6 +63,12 @@ class TestFollowBeneficiary:
             assert membership.end_reason is None
             assert membership.last_contact_at == updated_at
 
+    def test_non_prescriber_or_employer(self):
+        staff = ItouStaffFactory()
+        beneficiary = JobSeekerFactory()
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, staff)
+        assert not FollowUpGroup.objects.exists()
+
     def test_is_referent(self):
         beneficiary = JobSeekerFactory()
         prescriber = PrescriberFactory()

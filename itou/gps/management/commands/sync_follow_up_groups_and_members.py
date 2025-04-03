@@ -24,6 +24,7 @@ CHUNK_SIZE = 1000
 def get_users_contacts(ids):
     beneficiaries_qs = (
         User.objects.filter(pk__in=ids)
+        .select_related("created_by")
         .annotate(
             job_apps_senders=ArraySubquery(
                 # only look for employer or prescriber
@@ -51,7 +52,7 @@ def get_users_contacts(ids):
                 JobApplicationTransitionLog.objects.filter(
                     job_application__job_seeker=OuterRef("pk"), to_state=JobApplicationState.ACCEPTED
                 )
-                .exclude(user=None)
+                .filter(user__kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
                 .values(json=JSONObject(user_id="user_id", timestamp="timestamp"))
             )
         )
@@ -70,7 +71,7 @@ def get_users_contacts(ids):
             )
         ]:
             contacts[user_id].append(timestamp)
-        if beneficiary.created_by_id:
+        if beneficiary.created_by and beneficiary.created_by.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
             contacts[beneficiary.created_by_id].append(beneficiary.date_joined)
         users_contacts[beneficiary.pk] = contacts
     return users_contacts

@@ -29,8 +29,9 @@ class TestSyncGroupsManagementCommand:
         settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
         ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-    def test_get_uses_contacts(ids):
+    def test_get_users_contacts(ids):
         beneficiary = JobSeekerFactory()
+        staff = ItouStaffFactory()
 
         # employer with multiple contacts
         employer = EmployerFactory()
@@ -55,6 +56,10 @@ class TestSyncGroupsManagementCommand:
         for state in JobApplicationState:
             JobApplicationTransitionLog.objects.create(user=employer, to_state=state, job_application=job_app_1)
         job_app_1_log = JobApplicationTransitionLog.objects.get(to_state=JobApplicationState.ACCEPTED)
+        # ignored transition created by a staff member
+        JobApplicationTransitionLog.objects.create(
+            user=staff, to_state=JobApplicationState.ACCEPTED, job_application=job_app_1
+        )
 
         # this prescriber had multiple "contacts":
         prescriber = PrescriberFactory()
@@ -118,8 +123,10 @@ class TestSyncGroupsManagementCommand:
         follower_1 = PrescriberFactory()
         follower_2 = PrescriberFactory()
 
-        # A beneficiary with no existing group
-        beneficiary_1 = JobSeekerFactory()
+        staff = ItouStaffFactory()
+
+        # A beneficiary with no existing group, staff user will be ignored
+        beneficiary_1 = JobSeekerFactory(created_by=staff)
         # Another one with a group but we found new contacts
         beneficiary_2 = JobSeekerFactory()
         group_2 = FollowUpGroupFactory(beneficiary=beneficiary_2)
