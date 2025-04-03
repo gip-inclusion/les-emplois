@@ -2,6 +2,7 @@ from unittest import mock
 
 from django import forms
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
+from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -179,6 +180,16 @@ class ReadonlyMixin:
 
     def has_delete_permission(self, *args, **kwargs):
         return False
+
+
+class TransitionLogMixin(ReadonlyMixin):
+    def has_delete_permission(self, request, obj=None):
+        if obj is None:
+            return False
+
+        modified_object = obj.get_modified_object()
+        codename = get_permission_codename("delete", modified_object._meta)
+        return request.user.has_perm(f"{modified_object._meta.app_label}.{codename}")
 
 
 class CreatedOrUpdatedByMixin:
