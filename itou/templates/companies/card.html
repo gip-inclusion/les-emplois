@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
+{% load markdownify %}
+{% load matomo %}
 {% load static %}
 {% load str_filters %}
-{% load matomo %}
-{% load markdownify %}
 {% load url_add_query %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}

@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
-{% load static %}
+{% load django_bootstrap5 %}
 {% load format_filters %}
 {% load list_filters %}
-{% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}
     Nouvelle fiche salarié ASP - étape {{ step }} - {{ request.current_organization.display_name }} {{ block.super }}
