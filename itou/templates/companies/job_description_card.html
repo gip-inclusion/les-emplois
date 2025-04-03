@@ -18,7 +18,19 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
+    <div class="d-flex justify-content-between align-items-center">
+        {# Wrap previous_step in a div to ensure that second div is justified right #}
+        <div>{% include "layout/previous_step.html" with back_url=back_url only %}</div>
+        <div>
+            {% if job.company == request.current_organization %}
+                <form hx-post="{% url 'companies_views:job_description_refresh_for_detail' job.pk %}" hx-swap="innerHTML">
+                    {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=True job_description=job csrf_token=csrf_token request=request only %}
+                </form>
+            {% else %}
+                <p>Mise à jour le {{ job.updated_at|date:"d/m/Y" }}</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block title_content %}

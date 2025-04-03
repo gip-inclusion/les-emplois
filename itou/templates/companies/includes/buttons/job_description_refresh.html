@@ -1,0 +1,28 @@
+{% load datetime_filters %}
+
+{% csrf_token %}
+
+{% if for_detail %}
+    <button type="submit" class="btn border-0">
+        <div class="stable-text">
+            <i class="ri-refresh-line fw-normal" data-bs-toggle="tooltip" data-bs-title="Actualiser la date de mise à jour" data-bs-placement="left" aria-label="Actualiser la date de mise à jour de ce métier"></i>
+            <span class="fw-normal">Mise à jour le {{ job_description.updated_at|date:"d/m/Y" }}</span>
+        </div>
+        <div class="loading-text">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            <span class="fw-normal">Mise à jour le {{ job_description.updated_at|date:"d/m/Y" }}</span>
+        </div>
+    </button>
+{% else %}
+    <button type="submit" class="btn border-0">
+        <div class="stable-text">
+            <i class="ri-refresh-line fw-normal" data-bs-toggle="tooltip" data-bs-title="Actualiser la date de mise à jour" data-bs-placement="top" aria-label="Actualiser la date de mise à jour de ce métier"></i>
+        </div>
+        <div class="loading-text">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        </div>
+    </button>
+    {% if request.htmx %}
+        <span id="job_description_{{ job_description.pk }}_list_cell_updated_at" hx-swap-oob="true">{{ job_description.updated_at|naturaldate|capfirst }}</span>
+    {% endif %}
+{% endif %}
