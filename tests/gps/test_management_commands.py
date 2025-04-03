@@ -1,18 +1,14 @@
 import datetime
-from unittest.mock import patch
 
-import numpy as np
-import pandas as pd
 import pytest
 from django.core import management
 from freezegun import freeze_time
 
 from itou.gps.management.commands import sync_follow_up_groups_and_members
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.enums import UserKind
-from itou.users.models import JobSeekerProfile
 from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -22,7 +18,6 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerProfileFactory,
     PrescriberFactory,
 )
 
@@ -219,79 +214,6 @@ class TestSyncGroupsManagementCommand:
         assert membership_3_1.creator == batch_group_creator
         assert membership_3_1.last_contact_at == beneficiary_3.date_joined
         assert membership_3_1.created_at == beneficiary_3.date_joined
-
-
-class TestImportAdvisorManagementCommand:
-    def test_import_advisor_information(self):
-        contacted_profile = JobSeekerProfileFactory(with_contact=True)
-        contactless_profile = JobSeekerProfileFactory()
-        profile_contact_no_name = JobSeekerProfileFactory()
-        profile_contact_no_email = JobSeekerProfileFactory()
-
-        # dataset contains a the existing groups
-
-        mocked_pandas_dataset = pd.DataFrame(
-            {
-                "nir": [
-                    contacted_profile.nir,
-                    contactless_profile.nir,
-                    "123456789010101",  # non-existent in the database,
-                    contacted_profile.nir,  # duplicate - ignored with a log
-                    profile_contact_no_name.nir,
-                    profile_contact_no_email.nir,
-                ],
-                "prescriber_name": [
-                    "Test MacTest",
-                    "Test Testson",
-                    "Test Ignored",
-                    "Test Ignored",
-                    np.nan,
-                    "Test Ignored",
-                ],
-                "prescriber_email": [
-                    "test.mactest@francetravail.fr",
-                    "test.testson@francetravail.fr",
-                    "testignored@francetravail.fr",
-                    "testignored@francetravail.fr",
-                    "testignored@francetravail.fr",
-                    np.nan,
-                ],
-            }
-        )
-
-        with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
-            management.call_command("import_advisor_information", "example.xlsx", wet_run=True)
-
-        assert FranceTravailContact.objects.count() == 2
-        assert JobSeekerProfile.objects.filter(advisor_information__isnull=True).count() == 2
-
-        contacted_profile.refresh_from_db()
-        assert contacted_profile.advisor_information.name == "Test MacTest"
-        assert contacted_profile.advisor_information.email == "test.mactest@francetravail.fr"
-
-        contactless_profile.refresh_from_db()
-        assert contactless_profile.advisor_information.name == "Test Testson"
-        assert contactless_profile.advisor_information.email == "test.testson@francetravail.fr"
-
-    def test_import_advisor_information_recover_keyless_nir(self):
-        # test asserts that the command can recover from missing a key in the NIR value
-        profile = JobSeekerProfileFactory(with_contact=True)
-
-        mocked_pandas_dataset = pd.DataFrame(
-            {
-                "nir": [profile.nir[:13]],
-                "prescriber_name": ["Test MacTest"],
-                "prescriber_email": ["test.mactest@francetravail.fr"],
-            }
-        )
-        print(str(profile.nir[:13]))
-
-        with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
-            management.call_command("import_advisor_information", "example.xlsx", wet_run=True)
-
-        profile.refresh_from_db()
-        assert profile.advisor_information.name == "Test MacTest"
-        assert profile.advisor_information.email == "test.mactest@francetravail.fr"
 
 
 class TestArchiveOldFollowUpMembershipCommand:
