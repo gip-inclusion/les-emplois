@@ -99,8 +99,10 @@ class TestProcessListSiae:
                    data-emplois-sync-with="id_selected_jobs_0"
                    name="{self.SELECTED_JOBS}"
                    type="checkbox"
-                   value="{job1.appellation.code}">
-            <label for="id_selected_jobs_0-top" class="form-check-label">{job1.appellation.name}</label>
+                   value="{job1.pk}">
+            <label for="id_selected_jobs_0-top" class="form-check-label">
+                {job1.display_name} ({job1.appellation.code})
+            </label>
             </div>
             </li>
             <li class="dropdown-item">
@@ -110,8 +112,10 @@ class TestProcessListSiae:
                        data-emplois-sync-with="id_selected_jobs_1"
                        name="{self.SELECTED_JOBS}"
                        type="checkbox"
-                       value="{job2.appellation.code}">
-                <label for="id_selected_jobs_1-top" class="form-check-label">{job2.appellation.name}</label>
+                       value="{job2.pk}">
+                <label for="id_selected_jobs_1-top" class="form-check-label">
+                    {job2.display_name} ({job2.appellation.code})
+                </label>
             </div>
             </li>
             </ul>
@@ -559,11 +563,14 @@ class TestProcessListSiae:
 
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
-        job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation1])
-        _another_job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[appellation2])
+        job1 = JobDescriptionFactory(company=company, appellation=appellation1)
+        job2 = JobDescriptionFactory(company=company, appellation=appellation2)
+
+        job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[job1])
+        _another_job_app = JobApplicationSentByJobSeekerFactory(to_company=company, selected_jobs=[job2])
 
         client.force_login(employer)
-        response = client.get(reverse("apply:list_for_siae"), {"selected_jobs": [appellation1.pk]})
+        response = client.get(reverse("apply:list_for_siae"), {"selected_jobs": [job1.pk]})
         assert response.context["job_applications_page"].object_list == [job_app]
 
     @freeze_time("2025-03-13")
