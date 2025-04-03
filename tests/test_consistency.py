@@ -7,6 +7,8 @@ import pathlib
 from crontab import CronTab
 from django.apps import apps
 from django.conf import settings
+from django.template import loader, loader_tags
+from django.template.defaulttags import LoadNode
 
 import itou.job_applications.enums as job_applications_enums
 
@@ -134,3 +136,38 @@ def test_check_verbose_name_lower():
                 errors.append(f"Field “{field}” verbose_name should be lower cased.")
 
     assert errors == []
+
+
+def test_check_templates_ordering():
+    EXPECTED_BLOCK_ORDER = [
+        "title",
+        "title_prevstep",
+        "title_content",
+        "title_messages",
+        "title_extra",
+        "content",
+        "script",
+    ]
+    errors = []
+    for template_name in iter_template_names():
+        node_list = loader.get_template(template_name).template.nodelist
+        if len(node_list) == 1 and isinstance(node_list[0], loader_tags.ExtendsNode):
+            node_list = node_list[0].nodelist
+        blocks = []
+        loads = []
+        for node in node_list:
+            if isinstance(node, loader_tags.BlockNode) and node.name in EXPECTED_BLOCK_ORDER:
+                blocks.append(node.name)
+            if isinstance(node, LoadNode):
+                loads.append(node.token.contents)
+        if blocks:
+            expected_order = [block for block in EXPECTED_BLOCK_ORDER if block in blocks]
+            if blocks != expected_order:
+                errors.append((template_name, f"Unsorted blocks: {blocks} ({expected_order=})"))
+        if loads:
+            for load in loads:
+                if len(load.split()) != 2:
+                    errors.append((template_name, f"One load per line expected: {load}"))
+            if loads != sorted(loads):
+                errors.append((template_name, f"Unsorted loads: {loads}"))
+    assert sorted(errors) == []  # Group errors by template_name
