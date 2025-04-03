@@ -1299,14 +1299,49 @@ class TestLatestApproval:
         assert user.latest_common_approval is None
 
 
-@pytest.mark.parametrize("initial_asp_uid", ("08b4e9f755a688b554a6487d96d2a0", ""))
+@pytest.mark.parametrize("initial_asp_uid", ("000000000000000000000000000000", ""))
 @override_settings(SECRET_KEY="test")
 def test_job_seeker_profile_asp_uid(initial_asp_uid):
-    profile = JobSeekerProfileFactory(user__pk=42)
-    JobSeekerProfile.objects.filter(pk=profile.pk).update(asp_uid=initial_asp_uid)
+    profile = JobSeekerProfileFactory(user__pk=42, asp_uid=initial_asp_uid)
+    assert profile.asp_uid == initial_asp_uid or "08b4e9f755a688b554a6487d96d2a0"
+
+
+def test_job_seeker_profile_asp_uid_field_history():
+    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
+    assert profile.fields_history == []
+
+    profile.asp_uid = "000000000000000000000000000001"
     profile.save()
     profile.refresh_from_db()
-    assert profile.asp_uid == "08b4e9f755a688b554a6487d96d2a0"
+    fields_history = [
+        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in profile.fields_history
+    ]
+    assert fields_history == [
+        {
+            "before": {"asp_uid": "000000000000000000000000000000"},
+            "after": {"asp_uid": "000000000000000000000000000001"},
+        }
+    ]
+
+    profile.asp_uid = "000000000000000000000000000002"
+    profile.save()
+    profile.refresh_from_db()
+    fields_history = [
+        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in profile.fields_history
+    ]
+    assert fields_history == [
+        {
+            "before": {"asp_uid": "000000000000000000000000000000"},
+            "after": {"asp_uid": "000000000000000000000000000001"},
+        },
+        {
+            "before": {"asp_uid": "000000000000000000000000000001"},
+            "after": {"asp_uid": "000000000000000000000000000002"},
+        },
+    ]
+    assert datetime.datetime.fromisoformat(profile.fields_history[1]["_timestamp"]).timestamp() == pytest.approx(
+        datetime.datetime.now().timestamp()
+    )
 
 
 @pytest.mark.parametrize(

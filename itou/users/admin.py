@@ -1,4 +1,5 @@
 import uuid
+from pprint import pformat
 
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
@@ -761,6 +762,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "pe_last_certification_attempt_at",
         "is_pe_certified",
         "disabled_notifications",
+        "fields_history_formatted",
     )
     show_full_result_count = False
 
@@ -832,6 +834,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                 )
             },
         ),
+        ("Audit", {"fields": ("fields_history_formatted",)}),
     )
 
     inlines = (PkSupportRemarkInline,)
@@ -854,6 +857,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
     @admin.display(description="utilisateur")
     def user_link(self, obj):
         return get_admin_view_link(obj.user, content=f"🔗 {obj.user.email}")
+
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
 
     def get_search_fields(self, request):
         search_fields = []

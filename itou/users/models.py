@@ -8,6 +8,7 @@ from citext import CIEmailField
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
@@ -43,6 +44,7 @@ from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -797,6 +799,11 @@ def get_allauth_account_user_display(user):
     return user.email
 
 
+class JobSeekerProfileManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().defer("fields_history")
+
+
 class JobSeekerProfile(models.Model):
     """
     Specific information about the job seeker
@@ -1132,6 +1139,17 @@ class JobSeekerProfile(models.Model):
         ),
     )
 
+    fields_history = ArrayField(
+        models.JSONField(
+            encoder=DjangoJSONEncoder,
+        ),
+        verbose_name="historique des champs modifiés sur le modèle",
+        default=list,
+        db_default=[],
+    )
+
+    objects = JobSeekerProfileManager()
+
     class Meta:
         verbose_name = "profil demandeur d'emploi"
         verbose_name_plural = "profils demandeur d'emploi"
@@ -1157,6 +1175,7 @@ class JobSeekerProfile(models.Model):
         indexes = [
             models.Index(fields=["is_stalled"], name="users_jobseeker_stalled_idx", condition=Q(is_stalled=True)),
         ]
+        triggers = [FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid"])]
 
     def __str__(self):
         return str(self.user)
