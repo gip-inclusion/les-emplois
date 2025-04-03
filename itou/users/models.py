@@ -653,7 +653,7 @@ class User(AbstractUser, AddressMixin):
         # TODO (François): --^
         return (
             self.is_job_seeker
-            and self.eligibility_diagnoses.filter(selected_administrative_criteria__certified=True).exists()
+            and self.eligibility_diagnoses.exclude(selected_administrative_criteria__certified=None).exists()
         )
 
     def joined_recently(self):

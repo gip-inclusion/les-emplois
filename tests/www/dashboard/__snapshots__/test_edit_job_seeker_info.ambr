@@ -266,9 +266,14 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
-                 AND "eligibility_selectedadministrativecriteria"."certified")
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "eligibility_eligibilitydiagnosis" U0
+                             LEFT OUTER JOIN "eligibility_selectedadministrativecriteria" U1 ON (U0."id" = U1."eligibility_diagnosis_id")
+                             WHERE (U1."certified" IS NULL
+                                    AND U0."id" = ("eligibility_eligibilitydiagnosis"."id"))
+                             LIMIT 1)))
           LIMIT 1
         ''',
       }),
@@ -645,9 +650,14 @@
         'sql': '''
           SELECT %s AS "a"
           FROM "eligibility_eligibilitydiagnosis"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_eligibilitydiagnosis"."id" = "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id")
           WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
-                 AND "eligibility_selectedadministrativecriteria"."certified")
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "eligibility_eligibilitydiagnosis" U0
+                             LEFT OUTER JOIN "eligibility_selectedadministrativecriteria" U1 ON (U0."id" = U1."eligibility_diagnosis_id")
+                             WHERE (U1."certified" IS NULL
+                                    AND U0."id" = ("eligibility_eligibilitydiagnosis"."id"))
+                             LIMIT 1)))
           LIMIT 1
         ''',
       }),
