@@ -9,7 +9,6 @@ class ArchivedUser(models.Model):
     date_joined = models.DateField(verbose_name=_("date joined"))
     first_login = models.DateField(verbose_name=_("first login"), blank=True, null=True)
     last_login = models.DateField(verbose_name=_("last login"), blank=True, null=True)
-    last_activity_at = models.DateField(verbose_name="date de dernière activité")
     archived_at = models.DateField(verbose_name="date d'archivage")
     user_signup_kind = models.CharField(
         max_length=50, verbose_name="créé par un utilisateur de type", blank=True, null=True
