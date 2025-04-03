@@ -1,7 +1,7 @@
-{% load django_bootstrap5 %}
-{% load str_filters %}
-{% load matomo %}
 {% load buttons_form %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% load str_filters %}
 
 <div class="c-form" id="acceptFormDiv">
     <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">

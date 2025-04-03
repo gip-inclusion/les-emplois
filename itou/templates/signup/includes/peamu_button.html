@@ -1,5 +1,5 @@
-{% load static %}
 {% load matomo %}
+{% load static %}
 
 <form method="post" action="{% url 'pe_connect:authorize' %}">
     {% csrf_token %}

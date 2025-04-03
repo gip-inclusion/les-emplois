@@ -1,8 +1,8 @@
 {% extends "layout/base.html" %}
-{% load static %}
 {% load format_filters %}
-{% load str_filters %}
 {% load matomo %}
+{% load static %}
+{% load str_filters %}
 {% load url_add_query %}
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}

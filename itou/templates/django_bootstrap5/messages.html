@@ -1,4 +1,5 @@
-{% load i18n django_bootstrap5 %}
+{% load django_bootstrap5 %}
+{% load i18n %}
 {% for message in messages %}
     {% if "toast" not in message.tags and "modal" not in message.tags %}
         <div class="alert alert-{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
