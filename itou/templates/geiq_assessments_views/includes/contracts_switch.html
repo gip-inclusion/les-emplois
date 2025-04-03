@@ -4,7 +4,12 @@
     {% url "geiq_assessments_views:assessment_contracts_include" pk=assessment.pk contract_pk=contract.pk as post_url %}
 {% endif %}
 
-<form hx-post="{{ post_url }}" hx-trigger="change" id="toggle_allowance_requested_for_contract_{{ contract.pk }}" hx-target="this" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+<form hx-post="{{ post_url }}{% if from_list %}?from_list=1{% endif %}"
+      hx-trigger="change"
+      id="toggle_allowance_requested_for_contract_{{ contract.pk }}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      class="js-prevent-multiple-submit">
     {% csrf_token %}
     <div class="form-check form-switch">
         <input type="checkbox"
@@ -13,9 +18,11 @@
                id="allowance_requested_for_contract_{{ contract.pk }}"
                {% if contract.allowance_requested %}checked{% endif %}
                {% if assessment.submitted_at %}disabled{% endif %} />
-        <label class="form-check-label visually-hidden" for="allowance_requested_for_contract_{{ contract.pk }}"></label>
+        <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_requested_for_contract_{{ contract.pk }}">
+            Obtenir l’aide
+        </label>
     </div>
 </form>
-{% if request.htmx %}
+{% if from_list and request.htmx %}
     {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=assessment hx_swap_oob=True only %}
 {% endif %}

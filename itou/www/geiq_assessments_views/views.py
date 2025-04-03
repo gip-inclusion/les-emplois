@@ -345,6 +345,7 @@ def assessment_contracts_include(
     context = {
         "assessment": assessment,
         "contract": contract,
+        "from_list": bool(request.GET.get("from_list")),
     }
     return render(request, template_name, context)
 
@@ -369,5 +370,6 @@ def assessment_contracts_exclude(
     context = {
         "assessment": assessment,
         "contract": contract,
+        "from_list": bool(request.GET.get("from_list")),
     }
     return render(request, template_name, context)
