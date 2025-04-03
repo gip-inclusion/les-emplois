@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -314,7 +315,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s)
         ''',
@@ -462,7 +464,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -783,7 +786,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s,
                                       %s,
@@ -843,14 +847,14 @@
           </div>
       </div>
       <div>
-          
-              
-              
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -865,17 +869,17 @@
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
-                          
+
                           En attente
                       </span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -890,14 +894,14 @@
           </div>
       </div>
       <div>
-          
-              
-              
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Résultat négatif</span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -957,7 +961,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1203,12 +1208,12 @@
           </div>
       </div>
       <div>
-          
-              
-              
+
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Résultat positif</span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1223,14 +1228,14 @@
           </div>
       </div>
       <div>
-          
-              
-              
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1245,14 +1250,14 @@
           </div>
       </div>
       <div>
-          
-              
-              
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1267,11 +1272,11 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">Phase contradictoire</span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1286,11 +1291,11 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">Phase contradictoire</span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1305,14 +1310,14 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
                       Phase contradictoire -
                       À traiter
                   </span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1327,17 +1332,17 @@
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
                           Phase contradictoire -
                           En attente
                       </span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1352,12 +1357,12 @@
           </div>
       </div>
       <div>
-          
-              
-              
+
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Résultat positif</span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1372,11 +1377,11 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">En cours</span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1391,14 +1396,14 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-                      
+
                       À traiter
                   </span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1413,17 +1418,17 @@
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
-                          
+
                           En attente
                       </span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1438,17 +1443,17 @@
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
-                          
+
                           Problème constaté
                       </span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1463,14 +1468,14 @@
           </div>
       </div>
       <div>
-          
-              
+
+
                   <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-                      
+
                       À traiter
                   </span>
-              
-          
+
+
       </div>
   </div>
   '''
@@ -1485,14 +1490,14 @@
           </div>
       </div>
       <div>
-          
-              
-              
-                  
+
+
+
+
                       <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+
+
+
       </div>
   </div>
   '''
@@ -1552,7 +1557,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1886,7 +1892,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2222,7 +2229,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21

@@ -268,6 +268,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         "is_created_by_a_proxy",
         "has_verified_email",
         "last_login",
+        "upcoming_deletion_notified_at",
     )
     list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (
@@ -287,6 +288,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         "jobseeker_profile_link",
         "disabled_notifications",
         "follow_up_groups_or_members",
+        "upcoming_deletion_notified_at",
     )
 
     add_fieldsets = (
@@ -488,7 +490,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
 
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
         assert "last_login" in fieldsets[-2][1]["fields"]
-        fieldsets[-2] = ("Dates importantes", {"fields": ("last_login", "date_joined", "last_checked_at")})
+        fieldsets[-2] = (
+            "Dates importantes",
+            {"fields": ("last_login", "date_joined", "last_checked_at", "upcoming_deletion_notified_at")},
+        )
 
         assert fieldsets[2][0] == "Permissions"
         if request.user.is_superuser:

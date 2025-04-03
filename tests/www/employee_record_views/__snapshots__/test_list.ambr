@@ -2,31 +2,31 @@
 # name: TestListEmployeeRecords.test_employee_record_to_disable
   '''
   <div class="c-box--results__footer">
-          
+
               <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                  
+
                       <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                  
+
                   <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">Voir la fiche salarié</a>
-                  
+
                       <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter</a>
-                  
+
               </div>
-          
+
       </div>
   '''
 # ---
 # name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
-          
+
               <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                  
-  
+
+
   <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]&amp;jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
-  
+
               </div>
-          
+
       </div>
   '''
 # ---
@@ -38,11 +38,11 @@
                       <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
                   </div>
                   <div class="col">
-                      
+
                           <p class="mb-0">
                               2 nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
                           </p>
-                      
+
                   </div>
                   <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
                       <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
@@ -62,9 +62,9 @@
                       <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
                   </div>
                   <div class="col">
-                      
+
                           <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
-                      
+
                   </div>
                   <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
                       <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
@@ -131,7 +131,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -286,7 +287,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" IN
               (SELECT U1."job_seeker_id"
@@ -484,6 +486,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
