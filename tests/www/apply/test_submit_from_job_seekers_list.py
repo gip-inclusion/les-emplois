@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -11,12 +12,15 @@ from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.test import parse_response_to_soup
 
 
 class TestApplyAsPrescriber:
-    def test_apply_as_prescriber(self, client):
+    @freeze_time("2025-04-03 10:03")
+    def test_apply_as_prescriber(self, client, snapshot):
         guerande = create_city_guerande()
         guerande_company = CompanyWithMembershipAndJobsFactory(
+            for_snapshot=True,
             romes=("N1101", "N1105"),
             department="44",
             coords=guerande.coords,
@@ -35,6 +39,7 @@ class TestApplyAsPrescriber:
         JobApplicationFactory(
             job_seeker=job_seeker,
             sender=prescriber,
+            eligibility_diagnosis=None,
         )
 
         client.force_login(prescriber)
@@ -137,6 +142,18 @@ class TestApplyAsPrescriber:
 
         # Step application's eligibility
         # ----------------------------------------------------------------------
+        response = client.get(next_url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    ("href", f"apply%2F{guerande_company.pk}", "apply%2F[PK of Company]"),
+                    ("href", f"apply/{guerande_company.pk}", "apply/[PK of Company]"),
+                    ("href", f"/company/{guerande_company.pk}", "company/[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="eligibility_step")
 
         # job seeker is getting RSA
         response = client.post(next_url, {"level_1_1": True})
