@@ -1,6 +1,7 @@
 from urllib.parse import quote
 
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -11,12 +12,15 @@ from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.test import parse_response_to_soup
 
 
 class TestApplyAsPrescriber:
-    def test_apply_as_prescriber(self, client):
+    @freeze_time("2025-04-03 10:03")
+    def test_apply_as_prescriber(self, client, snapshot):
         guerande = create_city_guerande()
         guerande_company = CompanyWithMembershipAndJobsFactory(
+            for_snapshot=True,
             romes=("N1101", "N1105"),
             department="44",
             coords=guerande.coords,
@@ -35,6 +39,7 @@ class TestApplyAsPrescriber:
         JobApplicationFactory(
             job_seeker=job_seeker,
             sender=prescriber,
+            eligibility_diagnosis=None,
         )
 
         client.force_login(prescriber)
@@ -126,13 +131,29 @@ class TestApplyAsPrescriber:
         assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id, "company_pk": guerande_company.pk},
         )
         assertRedirects(response, next_url)
 
         # Step application's eligibility
         # ----------------------------------------------------------------------
+        response = client.get(next_url)
+        assert str(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"eligibility%2Fupdate%2F{job_seeker.public_id}%2F{guerande_company.pk}",
+                        "eligibility%2Fupdate%2F[Public ID of JobSeeker]%2F[PK of Company]",
+                    ),
+                    ("href", f"apply/{guerande_company.pk}", "apply/[PK of Company]"),
+                    ("href", f"/company/{guerande_company.pk}", "company/[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="eligibility_step")
 
         # job seeker is getting RSA
         response = client.post(next_url, {"level_1_1": True})
@@ -287,26 +308,12 @@ class TestApplyAsPrescriber:
         assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility
-        # ----------------------------------------------------------------------
-
-        # job seeker is getting RSA
-        response = client.post(next_url, {"level_1_1": True})
-
-        assert EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=guerande_company)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
@@ -459,22 +466,12 @@ class TestApplyAsCompany:
         assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
-        assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
-
-        # Step application's eligibility
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-
-        next_url = reverse(
             "apply:application_resume",
             kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
-        # Step application's resume.
+        # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)

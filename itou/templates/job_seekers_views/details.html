@@ -20,7 +20,7 @@
         {% endif %}
         {% if can_edit_iae_eligibility %}
             <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le candidat">
-                <a href="{% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">
+                <a href="{% url 'eligibility_views:update' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">
                     <i class="ri-checkbox-circle-line fw-medium" aria-hidden="true"></i>
                     {% if iae_eligibility_diagnosis %}
                         <span>Mettre à jour son éligibilité IAE</span>

@@ -8,39 +8,14 @@
     {{ block.super }}
     {% if not job_app_to_transfer|default:False %}
         {% if new_check_needed %}
-            <div class="alert alert-warning alert-dismissible fade show" role="status">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Veuillez vérifier les informations du candidat</strong>
-                        </p>
-                        <p class="mb-0">
-                            La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {% include "apply/includes/submit_new_check_needed.html" %}
         {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block title_content %}
     {% if not job_app_to_transfer|default:False %}
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">{% include 'apply/includes/_submit_title.html' %}</h1>
-            {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
-        </div>
-        <p>
-            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-            {% if can_view_personal_information and not request.user.is_job_seeker %}
-                <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
-            {% endif %}
-            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
-        </p>
+        {% include "apply/includes/submit_title_content.html" %}
     {% endif %}
 {% endblock %}
 
