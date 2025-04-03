@@ -589,7 +589,6 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
 
 
 class CreateJobSeekerForSenderBaseView(JobSeekerForSenderBaseView):
-    required_session_namespaces = ["job_seeker_session"]
     EXPECTED_SESSION_KIND = JobSeekerSessionKinds.GET_OR_CREATE
 
     def __init__(self):
