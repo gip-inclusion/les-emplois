@@ -1,10 +1,16 @@
+import logging
+
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.gps.enums import EndReason
+
+
+logger = logging.getLogger(__name__)
 
 
 class BulkCreatedAtQuerysetProxy:
@@ -18,6 +24,10 @@ class BulkCreatedAtQuerysetProxy:
 class FollowUpGroupManager(models.Manager):
     def follow_beneficiary(self, beneficiary, user, is_referent=None, is_active=True):
         assert beneficiary.is_job_seeker
+        if user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+            # This should not happen but we don't want to block everything
+            logger.warning("We should not try to add a FollowUpGroupMembership on user=%s", user)
+            return
         now = timezone.now()
         with transaction.atomic():
             group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
