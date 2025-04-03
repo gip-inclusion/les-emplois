@@ -1,3 +1,4 @@
+import itertools
 from datetime import date
 from functools import partial
 
@@ -99,7 +100,7 @@ class TestGroupLists:
     @freezegun.freeze_time("2024-06-21", tick=True)
     def test_group_list(self, snapshot, client):
         user = PrescriberFactory(
-            membership__organization__authorized=True, membership__organization__for_snapshot=True
+            membership__organization__authorized=True, membership__organization__for_snapshot=True, for_snapshot=True
         )
         client.force_login(user)
 
@@ -140,11 +141,20 @@ class TestGroupLists:
             response = client.get(reverse("gps:group_list"))
         groups = parse_response_to_soup(
             response,
-            selector="#follow-up-groups-section",
-            replace_in_attr=[
-                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]")
-                for group in [group_1, group_2, group_3]
-            ],
+            selector="#main",
+            replace_in_attr=itertools.chain(
+                *(
+                    [
+                        ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                        (
+                            "value",
+                            str(group.beneficiary_id),
+                            "[PK of JobSeeker]",
+                        ),
+                    ]
+                    for group in [group_1, group_2, group_3]
+                ),
+            ),
         )
         assert str(groups) == snapshot(name="test_my_groups__group_card")
 
