@@ -58,7 +58,7 @@
                                         </td>
                                         <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
-                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token only %}
+                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=True only %}
                                         </td>
                                     </tr>
                                 {% endfor %}

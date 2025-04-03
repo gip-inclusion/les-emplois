@@ -13,9 +13,8 @@
         <div class="d-xl-flex align-items-xl-center">
             <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Détail du contrat : {{ contract.employee.get_full_name }}</h1>
         </div>
-        <button class="btn btn-lg btn-ico-only btn-link justify-content-lg-end" type="button" data-it-action="print" aria-label="Imprimer la page">
-            <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
-        </button>
+
+        {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=False only %}
     </div>
 {% endblock %}
 
