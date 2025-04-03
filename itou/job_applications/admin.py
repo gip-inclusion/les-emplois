@@ -19,6 +19,7 @@ from itou.utils.admin import (
     ItouStackedInline,
     ItouTabularInline,
     ReadonlyMixin,
+    TransitionLogMixin,
     UUIDSupportRemarkInline,
     get_admin_view_link,
 )
@@ -336,7 +337,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
 
 @admin.register(models.JobApplicationTransitionLog)
-class JobApplicationTransitionLogAdmin(ReadonlyMixin, ItouModelAdmin):
+class JobApplicationTransitionLogAdmin(TransitionLogMixin, ItouModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")

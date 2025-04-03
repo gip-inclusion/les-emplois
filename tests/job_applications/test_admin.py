@@ -464,3 +464,22 @@ def test_create_inconsistent_job_application(admin_client):
             ),
         ],
     )
+
+
+def test_delete_is_possible_when_transition_logs_exists(snapshot, admin_client):
+    job_application = factories.JobApplicationFactory(for_snapshot=True)
+
+    response = admin_client.get(reverse("admin:job_applications_jobapplication_delete", args=[job_application.pk]))
+    assertNotContains(response, "votre compte ne possède pas la permission de supprimer les types d’objets suivants")
+    assertContains(response, "<li>Candidatures: 1</li>", count=1)
+
+    models.JobApplicationTransitionLog.log_transition(
+        transition=models.JobApplicationWorkflow.TRANSITION_RENDER_OBSOLETE,
+        from_state=job_application.state,
+        to_state=JobApplicationState.OBSOLETE,
+        modified_object=job_application,
+    )
+    response = admin_client.get(reverse("admin:job_applications_jobapplication_delete", args=[job_application.pk]))
+    assertNotContains(response, "votre compte ne possède pas la permission de supprimer les types d’objets suivants")
+    assertContains(response, "<li>Candidatures: 1</li>", count=1)
+    assertContains(response, "<li>Log des transitions des candidatures: 1</li>", count=1)
