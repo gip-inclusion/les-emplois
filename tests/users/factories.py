@@ -6,6 +6,7 @@ import string
 import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 from django.utils.text import slugify
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, LaneType
@@ -63,6 +64,12 @@ class UserFactory(factory.django.DjangoModelFactory):
             email="john.doe@test.local",
             phone="0606060606",
             public_id="c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",
+        )
+        notified_days_ago = factory.Trait(
+            upcoming_deletion_notified_at=timezone.now() - datetime.timedelta(days=33),
+        )
+        joined_days_ago = factory.Trait(
+            date_joined=timezone.now() - datetime.timedelta(days=365),
         )
 
     username = factory.Sequence("user_name{}".format)

@@ -1,4 +1,36 @@
 # serializer version: 1
+# name: TestNotifyDeactivatedJobSeekerManagementCommand.test_deactivate_jobseekers_after_grace_period[job_seeker_notified_long_time_ago-<lambda>-False][deactivated_jobseeker_email]
+  '''
+  Bonjour Jane DOE,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyDeactivatedJobSeekerManagementCommand.test_deactivate_jobseekers_after_grace_period[job_seeker_notified_long_time_ago-<lambda>-False][deactivated_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte candidat'
+# ---
+# name: TestNotifyDeactivatedJobSeekerManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity-<lambda>-None-True][inactive_jobseeker_email]
+  '''
+  Bonjour Jane DOE,
+  Nous n’avons détecté aucune activité sur votre espace candidat sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Sans connexion de votre part avant le 09/05/2025, votre espace personnel sera supprimé ainsi que toutes les données associées.
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyDeactivatedJobSeekerManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity-<lambda>-None-True][inactive_jobseeker_email_subject]
+  '[DEV] Information avant suppression de votre compte candidat'
+# ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[company]
   '''
   Bonjour,
