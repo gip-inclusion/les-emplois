@@ -1,6 +1,5 @@
 import datetime
 import logging
-from tkinter import N
 
 from django.db import transaction
 from django.db.models import Exists, OuterRef
