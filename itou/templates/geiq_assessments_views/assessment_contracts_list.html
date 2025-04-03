@@ -38,6 +38,7 @@
                                     <th scope="col">Prénom NOM</th>
                                     <th scope="col">Date de début</th>
                                     <th scope="col">Date de fin</th>
+                                    <th scope="col">Contrat >= 3 mois en {{ assessment.campaign.year }}</th>
                                     <th scope="col">Aide potentielle</th>
                                     <th scope="col">Obtenir l’aide</th>
                                 </tr>
@@ -56,6 +57,7 @@
                                                 {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
                                             {% endif %}
                                         </td>
+                                        <td>{{ contract.with_3_months_in_assessment_year|yesno:"Oui,Non" }}</td>
                                         <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
                                             {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=True only %}
