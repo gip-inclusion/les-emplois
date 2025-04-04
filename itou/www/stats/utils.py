@@ -3,7 +3,6 @@ from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
-from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -52,17 +51,6 @@ def can_view_stats_siae(request):
     )
 
 
-def can_view_stats_siae_aci(request):
-    """
-    Non official stats with very specific access rights.
-    """
-    return (
-        can_view_stats_siae(request)
-        and request.current_organization.kind == CompanyKind.ACI
-        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
-    )
-
-
 def can_view_stats_siae_etp(request):
     """
     Non official stats with very specific access rights.
@@ -98,13 +86,6 @@ def can_view_stats_cd(request):
     )
 
 
-def can_view_stats_cd_aci(request):
-    return (
-        can_view_stats_cd(request)
-        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
-    )
-
-
 def can_view_stats_ft(request):
     return (
         request.user.is_prescriber
@@ -133,16 +114,6 @@ def can_view_stats_ddets_iae(request):
         request.user.is_labor_inspector
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DDETS_IAE
-    )
-
-
-def can_view_stats_ddets_iae_aci(request):
-    """
-    Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
-    """
-    return (
-        can_view_stats_ddets_iae(request)
-        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
     )
 
 

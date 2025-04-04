@@ -169,14 +169,11 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     context = {
         # FIXME(vperron): I think there's a rising need for a revamped permission system.
         "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
-        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
         "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
         "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
-        "can_view_stats_cd_aci": stats_utils.can_view_stats_cd_aci(request),
         "can_view_stats_ft": stats_utils.can_view_stats_ft(request),
         "can_view_stats_ph": stats_utils.can_view_stats_ph(request),
         "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
-        "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
         "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
         "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
         "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),

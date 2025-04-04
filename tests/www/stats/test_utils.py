@@ -1,11 +1,8 @@
-import factory.fuzzy
 import pytest
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 
-from itou.common_apps.address.departments import DEPARTMENTS
-from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
@@ -46,81 +43,6 @@ def test_can_view_stats_siae():
     user.companymembership_set.update(is_admin=False)
     request = get_request(user)
     assert utils.can_view_stats_siae(request)
-
-
-def test_can_view_stats_siae_aci():
-    company = CompanyFactory(
-        kind=CompanyKind.ACI, department=factory.fuzzy.FuzzyChoice([31, 84]), with_membership=True
-    )
-    user = company.members.get()
-
-    request = get_request(user)
-    assert utils.can_view_stats_siae_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Even non admin members can view their SIAE stats.
-    user.companymembership_set.update(is_admin=False)
-    request = get_request(user)
-    assert utils.can_view_stats_siae_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-
-def test_can_view_stats_cd_aci(settings):
-    """
-    CD as in "Conseil Départemental".
-    """
-    # Department outside of the whitelist cannot access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=PrescriberOrganizationKind.DEPT,
-        department=factory.fuzzy.FuzzyChoice(set(DEPARTMENTS) - set(settings.STATS_ACI_DEPARTMENT_WHITELIST)),
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Admin prescriber of authorized CD can access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True, kind=PrescriberOrganizationKind.DEPT, department=factory.fuzzy.FuzzyChoice([31, 84])
-    )
-    request = get_request(org.members.get())
-    assert utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non admin prescriber can access as well.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=PrescriberOrganizationKind.DEPT,
-        membership__is_admin=False,
-        department=factory.fuzzy.FuzzyChoice([31, 84]),
-    )
-    request = get_request(org.members.get())
-    assert utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non authorized organization does not give access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        kind=PrescriberOrganizationKind.DEPT,
-        department=factory.fuzzy.FuzzyChoice([31, 84]),
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non CD organization does not give access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=PrescriberOrganizationKind.CHRS,
-        department=factory.fuzzy.FuzzyChoice([31, 84]),
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Prescriber without organization cannot access.
-    request = get_request(PrescriberFactory())
-    assert not utils.can_view_stats_cd_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
 
 
 def test_can_view_stats_ft_as_regular_ft_agency():
@@ -244,27 +166,6 @@ def test_can_view_stats_ddets_iae(kind, is_admin, expected_can_view_stats_ddets_
     institution = InstitutionWithMembershipFactory(kind=kind, membership__is_admin=is_admin, department="93")
     request = get_request(institution.members.get())
     assert utils.can_view_stats_ddets_iae(request) is expected_can_view_stats_ddets_iae
-    assert utils.can_view_stats_dashboard_widget(request)
-
-
-@pytest.mark.parametrize(
-    "kind, is_admin, expected_can_view_stats_ddets_iae_aci",
-    [
-        # Admin member of DDETS IAE can access.
-        (InstitutionKind.DDETS_IAE, True, True),
-        # Non admin member of DDETS IAE can access as well.
-        (InstitutionKind.DDETS_IAE, False, True),
-        # Member of institution of wrong kind cannot access.
-        (InstitutionKind.OTHER, True, False),
-    ],
-)
-def test_can_view_stats_ddets_iae_aci(kind, is_admin, expected_can_view_stats_ddets_iae_aci):
-    # Admin member of DDETS IAE can access.
-    institution = InstitutionWithMembershipFactory(
-        kind=kind, membership__is_admin=is_admin, department=factory.fuzzy.FuzzyChoice([31, 84])
-    )
-    request = get_request(institution.members.get())
-    assert utils.can_view_stats_ddets_iae_aci(request) is expected_can_view_stats_ddets_iae_aci
     assert utils.can_view_stats_dashboard_widget(request)
 
 
