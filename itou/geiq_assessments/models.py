@@ -209,6 +209,22 @@ class Employee(models.Model):
     def __str__(self):
         return self.get_full_name()
 
+    def get_prior_actions(self):
+        actions = []
+        # Sorted in python to leverage prefetch_related field
+        for prequalification in sorted(self.prequalifications.all(), key=lambda prequal: prequal.end_at, reverse=True):
+            years = {str(prequalification.start_at.year), str(prequalification.end_at.year)}
+            display_years = "-".join(sorted(years))
+
+            if prequalification.other_data.get("action_pre_qualification", {}).get("libelle_abr") != "AUTRE":
+                action = prequalification.other_data.get("action_pre_qualification", {}).get("libelle")
+            elif other_action := prequalification.other_data.get("autre_type_prequalification_action"):
+                action = other_action
+            else:
+                action = "Autre"
+            actions.append(f"{action} ({display_years})")
+        return actions
+
 
 class EmployeeContract(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
