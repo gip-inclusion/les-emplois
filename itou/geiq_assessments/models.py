@@ -154,6 +154,11 @@ class Assessment(models.Model):
             )
         )
 
+    def label_antenna_ids(self):
+        if not self.label_antennas:
+            return []
+        return [antenna["id"] for antenna in self.label_antennas]
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
