@@ -16,7 +16,7 @@ services:
   # https://hub.docker.com/r/mdillon/postgis/tags
   postgres:
     container_name: itou_postgres
-    image: postgis/postgis:15-master
+    image: postgis/postgis:17-master
     # Disable some safety switches for a faster postgres: https://www.postgresql.org/docs/current/non-durability.html
     command: -c fsync=off -c full_page_writes=off -c synchronous_commit=off
     environment:
@@ -71,7 +71,7 @@ services:
         APP_USER: app
         APP_DIR: /app
         PYTHON_VERSION: 3.13
-        PG_MAJOR: 15
+        PG_MAJOR: 17
     volumes:
       # Mount the current directory into `/app` inside the running container.
       - .:/app
