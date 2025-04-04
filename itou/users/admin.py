@@ -63,7 +63,7 @@ class DisabledNotificationsMixin:
     def disabled_notifications(self, obj):
         if obj.user.is_employer:
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.company)
-        elif obj.user.is_prescriber_with_authorized_org:
+        elif obj.user.is_prescriber:
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.organization)
         else:
             notification_settings, _ = NotificationSettings.get_or_create(obj.user)
@@ -369,7 +369,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
     def disabled_notifications(self, obj):
         if obj.is_employer:
             return "Voir pour chaque structure ci-dessous"
-        if obj.is_prescriber_with_authorized_org:
+        if obj.is_prescriber:
             return "Voir pour chaque organisation ci-dessous"
         notification_settings, _ = NotificationSettings.get_or_create(obj)
         disabled_notifications = notification_settings.disabled_notifications_names
