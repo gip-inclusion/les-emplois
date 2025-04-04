@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}Bilan financier de l’action - {{ block.super }}{% endblock %}
 
@@ -27,8 +28,9 @@
             <div class="row">
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <h4>1. Téléchargez le modèle du document</h4>
-                    <a href="https://www.service-public.fr/particuliers/vosdroits/R46623" class="btn btn-outline-primary mb-3 has-external-link" rel="noopener" target="_blank">
+                    <a href="{% static 'pdf/cerfa_15059-02.pdf' %}" class="btn btn-ico btn-outline-primary mb-3" rel="noopener" target="_blank">
                         <span>Modèle bilan financier de l’action</span>
+                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                     </a>
                     <h4>2. Déposez ici le document rempli</h4>
 
