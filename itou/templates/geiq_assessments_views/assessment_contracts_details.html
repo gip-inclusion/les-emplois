@@ -213,7 +213,17 @@
                                 </li>
                                 <li>
                                     <small>Préqualifications</small>
-                                    <strong>TODO</strong>
+                                    <strong>
+                                        {% with prior_actions=contract.employee.get_prior_actions %}
+                                            {% if prior_actions %}
+                                                <ul>
+                                                    {% for prior_action in prior_actions %}<li>{{ prior_action }}</li>{% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% endwith %}
+                                    </strong>
                                 </li>
                             </ul>
                         </div>
