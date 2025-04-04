@@ -8,6 +8,8 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
+{% block title_content %}<h1>Modifier cette organisation</h1>{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     <div class="alert alert-info" role="status">
@@ -21,8 +23,6 @@
         </p>
     </div>
 {% endblock %}
-
-{% block title_content %}<h1>Modifier cette organisation</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

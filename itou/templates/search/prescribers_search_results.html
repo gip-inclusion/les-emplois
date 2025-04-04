@@ -7,12 +7,6 @@
     {{ block.super }}
 {% endblock %}
 
-{% block script %}
-    {{ block.super }}
-    <script src='{% static "js/htmx_compat.js" %}'></script>
-    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
-{% endblock %}
-
 {% block title_content %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
 
 {% block title_extra %}
@@ -50,4 +44,10 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}

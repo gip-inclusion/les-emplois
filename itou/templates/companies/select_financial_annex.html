@@ -2,11 +2,11 @@
 {% load buttons_form %}
 {% load django_bootstrap5 %}
 
+{% block title %}Sélectionner une annexe financière {{ block.super }}{% endblock %}
+
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
-
-{% block title %}Sélectionner une annexe financière {{ block.super }}{% endblock %}
 
 {% block title_content %}<h1>Sélectionner une annexe financière</h1>{% endblock %}
 

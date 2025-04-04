@@ -6,6 +6,10 @@
     GPS - Profil de {{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
 
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block title_content %}
     <div class="c-title">
         <div class="c-title__main">
@@ -41,10 +45,6 @@
             <a class="nav-link{% if active_tab == "contribution" %} active{% endif %}" href="{% url 'gps:group_contribution' group_id=group.pk %}?back_url={{ back_url|urlencode }}">Mon intervention</a>
         </li>
     </ul>
-{% endblock %}
-
-{% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block script %}
