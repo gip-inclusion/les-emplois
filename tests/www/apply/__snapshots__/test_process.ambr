@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessAcceptViews.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -850,6 +850,29 @@
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          '_accept[www/apply/views/common.py]',
+          'accept[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "eligibility_eligibilitydiagnosis" U0
+                             LEFT OUTER JOIN "eligibility_selectedadministrativecriteria" U1 ON (U0."id" = U1."eligibility_diagnosis_id")
+                             WHERE (U1."certified" IS NULL
+                                    AND U0."id" = ("eligibility_eligibilitydiagnosis"."id"))
+                             LIMIT 1)))
           LIMIT 1
         ''',
       }),

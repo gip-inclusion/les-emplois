@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -256,6 +256,29 @@
       }),
       dict({
         'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "eligibility_eligibilitydiagnosis" U0
+                             LEFT OUTER JOIN "eligibility_selectedadministrativecriteria" U1 ON (U0."id" = U1."eligibility_diagnosis_id")
+                             WHERE (U1."certified" IS NULL
+                                    AND U0."id" = ("eligibility_eligibilitydiagnosis"."id"))
+                             LIMIT 1)))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'User.has_verified_email[users/models.py]',
           'User.can_edit_email[users/models.py]',
           'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
@@ -354,7 +377,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -613,6 +636,29 @@
           FROM "asp_country"
           WHERE "asp_country"."id" = %s
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.identity_certified_compat[users/models.py]',
+          'EditJobSeekerInfoForm.__init__[users/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'EditJobSeekerInfoForm.__init__[common_apps/nir/forms.py]',
+          'EditJobSeekerInfoForm.__init__[www/dashboard/forms.py]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND NOT (EXISTS
+                            (SELECT %s AS "a"
+                             FROM "eligibility_eligibilitydiagnosis" U0
+                             LEFT OUTER JOIN "eligibility_selectedadministrativecriteria" U1 ON (U0."id" = U1."eligibility_diagnosis_id")
+                             WHERE (U1."certified" IS NULL
+                                    AND U0."id" = ("eligibility_eligibilitydiagnosis"."id"))
+                             LIMIT 1)))
+          LIMIT 1
         ''',
       }),
       dict({
