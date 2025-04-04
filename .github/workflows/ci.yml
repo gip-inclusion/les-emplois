@@ -28,7 +28,7 @@ jobs:
 
       postgres:
         # Docker Hub image
-        image: postgis/postgis:15-master
+        image: postgis/postgis:17-master
         env:
           POSTGRES_PASSWORD: password
         volumes:

@@ -1,5 +1,15 @@
 # Journal des changements techniques majeurs
 
+## 2025-04-07
+
+- Mise à jour vers Postgres 17: si vous utilisez docker il faudra supprimer
+  (ou migrer) le volume docker `les-emplois_postgres_data` pour éviter
+  l’erreur très claire de postgres:
+
+    FATAL:  database files are incompatible with server
+    DETAIL:  The data directory was initialized by PostgreSQL version 15,
+    which is not compatible with this version 17.4 (Debian 17.4-1.pgdg110+2).
+
 ## 2025-03-27
 
 - [`uv`](https://docs.astral.sh/uv/) est maintenant requis pour développer sur
