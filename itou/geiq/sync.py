@@ -314,12 +314,9 @@ def _more_than_3_months_in_year(start: datetime.date, end: datetime.date, *, yea
 
 
 def sync_employee_and_contracts(assessment, new_mode=False):
+    assessment_antenna_ids = []
     if new_mode:
         assert not assessment.contracts_synced_at
-        geiq_id = assessment.label_geiq_id
-        Employee = geiq_assessments_models.Employee
-        EmployeeContract = geiq_assessments_models.EmployeeContract
-        EmployeePrequalification = geiq_assessments_models.EmployeePrequalification
         if new_mode:
             # Prevent concurrent sync on the same assessment
             assessment = geiq_assessments_models.Assessment.objects.select_for_update().get(pk=assessment.pk)
@@ -330,6 +327,11 @@ def sync_employee_and_contracts(assessment, new_mode=False):
                     assessment.contracts_synced_at,
                 )
                 return
+        geiq_id = assessment.label_geiq_id
+        Employee = geiq_assessments_models.Employee
+        EmployeeContract = geiq_assessments_models.EmployeeContract
+        EmployeePrequalification = geiq_assessments_models.EmployeePrequalification
+        assessment_antenna_ids = assessment.label_antenna_ids()
     else:
         assert not assessment.submitted_at
         geiq_id = assessment.label_id
@@ -342,7 +344,14 @@ def sync_employee_and_contracts(assessment, new_mode=False):
     prequalification_infos = []
     employee_infos = {}
     employee_support_periods = {}
-    for contract_info in client.get_all_contracts(geiq_id):
+
+    limit_end_date = (
+        datetime.date(assessment.campaign.year - 1, 10, 1)
+        if new_mode
+        else datetime.date(assessment.campaign.year, 1, 1)
+    )
+    # TODO: rajouter filtre sur antennes ?
+    for contract_info in client.get_all_contracts(geiq_id, date_fin=limit_end_date - datetime.timedelta(days=1)):
         contract_info["date_debut"] = convert_iso_datetime_to_date(contract_info["date_debut"])
         contract_info["date_fin"] = convert_iso_datetime_to_date(contract_info["date_fin"])
         contract_info["date_fin_contrat"] = (
@@ -357,8 +366,11 @@ def sync_employee_and_contracts(assessment, new_mode=False):
         # If a contract was planned to end in 2023 but ended in 2022,
         # its data is irrelevant for 2023 assessment: ignore it
         end_date = contract_info["date_fin_contrat"] or contract_info["date_fin"]
-        if end_date.year < assessment.campaign.year:
+        if end_date < limit_end_date:
             # Ignoring contract ending before assessment year
+            continue
+        if new_mode and contract_info["antenne"]["id"] not in assessment_antenna_ids:
+            # Contract on other antenna
             continue
 
         employee_info = contract_info["salarie"]
