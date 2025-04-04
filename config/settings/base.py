@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "pgtrigger",
     "django_otp",
     "django_otp.plugins.otp_totp",
+    "slippers",
     # Register adapters before to load allauth apps.
     "itou.allauth_adapters",
     "allauth",
@@ -180,7 +181,8 @@ TEMPLATES = [
                 "itou.utils.context_processors.expose_enums",
                 "itou.utils.context_processors.matomo",
                 "itou.utils.context_processors.active_announcement_campaign",
-            ]
+            ],
+            "builtins": ["slippers.templatetags.slippers"],
         },
     }
 ]
@@ -333,6 +335,8 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
+
+SILENCED_SYSTEM_CHECKS = ["slippers.E001"]  # We register the components differently
 
 # User authentication callbacks such as redirections after login.
 # Replaces LOGIN_REDIRECT_URL, which is static, by ACCOUNT_ADAPTER which is dynamic.
