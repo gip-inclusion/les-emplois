@@ -128,6 +128,7 @@ class FollowUpGroupMembership(models.Model):
         ]
 
     is_referent = models.BooleanField(default=False, verbose_name="référent")
+    is_referent_certified = models.BooleanField(db_default=False, verbose_name="référent certifié")
 
     # Is this user still an active member of the group?
     # Or maybe waiting for an invitation to be activated?

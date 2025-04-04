@@ -124,7 +124,7 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
             FollowUpGroupMembership.objects.with_members_organizations_names()
             .filter(follow_up_group=self.group)
             .filter(is_active=True)
-            .order_by("-created_at")
+            .order_by("-is_referent_certified", "-created_at")
             .select_related("member")
         )
 

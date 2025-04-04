@@ -39,7 +39,9 @@ def log_contact_info_display(current_user, follow_up_group, target_participant, 
     doc_id = "6tLJYftGnEBTg5yfTCs5N5"
     table_id = "Intentions_mer"
 
-    referent_mapping = dict(follow_up_group.memberships.values_list("member_id", "is_referent"))
+    membership_data = follow_up_group.memberships.values_list("member_id", "is_referent", "is_referent_certified")
+    referent_mapping = {d[0]: d[1] for d in membership_data}
+    referent_certified_mapping = {d[0]: d[2] for d in membership_data}
 
     new_record = {
         "fields": {
@@ -59,6 +61,7 @@ def log_contact_info_display(current_user, follow_up_group, target_participant, 
             "target_participant_email": target_participant.email,
             "target_participant_type": get_user_kind_display(target_participant),
             "target_participant_is_referent": referent_mapping[target_participant.pk],
+            "target_participant_is_ft_import": referent_certified_mapping[target_participant.pk],
             "target_participant_admin_url": get_user_admin_url(target_participant),
         }
     }
