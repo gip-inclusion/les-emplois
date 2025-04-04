@@ -292,7 +292,7 @@
                             <ul class="list-data list-data__two-column-md mb-3">
                                 <li>
                                     <small>Emploi de sortie</small>
-                                    <strong>{{ contract.other_data.emploi_sorti|label_object_format }}</strong>
+                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
                                 </li>
                                 <li>
                                     <small>Détail sur l’emploi de sortie</small>
