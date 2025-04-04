@@ -320,6 +320,16 @@ def sync_employee_and_contracts(assessment, new_mode=False):
         Employee = geiq_assessments_models.Employee
         EmployeeContract = geiq_assessments_models.EmployeeContract
         EmployeePrequalification = geiq_assessments_models.EmployeePrequalification
+        if new_mode:
+            # Prevent concurrent sync on the same assessment
+            assessment = geiq_assessments_models.Assessment.objects.select_for_update().get(pk=assessment.pk)
+            if assessment.contracts_synced_at:
+                logger.info(
+                    "Assessment pk=%s: contract already synced at %s - aborting",
+                    assessment.pk,
+                    assessment.contracts_synced_at,
+                )
+                return
     else:
         assert not assessment.submitted_at
         geiq_id = assessment.label_id
@@ -399,7 +409,6 @@ def sync_employee_and_contracts(assessment, new_mode=False):
             employee_info["support_days_nb"] = support_days_nb
 
     # Sync data to DB
-
     def employee_data_to_django(data, *, mapping, model):
         employee = label_data_to_django(data, mapping=mapping, model=model)
         employee.assessment = assessment
