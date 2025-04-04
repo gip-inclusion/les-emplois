@@ -58,7 +58,7 @@ class AdministrativeCriteriaForm(forms.Form):
             raise forms.ValidationError(self.ERROR_LONG_TERM_JOB_SEEKER)
 
         # No required criterion for authorized prescribers. Stop here.
-        if self.user.is_prescriber_with_authorized_org or not self.siae:
+        if self.user.is_authorized_prescriber or not self.siae:
             return selected_objects
 
         level_1 = [

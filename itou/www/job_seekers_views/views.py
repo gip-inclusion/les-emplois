@@ -84,7 +84,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
                 for_siae=self.request.current_organization if self.request.user.is_employer else None,
                 prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
-        if self.request.user.is_prescriber_with_authorized_org and approval is None:
+        if self.request.user.is_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
         if geiq_eligibility_diagnosis:

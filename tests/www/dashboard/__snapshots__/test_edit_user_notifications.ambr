@@ -1598,7 +1598,7 @@
 # ---
 # name: test_prescriber_allowed[view queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1747,29 +1747,6 @@
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IncludeNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[dashboard/edit_user_notifications.html]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -2392,7 +2369,7 @@
 # ---
 # name: test_solo_adviser_allowed[view queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -2525,29 +2502,6 @@
                  AND "communications_notificationsettings"."structure_pk" IS NULL
                  AND "communications_notificationsettings"."structure_type_id" IS NULL)
           ORDER BY "communications_notificationsettings"."id" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IfNode[layout/_header_help_dropdown_content.html]',
-          'IncludeNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[dashboard/edit_user_notifications.html]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
           LIMIT 1
         ''',
       }),

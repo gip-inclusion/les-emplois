@@ -262,7 +262,7 @@ def _geiq_eligibility_criteria(
     if request.method == "POST" and form.is_valid():
         criteria = form.cleaned_data
         if request.htmx:
-            allowance_amount = geiq_allowance_amount(request.user.is_prescriber_with_authorized_org, criteria)
+            allowance_amount = geiq_allowance_amount(request.user.is_authorized_prescriber, criteria)
         else:
             if diagnosis:
                 GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)

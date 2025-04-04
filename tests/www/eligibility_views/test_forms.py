@@ -19,6 +19,7 @@ class TestAdministrativeCriteriaForm:
 
     def test_valid_for_prescriber(self):
         user = PrescriberFactory()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         criterion1 = AdministrativeCriteria.objects.get(pk=13)
         form_data = {f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion1.pk}": "true"}
         form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
@@ -29,6 +30,7 @@ class TestAdministrativeCriteriaForm:
     def test_valid_for_siae(self):
         company = CompanyFactory(kind=CompanyKind.ACI, with_membership=True)
         user = company.members.first()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -56,6 +58,7 @@ class TestAdministrativeCriteriaForm:
     def test_criteria_fields(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         form = AdministrativeCriteriaForm(user, company)
         assert AdministrativeCriteria.objects.all().count() == len(form.fields)
@@ -66,6 +69,7 @@ class TestAdministrativeCriteriaForm:
         """
         company = CompanyFactory(kind=CompanyKind.ACI, with_membership=True)
         user = company.members.first()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -87,6 +91,7 @@ class TestAdministrativeCriteriaForm:
     def test_valid_for_siae_of_kind_etti(self):
         company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
         user = company.members.first()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -115,6 +120,7 @@ class TestAdministrativeCriteriaForm:
         """
         company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
         user = company.members.first()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -136,6 +142,7 @@ class TestAdministrativeCriteriaForm:
         Test ERROR_SENIOR_JUNIOR.
         """
         user = PrescriberFactory()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(name="Senior (+50 ans)")
         criterion2 = AdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
@@ -153,6 +160,7 @@ class TestAdministrativeCriteriaForm:
         Test ERROR_LONG_TERM_JOB_SEEKER.
         """
         user = PrescriberFactory()
+        user.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
 
         criterion1 = AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)")
         criterion2 = AdministrativeCriteria.objects.get(name="DELD (12-24 mois)")
@@ -169,7 +177,9 @@ class TestAdministrativeCriteriaForm:
 
     def test_no_required_criteria_for_prescriber_with_authorized_organization(self):
         prescriber = PrescriberFactory()
+        prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber.is_authorized_prescriber = True  # set by ItouCurrentOrganizationMiddleware
         company = CompanyFactory()
 
         assert not AdministrativeCriteriaForm(prescriber, company, data={}).is_valid()
@@ -177,6 +187,7 @@ class TestAdministrativeCriteriaForm:
 
     def test_no_required_criteria_when_no_siae(self):
         prescriber = PrescriberFactory()
+        prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         company = CompanyFactory()
 
         assert not AdministrativeCriteriaForm(prescriber, company, data={}).is_valid()

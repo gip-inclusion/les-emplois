@@ -1617,6 +1617,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
@@ -3880,6 +3882,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
+          'User.can_edit_personal_information[users/models.py]',
+          'User.can_view_personal_information[users/models.py]',
           'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
         ]),
         'sql': '''

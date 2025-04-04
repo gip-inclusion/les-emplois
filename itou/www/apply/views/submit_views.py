@@ -555,7 +555,7 @@ class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseVi
 
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
-        if not request.user.is_prescriber_with_authorized_org:
+        if not request.user.is_authorized_prescriber:
             return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
@@ -688,18 +688,14 @@ class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
 
     def get_back_url(self):
         view_name = "apply:application_jobs"
-        if self.company.kind == CompanyKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
+        if self.company.kind == CompanyKind.GEIQ and self.request.user.is_authorized_prescriber:
             view_name = "apply:application_geiq_eligibility"
         elif self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
                 not self.company.is_subject_to_eligibility_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis.
-                not (
-                    self.request.user.is_prescriber
-                    and self.request.current_organization
-                    and self.request.current_organization.is_authorized
-                ),
+                not self.request.user.is_authorized_prescriber,
                 # No need for eligibility diagnosis if the job seeker already have a PASS IAE
                 self.job_seeker.has_valid_approval,
             ]
