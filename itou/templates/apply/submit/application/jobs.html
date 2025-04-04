@@ -4,7 +4,7 @@
 {% load django_bootstrap5 %}
 
 {% block title_prevstep %}
-    {% if not form.spontaneous_application and not form.selected_jobs|length %}
+    {% if form.no_available_jobs %}
         {% url "companies_views:card" siae_id=siae.pk as default_back_url %}
         {% include "layout/previous_step.html" with back_url=back_url|default:default_back_url only %}
     {% endif %}
@@ -62,14 +62,14 @@
             </li>
         {% endif %}
     </ul>
-    {% if not form.spontaneous_application and not form.selected_jobs|length %}
+    {% if form.no_available_jobs %}
         <p>Cet employeur ne souhaite pas recevoir de candidatures pour le moment.</p>
     {% endif %}
 {% endblock %}
 
 {% block form_submit_button %}
     {# Disable the form submission if there are no available jobs #}
-    {% if form.spontaneous_application or form.selected_jobs|length %}
+    {% if not form.no_available_jobs %}
         {{ block.super }}
     {% else %}
         {% url "companies_views:card" siae_id=siae.pk as default_back_url %}
