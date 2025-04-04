@@ -353,7 +353,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
 
         if email := self.cleaned_data.get("email"):
             validated_by = User.objects.filter(email=email).first()
-            if validated_by and validated_by.is_prescriber_with_authorized_org:
+            if validated_by and validated_by.is_prescriber_with_authorized_org_memberships:
                 self.instance.validated_by = validated_by
             else:
                 # Either does not exist or is not an authorized prescriber

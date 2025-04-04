@@ -593,7 +593,7 @@ class User(AbstractUser, AddressMixin):
         return bool(self.is_job_seeker and self.created_by_id and not self.last_login)
 
     @cached_property
-    def is_prescriber_with_authorized_org(self):
+    def is_prescriber_with_authorized_org_memberships(self):
         return (
             self.is_prescriber
             and self.prescribermembership_set.filter(

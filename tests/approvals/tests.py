@@ -1555,7 +1555,7 @@ class TestProlongationModel:
 
         # Unauthorize the prescriber organization
         prolongation.validated_by.prescriberorganization_set.update(is_authorized=False)
-        del prolongation.validated_by.is_prescriber_with_authorized_org
+        del prolongation.validated_by.is_prescriber_with_authorized_org_memberships
 
         with pytest.raises(ValidationError) as error:
             prolongation.clean()
