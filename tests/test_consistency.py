@@ -148,14 +148,19 @@ def test_check_templates_ordering():
         "content",
         "script",
     ]
+
+    def iter_through_extends_node(nodelist):
+        for node in nodelist:
+            if isinstance(node, loader_tags.ExtendsNode):
+                yield from node.nodelist
+            else:
+                yield node
+
     errors = []
     for template_name in iter_template_names():
-        node_list = loader.get_template(template_name).template.nodelist
-        if len(node_list) == 1 and isinstance(node_list[0], loader_tags.ExtendsNode):
-            node_list = node_list[0].nodelist
         blocks = []
         loads = []
-        for node in node_list:
+        for node in iter_through_extends_node(loader.get_template(template_name).template.nodelist):
             if isinstance(node, loader_tags.BlockNode) and node.name in EXPECTED_BLOCK_ORDER:
                 blocks.append(node.name)
             if isinstance(node, LoadNode):
