@@ -94,8 +94,6 @@ def test_stats_cd_log_visit(client, settings, view_name):
     prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True, department="22")
     user = prescriber_org.members.get()
 
-    settings.STATS_ACI_DEPARTMENT_WHITELIST = [prescriber_org.department]
-
     client.force_login(user)
 
     assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
@@ -130,7 +128,6 @@ def test_stats_siae_log_visit(client, settings, view_name):
     user = company.members.get()
 
     settings.STATS_SIAE_USER_PK_WHITELIST = [user.pk]
-    settings.STATS_ACI_DEPARTMENT_WHITELIST = [company.department]
 
     client.force_login(user)
 
@@ -164,8 +161,6 @@ def test_stats_siae_log_visit(client, settings, view_name):
 def test_stats_ddets_iae_log_visit(client, settings, view_name):
     institution = InstitutionWithMembershipFactory(kind="DDETS IAE", department="22")
     user = institution.members.get()
-
-    settings.STATS_ACI_DEPARTMENT_WHITELIST = [institution.department]
 
     client.force_login(user)
 
