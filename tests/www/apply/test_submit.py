@@ -246,21 +246,28 @@ class TestApply:
             ),
         )
 
-    def test_blocked_application(self, client):
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_blocked_application(self, client, view_name, post_data):
         # It's possible that for example the user loaded this page before spontaneous applications were closed.
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
         job_seeker = JobSeekerFactory()
-        client.force_login(job_seeker)
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
         session = client.session
         session[f"job_application-{company.pk}"] = {"selected_jobs": []}
         session.save()
 
         response = client.post(
             reverse(
-                "apply:application_resume",
+                view_name,
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
-            {"message": "Hire me?"},
+            post_data,
         )
         assert JobApplication.objects.exists() is False
         assertRedirects(
@@ -275,20 +282,27 @@ class TestApply:
             [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
         )
 
-    def test_spontaneous_application_blocked(self, client):
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_spontaneous_application_blocked(self, client, view_name, post_data):
         company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
         job_seeker = JobSeekerFactory()
-        client.force_login(job_seeker)
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
         session = client.session
         session[f"job_application-{company.pk}"] = {"selected_jobs": []}
         session.save()
 
         response = client.post(
             reverse(
-                "apply:application_resume",
+                view_name,
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
-            {"message": "Hire me?"},
+            post_data,
         )
         assert JobApplication.objects.exists() is False
         assertRedirects(
@@ -303,11 +317,18 @@ class TestApply:
             [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)],
         )
 
-    def test_recruitment_closed_on_position(self, client):
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_recruitment_closed_on_position(self, client, view_name, post_data):
         # No block is active, but one of the selected jobs is no longer active.
         company = CompanyFactory(with_jobs=True, with_membership=True)
         job_seeker = JobSeekerFactory()
-        client.force_login(job_seeker)
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
         session = client.session
 
         jobs = company.job_description_through.all()
@@ -320,10 +341,10 @@ class TestApply:
 
         response = client.post(
             reverse(
-                "apply:application_resume",
+                view_name,
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
-            {"message": "Hire me?"},
+            post_data,
         )
         assert JobApplication.objects.exists() is False
         assertRedirects(
