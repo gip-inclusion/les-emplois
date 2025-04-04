@@ -1,11 +1,18 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load matomo %}
 {% load static %}
 {% load str_filters %}
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Structure</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Structure</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
