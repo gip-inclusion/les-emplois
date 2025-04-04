@@ -11,6 +11,7 @@ from itou.files.models import File
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.users.enums import Title
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class AssessmentCampaign(models.Model):
@@ -213,16 +214,17 @@ class Employee(models.Model):
         actions = []
         # Sorted in python to leverage prefetch_related field
         for prequalification in sorted(self.prequalifications.all(), key=lambda prequal: prequal.end_at, reverse=True):
-            years = {str(prequalification.start_at.year), str(prequalification.end_at.year)}
-            display_years = "-".join(sorted(years))
-
             if prequalification.other_data.get("action_pre_qualification", {}).get("libelle_abr") != "AUTRE":
                 action = prequalification.other_data.get("action_pre_qualification", {}).get("libelle")
             elif other_action := prequalification.other_data.get("autre_type_prequalification_action"):
                 action = other_action
             else:
                 action = "Autre"
-            actions.append(f"{action} ({display_years})")
+            hour_nb = prequalification.other_data.get("nombre_heure_formation", 0)
+            actions.append(
+                f"{action} ({hour_nb} heure{pluralizefr(hour_nb)} "
+                f"du {prequalification.start_at:%d/%m/%Y} au {prequalification.end_at:%d/%m/%Y})"
+            )
         return actions
 
 
