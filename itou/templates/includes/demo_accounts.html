@@ -73,6 +73,20 @@
                             {% endfor %}
                         </div>
                     </div>
+                    {% if ITOU_ENVIRONMENT == "DEV" %}
+                        <hr class="my-4">
+                        <div>
+                            <h4 class="h5">Administrateur</h4>
+                            <div class="d-flex flex-column flex-sm-row gap-3">
+                                {% admin_accounts_tag as admin_accounts %}
+                                {% for account in admin_accounts %}
+                                    <button type="button" class="btn btn-secondary postLogin" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                        {{ account.title }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="d-none">
                     <!-- `action` is set by demo_accounts.js based on clicked link's "data-action-url" attribute. -->
