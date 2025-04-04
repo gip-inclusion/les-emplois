@@ -1,3 +1,4 @@
+import collections
 import itertools
 import json
 import os
@@ -173,6 +174,9 @@ def test_check_templates_ordering():
             for load in loads:
                 if len(load.split()) != 2:
                     errors.append((template_name, f"One load per line expected: {load}"))
+            if len(loads) != len(set(loads)):
+                duplicates = sorted(load for load, count in collections.Counter(loads).items() if count != 1)
+                errors.append((template_name, f"Duplicate loads found: {duplicates}"))
             if loads != sorted(loads):
                 errors.append((template_name, f"Unsorted loads: {loads}"))
     assert sorted(errors) == []  # Group errors by template_name
