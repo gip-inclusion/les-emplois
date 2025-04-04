@@ -1534,7 +1534,7 @@ class CommonProlongation(models.Model):
         if (
             hasattr(self, "validated_by")
             and self.validated_by
-            and not self.validated_by.is_prescriber_with_authorized_org
+            and not self.validated_by.is_prescriber_with_authorized_org_memberships
         ):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 

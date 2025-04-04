@@ -1358,12 +1358,12 @@ def test_save_erases_pe_obfuscated_nir_when_the_nir_changes_after_a_failed_attem
 @pytest.mark.parametrize("user_active", [False, True])
 @pytest.mark.parametrize("membership_active", [False, True])
 @pytest.mark.parametrize("organization_authorized", [False, True])
-def test_is_prescriber_with_authorized_org(user_active, membership_active, organization_authorized):
+def test_is_prescriber_with_authorized_org_memberships(user_active, membership_active, organization_authorized):
     prescriber = PrescriberFactory(is_active=user_active)
     PrescriberMembershipFactory(
         is_active=membership_active, user=prescriber, organization__is_authorized=organization_authorized
     )
-    assert prescriber.is_prescriber_with_authorized_org is all(
+    assert prescriber.is_prescriber_with_authorized_org_memberships is all(
         [user_active, membership_active, organization_authorized]
     )
 
