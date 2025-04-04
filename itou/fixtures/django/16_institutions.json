@@ -14,7 +14,7 @@
       "geocoding_updated_at": null,
       "insee_city": null,
       "kind": "DREETS IAE",
-      "name": "DREETS Provence-Alpes-Côte d’Azur",
+      "name": "DREETS-PACA",
       "post_code": "13285",
       "uid": "01237117-9b60-4ac3-b628-93b332fe2c6f"
     },
@@ -36,7 +36,7 @@
       "geocoding_updated_at": null,
       "insee_city": null,
       "kind": "DDETS IAE",
-      "name": "DDETS de Nîmes",
+      "name": "DDETS 30",
       "post_code": "30972",
       "uid": "02c9b4ed-110c-4639-8445-aa5ab9937d2c"
     },
@@ -58,7 +58,7 @@
       "geocoding_updated_at": null,
       "insee_city": null,
       "kind": "DDETS GEIQ",
-      "name": "DDETS de Nîmes",
+      "name": "DDETS 30",
       "post_code": "30972",
       "uid": "acd5ea76-3aad-476a-a2db-5212d90d09b2"
     },
@@ -80,7 +80,7 @@
       "geocoding_updated_at": null,
       "insee_city": null,
       "kind": "DREETS GEIQ",
-      "name": "DREETS Provence-Alpes-Côte d’Azur",
+      "name": "DREETS-PACA",
       "post_code": "13285",
       "uid": "90d63648-3ebc-47f6-bf85-fa432ec6514f"
     },
