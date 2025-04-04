@@ -26,7 +26,7 @@ class CreateForm(forms.Form):
     )
     ddets = forms.ModelChoiceField(
         label="Sélectionnez la DDETS",
-        queryset=Institution.objects.filter(kind=InstitutionKind.DDETS_GEIQ),
+        queryset=Institution.objects.filter(kind=InstitutionKind.DDETS_GEIQ).order_by("department"),
         required=False,
     )
     convention_with_dreets = forms.BooleanField(
@@ -43,7 +43,7 @@ class CreateForm(forms.Form):
     )
     dreets = forms.ModelChoiceField(
         label="Sélectionnez la DREETS",
-        queryset=Institution.objects.filter(kind=InstitutionKind.DREETS_GEIQ),
+        queryset=Institution.objects.filter(kind=InstitutionKind.DREETS_GEIQ).order_by("name"),
         required=False,
     )
 
