@@ -63,14 +63,6 @@
                             </a>
 
                         </li>
-                        {% if can_view_stats_ddets_iae_aci %}
-                            <li class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'stats:stats_ddets_iae_aci' %}" class="btn-link btn-ico">
-                                    <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                    <span>Suivi du cofinancement des ACI de mon département</span>
-                                </a>
-                            </li>
-                        {% endif %}
                     {% endif %}
                     {% if can_view_stats_ddets_log %}
                         <li class="d-flex justify-content-between align-items-center mb-3">

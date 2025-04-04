@@ -202,26 +202,6 @@ def stats_redirect(request, dashboard_name):
     return HttpResponseRedirect(reverse(f"stats:stats_{normalized_organization_kind}_{dashboard_name}"))
 
 
-def stats_siae_aci(request):
-    """
-    ACI stats shown to their own members.
-    They can only view data for their own ACI.
-    """
-    current_org = get_stats_siae_current_org(request)
-    if not utils.can_view_stats_siae_aci(request):
-        raise PermissionDenied
-    context = {
-        "page_title": "Suivi du cofinancement de mon ACI",
-        "department": current_org.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
-    }
-    return render_stats(
-        request=request,
-        context=context,
-        params={mb.ASP_SIAE_FILTER_KEY_FLAVOR2: current_org.convention.asp_id},
-    )
-
-
 def stats_siae_etp(request):
     """
     SIAE stats shown to their own members.
@@ -336,18 +316,6 @@ def stats_cd_hiring(request):
 
 def stats_cd_brsa(request):
     return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
-
-
-def stats_cd_aci(request):
-    current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_cd_aci(request):
-        raise PermissionDenied
-
-    return render_stats_cd(
-        request=request,
-        page_title="Suivi du cofinancement des ACI",
-        params=get_params_aci_asp_ids_for_department(current_org.department),
-    )
 
 
 def stats_cd_orga_etp(request):
@@ -575,18 +543,6 @@ def stats_ddets_iae_state(request):
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
         extend_stats_to_whole_region=True,
-    )
-
-
-def stats_ddets_iae_aci(request):
-    current_org = get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_iae_aci(request):
-        raise PermissionDenied
-
-    return render_stats_ddets_iae(
-        request=request,
-        page_title="Suivi du cofinancement des ACI",
-        params=get_params_aci_asp_ids_for_department(current_org.department),
     )
 
 

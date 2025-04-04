@@ -11,7 +11,6 @@ urlpatterns = [
     path("", views.stats_public, name="stats_public"),
     path("redirect/<str:dashboard_name>", views.stats_redirect, name="redirect"),
     # Employer stats.
-    path("siae/aci", views.stats_siae_aci, name="stats_siae_aci"),
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
     path("siae/orga_etp", views.stats_siae_orga_etp, name="stats_siae_orga_etp"),
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),
@@ -20,7 +19,6 @@ urlpatterns = [
     path("cd/iae", views.stats_cd_iae, name="stats_cd_iae"),
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
     path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
-    path("cd/aci", views.stats_cd_aci, name="stats_cd_aci"),
     path("cd/orga_etp", views.stats_cd_orga_etp, name="stats_cd_orga_etp"),
     # Prescriber stats - FT.
     # Legacy `pe` term is used in URLs for retroactivity in Matomo stats but in fact it means `ft`.
@@ -52,7 +50,6 @@ urlpatterns = [
     path("ddets/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
     path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
     path("ddets/state", views.stats_ddets_iae_state, name="stats_ddets_iae_state"),
-    path("ddets/aci", views.stats_ddets_iae_aci, name="stats_ddets_iae_aci"),
     path("ddets/orga_etp", views.stats_ddets_iae_orga_etp, name="stats_ddets_iae_orga_etp"),
     # Institution stats - DDETS LOG - department level.
     path("ddets_log/state", views.stats_ddets_log_state, name="stats_ddets_log_state"),

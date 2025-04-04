@@ -32,11 +32,6 @@ METABASE_DASHBOARDS = {
     #
     # Employer stats.
     #
-    "stats_siae_aci": {
-        "dashboard_id": 327,
-        "tally_popup_form_id": "3E0WLX",
-        "tally_embed_form_id": "w4jrLk",
-    },
     "stats_siae_etp": {
         "dashboard_id": 465,
         "tally_popup_form_id": "mYxB7W",
@@ -74,11 +69,6 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 330,
         "tally_popup_form_id": "wzeYZa",
         "tally_embed_form_id": "w52xL6",
-    },
-    "stats_cd_aci": {
-        "dashboard_id": 327,
-        "tally_popup_form_id": "3E0WLX",
-        "tally_embed_form_id": "w4jrLk",
     },
     "stats_cd_orga_etp": {
         "dashboard_id": 485,
@@ -148,11 +138,6 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 310,
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
-    },
-    "stats_ddets_iae_aci": {
-        "dashboard_id": 327,
-        "tally_popup_form_id": "3E0WLX",
-        "tally_embed_form_id": "w4jrLk",
     },
     "stats_ddets_iae_orga_etp": {
         "dashboard_id": 485,
