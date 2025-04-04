@@ -12,6 +12,18 @@ register = template.Library()
 
 
 @register.simple_tag
+def admin_accounts_tag():
+    action_url = reverse("login:itou_staff")
+    return [
+        {
+            "title": "Admin",
+            "email": "admin@test.com",
+            "action_url": action_url,
+        },
+    ]
+
+
+@register.simple_tag
 def employers_accounts_tag():
     action_url = reverse("login:employer")
     return [
