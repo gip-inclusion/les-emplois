@@ -559,9 +559,13 @@ class TestModel:
 
     def test_can_edit_personal_information(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber.is_authorized_prescriber = True  # set by ItouCurrentOrganizationMiddleware
         unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         employer = CompanyFactory(with_membership=True).members.first()
+        employer.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         job_seeker = JobSeekerFactory()
+        job_seeker.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
         logged_user_created_by_prescriber = JobSeekerFactory(
             created_by=unauthorized_prescriber, last_login=timezone.now()
@@ -619,9 +623,13 @@ class TestModel:
 
     def test_can_view_personal_information(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber.is_authorized_prescriber = True  # set by ItouCurrentOrganizationMiddleware
         unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         employer = CompanyFactory(with_membership=True).members.first()
+        employer.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         job_seeker = JobSeekerFactory()
+        job_seeker.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
         user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=None)
 
@@ -668,9 +676,12 @@ class TestModel:
     def test_can_add_nir(self):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
+        employer.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         authorized_prescriber = prescriber_org.members.first()
+        authorized_prescriber.is_authorized_prescriber = True  # set by ItouCurrentOrganizationMiddleware
         unauthorized_prescriber = PrescriberFactory()
+        unauthorized_prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         job_seeker_no_nir = JobSeekerFactory(jobseeker_profile__nir="")
         job_seeker_with_nir = JobSeekerFactory()
 
@@ -1446,12 +1457,12 @@ def test_save_erases_pe_obfuscated_nir_when_the_nir_changes_after_a_failed_attem
 @pytest.mark.parametrize("user_active", [False, True])
 @pytest.mark.parametrize("membership_active", [False, True])
 @pytest.mark.parametrize("organization_authorized", [False, True])
-def test_is_prescriber_with_authorized_org(user_active, membership_active, organization_authorized):
+def test_is_prescriber_with_authorized_org_memberships(user_active, membership_active, organization_authorized):
     prescriber = PrescriberFactory(is_active=user_active)
     PrescriberMembershipFactory(
         is_active=membership_active, user=prescriber, organization__is_authorized=organization_authorized
     )
-    assert prescriber.is_prescriber_with_authorized_org is all(
+    assert prescriber.is_prescriber_with_authorized_org_memberships is all(
         [user_active, membership_active, organization_authorized]
     )
 

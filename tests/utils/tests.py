@@ -84,7 +84,11 @@ from tests.institutions.factories import (
     InstitutionWithMembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -454,6 +458,21 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
+
+    @pytest.mark.parametrize("membership_active", [False, True])
+    @pytest.mark.parametrize("organization_authorized", [False, True])
+    def test_is_authorized_prescriber(
+        self, mocked_get_response_for_middlewaremixin, membership_active, organization_authorized
+    ):
+        prescriber = PrescriberFactory()
+        PrescriberMembershipFactory(
+            is_active=membership_active, user=prescriber, organization__is_authorized=organization_authorized
+        )
+        request = RequestFactory().get("/")
+        request.user = prescriber
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert request.user.is_authorized_prescriber is all([membership_active, organization_authorized])
 
 
 def test_logout_as_siae_multiple_memberships(client):

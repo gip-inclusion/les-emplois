@@ -31,7 +31,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def test_func(self):
         if self.standalone:
-            return self.request.user.is_prescriber_with_authorized_org
+            return self.request.user.is_authorized_prescriber
         return False
 
     def dispatch(self, request, *args, **kwargs):

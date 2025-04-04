@@ -2015,6 +2015,7 @@ class TestJobApplicationXlsxExport:
         )
         prescriber = job_application.sender
         assert prescriber.is_prescriber
+        prescriber.is_authorized_prescriber = False  # set by ItouCurrentOrganizationMiddleware
         job_application.accept(user=job_application.to_company.members.first())
 
         # The accept transition above will create a valid PASS IAE for the job seeker.

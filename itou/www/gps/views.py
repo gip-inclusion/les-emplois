@@ -35,7 +35,7 @@ def is_allowed_to_use_gps(user):
 
 
 def is_allowed_to_use_gps_advanced_features(user):
-    return user.is_employer or user.is_prescriber_with_authorized_org
+    return user.is_employer or user.is_authorized_prescriber
 
 
 def show_gps_as_a_nav_entry(request):
