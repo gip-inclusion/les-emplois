@@ -7,14 +7,14 @@
 
 {% block title %}Confirmer l'adresse e-mail {{ block.super }}{% endblock %}
 
+{% block title_content %}<h1>Confirmer l'adresse e-mail</h1>{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     <div class="alert alert-warning" role="status">
         <p class="mb-0">Ce compte est inactif.</p>
     </div>
 {% endblock %}
-
-{% block title_content %}<h1>Confirmer l'adresse e-mail</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">
