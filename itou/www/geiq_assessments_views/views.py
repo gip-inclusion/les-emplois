@@ -74,12 +74,13 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
                 label_antennas.append({"id": antenna_id, "name": antenna_name})
 
         # Check existing assessments
-        for existing_label_antennas in Assessment.objects.filter(
+        for existing_assessment in Assessment.objects.filter(
             campaign=campaign_label_infos.campaign,
             label_geiq_id=geiq_info["id"],
-        ).values_list("label_antennas", flat=True):
+        ).only("label_antennas"):
+            existing_antenna_ids = existing_assessment.label_antenna_ids()
             for antenna in label_antennas:
-                if antenna["id"] in [existing_antenna["id"] for existing_antenna in existing_label_antennas]:
+                if antenna["id"] in existing_antenna_ids:
                     conflicting_antennas.append(antenna)
 
         if not conflicting_antennas:
