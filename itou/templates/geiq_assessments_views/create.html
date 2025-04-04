@@ -1,12 +1,41 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load i18n %}
 {% load format_filters %}
 {% load static %}
 
 {% block title %}Créer un bilan d’exécution {{ block.super }}{% endblock %}
 
 {% block title_content %}<h1>Créer un bilan d’exécution</h1>{% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% if conflicting_antennas %}
+        <div class="alert alert-danger alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>
+                            {% blocktrans count antennas_nb=conflicting_antennas|length %}
+                                Cette structure a déjà été ajoutée à un bilan d’exécution, vous ne pouvez pas la sélectionner pour créer ce bilan.
+                            {% plural %}
+                                Ces structures ont déjà été ajoutées à un bilan d’exécution, nous ne pouvez pas les sélectionner pour créer ce bilan.
+                            {% endblocktrans %}
+                        </strong>
+                    </p>
+                    <ul class="mb-0">
+                        {% for antenna in conflicting_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

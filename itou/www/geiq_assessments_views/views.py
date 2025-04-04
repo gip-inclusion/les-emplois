@@ -64,8 +64,8 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
     else:
         create_form = None
 
+    conflicting_antennas = []
     if request.method == "POST" and create_form and create_form.is_valid():
-        # TODO: store antenna selection
         label_antennas = []
         if create_form.cleaned_data.get("main_geiq"):
             label_antennas.append({"id": 0, "name": geiq_info["nom"]})
@@ -73,45 +73,62 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
             if create_form.cleaned_data.get(create_form.get_antenna_field(antenna_id)):
                 label_antennas.append({"id": antenna_id, "name": antenna_name})
 
-        ddets = create_form.cleaned_data["ddets"]
-        dreets = create_form.cleaned_data["dreets"]
-        name_for_geiq_parts = []
-        if dreets:
-            name_for_geiq_parts.append(f"DREETS {dreets.region}")
-        if ddets:
-            name_for_geiq_parts.append(f"DDETS {ddets.department}")
-
-        assessment = Assessment.objects.create(
+        # Check existing assessments
+        for existing_label_antennas in Assessment.objects.filter(
             campaign=campaign_label_infos.campaign,
-            name_for_institution=geiq_info["nom"],
-            name_for_geiq="/".join(name_for_geiq_parts),
             label_geiq_id=geiq_info["id"],
-            label_antennas=sorted(label_antennas, key=operator.itemgetter("id")),  # Stable order to detect duplicates
-        )
+        ).values_list("label_antennas", flat=True):
+            for antenna in label_antennas:
+                if antenna["id"] in [existing_antenna["id"] for existing_antenna in existing_label_antennas]:
+                    conflicting_antennas.append(antenna)
 
-        # TODO: link companies matching the selected SIRET
-        # petit risque si un malin se crée une antenne avec le SIRET d'une antenne GEIQ connue
-        # ajouter le lien vers la fiche entreprise pour indiquer que l'antenne est connue des emplois ?
-        assessment.companies.add(request.current_organization)
-        ddets_dreets = (
-            Institution.objects.filter(
-                kind=InstitutionKind.DREETS_GEIQ, department__in=REGIONS[DEPARTMENT_TO_REGION[ddets.department]]
-            ).first()
-            if ddets
-            else None
-        )
-        if ddets:
-            AssessmentInstitutionLink.objects.create(assessment=assessment, institution=ddets, with_convention=True)
+        if not conflicting_antennas:
+            ddets = create_form.cleaned_data["ddets"]
+            dreets = create_form.cleaned_data["dreets"]
+            name_for_geiq_parts = []
+            if dreets:
+                name_for_geiq_parts.append(f"DREETS {dreets.region}")
+            if ddets:
+                name_for_geiq_parts.append(f"DDETS {ddets.department}")
 
-        if dreets:
-            AssessmentInstitutionLink.objects.create(assessment=assessment, institution=dreets, with_convention=True)
-        if ddets_dreets and ddets_dreets != dreets:
-            AssessmentInstitutionLink.objects.create(
-                assessment=assessment, institution=ddets_dreets, with_convention=False
+            assessment = Assessment.objects.create(
+                campaign=campaign_label_infos.campaign,
+                name_for_institution=geiq_info["nom"],
+                name_for_geiq="/".join(name_for_geiq_parts),
+                label_geiq_id=geiq_info["id"],
+                label_antennas=sorted(
+                    label_antennas, key=operator.itemgetter("id")
+                ),  # Stable order to detect duplicates
             )
-        return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
+
+            # TODO: link companies matching the selected SIRET
+            # petit risque si un malin se crée une antenne avec le SIRET d'une antenne GEIQ connue
+            # ajouter le lien vers la fiche entreprise pour indiquer que l'antenne est connue des emplois ?
+            assessment.companies.add(request.current_organization)
+            ddets_dreets = (
+                Institution.objects.filter(
+                    kind=InstitutionKind.DREETS_GEIQ, department__in=REGIONS[DEPARTMENT_TO_REGION[ddets.department]]
+                ).first()
+                if ddets
+                else None
+            )
+            if ddets:
+                AssessmentInstitutionLink.objects.create(
+                    assessment=assessment, institution=ddets, with_convention=True
+                )
+
+            if dreets:
+                AssessmentInstitutionLink.objects.create(
+                    assessment=assessment, institution=dreets, with_convention=True
+                )
+            if ddets_dreets and ddets_dreets != dreets:
+                AssessmentInstitutionLink.objects.create(
+                    assessment=assessment, institution=ddets_dreets, with_convention=False
+                )
+            return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
 
     context = {
+        "conflicting_antennas": conflicting_antennas,
         "campaign_label_infos": campaign_label_infos,
         "geiq_info": geiq_info,
         "siret": current_siret,
