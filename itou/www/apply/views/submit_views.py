@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import storages
 from django.forms import ValidationError
@@ -423,22 +424,46 @@ class ApplicationJobsView(ApplicationBaseView):
         }
 
 
-class RequireApplySessionMixin:
+class RequireValidApplySessionMixin:
+    def get_redirect_url(self):
+        return reverse(
+            "apply:application_jobs",
+            kwargs={
+                "company_pk": self.company.pk,
+                "job_seeker_public_id": self.job_seeker.public_id,
+            },
+        )
+
     def dispatch(self, request, *args, **kwargs):
         if not self.apply_session.exists():
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_jobs",
-                    kwargs={
-                        "company_pk": self.company.pk,
-                        "job_seeker_public_id": self.job_seeker.public_id,
-                    },
-                )
-            )
+            return HttpResponseRedirect(self.get_redirect_url())
+
+        # Application must not be blocked by the employer at time of access
+        if not self.company.has_member(request.user):
+            if self.company.block_job_applications:
+                messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
+                return HttpResponseRedirect(self.get_redirect_url())
+
+            # Spontaneous application blocked
+            if (
+                not self.apply_session.get("selected_jobs", [])
+                and not self.company.is_open_to_spontaneous_applications
+            ):
+                messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)
+                return HttpResponseRedirect(self.get_redirect_url())
+
+            # One of the selected jobs is now inactive
+            if self.company.job_description_through.filter(
+                is_active=False,
+                pk__in=self.apply_session.get("selected_jobs", []),
+            ).exists():
+                messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS_FOR_JOB_DESCRIPTION)
+                return HttpResponseRedirect(self.get_redirect_url())
+
         return super().dispatch(request, *args, **kwargs)
 
 
-class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
+class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/eligibility.html"
 
     def __init__(self):
@@ -520,7 +545,7 @@ class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
         return context
 
 
-class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
+class ApplicationGEIQEligibilityView(RequireValidApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/geiq_eligibility.html"
 
     def __init__(self):
@@ -598,7 +623,7 @@ class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseVi
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
-class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
+class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/resume.html"
     form_class = SubmitJobApplicationForm
 

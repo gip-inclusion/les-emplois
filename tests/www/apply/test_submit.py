@@ -43,6 +43,7 @@ from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.views import constants as apply_view_constants
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
@@ -69,7 +70,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries
+from tests.utils.test import KNOWN_SESSION_KEYS, assertSnapshotQueries, parse_response_to_soup
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -244,6 +245,141 @@ class TestApply:
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
+
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_blocked_application(self, client, view_name, post_data):
+        # It's possible that for example the user loaded this page before spontaneous applications were closed.
+        company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        response = client.post(
+            reverse(
+                view_name,
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            post_data,
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
+        )
+
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_spontaneous_application_blocked(self, client, view_name, post_data):
+        company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        response = client.post(
+            reverse(
+                view_name,
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            post_data,
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)],
+        )
+
+    @pytest.mark.parametrize(
+        "view_name,post_data",
+        [
+            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_resume", {"message": "Hire me?"}),
+        ],
+    )
+    def test_recruitment_closed_on_position(self, client, view_name, post_data):
+        # No block is active, but one of the selected jobs is no longer active.
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(PrescriberFactory(membership__organization__authorized=True))
+        session = client.session
+
+        jobs = company.job_description_through.all()
+        inactive_job = jobs[0]
+        inactive_job.is_active = False
+        inactive_job.save(update_fields=["is_active"])
+
+        session[f"job_application-{company.pk}"] = {"selected_jobs": [jobs[0].pk, jobs[1].pk]}
+        session.save()
+
+        response = client.post(
+            reverse(
+                view_name,
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            post_data,
+        )
+        assert JobApplication.objects.exists() is False
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS_FOR_JOB_DESCRIPTION
+                )
+            ],
+        )
+
+    def test_application_block_ineffective_against_company_member(self, client):
+        # A member of the SIAE can bypass the block.
+        company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(company.members.first())
+        session = client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+
+        client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.get().message == "Hire me?"
 
     def test_resume_is_optional(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
@@ -3378,6 +3514,29 @@ class TestApplicationView:
         )
         assertNotContains(response, self.spontaneous_application_label)
         assert self.spontaneous_application_field not in response.context["form"].fields
+
+    def test_application_jobs_none_available(self, client, snapshot):
+        # No jobs available and spontaneous applications closed.
+        company = CompanyFactory(with_membership=True, spontaneous_applications_open_since=None)
+        client.force_login(company.members.first())
+        job_seeker = JobSeekerFactory()
+
+        response = client.get(
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    ".c-form > form",
+                    replace_in_attr=[("href", f"/company/{company.pk}/card", "/company/[Pk of Company]/card")],
+                )
+            )
+            == snapshot
+        )
 
     def test_application_start_with_invalid_job_description_id(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
