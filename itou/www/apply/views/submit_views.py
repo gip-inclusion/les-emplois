@@ -435,9 +435,9 @@ class RequireValidApplySessionMixin:
         )
 
     def dispatch(self, request, *args, **kwargs):
-        # Apply session must exist
         if not self.apply_session.exists():
             return HttpResponseRedirect(self.get_redirect_url())
+
         # Application must not be blocked by the employer at time of access
         if not self.company.has_member(request.user):
             if self.company.block_job_applications:
@@ -446,7 +446,7 @@ class RequireValidApplySessionMixin:
 
             # Spontaneous application blocked
             if (
-                not len(self.apply_session.get("selected_jobs", []))
+                not self.apply_session.get("selected_jobs", [])
                 and not self.company.is_open_to_spontaneous_applications
             ):
                 messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS)
