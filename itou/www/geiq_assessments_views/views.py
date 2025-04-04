@@ -297,18 +297,18 @@ class AssessmentContractDetailsTab(models.TextChoices):
 def assessment_contracts_details(
     request, pk, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
 ):
-    assessments = Assessment.objects.filter(companies=request.current_organization)
-    assessment = get_object_or_404(assessments, pk=pk)
-    contract = get_object_or_404(
-        EmployeeContract.objects.filter(employee__assessment=assessment).select_related(
-            "employee__assessment__campaign"
-        ),
-        pk=contract_pk,
-    )
     try:
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
         raise Http404
+    assessments = Assessment.objects.filter(companies=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    contract_qs = EmployeeContract.objects.filter(employee__assessment=assessment).select_related(
+        "employee__assessment__campaign"
+    )
+    if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
+        contract_qs = contract_qs.prefetch_related("employee__prequalifications")
+    contract = get_object_or_404(contract_qs, pk=contract_pk)
     back_url = get_safe_url(
         request,
         "back_url",
