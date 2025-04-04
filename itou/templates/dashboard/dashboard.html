@@ -6,6 +6,10 @@
 
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
 
+{% block title_content %}
+    {% include 'dashboard/includes/dashboard_title_content.html' %}
+{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
 
@@ -139,10 +143,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
-{% endblock %}
-
-{% block title_content %}
-    {% include 'dashboard/includes/dashboard_title_content.html' %}
 {% endblock %}
 
 {% block title_extra %}

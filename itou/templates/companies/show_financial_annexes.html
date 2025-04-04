@@ -5,6 +5,8 @@
 
 {% block title %}Annexes financières {{ block.super }}{% endblock %}
 
+{% block title_content %}<h1>Structure</h1>{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     {% if not siae.is_active %}
@@ -26,8 +28,6 @@
         {% endif %}
     {% endif %}
 {% endblock %}
-
-{% block title_content %}<h1>Structure</h1>{% endblock %}
 
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="3">

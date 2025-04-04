@@ -5,13 +5,13 @@
 
 {% block title %}{{ prescriber_org.display_name }} {{ block.super }}{% endblock %}
 
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block title_content %}
     <h1>Prescripteur habilité</h1>
     <h2>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</h2>
-{% endblock %}
-
-{% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block content %}

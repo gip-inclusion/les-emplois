@@ -9,6 +9,16 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
+{% block title_content %}
+    <h1 class="h1">
+        {% if evaluated_siae.evaluation_is_final %}
+            Pièces justificatives
+        {% else %}
+            Contrôler les pièces justificatives
+        {% endif %}
+    </h1>
+{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     {% if campaign_closed_before_final_evaluation or accepted_by_default %}
@@ -39,16 +49,6 @@
             </div>
         </div>
     {% endif %}
-{% endblock %}
-
-{% block title_content %}
-    <h1 class="h1">
-        {% if evaluated_siae.evaluation_is_final %}
-            Pièces justificatives
-        {% else %}
-            Contrôler les pièces justificatives
-        {% endif %}
-    </h1>
 {% endblock %}
 
 {% block content %}

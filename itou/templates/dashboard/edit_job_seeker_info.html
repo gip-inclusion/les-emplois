@@ -4,6 +4,8 @@
 
 {% block title %}Informations personnelles de {{ job_seeker.get_full_name }} {{ block.super }}{% endblock %}
 
+{% block title_content %}<h1>Informations personnelles de {{ job_seeker.get_full_name }}</h1>{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     <div class="alert alert-warning" role="status">
@@ -15,8 +17,6 @@
         </p>
     </div>
 {% endblock %}
-
-{% block title_content %}<h1>Informations personnelles de {{ job_seeker.get_full_name }}</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

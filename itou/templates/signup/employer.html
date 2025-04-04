@@ -4,6 +4,11 @@
 
 {% block title %}Employeur solidaire - Inscription {{ block.super }}{% endblock %}
 
+{% block title_content %}
+    <h1 class="mb-0">Inscription</h1>
+    <p>Employeur solidaire</p>
+{% endblock %}
+
 {% block title_messages %}
     {{ block.super }}
     <div class="alert alert-info" role="status">
@@ -24,11 +29,6 @@
             {{ company.post_code }} {{ company.city }}
         </p>
     </div>
-{% endblock %}
-
-{% block title_content %}
-    <h1 class="mb-0">Inscription</h1>
-    <p>Employeur solidaire</p>
 {% endblock %}
 
 {% block content %}

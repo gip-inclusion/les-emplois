@@ -9,6 +9,10 @@
     Profil de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
 
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <h1 class="mb-0">Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
@@ -27,9 +31,6 @@
 
 {% block title_extra %}
     {% include "job_seekers_views/includes/nav_tabs.html" with job_seeker=job_seeker active_nav_tab="job-applications" only %}
-{% endblock %}
-{% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block content %}
