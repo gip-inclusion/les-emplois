@@ -9,10 +9,11 @@
     </div>
     <div>
         {% if assessment.action_financial_assessment_file %}
-            <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn-link" rel="noopener" target="_blank">
-                {{ assessment.action_financial_assessment_filename }}
+            <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn-link btn-ico" rel="noopener" target="_blank">
+                <span>{{ assessment.action_financial_assessment_filename }}</span>
+                <i class="ri-download-line fw-medium" aria-hidden="true"></i>
             </a>
-            <br>
+            <br class="mb-2">
             <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-ico btn-outline-primary"><i class="ri-pencil-line fw-medium" aria-hidden="true"></i><span>Modifier</span></a>
         {% else %}
             <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-primary">Compléter</a>
