@@ -482,7 +482,8 @@ class User(AbstractUser, AddressMixin):
             return True
 
         if self.is_prescriber:
-            if self.is_prescriber_with_authorized_org:
+            # NB: We need the ItouCurrentOrganizationMiddleware to set is_authorized_prescriber
+            if self.is_authorized_prescriber:
                 return user.is_handled_by_proxy
             else:
                 return user.is_handled_by_proxy and user.is_created_by(self)
@@ -497,7 +498,8 @@ class User(AbstractUser, AddressMixin):
 
         if user.is_job_seeker:  # Restrict display of personal information to job seeker
             if self.is_prescriber:
-                if self.is_prescriber_with_authorized_org:
+                # NB: We need the ItouCurrentOrganizationMiddleware to set is_authorized_prescriber
+                if self.is_authorized_prescriber:
                     return True
                 else:
                     return user.is_handled_by_proxy and user.is_created_by(self)
@@ -507,7 +509,9 @@ class User(AbstractUser, AddressMixin):
         return False
 
     def can_add_nir(self, job_seeker):
-        return (self.is_prescriber_with_authorized_org or self.is_employer) and (
+        # NB: We need the ItouCurrentOrganizationMiddleware to set is_authorized_prescriber
+
+        return (self.is_authorized_prescriber or self.is_employer) and (
             job_seeker and not job_seeker.jobseeker_profile.nir
         )
 
