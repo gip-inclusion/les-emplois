@@ -62,8 +62,9 @@ def geolocate_qs(qs, is_verbose=False):
     )
 
     if is_verbose:
-        print(
-            f"> about to geolocate count={non_geolocated_qs.count()} objects without geolocation or with a low score."
+        logger.info(
+            "Geolocating objects, about to geolocate objects without geolocation or with a low score",
+            extra={"count": non_geolocated_qs.count()},
         )
 
     # Note : we could also order by latest geolocalization attempt. An order is necessary though
@@ -71,17 +72,24 @@ def geolocate_qs(qs, is_verbose=False):
     localizable_qs = non_geolocated_qs.exclude(Q(address_line_1="") | Q(post_code="")).order_by("pk")
 
     if is_verbose:
-        print(f"> count={localizable_qs.count()} of these have an address and a post code.")
+        logger.info(
+            "Geolocating objects, about to geolocate objects with an address and a post code",
+            extra={"count": localizable_qs.count()},
+        )
 
     for obj, geo_result in zip(
         localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code"))
     ):
         score = float(geo_result["result_score"] or 0.0)
         if is_verbose:
-            print(
-                f"API result score={geo_result['result_score'] or 0.0} "
-                f"label='{geo_result['result_label'] or 'unknown'}' "
-                f"searched_address='{obj.address_line_1} {obj.post_code}' object_pk={obj.pk}"
+            logger.info(
+                "Geolocating object, API result score",
+                extra={
+                    "score": geo_result["result_score"],
+                    "label": geo_result["result_label"],
+                    "searched_address": f"{obj.address_line_1} {obj.post_code}",
+                    "object": obj.pk,
+                },
             )
         if score >= BAN_API_RELIANCE_SCORE:
             if obj.geocoding_score and obj.geocoding_score > score:  # do not yield lower scores than the current

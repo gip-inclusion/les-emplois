@@ -952,7 +952,7 @@ class TestCommandSendUsersToBrevo:
 
 
 @freeze_time("2023-05-01")
-def test_update_job_seeker_coords(settings, capsys, respx_mock):
+def test_update_job_seeker_coords(settings, capsys, caplog, respx_mock):
     js1 = JobSeekerFactory(
         with_address=True, coords="POINT (2.387311 48.917735)", geocoding_score=0.65
     )  # score too low
@@ -974,19 +974,39 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
     )
 
     call_command("update_job_seeker_coords", wet_run=True, verbosity=2)
-    stdout, stderr = capsys.readouterr()
-    assert stderr == ""
-    assert stdout.splitlines() == [
-        "> about to geolocate count=3 objects without geolocation or with a low score.",
-        "> count=3 of these have an address and a post code.",
-        "API result score=0.77 label='7 rue de Laroche' "
-        f"searched_address='{js1.address_line_1} {js1.post_code}' object_pk={js1.id}",
-        "API result score=0.32 label='5 rue Bigot' "
-        f"searched_address='{js2.address_line_1} {js2.post_code}' object_pk={js2.id}",
-        "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
-        f"searched_address='{js3.address_line_1} {js3.post_code}' object_pk={js3.id}",
-        "> count=1 job seekers geolocated with a high score.",
-    ]
+    records_data = {
+        0: {
+            "message": "Geolocating objects, about to geolocate objects without geolocation or with a low score",
+            "count": 3,
+        },
+        1: {"message": "Geolocating objects, about to geolocate objects with an address and a post code", "count": 3},
+        3: {
+            "message": "Geolocating object, API result score",
+            "score": "0.77",
+            "label": "7 rue de Laroche",
+            "searched_address": f"{js1.address_line_1} {js1.post_code}",
+            "object": js1.id,
+        },
+        4: {
+            "message": "Geolocating object, API result score",
+            "score": "0.32",
+            "label": "5 rue Bigot",
+            "searched_address": f"{js2.address_line_1} {js2.post_code}",
+            "object": js2.id,
+        },
+        5: {
+            "message": "Geolocating object, API result score",
+            "score": "0.83",
+            "label": "9 avenue Delorme 92220 Boulogne",
+            "searched_address": f"{js3.address_line_1} {js3.post_code}",
+            "object": js3.id,
+        },
+    }
+
+    for index, data in records_data.items():
+        record = caplog.records[index]
+        for key, value in data.items():
+            assert getattr(record, key) == value
 
     js3.refresh_from_db()
     assert js3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
