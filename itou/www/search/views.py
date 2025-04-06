@@ -42,7 +42,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         # An extra GET parameter is used: job_seeker.
         # It is not part of the form so we pop it.
         params_get = self.request.GET.copy()
-        params_get.pop("job_seeker", None)
+        params_get.pop("job_seeker_public_id", None)
         kwargs["data"] = params_get or None
         return kwargs
 

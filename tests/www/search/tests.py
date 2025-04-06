@@ -489,13 +489,14 @@ class TestSearchCompany:
         client.force_login(prescriber)
 
         response = client.get(
-            self.URL, {"city": guerande.slug, "distance": 100, "job_seeker": job_application.job_seeker.public_id}
+            self.URL,
+            {"city": guerande.slug, "distance": 100, "job_seeker_public_id": job_application.job_seeker.public_id},
         )
         assertContains(response, f"Vous postulez actuellement pour {job_application.job_seeker.get_full_name()}")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{guerande_company.get_card_url()}?job_seeker={job_seeker_public_id}"
+            f"{guerande_company.get_card_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
@@ -505,20 +506,22 @@ class TestSearchCompany:
 
         # Has link to job description with job_seeker public_id
         job_description_url_with_job_seeker_id = (
-            f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
+            f"{job_description.get_absolute_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, job_description_url_with_job_seeker_id)
 
         # Has link to apply to company with job_seeker public_id
         apply_url_with_job_seeker_id = (
-            f"{reverse('apply:start', kwargs={'company_pk': guerande_company.pk})}?job_seeker={job_seeker_public_id}"
+            f"{reverse('apply:start', kwargs={'company_pk': guerande_company.pk})}"
+            f"?job_seeker_public_id={job_seeker_public_id}"
         )
         assertContains(response, apply_url_with_job_seeker_id)
 
         # Has button to reset filters with job_seeker public_id
         reset_button = (
-            f'<a href="{reverse("search:employers_results")}?city={guerande.slug}&job_seeker={job_seeker_public_id}" '
+            f'<a href="{reverse("search:employers_results")}?city={guerande.slug}'
+            f'&job_seeker_public_id={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
             '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
             "<span>Effacer tout</span></a>"
@@ -1298,7 +1301,7 @@ class TestJobDescriptionSearchView:
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{guerande_company.get_card_url()}?job_seeker={job_seeker_public_id}"
+            f"{guerande_company.get_card_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
@@ -1308,7 +1311,7 @@ class TestJobDescriptionSearchView:
 
         # Has link to job description with job_seeker public_id
         job_description_url_with_job_seeker_id = (
-            f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
+            f"{job_description.get_absolute_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, job_description_url_with_job_seeker_id)
@@ -1316,7 +1319,7 @@ class TestJobDescriptionSearchView:
         # Has button to reset filters with job_seeker public_id
         reset_button = (
             f'<a href="{reverse("search:job_descriptions_results")}?city={guerande.slug}'
-            f'&job_seeker={job_seeker_public_id}" '
+            f'&job_seeker_public_id={job_seeker_public_id}" '
             'class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">'
             '<i class="ri-eraser-line fw-medium" aria-hidden="true"></i>'
             "<span>Effacer tout</span></a>"

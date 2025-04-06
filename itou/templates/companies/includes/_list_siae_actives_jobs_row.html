@@ -8,9 +8,9 @@
                class="fw-bold text-decoration-none stretched-link">{{ job.display_name }}</a>
         {% else %}
             {% if job.pk %}
-                {% url_add_query job.get_absolute_url job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
+                {% url_add_query job.get_absolute_url job_seeker_public_id=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
             {% else %}
-                {% url_add_query "#" job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
+                {% url_add_query "#" job_seeker_public_id=job_seeker.public_id|default:'' back_url=request.get_full_path as job_url %}
             {% endif %}
             <a href="{{ job_url }}" class="fw-bold text-decoration-none stretched-link" {% matomo_event "candidature" "clic" "clic-metiers" %}>{{ job.display_name }}</a>
         {% endif %}

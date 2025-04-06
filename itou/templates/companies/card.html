@@ -49,7 +49,7 @@
                 {% else %}
                     <div class="form-group col-12 col-lg-auto">
                         {% url 'apply:start' company_pk=siae.pk as apply_url %}
-                        <a href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:"" back_url=request.get_full_path %}"
+                        <a href="{% url_add_query apply_url job_seeker_public_id=job_seeker.public_id|default:"" back_url=request.get_full_path %}"
                            class="btn btn-lg btn-white btn-block btn-ico"
                            {% matomo_event "candidature" "clic" "start_application" %}
                            aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
@@ -214,7 +214,7 @@
                                 <div class="d-flex justify-content-end mt-3">
                                     {% url 'apply:start' company_pk=siae.pk as apply_url %}
                                     <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                                       href="{% url_add_query apply_url job_seeker=job_seeker.public_id|default:"" back_url=request.get_full_path %}"
+                                       href="{% url_add_query apply_url job_seeker_public_id=job_seeker.public_id|default:"" back_url=request.get_full_path %}"
                                        {% matomo_event "candidature" "clic" "start_application" %}
                                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                                         <i class="ri-draft-line" aria-hidden="true"></i>

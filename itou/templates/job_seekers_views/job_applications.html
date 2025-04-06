@@ -22,9 +22,9 @@
         {% fragment as c_title__cta %}
             {% url 'search:employers_results' as search_url %}
             {% if can_view_personal_information %}
-                {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+                {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}
             {% else %}
-                {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
+                {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
             {% endif %}
             <a href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
                 <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
