@@ -290,7 +290,7 @@ def get_view_name(request):
     return view_name
 
 
-def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_title=False):
+def metabase_embedded_url(dashboard_id, *, params=None, with_title=False):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
     * expiration delay of token
@@ -301,10 +301,6 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
     """
     if params is None:
         params = {}
-    if dashboard_id is None:
-        view_name = get_view_name(request)
-        metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
-        dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
     payload = {
         "resource": {"dashboard": dashboard_id},

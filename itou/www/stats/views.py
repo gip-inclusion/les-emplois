@@ -122,7 +122,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
 
     base_context = {
         "back_url": None,
-        "iframeurl": mb.metabase_embedded_url(request=request, params=params),
+        "iframeurl": mb.metabase_embedded_url(dashboard_id=dashboard_id, params=params),
         "is_stats_public": False,
         "show_siae_evaluation_message": False,
         "stats_base_url": settings.METABASE_SITE_URL,
