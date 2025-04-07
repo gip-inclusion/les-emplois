@@ -79,6 +79,12 @@ def _get_job_seeker_to_apply_for(request):
     return job_seeker
 
 
+def initialize_apply_session(request, company, data):
+    apply_session = SessionNamespace(request.session, f"job_application-{company.pk}")
+    apply_session.init(data)
+    return apply_session
+
+
 class StartView(View):
     def setup(self, request, company_pk, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -154,8 +160,7 @@ class StartView(View):
             else:
                 session_data["selected_jobs"] = [job_description.pk]
 
-        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
-        self.apply_session.init(session_data)
+        self.apply_session = initialize_apply_session(request, self.company, session_data)
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
         if self.tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):

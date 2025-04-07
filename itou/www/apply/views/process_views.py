@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
@@ -39,7 +39,12 @@ from itou.www.apply.forms import (
     TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
+from itou.www.apply.views.submit_views import (
+    ApplicationEndView,
+    ApplicationJobsView,
+    ApplicationResumeView,
+    initialize_apply_session,
+)
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
 
@@ -615,6 +620,38 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(JobDescriptionCa
         }
 
 
+def job_application_external_transfer_start_view(request, job_application_id, company_pk, **kwargs):
+    job_application = get_object_or_404(
+        JobApplication.objects.is_active_company_member(request.user), pk=job_application_id
+    )
+    company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+
+    if company in request.organizations:
+        # This is not an external transfer
+        url = reverse(
+            "apply:job_application_internal_transfer",
+            kwargs={"job_application_id": job_application.pk, "company_pk": company.pk},
+        )
+        if params := request.GET.urlencode():
+            url = f"{url}?{params}"
+        return HttpResponseRedirect(url)
+
+    # It's an external transfer : initialize the apply_session
+    back_url = get_safe_url(request, "back_url")
+    if back_url is None:
+        raise Http404
+    data = {"reset_url": back_url}
+    initialize_apply_session(request, company, data)
+
+    url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "company_pk": company.pk},
+    )
+    if params := request.GET.urlencode():
+        url = f"{url}?{params}"
+    return HttpResponseRedirect(url)
+
+
 class ApplicationOverrideMixin:
     additionnal_related_models = []
 
@@ -630,6 +667,7 @@ class ApplicationOverrideMixin:
 
 
 class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
+    # FIXME(alaurent) remove next week : now handled by job_application_external_transfer_start_view
     def dispatch(self, request, *args, **kwargs):
         if self.company in request.organizations:
             # This is not an external transfer
