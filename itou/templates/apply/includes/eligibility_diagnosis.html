@@ -1,13 +1,9 @@
 {% if siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
         <hr class="my-4">
-        {% if is_sent_by_authorized_prescriber %}
-            <h3>Éligibilité à l'IAE</h3>
-        {% else %}
-            <h3>Critères d'éligibilité</h3>
-        {% endif %}
+        <h3>{{ is_sent_by_authorized_prescriber|yesno:"Éligibilité à l'IAE,Critères d'éligibilité" }}</h3>
         <p class="text-success">
-            {{ is_sent_by_authorized_prescriber|yesno:"Confirmés,Validés" }}
+            {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validés" }}
             le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
             <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
             {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
