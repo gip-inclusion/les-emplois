@@ -66,7 +66,7 @@ class TestEmployeeDetailView:
         assertContains(response, self.APPROVAL_NUMBER_LABEL)
         assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
         assertContains(response, "Informations du salarié")
-        assertContains(response, "Éligibilité à l'IAE")
+        assertContains(response, "Éligibilité à l'IAE", html=True)
         assertContains(response, "Candidatures de ce salarié")
         assertContains(response, "Voir sa candidature", count=2)
         job_application_base_url = reverse(
