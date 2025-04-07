@@ -258,7 +258,11 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dgefp_iae_")],
+    [
+        p.name
+        for p in stats_urls.urlpatterns
+        if p.name.startswith("stats_dgefp_iae_") and p.name not in {"stats_dgefp_iae_showroom"}
+    ],
 )
 def test_stats_dgefp_iae_log_visit(client, view_name):
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE)

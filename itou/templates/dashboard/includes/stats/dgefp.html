@@ -79,6 +79,182 @@
                     </div>
                 </div>
             </div>
+            <div class="col mb-3 mb-lg-5 d-flex flex-row flex-fill">
+                <div class="col mb-3 mb-lg-5">
+                    <h3>Autres données</h3>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des DDETS/DREETS</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_auto_prescription" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Les auto-prescription et suivi du contrôle à posteriori des structures de mon département</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_ph_prescription" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_follow_prolongation" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivi des demandes de prolongation de mon département</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_hiring" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Données facilitation à l'embauche de mon département</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_state" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Prescriptions des acteurs AHI de ma région</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ddets_iae_orga_etp" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivre les effectifs annuels et mensuels en ETP des structures de mon département</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination de France Travail</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ft_state_main" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des candidatures émises et de leur traitement</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ft_conversion_main" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des parcours des candidats diagnostiqués</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des Conseils Départementaux</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "cd_orga_etp" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivi des effectifs annuels et mensuels (ETP)</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "cd_hiring" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des candidatures reçues et de leur traitement</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "cd_brsa" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des prescriptions pour les publics ARSA</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des prescripteurs habilités</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "ph_state_main" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des candidatures émises et de leur traitement</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des SIAE</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "siae_orga_etp" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "siae_hiring" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Analyse des candidatures reçues et de leur traitement</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "siae_auto_prescription" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Suivi de l’activité d’auto-prescription et du contrôle à posteriori</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des réseaux de l'IAE</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "iae_network_hiring" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                        <div class="p-3 p-lg-4">
+                            <h4 class="mb-0">Tableaux de bord à destination des réseaux de Convergence</h4>
+                        </div>
+                        <div class="px-3 px-lg-4">
+                            <ul class="list-unstyled mb-lg-5">
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "convergence_prescription" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Prescriptions et parcours</span>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_dgefp_iae_showroom" "convergence_job_application" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
+                                        <span>Traitement et résultats des candidatures émises</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

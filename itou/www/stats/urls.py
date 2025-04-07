@@ -94,6 +94,7 @@ urlpatterns = [
     path("dgefp/state", views.stats_dgefp_iae_state, name="stats_dgefp_iae_state"),
     path("dgefp/siae_evaluation", views.stats_dgefp_iae_siae_evaluation, name="stats_dgefp_iae_siae_evaluation"),
     path("dgefp/orga_etp", views.stats_dgefp_iae_orga_etp, name="stats_dgefp_iae_orga_etp"),
+    path("dgefp/showroom/<str:dashboard_full_name>", views.stats_dgefp_iae_showroom, name="stats_dgefp_iae_showroom"),
     # Institution stats - DIHAL - nation level.
     path("dihal/state", views.stats_dihal_state, name="stats_dihal_state"),
     # Institution stats - DRIHL - region level - IDF only.
