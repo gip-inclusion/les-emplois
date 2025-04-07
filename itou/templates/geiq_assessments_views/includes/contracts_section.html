@@ -37,3 +37,7 @@
         {% endif %}
     </div>
 </div>
+
+{% if request.htmx %}
+    {% include "geiq_assessments_views/includes/assessment_kpi_tab.html" with active_tab=active_tab assessment=assessment request_htmx=True only %}
+{% endif %}

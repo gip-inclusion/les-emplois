@@ -274,7 +274,7 @@ def assessment_contracts_sync(request, pk):
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
 
-    context = {"assessment": assessment}
+    context = {"assessment": assessment, "active_tab": AssessmentDetailsTab.MAIN}
     try:
         sync.sync_employee_and_contracts(assessment, new_mode=True)
         # TODO: sync label data to db & update assessment.label_contracts_synced_at
