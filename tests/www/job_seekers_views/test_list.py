@@ -159,9 +159,8 @@ def test_displayed_filters(client, url, assertion):
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_empty_list(client, url, snapshot):
-    client.force_login(
-        PrescriberFactory(membership=True, membership__organization__not_in_territorial_experimentation=True)
-    )
+    organization = PrescriberOrganizationWith2MembershipFactory(not_in_territorial_experimentation=True)
+    client.force_login(organization.members.first())
     response = client.get(url)
     assert str(parse_response_to_soup(response, selector="#main")) == snapshot
 
