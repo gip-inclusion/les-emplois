@@ -673,9 +673,9 @@ json-log-formatter==1.1.1 \
     # via
     #   -r requirements/base.txt
     #   django-datadog-logger
-json5==0.10.0 \
-    --hash=sha256:19b23410220a7271e8377f81ba8aacba2fdd56947fbb137ee5977cbe1f5e8dfa \
-    --hash=sha256:e66941c8f0a02026943c52c2eb34ebeb2a6f819a0be05920a6f5243cd30fd559
+json5==0.12.0 \
+    --hash=sha256:0b4b6ff56801a1c7dc817b0241bca4ce474a0e6a163bfef3fc594d3fd263ff3a \
+    --hash=sha256:6d37aa6c08b0609f16e1ec5ff94697e2cbbfbad5ac112afa05794da9ab7810db
     # via djlint
 jsonschema==4.23.0 \
     --hash=sha256:d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4 \
@@ -1639,10 +1639,7 @@ typing-extensions==4.13.0 \
     --hash=sha256:c8dd92cc0d6425a97c18fbb9d1954e5ff92c1ca881a309c45f06ebc0b79058e5
     # via
     #   -r requirements/base.txt
-    #   anyio
     #   beautifulsoup4
-    #   psycopg
-    #   referencing
     #   slippers
 tzdata==2025.2 \
     --hash=sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8 \
