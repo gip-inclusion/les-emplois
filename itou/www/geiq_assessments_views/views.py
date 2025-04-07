@@ -138,6 +138,12 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
     return render(request, template_name, context)
 
 
+class AssessmentDetailsTab(models.TextChoices):
+    MAIN = "main", "Mon dossier"
+    KPI = "kpi", "Indicateurs clés"
+    RESULT = "result", "Résultat"
+
+
 @check_user(lambda user: user.is_employer)
 def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
@@ -159,6 +165,7 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
         "assessment": assessment,
         "back_url": reverse("geiq_assessments_views:list_for_geiq"),
         "matomo_custom_title": "Bilan d’exécution - page de detail",
+        "active_tab": AssessmentDetailsTab.MAIN,
     }
     return render(request, template_name, context)
 
@@ -389,5 +396,24 @@ def assessment_contracts_exclude(
         "assessment": assessment,
         "contract": contract,
         "from_list": bool(request.GET.get("from_list")),
+    }
+    return render(request, template_name, context)
+
+
+@require_safe
+@check_user(lambda user: user.is_employer)
+def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment_kpi.html"):
+    if request.current_organization.kind != CompanyKind.GEIQ:
+        raise Http404
+    assessment = Assessment.objects.prefetch_related(
+        "employees__contracts",
+    ).get(companies=request.current_organization.pk, pk=pk)
+
+    context = {
+        "assessment": assessment,
+        "back_url": reverse("geiq_assessments_views:list_for_geiq"),
+        "matomo_custom_title": "Bilan d’exécution - onglet des indicateurs clés",
+        "AssessmentDetailsTab": AssessmentDetailsTab,
+        "active_tab": AssessmentDetailsTab.KPI,
     }
     return render(request, template_name, context)

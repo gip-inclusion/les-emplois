@@ -1,26 +1,6 @@
-{% extends "layout/base.html" %}
+{% extends "geiq_assessments_views/_assessment_base.html" %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
-
-{% block title %}Bilan d’exécution - {{ assessment.name_for_geiq }} {{ block.super }}{% endblock %}
-
-{% block title_prevstep %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
-{% endblock %}
-
-{% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - {{ assessment.name_for_geiq }}</h1>
-            <span class="badge badge-base rounded-pill text-nowrap bg-info">À compléter</span>
-        </div>
-        <button class="btn btn-lg btn-ico-only btn-link justify-content-lg-end" type="button" data-it-action="print" aria-label="Imprimer la page">
-            <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
-        </button>
-    </div>
-{% endblock %}
-
-{% block title_messages %}{{ block.super }}{% endblock %}
 
 {% block content %}
     <section class="s-section">
