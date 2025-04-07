@@ -1,0 +1,5 @@
+<li class="nav-item" id="kpi-tab"{% if request_htmx %} hx-swap-oob="true"{% endif %}>
+    <a class="nav-link{% if not assessment.contracts_synced_at %} disabled{% endif %}{% if active_tab == active_tab.KPI %} active{% endif %}"
+       href="{% url 'geiq_assessments_views:assessment_kpi' pk=assessment.pk %}"
+       {% if not assessment.contracts_synced_at %}tabindex="-1" aria-disabled="true"{% endif %}>{{ active_tab.KPI.label }}</a>
+</li>
