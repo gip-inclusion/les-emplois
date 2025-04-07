@@ -1188,9 +1188,9 @@ pytest==8.3.5 \
     #   pytest-subtests
     #   pytest-xdist
     #   syrupy
-pytest-django==4.10.0 \
-    --hash=sha256:1091b20ea1491fd04a310fc9aaff4c01b4e8450e3b157687625e16a6b5f3a366 \
-    --hash=sha256:57c74ef3aa9d89cae5a5d73fbb69a720a62673ade7ff13b9491872409a3f5918
+pytest-django==4.11.1 \
+    --hash=sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10 \
+    --hash=sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991
     # via -r requirements/test.in
 pytest-mock==3.14.0 \
     --hash=sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f \
@@ -1639,10 +1639,7 @@ typing-extensions==4.13.0 \
     --hash=sha256:c8dd92cc0d6425a97c18fbb9d1954e5ff92c1ca881a309c45f06ebc0b79058e5
     # via
     #   -r requirements/base.txt
-    #   anyio
     #   beautifulsoup4
-    #   psycopg
-    #   referencing
     #   slippers
 tzdata==2025.2 \
     --hash=sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8 \
