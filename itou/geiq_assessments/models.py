@@ -98,6 +98,8 @@ class Assessment(models.Model):
         blank=True,
         on_delete=models.PROTECT,
     )
+    label_rates = models.JSONField(verbose_name="taux récupérés sur l'API label", null=True)
+    employee_nb = models.PositiveSmallIntegerField("nombre d'employés", default=0)
     contracts_synced_at = models.DateTimeField("données de contrats label récupérées le", blank=True, null=True)
     contracts_selection_validated_at = models.DateTimeField(
         "données de contrats label récupérées le", blank=True, null=True

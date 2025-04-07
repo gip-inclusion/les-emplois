@@ -344,12 +344,14 @@ def sync_employee_and_contracts(assessment, new_mode=False):
     prequalification_infos = []
     employee_infos = {}
     employee_support_periods = {}
+    employees_in_assessment_year = set()
 
     limit_end_date = (
         datetime.date(assessment.campaign.year - 1, 10, 1)
         if new_mode
         else datetime.date(assessment.campaign.year, 1, 1)
     )
+    label_rates = client.get_taux_geiq(geiq_id=geiq_id)[0]
     # TODO: rajouter filtre sur antennes ?
     for contract_info in client.get_all_contracts(geiq_id, date_fin=limit_end_date - datetime.timedelta(days=1)):
         contract_info["date_debut"] = convert_iso_datetime_to_date(contract_info["date_debut"])
@@ -374,6 +376,9 @@ def sync_employee_and_contracts(assessment, new_mode=False):
             continue
 
         employee_info = contract_info["salarie"]
+        if end_date >= datetime.date(assessment.campaign.year, 1, 1):
+            employees_in_assessment_year.add(employee_info["id"])
+
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
             # Check consistency between contracts
@@ -471,7 +476,9 @@ def sync_employee_and_contracts(assessment, new_mode=False):
 
     if new_mode:
         assessment.contracts_synced_at = timezone.now()
-        assessment.save(update_fields={"contracts_synced_at"})
+        assessment.employee_nb = len(employees_in_assessment_year)
+        assessment.label_rates = label_rates
+        assessment.save(update_fields={"contracts_synced_at", "employee_nb", "label_rates"})
     else:
         assessment.last_synced_at = timezone.now()
         assessment.save(update_fields={"last_synced_at"})

@@ -9,6 +9,8 @@ urlpatterns = [
     path("list", views.list_for_geiq, name="list_for_geiq"),
     path("create", views.create_assessment, name="create"),
     path("details/<uuid:pk>", views.assessment_details, name="details"),
+    path("details/<uuid:pk>/kpi", views.assessment_kpi, name="assessment_kpi"),
+    path("details/<uuid:pk>/result", views.assessment_kpi, name="assessment_kpi"),
     path(
         "details/<uuid:pk>/summary-document",
         views.assessment_get_file,
