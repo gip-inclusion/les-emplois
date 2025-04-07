@@ -4,6 +4,7 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.http import urlencode
 
@@ -36,6 +37,11 @@ class PrescriberOrganizationQuerySet(OrganizationQuerySet):
 
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
+
+    def with_has_active_members(self):
+        return self.annotate(
+            has_active_members=Exists(PrescriberMembership.objects.active().filter(organization=OuterRef("pk")))
+        )
 
 
 class PrescriberOrganizationManager(models.Manager):

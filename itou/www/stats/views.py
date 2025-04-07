@@ -14,6 +14,8 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
+import re
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
@@ -30,7 +32,10 @@ from itou.common_apps.address.departments import (
     format_region_for_matomo,
 )
 from itou.companies import models as companies_models
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.companies.models import Company
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
@@ -39,6 +44,11 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.stats import utils
+
+
+DGEFP_SHOWROOM_DEPARTMENT = "69"
+DGEFP_SHOWROOM_CONVERGENCE_REGION = "Île-de-France"
+DGEFP_SHOWROOM_IAE_NETWORK_NAME = "Unai"
 
 
 def get_stats_siae_current_org(request):
@@ -105,11 +115,13 @@ def get_params_aci_asp_ids_for_department(department):
     }
 
 
-def render_stats(request, context, params=None, template_name="stats/stats.html", show_tally=settings.TALLY_URL):
+def render_stats(
+    *, request, context, params=None, template_name="stats/stats.html", view_name=None, show_tally=settings.TALLY_URL
+):
     if params is None:
         params = {}
 
-    view_name = mb.get_view_name(request)
+    view_name = view_name or mb.get_view_name(request)
     metabase_dashboard = mb.METABASE_DASHBOARDS[view_name]
     dashboard_id = metabase_dashboard["dashboard_id"]
 
@@ -681,6 +693,79 @@ def stats_dgefp_iae_orga_etp(request):
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels en ETP",
+    )
+
+
+def stats_dgefp_iae_showroom(request, dashboard_full_name):
+    if not utils.can_view_stats_dgefp_iae(request):
+        raise PermissionDenied
+
+    if f"stats_{dashboard_full_name}" not in mb.METABASE_DASHBOARDS:
+        return HttpResponseNotFound()
+
+    [kind, name] = re.match(r"(cd|convergence|ddets_iae|ft|iae_network|ph|siae)_(\w+)", dashboard_full_name).groups()
+    if kind == "cd":
+        params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+    if kind == "ddets_iae":
+        params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+    if kind == "convergence":
+        params = get_params_for_region(DGEFP_SHOWROOM_CONVERGENCE_REGION)
+    elif kind == "ft":
+        params = {
+            # FIXME: **get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT),
+            mb.DEPARTMENT_FILTER_KEY: DEPARTMENTS[DGEFP_SHOWROOM_DEPARTMENT],
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
+        }
+    elif kind == "iae_network":
+        params = {
+            mb.IAE_NETWORK_FILTER_KEY: Institution.objects.filter(
+                kind=InstitutionKind.IAE_NETWORK, name=DGEFP_SHOWROOM_IAE_NETWORK_NAME
+            )
+            .values_list("pk", flat=True)
+            .get()
+        }
+    elif kind == "ph":
+        organization_pks = set()
+        organization_labels = set()
+        for organization in (
+            PrescriberOrganization.objects.with_has_active_members()
+            # Only authorized prescriber organizations
+            .filter(is_authorized=True, authorization_status=PrescriberAuthorizationStatus.VALIDATED)
+            # Mimic `can_view_stats_ph()`
+            .filter(has_active_members=True, kind__in=utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST)
+            # Limit to the selected department
+            .filter(department=DGEFP_SHOWROOM_DEPARTMENT)
+            .values_list("pk", "kind", named=True)
+        ):
+            organization_pks.add(organization.pk)
+            organization_labels.add(PrescriberOrganizationKind(organization.kind).label)
+        params = {
+            mb.PRESCRIBER_FILTER_KEY: list(organization_labels),
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: list(organization_pks),
+        }
+    elif kind == "siae":
+        match name:
+            case "orga_etp":
+                param_name, value_field = mb.ASP_SIAE_FILTER_KEY_FLAVOR3, "convention__asp_id"
+            case _:
+                param_name, value_field = mb.C1_SIAE_FILTER_KEY, "pk"
+        params = {
+            param_name: list(
+                set(
+                    Company.objects.active_or_in_grace_period()
+                    .with_has_active_members()
+                    .filter(has_active_members=True, department=DGEFP_SHOWROOM_DEPARTMENT)
+                    .values_list(value_field, flat=True)
+                )
+            ),
+        }
+
+    return render_stats(
+        request=request,
+        context={"department": None, "region": None},  # Force national level
+        params=params,
+        view_name=f"stats_{dashboard_full_name}",
+        show_tally=False,
     )
 
 
