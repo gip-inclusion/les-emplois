@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## 2025-04-07
+
+### Ajouté
+
+- [Candidats : Utiliser les données du Pilotage pour identifier les candidats dans la file active depuis plus de 30j](https://github.com/gip-inclusion/les-emplois/pull/5813)
+- [Candidats : Identifier les candidats dans la file active depuis plus de 30j](https://github.com/gip-inclusion/les-emplois/pull/5790)
+- [Candidature : Ajout d'une bannière pour inviter les employeurs à un entretien](https://github.com/gip-inclusion/les-emplois/pull/5858) 🖼
+- [Pilotage : Ajouter la table des suspensions à l'export Metabase](https://github.com/gip-inclusion/les-emplois/pull/5801)
+
+### Modifié
+
+- [Candidature : Autoriser l'annulation quand la fiche salarié n'a pas été transmise](https://github.com/gip-inclusion/les-emplois/pull/5864)
+- [GPS : Ne pas créer de relations sur des utilisateurs non prescripteur ou employeur](https://github.com/gip-inclusion/les-emplois/pull/5879)
+- [GPS : Permettre de donner la visibilité sur les informations candidat au cas par cas](https://github.com/gip-inclusion/les-emplois/pull/5794)
+- [Pilotage : Suivre le type de prescripteur dans les réponses au formulaire NPS TB 488](https://github.com/gip-inclusion/les-emplois/pull/5827)
+- [UX/UI : Correction de l'affichage du diagnostic d'éligibilité et ajout d'une phrase de clarification](https://github.com/gip-inclusion/les-emplois/pull/5862) 🖼️
+
+### Supprimé
+
+- [Pilotage : Suppression des tableaux de bord en ballotage défavorable](https://github.com/gip-inclusion/les-emplois/pull/5857)
+
+### Tech
+
+- [Rendre uv indispensable pour le développement](https://github.com/gip-inclusion/les-emplois/pull/5843)
+
 ## 2025-03-31
 
 ### Modifié
