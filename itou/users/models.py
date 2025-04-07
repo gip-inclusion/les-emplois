@@ -23,7 +23,6 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
-from itou.approvals.models import PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -516,6 +515,8 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def latest_pe_approval(self):
+        from itou.approvals.models import PoleEmploiApproval
+
         if not self.is_job_seeker:
             return None
 
