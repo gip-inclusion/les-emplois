@@ -105,20 +105,13 @@ def get_params_aci_asp_ids_for_department(department):
     }
 
 
-def render_stats(request, context, params=None, template_name="stats/stats.html"):
+def render_stats(request, context, params=None, template_name="stats/stats.html", show_tally=settings.TALLY_URL):
     if params is None:
         params = {}
+
     view_name = mb.get_view_name(request)
-    metabase_dashboard = mb.METABASE_DASHBOARDS.get(view_name)
+    metabase_dashboard = mb.METABASE_DASHBOARDS[view_name]
     dashboard_id = metabase_dashboard["dashboard_id"]
-    tally_popup_form_id = None
-    tally_embed_form_id = None
-    if settings.TALLY_URL and metabase_dashboard:
-        tally_popup_form_id = metabase_dashboard.get("tally_popup_form_id")
-        tally_embed_form_id = metabase_dashboard.get("tally_embed_form_id")
-    tally_suspension_form = (
-        f"https://tally.so/r/wkOxRR?URLTB={dashboard_id}" if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS else None
-    )
 
     base_context = {
         "back_url": None,
@@ -126,10 +119,12 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         "is_stats_public": False,
         "show_siae_evaluation_message": False,
         "stats_base_url": settings.METABASE_SITE_URL,
-        "tally_popup_form_id": tally_popup_form_id,
-        "tally_embed_form_id": tally_embed_form_id,
+        "tally_popup_form_id": metabase_dashboard.get("tally_popup_form_id") if show_tally else None,
+        "tally_embed_form_id": metabase_dashboard.get("tally_embed_form_id") if show_tally else None,
         "PILOTAGE_HELP_CENTER_URL": global_constants.PILOTAGE_HELP_CENTER_URL,
-        "tally_suspension_form": tally_suspension_form,
+        "tally_suspension_form": (
+            f"https://tally.so/r/wkOxRR?URLTB={dashboard_id}" if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS else None
+        ),
         "tally_hidden_fields": {},
     }
 
