@@ -202,6 +202,7 @@ NAV_ENTRIES = {
             "geiq_assessments_views:list_for_geiq",
             "geiq_assessments_views:create",
             "geiq_assessments_views:details",
+            "geiq_assessments_views:assessment_kpi",
             "geiq_assessments_views:upload_action_financial_assessment",
             "geiq_assessments_views:assessment_comment",
             "geiq_assessments_views:assessment_contracts_list",

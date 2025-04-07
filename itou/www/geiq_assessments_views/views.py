@@ -405,9 +405,9 @@ def assessment_contracts_exclude(
 def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment_kpi.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
-    assessment = Assessment.objects.prefetch_related(
-        "employees__contracts",
-    ).get(companies=request.current_organization.pk, pk=pk)
+    assessment = Assessment.objects.filter(contracts_synced_at__isnull=False).get(
+        companies=request.current_organization.pk, pk=pk
+    )
 
     context = {
         "assessment": assessment,
