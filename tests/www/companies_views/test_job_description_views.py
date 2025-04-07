@@ -715,3 +715,23 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         assertContains(response, "a job description")
         assertContains(response, "a profile description")
         assertNotContains(response, PLACE_HOLDER)
+
+    def test_display_custom_or_appellation_name(self, client):
+        TITLE_MARKUP = '<h1 class="mb-1 mb-xl-0 me-xl-3">%s</h1>'
+        SUBTITLE_MARKUP = '<p class="mb-0">%s</p>'
+
+        # custom_name is missing, show only appellation.name, and bellow appellation.code
+        response = self._login(client, self.user)
+        assertContains(response, TITLE_MARKUP % self.job_description.appellation.name, html=True)
+        assertContains(response, SUBTITLE_MARKUP % self.job_description.appellation.code, html=True)
+
+        # custom_name is provided: custom_name in title and appellation name + code in subtitle
+        self.job_description.custom_name = "Custom name"
+        self.job_description.save()
+        response = client.get(self.url)
+        assertContains(response, TITLE_MARKUP % self.job_description.custom_name, html=True)
+        assertContains(
+            response,
+            SUBTITLE_MARKUP % f"{self.job_description.appellation.name} ({self.job_description.appellation.code})",
+            html=True,
+        )
