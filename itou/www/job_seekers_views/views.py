@@ -505,6 +505,11 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
         )
 
+    def _can_add_nir(self, job_seeker):
+        return (self.request.user.is_prescriber_with_authorized_org or self.request.user.is_employer) and (
+            job_seeker and not job_seeker.jobseeker_profile.nir
+        )
+
     def post(self, request, *args, **kwargs):
         can_add_nir = False
         preview_mode = False
@@ -514,7 +519,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         if self.form.is_valid():
             job_seeker = self.form.get_user()
             nir = self.job_seeker_session.get("profile", {}).get("nir")
-            can_add_nir = nir and self.sender.can_add_nir(job_seeker)
+            can_add_nir = nir and self._can_add_nir(job_seeker)
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
