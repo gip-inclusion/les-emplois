@@ -1,19 +1,19 @@
 {% if not assessment.submitted_at %}
-    <div id="assessment-status-box" class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+    <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
         <h4>Bilan d’exécution à valider</h4>
         <p class="mb-0">
             Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son rapport d’activité et valider le bilan.
         </p>
     </div>
-{% else %}
-    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+{% elif not assessment.reviewed_at %}
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
         <h4>Bilan d’exécution à contrôler</h4>
         <p>
             Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour contrôler les informations de ce bilan d’exécution.
         </p>
         <p class="mb-0">Actions restantes :</p>
         <ul>
-            {% for action in assessment.missing_actions_to_submit %}
+            {% for action in assessment.missing_actions_to_review %}
                 <li>
                     <strong>{{ action }}</strong>
                 </li>
