@@ -120,7 +120,7 @@ class EmployeeDetailView(DetailView):
         context["link_immersion_facile"] = None
 
         context["link_immersion_facile"] = immersion_search_url(self.object)
-        context["approval_expired"] = approval and not approval.is_in_progress
+        context["approval_valid"] = approval and approval.is_valid()
         context["approval_expires_soon"] = approval and approval.remainder.days < 90
 
         context["all_job_applications"] = (
