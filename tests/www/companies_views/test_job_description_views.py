@@ -294,7 +294,7 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
     def setup_method(self):
         self.url = self.edit_url
 
-    def test_edit_job_description_company(self, client, subtests):
+    def test_edit_job_description_company(self, client):
         client.force_login(self.user)
         response = client.get(self.url)
 
@@ -302,8 +302,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
 
         # Step 1: edit job description
         response = client.get(self.edit_url)
-
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
@@ -314,14 +312,10 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
             "open_positions": 5,
         }
         response = client.post(self.edit_url, data=post_data)
-
         assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        for k, v in post_data.items():
-            with subtests.test(k):
-                assert v == session_data.get(k)
+        expected_session_data = post_data
+        expected_session_data["custom_name"] = ""
+        assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 2: edit job description details
         post_data = {
@@ -329,16 +323,11 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
             "profile_description": "profile_description",
             "is_resume_mandatory": True,
         }
-
         response = client.post(self.edit_details_url, data=post_data)
-
         assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        for k, v in post_data.items():
-            with subtests.test(k):
-                assert v == session_data.get(k)
+        expected_session_data.update(post_data)
+        expected_session_data["is_qpv_mandatory"] = False
+        assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 3: preview and validation
         response = client.get(self.edit_preview_url)
@@ -353,7 +342,7 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
         assert self.company.job_description_through.count() == 5
 
-    def test_edit_job_description_opcs(self, client, subtests):
+    def test_edit_job_description_opcs(self, client):
         opcs = CompanyFactory(
             department="75",
             coords=self.paris_city.coords,
@@ -372,8 +361,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         # Step 1: edit job description
         response = client.get(self.edit_url)
 
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
             "market_context_description": "Whatever market description",
@@ -386,12 +373,9 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         response = client.post(self.edit_url, data=post_data)
 
         assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        for k, v in post_data.items():
-            with subtests.test(k):
-                assert v == session_data.get(k)
+        expected_session_data = post_data
+        expected_session_data["custom_name"] = ""
+        assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 2: edit job description details and check the rendered markdown
         post_data = {
@@ -404,12 +388,8 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         response = client.post(self.edit_details_url, data=post_data)
 
         assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        for k, v in post_data.items():
-            with subtests.test(k):
-                assert v == session_data.get(k)
+        expected_session_data.update(post_data)
+        assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 3: preview and validation
         response = client.get(self.edit_preview_url)
