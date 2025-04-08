@@ -14,6 +14,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
@@ -76,7 +77,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
     for membership in memberships_page:
         membership.user_can_view_personal_information = (
             membership.can_view_personal_information
-            or request.user.can_view_personal_information(membership.follow_up_group.beneficiary)
+            or can_view_personal_information(request, membership.follow_up_group.beneficiary)
         )
 
     context = {
@@ -108,7 +109,7 @@ class GroupDetailsMixin:
             "group": self.group,
             "can_view_personal_information": (
                 self.membership.can_view_personal_information
-                or self.request.user.can_view_personal_information(self.group.beneficiary)
+                or can_view_personal_information(self.request, self.group.beneficiary)
             ),
             "can_print_page": True,
         }
@@ -178,7 +179,7 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
             "render_advisor_matomo_option": matomo_option,
             "matomo_option": f"coordonnees-conseiller-{matomo_option or 'ailleurs'}",
             "active_tab": "beneficiary",
-            "can_edit_personal_information": self.request.user.can_edit_personal_information(self.group.beneficiary),
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.group.beneficiary),
         }
 
         return context
@@ -478,8 +479,7 @@ def beneficiaries_autocomplete(request):
                 "name": mask_unless(
                     user.get_full_name(),
                     predicate=(
-                        user.membership_can_view_personal_information
-                        or request.user.can_view_personal_information(user)
+                        user.membership_can_view_personal_information or can_view_personal_information(request, user)
                     ),
                 ),
                 "birthdate": "",
@@ -488,15 +488,13 @@ def beneficiaries_autocomplete(request):
                 # only add a . after M, not Mme
                 data["title"] = (
                     f"{user.title.capitalize()}."[:3]
-                    if user.membership_can_view_personal_information
-                    or request.user.can_view_personal_information(user)
+                    if user.membership_can_view_personal_information or can_view_personal_information(request, user)
                     else ""
                 )
             if getattr(user.jobseeker_profile, "birthdate", None):
                 data["birthdate"] = (
                     user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
-                    if user.membership_can_view_personal_information
-                    or request.user.can_view_personal_information(user)
+                    if user.membership_can_view_personal_information or can_view_personal_information(request, user)
                     else ""
                 )
             return data

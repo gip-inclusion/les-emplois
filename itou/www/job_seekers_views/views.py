@@ -29,6 +29,7 @@ from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.views.submit_views import ApplicationBaseView
@@ -112,8 +113,8 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
                 .prefetch_related("selected_jobs")
             ),
             # already checked in test_func because the user name is displayed in the title
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.object),
-            "can_edit_personal_information": self.request.user.can_edit_personal_information(self.object),
+            "can_view_personal_information": can_view_personal_information(self.request, self.object),
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
         }
 
 
@@ -182,7 +183,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:
-        job_seeker.user_can_view_personal_information = request.user.can_view_personal_information(job_seeker)
+        job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
@@ -311,7 +312,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
             params = {
                 "job_seeker": job_seeker.public_id,
-                "city": job_seeker.city_slug if self.request.user.can_view_personal_information(job_seeker) else "",
+                "city": job_seeker.city_slug if can_view_personal_information(self.request, job_seeker) else "",
             }
             return add_url_params(reverse("search:employers_results"), params)
         if self.standalone_creation:
@@ -472,7 +473,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
                 # Ask the sender to confirm the NIR we found is associated to the correct user
                 "preview_mode": bool(self.form.data.get("preview")),
                 "job_seeker": job_seeker,
-                "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
+                "can_view_personal_information": can_view_personal_information(self.request, job_seeker),
                 "is_job_seeker_in_list": self.is_job_seeker_in_user_jobseekers_list(job_seeker),
             }
         else:
@@ -567,7 +568,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                 "can_add_nir": can_add_nir,
                 "preview_mode": preview_mode,
                 "job_seeker": job_seeker,
-                "can_view_personal_information": job_seeker and self.sender.can_view_personal_information(job_seeker),
+                "can_view_personal_information": job_seeker and can_view_personal_information(request, job_seeker),
                 "is_job_seeker_in_list": is_job_seeker_in_list,
             }
         )
@@ -871,7 +872,7 @@ class UpdateJobSeekerStartView(View):
         if not from_url:
             raise Http404
 
-        if request.user.is_job_seeker or not request.user.can_view_personal_information(job_seeker):
+        if request.user.is_job_seeker or not can_view_personal_information(request, job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
 
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(
@@ -906,7 +907,7 @@ class UpdateJobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.job_seeker = get_object_or_404(
             self.get_job_seeker_queryset(), pk=self.job_seeker_session.get("job_seeker_pk")
         )
-        if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
+        if request.user.is_job_seeker or not can_view_personal_information(request, self.job_seeker):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
 
@@ -974,11 +975,11 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
             },
             data=request.POST or None,
         )
-        if not self.request.user.can_edit_personal_information(self.job_seeker):
+        if not can_edit_personal_information(self.request, self.job_seeker):
             self._disable_form()
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.can_edit_personal_information(self.job_seeker):
+        if not can_edit_personal_information(self.request, self.job_seeker):
             return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set(
@@ -1001,7 +1002,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
             "confirmation_needed": False,
             "form": self.form,
             "matomo_form_name": "apply-update-job-seeker-identity",
-            "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
+            "readonly_form": not can_edit_personal_information(self.request, self.job_seeker),
             "progress": "20",
         }
 
@@ -1023,11 +1024,11 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
             initial=self.job_seeker_session.get("user", {}),
             data=request.POST or None,
         )
-        if not self.request.user.can_edit_personal_information(self.job_seeker):
+        if not can_edit_personal_information(self.request, self.job_seeker):
             self._disable_form()
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.can_edit_personal_information(self.job_seeker):
+        if not can_edit_personal_information(self.request, self.job_seeker):
             return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
@@ -1038,7 +1039,7 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
+            "readonly_form": not can_edit_personal_information(self.request, self.job_seeker),
             "progress": "40",
         }
 
@@ -1117,7 +1118,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         super().setup(request, *args, **kwargs)
 
         allowed_user_fields_to_update = []
-        if self.request.user.can_edit_personal_information(self.job_seeker):
+        if can_edit_personal_information(self.request, self.job_seeker):
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep1Form.Meta.fields)
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep2Form.Meta.fields)
 

@@ -30,6 +30,7 @@ from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -139,8 +140,8 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         )
 
     context = {
-        "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
-        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
+        "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
         "display_refusal_info": False,
         "eligibility_diagnosis": eligibility_diagnosis,
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
@@ -239,7 +240,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     context = {
         "can_be_cancelled": can_be_cancelled,
         "can_view_personal_information": True,  # SIAE members have access to personal info
-        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
         "display_refusal_info": False,
         "eligibility_diagnosis": eligibility_diagnosis,
         "eligibility_diagnosis_by_siae_required": job_application.eligibility_diagnosis_by_siae_required(),
@@ -326,8 +327,8 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         refusal_contact_email = ""
 
     context = {
-        "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
-        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
+        "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
         "eligibility_diagnosis": eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?

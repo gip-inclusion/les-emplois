@@ -24,6 +24,7 @@ from itou.job_applications.models import JobApplication, PriorAction
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
 from itou.utils.widgets import DuetDatePickerWidget
@@ -947,7 +948,7 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         users = [
             (
                 user.id,
-                mask_unless(user_full_name, predicate=self.request.user.can_view_personal_information(user)),
+                mask_unless(user_full_name, predicate=can_view_personal_information(self.request, user)),
             )
             for user in users
             if (user_full_name := user.get_full_name())

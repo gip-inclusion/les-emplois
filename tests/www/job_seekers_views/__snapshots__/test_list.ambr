@@ -903,8 +903,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
@@ -1953,8 +1953,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',

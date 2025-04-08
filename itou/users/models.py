@@ -479,35 +479,6 @@ class User(AbstractUser, AddressMixin):
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
-    def can_edit_personal_information(self, user):
-        if self.pk == user.pk:  # I am me
-            return True
-
-        if self.is_prescriber:
-            if self.is_prescriber_with_authorized_org:
-                return user.is_handled_by_proxy
-            else:
-                return user.is_handled_by_proxy and user.is_created_by(self)
-        elif self.is_employer:
-            return user.is_handled_by_proxy
-
-        return False
-
-    def can_view_personal_information(self, user):
-        if self.can_edit_personal_information(user):  # If we can edit them then we can view them
-            return True
-
-        if user.is_job_seeker:  # Restrict display of personal information to job seeker
-            if self.is_prescriber:
-                if self.is_prescriber_with_authorized_org:
-                    return True
-                else:
-                    return user.is_handled_by_proxy and user.is_created_by(self)
-            elif self.is_employer:
-                return True
-
-        return False
-
     def can_add_nir(self, job_seeker):
         return (self.is_prescriber_with_authorized_org or self.is_employer) and (
             job_seeker and not job_seeker.jobseeker_profile.nir

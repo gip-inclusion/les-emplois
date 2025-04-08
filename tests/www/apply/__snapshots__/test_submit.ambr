@@ -1282,8 +1282,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
@@ -1554,8 +1554,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -1822,8 +1822,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -2084,8 +2084,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -3472,8 +3472,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
@@ -3744,8 +3744,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -4012,8 +4012,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -4274,8 +4274,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -5662,8 +5662,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
@@ -5934,8 +5934,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -6202,8 +6202,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -6464,8 +6464,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -7852,8 +7852,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
         ]),
         'sql': '''
@@ -8124,8 +8124,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -8392,8 +8392,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
         ]),
@@ -8654,8 +8654,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
           'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
         ]),

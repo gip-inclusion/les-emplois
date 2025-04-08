@@ -23,6 +23,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
@@ -183,8 +184,8 @@ class ApplicationBaseView(ApplyStepBaseView):
             "is_subject_to_eligibility_rules": self.company.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
             "is_subject_to_geiq_eligibility_rules": self.company.kind == CompanyKind.GEIQ,
-            "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
+            "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
             # Do not show the warning for job seekers
             "new_check_needed": (
                 not self.request.user.is_job_seeker
@@ -766,7 +767,7 @@ class ApplicationEndView(ApplyStepBaseView):
         )
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.can_edit_personal_information(self.job_application.job_seeker):
+        if not can_edit_personal_information(self.request, self.job_application.job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
         if self.form.is_valid():
             self.form.save()
@@ -778,11 +779,11 @@ class ApplicationEndView(ApplyStepBaseView):
         return super().get_context_data(**kwargs) | {
             "job_application": self.job_application,
             "form": self.form,
-            "can_edit_personal_information": self.request.user.can_edit_personal_information(
-                self.job_application.job_seeker
+            "can_edit_personal_information": can_edit_personal_information(
+                self.request, self.job_application.job_seeker
             ),
-            "can_view_personal_information": self.request.user.can_view_personal_information(
-                self.job_application.job_seeker
+            "can_view_personal_information": can_view_personal_information(
+                self.request, self.job_application.job_seeker
             ),
             "reset_url": reverse(
                 "apply:application_end",
@@ -928,7 +929,7 @@ def hire_confirmation(
         ),
         template_name=template_name,
         extra_context={
-            "can_edit_personal_information": request.user.can_edit_personal_information(job_seeker),
+            "can_edit_personal_information": can_edit_personal_information(request, job_seeker),
             "is_subject_to_eligibility_rules": company.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "eligibility_diagnosis": eligibility_diagnosis,
@@ -963,7 +964,7 @@ class ApplyForJobSeekerMixin:
 
             self.job_seeker = _get_job_seeker_to_apply_for(request)
             if self.job_seeker:
-                self.can_view_personal_information = request.user.can_view_personal_information(self.job_seeker)
+                self.can_view_personal_information = can_view_personal_information(request, self.job_seeker)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
