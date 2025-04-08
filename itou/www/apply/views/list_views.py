@@ -275,7 +275,7 @@ def list_prescriptions_exports_download(request, month_identifier=None):
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename, request_user=request.user)
+    return stream_xlsx_export(job_applications, filename, request=request)
 
 
 def list_for_siae(request, template_name="apply/list_for_siae.html"):
@@ -397,7 +397,7 @@ def list_for_siae_exports_download(request, month_identifier=None):
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename, request_user=request.user)
+    return stream_xlsx_export(job_applications, filename, request=request)
 
 
 @check_user(lambda user: user.is_employer)

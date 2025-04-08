@@ -115,9 +115,9 @@ def _resolve_title(title, nir):
     return ""
 
 
-def _serialize_job_application(job_application, request_user):
+def _serialize_job_application(job_application, request):
     job_seeker = job_application.job_seeker
-    can_view_personal_information = request_user.can_view_personal_information(job_seeker)
+    can_view_personal_information = request.user.can_view_personal_information(job_seeker)
     company = job_application.to_company
 
     numero_pass_iae = ""
@@ -159,11 +159,11 @@ def _serialize_job_application(job_application, request_user):
     ]
 
 
-def _job_applications_serializer(queryset, *, request_user):
-    return [_serialize_job_application(job_application, request_user) for job_application in queryset]
+def _job_applications_serializer(queryset, *, request):
+    return [_serialize_job_application(job_application, request) for job_application in queryset]
 
 
-def stream_xlsx_export(job_applications, filename, request_user):
+def stream_xlsx_export(job_applications, filename, request):
     """
     Takes a list of job application, converts them to XLSX and writes them in the provided stream
     The stream can be for instance an http response, a string (io.StringIO()) or a file
@@ -172,5 +172,5 @@ def stream_xlsx_export(job_applications, filename, request_user):
         job_applications,
         filename,
         JOB_APPLICATION_CSV_HEADERS,
-        functools.partial(_job_applications_serializer, request_user=request_user),
+        functools.partial(_job_applications_serializer, request=request),
     )
