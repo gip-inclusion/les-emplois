@@ -3777,7 +3777,6 @@ def test_application_end_update_job_seeker(client):
     job_application = JobApplicationFactory(job_seeker__with_mocked_address=True)
     job_seeker = job_application.job_seeker
     # Ensure sender cannot update job seeker infos
-    assert not job_seeker.can_edit_personal_information(job_application.sender)
     assert job_seeker.address_line_2 == ""
     url = reverse(
         "apply:application_end",

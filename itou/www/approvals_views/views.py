@@ -36,6 +36,7 @@ from itou.utils.auth import check_user
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.approvals_views.forms import (
@@ -203,7 +204,7 @@ class ApprovalDetailView(UserPassesTestMixin, DetailView):
         approval = self.object
 
         context["is_employer_with_accepted_application"] = is_employer_with_accepted_application
-        context["can_view_personal_information"] = self.request.user.can_view_personal_information(approval.user)
+        context["can_view_personal_information"] = can_view_personal_information(self.request, approval.user)
         context["matomo_custom_title"] = "Détail PASS IAE"
         context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))

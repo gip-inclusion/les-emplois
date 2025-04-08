@@ -5,6 +5,7 @@ from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.users.enums import Title, UserKind
 from itou.utils.export import to_streaming_response
+from itou.utils.perms import utils as perms_utils
 from itou.utils.templatetags import str_filters
 
 
@@ -117,7 +118,7 @@ def _resolve_title(title, nir):
 
 def _serialize_job_application(job_application, request):
     job_seeker = job_application.job_seeker
-    can_view_personal_information = request.user.can_view_personal_information(job_seeker)
+    can_view_personal_information = perms_utils.can_view_personal_information(request, job_seeker)
     company = job_application.to_company
 
     numero_pass_iae = ""

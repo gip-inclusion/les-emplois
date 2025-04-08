@@ -16,6 +16,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.immersion_facile import immersion_search_url
 from itou.utils.perms.company import get_current_company_or_404
+from itou.utils.perms.utils import can_edit_personal_information
 from itou.utils.urls import get_safe_url
 
 
@@ -110,7 +111,7 @@ class EmployeeDetailView(DetailView):
             )
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
-        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object)
+        context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.object)
         context["approval"] = approval
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"

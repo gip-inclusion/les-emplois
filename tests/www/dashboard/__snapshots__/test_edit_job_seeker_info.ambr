@@ -559,7 +559,7 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
           'edit_job_seeker_info[www/dashboard/views.py]',
         ]),
         'sql': '''

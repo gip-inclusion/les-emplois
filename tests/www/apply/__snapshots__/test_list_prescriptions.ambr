@@ -309,8 +309,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
@@ -1729,8 +1729,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           '_serialize_job_application[job_applications/export.py]',
           '_job_applications_serializer[job_applications/export.py]',
           'serialize_queryset_by_batch[<site-packages>/xlsx_streaming/streaming.py]',
@@ -3361,8 +3361,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
@@ -4565,8 +4565,8 @@
       dict({
         'origin': list([
           'User.is_prescriber_with_authorized_org[users/models.py]',
-          'User.can_edit_personal_information[users/models.py]',
-          'User.can_view_personal_information[users/models.py]',
+          'can_edit_personal_information[utils/perms/utils.py]',
+          'can_view_personal_information[utils/perms/utils.py]',
           'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',

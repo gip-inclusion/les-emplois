@@ -14,6 +14,7 @@ from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelF
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
@@ -55,9 +56,7 @@ class FilterForm(forms.Form):
         return [
             (
                 job_seeker.pk,
-                mask_unless(
-                    job_seeker.get_full_name(), predicate=request.user.can_view_personal_information(job_seeker)
-                ),
+                mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_information(request, job_seeker)),
             )
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
             if job_seeker.get_full_name()

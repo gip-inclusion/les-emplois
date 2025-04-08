@@ -32,6 +32,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
+from itou.utils.perms.utils import can_edit_personal_information
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
@@ -322,7 +323,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         from_application_uuid = uuid.UUID(request.GET.get("from_application"))
     except (TypeError, ValueError):
         from_application_uuid = None
-    if not request.user.can_edit_personal_information(job_seeker):
+    if not can_edit_personal_information(request, job_seeker):
         raise PermissionDenied
 
     dashboard_url = reverse_lazy("dashboard:index")

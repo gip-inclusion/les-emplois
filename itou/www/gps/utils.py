@@ -5,6 +5,7 @@ from django.urls import reverse
 from itou.common_apps.organizations.models import MembershipQuerySet
 from itou.gps.models import FollowUpGroup
 from itou.utils import slack
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 
@@ -15,7 +16,7 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
     )
     name = mask_unless(
         beneficiary.get_full_name(),
-        predicate=membership.can_view_personal_information or request.user.can_view_personal_information(beneficiary),
+        predicate=membership.can_view_personal_information or can_view_personal_information(request, beneficiary),
     )
     if is_active is False:
         messages.info(

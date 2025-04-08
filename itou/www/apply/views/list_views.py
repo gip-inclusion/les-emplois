@@ -1,4 +1,5 @@
 import enum
+import functools
 from collections import defaultdict
 
 from django.conf import settings
@@ -19,6 +20,7 @@ from itou.utils.auth import check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ArchivedChoices,
@@ -213,7 +215,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
-    _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
+    _add_user_can_view_personal_information(
+        job_applications_page, functools.partial(can_view_personal_information, request)
+    )
     _add_administrative_criteria(job_applications_page)
 
     try:

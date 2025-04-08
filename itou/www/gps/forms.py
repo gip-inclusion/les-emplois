@@ -7,6 +7,7 @@ from django_select2.forms import Select2Widget
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 from itou.www.gps.enums import Channel, EndReason
@@ -45,7 +46,7 @@ class MembershipsFiltersForm(forms.Form):
                 mask_unless(
                     beneficiary.get_full_name(),
                     predicate=(
-                        beneficiaries_data[beneficiary.pk] or request.user.can_view_personal_information(beneficiary)
+                        beneficiaries_data[beneficiary.pk] or can_view_personal_information(request, beneficiary)
                     ),
                 ),
             )
