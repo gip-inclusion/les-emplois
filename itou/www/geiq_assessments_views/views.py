@@ -170,9 +170,15 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def assessment_get_file(request, pk, *, file_field):
-    assessments = Assessment.objects.filter(companies=request.current_organization).select_related("campaign")
+    if request.user.is_employer:
+        filter_kwargs = {"companies": request.current_organization}
+    elif request.user.is_labor_inspector:
+        filter_kwargs = {"institutions": request.current_organization}
+    else:
+        raise Http404  # This should never happen thanks to check_user
+    assessments = Assessment.objects.filter(**filter_kwargs).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
     match file_field:
         case "summary_document_file":
@@ -419,3 +425,65 @@ def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment
         "active_tab": AssessmentDetailsTab.KPI,
     }
     return render(request, template_name, context)
+
+
+@require_safe
+@check_user(lambda user: user.is_labor_inspector)
+def list_for_institution(request, template_name="geiq_assessments_views/list_for_institution.html"):
+    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+        raise Http404
+    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
+    context = {
+        "assessments": assessments,
+    }
+    return render(request, template_name, context)
+
+
+class AssessmentContractDetailsForInstitutionTab(models.TextChoices):
+    FILE = "file", "Dossier transmis par le GEIQ"
+    CONTRACTS = "contracts", "Données salariés"
+
+
+@require_safe
+@check_user(lambda user: user.is_labor_inspector)
+def details_for_institution(
+    request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
+):
+    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+        raise Http404
+    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
+    assessment = get_object_or_404(assessments, pk=pk)
+    context = {
+        "assessment": assessment,
+        "active_tab": AssessmentContractDetailsForInstitutionTab.FILE,
+        "back_url": reverse("geiq_assessments_views:list_for_institution"),
+    }
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_employer)
+def contracts_list_for_institution(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
+    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+        raise Http404
+    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
+    assessment = get_object_or_404(assessments, pk=pk)
+    contracts_page = pager(
+        EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
+            "employee__first_name", "employee__last_name"
+        ),
+        request.GET.get("page"),
+        items_per_page=10,
+    )
+    context = {
+        "assessment": assessment,
+        "back_url": reverse("geiq_assessments_views:list_for_institution"),
+        "contracts_page": contracts_page,
+    }
+    return render(request, template_name, context)
+
+
+# contracts_list_for_institution
+# review_assessment
+# contracts_include_for_institution
+# contracts_exclude_for_institution
+# contracts_details_for_institution

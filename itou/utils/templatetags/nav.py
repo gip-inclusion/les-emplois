@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from itou.companies.enums import CompanyKind
+from itou.institutions.enums import InstitutionKind
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 
 
@@ -221,6 +222,18 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
     ),
+    "labor-inspector-geiq-assessments": NavItem(
+        label="Bilans d’exécution GEIQ",
+        icon="ri-list-check-3",
+        is_new=True,  # TODO(xfernandez) Remove on 2025/09/01
+        target=reverse("geiq_assessments_views:list_for_institution"),
+        active_view_names=[
+            "geiq_assessments_views:list_for_institution",
+        ],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="institution-geiq-bilan-execution",
+    ),
     # GPS (for employers and prescribers with an org in department nb 30)
     "gps": NavItem(
         label="GPS",
@@ -303,6 +316,8 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
+            if request.current_organization.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+                menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
         if is_allowed_to_use_gps(request) and show_gps_as_a_nav_entry(request):
             menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
