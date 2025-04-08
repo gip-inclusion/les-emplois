@@ -8,8 +8,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory
 
 
 class TestAdministrativeCriteriaForm:
@@ -18,17 +17,15 @@ class TestAdministrativeCriteriaForm:
     """
 
     def test_valid_for_prescriber(self):
-        user = PrescriberFactory()
         criterion1 = AdministrativeCriteria.objects.get(pk=13)
         form_data = {f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion1.pk}": "true"}
-        form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
         assert form.cleaned_data == expected_cleaned_data
 
     def test_valid_for_siae(self):
-        company = CompanyFactory(kind=CompanyKind.ACI, with_membership=True)
-        user = company.members.first()
+        company = CompanyFactory(kind=CompanyKind.ACI)
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -37,7 +34,7 @@ class TestAdministrativeCriteriaForm:
 
         # At least 1 criterion level 1.
         form_data = {f"{criterion1.key}": "true"}
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
         assert form.cleaned_data == expected_cleaned_data
@@ -48,31 +45,29 @@ class TestAdministrativeCriteriaForm:
             f"{criterion3.key}": "true",
             f"{criterion4.key}": "true",
         }
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion2, criterion3, criterion4]
         assert form.cleaned_data == expected_cleaned_data
 
     def test_criteria_fields(self):
-        company = CompanyFactory(with_membership=True)
-        user = company.members.first()
+        company = CompanyFactory()
 
-        form = AdministrativeCriteriaForm(user, company)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company)
         assert AdministrativeCriteria.objects.all().count() == len(form.fields)
 
     def test_error_criteria_number_for_siae(self):
         """
         Test errors for SIAEs.
         """
-        company = CompanyFactory(kind=CompanyKind.ACI, with_membership=True)
-        user = company.members.first()
+        company = CompanyFactory(kind=CompanyKind.ACI)
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
         criterion3 = AdministrativeCriteria.objects.get(pk=9)
 
         form_data = {f"{criterion1.key}": "false"}
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         assert form.ERROR_CRITERIA_NUMBER in form.errors["__all__"]
 
@@ -80,13 +75,12 @@ class TestAdministrativeCriteriaForm:
             f"{criterion2.key}": "true",
             f"{criterion3.key}": "true",
         }
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         assert form.ERROR_CRITERIA_NUMBER in form.errors["__all__"]
 
     def test_valid_for_siae_of_kind_etti(self):
-        company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
-        user = company.members.first()
+        company = CompanyFactory(kind=CompanyKind.ETTI)
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
@@ -94,7 +88,7 @@ class TestAdministrativeCriteriaForm:
 
         # At least 1 criterion level 1.
         form_data = {f"{criterion1.key}": "true"}
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion1]
         assert form.cleaned_data == expected_cleaned_data
@@ -104,7 +98,7 @@ class TestAdministrativeCriteriaForm:
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
         }
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         expected_cleaned_data = [criterion2, criterion3]
         assert form.cleaned_data == expected_cleaned_data
@@ -113,21 +107,20 @@ class TestAdministrativeCriteriaForm:
         """
         Test errors for SIAEs of kind ETTI.
         """
-        company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
-        user = company.members.first()
+        company = CompanyFactory(kind=CompanyKind.ETTI)
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
 
         # No level 1 criterion.
         form_data = {f"{criterion1.key}": "false"}
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         assert form.ERROR_CRITERIA_NUMBER_ETTI_AI in form.errors["__all__"]
 
         # Only one level 2 criterion.
         form_data = {f"{criterion2.key}": "true"}
-        form = AdministrativeCriteriaForm(user, siae=company, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data=form_data)
         form.is_valid()
         assert form.ERROR_CRITERIA_NUMBER_ETTI_AI in form.errors["__all__"]
 
@@ -135,8 +128,6 @@ class TestAdministrativeCriteriaForm:
         """
         Test ERROR_SENIOR_JUNIOR.
         """
-        user = PrescriberFactory()
-
         criterion1 = AdministrativeCriteria.objects.get(name="Senior (+50 ans)")
         criterion2 = AdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
 
@@ -144,7 +135,7 @@ class TestAdministrativeCriteriaForm:
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion1.pk}": "true",
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
         }
-        form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data=form_data)
         form.is_valid()
         assert form.ERROR_SENIOR_JUNIOR in form.errors["__all__"]
 
@@ -152,8 +143,6 @@ class TestAdministrativeCriteriaForm:
         """
         Test ERROR_LONG_TERM_JOB_SEEKER.
         """
-        user = PrescriberFactory()
-
         criterion1 = AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)")
         criterion2 = AdministrativeCriteria.objects.get(name="DELD (12-24 mois)")
 
@@ -163,24 +152,21 @@ class TestAdministrativeCriteriaForm:
             # Level 2.
             f"{criterion2.key}": "true",
         }
-        form = AdministrativeCriteriaForm(user, siae=None, data=form_data)
+        form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data=form_data)
         form.is_valid()
         assert form.ERROR_LONG_TERM_JOB_SEEKER in form.errors["__all__"]
 
     def test_no_required_criteria_for_prescriber_with_authorized_organization(self):
-        prescriber = PrescriberFactory()
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         company = CompanyFactory()
 
-        assert not AdministrativeCriteriaForm(prescriber, company, data={}).is_valid()
-        assert AdministrativeCriteriaForm(authorized_prescriber, company, data={}).is_valid()
+        assert not AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data={}).is_valid()
+        assert AdministrativeCriteriaForm(is_authorized_prescriber=True, siae=company, data={}).is_valid()
 
     def test_no_required_criteria_when_no_siae(self):
-        prescriber = PrescriberFactory()
         company = CompanyFactory()
 
-        assert not AdministrativeCriteriaForm(prescriber, company, data={}).is_valid()
-        assert AdministrativeCriteriaForm(prescriber, None, data={}).is_valid()
+        assert not AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data={}).is_valid()
+        assert AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data={}).is_valid()
 
 
 class TestAdministrativeCriteriaOfJobApplicationForm:

@@ -179,7 +179,9 @@ def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name,
             "du contrôle a posteriori. " + suspension_explanation
         )
 
-    form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=siae, data=request.POST or None)
+    form_administrative_criteria = AdministrativeCriteriaForm(
+        request.user.is_prescriber_with_authorized_org, siae=siae, data=request.POST or None
+    )
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(
             job_seeker,

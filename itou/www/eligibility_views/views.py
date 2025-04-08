@@ -42,7 +42,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
+        kwargs["is_authorized_prescriber"] = self.request.user.is_prescriber_with_authorized_org
         kwargs["siae"] = self.company
         return kwargs
 
