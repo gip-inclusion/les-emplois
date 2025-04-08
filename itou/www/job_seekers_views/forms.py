@@ -43,20 +43,20 @@ class FilterForm(forms.Form):
         label="Nom de la personne", required=False, widget=Select2MultipleWidget
     )
 
-    def __init__(self, job_seeker_qs, data, *args, request_user, request_organization, **kwargs):
+    def __init__(self, job_seeker_qs, data, *args, request, **kwargs):
         super().__init__(data, *args, **kwargs)
-        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request_user)
-        if request_organization:
+        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seeker_qs, request)
+        if request.current_organization:
             self.fields["organization_members"].choices = self._get_choices_for_organization_members(
-                job_seeker_qs, request_organization
+                job_seeker_qs, request.current_organization
             )
 
-    def _get_choices_for_job_seeker(self, job_seeker_qs, request_user):
+    def _get_choices_for_job_seeker(self, job_seeker_qs, request):
         return [
             (
                 job_seeker.pk,
                 mask_unless(
-                    job_seeker.get_full_name(), predicate=request_user.can_view_personal_information(job_seeker)
+                    job_seeker.get_full_name(), predicate=request.user.can_view_personal_information(job_seeker)
                 ),
             )
             for job_seeker in job_seeker_qs.order_by("first_name", "last_name")

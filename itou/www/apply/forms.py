@@ -938,8 +938,8 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
 
     to_companies = forms.MultipleChoiceField(required=False, label="Organisation", widget=Select2MultipleWidget)
 
-    def __init__(self, job_applications_qs, *args, request_user, **kwargs):
-        self.request_user = request_user
+    def __init__(self, job_applications_qs, *args, request, **kwargs):
+        self.request = request
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["to_companies"].choices += self.get_to_companies_choices()
 
@@ -947,7 +947,7 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         users = [
             (
                 user.id,
-                mask_unless(user_full_name, predicate=self.request_user.can_view_personal_information(user)),
+                mask_unless(user_full_name, predicate=self.request.user.can_view_personal_information(user)),
             )
             for user in users
             if (user_full_name := user.get_full_name())

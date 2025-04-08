@@ -166,8 +166,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     form = FilterForm(
         queryset,
         request.GET,
-        request_user=request.user,
-        request_organization=request.current_organization,
+        request=request,
     )
 
     filters_counter = 0
