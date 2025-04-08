@@ -1,7 +1,7 @@
 {% if contract.allowance_requested %}
-    {% url "geiq_assessments_views:assessment_contracts_exclude" pk=assessment.pk contract_pk=contract.pk as post_url %}
+    {% url "geiq_assessments_views:assessment_contracts_exclude" contract_pk=contract.pk as post_url %}
 {% else %}
-    {% url "geiq_assessments_views:assessment_contracts_include" pk=assessment.pk contract_pk=contract.pk as post_url %}
+    {% url "geiq_assessments_views:assessment_contracts_include" contract_pk=contract.pk as post_url %}
 {% endif %}
 
 <form hx-post="{{ post_url }}{% if from_list %}?from_list=1{% endif %}"

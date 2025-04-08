@@ -320,28 +320,28 @@ class AssessmentContractDetailsTab(models.TextChoices):
 
 @check_user(lambda user: user.is_employer)
 def assessment_contracts_details(
-    request, pk, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
+    request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
 ):
     try:
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
         raise Http404
-    assessments = Assessment.objects.filter(companies=request.current_organization)
-    assessment = get_object_or_404(assessments, pk=pk)
-    contract_qs = EmployeeContract.objects.filter(employee__assessment=assessment).select_related(
-        "employee__assessment__campaign"
-    )
+    contract_qs = EmployeeContract.objects.filter(
+        employee__assessment__companies=request.current_organization
+    ).select_related("employee__assessment__campaign")
     if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
         contract_qs = contract_qs.prefetch_related("employee__prequalifications")
     contract = get_object_or_404(contract_qs, pk=contract_pk)
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk}),
+        fallback_url=reverse(
+            "geiq_assessments_views:assessment_contracts_list", kwargs={"pk": contract.employee.assessment.pk}
+        ),
     )
     context = {
         "back_url": back_url,
-        "assessment": assessment,
+        "assessment": contract.employee.assessment,
         "contract": contract,
         "matomo_custom_title": "Bilan d’exécution - page de detail d’un contrat",
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
@@ -353,14 +353,15 @@ def assessment_contracts_details(
 @require_POST
 @check_user(lambda user: user.is_employer)
 def assessment_contracts_include(
-    request, pk, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
+    request, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
-    assessments = Assessment.objects.filter(companies=request.current_organization)
-    assessment = get_object_or_404(assessments, pk=pk)
     contract = get_object_or_404(
-        EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
+        EmployeeContract.objects.filter(employee__assessment__companies=request.current_organization)
+        .select_related("employee__assessment")
+        .select_for_update(of=("self",)),
         pk=contract_pk,
     )
+    assessment = contract.employee.assessment
     if not assessment.submitted_at and not contract.allowance_requested:
         contract.allowance_requested = True
         contract.save(update_fields=("allowance_requested",))
@@ -378,14 +379,15 @@ def assessment_contracts_include(
 @require_POST
 @check_user(lambda user: user.is_employer)
 def assessment_contracts_exclude(
-    request, pk, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
+    request, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
-    assessments = Assessment.objects.filter(companies=request.current_organization)
-    assessment = get_object_or_404(assessments, pk=pk)
     contract = get_object_or_404(
-        EmployeeContract.objects.filter(employee__assessment=assessment).select_for_update(of=("self",)),
+        EmployeeContract.objects.filter(employee__assessment__companies=request.current_organization)
+        .select_related("employee__assessment")
+        .select_for_update(of=("self",)),
         pk=contract_pk,
     )
+    assessment = contract.employee.assessment
     if not assessment.submitted_at and contract.allowance_requested:
         contract.allowance_requested = False
         contract.save(update_fields=("allowance_requested",))
