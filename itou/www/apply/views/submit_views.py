@@ -480,7 +480,7 @@ class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseV
             initial_data["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
 
         self.form = AdministrativeCriteriaForm(
-            request.user,
+            request.user.is_prescriber_with_authorized_org,
             siae=self.company,
             initial=initial_data,
             data=request.POST or None,
