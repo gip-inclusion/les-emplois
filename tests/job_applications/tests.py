@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Max
 from django.forms.models import model_to_dict
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -1815,13 +1816,13 @@ class TestJobApplicationXlsxExport:
             eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_company.members.first())
+        request = RequestFactory()
+        request.user = job_application.to_company.members.first()
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        response = stream_xlsx_export(
-            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
-        )
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1865,12 +1866,12 @@ class TestJobApplicationXlsxExport:
                 eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
             )
             job_application.accept(user=job_application.to_company.members.first())
+        request = RequestFactory()
+        request.user = job_application.to_company.members.first()
 
         assert job_seeker.approvals.last().is_in_waiting_period
 
-        response = stream_xlsx_export(
-            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
-        )
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1914,9 +1915,10 @@ class TestJobApplicationXlsxExport:
         job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
         job_application.refuse(user=job_application.to_company.members.get())
 
-        response = stream_xlsx_export(
-            JobApplication.objects.all(), "filename", request_user=job_application.to_company.members.first()
-        )
+        request = RequestFactory()
+        request.user = job_application.to_company.members.first()
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1972,7 +1974,10 @@ class TestJobApplicationXlsxExport:
             hiring_start_at=start,
             state=JobApplicationState.ACCEPTED,
         )
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=company.members.first())
+        request = RequestFactory()
+        request.user = company.members.first()
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -2020,7 +2025,10 @@ class TestJobApplicationXlsxExport:
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=prescriber)
+        request = RequestFactory()
+        request.user = prescriber
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -2056,7 +2064,7 @@ class TestJobApplicationXlsxExport:
         job_seeker.created_by = prescriber
         job_seeker.save(update_fields=("created_by",))
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request_user=prescriber)
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
