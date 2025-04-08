@@ -101,9 +101,8 @@ class Assessment(models.Model):
     label_rates = models.JSONField(verbose_name="taux récupérés sur l'API label", null=True)
     employee_nb = models.PositiveSmallIntegerField("nombre d'employés", default=0)
     contracts_synced_at = models.DateTimeField("données de contrats label récupérées le", blank=True, null=True)
-    contracts_selection_validated_at = models.DateTimeField(
-        "données de contrats label récupérées le", blank=True, null=True
-    )
+    # GEIQ actions
+    contracts_selection_validated_at = models.DateTimeField("sélection des contrats validée le", blank=True, null=True)
     geiq_comment = models.TextField("commentaire général du GEIQ", blank=True)
 
     submitted_at = models.DateTimeField("transmis le", blank=True, null=True)
@@ -111,6 +110,18 @@ class Assessment(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name="transmis par",
         related_name="submitted_assessments",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+    )
+    # Institution actions
+    decision_validated_at = models.DateTimeField("décision saisie le", blank=True, null=True)
+    grants_selection_validated_at = models.DateTimeField("aides accordées validées le", blank=True, null=True)
+    reviewed_at = models.DateTimeField("contrôlé le", blank=True, null=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="contrôlé par",
+        related_name="reviewed_assessments",
         null=True,
         blank=True,
         on_delete=models.RESTRICT,  # For traceability and accountability
