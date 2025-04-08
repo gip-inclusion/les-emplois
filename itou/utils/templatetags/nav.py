@@ -281,7 +281,7 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
-        if is_allowed_to_use_gps(request.user) and show_gps_as_a_nav_entry(request):
+        if is_allowed_to_use_gps(request) and show_gps_as_a_nav_entry(request):
             menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
             NavGroup(

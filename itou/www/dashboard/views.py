@@ -133,7 +133,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
-        "can_view_gps_card": is_allowed_to_use_gps(request.user) and not show_gps_as_a_nav_entry(request),
+        "can_view_gps_card": is_allowed_to_use_gps(request) and not show_gps_as_a_nav_entry(request),
         "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,

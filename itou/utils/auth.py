@@ -18,6 +18,20 @@ def check_user(test_func, err_msg=""):
     return decorator
 
 
+def check_request(test_func, err_msg=""):
+    def decorator(view_func):
+        def _check_request_view_wrapper(request, *args, **kwargs):
+            test_pass = test_func(request)
+
+            if test_pass:
+                return view_func(request, *args, **kwargs)
+            raise PermissionDenied(err_msg)
+
+        return wraps(view_func)(_check_request_view_wrapper)
+
+    return decorator
+
+
 class LoginNotRequiredMixin:
     @classmethod
     def as_view(cls, *args, **kwargs):
