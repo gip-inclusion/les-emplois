@@ -1,3 +1,4 @@
+import pathlib
 import uuid
 from itertools import batched
 from math import ceil
@@ -33,7 +34,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "import_excel_file",
-            type=str,
+            type=pathlib.Path,
             help="The filepath of the GPS export file, with extension .xlsx",
         )
         parser.add_argument(
