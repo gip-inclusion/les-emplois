@@ -356,16 +356,10 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     job_description.company = company
 
     if request.method == "POST":
-        try:
-            job_description.save()
-            messages.success(
-                request,
-                "Fiche de poste enregistrée",
-                extra_tags="toast",
-            )
-        finally:
-            request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-            return HttpResponseRedirect(reverse("companies_views:job_description_list"))
+        job_description.save()
+        messages.success(request, "Fiche de poste enregistrée", extra_tags="toast")
+        request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
+        return HttpResponseRedirect(reverse("companies_views:job_description_list"))
 
     context = {
         "siae": company,

@@ -686,18 +686,14 @@ class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
-        try:
-            # Send notifications
-            company_recipients = job_application.to_company.active_members.all()
-            for employer in company_recipients:
-                job_application.notifications_new_for_employer(employer).send()
-            job_application.notifications_new_for_job_seeker.send()
-            if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-                job_application.notifications_new_for_proxy.send()
-        finally:
-            # We are done, send to the (mostly) stateless final page as we now have no session.
-            # "company_pk" is kinda useless with "application_pk" but is kept for URL consistency.
-            return job_application
+        # Send notifications
+        company_recipients = job_application.to_company.active_members.all()
+        for employer in company_recipients:
+            job_application.notifications_new_for_employer(employer).send()
+        job_application.notifications_new_for_job_seeker.send()
+        if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+            job_application.notifications_new_for_proxy.send()
+        return job_application
 
     def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
