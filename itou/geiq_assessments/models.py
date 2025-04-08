@@ -154,6 +154,14 @@ class Assessment(models.Model):
             actions.append("Commentaire")
         return actions
 
+    def missing_actions_to_review(self):
+        actions = []
+        if not self.grants_selection_validated_at:
+            actions.append("Contrôler la sélection")
+        if not self.decision_validated_at:
+            actions.append("Saisir la décision")
+        return actions
+
     def get_allowance_stats(self):
         return (
             EmployeeContract.objects.filter(employee__assessment=self)
