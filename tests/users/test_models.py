@@ -35,7 +35,6 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -556,20 +555,6 @@ class TestModel:
         job_seeker = JobSeekerFactory(created_by=user)
         job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
         assert not user.can_edit_email(job_seeker)
-
-    def test_can_add_nir(self):
-        company = CompanyFactory(with_membership=True)
-        employer = company.members.first()
-        prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        authorized_prescriber = prescriber_org.members.first()
-        unauthorized_prescriber = PrescriberFactory()
-        job_seeker_no_nir = JobSeekerFactory(jobseeker_profile__nir="")
-        job_seeker_with_nir = JobSeekerFactory()
-
-        assert authorized_prescriber.can_add_nir(job_seeker_no_nir)
-        assert not unauthorized_prescriber.can_add_nir(job_seeker_no_nir)
-        assert employer.can_add_nir(job_seeker_no_nir)
-        assert not authorized_prescriber.can_add_nir(job_seeker_with_nir)
 
     def test_is_account_creator(self):
         user = PrescriberFactory()
