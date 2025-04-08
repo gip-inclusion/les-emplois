@@ -34,7 +34,8 @@ def test_data_inclusion_client(settings, respx_mock):
         "thematiques": [
             "acces-aux-droits-et-citoyennete",
             "equipement-et-alimentation",
-            "logement-hebergementmobilite",
+            "logement-hebergement",
+            "mobilite",
             "numerique",
             "remobilisation",
         ],

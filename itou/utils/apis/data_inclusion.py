@@ -11,7 +11,8 @@ API_TIMEOUT_SECONDS = 1.0
 API_THEMATIQUES = [
     "acces-aux-droits-et-citoyennete",
     "equipement-et-alimentation",
-    "logement-hebergementmobilite",
+    "logement-hebergement",
+    "mobilite",
     "numerique",
     "remobilisation",
 ]
