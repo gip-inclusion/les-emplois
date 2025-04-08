@@ -98,16 +98,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
             .active_or_in_grace_period()
             .values_list("pk", flat=True)
         )
-        try:
-            return queryset.filter(job_application__to_company__id__in=companies).order_by(
-                "-created_at", "-updated_at"
-            )
-        finally:
-            # Tracking is currently done via user-agent header
-            logger.info(
-                "User-Agent: %s",
-                self.request.headers.get("User-Agent"),
-            )
+        return queryset.filter(job_application__to_company__id__in=companies).order_by("-created_at", "-updated_at")
 
 
 # Doc section is in French for Swagger / OAS auto doc generation

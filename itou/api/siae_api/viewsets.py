@@ -178,7 +178,7 @@ class SiaeViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
                 .order_by("-updated_at", "-created_at")
             ),
         )
-    )
+    ).order_by("pk")
 
     NOT_FOUND_RESPONSE = OpenApiExample(
         "Not Found",
@@ -200,16 +200,3 @@ class SiaeViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
     def list(self, request):
         # we need this despite the default behavior because of the documentation annotations
         return super().list(request)
-
-    def get_queryset(self):
-        # We only get to this point if permissions are OK
-        queryset = super().get_queryset()
-
-        try:
-            return queryset.order_by("id")
-        finally:
-            # Tracking is currently done via user-agent header
-            logger.info(
-                "User-Agent: %s",
-                self.request.headers.get("User-Agent"),
-            )
