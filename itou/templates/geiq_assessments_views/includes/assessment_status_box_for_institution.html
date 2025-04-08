@@ -7,11 +7,20 @@
     </div>
 {% else %}
     <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
-        <h4>Votre dossier a été transmis le {{ assessment.submitted_at|date:"d/m/Y" }}</h4>
+        <h4>Bilan d’exécution à contrôler</h4>
         <p>
-            Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter la TODO:XXXX.
-            <br>
-            Vous serez notifié par mail de la décision suite à l’exam de votre bilan.
+            Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour contrôler les informations de ce bilan d’exécution.
         </p>
+        <p class="mb-0">Actions restantes :</p>
+        <ul>
+            {% for action in assessment.missing_actions_to_submit %}
+                <li>
+                    <strong>{{ action }}</strong>
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn btn-primary btn-block" disabled>
+            <span>Contrôler le dossier</span>
+        </button>
     </div>
 {% endif %}
