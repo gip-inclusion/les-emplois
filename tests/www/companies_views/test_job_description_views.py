@@ -82,13 +82,6 @@ class JobDescriptionAbstract:
         self.edit_details_url = reverse("companies_views:edit_job_description_details")
         self.edit_preview_url = reverse("companies_views:edit_job_description_preview")
 
-    def _login(self, client, user):
-        client.force_login(user)
-
-        response = client.get(self.url)
-
-        return response
-
 
 class TestJobDescriptionListView(JobDescriptionAbstract):
     BLOCK_JOB_APPS_BTN = "Bloquer l'envoi de candidatures"
@@ -131,7 +124,8 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
             self.company.job_description_through.all().delete()
             assert self.company.jobs.count() == 0
 
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
         assertContains(response, self.BLOCK_JOB_APPS_BTN)
         assertNotContains(response, self.UNBLOCK_JOB_APPS_BTN)
 
@@ -159,7 +153,8 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
 
     @freeze_time("2025-01-01")
     def test_toggle_spontaneous_applications(self, client, snapshot):
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
         assert (
             str(parse_response_to_soup(response, "#toggle_job_description_form_spontaneous_applications")) == snapshot
         )
@@ -176,7 +171,8 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
 
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -251,7 +247,8 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         assert not other_company_job_description.is_active
 
     def test_delete_job_descriptions(self, client):
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -298,7 +295,8 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         self.url = self.edit_url
 
     def test_edit_job_description_company(self, client, subtests):
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -366,7 +364,8 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         user_opcs = opcs.members.first()
         opcs.jobs.add(*self.appellations)
 
-        response = self._login(client, user_opcs)
+        client.force_login(user_opcs)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -431,8 +430,8 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         # If the session data have been erased during one of the job description
         # crestion / update tunnel (browser navigation for instance),
         # then redirect to the first step.
-
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.status_code == 200
 
@@ -511,7 +510,8 @@ class TestUpdateJobDescriptionView(JobDescriptionAbstract):
         return location.name
 
     def test_update_job_description(self, client):
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assert response.status_code == 200
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
@@ -570,7 +570,8 @@ class TestUpdateJobDescriptionView(JobDescriptionAbstract):
         assert self.job_description.location is not None
         initial_location = self.job_description.location
 
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
         assert response.status_code == 200
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
@@ -655,7 +656,8 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
 
     def test_employer_card_actions(self, client):
         # Checks if company can update their job descriptions
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         assertContains(response, "Modifier la fiche de poste")
         assertContains(response, self.update_job_description_url(self.job_description))
@@ -696,7 +698,8 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
     def test_display_placeholder_for_empty_fields(self, client):
         PLACE_HOLDER = "La structure n'a pas encore renseigné cette rubrique"
 
-        response = self._login(client, self.user)
+        client.force_login(self.user)
+        response = client.get(self.url)
 
         # Job description created in setup has empty description fields
         assertContains(response, PLACE_HOLDER, count=2)
