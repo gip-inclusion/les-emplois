@@ -244,12 +244,20 @@ class EmployeeContract(models.Model):
     planned_end_at = models.DateField(verbose_name="date de fin prévisionnelle")
     end_at = models.DateField(verbose_name="date de fin", null=True)
 
-    allowance_requested = models.BooleanField(verbose_name="Aide demandée par le GEIQ")
+    allowance_requested = models.BooleanField(verbose_name="aide demandée par le GEIQ")
+    allowance_granted = models.BooleanField(verbose_name="aide acceptée par l'institution")
 
     other_data = models.JSONField(verbose_name="autres données")
 
     class Meta:
         verbose_name = "contrat"
+        constraints = [
+            models.CheckConstraint(
+                name="geiq_allowance_requested_or_not_granted",
+                violation_error_message=("Impossible d'accorder une aide non-sollicitée"),
+                condition=(models.Q(allowance_requested=True) | models.Q(allowance_granted=False)),
+            ),
+        ]
 
     def with_3_months_in_assessment_year(self):
         from itou.geiq.sync import _more_than_3_months_in_year
