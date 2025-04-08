@@ -12,7 +12,7 @@ from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
@@ -31,19 +31,19 @@ from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
 
-def is_allowed_to_use_gps(user):
-    return user.is_employer or user.is_prescriber
+def is_allowed_to_use_gps(request):
+    return request.user.is_employer or request.user.is_prescriber
 
 
-def is_allowed_to_use_gps_advanced_features(user):
-    return user.is_employer or user.is_prescriber_with_authorized_org
+def is_allowed_to_use_gps_advanced_features(request):
+    return request.user.is_employer or request.user.is_prescriber_with_authorized_org
 
 
 def show_gps_as_a_nav_entry(request):
     return getattr(request.current_organization, "department", None) in settings.GPS_NAV_ENTRY_DEPARTMENTS
 
 
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def group_list(request, current, template_name="gps/group_list.html"):
     qs = FollowUpGroupMembership.objects.filter(member=request.user, is_active=True)
 
@@ -93,7 +93,7 @@ class GroupDetailsMixin:
     # Don't use UserPassesTestMixin because we need the kwargs
     def setup(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            if not is_allowed_to_use_gps(request.user):
+            if not is_allowed_to_use_gps(request):
                 raise PermissionDenied("Votre utilisateur n'est pas autorisé à accéder à ces informations.")
             self.group = get_object_or_404(FollowUpGroup.objects.select_related("beneficiary"), pk=kwargs["group_id"])
             self.membership = get_object_or_404(
@@ -174,7 +174,7 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
 
         context = context | {
-            "can_see_diagnosis": is_allowed_to_use_gps_advanced_features(self.request.user),
+            "can_see_diagnosis": is_allowed_to_use_gps_advanced_features(self.request),
             "matomo_custom_title": "Profil GPS - bénéficiaire",
             "render_advisor_matomo_option": matomo_option,
             "matomo_option": f"coordonnees-conseiller-{matomo_option or 'ailleurs'}",
@@ -216,7 +216,7 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
 
 
 @require_POST
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def display_contact_info(request, group_id, target_participant_public_id, mode):
     template_name = {
         "email": "gps/includes/member_email.html",
@@ -235,7 +235,7 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
 
 
 @require_POST
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def ask_access(request, group_id):
     follow_up_group = get_object_or_404(
         FollowUpGroup.objects.filter(members=request.user).select_related("beneficiary"),
@@ -262,7 +262,7 @@ def ask_access(request, group_id):
     )
 
 
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def join_group(request, template_name="gps/join_group.html"):
     urls = {
         Channel.FROM_COWORKER: reverse("gps:join_group_from_coworker"),
@@ -278,13 +278,13 @@ def join_group(request, template_name="gps/join_group.html"):
 
     context = {
         "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("gps:group_list")),
-        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
+        "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request),
         "Channel": Channel,
     }
     return render(request, template_name, context)
 
 
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def join_group_from_coworker(request, template_name="gps/join_group_from_coworker.html"):
     if request.current_organization is None:
         raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
@@ -303,7 +303,7 @@ def join_group_from_coworker(request, template_name="gps/join_group_from_coworke
     return render(request, template_name, context)
 
 
-@check_user(is_allowed_to_use_gps_advanced_features)
+@check_request(is_allowed_to_use_gps_advanced_features)
 def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
     form = CheckJobSeekerNirForm(data=request.POST or None, is_gps=True)
     context = {
@@ -348,7 +348,7 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
     return render(request, template_name, context)
 
 
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def join_group_from_name_and_email(request, template_name="gps/join_group_from_name_and_email.html"):
     form = JobSeekerSearchByNameEmailForm(data=request.POST or None)
     context = {
@@ -377,7 +377,7 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
             ).first()
             if job_seeker_email_match:
                 context["email_only_match"] = True
-                if is_allowed_to_use_gps_advanced_features(request.user):
+                if is_allowed_to_use_gps_advanced_features(request):
                     # slight change in modal wording
                     job_seeker = job_seeker_email_match
                 else:
@@ -408,7 +408,7 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
                 )
 
         # For authorized prescribers + employers
-        if form.data.get("confirm") and is_allowed_to_use_gps_advanced_features(request.user):
+        if form.data.get("confirm") and is_allowed_to_use_gps_advanced_features(request):
             add_beneficiary(request, job_seeker)
             return HttpResponseRedirect(reverse("gps:group_list"))
 
@@ -431,13 +431,13 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
             # Ask the sender to confirm the found user is correct
             "preview_mode": job_seeker and bool(form.data.get("preview")),
             "job_seeker": job_seeker,
-            "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request.user),
+            "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request),
         }
 
     return render(request, template_name, context)
 
 
-@check_user(is_allowed_to_use_gps)
+@check_request(is_allowed_to_use_gps)
 def beneficiaries_autocomplete(request):
     """
     Returns JSON data compliant with Select2

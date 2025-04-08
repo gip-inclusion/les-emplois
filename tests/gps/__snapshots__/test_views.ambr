@@ -1720,7 +1720,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroup"."beneficiary_id",
@@ -1741,7 +1741,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1793,7 +1793,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1812,7 +1812,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1830,7 +1830,7 @@
       dict({
         'origin': list([
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroupmembership"."id",
@@ -1940,7 +1940,7 @@
       dict({
         'origin': list([
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "col1",
@@ -2067,7 +2067,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -2410,7 +2410,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroup"."beneficiary_id",
@@ -2431,7 +2431,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2481,7 +2481,7 @@
           'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
           'MembershipsFiltersForm.__init__[www/gps/forms.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2500,7 +2500,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -2518,7 +2518,7 @@
       dict({
         'origin': list([
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroupmembership"."id",
@@ -2628,7 +2628,7 @@
       dict({
         'origin': list([
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "col1",
@@ -2753,7 +2753,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[gps/group_list.html]',
           'group_list[www/gps/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
