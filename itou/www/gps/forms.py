@@ -23,10 +23,10 @@ class MembershipsFiltersForm(forms.Form):
         ),
     )
 
-    def __init__(self, memberships_qs, *args, request_user, **kwargs):
+    def __init__(self, memberships_qs, *args, request, **kwargs):
         self.queryset = memberships_qs
         super().__init__(*args, **kwargs)
-        self.fields["beneficiary"].choices = self._get_beneficiary_choices(request_user)
+        self.fields["beneficiary"].choices = self._get_beneficiary_choices(request)
 
     def filter(self):
         queryset = self.queryset
@@ -34,7 +34,7 @@ class MembershipsFiltersForm(forms.Form):
             queryset = queryset.filter(follow_up_group__beneficiary_id=beneficiary, is_active=True)
         return queryset
 
-    def _get_beneficiary_choices(self, request_user):
+    def _get_beneficiary_choices(self, request):
         beneficiaries_data = dict(
             self.queryset.values_list("follow_up_group__beneficiary_id", "can_view_personal_information")
         )
@@ -45,7 +45,7 @@ class MembershipsFiltersForm(forms.Form):
                 mask_unless(
                     beneficiary.get_full_name(),
                     predicate=(
-                        beneficiaries_data[beneficiary.pk] or request_user.can_view_personal_information(beneficiary)
+                        beneficiaries_data[beneficiary.pk] or request.user.can_view_personal_information(beneficiary)
                     ),
                 ),
             )
