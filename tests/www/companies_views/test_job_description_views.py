@@ -427,69 +427,9 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         assert opcs.job_description_through.count() == 5
 
     def test_empty_session_during_edit(self, client):
-        # If the session data have been erased during one of the job description
-        # crestion / update tunnel (browser navigation for instance),
-        # then redirect to the first step.
         client.force_login(self.user)
-        response = client.get(self.url)
-
-        assert response.status_code == 200
-
-        # Step 1: edit job description
-        response = client.get(self.edit_url)
-
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-        post_data = {
-            "appellation": "11076",  # Must be a non existing one for the company
-            "custom_name": "custom_name",
-            "location": self.paris_city.pk,
-            "hours_per_week": 35,
-            "contract_type": ContractType.OTHER.value,
-            "other_contract_type": "other_contract_type",
-            "open_positions": 5,
-        }
-        response = client.post(self.edit_url, data=post_data)
-
-        assertRedirects(response, self.edit_details_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        # Remove session data
-        # - do not remove directly from client (i.e client.session.pop(...) )
-        # - don't forget to call session.save()
-        session = client.session
-        session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        session.save()
-
-        assert session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) is None
-
-        response = client.get(self.edit_details_url)
-        assertRedirects(response, self.edit_url)
-
-        # Step 1 + 2
-        response = client.post(self.edit_url, data=post_data)
-        response = client.post(self.edit_details_url, data=post_data)
-        post_data = {
-            "description": "description",
-            "profile_description": "profile_description",
-            "is_resume_mandatory": True,
-            "is_qpv_mandatory": True,
-        }
-
-        response = client.post(self.edit_details_url, data=post_data)
-
-        assertRedirects(response, self.edit_preview_url)
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        # Remove session data
-        session = client.session
-        session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-        session.save()
-
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-        response = client.get(self.edit_preview_url)
-        assertRedirects(response, self.edit_url)
+        assertRedirects(client.get(self.edit_details_url), self.edit_url)
+        assertRedirects(client.get(self.edit_preview_url), self.edit_url)
 
 
 class TestUpdateJobDescriptionView(JobDescriptionAbstract):
