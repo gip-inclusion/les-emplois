@@ -162,10 +162,10 @@ class Assessment(models.Model):
             actions.append("Saisir la décision")
         return actions
 
-    def get_allowance_stats(self):
+    def _get_allowance_stats(self, filter_field):
         return (
             EmployeeContract.objects.filter(employee__assessment=self)
-            .filter(allowance_requested=True)
+            .filter(**{filter_field: True})
             .aggregate(
                 contracts_nb=Count("pk"),
                 aid_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0)),
@@ -174,6 +174,12 @@ class Assessment(models.Model):
                 potential_aid_amount=Sum("employee__allowance_amount"),
             )
         )
+
+    def get_allowance_stats_for_geiq(self):
+        return self._get_allowance_stats(filter_field="allowance_requested")
+
+    def get_allowance_stats_for_institution(self):
+        return self._get_allowance_stats(filter_field="allowance_granted")
 
     def label_antenna_ids(self):
         if not self.label_antennas:

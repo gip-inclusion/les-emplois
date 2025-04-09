@@ -23,5 +23,5 @@
     </div>
 </form>
 {% if from_list and request.htmx %}
-    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=contract.employee.assessment hx_swap_oob=True only %}
+    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True only %}
 {% endif %}

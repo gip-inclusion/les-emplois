@@ -306,7 +306,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     assessments = Assessment.objects.filter(**filter_kwargs)
     assessment = get_object_or_404(assessments, pk=pk)
 
-    back_url, readonly_access = None, False
+    back_url, readonly_access, stats = None, False, None  # defined to please the linters
     if request.user.is_employer:
         back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
         readonly_access = assessment.submitted_at
@@ -322,6 +322,10 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
             assessment.save(update_fields=("grants_selection_validated_at",))
         return HttpResponseRedirect(back_url)
 
+    if request.user.is_employer:
+        stats = assessment.get_allowance_stats_for_geiq()
+    elif request.user.is_labor_inspector:
+        stats = assessment.get_allowance_stats_for_institution()
     contracts_page = pager(
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
         .select_related("employee__assessment")
@@ -335,6 +339,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "contracts_page": contracts_page,
         "readonly_access": readonly_access,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
+        "stats": stats,
     }
     return render(request, template_name, context)
 
@@ -411,12 +416,20 @@ def _assessment_contracts_toggle(
         if assessment.grants_selection_validated_at:
             assessment.grants_selection_validated_at = None
             assessment.save(update_fields=("grants_selection_validated_at",))
+    from_list = bool(request.GET.get("from_list"))
+    stats = None
+    if from_list:
+        if request.user.is_employer:
+            stats = assessment.get_allowance_stats_for_geiq()
+        elif request.user.is_labor_inspector:
+            stats = assessment.get_allowance_stats_for_institution()
     context = {
         "assessment": assessment,
         "contract": contract,
-        "from_list": bool(request.GET.get("from_list")),
+        "from_list": from_list,
         "readonly_access": False,
         "value": new_value,
+        "stats": stats,
     }
     return render(request, template_name, context)
 
