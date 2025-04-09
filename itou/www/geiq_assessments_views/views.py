@@ -295,23 +295,25 @@ def assessment_contracts_sync(request, pk):
 @check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     # TODO: should this part be extracted in a `for_request() queryset method ?
+    contract_filter_kwargs = {}
     if request.user.is_employer:
         filter_kwargs = {"companies": request.current_organization}
     elif request.user.is_labor_inspector:
-        filter_kwargs = {"institutions": request.current_organization}
+        filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
+        contract_filter_kwargs = {"allowance_requested": True}
     else:
         raise Http404  # This should never happen thanks to check_user
     assessments = Assessment.objects.filter(**filter_kwargs)
     assessment = get_object_or_404(assessments, pk=pk)
 
-    back_url, validation_possible = None, False
+    back_url, readonly_access = None, False
     if request.user.is_employer:
         back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
-        validation_possible = not assessment.submitted_at
+        readonly_access = assessment.submitted_at
     elif request.user.is_labor_inspector:
         back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
-        validation_possible = not assessment.reviewed_at
-    if request.method == "POST" and validation_possible:
+        readonly_access = assessment.reviewed_at
+    if request.method == "POST" and not readonly_access:
         if request.user.is_employer:
             assessment.contracts_selection_validated_at = timezone.now()
             assessment.save(update_fields=("contracts_selection_validated_at",))
@@ -321,9 +323,9 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         return HttpResponseRedirect(back_url)
 
     contracts_page = pager(
-        EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
-            "employee__first_name", "employee__last_name"
-        ),
+        EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
+        .select_related("employee__assessment")
+        .order_by("employee__first_name", "employee__last_name"),
         request.GET.get("page"),
         items_per_page=10,
     )
@@ -331,7 +333,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "assessment": assessment,
         "back_url": back_url,
         "contracts_page": contracts_page,
-        "validation_possible": validation_possible,
+        "readonly_access": readonly_access,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
     }
     return render(request, template_name, context)
@@ -377,27 +379,44 @@ def assessment_contracts_details(
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def _assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
+    if request.user.is_employer:
+        filter_kwargs = {"employee__assessment__companies": request.current_organization}
+    elif request.user.is_labor_inspector:
+        filter_kwargs = {
+            "employee__assessment__institutions": request.current_organization,
+            "employee__assessment__submitted_at__isnull": False,
+        }
+    else:
+        raise Http404  # This should never happen thanks to check_user
     contract = get_object_or_404(
-        EmployeeContract.objects.filter(employee__assessment__companies=request.current_organization)
+        EmployeeContract.objects.filter(**filter_kwargs)
         .select_related("employee__assessment")
         .select_for_update(of=("self",)),
         pk=contract_pk,
     )
     assessment = contract.employee.assessment
-    if not assessment.submitted_at and contract.allowance_requested != new_value:
+    if request.user.is_employer and not assessment.submitted_at and contract.allowance_requested != new_value:
         contract.allowance_requested = new_value
         contract.save(update_fields=("allowance_requested",))
         if assessment.contracts_selection_validated_at:
             assessment.contracts_selection_validated_at = None
             assessment.save(update_fields=("contracts_selection_validated_at",))
+    elif request.user.is_labor_inspector and not assessment.reviewed_at and contract.allowance_granted != new_value:
+        contract.allowance_granted = new_value
+        contract.save(update_fields=("allowance_granted",))
+        if assessment.grants_selection_validated_at:
+            assessment.grants_selection_validated_at = None
+            assessment.save(update_fields=("grants_selection_validated_at",))
     context = {
         "assessment": assessment,
         "contract": contract,
         "from_list": bool(request.GET.get("from_list")),
+        "readonly_access": False,
+        "value": new_value,
     }
     return render(request, template_name, context)
 
