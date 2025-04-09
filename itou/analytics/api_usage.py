@@ -26,4 +26,5 @@ def collect_analytics_data(before, client=None):
         models.DatumCode.API_TOTAL_CALLS_JOB_APP_SEARCH: client.count_daily_logs(
             before, endpoint="candidatures/recherche/"
         ),
+        models.DatumCode.API_TOTAL_UT_GEIQ: client.count_daily_unique_tokens(before, endpoint="embauches-geiq/"),
     }

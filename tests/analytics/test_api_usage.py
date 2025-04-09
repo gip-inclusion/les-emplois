@@ -19,6 +19,7 @@ def test_collect_analytics_data_return_all_codes(datadog_client):
         models.DatumCode.API_TOTAL_CALLS_STRUCTURES,
         models.DatumCode.API_TOTAL_UT_JOB_APP_SEARCH,
         models.DatumCode.API_TOTAL_CALLS_JOB_APP_SEARCH,
+        models.DatumCode.API_TOTAL_UT_GEIQ,
     }
 
 
@@ -30,6 +31,7 @@ def test_collect_analytics_data_with_data(datadog_client):
         models.DatumCode.API_TOTAL_CALLS_CANDIDATS: 3,
         models.DatumCode.API_TOTAL_UV_CANDIDATS: 4,
         models.DatumCode.API_TOTAL_CALLS_GEIQ: 5,
+        models.DatumCode.API_TOTAL_UT_GEIQ: 6,
         models.DatumCode.API_TOTAL_CALLS_ER: 7,
         models.DatumCode.API_TOTAL_UV_ER: 8,
         models.DatumCode.API_TOTAL_CALLS_MARCHE: 9,

@@ -38,6 +38,7 @@ class DatumCode(models.TextChoices):
     API_TOTAL_CALLS_CANDIDATS = "API-003", "API candidats : total d'appels reçus"
     API_TOTAL_UV_CANDIDATS = "API-004", "API candidats : total de visiteurs uniques"
     API_TOTAL_CALLS_GEIQ = "API-005", "API GEIQ : total d'appels reçus"
+    API_TOTAL_UT_GEIQ = "API-006", "API GEIQ : total de jetons uniques"
     API_TOTAL_CALLS_ER = "API-007", "API FS : total d'appels reçus"
     API_TOTAL_UV_ER = "API-008", "API FS : total de visiteurs uniques"
     API_TOTAL_CALLS_MARCHE = "API-009", "API Le marché : total d'appels reçus"
