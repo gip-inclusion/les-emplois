@@ -5,7 +5,7 @@ import uuid
 
 from django.core.files.storage import default_storage
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Case, Count, Prefetch, Q, Sum, When
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -488,6 +488,38 @@ def details_for_institution(
     return render(request, template_name, context)
 
 
-# review_assessment
-# contracts_include_for_institution
-# contracts_exclude_for_institution
+@check_user(lambda user: user.is_labor_inspector)
+def assessment_review(request, pk, template_name="geiq_assessments_views/assessment_review.html"):
+    assessments = Assessment.objects.filter(institutions=request.current_organization)
+    assessment = get_object_or_404(assessments, pk=pk)
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
+    )
+    form = None
+    context = {
+        "assessment": assessment,
+        "form": form,
+        "back_url": back_url,
+    }
+    if request.method == "POST":  # and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(back_url)
+    context["stats"] = (
+        EmployeeContract.objects.filter(employee__assessment=assessment)
+        .filter(allowance_requested=True)
+        .aggregate(
+            allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
+            allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
+            refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
+            potential_allowance_amount=Sum(
+                Case(
+                    When(allowance_granted=True, then="employee__allowance_amount"),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
+        )
+    )
+    return render(request, template_name, context)

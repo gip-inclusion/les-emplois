@@ -82,20 +82,5 @@ urlpatterns = [
     # institution urls
     path("institution/", views.list_for_institution, name="list_for_institution"),
     path("institution/<uuid:pk>", views.details_for_institution, name="details_for_institution"),
-    # path("institution/<uuid:pk>/review", views.review_assessment, name="review_assessment"),
-    # path(
-    #    "institution/contracts/<uuid:contract_pk>/include",
-    #    views.contracts_include_for_institution,
-    #    name="contracts_include_for_institution",
-    # ),
-    # path(
-    #    "institution/contracts/<uuid:contract_pk>/exclude",
-    #    views.contracts_exclude_for_institution,
-    #    name="contracts_exclude_for_institution",
-    # ),
-    # path(
-    #    "institution/contracts/<uuid:contract_pk>/<str:tab>",
-    #    views.contracts_details_for_institution,
-    #    name="contracts_details_for_institution",
-    # ),
+    path("institution/<uuid:pk>/review", views.assessment_review, name="assessment_review"),
 ]

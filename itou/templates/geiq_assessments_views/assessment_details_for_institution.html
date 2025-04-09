@@ -90,7 +90,7 @@
                                     {% include "geiq_assessments_views/includes/badge_checked.html" only %}
                                 {% endif %}
                             </div>
-                            <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-column gap-3 mb-3">
                                 <div class="d-flex flex-row justify-content-between">
                                     Montant conventionné (convention initiale + avenant)<strong>- €</strong>
                                 </div>
@@ -98,6 +98,9 @@
                                     Montant total accordé<strong>- €</strong>
                                 </div>
                             </div>
+                            <a href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}" class="btn btn-primary">
+                                <span>Saisir la décision</span>
+                            </a>
                         </div>
                     {% endif %}
                 </div>
