@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load str_filters %}
 
@@ -11,14 +12,17 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
                 Demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}
+                {% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-base" %}
             </h1>
-            {% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-base" %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
         <div class="c-box c-box--action">
             <h2 class="visually-hidden">Actions rapides</h2>

@@ -1,5 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 
@@ -9,9 +10,11 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-md-flex align-items-center mb-3">
-        <h1 class="mb-1 mb-md-0 me-3">Mettre en attente la candidature de {{ job_application.job_seeker.get_full_name }}</h1>
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Mettre en attente la candidature de {{ job_application.job_seeker.get_full_name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content_extend %}

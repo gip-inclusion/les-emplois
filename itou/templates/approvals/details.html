@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load matomo %}
 {% load static %}
@@ -13,9 +14,11 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-        <h1 class="m-0">PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
-        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="sur le PASS IAE" %}
+        {% fragment as c_title__main %}
+            <h1>PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             {% if approval_deletion_form_url %}
                 <a href="{{ approval_deletion_form_url }}"
                    id="approval-deletion-link"
@@ -33,8 +36,8 @@
                     <span>Afficher l’attestation</span>
                 </a>
             {% endif %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

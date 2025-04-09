@@ -1,12 +1,17 @@
 {% extends "apply/submit_base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 
 {% block title_content %}
-    <div class="d-md-flex align-items-center mb-3">
-        <h1 class="mb-1 mb-md-0 me-3">{% include 'apply/includes/_submit_title.html' %}</h1>
-        {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {% include 'apply/includes/_submit_title.html' %}
+                {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content_extend %}
