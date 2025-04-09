@@ -49,7 +49,7 @@
                                     {% include "geiq_assessments_views/includes/badge_to_control.html" only %}
                                 {% endif %}
                             </div>
-                            <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-column gap-3 mb-3">
                                 <div class="d-flex flex-row justify-content-between">
                                     Dont potentiellement éligible à l’aide de 814 €<strong>10</strong>
                                 </div>
@@ -69,6 +69,9 @@
                                     Montant de l’aide potentielle<strong>{{ 70000|format_int_euros }}</strong>
                                 </div>
                             </div>
+                            <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
+                                <span>Contrôler la sélection</span>
+                            </a>
                         </div>
                         <div class="c-box">
                             <div class="d-flex justify-content-between flex-row mb-3">
