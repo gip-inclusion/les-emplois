@@ -483,6 +483,7 @@ def details_for_institution(
         "assessment": assessment,
         "active_tab": AssessmentContractDetailsForInstitutionTab.FILE,
         "back_url": reverse("geiq_assessments_views:list_for_institution"),
+        "stats": assessment.get_allowance_stats_for_institution() if assessment.submitted_at else None,
     }
     return render(request, template_name, context)
 
