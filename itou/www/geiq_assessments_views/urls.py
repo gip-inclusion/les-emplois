@@ -64,13 +64,15 @@ urlpatterns = [
     ),
     path(
         "contracts/<uuid:contract_pk>/include",
-        views.assessment_contracts_include,
+        views._assessment_contracts_toggle,
         name="assessment_contracts_include",
+        kwargs={"new_value": True},
     ),
     path(
         "contracts/<uuid:contract_pk>/exclude",
-        views.assessment_contracts_exclude,
+        views._assessment_contracts_toggle,
         name="assessment_contracts_exclude",
+        kwargs={"new_value": False},
     ),
     path(
         "contracts/<uuid:contract_pk>/<str:tab>",
