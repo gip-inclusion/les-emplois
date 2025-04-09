@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -121,6 +122,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -214,6 +216,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -261,7 +264,7 @@
   Utilisateur - type,Structure - type,Structure - nom,Structure - SIRET,Structure - adresse ligne 1,Structure - adresse ligne 2,Structure - code postal,Structure - ville,Structure - département,Structure - région,Utilisateur - prénom,Utilisateur - nom,Utilisateur - e-mail,Administrateur ?,Utilisateur - date d'inscription
   Employeur,EI,ACME Inc.,012345678910,112 rue de la Croix-Nivert,,75015,Paris,75,Île-de-France,John,Doe,john.doe@test.local,Oui,17-05-2024
   Orienteur,FT,Pres. Org.,012345678910,39 rue d'Artois,,75008,Paris,75,Île-de-France,Pierre,Dupont,pierre.dupont@test.local,Oui,17-05-2024
-  
+
   '''
 # ---
 # name: TestExportJobApplications.test_export[after].1
@@ -319,7 +322,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -422,6 +426,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -512,6 +517,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -892,7 +898,7 @@
 # name: TestExportJobApplications.test_export[after][streaming content]
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
-  
+
   '''
 # ---
 # name: TestExportJobApplications.test_export[before].1
@@ -950,7 +956,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1053,6 +1060,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -1143,6 +1151,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1523,7 +1532,7 @@
 # name: TestExportJobApplications.test_export[before][streaming content]
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
-  
+
   '''
 # ---
 # name: TestExportJobApplications.test_export[contains].1
@@ -1581,7 +1590,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1684,6 +1694,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "cities_city"."id",
                  "cities_city"."name",
                  "cities_city"."normalized_name",
@@ -1774,6 +1785,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -2312,7 +2324,7 @@
   '''
   job_seeker_title,job_seeker_first_name,job_seeker_last_name,job_seeker_nir,job_seeker_france_travail_id,job_seeker_ft_obfuscated_nir,job_seeker_date_joined,job_seeker_birth_date,job_seeker_birth_municipality,job_seeker_birth_country,job_seeker_email,job_seeker_phone,job_seeker_identity_provider,job_seeker_created_by,job_seeker_address1_line_1,job_seeker_address1_line_2,job_seeker_address1_post_code,job_seeker_address1_city,job_seeker_address1_city_code_insee,job_seeker_address1_coords,job_seeker_address1_geocoding_score,job_seeker_address1_BAN_API_address,job_seeker_address2_lane_number,job_seeker_address2_non_std_extension,job_seeker_address2_lane_type,job_seeker_address2_lane_name,job_seeker_address2_additional_address,job_seeker_address2_post_code,job_seeker_address2_municipality,job_seeker_education_level,job_seeker_resourceless,job_seeker_rqth,job_seeker_oeth,job_seeker_france_travail_since,job_seeker_unemployed_since,job_seeker_has_rsa_allocation,job_seeker_rsa_allocation_since,job_seeker_has_ass_allocation,job_seeker_ass_allocation_since,job_seeker_has_aah_allocation,job_seeker_aah_allocation_since,application_eligibility_diagnosis_author_kind,application_eligibility_diagnosis_author_siae_kind,application_eligibility_diagnosis_author_siae_siret,application_eligibility_diagnosis_author_siae_naf,application_eligibility_diagnosis_author_siae_name,application_eligibility_diagnosis_author_prescriber_organization_siret,application_eligibility_diagnosis_author_prescriber_organization_kind,application_eligibility_diagnosis_author_prescriber_organization_is_habilitated,application_eligibility_diagnosis_author_prescriber_organization_code_safir,application_eligibility_diagnosis_expires_at,application_eligibility_diagnosis_administrative_criteria,application_to_company_kind,application_to_company_siret,application_to_company_naf,application_to_company_name,sender,sender_company_kind,sender_company_siret,sender_company_naf,sender_company_name,sender_prescriber_organization_siret,sender_prescriber_organization_kind,sender_prescriber_organization_is_habilitated,sender_prescriber_organization_code_safir,selected_jobs,hired_for_job_name,hired_for_job_appellation_code,hired_for_job_appellation_name,hired_for_job_ROME_code,hired_for_job_ROME_name,hired_for_job_contract_type,hired_for_job_contract_nature,hired_for_job_location,hired_for_job_location_hours_per_week,hiring_start_at,hiring_end_at,contract_type,contract_type_details,nb_hours_per_week,qualification_type,qualification_level,planned_training_hours,inverted_vae_contract,PASS_IAE_number,PASS_IAE_start_at,PASS_IAE_end_at,PASS_IAE_prolongations,PASS_IAE_suspensions
   MME,Jane,Doe,290010101010125,,,2024-05-10T09:11:11+00:00,1990-01-01,,,jane.doe@test.local,0612345678,DJANGO,,12 rue Georges Bizet,,35000,Rennes,,,,,12,,RUE,Georges Bizet,,35000,,40,False,False,False,,,NON,,False,,False,,prescriber,,,,,12345678900012,FT,True,,2024-11-10,,EI,32112345600020,1234Z,Acme inc.,Pierre DUPONT — pierre.dupont@test.local,,,,,,,,,Candidature spontanée,,,,,,,,,,2024-05-10,2026-05-10,,,,,,,,XXXXX1234567,2024-05-10,2026-06-08,[2024-05-10;2024-06-09] (SENIOR),
-  
+
   '''
 # ---
 # name: TestExportPEApiRejections.test_export.1
@@ -2370,7 +2382,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2440,6 +2453,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2552,13 +2566,13 @@
                                       Identifiant unique (du SSO) : <strong>8487651a-a6c8-4a57-9663-64fadf1dc764</strong>
                                   </li>
                               </ul>
-                              
+
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_keep_to_user" name="user_to_keep" type="radio" value="to_user"/>
                                       <label class="form-check-label" for="id_keep_to_user">Utiliser ce compte pour la connexion</label>
-  
+
                                   </div>
-                              
+
                           </div>
                       </div>
                       <div class="col">
@@ -2586,12 +2600,12 @@
                                       Identifiant unique (du SSO) : <strong>471d1de6-e1ff-4cd2-be2e-61f603c04687</strong>
                                   </li>
                               </ul>
-                              
+
                                   <div class="form-check">
                                       <input class="form-check-input" id="id_keep_from_user" name="user_to_keep" type="radio" value="from_user"/>
                                       <label class="form-check-label" for="id_keep_from_user">Utiliser ce compte pour la connexion</label>
                                   </div>
-                              
+
                           </div>
                       </div>
                   </div>
@@ -2607,7 +2621,7 @@
                           <h2>Mes appareils</h2>
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              
+
                                   <p>Voici la liste de vos appareils configurés :</p>
                                   <table class="table table-sm">
                                       <caption class="visually-hidden">Liste de vos appareils configurés</caption>
@@ -2621,12 +2635,12 @@
                                           </tr>
                                       </thead>
                                       <tbody>
-                                          
+
                                               <tr>
                                                   <td>
-                                                      
+
                                                           <i class="ri-verified-badge-fill text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
-                                                      
+
                                                   </td>
                                                   <td>bitwarden</td>
                                                   <td>11 mars 2025 06:18</td>
@@ -2634,16 +2648,16 @@
                                                       11 mars 2025 06:20
                                                   </td>
                                                   <td>
-  
+
                                                       <button aria-label="Supprimer l’appareil bitwarden" class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-target="#delete_[PK of device_1]_modal" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
                                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal"></i>
                                                       </button>
                                                   </td>
                                               </tr>
-                                          
+
                                               <tr>
                                                   <td>
-                                                      
+
                                                   </td>
                                                   <td>authenticator</td>
                                                   <td>11 mars 2025 06:19</td>
@@ -2651,24 +2665,24 @@
                                                       <i class="text-disabled">jamais</i>
                                                   </td>
                                                   <td>
-  
+
                                                       <button aria-label="Supprimer l’appareil authenticator" class="btn btn-sm btn-link text-danger" data-bs-target="#delete_[PK of device_2]_modal" data-bs-toggle="modal" type="button">
                                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal"></i>
                                                       </button>
                                                   </td>
                                               </tr>
-                                          
+
                                       </tbody>
                                   </table>
-                              
+
                               <button class="btn btn-block btn-primary" name="action" type="submit" value="new">
                                   Configurer un
                                   nouvel
                                   appareil
                               </button>
-  
-                              
-                              
+
+
+
                                   <div aria-hidden="true" class="modal fade" id="delete_[PK of device_1]_modal" tabindex="-1">
                                       <div class="modal-dialog modal-dialog-centered">
                                           <div class="modal-content">
@@ -2676,12 +2690,12 @@
                                                   <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil bitwarden ?</h3>
                                               </div>
                                               <div class="modal-body">
-                                                  
+
                                                       <p>Cet appareil est celui que vous avez utilisé pour vous connecter.</p>
                                                       <p>
                                                           Si vous le supprimez, vous devrez immédiatement confirmer votre identité avec un des autres appareils que vous avez enregistré.
                                                       </p>
-                                                  
+
                                                   <p>Cette action est irréversible.</p>
                                               </div>
                                               <div class="modal-footer">
@@ -2693,7 +2707,7 @@
                                           </div>
                                       </div>
                                   </div>
-                              
+
                                   <div aria-hidden="true" class="modal fade" id="delete_[PK of device_2]_modal" tabindex="-1">
                                       <div class="modal-dialog modal-dialog-centered">
                                           <div class="modal-content">
@@ -2701,7 +2715,7 @@
                                                   <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil authenticator ?</h3>
                                               </div>
                                               <div class="modal-body">
-                                                  
+
                                                   <p>Cette action est irréversible.</p>
                                               </div>
                                               <div class="modal-footer">
@@ -2713,7 +2727,7 @@
                                           </div>
                                       </div>
                                   </div>
-                              
+
                           </form>
                       </div>
                   </div>
@@ -2732,17 +2746,17 @@
                           <h2>Mes appareils</h2>
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              
+
                                   <p>Vous n'avez pas configuré d'appareil OTP.</p>
-                              
+
                               <button class="btn btn-block btn-primary" name="action" type="submit" value="new">
                                   Configurer un
-                                  
+
                                   appareil
                               </button>
-  
-                              
-                              
+
+
+
                           </form>
                       </div>
                   </div>
@@ -2761,7 +2775,7 @@
                           <h2>Mes appareils</h2>
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              
+
                                   <p>Voici la liste de vos appareils configurés :</p>
                                   <table class="table table-sm">
                                       <caption class="visually-hidden">Liste de vos appareils configurés</caption>
@@ -2775,12 +2789,12 @@
                                           </tr>
                                       </thead>
                                       <tbody>
-                                          
+
                                               <tr>
                                                   <td>
-                                                      
+
                                                           <i class="ri-verified-badge-fill text-success" data-bs-placement="top" data-bs-title="Vous avez utilisé cet appareil pour vous connecter." data-bs-toggle="tooltip"></i>
-                                                      
+
                                                   </td>
                                                   <td>Mon appareil</td>
                                                   <td>11 mars 2025 06:18</td>
@@ -2788,24 +2802,24 @@
                                                       11 mars 2025 06:18
                                                   </td>
                                                   <td>
-  
+
                                                       <button aria-label="Supprimer l’appareil Mon appareil" class="btn btn-sm btn-link disabled" data-bs-placement="top" data-bs-target="#delete_[PK of device]_modal" data-bs-title="Impossible de supprimer l’appareil que vous avez utilisé pour vous connecter." data-bs-toggle="tooltip" type="button">
                                                           <i aria-hidden="true" class="ri-delete-bin-line fw-normal"></i>
                                                       </button>
                                                   </td>
                                               </tr>
-                                          
+
                                       </tbody>
                                   </table>
-                              
+
                               <button class="btn btn-block btn-primary" name="action" type="submit" value="new">
                                   Configurer un
                                   nouvel
                                   appareil
                               </button>
-  
-                              
-                              
+
+
+
                                   <div aria-hidden="true" class="modal fade" id="delete_[PK of device]_modal" tabindex="-1">
                                       <div class="modal-dialog modal-dialog-centered">
                                           <div class="modal-content">
@@ -2813,7 +2827,7 @@
                                                   <h3 class="modal-title">Êtes-vous sûr de vouloir supprimer l'appareil Mon appareil ?</h3>
                                               </div>
                                               <div class="modal-body">
-                                                  
+
                                                   <p>Cette action est irréversible.</p>
                                               </div>
                                               <div class="modal-footer">
@@ -2825,7 +2839,7 @@
                                           </div>
                                       </div>
                                   </div>
-                              
+
                           </form>
                       </div>
                   </div>

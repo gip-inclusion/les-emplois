@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -208,61 +209,61 @@
                                           <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
                                           <p>Les champs suivants ne sont pas renseignés :</p>
                                           <ul class="mb-0">
-                                              
-                                                  
-                                              
-                                                  
+
+
+
+
                                                       <li>
                                                           <strong>Civilité</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
+
+
+
+
+
+
+
                                                       <li>
                                                           <strong>Téléphone</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                       <li>
                                                           <strong>Adresse actuelle</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                           </ul>
                                       </div>
                                   </div>
@@ -283,61 +284,61 @@
                                           <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
                                           <p>Les champs suivants ne sont pas renseignés :</p>
                                           <ul class="mb-0">
-                                              
-                                                  
-                                              
-                                                  
+
+
+
+
                                                       <li>
                                                           <strong>Civilité</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                       <li>
                                                           <strong>Adresse actuelle</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
+
+
+
                                                       <li>
                                                           <strong>Date de naissance</strong>
                                                       </li>
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
-                                                  
-                                              
+
+
+
+
+
+
+
+
+
+
+
+
                                           </ul>
                                       </div>
                                   </div>
@@ -348,7 +349,7 @@
   '''
   <select aria-describedby="id_address_for_autocomplete_helptext" class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
     <option value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>
-  
+
   </select>
   '''
 # ---
@@ -356,7 +357,7 @@
   '''
   <select aria-describedby="id_address_for_autocomplete_helptext" class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
     <option selected="" value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>
-  
+
   </select>
   '''
 # ---

@@ -3,43 +3,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -48,14 +48,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -66,10 +66,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -79,48 +79,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -128,77 +128,77 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
-                                          
+
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
-                  
+
+
                               <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité GEIQ non confirmée
           </span>
-                  
-              
+
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>John DOE
-                  
-                  
+
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>GEIQ</strong>
           </li>
       </ul>
-      
+
           <div class="alert alert-info" role="status">
       <div class="row">
           <div class="col-auto pe-0">
@@ -209,21 +209,21 @@
                   <strong>Aide à l'accompagement GEIQ</strong>
               </p>
               <p class="mb-0">
-                  
+
                       Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
-                  
+
                   à une aide financière de l’État s’élevant à <b>0 €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
               </p>
           </div>
       </div>
   </div>
-  
-      
+
+
   </div>
-  
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -231,7 +231,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -239,43 +239,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -284,14 +284,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -302,10 +302,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -315,48 +315,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -364,51 +364,51 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                          
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic IAE</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
+
                           <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-              
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
@@ -416,28 +416,28 @@
               <small>Confirmé par</small>
               <strong>John DOE
                   (Acme inc.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Employeur</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
-                                      
+
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -445,7 +445,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -453,51 +453,51 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
-                      
+
                           <span>Valider son éligibilité IAE</span>
-                      
+
                   </a>
                   <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
               </div>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -506,14 +506,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -524,10 +524,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -537,48 +537,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -586,38 +586,38 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -625,7 +625,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -633,51 +633,51 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
-                      
+
                           <span>Mettre à jour son éligibilité IAE</span>
-                      
+
                   </a>
                   <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
               </div>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -686,14 +686,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -704,10 +704,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -717,48 +717,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -766,128 +766,128 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                          
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic IAE</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
+
                           <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-              
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
-                                      
-                                          
+
+
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
-                  
+
+
                               <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligibilité GEIQ confirmée
           </span>
-                  
-              
+
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -895,7 +895,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -903,41 +903,41 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
+
+
+
+
           <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
               <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
               <span>Postuler pour ce candidat</span>
           </a>
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -946,14 +946,14 @@
           <a aria-controls="candidatures" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -962,45 +962,45 @@
                           <div aria-labelledby="job-applications-tab" class="tab-pane fade show active" id="candidatures" role="tabpanel">
                               <h2>Candidatures envoyées par ma structure</h2>
                               <hr/>
-                              
-                              
-                                  
-                                  
+
+
+
+
   <div class="c-box c-box--results has-links-inside my-3 my-md-4">
       <div class="c-box--results__header">
-          
-  
+
+
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 14 août 2024 par
-          
+
               <strong>Vous</strong>
-          
-          
+
+
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
-          
+
       </p>
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
-  
+
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
           <div class="c-box--results__list-data">
-              
-  
-  
-      
+
+
+
+
           <div class="c-info c-info--secondary">
               <span class="c-info__summary">Candidature spontanée</span>
           </div>
-      
-  
-  
+
+
+
           </div>
       </div>
       <div class="c-box--results__footer">
@@ -1009,45 +1009,45 @@
           </div>
       </div>
   </div>
-  
-                              
-                                  
-                                  
+
+
+
+
   <div class="c-box c-box--results has-links-inside my-3 my-md-4">
       <div class="c-box--results__header">
-          
-  
+
+
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 14 août 2024 par
-          
+
               <strong>Vous</strong>
-          
-          
+
+
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Autre entreprise</span>
               </a>
-          
+
       </p>
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-222222222222">Nouvelle candidature</span></div>
   </div>
-  
+
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
           <div class="c-box--results__list-data">
-              
-  
-  
-      
+
+
+
+
           <div class="c-info c-info--secondary">
               <span class="c-info__summary">Candidature spontanée</span>
           </div>
-      
-  
-  
+
+
+
           </div>
       </div>
       <div class="c-box--results__footer">
@@ -1056,15 +1056,15 @@
           </div>
       </div>
   </div>
-  
-                              
+
+
                           </div>
                       </div>
                   </div>
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -1123,7 +1123,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1225,6 +1226,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1318,6 +1320,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1515,6 +1518,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1738,6 +1742,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1859,43 +1864,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -1904,14 +1909,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -1922,10 +1927,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -1935,48 +1940,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -1984,79 +1989,79 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
-                                          
+
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
-                  
+
+
                               <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligibilité GEIQ confirmée
           </span>
-                  
-              
+
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
           <div class="alert alert-info" role="status">
       <div class="row">
           <div class="col-auto pe-0">
@@ -2067,21 +2072,21 @@
                   <strong>Aide à l'accompagement GEIQ</strong>
               </p>
               <p class="mb-0">
-                  
+
                       Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
-                  
+
                   à une aide financière de l’État s’élevant à <b>1400 €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
               </p>
           </div>
       </div>
   </div>
-  
-      
+
+
   </div>
-  
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -2089,7 +2094,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2097,51 +2102,51 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
-                      
+
                           <span>Valider son éligibilité IAE</span>
-                      
+
                   </a>
                   <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
               </div>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -2150,14 +2155,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -2168,10 +2173,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -2181,48 +2186,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -2230,84 +2235,84 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
-                                          
+
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
-                  
+
+
                               <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligibilité GEIQ confirmée
           </span>
-                  
-              
+
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -2315,7 +2320,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2323,43 +2328,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -2368,14 +2373,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -2386,10 +2391,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -2399,48 +2404,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -2448,38 +2453,38 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -2487,7 +2492,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2495,43 +2500,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -2540,14 +2545,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -2558,10 +2563,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -2571,48 +2576,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -2620,82 +2625,82 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                          
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic IAE</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
+
                           <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-              
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
-                                      
+
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -2703,7 +2708,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2711,51 +2716,51 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
-                      
+
                           <span>Mettre à jour son éligibilité IAE</span>
-                      
+
                   </a>
                   <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
               </div>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -2764,14 +2769,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -2782,10 +2787,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -2795,48 +2800,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -2844,82 +2849,82 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                          
+
+
   <div class="c-box mb-3 mb-lg-5">
       <div class="row mb-3">
           <div class="col-12 col-sm">
-              
+
                   <h3 class="mb-0">Diagnostic IAE</h3>
-              
+
               <span class="text-success fs-sm">Valide du 14/08/2024 au 14/02/2025</span>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              
+
                           <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-              
+
           </div>
       </div>
       <ul class="list-data list-data__two-column-md mb-3">
           <li>
               <small>Confirmé par</small>
               <strong>Pierre DUPONT
-                  
-                  
+
+
                       (Pres. Org.)
-                  
+
               </strong>
           </li>
           <li>
               <small>Critères administratifs sélectionnés</small>
-              
-              
+
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
           <li>
               <small>Type</small>
               <strong>Prescripteur habilité</strong>
           </li>
       </ul>
-      
+
   </div>
-  
-                                      
-                                      
+
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -2927,7 +2932,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2935,43 +2940,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -2980,14 +2985,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -2998,10 +3003,10 @@
                                   <div class="col-12">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -3011,48 +3016,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -3060,38 +3065,38 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
+
+
                                   </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -3099,7 +3104,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -3107,43 +3112,43 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-                              
+
+
+
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
-              
-          
-          
+
+
+
+
+
               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
-          
+
       </div>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+
+
+
+
+
+
+
+
+
+
   <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
       <li class="nav-item" role="presentation">
           <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Informations générales</a>
@@ -3152,14 +3157,14 @@
           <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">Candidatures</a>
       </li>
   </ul>
-  
-  
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="s-section__row row">
@@ -3170,10 +3175,10 @@
                                   <div class="col-12 col-lg-8 order-2 order-lg-1">
                                       <h2>Informations</h2>
                                       <div class="c-box mb-3 mb-lg-5">
-                                          
-  
-  
-  
+
+
+
+
   <div class="row mb-3">
       <div class="col-12 col-sm">
           <h3 class="mb-0">Informations personnelles</h3>
@@ -3183,48 +3188,48 @@
               <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
               <span>Modifier</span>
           </a>
-          
+
               <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
                   <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1"></i>
               </button>
-          
+
       </div>
   </div>
-  
-  
+
+
   <ul class="list-data list-data__two-column-md mb-3">
       <li>
           <small>Prénom</small>
           <strong>Jane</strong>
       </li>
-      
+
           <li>
               <small>Téléphone</small>
-              
+
                   <strong>06 12 34 56 78</strong>
-                  
+
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
-      
+
       <li>
           <small>Nom</small>
           <strong>DOE</strong>
       </li>
-      
+
           <li>
               <small>Adresse e-mail</small>
               <strong>jane.doe@test.local</strong>
-              
+
               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
           </li>
           <li>
               <small>Date de naissance</small>
@@ -3232,43 +3237,43 @@
           </li>
           <li>
               <small>Adresse</small>
-              
+
                   <address>12 rue Georges Bizet, 35000 Rennes</address>
-              
+
           </li>
           <li>
               <small>Numéro de sécurité sociale</small>
-              
+
                   <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
-              
+
+
           </li>
           <li>
               <small>Identifiant France Travail</small>
-              
+
                   <i class="text-disabled">Non renseigné</i>
-              
+
           </li>
-          
-      
+
+
   </ul>
-  
-  
-  
+
+
+
                                       </div>
-                                      
-                                      
+
+
                                   </div>
-                                  
+
                                       <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                                          
-  
-  
-  
+
+
+
+
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
       <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
                   <i aria-hidden="true" class="ri-pass-valid-line"></i>
@@ -3279,7 +3284,7 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
-          
+
               <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2000</strong>
@@ -3299,27 +3304,27 @@
                   </small>
                   <strong class="text-success">356252 jours (Environ 975 ans et 4 mois)</strong>
               </li>
-          
+
       </ul>
-      
-          
-          
-              
-                  
-              
-          
-          
-          
+
+
+
+
+
+
+
+
+
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
-          
-      
+
+
   </div>
-  
+
                                       </div>
-                                  
+
                               </div>
                           </div>
                       </div>
@@ -3327,7 +3332,7 @@
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -3386,7 +3391,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3488,6 +3494,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3581,6 +3588,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3800,6 +3808,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",

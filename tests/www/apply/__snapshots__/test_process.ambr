@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -256,6 +257,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -454,6 +456,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -636,6 +639,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -773,6 +777,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -980,15 +985,15 @@
           Transférer cette candidature vers
       </button>
       <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-          
-          
+
+
               <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
                   <div class="dropdown-item disabled">
                       <i aria-hidden="true" class="ri-home-smile-line"></i>
                       <strong>Une autre structure</strong>
                   </div>
               </div>
-          
+
       </div>
   </div>
   '''
@@ -1000,13 +1005,13 @@
           Transférer cette candidature vers
       </button>
       <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-          
-          
+
+
               <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
                   <i aria-hidden="true" class="ri-home-smile-line"></i>
                   <strong>Une autre structure</strong>
               </a>
-          
+
       </div>
   </div>
   '''
@@ -1069,7 +1074,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1238,7 +1244,7 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
-          
+
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0
              INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
@@ -1287,6 +1293,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1368,6 +1375,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1432,6 +1440,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -1550,6 +1559,7 @@
                  T12."public_id",
                  T12."address_filled_at",
                  T12."first_login",
+                 T12."upcoming_deletion_notified_at",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -1688,6 +1698,7 @@
                  T15."public_id",
                  T15."address_filled_at",
                  T15."first_login",
+                 T15."upcoming_deletion_notified_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -2146,7 +2157,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
@@ -2243,7 +2255,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2412,7 +2425,7 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
-          
+
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0
              INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
@@ -2461,6 +2474,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2542,6 +2556,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2606,6 +2621,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -2724,6 +2740,7 @@
                  T12."public_id",
                  T12."address_filled_at",
                  T12."first_login",
+                 T12."upcoming_deletion_notified_at",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -2862,6 +2879,7 @@
                  T15."public_id",
                  T15."address_filled_at",
                  T15."first_login",
+                 T15."upcoming_deletion_notified_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -3320,7 +3338,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
@@ -3365,56 +3384,56 @@
 # name: TestProcessViews.test_details_for_company_transition_logs_hides_hired_by_other
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
                   <span>
-                      
+
                           Passé en "Embauché ailleurs"
-                      
-                      
+
+
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: TestProcessViews.test_details_for_company_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
                   <span>
-                      
+
                           Passé en "Candidature acceptée"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature à l'étude"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
@@ -3473,7 +3492,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3536,7 +3556,7 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
-          
+
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0
              INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
@@ -3578,6 +3598,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3659,6 +3680,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3723,6 +3745,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -3832,6 +3855,7 @@
                  T11."public_id",
                  T11."address_filled_at",
                  T11."first_login",
+                 T11."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -4029,6 +4053,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4272,7 +4297,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
@@ -4317,112 +4343,112 @@
 # name: TestProcessViews.test_details_for_job_seeker_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
                   <span>
-                      
+
                           Passé en "Candidature acceptée"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature à l'étude"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: TestProcessViews.test_details_for_prescriber_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
                   <span>
-                      
+
                           Passé en "Candidature acceptée"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature à l'étude"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: TestProcessViews.test_external_transfer_log_display
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
                   <span>
-                      
+
                           Candidature transférée à un autre employeur
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature déclinée"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_body]
   '''
   Bonjour,
-  
+
   Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
-  
+
   Commentaire de l’employeur:
-  
+
   On vous rappellera.
-  
+
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -4435,13 +4461,13 @@
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_body]
   '''
   Bonjour,
-  
+
   La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
-  
+
   Commentaire de l’employeur:
-  
+
   On vous rappellera.
-  
+
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -4454,13 +4480,13 @@
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_body]
   '''
   Bonjour,
-  
+
   Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
-  
+
   Commentaire de l’employeur:
-  
+
   On vous rappellera.
-  
+
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -4473,9 +4499,9 @@
 # name: TestProcessViews.test_postpone_from_prescriber[postpone_email_to_job_seeker_body]
   '''
   Bonjour,
-  
+
   Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
-  
+
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -4488,9 +4514,9 @@
 # name: TestProcessViews.test_postpone_from_prescriber[postpone_email_to_proxy_body]
   '''
   Bonjour,
-  
+
   La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
-  
+
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -4503,262 +4529,262 @@
 # name: test_add_prior_action_processing
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Action préalable à l’embauche"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: test_delete_prior_action[False]
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:40:00+00:00">Le 12 décembre 2023 à 13:40</time>
                   <span>
-                      
+
                           Passé en "Action préalable à l’embauche"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature à l'étude"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: test_delete_prior_action[True]
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
+
+
               <li>
                   <time datetime="2023-12-12T12:40:00+00:00">Le 12 décembre 2023 à 13:40</time>
                   <span>
-                      
+
                           Passé en "Action préalable à l’embauche"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
               <li>
                   <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
                   <span>
-                      
+
                           Passé en "Candidature à l'étude"
-                      
+
                       par John DOE
                   </span>
               </li>
-          
+
           <li>
               <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
               <span>Nouvelle candidature</span>
           </li>
-      
+
   </ul>
   '''
 # ---
 # name: test_reload_contract_type_and_options[APPRENTICESHIP]
   '''
-  
+
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
-  
+
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
-  
+
     <option value="APPRENTICESHIP" selected>Contrat d&#x27;apprentissage</option>
-  
+
     <option value="PROFESSIONAL_TRAINING">Contrat de professionalisation</option>
-  
+
     <option value="OTHER">Autre type de contrat</option>
-  
+
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      
+
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
-  
+
   '''
 # ---
 # name: test_reload_contract_type_and_options[OTHER]
   '''
-  
+
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
-  
+
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
-  
+
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
-  
+
     <option value="PROFESSIONAL_TRAINING">Contrat de professionalisation</option>
-  
+
     <option value="OTHER" selected>Autre type de contrat</option>
-  
+
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      
+
           <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" aria-describedby="id_contract_type_details_helptext" id="id_contract_type_details">
   </textarea><div id="id_contract_type_details_helptext" class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div></div>
-      
+
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
-  
+
   '''
 # ---
 # name: test_reload_contract_type_and_options[PROFESSIONAL_TRAINING]
   '''
-  
+
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
-  
+
   <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
-  
+
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
-  
+
     <option value="PROFESSIONAL_TRAINING" selected>Contrat de professionalisation</option>
-  
+
     <option value="OTHER">Autre type de contrat</option>
-  
+
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      
+
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" required id="id_nb_hours_per_week"></div>
   </div>
-  
+
   '''
 # ---
 # name: test_reload_qualification_fields[CCN]
   '''
-  
+
   <div id="geiq_qualification_fields_block">
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
-  
+
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
-  
+
     <option value="CQP">CQP</option>
-  
+
     <option value="CCN" selected>Positionnement de CCN</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
-  
+
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
-  
+
     <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
-  
+
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
-  
+
     <option value="NOT_RELEVANT">Non concerné</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
-  
+
   '''
 # ---
 # name: test_reload_qualification_fields[CQP]
   '''
-  
+
   <div id="geiq_qualification_fields_block">
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
-  
+
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
-  
+
     <option value="CQP" selected>CQP</option>
-  
+
     <option value="CCN">Positionnement de CCN</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
-  
+
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
-  
+
     <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
-  
+
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
-  
+
     <option value="NOT_RELEVANT">Non concerné</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
-  
+
   '''
 # ---
 # name: test_reload_qualification_fields[STATE_DIPLOMA]
   '''
-  
+
   <div id="geiq_qualification_fields_block">
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
-  
+
     <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>
-  
+
     <option value="CQP">CQP</option>
-  
+
     <option value="CCN">Positionnement de CCN</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
-  
+
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
-  
+
     <option value="LEVEL_4">Niveau 4 (BP, Bac général, Techno ou Pro, BT)</option>
-  
+
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
-  
+
   </select></div>
       <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" required id="id_planned_training_hours"></div>
   </div>
-  
+
   '''
 # ---

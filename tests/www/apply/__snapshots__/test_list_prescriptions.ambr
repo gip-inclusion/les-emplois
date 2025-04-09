@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -205,7 +206,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
@@ -299,7 +301,8 @@
                              T3."last_checked_at",
                              T3."public_id",
                              T3."address_filled_at",
-                             T3."first_login"
+                             T3."first_login",
+                             T3."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T3 ON ("job_applications_jobapplication"."job_seeker_id" = T3."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
@@ -575,7 +578,7 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
-          
+
                (SELECT U0."id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
@@ -649,7 +652,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
-          
+
             (SELECT U0."id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
@@ -701,6 +704,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -773,6 +777,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",
@@ -1181,7 +1186,7 @@
                               <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
                                   <span>Besoin d'un chiffre ?</span>
                               </button>
-                              
+
                                   <div class="c-info__detail collapse" id="collapseBesoinChiffre">
                                       Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
                                       <ul class="mb-0">
@@ -1193,7 +1198,7 @@
                                           </li>
                                       </ul>
                                   </div>
-                              
+
                           </div>
   '''
 # ---
@@ -1252,7 +1257,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1374,7 +1380,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
-          
+
             (SELECT U0."id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
@@ -1425,6 +1431,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1497,6 +1504,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",
@@ -1845,6 +1853,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2024,6 +2033,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2203,10 +2213,10 @@
               </h4>
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
           </div>
-          
-  
+
+
   <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
-      
+
       <fieldset>
           <legend>
               <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
@@ -2215,80 +2225,80 @@
           </legend>
           <div class="my-3 collapse" id="collapseStates">
               <ul>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
                               <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
                               <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
                               <label class="form-check-label" for="id_states_2">Candidature en attente</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
                               <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
                               <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
                               <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
                               <label class="form-check-label" for="id_states_6">Embauche annulée</label>
                           </div>
                       </li>
-                  
+
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
                               <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
                           </div>
                       </li>
-                  
+
               </ul>
           </div>
       </fieldset>
-  
-  
+
+
       <input id="display-kind" name="display" type="hidden" value="list"/>
       <input id="id_order" name="order" type="hidden" value="-created_at"/>
-      
-          
-  
-          
-  
-  
-  
-          
-  
-  
+
+
+
+
+
+
+
+
+
+
       <hr/>
       <fieldset>
           <legend>
@@ -2301,11 +2311,11 @@
   </select></div>
           </div>
       </fieldset>
-  
-  
-          
-  
-  
+
+
+
+
+
       <hr/>
       <fieldset>
           <legend>
@@ -2314,70 +2324,70 @@
               </button>
           </legend>
           <div class="mt-3 collapse" id="collapseSenders">
-              
+
                   <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
   </select></div>
-              
-  
-              
-  
-              
+
+
+
+
+
           </div>
       </fieldset>
-  
-  
-          
+
+
+
               <hr/>
-              
-  
+
+
   <fieldset>
       <legend>
           <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">Critères administratifs déclarés</button>
       </legend>
       <div class="mt-3 collapse" id="collapse-criteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
     <option value="1">Bénéficiaire du RSA</option>
-  
+
     <option value="2">Allocataire ASS</option>
-  
+
     <option value="3">Allocataire AAH</option>
-  
+
     <option value="4">DETLD (+ 24 mois)</option>
-  
+
     <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
-  
+
     <option value="6">Senior (+50 ans)</option>
-  
+
     <option value="7">Jeune (-26 ans)</option>
-  
+
     <option value="8">Sortant de l'ASE</option>
-  
+
     <option value="9">DELD (12-24 mois)</option>
-  
+
     <option value="10">Travailleur handicapé</option>
-  
+
     <option value="11">Parent isolé</option>
-  
+
     <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
-  
+
     <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
-  
+
     <option value="14">Résident ZRR</option>
-  
+
     <option value="15">Résident QPV</option>
-  
+
     <option value="16">Sortant de détention ou personne placée sous main de justice</option>
-  
+
     <option value="17">Maîtrise de la langue française</option>
-  
+
     <option value="18">Mobilité</option>
-  
+
   </select></div></div>
   </fieldset>
-  
-          
-          
-  
-  
+
+
+
+
+
       <hr/>
       <fieldset>
           <legend>
@@ -2390,11 +2400,11 @@
               </ul>
           </div>
       </fieldset>
-  
-  
-          
-  
-  
+
+
+
+
+
       <hr/>
       <fieldset>
           <legend>
@@ -2410,49 +2420,49 @@
               </ul>
           </div>
       </fieldset>
-  
-  
-          
-          
+
+
+
+
           <hr/>
-          
-  
+
+
   <fieldset>
       <legend>
           <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
       </legend>
       <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
                   <label class="form-check-label" for="id_archived_0">Candidatures actives (affichage par défaut)</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
                   <label class="form-check-label" for="id_archived_1">Candidatures archivées</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
                   <label class="form-check-label" for="id_archived_2">Toutes les candidatures</label>
               </div>
-          
-      
+
+
   </div></div></div>
   </fieldset>
-  
-      
-      
-  
+
+
+
+
   <hr/>
   <fieldset>
       <legend>
@@ -2465,339 +2475,339 @@
           <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date"></duet-date-picker></div>
       </div>
   </fieldset>
-  
+
   </div>
-  
+
           <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
       <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-  
-  
+
+
+
+
+
+
+
+
+
   </div>
-  
+
       </div>
   '''
 # ---
 # name: test_list_snapshot[applications list]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
-              
-                  
-  
-  
-  
+
+
+
+
+
+
+
   <div class="c-box c-box--results has-links-inside my-3 my-md-4">
       <div class="c-box--results__header">
-          
-  
+
+
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 27 novembre 2024 par
-          
+
               <strong>Vous</strong>
-          
-          
+
+
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
-          
+
       </p>
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></div>
   </div>
-  
+
           <div class="c-box--results__summary">
               <i aria-hidden="true" class="ri-user-line"></i>
               <div>
-                  
+
                       <h3>J… D…</h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
+
                               <span>
                                   <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
                                   35 -
                                   Rennes
                               </span>
-                          
-                          
-                              
-                                  
+
+
+
+
                                               <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
-                          
-                          
-  
-  
+
+
+
+
+
+
                       </div>
-                  
+
               </div>
           </div>
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
           <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
+
+
+
+
+
           <div class="c-info c-info--secondary">
               <span class="c-info__summary">Candidature spontanée</span>
           </div>
-      
-  
-  
+
+
+
           </div>
       </div>
       <div class="c-box--results__footer">
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+
+
                   <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
+
           </div>
       </div>
   </div>
-  
-              
-                  
-  
-  
-  
+
+
+
+
+
+
   <div class="c-box c-box--results has-links-inside my-3 my-md-4">
       <div class="c-box--results__header">
-          
-  
+
+
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 27 novembre 2024 par
-          
+
               <strong>Vous</strong>
-          
-          
+
+
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
-          
+
       </p>
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></div>
   </div>
-  
+
           <div class="c-box--results__summary">
               <i aria-hidden="true" class="ri-user-line"></i>
               <div>
-                  
+
                       <h3>J… D…</h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
+
                               <span>
                                   <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
                                   35 -
                                   Rennes
                               </span>
-                          
-                          
-                              
-                                  
+
+
+
+
                                               <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
-                          
-                          
-  
-  
+
+
+
+
+
+
                       </div>
-                  
+
               </div>
           </div>
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
           <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
+
+
+
+
+
           <div class="c-info c-info--secondary">
               <span class="c-info__summary">Candidature spontanée</span>
           </div>
-      
-  
-  
+
+
+
           </div>
       </div>
       <div class="c-box--results__footer">
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+
+
                   <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
+
           </div>
       </div>
   </div>
-  
-              
-                  
-  
-  
-  
+
+
+
+
+
+
   <div class="c-box c-box--results has-links-inside my-3 my-md-4">
       <div class="c-box--results__header">
-          
-  
+
+
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 27 novembre 2024 par
-          
+
               <strong>Vous</strong>
-          
-          
+
+
               chez
               <a class="btn-ico btn-link" href="/company/[PK of Company]/card?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">
                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1"></i>
                   <span>Acme inc.</span>
               </a>
-          
+
       </p>
       <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></div>
   </div>
-  
+
           <div class="c-box--results__summary">
               <i aria-hidden="true" class="ri-user-line"></i>
               <div>
-                  
+
                       <h3>J… D…</h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
+
                               <span>
                                   <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
                                   35 -
                                   Rennes
                               </span>
-                          
-                          
-                              
-                                  
+
+
+
+
                                               <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
-                          
-                          
-  
-  
+
+
+
+
+
+
                       </div>
-                  
+
               </div>
           </div>
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
           <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
+
+
+
+
+
           <div class="c-info c-info--secondary">
               <span class="c-info__summary">Candidature spontanée</span>
           </div>
-      
-  
-  
+
+
+
           </div>
       </div>
       <div class="c-box--results__footer">
           <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+
+
                   <a aria-label="Gérer la candidature de J… D…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
+
           </div>
       </div>
   </div>
-  
-              
-          
-          
-  
-  
-  
-      
+
+
+
+
+
+
+
+
   </section>
   '''
 # ---
 # name: test_list_snapshot[applications table]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
+
+
               <div class="table-responsive mt-3 mt-md-4">
-                  
+
                       <table class="table table-hover table-sortable">
       <caption class="visually-hidden">Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)</caption>
       <thead>
           <tr>
-              
-              
+
+
                   <th aria-sort="none" scope="col">
       <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="job_seeker_full_name" type="button">
           Candidature de
       </button>
   </th>
-  
-              
+
+
               <th aria-sort="descending" scope="col">
       <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
           Émise le
       </button>
   </th>
-  
+
               <th scope="col">Statut</th>
               <th scope="col">Employeur</th>
               <th scope="col">Poste</th>
               <th scope="col">Emetteur</th>
-              
-                  
+
+
                   <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
-              
+
               <th class="text-end w-50px" scope="col"></th>
           </tr>
       </thead>
       <tbody>
-          
-              
-  
-  
-  
-  
-      
-  
-  
+
+
+
+
+
+
+
+
+
   <tr class="align-top">
-      
-      
+
+
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   J… D…
@@ -2806,69 +2816,69 @@
                   35 -
                   Rennes
               </span>
-              
-                  
-                      
+
+
+
                                   <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
-              
+
+
+
           </td>
-      
-  
+
+
       <td>27/11/2024</td>
       <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
-  
-      
+
+
           <td>Acme inc.</td>
-      
-  
+
+
       <td>
-          
-              
+
+
                   Candidature spontanée
-              
-          
+
+
       </td>
       <td>
-          
+
               Vous
-          
+
       </td>
-      
-          
+
+
           <td>
-              
+
                   <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
+
+
           </td>
-      
-  
+
+
       <td class="text-end w-50px align-middle">
-          
+
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
               </a>
-          
+
       </td>
   </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
+
+
+
+
+
+
+
+
+
+
   <tr class="align-top">
-      
-      
+
+
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   J… D…
@@ -2877,69 +2887,69 @@
                   35 -
                   Rennes
               </span>
-              
-                  
-                      
+
+
+
                                   <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
-              
+
+
+
           </td>
-      
-  
+
+
       <td>27/11/2024</td>
       <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
-  
-      
+
+
           <td>Acme inc.</td>
-      
-  
+
+
       <td>
-          
-              
+
+
                   Candidature spontanée
-              
-          
+
+
       </td>
       <td>
-          
+
               Vous
-          
+
       </td>
-      
-          
+
+
           <td>
-              
+
                   <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
+
+
           </td>
-      
-  
+
+
       <td class="text-end w-50px align-middle">
-          
+
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
               </a>
-          
+
       </td>
   </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
+
+
+
+
+
+
+
+
+
+
   <tr class="align-top">
-      
-      
+
+
           <td>
               <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   J… D…
@@ -2948,102 +2958,102 @@
                   35 -
                   Rennes
               </span>
-              
-                  
-                      
+
+
+
                                   <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
-              
+
+
+
           </td>
-      
-  
+
+
       <td>27/11/2024</td>
       <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
-  
-      
+
+
           <td>Acme inc.</td>
-      
-  
+
+
       <td>
-          
-              
+
+
                   Candidature spontanée
-              
-          
+
+
       </td>
       <td>
-          
+
               Vous
-          
+
       </td>
-      
-          
+
+
           <td>
-              
+
                   <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
+
+
           </td>
-      
-  
+
+
       <td class="text-end w-50px align-middle">
-          
+
               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
                   <i aria-label="Gérer la candidature de J… D…" class="ri-arrow-drop-right-line fs-lg"></i>
               </a>
-          
+
       </td>
   </tr>
-  
-          
+
+
       </tbody>
   </table>
-  
-                  
+
+
               </div>
-          
-          
-  
-  
-  
-      
+
+
+
+
+
+
   </section>
   '''
 # ---
 # name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
+
           <div class="text-center my-3 my-md-4">
               <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.png"/>
               <p class="mb-1 mt-3">
                   <strong>
-                      
+
                           Aucune candidature pour le moment
-                      
+
                   </strong>
               </p>
               <p>
                   <i>
-                      
+
                           Vous trouverez ici les candidatures émises par votre organisation
                           <br class="d-none d-lg-inline"/>
                           pour les candidats.
-                      
+
                   </i>
               </p>
-              
+
                   <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers/results">
                       <i aria-hidden="true" class="ri-user-follow-line ri-lg fw-normal"></i>
                       <span>Postuler pour un candidat</span>
                   </a>
-              
+
           </div>
-      
+
   </section>
   '''
 # ---
@@ -3102,7 +3112,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3253,7 +3264,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -3349,7 +3361,8 @@
                              T4."last_checked_at",
                              T4."public_id",
                              T4."address_filled_at",
-                             T4."first_login"
+                             T4."first_login",
+                             T4."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -3631,7 +3644,7 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
-          
+
                (SELECT U0."id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
@@ -3707,7 +3720,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
-          
+
             (SELECT U0."id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
@@ -3759,6 +3772,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3831,6 +3845,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -4306,7 +4321,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4457,7 +4473,8 @@
                              "users_user"."last_checked_at",
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
-                             "users_user"."first_login"
+                             "users_user"."first_login",
+                             "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -4553,7 +4570,8 @@
                              T4."last_checked_at",
                              T4."public_id",
                              T4."address_filled_at",
-                             T4."first_login"
+                             T4."first_login",
+                             T4."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -4835,7 +4853,7 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
-          
+
                (SELECT U0."id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
@@ -4911,7 +4929,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
-          
+
             (SELECT U0."id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
@@ -4963,6 +4981,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -5035,6 +5054,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -5437,20 +5457,20 @@
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
       <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
+
+
+
+
+
+
+
           <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=list&amp;order=-created_at">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
-      
-  
-  
+
+
+
   </div>
   '''
 # ---
@@ -5458,44 +5478,44 @@
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
       <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
+
+
+
+
+
+
+
           <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/prescriptions/list?display=table&amp;order=created_at">
               <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
               <span>Effacer tout</span>
           </a>
-      
-  
-  
+
+
+
   </div>
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in list view]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
+
               <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=list&amp;order=-created_at">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>
-          
+
       </div>
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in table view & created_at ascending order]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
+
               <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/prescriptions/list?display=table&amp;order=created_at">
                   <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
                   <span>Effacer tout</span>
               </a>
-          
+
       </div>
   '''
 # ---

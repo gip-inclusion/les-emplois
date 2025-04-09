@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -116,22 +117,22 @@
 # name: TestCompanyAdmin.test_display_for_new_company[approvals list]
   '''
   <div class="form-row field-approvals_list">
-              
-              
+
+
                   <div>
-                      
+
                           <div class="flex-container">
-                              
+
                                   <label>Liste des PASS IAE pour cette entreprise :</label>
-                                  
+
                                       <div class="readonly">-</div>
-                                  
-                              
+
+
                           </div>
-                      
+
                   </div>
-              
-              
+
+
           </div>
   '''
 # ---

@@ -2,11 +2,11 @@
 # name: TestDashboardView.test_dashboard
   '''
   <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
+
+
+
+
+
   <div class="row">
       <div class="col-12">
           <label class="visually-hidden" for="id_city">Ville</label>
@@ -25,7 +25,7 @@
           </div>
       </div>
   </div>
-  
+
                               </form>
   '''
 # ---
@@ -84,7 +84,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -609,11 +610,11 @@
                           <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
                               <h2>Vue d’ensemble</h2>
                               <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
+
+
+
+
+
   <div class="row">
       <div class="col-12">
           <label class="visually-hidden" for="id_city">Ville</label>
@@ -632,10 +633,10 @@
           </div>
       </div>
   </div>
-  
+
                               </form>
                               <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
-                                  
+
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -651,8 +652,8 @@
           </div>
       </div>
   </div>
-  
-                                      
+
+
                                           <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -680,7 +681,7 @@
           </div>
       </div>
   </div>
-  
+
                                           <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -696,8 +697,8 @@
           </div>
       </div>
   </div>
-  
-                                      
+
+
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -713,24 +714,24 @@
           </div>
       </div>
   </div>
-  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                               </div>
-                              
+
                           </div>
-                          
+
                       </div>
                   </div>
               </div>
@@ -748,11 +749,11 @@
                           <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
                               <h2>Vue d’ensemble</h2>
                               <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
+
+
+
+
+
   <div class="row">
       <div class="col-12">
           <label class="visually-hidden" for="id_city">Ville</label>
@@ -771,10 +772,10 @@
           </div>
       </div>
   </div>
-  
+
                               </form>
                               <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
-                                  
+
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -790,8 +791,8 @@
           </div>
       </div>
   </div>
-  
-                                      
+
+
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
@@ -807,24 +808,24 @@
           </div>
       </div>
   </div>
-  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                               </div>
-                              
+
                           </div>
-                          
+
                       </div>
                   </div>
               </div>

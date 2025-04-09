@@ -11,55 +11,55 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
                   <label class="form-check-label" for="id_reason-reason_0">L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
                   <label class="form-check-label" for="id_reason-reason_1">La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
                   <label class="form-check-label" for="id_reason-reason_2">La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
                   <label class="form-check-label" for="id_reason-reason_3">Le motif de prolongation demandé n’est pas adapté à la situation du candidat.</label>
               </div>
-          
-      
+
+
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -73,17 +73,17 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -103,31 +103,31 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 2</strong>/2 : Explications supplémentaires
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason_explanation"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
-  
-                                  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -141,17 +141,17 @@
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-                              
+
+
       <h1>Refuser la demande de prolongation pour Jane DOE</h1>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
@@ -170,57 +170,57 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 3</strong>/3 : Solution envisagée
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="proposed_actions"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label">Quelle(s) action(s) envisagez-vous de proposer au candidat ?</label><div class="" id="id_proposed_actions-proposed_actions">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_proposed_actions-proposed_actions_0" name="proposed_actions-proposed_actions" type="checkbox" value="EXIT_IAE"/>
                   <label class="form-check-label" for="id_proposed_actions-proposed_actions_0">Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_proposed_actions-proposed_actions_1" name="proposed_actions-proposed_actions" type="checkbox" value="SOCIAL_PARTNER"/>
                   <label class="form-check-label" for="id_proposed_actions-proposed_actions_1">Orientation vers un partenaire de l’accompagnement social/professionnel.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_proposed_actions-proposed_actions_2" name="proposed_actions-proposed_actions" type="checkbox" value="OTHER"/>
                   <label class="form-check-label" for="id_proposed_actions-proposed_actions_2">Autre</label>
               </div>
-          
-      
+
+
   </div></div><div class="form-group form-group-required"><label class="form-label" for="id_proposed_actions-proposed_actions_explanation">Précisions</label><textarea class="form-control" cols="40" id="id_proposed_actions-proposed_actions_explanation" name="proposed_actions-proposed_actions_explanation" placeholder="Message" required="" rows="10"></textarea></div>
-  
-                                  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason_explanation">Retour</button>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -240,55 +240,55 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
                   <label class="form-check-label" for="id_reason-reason_0">L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
                   <label class="form-check-label" for="id_reason-reason_1">La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
                   <label class="form-check-label" for="id_reason-reason_2">La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
                   <label class="form-check-label" for="id_reason-reason_3">Le motif de prolongation demandé n’est pas adapté à la situation du candidat.</label>
               </div>
-          
-      
+
+
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -302,17 +302,17 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -332,31 +332,31 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 2</strong>/3 : Explications supplémentaires
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason_explanation"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
-  
-                                  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -370,17 +370,17 @@
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-                              
+
+
       <h1>Refuser la demande de prolongation pour Jane DOE</h1>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
@@ -399,55 +399,55 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
                   <label class="form-check-label" for="id_reason-reason_0">L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
                   <label class="form-check-label" for="id_reason-reason_1">La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
                   <label class="form-check-label" for="id_reason-reason_2">La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
                   <label class="form-check-label" for="id_reason-reason_3">Le motif de prolongation demandé n’est pas adapté à la situation du candidat.</label>
               </div>
-          
-      
+
+
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -461,17 +461,17 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -491,31 +491,31 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 2</strong>/2 : Explications supplémentaires
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason_explanation"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
-  
-                                  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -529,17 +529,17 @@
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-                              
+
+
       <h1>Refuser la demande de prolongation pour Jane DOE</h1>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
@@ -558,55 +558,55 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
-      
-          
-          
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_0" name="reason-reason" type="radio" value="IAE"/>
                   <label class="form-check-label" for="id_reason-reason_0">L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_1" name="reason-reason" type="radio" value="SIAE"/>
                   <label class="form-check-label" for="id_reason-reason_1">La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_2" name="reason-reason" type="radio" value="DURATION"/>
                   <label class="form-check-label" for="id_reason-reason_2">La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
               </div>
-          
-      
-          
-          
+
+
+
+
               <div class="form-check">
                   <input class="form-check-input" id="id_reason-reason_3" name="reason-reason" type="radio" value="REASON"/>
                   <label class="form-check-label" for="id_reason-reason_3">Le motif de prolongation demandé n’est pas adapté à la situation du candidat.</label>
               </div>
-          
-      
+
+
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -620,17 +620,17 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -650,31 +650,31 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 2</strong>/2 : Explications supplémentaires
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason_explanation"/>
-  
+
                                   <div class="form-group form-group-required"><label class="form-label" for="id_reason_explanation-reason_explanation">Explications du motif de refus</label><textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea></div>
-  
-                                  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
-                                      
+
                                           <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
-                                      
+
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -688,17 +688,17 @@
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-                              
+
+
       <h1>Refuser la demande de prolongation pour Jane DOE</h1>
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
@@ -760,7 +760,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -928,8 +929,8 @@
                           </div>
                       </div>
                       <p class="mb-0">0 résultat</p>
-  
-                      
+
+
                           <hr class="my-3"/>
                           <div class="text-center my-3 my-md-4">
                               <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.png"/>
@@ -944,12 +945,12 @@
                                   </i>
                               </p>
                           </div>
-                      
-  
-                      
-  
-  
-  
+
+
+
+
+
+
                   </div>
               </div>
           </div>
@@ -975,8 +976,8 @@
                           </div>
                       </div>
                       <p class="mb-0">1 résultat</p>
-  
-                      
+
+
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table">
                                   <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
@@ -997,7 +998,7 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      
+
                                           <tr>
                                               <td class="fw-bold">Jane DOE</td>
                                               <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
@@ -1005,29 +1006,29 @@
                                               <td>01/01/2000</td>
                                               <td>Pierre DUPONT</td>
                                               <td>
-      
+
           <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">À traiter</span>
-      
-  
+
+
   </td>
                                               <td class="text-end w-50px">
                                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
-                                                      
+
                                                           <i aria-label="Traiter la prolongation de Jane DOE" class="ri-pencil-line"></i>
-                                                      
+
                                                   </a>
                                               </td>
                                           </tr>
-                                      
+
                                   </tbody>
                               </table>
                           </div>
-                      
-  
-                      
-  
-  
-  
+
+
+
+
+
+
                   </div>
               </div>
           </div>
@@ -1089,7 +1090,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1285,6 +1287,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1354,7 +1357,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           INNER JOIN "approvals_approval" ON ("approvals_prolongationrequest"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -1419,8 +1423,8 @@
                           </div>
                       </div>
                       <p class="mb-0">1 résultat</p>
-  
-                      
+
+
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table">
                                   <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
@@ -1441,7 +1445,7 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      
+
                                           <tr>
                                               <td class="fw-bold">Jane DOE</td>
                                               <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
@@ -1449,29 +1453,29 @@
                                               <td>01/01/2000</td>
                                               <td>Pierre DUPONT</td>
                                               <td>
-      
+
           <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">À traiter</span>
-      
-  
+
+
   </td>
                                               <td class="text-end w-50px">
                                                   <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
-                                                      
+
                                                           <i aria-label="Traiter la prolongation de Jane DOE" class="ri-pencil-line"></i>
-                                                      
+
                                                   </a>
                                               </td>
                                           </tr>
-                                      
+
                                   </tbody>
                               </table>
                           </div>
-                      
-  
-                      
-  
-  
-  
+
+
+
+
+
+
                   </div>
               </div>
           </div>
@@ -1496,7 +1500,7 @@
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
-                          
+
                               <h3>Bilan des actions réalisées</h3>
                               <p>
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
@@ -1507,8 +1511,8 @@
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
-                          
-                          
+
+
                               <h3>Explications supplémentaires</h3>
                               <p>
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
@@ -1520,13 +1524,13 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span>Copier</span>
   </button>
-  
+
                               </p>
                               <p>
                                   <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
-                          
+
                       </div>
   '''
 # ---
@@ -1534,63 +1538,63 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
+
+
+
+
       <div class="c-prevstep">
           <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
               <span>
                   Retour
-                  
+
               </span>
           </a>
       </div>
-  
-  
-  
-                              
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <div class="d-xl-flex align-items-xl-center">
               <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
                   Demande de prolongation pour Jane DOE
               </h1>
-              
-      
+
+
           <span class="badge rounded-pill badge-base bg-danger">Refusée</span>
-      
-  
-  
+
+
+
           </div>
       </div>
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
+
                           <div class="c-box mb-3 mb-lg-5">
                               <h2>Décision</h2>
                               <hr/>
@@ -1598,7 +1602,7 @@
                                   Demande refusée le 01 janvier 2000 par Pierre DUPONT
                               </p>
                           </div>
-                      
+
                       <div class="c-box mb-3 mb-lg-5">
                           <h2>Détail de la demande</h2>
                           <hr/>
@@ -1615,7 +1619,7 @@
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
-                          
+
                               <h3>Bilan des actions réalisées</h3>
                               <p>
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
@@ -1626,8 +1630,8 @@
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
-                          
-                          
+
+
                               <h3>Explications supplémentaires</h3>
                               <p>
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
@@ -1639,22 +1643,22 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span>Copier</span>
   </button>
-  
+
                               </p>
                               <p>
                                   <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
-                          
+
                       </div>
-                      
-  
+
+
                   </div>
                   <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
+
+
+
+
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
       <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
                   <i aria-hidden="true" class="ri-pass-valid-line"></i>
@@ -1665,7 +1669,7 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
-          
+
               <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2000</strong>
@@ -1685,30 +1689,30 @@
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
               </li>
-          
+
       </ul>
-      
-          
-          
-              
-                  
-              
-          
-          
-          
+
+
+
+
+
+
+
+
+
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
-          
-      
+
+
   </div>
-  
-                      
-                      
-                          
-                              
-  
+
+
+
+
+
+
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i aria-hidden="true" class="ri-community-line"></i>
@@ -1729,10 +1733,10 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
               </li>
-              
-                  
+
+
       <li>
       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
@@ -1740,13 +1744,13 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-      
+
+
+
+
+
   <li>
       <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
@@ -1754,34 +1758,34 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-  
-              
+
+
+
+
+
+
           </ul>
-          
-              
-                  
-                  
-                      
-                  
+
+
+
+
+
+
                   <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
+
+
       </div>
   </div>
-  
-                          
-                      
+
+
+
                   </div>
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -1789,63 +1793,63 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
+
+
+
+
       <div class="c-prevstep">
           <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
               <span>
                   Retour
-                  
+
               </span>
           </a>
       </div>
-  
-  
-  
-                              
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <div class="d-xl-flex align-items-xl-center">
               <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
                   Demande de prolongation pour Jane DOE
               </h1>
-              
-      
+
+
           <span class="badge rounded-pill badge-base bg-success">Acceptée</span>
-      
-  
-  
+
+
+
           </div>
       </div>
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
+
                           <div class="c-box mb-3 mb-lg-5">
                               <h2>Décision</h2>
                               <hr/>
@@ -1853,7 +1857,7 @@
                                   Demande acceptée le 01 janvier 2000 par Pierre DUPONT
                               </p>
                           </div>
-                      
+
                       <div class="c-box mb-3 mb-lg-5">
                           <h2>Détail de la demande</h2>
                           <hr/>
@@ -1870,7 +1874,7 @@
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
-                          
+
                               <h3>Bilan des actions réalisées</h3>
                               <p>
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
@@ -1881,8 +1885,8 @@
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
-                          
-                          
+
+
                               <h3>Explications supplémentaires</h3>
                               <p>
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
@@ -1894,22 +1898,22 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span>Copier</span>
   </button>
-  
+
                               </p>
                               <p>
                                   <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
-                          
+
                       </div>
-                      
-  
+
+
                   </div>
                   <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
+
+
+
+
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
       <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
                   <i aria-hidden="true" class="ri-pass-valid-line"></i>
@@ -1920,7 +1924,7 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
-          
+
               <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2000</strong>
@@ -1940,30 +1944,30 @@
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
               </li>
-          
+
       </ul>
-      
-          
-          
-              
-                  
-              
-          
-          
-          
+
+
+
+
+
+
+
+
+
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
-          
-      
+
+
   </div>
-  
-                      
-                      
-                          
-                              
-  
+
+
+
+
+
+
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i aria-hidden="true" class="ri-community-line"></i>
@@ -1984,10 +1988,10 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
               </li>
-              
-                  
+
+
       <li>
       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
@@ -1995,13 +1999,13 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-      
+
+
+
+
+
   <li>
       <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
@@ -2009,34 +2013,34 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-  
-              
+
+
+
+
+
+
           </ul>
-          
-              
-                  
-                  
-                      
-                  
+
+
+
+
+
+
                   <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
+
+
       </div>
   </div>
-  
-                          
-                      
+
+
+
                   </div>
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---
@@ -2044,44 +2048,44 @@
   '''
   <main class="s-main" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
+
   </div>
-  
+
               <section class="s-title-02">
                   <div class="s-title-02__container container">
                       <div class="s-title-02__row row">
                           <div class="s-title-02__col col-12">
-                              
-      
-  
-  
+
+
+
+
       <div class="c-prevstep">
           <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
               <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
               <span>
                   Retour
-                  
+
               </span>
           </a>
       </div>
-  
-  
-  
-                              
+
+
+
+
       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
           <div class="d-xl-flex align-items-xl-center">
               <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
                   Demande de prolongation pour Jane DOE
               </h1>
-              
-      
+
+
           <span class="badge rounded-pill badge-base bg-accent-03 text-primary">À traiter</span>
-      
-  
-  
+
+
+
           </div>
       </div>
-      
+
           <div class="c-box c-box--action">
               <h2 class="visually-hidden">Actions rapides</h2>
               <div class="form-row align-items-center gx-3">
@@ -2102,26 +2106,26 @@
                   </div>
               </div>
           </div>
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
+
+
+
+
+
+
+
+
+
                           </div>
                       </div>
                   </div>
               </section>
-  
-              
+
+
       <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
+
                       <div class="c-box mb-3 mb-lg-5">
                           <h2>Détail de la demande</h2>
                           <hr/>
@@ -2138,7 +2142,7 @@
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
-                          
+
                               <h3>Bilan des actions réalisées</h3>
                               <p>
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
@@ -2149,8 +2153,8 @@
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
-                          
-                          
+
+
                               <h3>Explications supplémentaires</h3>
                               <p>
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
@@ -2162,22 +2166,22 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span>Copier</span>
   </button>
-  
+
                               </p>
                               <p>
                                   <i aria-hidden="true" class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
-                          
+
                       </div>
-                      
-  
+
+
                   </div>
                   <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
+
+
+
+
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
       <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
                   <i aria-hidden="true" class="ri-pass-valid-line"></i>
@@ -2188,7 +2192,7 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
-          
+
               <li class="order-2">
                   <small>Date de début</small>
                   <strong>01/01/2000</strong>
@@ -2208,13 +2212,13 @@
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
               </li>
-          
+
       </ul>
-      
-          
-          
-              
-                  
+
+
+
+
+
                       <hr class="my-3 my-md-4"/>
                       <ul class="list-data">
                           <li>
@@ -2224,24 +2228,24 @@
                               </strong>
                           </li>
                       </ul>
-                  
-              
-          
-          
-          
+
+
+
+
+
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
                   <span>Afficher le PASS IAE</span>
               </a>
-          
-      
+
+
   </div>
-  
-                      
-                      
-                          
-                              
-  
+
+
+
+
+
+
   <div class="c-box c-box--structure">
       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
           <i aria-hidden="true" class="ri-community-line"></i>
@@ -2262,10 +2266,10 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
               </li>
-              
-                  
+
+
       <li>
       <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
       <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
@@ -2273,13 +2277,13 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-      
+
+
+
+
+
   <li>
       <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
       06 12 34 56 78
@@ -2287,34 +2291,34 @@
       <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
-  
+
   </li>
-  
-  
-  
-  
-  
-              
+
+
+
+
+
+
           </ul>
-          
-              
-                  
-                  
-                      
-                  
+
+
+
+
+
+
                   <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
+
+
       </div>
   </div>
-  
-                          
-                      
+
+
+
                   </div>
               </div>
           </div>
       </section>
-  
+
           </main>
   '''
 # ---

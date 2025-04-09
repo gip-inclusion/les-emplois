@@ -32,15 +32,25 @@ from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyMembershipFactory
+from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+)
+from tests.gps.factories import FollowUpGroupFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
-    PrescriberFactory,
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -1414,3 +1424,335 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             assert mailoutbox[idx].subject == (
                 f"[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation {expected_organization_name}"
             )
+
+
+class TestNotifyDeactivatedJobSeekerManagementCommand:
+    test_datas = [
+        (
+            "inactive_job_seeker",
+            {"joined_days_ago": 365},
+            "upcoming_deletion_notified_at",
+            None,
+        ),
+        (
+            "inactive_job_seeker_with_recent_activity",
+            {
+                "joined_days_ago": 365,
+                "upcoming_deletion_notified_at": (now := timezone.now()),
+                "last_login": now,
+            },
+            "upcoming_deletion_notified_at",
+            now,
+        ),
+        (
+            "inactive_job_seeker_to_deactivate",
+            {
+                "joined_days_ago": 365,
+                "notified_days_ago": 32,
+            },
+            "is_active",
+            True,
+        ),
+    ]
+
+    @pytest.mark.parametrize("name, job_seeker_factory_args, field_to_check, expected_value", test_datas)
+    def test_dry_run_does_not_update_job_seeker(self, name, job_seeker_factory_args, field_to_check, expected_value):
+        JobSeekerFactory(**job_seeker_factory_args)
+
+        call_command("notify_deactivate_inactive_jobseekers")
+
+        job_seeker = User.objects.get()
+        assert getattr(job_seeker, field_to_check) == expected_value
+
+    @pytest.mark.parametrize("name, job_seeker_factory_args, field_to_check, expected_value", test_datas)
+    def test_batch_size(self, name, job_seeker_factory_args, field_to_check, expected_value):
+        JobSeekerFactory.create_batch(3, **job_seeker_factory_args)
+
+        call_command("notify_deactivate_inactive_jobseekers", batch_size=2, wet_run=True)
+
+        assert User.objects.filter(**{field_to_check: expected_value}).count() == 1  # pending users
+        assert User.objects.exclude(**{field_to_check: expected_value}).count() == 2  # updated users
+
+    @pytest.mark.parametrize(
+        "name, factory, related_object_factory, notified",
+        [
+            (
+                "jobseeker_without_recent_activity",
+                lambda: JobSeekerFactory(joined_days_ago=365, for_snapshot=True),
+                None,
+                True,
+            ),
+            (
+                "deactivated_jobseeker_without_recent_activity",
+                lambda: JobSeekerFactory(joined_days_ago=365, is_active=False),
+                None,
+                False,
+            ),
+            (
+                "jobseeker_with_recent_activity",
+                lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now()),
+                None,
+                False,
+            ),
+            (
+                "jobseeker_with_recent_job_application",
+                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
+                False,
+            ),
+            (
+                "jobseeker_with_recent_approval",
+                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda jobseeker: ApprovalFactory(user=jobseeker),
+                False,
+            ),
+            (
+                "jobseeker_with_recent_eligibility_diagnosis",
+                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+                False,
+            ),
+            (
+                "jobseeker_with_recent_geiq_eligibility_diagnosis",
+                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+                False,
+            ),
+            (
+                "jobseeker_with_recent_follow_up_group",
+                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
+                False,
+            ),
+            ("prescriber_without_recent_activity", lambda: PrescriberFactory(joined_days_ago=365), None, False),
+            ("employer_without_recent_activity", lambda: EmployerFactory(joined_days_ago=365), None, False),
+            (
+                "labor_inspector_without_recent_activity",
+                lambda: LaborInspectorFactory(joined_days_ago=365),
+                None,
+                False,
+            ),
+            ("itou_staff_without_recent_activity", lambda: ItouStaffFactory(joined_days_ago=365), None, False),
+        ],
+    )
+    def test_notify_inactive_jobseekers(
+        self,
+        name,
+        factory,
+        related_object_factory,
+        notified,
+        django_capture_on_commit_callbacks,
+        caplog,
+        mailoutbox,
+        snapshot,
+    ):
+        user = factory()
+        if related_object_factory:
+            related_object_factory(user)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_deactivate_inactive_jobseekers", wet_run=True)
+
+        user.refresh_from_db()
+        assert (user.upcoming_deletion_notified_at is not None) == notified
+
+        if notified:
+            assert "Notified inactive job seekers without recent activity: 1" in caplog.messages
+            assert len(mailoutbox) == 1
+
+            mail = mailoutbox[0]
+            assert user.email == mail.to[0]
+            assert mail.subject == snapshot(name="inactive_jobseeker_email_subject")
+            body = mail.body.replace(user.date_joined.strftime("%d/%m/%Y"), "XX/XX/XXXX").replace(
+                user.upcoming_deletion_notified_at.strftime("%d/%m/%Y"), "YY/YY/YYYY"
+            )
+            assert body == snapshot(name="inactive_jobseeker_email")
+        else:
+            assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
+            assert len(mailoutbox) == 0
+
+    @pytest.mark.parametrize(
+        "name, factory, related_object_factory, notification_reset",
+        [
+            (
+                "notified_jobseeker",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                None,
+                False,
+            ),
+            (
+                "deactivated_notified_jobseeker",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1, is_active=False),
+                None,
+                False,
+            ),
+            (
+                "notified_jobseeker_with_recent_login",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                None,
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_date_joined",
+                lambda: JobSeekerFactory(
+                    date_joined=timezone.now(),
+                    notified_days_ago=1,
+                ),
+                None,
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_job_application",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_approval",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda jobseeker: ApprovalFactory(user=jobseeker),
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_eligibility_diagnosis",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_geiq_eligibility_diagnosis",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+                True,
+            ),
+            (
+                "notified_jobseeker_with_recent_follow_up_group",
+                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
+                True,
+            ),
+            (
+                "itoustaff_with_recent_login",
+                lambda: ItouStaffFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                None,
+                False,
+            ),
+            (
+                "labor_inspector_with_recent_login",
+                lambda: LaborInspectorFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                None,
+                False,
+            ),
+            (
+                "employer_with_recent_login",
+                lambda: EmployerFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                None,
+                False,
+            ),
+            (
+                "prescriber_with_recent_login",
+                lambda: PrescriberFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                None,
+                False,
+            ),
+        ],
+    )
+    def test_reset_notified_jobseekers_with_recent_activity(
+        self, name, factory, related_object_factory, notification_reset
+    ):
+        user = factory()
+        if related_object_factory:
+            related_object_factory(user)
+
+        call_command("notify_deactivate_inactive_jobseekers", wet_run=True)
+
+        user.refresh_from_db()
+        assert (user.upcoming_deletion_notified_at is None) == notification_reset
+
+    @pytest.mark.parametrize(
+        "name,factory,is_active",
+        [
+            ("job_seeker_not_notified", lambda: JobSeekerFactory(), True),
+            (
+                "job_seeker_notified_recently",
+                lambda: JobSeekerFactory(
+                    joined_days_ago=365,
+                    # notified_days_ago=32 seems to be not working
+                    upcoming_deletion_notified_at=timezone.now() - datetime.timedelta(days=32),
+                ),
+                True,
+            ),
+            (
+                "job_seeker_notified_long_time_ago",
+                lambda: JobSeekerFactory(
+                    for_snapshot=True,
+                    joined_days_ago=365,
+                    notified_days_ago=True,
+                ),
+                False,
+            ),
+            (
+                "job_seeker_already_deactivated",
+                lambda: JobSeekerFactory(
+                    joined_days_ago=365,
+                    notified_days_ago=True,
+                    is_active=False,
+                ),
+                False,
+            ),
+            (
+                "labor_inspector_not_notified",
+                lambda: LaborInspectorFactory(
+                    notified_days_ago=True,
+                ),
+                True,
+            ),
+            (
+                "employer",
+                lambda: EmployerFactory(
+                    notified_days_ago=True,
+                ),
+                True,
+            ),
+            (
+                "prescriber",
+                lambda: PrescriberFactory(
+                    notified_days_ago=True,
+                ),
+                True,
+            ),
+            (
+                "itoustaff",
+                lambda: ItouStaffFactory(
+                    notified_days_ago=True,
+                ),
+                True,
+            ),
+        ],
+    )
+    def test_deactivate_jobseekers_after_grace_period(
+        self, name, factory, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot
+    ):
+        user = factory()
+        notified = user.upcoming_deletion_notified_at is not None
+        already_deactivated = user.is_active is False
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_deactivate_inactive_jobseekers", wet_run=True)
+
+        user.refresh_from_db()
+        assert user.is_active == is_active
+        assert (user.upcoming_deletion_notified_at is not None) == notified
+
+        if is_active or already_deactivated:
+            assert "Deactivated job seekers after grace period: 0" in caplog.messages
+            assert len(mailoutbox) == 0
+        else:
+            assert "Deactivated job seekers after grace period: 1" in caplog.messages
+            assert len(mailoutbox) == 1
+
+            mail = mailoutbox[0]
+            assert user.email == mail.to[0]
+            assert mail.subject == snapshot(name="deactivated_jobseeker_email_subject")
+            body = mail.body.replace(user.upcoming_deletion_notified_at.strftime("%d/%m/%Y"), "XX/XX/XXXX")
+            assert body == snapshot(name="deactivated_jobseeker_email")
