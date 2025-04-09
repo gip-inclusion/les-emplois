@@ -50,6 +50,8 @@ class Migration(migrations.Migration):
                             ("API-010", "API siaes : total d'appels reçus"),
                             ("API-011", "API siaes : total de visiteurs uniques (par adresse IP)"),
                             ("API-012", "API structures : total d'appels reçus"),
+                            ("API-013", "API candidatures : total d'appels reçus"),
+                            ("API-014", "API candidatures : total de jetons uniques"),
                             ("SENTRY-001", "Apdex"),
                             ("SENTRY-002", "Taux de requêtes en échec"),
                             ("UPDOWN-001", "Taux de disponibilité"),
