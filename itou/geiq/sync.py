@@ -445,6 +445,7 @@ def sync_employee_and_contracts(assessment, new_mode=False):
     def contract_data_to_django(data, *, mapping, model):
         contract = label_data_to_django(data, mapping=mapping, model=model)
         contract.employee = label_id_to_employee[data["salarie"]]
+        contract.allowance_granted = False
         if new_mode:
             contract.allowance_requested = _more_than_3_months_in_year(
                 contract.start_at, contract.end_at or contract.planned_end_at, year=assessment.campaign.year

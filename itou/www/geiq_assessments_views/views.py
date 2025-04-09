@@ -358,8 +358,8 @@ def assessment_contracts_details(
 
 @require_POST
 @check_user(lambda user: user.is_employer)
-def assessment_contracts_include(
-    request, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
+def _assessment_contracts_toggle(
+    request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
     contract = get_object_or_404(
         EmployeeContract.objects.filter(employee__assessment__companies=request.current_organization)
@@ -368,34 +368,8 @@ def assessment_contracts_include(
         pk=contract_pk,
     )
     assessment = contract.employee.assessment
-    if not assessment.submitted_at and not contract.allowance_requested:
-        contract.allowance_requested = True
-        contract.save(update_fields=("allowance_requested",))
-        if assessment.contracts_selection_validated_at:
-            assessment.contracts_selection_validated_at = None
-            assessment.save(update_fields=("contracts_selection_validated_at",))
-    context = {
-        "assessment": assessment,
-        "contract": contract,
-        "from_list": bool(request.GET.get("from_list")),
-    }
-    return render(request, template_name, context)
-
-
-@require_POST
-@check_user(lambda user: user.is_employer)
-def assessment_contracts_exclude(
-    request, contract_pk, template_name="geiq_assessments_views/includes/contracts_switch.html"
-):
-    contract = get_object_or_404(
-        EmployeeContract.objects.filter(employee__assessment__companies=request.current_organization)
-        .select_related("employee__assessment")
-        .select_for_update(of=("self",)),
-        pk=contract_pk,
-    )
-    assessment = contract.employee.assessment
-    if not assessment.submitted_at and contract.allowance_requested:
-        contract.allowance_requested = False
+    if not assessment.submitted_at and contract.allowance_requested != new_value:
+        contract.allowance_requested = new_value
         contract.save(update_fields=("allowance_requested",))
         if assessment.contracts_selection_validated_at:
             assessment.contracts_selection_validated_at = None
