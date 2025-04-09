@@ -14,7 +14,7 @@
             <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Détail du contrat : {{ contract.employee.get_full_name }}</h1>
         </div>
 
-        {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=False only %}
+        {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=False request=request only %}
     </div>
 {% endblock %}
 

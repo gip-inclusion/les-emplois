@@ -82,11 +82,6 @@ urlpatterns = [
     # institution urls
     path("institution/", views.list_for_institution, name="list_for_institution"),
     path("institution/<uuid:pk>", views.details_for_institution, name="details_for_institution"),
-    path(
-        "institution/<uuid:pk>/contracts",
-        views.contracts_list_for_institution,
-        name="contracts_list_for_institution",
-    ),
     # path("institution/<uuid:pk>/review", views.review_assessment, name="review_assessment"),
     # path(
     #    "institution/contracts/<uuid:contract_pk>/include",

@@ -24,12 +24,16 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=assessment hx_swap_oob=False only %}
-                    <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
-                    <p>
-                        Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
-                        <br>
-                        Par défaut, tous les contrats dont la durée est inférieure à 3 mois sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
-                    </p>
+                    {% if request.user.is_employer %}
+                        <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
+                        <p>
+                            Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                            <br>
+                            Par défaut, tous les contrats dont la durée est inférieure à 3 mois sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                        </p>
+                    {% elif request.user.is_labor_inspector %}
+                        <h2>Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide</h2>
+                    {% endif %}
                     <div class="table-responsive mt-3 mt-md-4">
                         <table class="table table-hover">
                             <caption class="visually-hidden">Liste des bilans d’exécution</caption>
@@ -40,7 +44,11 @@
                                     <th scope="col">Date de fin</th>
                                     <th scope="col">+ de 3 mois en {{ assessment.campaign.year }}</th>
                                     <th scope="col">Aide potentielle</th>
-                                    <th scope="col">Obtenir l’aide</th>
+                                    {% if request.user.is_employer %}
+                                        <th scope="col">Obtenir l’aide</th>
+                                    {% elif request.user.is_labor_inspector %}
+                                        <th scope="col">Éligible à l’aide</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,7 +77,7 @@
                     </div
                     {% include "includes/pagination.html" with page=contracts_page boost=True %}
 
-                    {% if not assessment.submitted_at %}
+                    {% if validation_possible %}
 
                         <form method="POST" class="js-prevent-multiple-submit">
                             {% csrf_token %}
