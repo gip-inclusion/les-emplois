@@ -51,6 +51,13 @@ def can_view_stats_siae(request):
     )
 
 
+def can_view_stats_siae_hiring_and_beneficiaries(request):
+    return (
+        can_view_stats_siae(request)
+        and request.current_organization.department in settings.STATS_SIAE_DEPARTMENTS_WHITELIST
+    )
+
+
 def can_view_stats_siae_etp(request):
     """
     Non official stats with very specific access rights.

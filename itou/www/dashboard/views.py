@@ -197,10 +197,14 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
             else None
         )
         if stats_utils.can_view_stats_siae(request):
+            can_view_stats_siae_hiring_and_beneficiaries = stats_utils.can_view_stats_siae_hiring_and_beneficiaries(
+                request
+            )
             context.update(
                 {
                     "layout_kind": DashboardStatsLayoutKind.EMPLOYER,
                     "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+                    "can_view_stats_siae_hiring_and_beneficiaries": can_view_stats_siae_hiring_and_beneficiaries,
                 }
             )
     elif request.user.is_prescriber:

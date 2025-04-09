@@ -261,6 +261,22 @@ def stats_siae_orga_etp(request):
     )
 
 
+def stats_siae_hiring_and_beneficiaries(request):
+    if not utils.can_view_stats_siae_hiring_and_beneficiaries(request):
+        raise PermissionDenied
+
+    return render_stats(
+        request=request,
+        context={
+            "page_title": "Suivi des recrutements et des bénéficiaires",
+            "department": request.current_organization.department,
+            "matomo_custom_url_suffix": format_region_and_department_for_matomo(
+                request.current_organization.department
+            ),
+        },
+    )
+
+
 def render_stats_siae(request, page_title):
     """
     SIAE stats shown only to their own members.
