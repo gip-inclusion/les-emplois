@@ -40,7 +40,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
-from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.stats import utils
@@ -49,26 +48,6 @@ from itou.www.stats import utils
 DGEFP_SHOWROOM_DEPARTMENT = "69"
 DGEFP_SHOWROOM_CONVERGENCE_REGION = "Île-de-France"
 DGEFP_SHOWROOM_IAE_NETWORK_NAME = "Unai"
-
-
-def get_stats_siae_current_org(request):
-    current_org = get_current_company_or_404(request)
-    if not utils.can_view_stats_siae(request):
-        raise PermissionDenied
-    return current_org
-
-
-def get_stats_dreets_iae_region(request):
-    current_org = get_current_institution_or_404(request)
-    if not utils.can_view_stats_dreets_iae(request):
-        raise PermissionDenied
-    return current_org.region
-
-
-def ensure_stats_dgefp_iae_permission(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_dgefp_iae(request):
-        raise PermissionDenied
 
 
 def get_params_for_departement(department):
@@ -85,10 +64,6 @@ def get_params_for_region(region):
         mb.REGION_FILTER_KEY: region,
     }
     return params
-
-
-def get_params_for_idf_region():
-    return get_params_for_region("Île-de-France")
 
 
 def get_params_for_whole_country():
@@ -215,13 +190,13 @@ def stats_siae_etp(request):
     They can only view data for their own SIAE.
     These stats are about ETP data from the ASP.
     """
-    current_org = get_stats_siae_current_org(request)
     if not utils.can_view_stats_siae_etp(request):
         raise PermissionDenied
+
     context = {
         "page_title": "Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures",
-        "department": current_org.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+        "department": request.current_organization.department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
     return render_stats(
         request=request,
@@ -242,13 +217,13 @@ def stats_siae_orga_etp(request):
     They can only view data for their own SIAE.
     These stats are about ETP data from the ASP.
     """
-    current_org = get_stats_siae_current_org(request)
     if not utils.can_view_stats_siae(request):
         raise PermissionDenied
+
     context = {
         "page_title": "Suivre les effectifs annuels et mensuels (ETP) de ma structure",
-        "department": current_org.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+        "department": request.current_organization.department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
     return render_stats(
         request=request,
@@ -267,11 +242,10 @@ def render_stats_siae(request, page_title):
     Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
     These stats are built directly from C1 data.
     """
-    current_org = get_stats_siae_current_org(request)
     context = {
         "page_title": page_title,
-        "department": current_org.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+        "department": request.current_organization.department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
     return render_stats(
         request=request,
@@ -584,15 +558,17 @@ def stats_ddets_log_state(request):
 
 
 def render_stats_dreets_iae(request, page_title, *, extra_context=None):
-    region = get_stats_dreets_iae_region(request)
-    params = get_params_for_region(region)
+    if not utils.can_view_stats_dreets_iae(request):
+        raise PermissionDenied
+
+    region = request.current_organization.region
     context = {
         "page_title": f"{page_title} ({region})",
         "matomo_custom_url_suffix": format_region_for_matomo(region),
         "region": region,
     }
     context.update(extra_context or {})
-    return render_stats(request=request, context=context, params=params)
+    return render_stats(request=request, context=context, params=get_params_for_region(region))
 
 
 def stats_dreets_iae_auto_prescription(request):
@@ -639,16 +615,18 @@ def stats_dreets_iae_orga_etp(request):
 
 
 def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context=None):
-    if extra_context is None:
-        # Do not use mutable default arguments,
-        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
-        extra_context = {}
-    ensure_stats_dgefp_iae_permission(request)
-    context = {
-        "page_title": page_title,
-    }
-    context.update(extra_context)
-    return render_stats(request=request, context=context, params=extra_params)
+    if not utils.can_view_stats_dgefp_iae(request):
+        raise PermissionDenied
+    extra_context = extra_context or {}
+
+    return render_stats(
+        request=request,
+        context={
+            "page_title": page_title,
+            **extra_context,
+        },
+        params=extra_params,
+    )
 
 
 def stats_dgefp_iae_auto_prescription(request):
@@ -786,7 +764,7 @@ def stats_drihl_state(request):
     context = {
         "page_title": "Suivi des prescriptions des AHI",
     }
-    return render_stats(request=request, context=context, params=get_params_for_idf_region())
+    return render_stats(request=request, context=context, params=get_params_for_region("Île-de-France"))
 
 
 def stats_iae_network_hiring(request):
