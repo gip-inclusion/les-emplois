@@ -14,7 +14,6 @@ def collect_analytics_data(before, client=None):
         models.DatumCode.API_TOTAL_CALLS_CANDIDATS: client.count_daily_logs(before, endpoint="candidats/"),
         models.DatumCode.API_TOTAL_UV_CANDIDATS: client.count_daily_unique_users(before, endpoint="candidats/"),
         models.DatumCode.API_TOTAL_CALLS_GEIQ: client.count_daily_logs(before, endpoint="embauches-geiq/"),
-        models.DatumCode.API_TOTAL_UV_GEIQ: client.count_daily_unique_users(before, endpoint="embauches-geiq/"),
         models.DatumCode.API_TOTAL_CALLS_ER: client.count_daily_logs(before, endpoint="employee-records/"),
         models.DatumCode.API_TOTAL_UV_ER: client.count_daily_unique_users(before, endpoint="employee-records/"),
         models.DatumCode.API_TOTAL_CALLS_MARCHE: client.count_daily_logs(before, endpoint="marche/"),
