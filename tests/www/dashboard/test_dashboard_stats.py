@@ -6,7 +6,7 @@ from django.urls import reverse
 from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.www.stats.utils import STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
+from itou.www.stats.utils import STATS_PH_ORGANISATION_KIND_WHITELIST
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
@@ -26,8 +26,7 @@ def test_index_stats_for_employer(snapshot, client):
 
 @pytest.mark.parametrize(
     "kind",
-    {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT}
-    | set(STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST),
+    {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT, *STATS_PH_ORGANISATION_KIND_WHITELIST},
 )
 def test_index_stats_for_authorized_prescriber(snapshot, client, kind):
     client.force_login(

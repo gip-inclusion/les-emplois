@@ -455,14 +455,12 @@ def stats_ph_state_main(request):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
 
-    allowed_org_pks = [request.current_organization.pk]
-    if request.current_organization.kind in utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST:
-        allowed_org_pks = list(
-            PrescriberOrganization.objects.filter(
-                kind=request.current_organization.kind,
-                department=request.current_organization.department,
-            ).values_list("pk", flat=True)
-        )
+    allowed_org_pks = list(
+        PrescriberOrganization.objects.filter(
+            kind=request.current_organization.kind,
+            department=request.current_organization.department,
+        ).values_list("pk", flat=True)
+    )
 
     return render_stats_ph(
         request=request,
@@ -732,7 +730,7 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
             # Only authorized prescriber organizations
             .filter(is_authorized=True, authorization_status=PrescriberAuthorizationStatus.VALIDATED)
             # Mimic `can_view_stats_ph()`
-            .filter(has_active_members=True, kind__in=utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST)
+            .filter(has_active_members=True, kind__in=utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
             # Limit to the selected department
             .filter(department=DGEFP_SHOWROOM_DEPARTMENT)
             .values_list("pk", "kind", named=True)
