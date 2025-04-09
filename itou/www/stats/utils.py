@@ -22,6 +22,7 @@ STATS_PH_ORGANISATION_KIND_WHITELIST = [
     PrescriberOrganizationKind.CHU,
     PrescriberOrganizationKind.ML,
     PrescriberOrganizationKind.OIL,
+    PrescriberOrganizationKind.PLIE,
     PrescriberOrganizationKind.RS_FJT,
 ]
 
