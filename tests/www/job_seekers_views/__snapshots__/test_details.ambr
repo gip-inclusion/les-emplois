@@ -17,19 +17,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -253,19 +262,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -467,14 +485,18 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+                  
+              
+              
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
                       
@@ -485,9 +507,12 @@
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
-              </div>
-          
-      </div>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -647,14 +672,18 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+                  
+              
+              
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
                       
@@ -665,9 +694,12 @@
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
-              </div>
-          
-      </div>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -917,17 +949,26 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div class="c-title__cta">
               
-          
-          <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-              <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-              <span>Postuler pour ce candidat</span>
-          </a>
-      </div>
+              
+                  
+              
+              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                  <span>Postuler pour ce candidat</span>
+              </a>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -1873,19 +1914,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -2111,14 +2161,18 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+                  
+              
+              
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
                       
@@ -2129,9 +2183,12 @@
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
-              </div>
-          
-      </div>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -2337,19 +2394,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -2509,19 +2575,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -2725,14 +2800,18 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <div aria-label="Actions sur le candidat" class="d-flex flex-column flex-md-row gap-3" role="group">
+              
+                  
+              
+              
                   <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                       <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium"></i>
                       
@@ -2743,9 +2822,12 @@
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
-              </div>
-          
-      </div>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -2949,19 +3031,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -3121,19 +3212,28 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <h1 class="mb-0">Candidat : Jane DOE</h1>
-          
-          
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Candidat : Jane DOE</h1>
+          </div>
+      
+          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
               
-          
-          
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
-                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                  <span>Postuler pour ce candidat</span>
-              </a>
-          
-      </div>
+              
+                  
+              
+              
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                      <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
+                      <span>Postuler pour ce candidat</span>
+                  </a>
+              
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   

@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 
 {% block title %}Mes salariés - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
@@ -8,9 +9,15 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Mes salariés - {{ request.current_organization.display_name }} - {{ employee.assessment.campaign.year }}</h1>
-    <p>Dernière mise à jour: {{ employee.assessment.last_synced_at|default:"-" }}</p>
-    <h2>{{ employee.get_full_name }}</h2>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Mes salariés - {{ request.current_organization.display_name }} - {{ employee.assessment.campaign.year }}</h1>
+            <p>Dernière mise à jour: {{ employee.assessment.last_synced_at|default:"-" }}</p>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <h2>{{ employee.get_full_name }}</h2>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

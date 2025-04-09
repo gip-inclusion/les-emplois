@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}Mes salariés - {{ assessment.company.display_name }} {{ block.super }}{% endblock %}
@@ -8,28 +9,30 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - {{ assessment.campaign.year }}</h1>
-            {% if not assessment.submitted_at %}
-                <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
-            {% elif not assessment.reviewed_at %}
-                <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
-            {% else %}
-                {% if assessment.review_state == ReviewState.ACCEPTED %}
-                    <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
-                {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
-                    <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
-                {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
-                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
-                {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
-                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
-                {% elif assessment.review_state == ReviewState.FULL_REFUND %}
-                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Bilan d’exécution - {{ assessment.campaign.year }}
+                {% if not assessment.submitted_at %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+                {% elif not assessment.reviewed_at %}
+                    <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+                {% else %}
+                    {% if assessment.review_state == ReviewState.ACCEPTED %}
+                        <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+                    {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
+                        <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+                    {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
+                        <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+                    {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
+                        <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+                    {% elif assessment.review_state == ReviewState.FULL_REFUND %}
+                        <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </div>
-    </div>
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_messages %}

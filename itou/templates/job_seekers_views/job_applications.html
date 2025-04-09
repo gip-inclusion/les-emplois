@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load matomo %}
 {% load static %}
@@ -14,19 +15,23 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <h1 class="mb-0">Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
-        {% url 'search:employers_results' as search_url %}
-        {% if can_view_personal_information %}
-            {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
-        {% else %}
-            {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
-        {% endif %}
-        <a href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
-            <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
-            <span>Postuler pour ce candidat</span>
-        </a>
-    </div>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% url 'search:employers_results' as search_url %}
+            {% if can_view_personal_information %}
+                {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+            {% else %}
+                {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
+            {% endif %}
+            <a href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
+                <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
+                <span>Postuler pour ce candidat</span>
+            </a>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_extra %}

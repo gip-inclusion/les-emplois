@@ -1,13 +1,18 @@
 {% extends "apply/submit_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title_content %}
-    <div class="d-xl-flex align-items-xl-center">
-        <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Informations personnelles de {{ job_seeker.get_full_name }}</h1>
-        {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
-    </div>
-    <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Informations personnelles de {{ job_seeker.get_full_name }}
+                {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
+            </h1>
+            <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content_extend %}
