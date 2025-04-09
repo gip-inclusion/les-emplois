@@ -1,5 +1,6 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
@@ -7,7 +8,13 @@
     {% include "layout/previous_step.html" with back_url=back_url|default:None only %}
 {% endblock %}
 
-{% block title_content %}<h1>Se connecter</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Se connecter</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

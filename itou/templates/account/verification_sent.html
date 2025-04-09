@@ -1,11 +1,18 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Vérifiez votre adresse e-mail {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Vérifiez votre adresse e-mail</h1>
-    <p>
-        Nous vous avons envoyé un e-mail avec un lien pour validation. Cliquez sur le lien fourni pour terminer votre inscription.
-    </p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Vérifiez votre adresse e-mail</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>
+                Nous vous avons envoyé un e-mail avec un lien pour validation. Cliquez sur le lien fourni pour terminer votre inscription.
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}

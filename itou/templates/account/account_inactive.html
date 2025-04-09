@@ -1,9 +1,16 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Compte inactif {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Compte inactif</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Compte inactif</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block title_messages %}
     {{ block.super }}
