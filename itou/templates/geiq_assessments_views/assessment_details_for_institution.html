@@ -51,22 +51,28 @@
                             </div>
                             <div class="d-flex flex-column gap-3 mb-3">
                                 <div class="d-flex flex-row justify-content-between">
-                                    Dont potentiellement éligible à l’aide de 814 €<strong>10</strong>
+                                    <span>Dont potentiellement éligible à l’aide de 814 €</span>
+                                    <strong>{{ stats.aid_of_814_nb }}</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
-                                    Dont potentiellement éligible à l’aide de 1 400 €<strong>25</strong>
+                                    <span>Dont potentiellement éligible à l’aide de 1 400 €</span>
+                                    <strong>{{ stats.aid_of_1400_nb }}</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
-                                    Nombre de salariés présentés par le GEIQ accompagnés sur une durée > 3 mois sur l’année<strong>35</strong>
+                                    <span>Nombre de salariés présentés par le GEIQ accompagnés sur une durée > 3 mois sur l’année</span>
+                                    <strong>-</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
-                                    Contrat de professionalisation<strong>30</strong>
+                                    <span>Contrat de professionalisation</span>
+                                    <strong>-</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
-                                    Contrat d’apprentissage<strong>5</strong>
+                                    <span>Contrat d’apprentissage</span>
+                                    <strong>-</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
-                                    Montant de l’aide potentielle<strong>{{ 70000|format_int_euros }}</strong>
+                                    <span>Montant de l’aide potentielle</span>
+                                    <strong>{{ stats.potential_aid_amount|format_int_euros }}</strong>
                                 </div>
                             </div>
                             <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
