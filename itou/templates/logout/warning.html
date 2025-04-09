@@ -1,10 +1,16 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
-
 
 {% block title %}Déconnexion {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Déconnexion</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Déconnexion</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section pt-lg-3">

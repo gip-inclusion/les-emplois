@@ -1,12 +1,17 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 
 {% block title %}Employeur solidaire - Inscription {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1 class="mb-0">Inscription</h1>
-    <p>Employeur solidaire</p>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Inscription</h1>
+            <p>Employeur solidaire</p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_messages %}

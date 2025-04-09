@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 {% load tally %}
@@ -7,8 +8,12 @@
 {% block title %}Employeur inclusif - Inscription {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1 class="mb-0">Inscription</h1>
-    <p>Employeur inclusif</p>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Inscription</h1>
+            <p>Employeur inclusif</p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

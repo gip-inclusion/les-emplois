@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
@@ -6,22 +7,28 @@
 {% block title %}Facilitateur de clauses sociales - Inscription {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1 class="mb-0">Inscription</h1>
-    <p>Facilitateur de clauses sociales</p>
-    <h2>Inscrire mon organisation porteuse de la clause sociale d’insertion</h2>
-    <p>
-        Cette inscription est soumise à des conditions qui ont été définies en lien avec nos partenaires publics et privés nationaux.
-    </p>
-    <p>
-        <span class="d-block">Les conditions suivantes sont nécessaires :</span>
-        <b>
-            La structure qui s’inscrit, pour un territoire donné, doit être porteuse d’un poste occupé par une personne ayant des compétences de facilitateur (reconnues et validées par le réseau national des facilitateurs) et s’engager à respecter les fondamentaux de la clause sociale.
-        </b>
-    </p>
-    <p>
-        Dans le cas contraire votre inscription sera déclarée non pertinente et votre compte sera désactivé.
-        Si vous souhaitez avoir davantage d’informations, vous pouvez contacter le réseau national des facilitateurs de la clause sociale, Alliance Villes Emploi : <a href="mailto:ave@ville-emploi.asso.fr" aria-label="Rédiger un e-mail à Alliance Villes Emploi">ave@ville-emploi.asso.fr</a>.
-    </p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Inscription</h1>
+            <p>Facilitateur de clauses sociales</p>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <h2>Inscrire mon organisation porteuse de la clause sociale d’insertion</h2>
+            <p>
+                Cette inscription est soumise à des conditions qui ont été définies en lien avec nos partenaires publics et privés nationaux.
+            </p>
+            <p>
+                <span class="d-block">Les conditions suivantes sont nécessaires :</span>
+                <b>
+                    La structure qui s’inscrit, pour un territoire donné, doit être porteuse d’un poste occupé par une personne ayant des compétences de facilitateur (reconnues et validées par le réseau national des facilitateurs) et s’engager à respecter les fondamentaux de la clause sociale.
+                </b>
+            </p>
+            <p>
+                Dans le cas contraire votre inscription sera déclarée non pertinente et votre compte sera désactivé.
+                Si vous souhaitez avoir davantage d’informations, vous pouvez contacter le réseau national des facilitateurs de la clause sociale, Alliance Villes Emploi : <a href="mailto:ave@ville-emploi.asso.fr" aria-label="Rédiger un e-mail à Alliance Villes Emploi">ave@ville-emploi.asso.fr</a>.
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
