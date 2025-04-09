@@ -116,9 +116,9 @@ class Assessment(models.Model):
     )
     # Institution actions
     review_comment = models.TextField("commentaire accompagnant la décision", blank=True)
-    convention_amount = models.PositiveSmallIntegerField("montant conventionné", default=0)
-    granted_amount = models.PositiveSmallIntegerField("montant total accordé", default=0)
-    advance_amount = models.PositiveSmallIntegerField("montant déjà versé", default=0)
+    convention_amount = models.PositiveIntegerField("montant conventionné", default=0)
+    granted_amount = models.PositiveIntegerField("montant total accordé", default=0)
+    advance_amount = models.PositiveIntegerField("montant déjà versé", default=0)
 
     decision_validated_at = models.DateTimeField("décision saisie le", blank=True, null=True)
     grants_selection_validated_at = models.DateTimeField("aides accordées validées le", blank=True, null=True)

@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import widgets
+from django.urls import reverse
 
 from itou.files.forms import ItouFileField
 from itou.geiq_assessments.models import Assessment
@@ -120,3 +121,54 @@ class ReviewForm(forms.ModelForm):
             "granted_amount",
             "advance_amount",
         ]
+        labels = {
+            "review_comment": "Commentaire",
+        }
+
+    def __init__(self, *args, instance, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
+        amount_fields = [
+            "convention_amount",
+            "granted_amount",
+            "advance_amount",
+        ]
+        for amount_field in amount_fields:
+            self.fields[amount_field].widget.attrs.update(
+                {
+                    "hx-trigger": "change",
+                    "hx-get": reverse("geiq_assessments_views:assessment_review", kwargs={"pk": instance.pk}),
+                    "hx-swap": "outerHTML",
+                    "hx-include": ",".join(f"#id_{field}" for field in amount_fields),
+                    "hx-select": "#decision-box",
+                    "hx-target": "#decision-box",
+                },
+            )
+
+    def clean(self):
+        super().clean()
+        if (convention_amount := self.cleaned_data["convention_amount"]) is not None:
+            if (
+                granted_amount := self.cleaned_data["granted_amount"]
+            ) is not None and granted_amount > convention_amount:
+                self.add_error(
+                    "granted_amount",
+                    forms.ValidationError("Le montant total accordé ne peut être supérieur au montant conventionné."),
+                )
+            if (
+                advance_amount := self.cleaned_data["advance_amount"]
+            ) is not None and advance_amount > convention_amount:
+                self.add_error(
+                    "advance_amount",
+                    forms.ValidationError(
+                        "Le montant du premier versement ne peut être supérieur au montant conventionné."
+                    ),
+                )
+
+    def balance_amount(self):
+        if (
+            self.cleaned_data
+            and self.cleaned_data.get("granted_amount") is not None
+            and self.cleaned_data.get("advance_amount") is not None
+        ):
+            return self.cleaned_data.get("granted_amount") - self.cleaned_data.get("advance_amount")
+        return None

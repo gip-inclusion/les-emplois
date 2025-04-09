@@ -24,7 +24,12 @@ from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
-from itou.www.geiq_assessments_views.forms import ActionFinancialAssessmentForm, CreateForm, GeiqCommentForm
+from itou.www.geiq_assessments_views.forms import (
+    ActionFinancialAssessmentForm,
+    CreateForm,
+    GeiqCommentForm,
+    ReviewForm,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -501,29 +506,40 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
         "back_url",
         fallback_url=reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
     )
-    form = None
+    if request.htmx and request.method == "GET":
+        form = ReviewForm(instance=assessment, data=request.GET)
+        form.full_clean()
+        balance_amount = form.balance_amount
+    else:
+        form = ReviewForm(instance=assessment, data=request.POST if request.method == "POST" else None)
+        balance_amount = assessment.granted_amount - assessment.advance_amount
     context = {
         "assessment": assessment,
         "form": form,
         "back_url": back_url,
+        "balance_amount": balance_amount,
     }
-    if request.method == "POST":  # and form.is_valid():
+    if request.method == "POST" and form.is_valid():
         form.save()
+        assessment.decision_validated_at = timezone.now()
+        assessment.save(update_fields=("decision_validated_at",))
         return HttpResponseRedirect(back_url)
-    context["stats"] = (
-        EmployeeContract.objects.filter(employee__assessment=assessment)
-        .filter(allowance_requested=True)
-        .aggregate(
-            allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
-            allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
-            refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
-            potential_allowance_amount=Sum(
-                Case(
-                    When(allowance_granted=True, then="employee__allowance_amount"),
-                    default=0,
-                    output_field=models.IntegerField(),
-                )
-            ),
+    if not request.htmx:
+        context["stats"] = (
+            EmployeeContract.objects.filter(employee__assessment=assessment)
+            .filter(allowance_requested=True)
+            .aggregate(
+                allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
+                allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
+                refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
+                potential_allowance_amount=Sum(
+                    Case(
+                        When(allowance_granted=True, then="employee__allowance_amount"),
+                        default=0,
+                        output_field=models.IntegerField(),
+                    )
+                ),
+            )
         )
-    )
+
     return render(request, template_name, context)
