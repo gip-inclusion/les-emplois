@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load static %}
 
 {% block title %}GPS - Ajouter un bénéficiaire {{ block.super }}{% endblock %}
@@ -8,7 +9,13 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block title_content %}<h1>Ajouter un bénéficiaire</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Ajouter un bénéficiaire</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

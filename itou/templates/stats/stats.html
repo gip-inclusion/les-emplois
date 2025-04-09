@@ -1,23 +1,30 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
 
 {% block title %}Statistiques et pilotage {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>{{ page_title }}</h1>
-    {% if show_siae_evaluation_message %}
-        <p>
-            Le tableau ci-dessous comprend 100 % des auto-prescriptions réalisées en année N-1. Vous pouvez affiner les données en utilisant les filtres disponibles.
-        </p>
-    {% endif %}
-    {% if is_stats_public %}
-        <p>
-            Cette page a pour objectif de présenter l'impact des emplois de l'inclusion. Pour retrouver les indicateurs qui étaient présentés ici, merci de vous rendre sur le
-            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" class="has-external-link" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">
-                pilotage de l'inclusion
-            </a>
-        </p>
-    {% endif %}
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>{{ page_title }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            {% if show_siae_evaluation_message %}
+                <p>
+                    Le tableau ci-dessous comprend 100 % des auto-prescriptions réalisées en année N-1. Vous pouvez affiner les données en utilisant les filtres disponibles.
+                </p>
+            {% endif %}
+            {% if is_stats_public %}
+                <p>
+                    Cette page a pour objectif de présenter l'impact des emplois de l'inclusion. Pour retrouver les indicateurs qui étaient présentés ici, merci de vous rendre sur le
+                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" class="has-external-link" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">
+                        pilotage de l'inclusion
+                    </a>
+                </p>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_messages %}

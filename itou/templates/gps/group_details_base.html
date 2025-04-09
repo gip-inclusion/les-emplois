@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
 {% load str_filters %}
 
@@ -11,26 +12,26 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="c-title">
-        <div class="c-title__main">
-            <div class="d-flex flex-row gap-3 align-items-center mb-3">
-                <h1 class="m-0">{{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }}</h1>
-                {% if can_print_page %}
-                    <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
-                        <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
-                    </button>
-                {% endif %}
-            </div>
-        </div>
-        {% if not can_view_personal_information %}
-            <div class="c-title__cta" role="group" aria-label="Actions sur les groupes de suivi">
-                <button class="btn btn-lg btn-secondary btn-ico" data-bs-toggle="modal" data-bs-target="#ask_access_modal">
-                    <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
-                    <span>Demander l’accès complet à la fiche</span>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>{{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if can_print_page %}
+                <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+                    <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
                 </button>
-            </div>
-        {% endif %}
-    </div>
+            {% endif %}
+            {% if not can_view_personal_information %}
+                <div class="c-title__cta" role="group" aria-label="Actions sur les groupes de suivi">
+                    <button class="btn btn-lg btn-secondary btn-ico" data-bs-toggle="modal" data-bs-target="#ask_access_modal">
+                        <i class="ri-user-unfollow-line fw-medium" aria-hidden="true"></i>
+                        <span>Demander l’accès complet à la fiche</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_extra %}

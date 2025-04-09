@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
@@ -7,20 +8,22 @@
 
 {% block title %}GPS - Mes bénéficiaires {{ block.super }}{% endblock %}
 
-
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 mb-md-3 justify-content-md-between align-items-md-center">
-        <div>
-            <h1 class="m-0">GPS</h1>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur les groupes de suivi" %}
+        {% fragment as c_title__main %}
+            <h1>GPS</h1>
             <p>Guide de partage et de suivi</p>
-        </div>
-        <div class="d-flex flex-column flex-md-row gap-md-3" role="group" aria-label="Actions sur les groupes de suivi">
-            <a href="{% url 'gps:join_group' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary mt-3 mt-md-0">
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <a href="{% url 'gps:join_group' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary">
                 <i class="ri-user-add-line" aria-hidden="true"></i>
                 <span>Ajouter un bénéficiaire</span>
             </a>
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
         <li class="nav-item">
             <a class="nav-link{% if active_memberships %} active{% endif %}" href="{% url 'gps:group_list' %}">En cours d’accompagnement</a>
@@ -30,7 +33,6 @@
         </li>
     </ul>
 {% endblock %}
-
 
 {% block content %}
     <section class="s-section" id="gps-my-groups">
