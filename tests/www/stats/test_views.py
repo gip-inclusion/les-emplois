@@ -500,16 +500,7 @@ def test_stats_ph_state_main_for_prescriber_without_organization(client):
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
-@pytest.mark.parametrize(
-    "organization_kind",
-    stats_utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
-    + [
-        PrescriberOrganizationKind.CHRS,
-        PrescriberOrganizationKind.CHU,
-        PrescriberOrganizationKind.OIL,
-        PrescriberOrganizationKind.RS_FJT,
-    ],  # Partial access by region (configured in can_view_stats_ph utility)
-)
+@pytest.mark.parametrize("organization_kind", stats_utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
 def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
     organization = PrescriberOrganizationWithMembershipFactory(
         kind=organization_kind, department="75", authorized=True

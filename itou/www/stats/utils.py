@@ -16,11 +16,11 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 
 
-STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST = [
+STATS_PH_ORGANISATION_KIND_WHITELIST = [
     PrescriberOrganizationKind.CAP_EMPLOI,
-    PrescriberOrganizationKind.ML,
     PrescriberOrganizationKind.CHRS,
     PrescriberOrganizationKind.CHU,
+    PrescriberOrganizationKind.ML,
     PrescriberOrganizationKind.OIL,
     PrescriberOrganizationKind.RS_FJT,
 ]
@@ -100,7 +100,7 @@ def can_view_stats_ph(request):
     return (
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
-        and request.current_organization.kind in STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST
+        and request.current_organization.kind in STATS_PH_ORGANISATION_KIND_WHITELIST
         and request.current_organization.is_authorized
         and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
     )
