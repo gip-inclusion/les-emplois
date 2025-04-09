@@ -45,6 +45,8 @@ class DatumCode(models.TextChoices):
     API_TOTAL_CALLS_SIAES = "API-010", "API siaes : total d'appels reçus"
     API_TOTAL_UV_SIAES = "API-011", "API siaes : total de visiteurs uniques (par adresse IP)"
     API_TOTAL_CALLS_STRUCTURES = "API-012", "API structures : total d'appels reçus"
+    API_TOTAL_CALLS_JOB_APP_SEARCH = "API-013", "API candidatures : total d'appels reçus"
+    API_TOTAL_UT_JOB_APP_SEARCH = "API-014", "API candidatures : total de jetons uniques"
     # Tech metrics
     TECH_SENTRY_APDEX = "SENTRY-001", "Apdex"
     TECH_SENTRY_FAILURE_RATE = "SENTRY-002", "Taux de requêtes en échec"

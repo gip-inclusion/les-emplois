@@ -91,3 +91,14 @@ class DatadogApiClient:
             metric_kind="@usr.id", agregation_kind="cardinality", endpoint=endpoint, start=start, end=end
         )
         return self._get_data_from_datadog(data=data)
+
+    def count_daily_unique_tokens(self, before=None, endpoint=""):
+        start, end = self._format_dates(before=before)
+        data = self.default_data(
+            metric_kind="@token",
+            agregation_kind="cardinality",
+            endpoint=endpoint,
+            start=start,
+            end=end,
+        )
+        return self._get_data_from_datadog(data=data)

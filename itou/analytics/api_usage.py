@@ -21,4 +21,10 @@ def collect_analytics_data(before, client=None):
         models.DatumCode.API_TOTAL_CALLS_SIAES: client.count_daily_logs(before, endpoint="siaes/"),
         models.DatumCode.API_TOTAL_UV_SIAES: client.count_daily_unique_ip_addresses(before, endpoint="siaes/"),
         models.DatumCode.API_TOTAL_CALLS_STRUCTURES: client.count_daily_logs(before, endpoint="structures/"),
+        models.DatumCode.API_TOTAL_UT_JOB_APP_SEARCH: client.count_daily_unique_tokens(
+            before, endpoint="candidatures/recherche/"
+        ),
+        models.DatumCode.API_TOTAL_CALLS_JOB_APP_SEARCH: client.count_daily_logs(
+            before, endpoint="candidatures/recherche/"
+        ),
     }
