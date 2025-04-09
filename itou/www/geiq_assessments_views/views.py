@@ -5,7 +5,7 @@ import uuid
 
 from django.core.files.storage import default_storage
 from django.db import models
-from django.db.models import Case, Count, Prefetch, Q, Sum, When
+from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -159,6 +159,10 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
         assessment.submitted_at = timezone.now()
         assessment.submitted_by = request.user
         assessment.save(update_fields=("submitted_at", "submitted_by"))
+        # Preselect all contracts for institution validation
+        EmployeeContract.objects.filter(employee__assessment=assessment).update(
+            allowance_granted=F("allowance_requested")
+        )
         return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
 
     context = {
