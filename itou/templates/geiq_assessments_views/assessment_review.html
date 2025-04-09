@@ -1,0 +1,111 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+
+{% block title %}Saisir la décision - Bilan d’exécution GEIQ - {{ block.super }}{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Saisir la décision
+                {% if assessment.decision_validated_at %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <div class="c-box mb-3">
+                        <h3 class="mb-3">Récapitulatif</h3>
+                        <div class="d-flex flex-column gap-3 mb-3">
+                            <div class="d-flex flex-row justify-content-between">
+                                <span>Nombre d’aide à 814 €</span>
+                                <strong>{{ stats.allowance_of_814_nb }}</strong>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between">
+                                <span>Nombre d’aide à 1 400 €</span>
+                                <strong>{{ stats.allowance_of_1400_nb }}</strong>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between">
+                                <span>Nombre d’aides refusées</span>
+                                <strong>{{ stats.refused_allowance_nb }}</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex flex-row justify-content-between">
+                                <span>Nombre potentiel de l’aide à l’accompagnement</span>
+                                <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                            </div>
+                        </div>
+                        <div class="c-info">
+                            <span class="c-info__summary">Ces données ont été calculées suite à la sélection que vous avez effectuée</span>
+                        </div>
+                    </div>
+                    <form method="post" class="js-prevent-multiple-submit">
+                        {% csrf_token %}
+                        <div class="c-box mb-3">
+                            <h3 class="mb-3">Conventionnement</h3>
+                            <div class="d-flex flex-column gap-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between">
+                                    <span>Montant conventionné (convention initiale + avenant)</span>
+                                    <strong>[input]</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="c-box mb-3">
+                            <h3 class="mb-3">Décision</h3>
+                            <div class="d-flex flex-column gap-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between">
+                                    <span>Montant total accordé</span>
+                                    <strong>[input]</strong>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <span>Premier versement déjà réalisé</span>
+                                    <strong>[input]</strong>
+                                </div>
+                                <hr>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <span>Deuxième versement à prévoir</span>
+                                    <strong>[computed]</strong>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between">
+                                    <span>Remboursement attendu</span>
+                                    <strong>[computed]</strong>
+                                </div>
+                            </div>
+                            Commentaire
+                            <div class="c-info">
+                                <span class="c-info__summary">Si vous validez cette décision, le GEIQ sera notifié par mail avec les détails renseignés.</span>
+                            </div>
+                        </div>
+                        {% itou_buttons_form primary_label="Valider la décision" reset_url=back_url %}
+                    </form>
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h4>
+                            Structures concernées par la convention
+                        </h5>
+                        <ul>
+                            {% for antenna in assessment.label_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
