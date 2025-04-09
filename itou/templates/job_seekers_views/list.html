@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load matomo %}
@@ -13,9 +14,11 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-        <h1 class="m-0">Candidats</h1>
-        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidats">
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur les candidatures" %}
+        {% fragment as c_title__main %}
+            <h1>Candidats</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             {% url "job_seekers_views:get_or_create_start" as get_or_create_url %}
             <a href="{% url_add_query get_or_create_url tunnel='standalone' from_url=request.path|urlencode %}"
                {% matomo_event "compte-candidat" "clic" "creer-un-compte-candidat" %}
@@ -27,8 +30,8 @@
                 <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                 <span>Postuler pour un candidat</span>
             </a>
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_messages %}

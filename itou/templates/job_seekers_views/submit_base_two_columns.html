@@ -1,10 +1,15 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

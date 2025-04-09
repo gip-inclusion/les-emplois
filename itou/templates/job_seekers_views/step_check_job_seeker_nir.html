@@ -1,5 +1,6 @@
 {% extends "job_seekers_views/submit_base_two_columns.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load matomo %}
@@ -7,30 +8,36 @@
 {% load str_filters %}
 
 {% block title_content %}
-    {{ block.super }}
-    {% if auto_prescription_process or hire_process %}
-        {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
-            <p>
-                {% if hire_process %}
-                    Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.
-                    {% if siae.kind == CompanyKind.GEIQ %}
-                        Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
-                        sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
-                    {% else %}
-                        Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
-                    {% endif %}
-                {% else %}
-                    {% if siae.kind == CompanyKind.GEIQ %}
-                        Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
-                    {% else %}
-                        Cet espace vous permet d’enregistrer une nouvelle candidature.
-                    {% endif %}
-                    Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            {% if auto_prescription_process or hire_process %}
+                {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
+                    <p>
+                        {% if hire_process %}
+                            Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.
+                            {% if siae.kind == CompanyKind.GEIQ %}
+                                Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
+                                sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
+                            {% else %}
+                                Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
+                            {% endif %}
+                        {% else %}
+                            {% if siae.kind == CompanyKind.GEIQ %}
+                                Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
+                            {% else %}
+                                Cet espace vous permet d’enregistrer une nouvelle candidature.
+                            {% endif %}
+                            Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+                        {% endif %}
+                    </p>
                 {% endif %}
-            </p>
-        {% endif %}
-    {% endif %}
-{% endblock title_content %}
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">

@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load matomo %}
 {% load static %}
@@ -14,16 +15,18 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <h1 class="mb-0">Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
-        {% url 'search:employers_results' as search_url %}
-        {% if can_view_personal_information %}
-            {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
-        {% else %}
-            {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
-        {% endif %}
-        {% if can_edit_iae_eligibility %}
-            <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le candidat">
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur le candidat" %}
+        {% fragment as c_title__main %}
+            <h1>Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% url 'search:employers_results' as search_url %}
+            {% if can_view_personal_information %}
+                {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+            {% else %}
+                {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
+            {% endif %}
+            {% if can_edit_iae_eligibility %}
                 <a href="{% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">
                     <i class="ri-checkbox-circle-line fw-medium" aria-hidden="true"></i>
                     {% if iae_eligibility_diagnosis %}
@@ -36,14 +39,14 @@
                     <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                     <span>Postuler pour ce candidat</span>
                 </a>
-            </div>
-        {% else %}
-            <a href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
-                <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
-                <span>Postuler pour ce candidat</span>
-            </a>
-        {% endif %}
-    </div>
+            {% else %}
+                <a href="{{ url_query }}" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %} class="btn btn-lg btn-primary btn-ico">
+                    <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
+                    <span>Postuler pour ce candidat</span>
+                </a>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block title_extra %}

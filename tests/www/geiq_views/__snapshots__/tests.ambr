@@ -108,16 +108,24 @@
   
   
                               
-      <h1>Mes salariés - 2023</h1>
-      <div class="d-flex align-items-center">
-          <p class="mb-0">Dernière mise à jour: -</p>
-          
-              <form method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn">Mise à jour</button>
-              </form>
-          
-      </div>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Mes salariés - 2023</h1>
+              <div>
+                  <span>Dernière mise à jour: -</span>
+                  
+                      <form class="d-inline-block ms-2" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn-link">Mise à jour</button>
+                      </form>
+                  
+              </div>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -155,11 +163,19 @@
   
   
                               
-      <h1>Données salariés - 2023</h1>
-      <div class="d-flex align-items-center">
-          <p class="mb-0">Dernière mise à jour: -</p>
-          
-      </div>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Données salariés - 2023</h1>
+              <div>
+                  <span>Dernière mise à jour: -</span>
+                  
+              </div>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -788,17 +804,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       
           <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement total</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -943,16 +965,22 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
                   
-                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+                      
+                          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+                      
                   
-              
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -1146,17 +1174,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       
           <span class="badge badge-base rounded-pill text-nowrap bg-success">Bilan validé</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -1299,16 +1333,22 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
                   
-                      <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+                      
+                          <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+                      
                   
-              
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -1502,17 +1542,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       
           <span class="badge badge-base rounded-pill text-nowrap bg-success">Bilan validé : solde partiellement accordé</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -1657,16 +1703,22 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
                   
-                      <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+                      
+                          <span class="badge badge-base rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+                      
                   
-              
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -1860,17 +1912,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       
           <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement partiel</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2015,16 +2073,22 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
                   
-                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+                      
+                          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+                      
                   
-              
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2218,17 +2282,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       
           <span class="badge badge-base rounded-pill text-nowrap bg-warning">Bilan validé : solde refusé</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2371,16 +2441,22 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
                   
-                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+                      
+                          <span class="badge badge-base rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+                      
                   
-              
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2570,15 +2646,21 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2719,14 +2801,20 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
-                  <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+                  
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -2901,15 +2989,21 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
       <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       
@@ -3095,14 +3189,20 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Bilan d’exécution - 2023</h1>
-              
-                  <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
-              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Bilan d’exécution - 2023
+                  
+                      <span class="badge badge-base rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+                  
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
   
                               
       

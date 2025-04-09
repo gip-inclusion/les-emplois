@@ -5299,12 +5299,7 @@ class TestCheckJobSeekerInformationsForHire:
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         response = client.get(url_check_infos)
-        assertContains(
-            response,
-            """<h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
-            Informations personnelles de Son Prénom SON NOM DE FAMILLE</h1>""",
-            html=True,
-        )
+        assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Éligibilité IAE à valider")
         params = {
@@ -5344,12 +5339,7 @@ class TestCheckJobSeekerInformationsForHire:
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         response = client.get(url_check_infos)
-        assertContains(
-            response,
-            """<h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
-            Informations personnelles de Son Prénom SON NOM DE FAMILLE</h1>""",
-            html=True,
-        )
+        assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         params = {
             "job_seeker": job_seeker.public_id,

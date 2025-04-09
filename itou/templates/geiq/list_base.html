@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load static %}
 
@@ -9,16 +10,20 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>{{ request.user.is_employer|yesno:"Mes salariés,Données salariés" }} - {{ assessment.campaign.year }}</h1>
-    <div class="d-flex align-items-center">
-        <p class="mb-0">Dernière mise à jour: {{ assessment.last_synced_at|default:"-" }}</p>
-        {% if not assessment.submitted_at and request.user.is_employer %}
-            <form method="post">
-                {% csrf_token %}
-                <button class="btn">Mise à jour</button>
-            </form>
-        {% endif %}
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>{{ request.user.is_employer|yesno:"Mes salariés,Données salariés" }} - {{ assessment.campaign.year }}</h1>
+            <div>
+                <span>Dernière mise à jour: {{ assessment.last_synced_at|default:"-" }}</span>
+                {% if not assessment.submitted_at and request.user.is_employer %}
+                    <form method="post" class="d-inline-block ms-2">
+                        {% csrf_token %}
+                        <button class="btn-link">Mise à jour</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}Bilan d’exécution - {{ assessment.company.display_name }} {{ block.super }}{% endblock %}
@@ -9,12 +10,14 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">Valider le bilan d’exécution - {{ assessment.campaign.year }}</h1>
-            {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
-        </div>
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Valider le bilan d’exécution - {{ assessment.campaign.year }}
+                {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment ReviewState=ReviewState only %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
