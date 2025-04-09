@@ -115,6 +115,11 @@ class Assessment(models.Model):
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
     # Institution actions
+    review_comment = models.TextField("commentaire accompagnant la décision", blank=True)
+    convention_amount = models.PositiveSmallIntegerField("montant conventionné", default=0)
+    granted_amount = models.PositiveSmallIntegerField("montant total accordé", default=0)
+    advance_amount = models.PositiveSmallIntegerField("montant déjà versé", default=0)
+
     decision_validated_at = models.DateTimeField("décision saisie le", blank=True, null=True)
     grants_selection_validated_at = models.DateTimeField("aides accordées validées le", blank=True, null=True)
     reviewed_at = models.DateTimeField("contrôlé le", blank=True, null=True)

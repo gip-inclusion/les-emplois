@@ -109,3 +109,14 @@ class GeiqCommentForm(forms.ModelForm):
         labels = {
             "geiq_comment": "Renseignez un commentaire",
         }
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Assessment
+        fields = [
+            "review_comment",
+            "convention_amount",
+            "granted_amount",
+            "advance_amount",
+        ]
