@@ -292,15 +292,34 @@ def assessment_contracts_sync(request, pk):
     return render(request, "geiq_assessments_views/includes/contracts_section.html", context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
-    assessments = Assessment.objects.filter(companies=request.current_organization)
+    # TODO: should this part be extracted in a `for_request() queryset method ?
+    if request.user.is_employer:
+        filter_kwargs = {"companies": request.current_organization}
+    elif request.user.is_labor_inspector:
+        filter_kwargs = {"institutions": request.current_organization}
+    else:
+        raise Http404  # This should never happen thanks to check_user
+    assessments = Assessment.objects.filter(**filter_kwargs)
     assessment = get_object_or_404(assessments, pk=pk)
-    back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
-    if request.method == "POST":
-        assessment.contracts_selection_validated_at = timezone.now()
-        assessment.save(update_fields=("contracts_selection_validated_at",))
+
+    back_url, validation_possible = None, False
+    if request.user.is_employer:
+        back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+        validation_possible = not assessment.submitted_at
+    elif request.user.is_labor_inspector:
+        back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+        validation_possible = not assessment.reviewed_at
+    if request.method == "POST" and validation_possible:
+        if request.user.is_employer:
+            assessment.contracts_selection_validated_at = timezone.now()
+            assessment.save(update_fields=("contracts_selection_validated_at",))
+        elif request.user.is_labor_inspector:
+            assessment.grants_selection_validated_at = timezone.now()
+            assessment.save(update_fields=("grants_selection_validated_at",))
         return HttpResponseRedirect(back_url)
+
     contracts_page = pager(
         EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
             "employee__first_name", "employee__last_name"
@@ -312,6 +331,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "assessment": assessment,
         "back_url": back_url,
         "contracts_page": contracts_page,
+        "validation_possible": validation_possible,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
     }
     return render(request, template_name, context)
@@ -435,29 +455,6 @@ def details_for_institution(
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
-def contracts_list_for_institution(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
-    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
-        raise Http404
-    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
-    assessment = get_object_or_404(assessments, pk=pk)
-    contracts_page = pager(
-        EmployeeContract.objects.filter(employee__assessment=assessment).order_by(
-            "employee__first_name", "employee__last_name"
-        ),
-        request.GET.get("page"),
-        items_per_page=10,
-    )
-    context = {
-        "assessment": assessment,
-        "back_url": reverse("geiq_assessments_views:list_for_institution"),
-        "contracts_page": contracts_page,
-    }
-    return render(request, template_name, context)
-
-
-# contracts_list_for_institution
 # review_assessment
 # contracts_include_for_institution
 # contracts_exclude_for_institution
-# contracts_details_for_institution
