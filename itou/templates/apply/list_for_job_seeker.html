@@ -1,11 +1,18 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 {% load str_filters %}
 
 {% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Candidatures envoyées</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Candidatures envoyées</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}

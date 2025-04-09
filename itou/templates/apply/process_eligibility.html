@@ -1,5 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load badges %}
+{% load components %}
 {% load str_filters %}
 
 {% block title %}
@@ -8,12 +9,14 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-md-flex align-items-center">
-        <h1 class="mb-1 mb-md-0 me-3">
-            Accepter la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-        </h1>
-        {% job_application_state_badge job_application extra_class="badge-base" %}
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Accepter la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                {% job_application_state_badge job_application extra_class="badge-base" %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content_extend %}
