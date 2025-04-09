@@ -68,7 +68,11 @@
                                         <td>{{ contract.with_3_months_in_assessment_year|yesno:"Oui,Non" }}</td>
                                         <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
-                                            {% include "geiq_assessments_views/includes/contracts_switch.html" with assessment=assessment contract=contract csrf_token=csrf_token from_list=True only %}
+                                            {% if request.user.is_employer %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True readonly_access=readonly_access only %}
+                                            {% elif request.user.is_labor_inspector %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True readonly_access=readonly_access only %}
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -77,7 +81,7 @@
                     </div
                     {% include "includes/pagination.html" with page=contracts_page boost=True %}
 
-                    {% if validation_possible %}
+                    {% if not readonly_access %}
 
                         <form method="POST" class="js-prevent-multiple-submit">
                             {% csrf_token %}

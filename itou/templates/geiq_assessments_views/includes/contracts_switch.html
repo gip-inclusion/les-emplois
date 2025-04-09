@@ -1,4 +1,4 @@
-{% if contract.allowance_requested %}
+{% if value %}
     {% url "geiq_assessments_views:assessment_contracts_exclude" contract_pk=contract.pk as post_url %}
 {% else %}
     {% url "geiq_assessments_views:assessment_contracts_include" contract_pk=contract.pk as post_url %}
@@ -12,12 +12,7 @@
       class="js-prevent-multiple-submit">
     {% csrf_token %}
     <div class="form-check form-switch">
-        <input type="checkbox"
-               class="form-check-input"
-               name="allowance"
-               id="allowance_for_contract_{{ contract.pk }}"
-               {% if contract.allowance_requested %}checked{% endif %}
-               {% if assessment.submitted_at %}disabled{% endif %} />
+        <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if readonly_access %}disabled{% endif %} />
         <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_for_contract_{{ contract.pk }}">
             {% if request.user.is_employer %}
                 Obtenir l’aide
@@ -28,5 +23,5 @@
     </div>
 </form>
 {% if from_list and request.htmx %}
-    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=assessment hx_swap_oob=True only %}
+    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with assessment=contract.employee.assessment hx_swap_oob=True only %}
 {% endif %}

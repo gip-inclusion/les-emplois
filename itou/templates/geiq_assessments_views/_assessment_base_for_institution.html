@@ -14,7 +14,7 @@
             <a class="nav-link{% if active_tab == active_tab.FILE %} active{% endif %}" href="{% url 'geiq_assessments_views:details_for_institution' pk=assessment.pk %}">{{ active_tab.FILE.label }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link{% if active_tab == active_tab.CONTRACTS %} active{% endif %}" href="{% url 'geiq_assessments_views:contracts_list' pk=assessment.pk %}">{{ active_tab.CONTRACTS.label }}</a>
+            <a class="nav-link{% if active_tab == active_tab.CONTRACTS %} active{% endif %}" href="{% url 'geiq_assessments_views:assessment_contracts_list' pk=assessment.pk %}">{{ active_tab.CONTRACTS.label }}</a>
         </li>
     </ul>
 {% endblock %}
