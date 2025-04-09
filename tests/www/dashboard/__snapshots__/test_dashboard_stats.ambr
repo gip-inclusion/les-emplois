@@ -549,6 +549,81 @@
                           </div>
   '''
 # ---
+# name: test_index_stats_for_authorized_prescriber[PLIE]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+                              <h2>Statistiques</h2>
+                              <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                  <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
+                              </div>
+                              
+                                  
+  
+  <section class="s-section mb-3 mb-lg-5">
+      <div class="s-section__container">
+          <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+              <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                  <h3>Mes données</h3>
+                  <div class="c-box p-0 flex-grow-1">
+                      <div class="p-3 p-lg-4">
+                          <h4 class="mb-0">Recrutement</h4>
+                      </div>
+                      <div class="px-3 px-lg-4">
+                          <ul class="list-unstyled mb-lg-5">
+                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                  <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal"></i>
+                                      <span>Analyse des candidatures émises et de leur traitement</span>
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+              
+  
+  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+      <h3>Données nationales publiques</h3>
+      <div class="c-box p-0 flex-grow-1">
+          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal"></i>
+                          <span>Profil des employeurs</span>
+                      </a>
+                  </li>
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal"></i>
+                          <span>Profil des prescripteurs</span>
+                      </a>
+                  </li>
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal"></i>
+                          <span>Bilan territorial des orientations</span>
+                      </a>
+                  </li>
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal"></i>
+                          <span>Cartographie des postes difficiles à pourvoir</span>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  
+          </div>
+      </div>
+  </section>
+  
+                              
+                          </div>
+  '''
+# ---
 # name: test_index_stats_for_authorized_prescriber[RS_FJT]
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
