@@ -24,6 +24,7 @@ def _mocked_client(mocker, now):
         "count_daily_unique_ip_addresses": {"siaes/": 11},
         "count_daily_unique_tokens": {
             "candidatures/recherche/": 13,
+            "embauches-geiq/": 6,
         },
     }
 
@@ -128,6 +129,13 @@ def _mocked_client(mocker, now):
         call_args=[now],
         call_kwargs={"endpoint": "candidatures/recherche/"},
         side_effect=side_effect_count_daily_logs,
+    )
+    mocker.patch.object(
+        client,
+        "count_daily_unique_tokens",
+        call_args=[now],
+        call_kwargs={"endpoint": "embauches-geiq/"},
+        side_effect=side_effect_count_daily_ut,
     )
     return client
 
