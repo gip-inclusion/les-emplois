@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load geiq_assessments_badges %}
 {% load static %}
 {% load str_filters %}
 
@@ -38,7 +39,7 @@
                                                 <a class="btn btn-link" href="{% url "geiq_assessments_views:details" pk=assessment.pk %}">{{ assessment.name_for_geiq }}</a>
                                             </td>
                                             <td>{{ assessment.submitted_at|date:"d/m/Y"|default:"-" }}</td>
-                                            <td>{{ assessment }}</td>
+                                            <td>{% state_for_geiq assessment %}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
