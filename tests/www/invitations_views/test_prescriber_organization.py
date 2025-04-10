@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
 from django.utils.html import escape
+from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -59,9 +60,23 @@ class TestSendPrescriberWithOrgInvitation:
         response = client.get(INVITATION_URL)
         assert_previous_step(response, reverse("prescribers_views:members"))
 
+    @freeze_time("2025-04-10")
     def test_invite_not_existing_user(self, client):
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
         assertRedirects(response, INVITATION_URL)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        "Collaborateur ajouté||Pour rejoindre votre organisation, il suffira à votre collaborateur "
+                        "de cliquer sur le lien d'activation contenu dans l'e-mail avant le 24 avril 2025."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
         self.assert_created_invitation()
 
     def test_invite_not_existing_user_with_prefill(self, client):
