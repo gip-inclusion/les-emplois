@@ -6,21 +6,31 @@
         </p>
     </div>
 {% elif not assessment.reviewed_at %}
-    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
         <h4>Bilan d’exécution à contrôler</h4>
         <p>
             Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour contrôler les informations de ce bilan d’exécution.
         </p>
-        <p class="mb-0">Actions restantes :</p>
-        <ul>
-            {% for action in assessment.missing_actions_to_review %}
-                <li>
-                    <strong>{{ action }}</strong>
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="button" class="btn btn-primary btn-block" disabled>
-            <span>Contrôler le dossier</span>
-        </button>
+        {% if assessment.missing_actions_to_review %}
+            <p class="mb-0">Actions restantes :</p>
+            <ul>
+                {% for action in assessment.missing_actions_to_review %}
+                    <li>
+                        <strong>{{ action }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn btn-primary btn-block" disabled>
+                <span>Contrôler le dossier</span>
+            </button>
+        {% else %}
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ico btn-primary btn-block">
+                    <i aria-hidden="true" class="ri-check-line"></i>
+                    <span>Valider le contrôle</span>
+                </button>
+            </form>
+        {% endif %}
     </div>
 {% endif %}
