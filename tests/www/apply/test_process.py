@@ -68,7 +68,12 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import KNOWN_SESSION_KEYS, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import (
+    assert_previous_step,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    session_data_without_known_keys,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -909,7 +914,7 @@ class TestProcessViews:
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         assert client.session[refuse_session_name] == {
             "config": {
                 "session_kind": "job-applications-batch-refuse",
@@ -946,7 +951,7 @@ class TestProcessViews:
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application_2.pk})
         response = client.get(url)
         [refuse_session_name_2] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and k != refuse_session_name
+            k for k in session_data_without_known_keys(client.session) if k != refuse_session_name
         ]
         refusal_reason_url_2 = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name_2, "step": "reason"}
@@ -982,7 +987,7 @@ class TestProcessViews:
         client.force_login(employer)
 
         response = client.get(reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}), follow=True)
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1044,7 +1049,7 @@ class TestProcessViews:
 
         refusal_reason_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(refusal_reason_url, follow=True)
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1097,7 +1102,7 @@ class TestProcessViews:
 
         response = client.get(reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}))
 
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1246,7 +1251,7 @@ class TestProcessViews:
 
         refusal_reason_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(refusal_reason_url, follow=True)
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -3378,7 +3383,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
 
     url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
-    [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+    [refuse_session_name] = session_data_without_known_keys(client.session)
     assert client.session[refuse_session_name] == {
         "config": {
             "session_kind": "job-applications-batch-refuse",
