@@ -557,7 +557,7 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
         "back_url": back_url,
         "balance_amount": balance_amount,
     }
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and form.is_valid() and not assessment.reviewed_at:
         form.save()
         assessment.decision_validated_at = timezone.now()
         assessment.save(update_fields=("decision_validated_at",))
