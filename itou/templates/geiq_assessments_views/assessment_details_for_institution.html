@@ -77,9 +77,11 @@
                                     <strong>{{ stats.potential_aid_amount|format_int_euros }}</strong>
                                 </div>
                             </div>
-                            <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
-                                <span>Contrôler la sélection</span>
-                            </a>
+                            {% if not assessment.reviewed_at %}
+                                <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
+                                    <span>Contrôler la sélection</span>
+                                </a>
+                            {% endif %}
                         </div>
                         <div class="c-box">
                             <div class="d-flex justify-content-between flex-row mb-3">
@@ -112,9 +114,11 @@
                                     </strong>
                                 </div>
                             </div>
-                            <a href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}" class="btn btn-primary">
-                                <span>Saisir la décision</span>
-                            </a>
+                            {% if not assessment.reviewed_at %}
+                                <a href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}" class="btn btn-primary">
+                                    <span>Saisir la décision</span>
+                                </a>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
