@@ -44,7 +44,6 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views import constants as apply_view_constants
-from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import (
@@ -1160,7 +1159,6 @@ class TestApplyAsAuthorizedPrescriber:
             "config": {
                 "tunnel": "sender",
                 "from_url": params["from_url"],
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {
@@ -1481,7 +1479,6 @@ class TestApplyAsAuthorizedPrescriber:
             "config": {
                 "tunnel": "sender",
                 "from_url": reset_url_company,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "user": {
@@ -1758,8 +1755,8 @@ class TestApplyAsAuthorizedPrescriber:
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         prescriber = prescriber_organization.members.get()
         client.force_login(prescriber)
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init({"selected_jobs": []})
+        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
+        apply_session.init("apply_session", {"selected_jobs": []})
         apply_session.save()
         response = client.get(
             reverse(
@@ -1920,7 +1917,6 @@ class TestApplyAsPrescriber:
             "config": {
                 "tunnel": "sender",
                 "from_url": reset_url_company,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
@@ -2306,7 +2302,6 @@ class TestApplyAsPrescriberNirExceptions:
             "config": {
                 "tunnel": "sender",
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {
@@ -2398,7 +2393,6 @@ class TestApplyAsPrescriberNirExceptions:
             "config": {
                 "tunnel": "sender",
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": siae.pk}),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": siae.pk},
             "profile": {
@@ -2529,7 +2523,7 @@ class TestApplyAsCompany:
             kwargs={"session_uuid": job_seeker_session_name},
         )
         expected_job_seeker_session = {
-            "config": {"tunnel": "sender", "from_url": reset_url, "session_kind": JobSeekerSessionKinds.GET_OR_CREATE},
+            "config": {"tunnel": "sender", "from_url": reset_url},
             "apply": {"company_pk": company.pk},
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -3016,7 +3010,6 @@ class TestDirectHireFullProcess:
             "config": {
                 "tunnel": "hire",
                 "from_url": reset_url_dashboard,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": company.pk},
             "profile": {
@@ -3481,8 +3474,8 @@ class TestApplicationView:
         return f"job_application-{company.pk}"
 
     def setup_session(self, session, company, data):
-        apply_session = SessionNamespace(session, self.apply_session_key(company))
-        apply_session.init(data)
+        apply_session = SessionNamespace(session, "apply_session", self.apply_session_key(company))
+        apply_session.init("apply_session", data)
         apply_session.save()
 
     def test_application_jobs_use_previously_selected_jobs(self, client):
@@ -3806,12 +3799,8 @@ class TestLastCheckedAtView:
 
     def _check_last_checked_at(self, client, user, sees_warning, sees_verify_link):
         client.force_login(user)
-        apply_session = SessionNamespace(client.session, f"job_application-{self.company.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": [],
-            }
-        )
+        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{self.company.pk}")
+        apply_session.init("apply_session", {"selected_jobs": []})
         apply_session.save()
 
         url = reverse(
@@ -3875,7 +3864,7 @@ class UpdateJobSeekerTestMixin:
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         self.config = {
-            "config": {"from_url": from_url, "session_kind": JobSeekerSessionKinds.UPDATE},
+            "config": {"from_url": from_url},
             "job_seeker_pk": self.job_seeker.pk,
         }
 
@@ -4480,12 +4469,8 @@ class TestUpdateJobSeekerStep3View:
         job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
 
         client.force_login(company.members.first())
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": [],
-            }
-        )
+        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
+        apply_session.init("apply_session", {"selected_jobs": []})
         apply_session.save()
 
         # START to setup jobseeker session
@@ -4568,7 +4553,6 @@ def test_detect_existing_job_seeker(client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "sender",
-            "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
         },
         "apply": {"company_pk": company.pk},
@@ -4681,12 +4665,10 @@ class TestApplicationGEIQEligibilityView:
         self.company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
 
     def _setup_session(self, client, company_pk=None):
-        apply_session = SessionNamespace(client.session, f"job_application-{company_pk or self.geiq.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": self.geiq.job_description_through.all(),
-            }
+        apply_session = SessionNamespace(
+            client.session, "apply_session", f"job_application-{company_pk or self.geiq.pk}"
         )
+        apply_session.init("apply_session", {"selected_jobs": self.geiq.job_description_through.all()})
         apply_session.save()
 
     def test_bypass_geiq_eligibility_diagnosis_form_for_orienter(self, client):
@@ -4992,9 +4974,10 @@ class TestCheckPreviousApplicationsView:
 
     def _login_and_setup_session(self, client, user):
         client.force_login(user)
-        apply_session = SessionNamespace(client.session, f"job_application-{self.company.pk}")
+        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{self.company.pk}")
         apply_session.init(
-            {"selected_jobs": [], "reset_url": reverse("companies_views:card", kwargs={"siae_id": self.company.pk})}
+            "apply_session",
+            {"selected_jobs": [], "reset_url": reverse("companies_views:card", kwargs={"siae_id": self.company.pk})},
         )
         apply_session.save()
 
@@ -5261,7 +5244,6 @@ class TestFindJobSeekerForHireView:
             "config": {
                 "tunnel": "hire",
                 "from_url": reverse("dashboard:index"),  # Hire: reset_url = dashboard
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "apply": {"company_pk": self.company.pk},
             "user": {

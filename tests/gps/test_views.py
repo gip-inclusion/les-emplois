@@ -19,7 +19,6 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 from itou.www.gps.enums import EndReason
-from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
@@ -1200,7 +1199,6 @@ class TestJoinGroupFromNir:
             "config": {
                 "tunnel": "gps",
                 "from_url": reverse("gps:join_group_from_nir"),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -1250,7 +1248,6 @@ class TestJoinGroupFromNir:
             "config": {
                 "tunnel": "gps",
                 "from_url": reverse("gps:join_group_from_nir"),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {
                 "nir": nir,
@@ -1310,7 +1307,6 @@ class TestJoinGroupFromNir:
             "config": {
                 "tunnel": "gps",
                 "from_url": reverse("gps:join_group_from_nir"),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {
                 "nir": nir,
@@ -1369,7 +1365,6 @@ class TestJoinGroupFromNir:
             "config": {
                 "tunnel": "gps",
                 "from_url": reverse("gps:join_group_from_nir"),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {
                 "nir": dummy_job_seeker.jobseeker_profile.nir,
@@ -1572,7 +1567,6 @@ class TestJoinGroupFromNameAndEmail:
             "config": {
                 "tunnel": "gps",
                 "from_url": reverse("gps:join_group_from_name_and_email"),
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "user": {
                 "email": dummy_job_seeker.email,
