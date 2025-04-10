@@ -3,6 +3,7 @@
 {% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load str_filters %}
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
@@ -54,7 +55,9 @@
                     {% if prescriber_orgs_with_members_same_siret %}
                         <div class="mt-3 mt-md-4">
                             <h3 class="h2">Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
-                            <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+                            <p>
+                                Par mesure de sécurité, seuls les membres déjà inscrits dans {{ prescriber_orgs_with_members_same_siret|pluralizefr:"cette organisation,ces organisations" }} peuvent ajouter de nouveaux collaborateurs
+                            </p>
                             {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
                                 {% include "signup/includes/prescriber_card.html" %}
                             {% endfor %}
@@ -65,7 +68,9 @@
                         <div class="mt-3 mt-md-4">
                             {% if not prescriber_orgs_with_members_same_siret %}
                                 <h3 class="h2">Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
-                                <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+                                <p>
+                                    Par mesure de sécurité, seuls les membres déjà inscrits dans {{ prescriber_orgs_with_members_same_siren|pluralizefr:"cette organisation,ces organisations" }} peuvent ajouter de nouveaux collaborateurs
+                                </p>
                             {% else %}
                                 <h3 class="h2">Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
                             {% endif %}

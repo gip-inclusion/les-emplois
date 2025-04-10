@@ -191,7 +191,7 @@ class TestSendMultipleCompanyInvitation:
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
         assertContains(
             response,
-            escape("Les invitations doivent avoir des adresses e-mail différentes."),
+            escape("Les collaborateurs doivent avoir des adresses e-mail différentes."),
         )
         invitations = EmployerInvitation.objects.count()
         assert invitations == 0

@@ -35,7 +35,7 @@ class TestAcceptInvitation:
         assertContains(
             response, escape(f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
         )
-        assertNotContains(response, escape("Cette invitation n'est plus valide."))
+        assertNotContains(response, escape("Ce lien n'est plus valide."))
 
         # Assert the user sees his new siae dashboard
         current_company = get_current_company_or_404(response.wsgi_request)
@@ -294,13 +294,13 @@ class TestAcceptInvitation:
 
         # User wants to join our website but it's too late!
         response = client.get(invitation.acceptance_link, follow=True)
-        assertContains(response, "expirée")
+        assertContains(response, escape("Lien d'activation expiré"), html=True)
 
         user = EmployerFactory(email=invitation.email)
         client.force_login(user)
         join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
         response = client.get(join_url, follow=True)
-        assertContains(response, escape("Cette invitation n'est plus valide."))
+        assertContains(response, escape("Ce lien n'est plus valide"))
 
     def test_inactive_siae(self, client):
         company = CompanyFactory(convention__is_active=False, with_membership=True)
@@ -321,7 +321,7 @@ class TestAcceptInvitation:
     def test_accepted_invitation(self, client):
         invitation = EmployerInvitationFactory(accepted=True)
         response = client.get(invitation.acceptance_link, follow=True)
-        assertContains(response, escape("Invitation acceptée"))
+        assertContains(response, escape("Lien d'activation déjà accepté"), html=True)
 
     def test_accept_existing_user_already_member_of_inactive_siae(self, client, mailoutbox):
         """

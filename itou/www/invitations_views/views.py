@@ -69,7 +69,7 @@ def handle_invited_user_registration_with_pro_connect(request, invitation, invit
 @login_not_required
 def new_user(request, invitation_type, invitation_id):
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
-        messages.error(request, "Cette invitation n'est plus valide.")
+        messages.error(request, "Ce lien n'est plus valide.")
         return redirect(reverse("search:employers_home"))
     invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
@@ -88,7 +88,7 @@ def new_user(request, invitation_type, invitation_id):
             return redirect("account_logout")
 
     if not invitation.can_be_accepted:
-        messages.error(request, "Cette invitation n'est plus valide.")
+        messages.error(request, "Ce lien n'est plus valide.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
     if invitation_type == KIND_EMPLOYER and not invitation.company.is_active:

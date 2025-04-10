@@ -22,13 +22,13 @@
                 {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
                 {# For security, display only the first char of the last name. #}
                 <i>
-                    Demandez une invitation à
-                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1|upper }}.
-                    pour rejoindre cette organisation.
+                    Si vous souhaitez rejoindre cette organisation, demandez à
+                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1|upper }}
+                    de vous ajouter en tant que collaborateur.
                 </i>
                 <br>
                 <a href="{% url 'signup:prescriber_request_invitation' membership.id %}" class="btn btn-secondary mt-2">
-                    Demander une invitation
+                    Demander à rejoindre cette organisation
                 </a>
             {% endwith %}
         {% else %}
