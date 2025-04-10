@@ -2,6 +2,7 @@
 {% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load geiq_assessments_badges %}
 {% load static %}
 {% load str_filters %}
 
@@ -29,6 +30,7 @@
                                     <tr>
                                         <th scope="col">Nom</th>
                                         <th scope="col">Campagne</th>
+                                        <th scope="col">Statut du bilan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,6 +40,7 @@
                                                 <a class="btn btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">{{ assessment.name_for_institution }}</a>
                                             </td>
                                             <td>{{ assessment.campaign.year }}</td>
+                                            <td>{% state_for_institution assessment %}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
