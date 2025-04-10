@@ -1,19 +1,20 @@
+{% load components %}
 {% load format_filters %}
 {% load matomo %}
 {% load url_add_query %}
 
-<div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-    <div>
+{% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+    {% fragment as c_title__main %}
         {% if not request.organizations %}
-            {% if user.get_full_name %}<h1 class="mb-0">{{ user.get_full_name }}</h1>{% endif %}
+            {% if user.get_full_name %}<h1>{{ user.get_full_name }}</h1>{% endif %}
             {% if user.is_prescriber %}
-                <p class="mb-0">Orienteur seul</p>
+                <p>Orienteur seul</p>
             {% elif user.is_job_seeker %}
-                <p class="mb-0">Candidat</p>
+                <p>Candidat</p>
             {% endif %}
         {% else %}
-            <h1 class="mb-0">{{ request.current_organization.display_name }}</h1>
-            <p class="mb-0">
+            <h1>{{ request.current_organization.display_name }}</h1>
+            <p>
                 {% if user.is_prescriber %}
                     {% if request.current_organization.code_safir_pole_emploi %}
                         {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
@@ -31,16 +32,16 @@
                 {% endif %}
             </p>
         {% endif %}
-    </div>
-    {% if user.is_employer %}
-        {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
-            {% comment %}
-            NOTE(vperron):
-            We currently do not allow OPCS users to apply for an offer.
-            We will have to discuss this matter further with AVE, but it has been
-            decided that it probably did not make much sense initially.
-            {% endcomment %}
-            <div>
+    {% endfragment %}
+    {% fragment as c_title__cta %}
+        {% if user.is_employer %}
+            {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
+                {% comment %}
+                NOTE(vperron):
+                We currently do not allow OPCS users to apply for an offer.
+                We will have to discuss this matter further with AVE, but it has been
+                decided that it probably did not make much sense initially.
+                {% endcomment %}
                 {% if siae_suspension_text_with_dates %}
                     <button type="button"
                             class="btn btn-lg btn-primary btn-ico disabled"
@@ -58,7 +59,7 @@
                         <span>Déclarer une embauche</span>
                     </a>
                 {% endif %}
-            </div>
+            {% endif %}
         {% endif %}
-    {% endif %}
-</div>
+    {% endfragment %}
+{% endcomponent_title %}

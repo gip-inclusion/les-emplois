@@ -1,11 +1,18 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Salariés</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Salariés</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block title_extra %}
     {% if request.current_organization.can_use_employee_record %}

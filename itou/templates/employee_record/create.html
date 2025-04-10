@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load list_filters %}
@@ -8,7 +9,13 @@
     Nouvelle fiche salarié ASP - étape {{ step }} - {{ request.current_organization.display_name }} {{ block.super }}
 {% endblock %}
 
-{% block title_content %}<h1>Fiches salarié ASP : {{ job_application.job_seeker.get_full_name }}</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Fiches salarié ASP : {{ job_application.job_seeker.get_full_name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

@@ -14,7 +14,9 @@
                     </div>
                 </div>
             </div>
-            <div>{% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}</div>
+            <div>
+                {% include 'employee_record/includes/_status.html' with employee_record=employee_record extra_class="badge-sm" only %}
+            </div>
         </div>
     </div>
     <hr class="m-0">

@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
@@ -10,12 +11,14 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-xl-flex align-items-xl-center">
-        <h1 class="mb-1 mb-xl-0 me-xl-3">
-            Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_full_name }}
-        </h1>
-        {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
-    </div>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_full_name }}
+                {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
