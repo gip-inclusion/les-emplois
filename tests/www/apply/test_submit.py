@@ -3480,6 +3480,11 @@ class TestApplicationView:
     def apply_session_key(company):
         return f"job_application-{company.pk}"
 
+    def setup_session(self, session, company, data):
+        apply_session = SessionNamespace(session, self.apply_session_key(company))
+        apply_session.init(data)
+        apply_session.save()
+
     def test_application_jobs_use_previously_selected_jobs(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
@@ -3577,13 +3582,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory()
 
         client.force_login(company.members.first())
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": company.job_description_through.all(),
-            }
-        )
-        apply_session.save()
+        self.setup_session(client.session, company, {"selected_jobs": company.job_description_through.all()})
 
         response = client.get(
             reverse(
@@ -3659,9 +3658,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory()
 
         client.force_login(company.members.first())
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init({})  # We still need a session, even if empty
-        apply_session.save()
+        self.setup_session(client.session, company, {})
 
         response = client.get(
             reverse(
@@ -3684,9 +3681,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory()
 
         client.force_login(prescriber)
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init({})  # We still need a session, even if empty
-        apply_session.save()
+        self.setup_session(client.session, company, {})
 
         response = client.get(
             reverse(
@@ -3708,9 +3703,7 @@ class TestApplicationView:
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         client.force_login(company.members.first())
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init({})  # We still need a session, even if empty
-        apply_session.save()
+        self.setup_session(client.session, company, {})
 
         response = client.get(
             reverse(
@@ -3733,9 +3726,7 @@ class TestApplicationView:
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         client.force_login(prescriber)
-        apply_session = SessionNamespace(client.session, f"job_application-{company.pk}")
-        apply_session.init({})  # We still need a session, even if empty
-        apply_session.save()
+        self.setup_session(client.session, company, {})
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
         response = client.post(
