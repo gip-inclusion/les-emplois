@@ -115,6 +115,16 @@ def new_user(request, invitation_type, invitation_id):
     return handle_registration(request, invitation, invitation_type)
 
 
+def _toast_invitation_sent(invitations):
+    s = pluralizefr(len(invitations))
+    expiration_date = formats.date_format(invitations[0].expiration_date)
+    return (
+        f"Collaborateur{s} ajouté{s}||Pour rejoindre votre organisation, il suffira à "
+        f"{pluralizefr(len(invitations), 'votre,vos')} collaborateur{s} de cliquer sur le lien d'activation "
+        f"contenu dans l'e-mail avant le {expiration_date}."
+    )
+
+
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
     form_kwargs = {"sender": request.user, "organization": organization}
@@ -145,25 +155,11 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
             for invitation in invitations:
                 invitation.send()
 
-            count = len(formset.forms)
-            if count == 1:
-                message = (
-                    "Votre invitation a été envoyée par courriel.<br>"
-                    "Pour rejoindre votre organisation, il suffira simplement à votre invité(e) "
-                    "de cliquer sur le lien de validation contenu dans le courriel.<br>"
-                )
-            else:
-                message = (
-                    "Vos invitations ont été envoyées par courriel.<br>"
-                    "Pour rejoindre votre organisation, il suffira simplement à vos invités "
-                    "de cliquer sur le lien de validation contenu dans le courriel.<br>"
-                )
-
-            expiration_date = formats.date_format(invitations[0].expiration_date)
-            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
-            message = safestring.mark_safe(message)
-            messages.success(request, message)
-
+            messages.success(
+                request,
+                _toast_invitation_sent(invitations),
+                extra_tags="toast",
+            )
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_prescriber_with_org")
@@ -195,9 +191,11 @@ def invite_employer(request, template_name="invitations_views/create.html"):
             for invitation in invitations:
                 invitation.send()
 
-            s = pluralizefr(len(formset.forms))
-            messages.success(request, f"Invitation{s} envoyée{s}", extra_tags="toast")
-
+            messages.success(
+                request,
+                _toast_invitation_sent(invitations),
+                extra_tags="toast",
+            )
             return redirect(back_url)
 
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": company}
@@ -225,25 +223,11 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
             for invitation in invitations:
                 invitation.send()
 
-            count = len(formset.forms)
-            if count == 1:
-                message = (
-                    "Votre invitation a été envoyée par courriel.<br>"
-                    "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
-                    "sur le lien de validation reçu dans le courriel.<br>"
-                )
-            else:
-                message = (
-                    "Vos invitations ont été envoyées par courriel.<br>"
-                    "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                    "cliquer sur le lien de validation reçu dans le courriel.<br>"
-                )
-
-            expiration_date = formats.date_format(invitations[0].expiration_date)
-            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
-            message = safestring.mark_safe(message)
-            messages.success(request, message)
-
+            messages.success(
+                request,
+                _toast_invitation_sent(invitations),
+                extra_tags="toast",
+            )
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_labor_inspector")
