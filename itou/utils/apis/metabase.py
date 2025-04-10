@@ -12,6 +12,7 @@ from django.utils import timezone
 ASP_SIAE_FILTER_KEY_FLAVOR1 = "identifiant_de_la_structure"
 ASP_SIAE_FILTER_KEY_FLAVOR2 = "id_asp_de_la_siae"
 ASP_SIAE_FILTER_KEY_FLAVOR3 = "id_asp_siae"
+ASP_SIAE_FILTER_KEY_FLAVOR4 = "id_de_la_siae"
 C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
 C1_PRESCRIBER_ORG_FILTER_KEY = "id_prescripteur"
 IAE_NETWORK_FILTER_KEY = "id_r%C3%A9seau"
@@ -51,6 +52,9 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 295,
         "tally_popup_form_id": "nW0zPj",
         "tally_embed_form_id": "waGd0v",
+    },
+    "stats_siae_hiring_and_beneficiaries": {
+        "dashboard_id": 497,
     },
     #
     # Prescriber stats - CD.

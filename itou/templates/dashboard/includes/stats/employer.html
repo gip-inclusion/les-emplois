@@ -46,6 +46,14 @@
                                     <span>Suivi de l’activité d’auto-prescription et du contrôle à posteriori</span>
                                 </a>
                             </li>
+                            {% if can_view_stats_siae_hiring_and_beneficiaries %}
+                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                    <a href="{% url "stats:stats_siae_hiring_and_beneficiaries" %}" class="btn-link btn-ico">
+                                        <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                        <span>Suivi des recrutements et des bénéficiaires</span>
+                                    </a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>

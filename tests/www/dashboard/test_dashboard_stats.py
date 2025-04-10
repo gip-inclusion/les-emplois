@@ -1,6 +1,7 @@
 import random
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 from itou.companies.enums import CompanyKind
@@ -12,10 +13,12 @@ from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
 
-def test_index_stats_for_employer(snapshot, client):
+@pytest.mark.parametrize("department", {*settings.STATS_SIAE_DEPARTMENTS_WHITELIST, "42"})
+def test_index_stats_for_employer(snapshot, client, department):
     client.force_login(
         EmployerFactory(
             with_company=True,
+            with_company__company__department=department,
             with_company__company__kind=random.choice(list(CompanyKind)),
         )
     )

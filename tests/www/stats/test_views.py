@@ -128,6 +128,7 @@ def test_stats_siae_log_visit(client, settings, view_name):
     user = company.members.get()
 
     settings.STATS_SIAE_USER_PK_WHITELIST = [user.pk]
+    settings.STATS_SIAE_DEPARTMENTS_WHITELIST = {company.department}
 
     client.force_login(user)
 
