@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load geiq_assessments_badges %}
@@ -7,7 +8,13 @@
 
 {% block title %}Bilan d’exécution {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Bilan d’exécution</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Bilan d’exécution</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
