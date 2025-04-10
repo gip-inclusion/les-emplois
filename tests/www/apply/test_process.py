@@ -917,7 +917,6 @@ class TestProcessViews:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         assert client.session[refuse_session_name] == {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             },
@@ -934,7 +933,6 @@ class TestProcessViews:
         client.post(refusal_reason_url, data=post_data)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             },
@@ -963,7 +961,6 @@ class TestProcessViews:
         client.post(refusal_reason_url_2, data=post_data)
         assert client.session[refuse_session_name_2] == {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "single",
                 "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk}),
             },
@@ -3386,7 +3383,6 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     [refuse_session_name] = session_data_without_known_keys(client.session)
     assert client.session[refuse_session_name] == {
         "config": {
-            "session_kind": "job-applications-batch-refuse",
             "tunnel": "single",
             "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
         },

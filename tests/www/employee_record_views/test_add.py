@@ -29,12 +29,7 @@ def test_wizard(snapshot, client):
         response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
 
     [wizard_session_name] = session_data_without_known_keys(client.session)
-    expected_session = {
-        "config": {
-            "session_kind": "add-employee-record",
-            "reset_url": reset_url,
-        },
-    }
+    expected_session = {"config": {"reset_url": reset_url}}
     assert client.session[wizard_session_name] == expected_session
     choose_employee_url = reverse(
         "employee_record_views:add", kwargs={"session_uuid": wizard_session_name, "step": "choose-employee"}

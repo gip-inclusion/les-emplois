@@ -34,6 +34,9 @@ def session_data_without_known_keys(session):
     data = dict(session)
     for k in ["_auth_user_id", "_auth_user_backend", "_auth_user_hash", "current_organization", "_csrftoken"]:
         data.pop(k, None)
+    for k in list(data):
+        if k.endswith("_session_kind"):
+            del data[k]
     return data
 
 

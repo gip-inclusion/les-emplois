@@ -661,7 +661,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -760,7 +759,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -853,7 +851,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -939,7 +936,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -998,7 +994,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -1066,7 +1061,6 @@ class TestBatchRefuse:
         [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
