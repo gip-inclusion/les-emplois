@@ -625,6 +625,15 @@ class JobDescription(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
     is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
+    last_employer_update_at = models.DateTimeField(
+        verbose_name="date de dernière mise à jour employeur",
+        null=True,
+        editable=False,
+        db_index=True,
+        help_text=(
+            "Toute mise à jour d’une fiche de poste à l’état actif effectuée par l’employeur réinitialise cette date."
+        ),
+    )
     custom_name = models.CharField(verbose_name="nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="description", blank=True)
     # is used to order job descriptions in the UI

@@ -418,6 +418,7 @@ class JobDescriptionAdmin(ItouModelAdmin):
         "created_at",
         "updated_at",
         "is_active",
+        "last_employer_update_at",
         "open_positions",
     )
     raw_id_fields = ("appellation", "company", "location")
@@ -434,6 +435,7 @@ class JobDescriptionAdmin(ItouModelAdmin):
         "source_id",
         "source_kind",
         "source_url",
+        "last_employer_update_at",
         "field_history",
     )
 

@@ -1,3 +1,4 @@
+import datetime
 import functools
 import string
 
@@ -241,3 +242,6 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
     location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())
     profile_description = factory.Faker("sentence", locale="fr_FR")
     market_context_description = factory.Faker("sentence", locale="fr_FR")
+    last_employer_update_at = factory.Faker(
+        "date_time_between", start_date="-30d", end_date="-3d", tzinfo=datetime.UTC
+    )
