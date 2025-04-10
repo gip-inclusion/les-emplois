@@ -202,7 +202,11 @@ def job_description_list(request, template_name="companies/job_description_list.
                     company_id=company.pk, pk=job_description_id
                 ).first():
                     job_description.is_active = is_active
-                    job_description.save(update_fields=["is_active", "updated_at"])
+                    update_fields = ["is_active", "updated_at"]
+                    if is_active:
+                        job_description.last_employer_update_at = timezone.now()
+                        update_fields += ["last_employer_update_at"]
+                    job_description.save(update_fields=update_fields)
                     if is_active:
                         messages.success(
                             request,
@@ -350,6 +354,8 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
     job_description.company = request.current_organization
 
     if request.method == "POST":
+        if job_description.is_active:
+            job_description.last_employer_update_at = timezone.now()
         job_description.save()
         messages.success(request, "Fiche de poste enregistrée", extra_tags="toast")
         request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)

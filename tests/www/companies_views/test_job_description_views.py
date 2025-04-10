@@ -1,3 +1,4 @@
+import datetime
 from functools import partial
 
 import pytest
@@ -246,6 +247,35 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         other_company_job_description.refresh_from_db()
         assert not other_company_job_description.is_active
 
+    def test_toggle_job_description_active_updates_last_employer_update_at(self, client):
+        with freeze_time("2025-04-09 15:16:17.18") as frozen_time:
+            client.force_login(self.user)
+
+            job_description = JobDescriptionFactory(company=self.company, is_active=True)
+            initial_last_employer_update_at = job_description.last_employer_update_at
+
+            frozen_time.tick()
+
+            # Setting inactive should not postpone last_employer_update_at
+            post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
+            client.post(self.url, data=post_data)
+            job_description.refresh_from_db()
+            assert not job_description.is_active
+            assert job_description.updated_at == timezone.now()
+            assert job_description.last_employer_update_at == initial_last_employer_update_at
+
+            # Setting active should postpone last_employer_update_at
+            post_data = {
+                "job_description_id": job_description.pk,
+                "job_description_is_active": "on",
+                "action": "toggle_active",
+            }
+            client.post(self.url, data=post_data)
+            job_description.refresh_from_db()
+            assert job_description.is_active is True
+            assert job_description.updated_at == timezone.now()
+            assert job_description.last_employer_update_at == timezone.now()
+
     def test_delete_job_descriptions(self, client):
         client.force_login(self.user)
         response = client.get(self.url)
@@ -294,6 +324,7 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
     def setup_method(self):
         self.url = self.edit_url
 
+    @freeze_time("2025-04-09 15:16:17.18")
     def test_edit_job_description_company(self, client):
         client.force_login(self.user)
         response = client.get(self.url)
@@ -341,6 +372,11 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
         assert self.company.job_description_through.count() == 5
 
+        # Creation immediately activates job description
+        # Hence its last activation date should be automatically defined
+        assert self.company.job_description_through.order_by("-pk").first().last_employer_update_at == timezone.now()
+
+    @freeze_time("2025-04-09 15:16:17.18")
     def test_edit_job_description_opcs(self, client):
         opcs = CompanyFactory(
             department="75",
@@ -405,6 +441,10 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
         assert opcs.job_description_through.count() == 5
 
+        # Creation immediately activates job description
+        # Hence its last activation date should be automatically defined
+        assert opcs.job_description_through.order_by("-pk").first().last_employer_update_at == timezone.now()
+
     def test_empty_session_during_edit(self, client):
         client.force_login(self.user)
         assertRedirects(client.get(self.edit_details_url), self.edit_url)
@@ -460,6 +500,46 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
 
         job_description.refresh_from_db()
         assert job_description.location is None
+
+    @pytest.mark.parametrize("is_active", [True, False])
+    def test_last_employer_update_at_updates(self, is_active, client):
+        client.force_login(self.user)
+
+        with freeze_time() as frozen_time:
+            job_description = JobDescriptionFactory(
+                company=self.company,
+                is_active=is_active,
+                last_employer_update_at=frozen_time().replace(tzinfo=datetime.UTC),
+            )
+            initial_last_employer_update_at = job_description.last_employer_update_at
+            session_data = client.session
+            session_data[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
+                "pk": job_description.pk,
+                "appellation": job_description.appellation.code,
+                "custom_name": job_description.custom_name,
+                "location": job_description.location,
+                "hours_per_week": job_description.hours_per_week,
+                "contract_type": job_description.contract_type,
+                "other_contract_type": job_description.other_contract_type,
+                "open_positions": job_description.open_positions,
+                "description": job_description.description,
+                "profile_description": job_description.profile_description,
+                "is_resume_mandatory": job_description.is_resume_mandatory,
+            }
+            session_data.save()
+
+            frozen_time.tick()
+
+            response = client.post(self.edit_preview_url)
+            assertRedirects(response, self.list_url)
+            assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
+
+            job_description.refresh_from_db()
+            assert job_description.is_active == is_active
+            assert job_description.updated_at == timezone.now()
+            assert job_description.last_employer_update_at == (
+                initial_last_employer_update_at + datetime.timedelta(seconds=int(is_active))
+            )
 
 
 class TestUpdateJobDescriptionView(JobDescriptionAbstract):

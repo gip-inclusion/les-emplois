@@ -1,3 +1,7 @@
+from zoneinfo import ZoneInfo
+
+import pytest
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
@@ -10,9 +14,10 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory
 from tests.utils.test import (
     BASE_NUM_QUERIES,
@@ -350,3 +355,58 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+
+class TestJobDescriptionAdmin:
+    TZ = ZoneInfo(settings.TIME_ZONE)
+
+    def _format_date(self, dt):
+        return dt.astimezone(self.TZ).date() if dt else ""
+
+    def _format_time(self, dt):
+        return dt.astimezone(self.TZ).time() if dt else ""
+
+    def _get_job_description_post_data(self, job_description):
+        post_data = {
+            "appellation": job_description.appellation.pk,
+            "company": job_description.company.pk,
+            "created_at_0": self._format_date(job_description.created_at),
+            "created_at_1": self._format_time(job_description.created_at),
+            "initial-created_at_0": self._format_date(job_description.created_at),
+            "initial-created_at_1": self._format_time(job_description.created_at),
+            "last_employer_update_at_0": self._format_date(job_description.last_employer_update_at),
+            "last_employer_update_at_1": self._format_time(job_description.last_employer_update_at),
+            "custom_name": job_description.custom_name or "",
+            "description": job_description.description or "",
+            "ui_rank": job_description.ui_rank,
+            "contract_type": job_description.contract_type,
+            "other_contract_type": job_description.other_contract_type or "",
+            "contract_nature": job_description.contract_nature or "",
+            "location": job_description.location.pk if job_description.location else "",
+            "hours_per_week": job_description.hours_per_week or "",
+            "open_positions": job_description.open_positions or "",
+            "profile_description": job_description.profile_description or "",
+            "market_context_description": job_description.market_context_description or "",
+            "creation_source": job_description.creation_source,
+            "_continue": "Enregistrer et continuer les modifications",
+        }
+
+        if job_description.is_resume_mandatory:
+            post_data["is_resume_mandatory"] = "on"
+
+        if job_description.is_qpv_mandatory:
+            post_data["is_qpv_mandatory"] = "on"
+
+        return post_data
+
+    @pytest.mark.parametrize("is_active", [True, False])
+    def test_edition_does_not_postpone_last_employer_update_at(self, is_active, admin_client):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        job_description = JobDescriptionFactory(is_active=is_active)
+        last_employer_update_at = job_description.last_employer_update_at
+
+        change_url = reverse("admin:companies_jobdescription_change", args=[job_description.pk])
+        admin_client.post(change_url, data=self._get_job_description_post_data(job_description))
+
+        job_description.refresh_from_db()
+        assert job_description.last_employer_update_at == last_employer_update_at
