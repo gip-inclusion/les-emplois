@@ -26,7 +26,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import KNOWN_SESSION_KEYS, parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, session_data_without_known_keys
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
 
 
@@ -112,7 +112,6 @@ class TestGetOrCreateForJobSeeker:
                 "config": {
                     "tunnel": tunnel,
                     "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                 },
                 "apply": {"company_pk": company.pk},
             }
@@ -137,7 +136,7 @@ class TestGetOrCreateForJobSeeker:
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url, {"back_url": reset_url})
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         response = client.get(
@@ -167,7 +166,7 @@ class TestGetOrCreateForJobSeeker:
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url)
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         response = client.get(
@@ -252,7 +251,7 @@ class TestGetOrCreateForSender:
         assert response.status_code == expected_status_code
 
         if expected_status_code == 302:
-            [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+            [job_seeker_session_name] = session_data_without_known_keys(client.session)
             view_name = (
                 "job_seekers_views:check_nir_for_hire"
                 if tunnel == "hire"
@@ -291,7 +290,6 @@ class TestGetOrCreateForSender:
         session[session_name] = {
             "config": {
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
             },
             "apply": {"company_pk": company.pk},
         }
@@ -309,7 +307,7 @@ class TestGetOrCreateForSender:
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url, follow=True)
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         response = client.get(
@@ -328,7 +326,7 @@ class TestGetOrCreateForSender:
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         birthdate = datetime.date(1911, 11, 1)
@@ -368,7 +366,7 @@ class TestGetOrCreateForSender:
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         birthdate = datetime.date(1911, 11, 1)
@@ -404,7 +402,7 @@ class TestGetOrCreateForSender:
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         [job_seeker_session_name] = [
-            k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS and not k.startswith("job_application")
+            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
         ]
 
         response = client.post(
@@ -506,7 +504,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
         check_nir_url = reverse(
             "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
@@ -584,7 +582,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
@@ -619,7 +617,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
 
         # Step determine the job seeker with a NIR.
@@ -640,7 +638,6 @@ class TestStandaloneCreateAsPrescriber:
             "config": {
                 "tunnel": "standalone",
                 "from_url": from_url,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
         }
@@ -937,7 +934,7 @@ class TestUpdateForSender:
         assert response.status_code == expected_status_code
 
         if expected_status_code == 302:
-            [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+            [job_seeker_session_name] = session_data_without_known_keys(client.session)
             step_1_url = reverse(
                 "job_seekers_views:update_job_seeker_step_1",
                 kwargs={"session_uuid": job_seeker_session_name},
@@ -968,10 +965,10 @@ class TestUpdateForSender:
         # Create a session with a wrong tunnel key
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             client.session,
+            JobSeekerSessionKinds.GET_OR_CREATE,
             data={
                 "config": {
                     "from_url": reverse("dashboard:index"),
-                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                 },
                 "job_seeker_pk": job_seeker.pk,
                 "apply": {"company_pk": company.pk},
@@ -1003,7 +1000,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -1050,7 +1047,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -1093,7 +1090,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [job_seeker_session_name] = session_data_without_known_keys(client.session)
 
         response = client.post(
             reverse(

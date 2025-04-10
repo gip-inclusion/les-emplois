@@ -322,11 +322,12 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
                 "config": {
                     "tunnel": "gps",
                     "from_url": request.get_full_path(),
-                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                 },
                 "profile": {"nir": form.cleaned_data["nir"]},
             }
-            job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+            job_seeker_session = SessionNamespace.create_uuid_namespace(
+                request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
+            )
             return HttpResponseRedirect(
                 reverse(
                     "job_seekers_views:search_by_email_for_sender",
@@ -395,11 +396,12 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
                     "config": {
                         "tunnel": "gps",
                         "from_url": request.get_full_path(),
-                        "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                     },
                     "user": form.cleaned_data,
                 }
-                job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+                job_seeker_session = SessionNamespace.create_uuid_namespace(
+                    request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
+                )
                 return HttpResponseRedirect(
                     reverse(
                         "job_seekers_views:create_job_seeker_step_1_for_sender",

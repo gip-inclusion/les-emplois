@@ -220,11 +220,12 @@ class GetOrCreateJobSeekerStartView(View):
             "config": {
                 "tunnel": self.tunnel,
                 "from_url": self.from_url,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             }
         }
         data |= {"apply": {"company_pk": company.pk}} if company else {}
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(request.session, data)
+        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
+            request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
+        )
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
@@ -248,14 +249,9 @@ class ExpectedJobSeekerSessionMixin:
         self.job_seeker_session = None
 
     def setup(self, request, *args, session_uuid, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, session_uuid)
+        self.job_seeker_session = SessionNamespace(request.session, self.EXPECTED_SESSION_KIND, session_uuid)
         if not self.job_seeker_session.exists():
             raise Http404
-        # Ensure we are performing the action (update, create…) the session was created for.
-        session_kind = self.job_seeker_session.get("config", {}).get("session_kind")
-        if session_kind != self.EXPECTED_SESSION_KIND:
-            raise Http404
-
         super().setup(request, *args, **kwargs)
 
     def get_reset_url(self):
@@ -882,8 +878,9 @@ class UpdateJobSeekerStartView(View):
 
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
+            JobSeekerSessionKinds.UPDATE,
             data={
-                "config": {"from_url": from_url, "session_kind": JobSeekerSessionKinds.UPDATE},
+                "config": {"from_url": from_url},
                 "job_seeker_pk": job_seeker.pk,
             },
         )

@@ -79,6 +79,8 @@ def _get_job_seeker_to_apply_for(request):
 
 
 class ApplyStepBaseView(TemplateView):
+    session_kind = "apply_session"
+
     def __init__(self):
         super().__init__()
         self.company = None
@@ -89,7 +91,7 @@ class ApplyStepBaseView(TemplateView):
 
     def setup(self, request, *args, **kwargs):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
+        self.apply_session = SessionNamespace(request.session, self.session_kind, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
             request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
@@ -129,10 +131,10 @@ class ApplyStepBaseView(TemplateView):
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
+            JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
             data={
                 "config": {
                     "from_url": self.get_reset_url(),
-                    "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
                 },
                 "apply": {"company_pk": self.company.pk},
             },
@@ -245,7 +247,7 @@ class StartView(ApplyStepBaseView):
         if self.company.block_job_applications and not self.company.has_member(request.user):
             raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
-        self.apply_session.init({})
+        self.apply_session.init(self.session_kind, {})
         if back_url := get_safe_url(request, "back_url"):
             self.apply_session.set("reset_url", back_url)
 
@@ -390,7 +392,7 @@ class ApplicationJobsView(ApplicationBaseView):
         super().setup(request, *args, **kwargs)
 
         if not self.apply_session.exists():
-            self.apply_session.init({})
+            self.apply_session.init(self.session_kind, {})
 
         self.form = ApplicationJobsForm(
             self.company,

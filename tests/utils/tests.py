@@ -22,7 +22,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import management
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import RequestFactory
@@ -1174,7 +1174,7 @@ class TestSessionNamespace:
         session = self._get_session_store()
         ns_name = faker.Faker().word()
 
-        ns = itou.utils.session.SessionNamespace(session, ns_name)
+        ns = itou.utils.session.SessionNamespace(session, "test_session", ns_name)
 
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
@@ -1191,11 +1191,11 @@ class TestSessionNamespace:
         session = self._get_session_store()
         ns_name = faker.Faker().word()
 
-        ns = itou.utils.session.SessionNamespace(session, ns_name)
+        ns = itou.utils.session.SessionNamespace(session, "test_session", ns_name)
         assert ns_name not in session  # The namespace doesn't yet exist in the session
 
         # .init()
-        ns.init({"key": "value"})
+        ns.init("test_session", {"key": "value"})
         assert ns_name in session
         assert session[ns_name] == {"key": "value"}
 
@@ -1232,18 +1232,82 @@ class TestSessionNamespace:
         session = self._get_session_store()
 
         # .create_uuid_namespace()
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session)
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session")
         assert isinstance(ns, itou.utils.session.SessionNamespace)
         assert str(uuid.UUID(ns.name)) == ns.name
         assert session[ns.name] == {}
         assert ns.name in session
 
         # .create_uuid_namespace() with data
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, data={"content": "a nice content"})
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(
+            session,
+            "test_session",
+            data={"content": "a nice content"},
+        )
         assert isinstance(ns, itou.utils.session.SessionNamespace)
         assert str(uuid.UUID(ns.name)) == ns.name
         assert ns.name in session
         assert session[ns.name] == {"content": "a nice content"}
+
+    def test_load_legacy_session(self):
+        session = self._get_session_store()
+        data = {"config": {"session_kind": "test_session"}, "data": "data"}
+        session["namespace"] = data
+        ns = itou.utils.session.SessionNamespace(session, "test_session", "namespace")
+
+        assert "data" in ns
+        ns.kind_verified = False
+
+        assert ns.exists()
+        ns.kind_verified = False
+
+        assert ns.get("data") == "data"
+        ns.kind_verified = False
+
+        assert ns.as_dict() == data
+        ns.kind_verified = False
+
+        ns.set("foo", "bar")
+        ns.kind_verified = False
+
+        ns.update({"a": "b"})
+        ns.kind_verified = False
+
+        ns = itou.utils.session.SessionNamespace(session, "other_session_kind", "namespace")
+        with pytest.raises(Http404):
+            assert ns.exists()
+        with pytest.raises(Http404):
+            assert "data" in ns
+        with pytest.raises(Http404):
+            assert ns.get("data")
+        with pytest.raises(Http404):
+            assert ns.set("foo", "bar")
+        with pytest.raises(Http404):
+            assert ns.update({"foo": "bar"})
+        with pytest.raises(Http404):
+            assert ns.as_dict()
+        with pytest.raises(Http404):
+            assert ns.delete()
+
+    def test_load_polluted_session(self):
+        session = self._get_session_store()
+        ns = itou.utils.session.SessionNamespace(session, "other_session_kind", "namespace")
+        ns.init("test_session", "data")
+        ns.kind_verified = False
+        with pytest.raises(Http404):
+            assert ns.exists()
+        with pytest.raises(Http404):
+            assert "data" in ns
+        with pytest.raises(Http404):
+            assert ns.get("data")
+        with pytest.raises(Http404):
+            assert ns.set("foo", "bar")
+        with pytest.raises(Http404):
+            assert ns.update({"foo": "bar"})
+        with pytest.raises(Http404):
+            assert ns.as_dict()
+        with pytest.raises(Http404):
+            assert ns.delete()
 
 
 class TestJSON:

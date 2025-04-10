@@ -19,7 +19,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
 )
-from tests.utils.test import KNOWN_SESSION_KEYS
+from tests.utils.test import session_data_without_known_keys
 
 
 class TestBatchArchive:
@@ -658,10 +658,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -757,10 +756,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -850,10 +848,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -936,10 +933,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -995,10 +991,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },
@@ -1063,10 +1058,9 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = [k for k in client.session.keys() if k not in KNOWN_SESSION_KEYS]
+        [refuse_session_name] = session_data_without_known_keys(client.session)
         expected_session = {
             "config": {
-                "session_kind": "job-applications-batch-refuse",
                 "tunnel": "batch",
                 "reset_url": next_url,
             },

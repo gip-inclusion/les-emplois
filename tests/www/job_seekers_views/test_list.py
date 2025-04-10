@@ -368,7 +368,6 @@ def test_job_seeker_created_for_prescription_is_shown(client):
         "config": {
             "tunnel": "sender",
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-            "session_kind": "job-seeker-get-or-create",
         },
         "apply": {"company_pk": company.pk},
         "user": {
