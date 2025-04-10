@@ -249,6 +249,9 @@ def stats_siae_hiring_and_beneficiaries(request):
                 request.current_organization.department
             ),
         },
+        params={
+            mb.ASP_SIAE_FILTER_KEY_FLAVOR4: request.current_organization.convention.asp_id,
+        },
     )
 
 
