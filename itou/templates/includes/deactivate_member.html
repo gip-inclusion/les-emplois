@@ -27,7 +27,7 @@
                 Toutes les notifications emails envoyées à cet utilisateur seront également envoyées aux administrateurs de votre {{ org_display }}.
             </li>
         </ul>
-        <p>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre {{ org_display }}.</p>
+        <p>En cas d'erreur, vous pourrez toujours l'ajouter à nouveau afin qu'il rejoigne votre {{ org_display }}.</p>
     {% endwith %}
 
     <form action="{% url base_url|add:":deactivate_member" target_member.public_id %}" method="post">

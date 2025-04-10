@@ -257,7 +257,7 @@ class TestAcceptPrescriberWithOrgInvitation:
         assertContains(
             response, escape(f"Vous êtes désormais membre de l'organisation {self.organization.display_name}.")
         )
-        assertNotContains(response, escape("Cette invitation n'est plus valide."))
+        assertNotContains(response, escape("Ce lien n'est plus valide."))
 
         # A confirmation e-mail is sent to the invitation sender.
         assert len(mailoutbox) == 1
@@ -573,7 +573,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
             "password2": DEFAULT_PASSWORD,
         }
         response = client.post(invitation.acceptance_link, data=post_data, follow=True)
-        assertContains(response, escape("Cette invitation n'est plus valide."))
+        assertContains(response, escape("Ce lien n'est plus valide."))
 
     def test_expired_invitation_with_existing_user(self, client):
         user = PrescriberFactory()
@@ -590,11 +590,11 @@ class TestAcceptPrescriberWithOrgInvitationExceptions:
 
         # GET or POST in this case
         response = client.get(invitation.acceptance_link, follow=True)
-        assertContains(response, escape("Cette invitation n'est plus valide."))
+        assertContains(response, escape("Ce lien n'est plus valide."))
 
         client.force_login(user)
         # Try to bypass the first check by directly reaching the join endpoint
         join_url = reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
         response = client.get(join_url, follow=True)
         # The 2 views return the same error message
-        assertContains(response, escape("Cette invitation n'est plus valide."))
+        assertContains(response, escape("Ce lien n'est plus valide."))

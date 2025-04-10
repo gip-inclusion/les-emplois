@@ -312,8 +312,8 @@ class PrescriberChooseOrgKindForm(forms.Form):
             member = org.prescribermembership_set.first()
             if member:
                 error += (
-                    " Pour rejoindre cette organisation, vous devez obtenir une invitation de : {} {}."
-                    ' <a href="{}">Demander une invitation</a>'
+                    " Pour rejoindre cette organisation, vous pouvez être ajouté(e) par : {} {}."
+                    ' <a href="{}">Demander l\'ajout</a>'
                 )
                 error_args += [
                     member.user.first_name.title(),

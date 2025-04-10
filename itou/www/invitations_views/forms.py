@@ -67,7 +67,7 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
         for form in self.forms:
             email = form.cleaned_data.get("email")
             if email in emails:
-                raise ValidationError("Les invitations doivent avoir des adresses e-mail différentes.")
+                raise ValidationError("Les collaborateurs doivent avoir des adresses e-mail différentes.")
             emails.append(email)
 
 

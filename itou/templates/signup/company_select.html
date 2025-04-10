@@ -135,7 +135,7 @@
                         <div class="c-form mt-3 mt-md-5">
                             <h3 class="mb-1">{{ companies_with_members|pluralizefr:"Entreprise déjà inscrite,Entreprises déjà inscrites" }}</h3>
                             <p>
-                                Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre {{ companies_with_members|pluralizefr:"cette structure,ces structures" }}.
+                                Par mesure de sécurité, seuls les membres déjà inscrits dans {{ companies_with_members|pluralizefr:"cette structure,ces structures" }} peuvent ajouter de nouveaux collaborateurs.
                             </p>
 
                             <ul class="list-group list-group-flush">
@@ -155,7 +155,7 @@
                                             {# note: memberships.first does not work, it does not take the prefetch into account. #}
                                             {% with siae.memberships.all.0.user as admin %}
                                                 {# For security, display only the first char of the last name. #}
-                                                Pour obtenir une invitation, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1|upper }}</b>.
+                                                Pour rejoindre cette structure, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1|upper }}</b>.
                                             {% endwith %}
                                         </p>
                                     </li>

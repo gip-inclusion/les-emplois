@@ -3,14 +3,12 @@
 
 Bonjour {{ first_name|title }} {{ last_name|upper }} !
 
-Vous avez été invité(e) à vous rattacher au compte de la structure {{ establishment.display_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
+Vous avez été ajouté(e) à la structure {{ establishment.display_name }} sur les Emplois de l'inclusion. Cliquez sur le lien ci-dessous pour accéder à votre nouvel espace de travail.
 
 {{ acceptance_link }}
 
 {# Don't specify datetime format as it depends on the language. #}
 {# Better relying on the global DATE_FORMAT configuration variable. #}
-Cette invitation restera valide jusqu'au {{ expiration_date|date }}.
-
-Ignorez cet e-mail si vous ne souhaitez pas rejoindre cette organisation.
+Le lien restera valide jusqu'au {{ expiration_date|date }}.
 
 {% endblock %}

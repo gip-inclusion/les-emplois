@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
 
-{{ sender.get_full_name }} vous a invité(e) à rejoindre l'organisation {{ establishment.display_name|truncatechars:80 }} sur les emplois de l'inclusion.
+{{ sender.get_full_name }} vous a ajouté(e) à l'organisation {{ establishment.display_name|truncatechars:80 }} sur les Emplois de l'inclusion.
 
 {% endblock %}

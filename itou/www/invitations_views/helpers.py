@@ -17,7 +17,7 @@ def handle_prescriber_intivation(invitation, request):
             request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
         )
     elif not invitation.accepted_at:
-        messages.error(request, "Cette invitation n'est plus valide.")
+        messages.error(request, "Ce lien n'est plus valide.")
 
 
 def handle_employer_invitation(invitation, request):
@@ -31,7 +31,7 @@ def handle_employer_invitation(invitation, request):
         invitation.accept()
         messages.success(request, f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
     elif not invitation.accepted_at:
-        messages.error(request, "Cette invitation n'est plus valide.")
+        messages.error(request, "Ce lien n'est plus valide.")
 
 
 def handle_labor_inspector_invitation(invitation, request):
@@ -45,7 +45,7 @@ def handle_labor_inspector_invitation(invitation, request):
             request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."
         )
     elif not invitation.accepted_at:
-        messages.error(request, "Cette invitation n'est plus valide.")
+        messages.error(request, "Ce lien n'est plus valide.")
 
 
 def accept_all_pending_invitations(request):
