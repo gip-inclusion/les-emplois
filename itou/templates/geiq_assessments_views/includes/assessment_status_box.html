@@ -30,9 +30,9 @@
     <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
         <h4>Votre dossier a été transmis le {{ assessment.submitted_at|date:"d/m/Y" }}</h4>
         <p>
-            Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter la TODO:XXXX.
+            Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter {{ assessment.institutions_to_contact }}.
             <br>
-            Vous serez notifié par mail de la décision suite à l’exam de votre bilan.
+            Vous serez notifié par mail de la décision suite à l’examen de votre bilan.
         </p>
     </div>
 {% endif %}
