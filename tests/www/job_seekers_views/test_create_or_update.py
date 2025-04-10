@@ -112,7 +112,6 @@ class TestGetOrCreateForJobSeeker:
                 "config": {
                     "tunnel": tunnel,
                     "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                 },
                 "apply": {"company_pk": company.pk},
             }
@@ -291,7 +290,6 @@ class TestGetOrCreateForSender:
         session[session_name] = {
             "config": {
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
-                "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
             },
             "apply": {"company_pk": company.pk},
         }
@@ -640,7 +638,6 @@ class TestStandaloneCreateAsPrescriber:
             "config": {
                 "tunnel": "standalone",
                 "from_url": from_url,
-                "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
             },
             "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir},
         }
@@ -968,10 +965,10 @@ class TestUpdateForSender:
         # Create a session with a wrong tunnel key
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             client.session,
+            JobSeekerSessionKinds.GET_OR_CREATE,
             data={
                 "config": {
                     "from_url": reverse("dashboard:index"),
-                    "session_kind": JobSeekerSessionKinds.GET_OR_CREATE,
                 },
                 "job_seeker_pk": job_seeker.pk,
                 "apply": {"company_pk": company.pk},

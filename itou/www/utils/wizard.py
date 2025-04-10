@@ -29,7 +29,6 @@ class WizardView(TemplateView):
             raise Http404
         session_data = {
             "config": {
-                "session_kind": cls.expected_session_kind,
                 "reset_url": reset_url,
             },
         }
@@ -38,6 +37,7 @@ class WizardView(TemplateView):
             session_data.update(extra_session_data)
         session = SessionNamespace.create_uuid_namespace(
             request.session,
+            cls.expected_session_kind,
             data=session_data,
         )
         return HttpResponseRedirect(
@@ -45,13 +45,10 @@ class WizardView(TemplateView):
         )
 
     def load_session(self, session_uuid):
-        wizard_session = SessionNamespace(self.request.session, session_uuid)
+        wizard_session = SessionNamespace(self.request.session, self.expected_session_kind, session_uuid)
         # FIXME: It would be great to redirect to a given url (self.failure_redirect_url ?) when there's no session
         # But we need such an url, and to be able to pass the test_func without failure to let dispatch redirect there
         if not wizard_session.exists():
-            raise Http404
-        if (session_kind := wizard_session.get("config", {}).get("session_kind")) != self.expected_session_kind:
-            logger.warning(f"Trying to reuse invalid session with kind={session_kind}")
             raise Http404
         # FIXME: Add current_organization.pk in the session and ensure it's still the current_organization
         self.wizard_session = wizard_session
