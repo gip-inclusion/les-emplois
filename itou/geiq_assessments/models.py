@@ -200,6 +200,27 @@ class Assessment(models.Model):
             return []
         return [antenna["id"] for antenna in self.label_antennas]
 
+    def institutions_to_contact(self):
+        conventionned_institutions = sorted(
+            [
+                institution_link.institution
+                for institution_link in self.institution_links.all()
+                if institution_link.with_convention
+            ],
+            key=lambda institution: (institution.kind, institution.name),
+        )
+        if not conventionned_institutions:
+            # This shouldn't happen
+            return "l’institution référente"
+        elif len(conventionned_institutions) == 1:
+            return f"la {conventionned_institutions[0]}"
+        else:
+            return (
+                "la "
+                + ", la ".join(institution for institution in conventionned_institutions[:-1])
+                + f"ou la {conventionned_institutions[-1]}"
+            )
+
 
 class AssessmentInstitutionLink(models.Model):
     assessment = models.ForeignKey(
