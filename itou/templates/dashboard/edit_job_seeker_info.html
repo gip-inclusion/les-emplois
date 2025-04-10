@@ -1,10 +1,17 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Informations personnelles de {{ job_seeker.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block title_content %}<h1>Informations personnelles de {{ job_seeker.get_full_name }}</h1>{% endblock %}
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Informations personnelles de {{ job_seeker.get_full_name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block title_messages %}
     {{ block.super }}

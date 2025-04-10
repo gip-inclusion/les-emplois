@@ -1,18 +1,24 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load url_add_query %}
 
 {% block title %}Éligibilité IAE - {{ job_seeker.get_full_name }}{{ block.super }}{% endblock %}
+
 {% block title_content %}
-    <h1>
-        {% if eligibility_diagnosis %}
-            Mettre à jour
-        {% else %}
-            Valider
-        {% endif %}
-        l'éligibilité de {{ job_seeker.get_full_name }}
-    </h1>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {% if eligibility_diagnosis %}
+                    Mettre à jour
+                {% else %}
+                    Valider
+                {% endif %}
+                l'éligibilité de {{ job_seeker.get_full_name }}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
