@@ -1,27 +1,27 @@
 {% if employee_record.status == "NEW" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi">Nouvelle à compléter</span>
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-emploi">Nouvelle à compléter</span>
 {% elif employee_record.status == "SENT" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-warning">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-warning">
         Envoyée à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "REJECTED" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-danger">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-danger">
         Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "PROCESSED" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-success">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-success">
         Intégrée par l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "READY" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-secondary">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-secondary">
         Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "DISABLED" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi-lightest text-primary">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "ARCHIVED" %}
-    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi-lightest text-primary">
+    <span class="badge rounded-pill {{ extra_class|default:"badge-base" }} text-nowrap bg-emploi-lightest text-primary">
         Archivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% endif %}
