@@ -131,6 +131,15 @@ class Assessment(models.Model):
         blank=True,
         on_delete=models.RESTRICT,  # For traceability and accountability
     )
+    dreets_reviewed_at = models.DateTimeField("contrôlé le (DREETS)", blank=True, null=True)
+    dreets_reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="contrôlé par (DREETS)",
+        related_name="dreets_reviewed_assessments",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+    )
 
     class Meta:
         verbose_name = "bilan d’exécution"

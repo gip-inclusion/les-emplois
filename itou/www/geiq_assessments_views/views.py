@@ -1,3 +1,4 @@
+import enum
 import io
 import logging
 import operator
@@ -479,20 +480,57 @@ class AssessmentContractDetailsForInstitutionTab(models.TextChoices):
     CONTRACTS = "contracts", "Données salariés"
 
 
-@require_safe
+class InstitutionAction(enum.StrEnum):
+    REVIEW = "review"
+    FIX = "fix"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+
 @check_user(lambda user: user.is_labor_inspector)
 def details_for_institution(
     request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
 ):
     if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
         raise Http404
-    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
+    assessments = Assessment.objects.filter(
+        submitted_at__isnull=False, institutions=request.current_organization
+    ).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
+    if request.method == "POST":
+        try:
+            action = InstitutionAction(request.POST.get("action"))
+        except ValueError:
+            action = None
+        if action is InstitutionAction.REVIEW:
+            now = timezone.now()
+            if not assessment.reviewed_at:
+                assessment.reviewed_at = now
+                assessment.reviewed_by = request.user
+                assessment.save(update_fields=("reviewed_at", "reviewed_by"))
+            if request.current_organization.kind == InstitutionKind.DREETS_GEIQ:
+                assessment.dreets_reviewed_at = now
+                assessment.dreets_reviewed_by = request.user
+                assessment.save(update_fields=("dreets_reviewed_at", "dreets_reviewed_by"))
+        elif action is InstitutionAction.FIX:
+            assessment.reviewed_at = None
+            assessment.reviewed_by = None
+            assessment.save(update_fields=("reviewed_at", "reviewed_by"))
+        if action:
+            return HttpResponseRedirect(
+                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+            )
+
     context = {
         "assessment": assessment,
         "active_tab": AssessmentContractDetailsForInstitutionTab.FILE,
         "back_url": reverse("geiq_assessments_views:list_for_institution"),
         "stats": assessment.get_allowance_stats_for_institution() if assessment.submitted_at else None,
+        "InstitutionAction": InstitutionAction,
     }
     return render(request, template_name, context)
 
