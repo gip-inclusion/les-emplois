@@ -31,7 +31,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def test_func(self):
         if self.standalone:
-            return self.request.user.is_prescriber_with_authorized_org
+            return self.request.from_authorized_prescriber
         return False
 
     def dispatch(self, request, *args, **kwargs):
@@ -42,7 +42,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["is_authorized_prescriber"] = self.request.user.is_prescriber_with_authorized_org
+        kwargs["is_authorized_prescriber"] = self.request.from_authorized_prescriber
         kwargs["siae"] = self.company
         return kwargs
 

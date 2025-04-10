@@ -2027,6 +2027,7 @@ class TestJobApplicationXlsxExport:
 
         request = RequestFactory()
         request.user = prescriber
+        request.from_authorized_prescriber = False
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [

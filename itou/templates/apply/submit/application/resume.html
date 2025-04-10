@@ -28,7 +28,7 @@
                                 <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_approval.end_at|date:"d/m/Y" }}</strong>
                             </p>
                             <p class="mb-0">
-                                {% if request.user.is_prescriber_with_authorized_org or auto_prescription_process %}
+                                {% if request.from_authorized_prescriber or auto_prescription_process %}
                                     Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
                                 {% elif prescription_process %}
                                     Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.

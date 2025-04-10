@@ -1598,7 +1598,7 @@
 # ---
 # name: TestGroupLists.test_group_list
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1783,28 +1783,6 @@
                                       %s)
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
-          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
-          'group_list[www/gps/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -2288,7 +2266,7 @@
 # ---
 # name: TestGroupLists.test_old_group_list
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2471,28 +2449,6 @@
           WHERE "users_user"."id" IN (%s)
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'MembershipsFiltersForm._get_beneficiary_choices[www/gps/forms.py]',
-          'MembershipsFiltersForm.__init__[www/gps/forms.py]',
-          'group_list[www/gps/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({

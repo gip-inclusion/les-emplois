@@ -481,7 +481,7 @@ class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseV
             initial_data["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
 
         self.form = AdministrativeCriteriaForm(
-            request.user.is_prescriber_with_authorized_org,
+            request.from_authorized_prescriber,
             siae=self.company,
             initial=initial_data,
             data=request.POST or None,
@@ -498,11 +498,7 @@ class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseV
             # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
             not self.company.is_subject_to_eligibility_rules,
             # Only "authorized prescribers" can perform an eligibility diagnosis.
-            not (
-                request.user.is_prescriber
-                and request.current_organization
-                and request.current_organization.is_authorized
-            ),
+            not request.from_authorized_prescriber,
             # No need for eligibility diagnosis if the job seeker already have a PASS IAE
             self.job_seeker.has_valid_approval,
         ]
@@ -581,7 +577,7 @@ class ApplicationGEIQEligibilityView(RequireValidApplySessionMixin, ApplicationB
 
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
-        if not request.user.is_prescriber_with_authorized_org:
+        if not request.from_authorized_prescriber:
             return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
@@ -710,7 +706,7 @@ class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
 
     def get_back_url(self):
         view_name = "apply:application_jobs"
-        if self.company.kind == CompanyKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
+        if self.company.kind == CompanyKind.GEIQ and self.request.from_authorized_prescriber:
             view_name = "apply:application_geiq_eligibility"
         elif self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [

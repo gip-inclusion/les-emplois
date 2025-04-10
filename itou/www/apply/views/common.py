@@ -180,7 +180,7 @@ def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name,
         )
 
     form_administrative_criteria = AdministrativeCriteriaForm(
-        request.user.is_prescriber_with_authorized_org, siae=siae, data=request.POST or None
+        request.from_authorized_prescriber, siae=siae, data=request.POST or None
     )
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(
@@ -264,7 +264,7 @@ def _geiq_eligibility_criteria(
     if request.method == "POST" and form.is_valid():
         criteria = form.cleaned_data
         if request.htmx:
-            allowance_amount = geiq_allowance_amount(request.user.is_prescriber_with_authorized_org, criteria)
+            allowance_amount = geiq_allowance_amount(request.from_authorized_prescriber, criteria)
         else:
             if diagnosis:
                 GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)

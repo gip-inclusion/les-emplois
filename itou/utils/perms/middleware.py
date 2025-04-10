@@ -126,6 +126,10 @@ class ItouCurrentOrganizationMiddleware:
                 if not request.current_organization:
                     logout_warning = LogoutWarning.LABOR_INSPECTOR_NO_INSTITUTION
 
+            request.from_authorized_prescriber = bool(
+                user.is_prescriber and request.current_organization and request.current_organization.is_authorized
+            )
+
         # Accepting an invitation to join a group is a two-step process.
         # - View one: account creation or login.
         # - View two: user is added to the group.

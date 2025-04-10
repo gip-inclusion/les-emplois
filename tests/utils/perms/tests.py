@@ -134,6 +134,7 @@ class TestUtils:
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
                 request.user = locals()[user_type]
+                request.from_authorized_prescriber = request.user == authorized_prescriber
                 assert can_edit_personal_information(request, locals()[other_user_type]) is expected, (
                     f"{user_type} can_edit_personal_information {other_user_type}"
                 )
@@ -184,6 +185,7 @@ class TestUtils:
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
                 request.user = locals()[user_type]
+                request.from_authorized_prescriber = request.user == authorized_prescriber
                 assert can_view_personal_information(request, locals()[other_user_type]) is expected, (
                     f"{user_type} can_view_personal_information {other_user_type}"
                 )

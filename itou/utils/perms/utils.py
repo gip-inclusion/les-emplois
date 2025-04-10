@@ -4,7 +4,7 @@ def can_view_personal_information(request, user):
 
     if user.is_job_seeker:  # Restrict display of personal information to job seeker
         if request.user.is_prescriber:
-            if request.user.is_prescriber_with_authorized_org:
+            if request.from_authorized_prescriber:
                 return True
             else:
                 return user.is_handled_by_proxy and user.is_created_by(request.user)
@@ -19,7 +19,7 @@ def can_edit_personal_information(request, user):
         return True
 
     if request.user.is_prescriber:
-        if request.user.is_prescriber_with_authorized_org:
+        if request.from_authorized_prescriber:
             return user.is_handled_by_proxy
         else:
             return user.is_handled_by_proxy and user.is_created_by(request.user)

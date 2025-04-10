@@ -64,7 +64,7 @@
 
     {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
-    {% if user.is_prescriber and request.current_organization and request.current_organization.is_authorized and not request.current_organization.has_reliable_coords_legacy %}
+    {% if request.from_authorized_prescriber and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.

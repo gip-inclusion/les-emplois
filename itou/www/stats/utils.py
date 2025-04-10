@@ -9,10 +9,8 @@ from itou.institutions.models import Institution
 from itou.metabase.models import DatumKey
 from itou.prescribers.enums import (
     DTFT_SAFIR_CODE_TO_DEPARTMENTS,
-    PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
 )
-from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 
 
@@ -78,32 +76,20 @@ def can_view_stats_cd(request):
     a non-CD organization of the `DEPT` kind.
     """
     return (
-        request.user.is_prescriber
-        and isinstance(request.current_organization, PrescriberOrganization)
+        request.from_authorized_prescriber
         and request.current_organization.kind == PrescriberOrganizationKind.DEPT
-        and request.current_organization.is_authorized
-        and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         and not request.current_organization.is_brsa
     )
 
 
 def can_view_stats_ft(request):
-    return (
-        request.user.is_prescriber
-        and isinstance(request.current_organization, PrescriberOrganization)
-        and request.current_organization.kind == PrescriberOrganizationKind.FT
-        and request.current_organization.is_authorized
-        and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-    )
+    return request.from_authorized_prescriber and request.current_organization.kind == PrescriberOrganizationKind.FT
 
 
 def can_view_stats_ph(request):
     return (
-        request.user.is_prescriber
-        and isinstance(request.current_organization, PrescriberOrganization)
+        request.from_authorized_prescriber
         and request.current_organization.kind in STATS_PH_ORGANISATION_KIND_WHITELIST
-        and request.current_organization.is_authorized
-        and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
     )
 
 

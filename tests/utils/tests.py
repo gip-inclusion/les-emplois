@@ -150,6 +150,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == company
         assert request.organizations == [company]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -191,6 +192,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == company_1
         assert request.organizations == [company_1, company_2]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_employer_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -217,6 +219,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == company_2
         assert request.organizations == [company_1, company_2]
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -261,6 +264,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == company
         assert request.organizations == [company]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_employer_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -288,6 +292,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == active_company
         assert request.organizations == [company, active_company]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -303,6 +308,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -319,6 +325,24 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == organization
         assert request.organizations == [organization]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
+
+    def test_prescriber_with_authorized_organization(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        request.user = organization.members.first()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(1):  # retrieve user memberships
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == organization.pk
+        # Check new request attributes
+        assert request.current_organization == organization
+        assert request.organizations == [organization]
+        assert request.is_current_organization_admin
+        assert request.from_authorized_prescriber
 
     def test_prescriber_with_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -337,6 +361,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == organization1
         assert request.organizations == [organization1, organization2]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_prescriber_with_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -357,6 +382,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == organization2
         assert request.organizations == [organization1, organization2]
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -375,6 +401,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_ft_prescriber_with_no_ft_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -396,6 +423,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_labor_inspector_admin_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -412,6 +440,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == institution
         assert request.organizations == [institution]
         assert request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -433,6 +462,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization == institution2
         assert request.organizations == [institution1, institution2]
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
     def test_labor_inspector_no_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -454,6 +484,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
+        assert not request.from_authorized_prescriber
 
 
 def test_logout_as_siae_multiple_memberships(client):

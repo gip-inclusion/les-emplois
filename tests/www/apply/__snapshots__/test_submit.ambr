@@ -1118,7 +1118,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1281,25 +1281,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1335,7 +1316,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1549,26 +1530,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -1643,7 +1604,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -1821,26 +1782,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1865,7 +1806,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -2079,26 +2020,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -3308,7 +3229,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -3471,25 +3392,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -3525,7 +3427,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -3739,26 +3641,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -3833,7 +3715,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -4011,26 +3893,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -4055,7 +3917,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -4269,26 +4131,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -5498,7 +5340,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -5661,25 +5503,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -5715,7 +5538,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -5929,26 +5752,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -6023,7 +5826,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -6201,26 +6004,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -6245,7 +6028,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -6459,26 +6242,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -7688,7 +7451,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -7851,25 +7614,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -7905,7 +7649,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -8119,26 +7863,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -8213,7 +7937,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -8391,26 +8115,6 @@
       }),
       dict({
         'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep2View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -8435,7 +8139,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 9,
+    'num_queries': 8,
     'queries': list([
       dict({
         'origin': list([
@@ -8649,26 +8353,6 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-          'UpdateJobSeekerStep3View.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
