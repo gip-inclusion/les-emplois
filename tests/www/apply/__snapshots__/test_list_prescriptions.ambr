@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_as_unauthorized_prescriber[SQL queries for prescriptions list]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -304,29 +304,6 @@
           INNER JOIN "users_user" T3 ON ("job_applications_jobapplication"."job_seeker_id" = T3."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
           ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -1199,7 +1176,7 @@
 # ---
 # name: test_exports_download[SQL queries of export]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1724,27 +1701,6 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          '_serialize_job_application[job_applications/export.py]',
-          '_job_applications_serializer[job_applications/export.py]',
-          'serialize_queryset_by_batch[<site-packages>/xlsx_streaming/streaming.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -3049,7 +3005,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 23,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -3356,29 +3312,6 @@
                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                  OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
           ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({
@@ -4253,7 +4186,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -4560,29 +4493,6 @@
                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                  OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
           ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'PrescriberFilterJobApplicationsForm._get_choices_for_job_seeker[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
-          LIMIT 1
         ''',
       }),
       dict({

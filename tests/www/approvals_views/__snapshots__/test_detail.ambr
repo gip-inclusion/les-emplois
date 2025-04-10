@@ -1563,7 +1563,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1851,25 +1851,6 @@
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."sender_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
           LIMIT 1
         ''',
       }),
@@ -3892,7 +3873,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -4180,25 +4161,6 @@
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."sender_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'User.is_prescriber_with_authorized_org[users/models.py]',
-          'can_edit_personal_information[utils/perms/utils.py]',
-          'can_view_personal_information[utils/perms/utils.py]',
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescriberorganization"."is_authorized"
-                 AND "users_user"."is_active")
           LIMIT 1
         ''',
       }),

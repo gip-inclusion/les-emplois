@@ -18,7 +18,7 @@
            {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
     </li>
     {% if user.is_authenticated %}
-        {% if user.is_employer or user.is_prescriber_with_authorized_org %}
+        {% if user.is_employer or request.from_authorized_prescriber %}
             <li>
                 <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
                    rel="noopener"
