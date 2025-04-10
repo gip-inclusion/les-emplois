@@ -219,7 +219,7 @@ def stats_siae_etp(request):
     if not utils.can_view_stats_siae_etp(request):
         raise PermissionDenied
     context = {
-        "page_title": "Suivi des effectifs annuels et mensuels en ETP",
+        "page_title": "Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures",
         "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
@@ -246,7 +246,7 @@ def stats_siae_orga_etp(request):
     if not utils.can_view_stats_siae(request):
         raise PermissionDenied
     context = {
-        "page_title": "Suivi des effectifs annuels et mensuels en ETP",
+        "page_title": "Suivre les effectifs annuels et mensuels (ETP) de ma structure",
         "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
@@ -286,11 +286,13 @@ def render_stats_siae(request, page_title):
 
 
 def stats_siae_hiring(request):
-    return render_stats_siae(request=request, page_title="Données de candidatures de mes structures")
+    return render_stats_siae(request=request, page_title="Analyse des candidatures reçues et de leur traitement")
 
 
 def stats_siae_auto_prescription(request):
-    return render_stats_siae(request=request, page_title="Focus auto-prescription")
+    return render_stats_siae(
+        request=request, page_title="Suivi de l’activité d’auto-prescription et du contrôle à posteriori"
+    )
 
 
 def render_stats_cd(request, page_title, *, params=None, extra_context=None):
@@ -318,11 +320,11 @@ def stats_cd_iae(request):
 
 
 def stats_cd_hiring(request):
-    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
+    return render_stats_cd(request=request, page_title="Analyse des candidatures reçues et de leur traitement")
 
 
 def stats_cd_brsa(request):
-    return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
+    return render_stats_cd(request=request, page_title="Analyse des prescriptions pour les publics ARSA")
 
 
 def stats_cd_orga_etp(request):
@@ -332,7 +334,7 @@ def stats_cd_orga_etp(request):
 
     return render_stats_cd(
         request=request,
-        page_title="Suivi des effectifs annuels et mensuels en ETP",
+        page_title="Suivi des effectifs annuels et mensuels (ETP)",
     )
 
 
@@ -393,7 +395,7 @@ def stats_ft_delay_raw(request):
 def stats_ft_conversion_main(request):
     return render_stats_ft(
         request=request,
-        page_title="Taux de transformation",
+        page_title="Analyse des parcours des candidats diagnostiqués",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
@@ -413,7 +415,7 @@ def stats_ft_conversion_raw(request):
 def stats_ft_state_main(request):
     return render_stats_ft(
         request=request,
-        page_title="Etat des candidatures orientées",
+        page_title="Analyse des candidatures émises et de leur traitement",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
@@ -464,7 +466,7 @@ def stats_ph_state_main(request):
 
     return render_stats_ph(
         request=request,
-        page_title="Etat des candidatures orientées",
+        page_title="Analyse des candidatures émises et de leur traitement",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
             mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
