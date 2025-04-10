@@ -1,4 +1,5 @@
 import random
+import uuid
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -281,14 +282,31 @@ def job_description_session_key(job_description_id):
 
 
 @check_user(lambda user: user.is_employer)
-def edit_job_description(request, job_description_id=None, template_name="companies/edit_job_description.html"):
-    session_key = job_description_session_key(job_description_id)
-    if job_description_id or session_key in request.session:
-        session_data = request.session.get(session_key, {})
+def edit_job_description(
+    request,
+    job_description_id=None,
+    edit_session_id=None,
+    template_name="companies/edit_job_description.html",
+):
+    def session_key():
+        # Use a prefix to prevent collisions with other views (edit_session_id is controlled by users).
+        return f"edit_job_description-{uuid.uuid4()}"
+
+    session_data = {}
+    if edit_session_id:
+        try:
+            session_data = request.session[edit_session_id]
+        except KeyError:
+            # Previous session expired.
+            edit_session_id = session_key()
     else:
-        # TODO(François): Drop this fallback next week.
+        edit_session_id = session_key()
+
+    # TODO(François): Drop this fallback next week.
+    if job_description_id is None and edit_session_id is None:
         session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY, {})
         job_description_id = session_data.get("pk")
+
     if job_description_id:
         job_description = get_object_or_404(
             JobDescription.objects.select_related("appellation", "location"),
@@ -303,7 +321,7 @@ def edit_job_description(request, job_description_id=None, template_name="compan
     )
 
     if request.method == "POST" and form.is_valid():
-        request.session[session_key] = {**session_data, **form.cleaned_data}
+        request.session[edit_session_id] = {**session_data, **form.cleaned_data}
         request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY, None)
         return HttpResponseRedirect(
             reverse(
