@@ -431,6 +431,7 @@ class ApplicationJobsView(ApplicationBaseView):
         super().setup(request, *args, **kwargs)
 
         if not self.apply_session.exists():
+            logger.warning("We should not automatically initialize the session", exc_info=True)
             self.apply_session.init(self.session_kind, {})
 
         self.form = ApplicationJobsForm(
