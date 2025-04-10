@@ -12,12 +12,20 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>
-          
-              Valider
-          
-          l'éligibilité de Jane DOE
-      </h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  
+                      Valider
+                  
+                  l'éligibilité de Jane DOE
+              </h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -243,12 +251,20 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>
-          
-              Mettre à jour
-          
-          l'éligibilité de Jane DOE
-      </h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  
+                      Mettre à jour
+                  
+                  l'éligibilité de Jane DOE
+              </h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
