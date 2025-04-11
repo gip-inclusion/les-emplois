@@ -38,6 +38,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -1133,8 +1134,8 @@ class TestProcessViews:
         assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
 
         # Un-authorize prescriber (ie. considered as "orienteur")
-        job_application.sender_prescriber_organization.is_authorized = False
-        job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
+        job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
+        job_application.sender_prescriber_organization.save(update_fields=["authorization_status"])
 
         response = client.get(refusal_reason_url)
         assertContains(
@@ -1624,8 +1625,8 @@ class TestProcessViews:
         assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
 
         # Un-authorize prescriber (ie. considered as "orienteur")
-        job_application.sender_prescriber_organization.is_authorized = False
-        job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
+        job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
+        job_application.sender_prescriber_organization.save(update_fields=["authorization_status"])
         response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )

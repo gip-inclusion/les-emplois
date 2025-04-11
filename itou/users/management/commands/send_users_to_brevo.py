@@ -15,6 +15,7 @@ from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
@@ -170,7 +171,9 @@ class Command(BaseCommand):
     def import_prescribers(self, client, professional_qs, *, wet_run):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
         authorized_prescriber_memberships = PrescriberMembership.objects.filter(
-            user_id=OuterRef("pk"), is_active=True, organization__is_authorized=True
+            user_id=OuterRef("pk"),
+            is_active=True,
+            organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
         logger.info("Prescribers count: %d", len(prescribers))

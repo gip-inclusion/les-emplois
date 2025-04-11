@@ -569,7 +569,6 @@
                  "prescribers_prescriberorganization"."email",
                  "prescribers_prescriberorganization"."website",
                  "prescribers_prescriberorganization"."description",
-                 "prescribers_prescriberorganization"."is_authorized",
                  "prescribers_prescriberorganization"."code_safir_pole_emploi",
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
