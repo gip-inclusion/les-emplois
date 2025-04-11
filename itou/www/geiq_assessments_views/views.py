@@ -18,7 +18,13 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.files.models import File
 from itou.geiq import sync
-from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, EmployeeContract, LabelInfos
+from itou.geiq_assessments.models import (
+    Assessment,
+    AssessmentCampaign,
+    AssessmentInstitutionLink,
+    EmployeeContract,
+    LabelInfos,
+)
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.apis import geiq_label
@@ -53,9 +59,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
     current_siret = request.current_organization.siret
-    campaign_label_infos = (
-        LabelInfos.objects.filter(campaign__year=timezone.localdate().year - 1).select_related("campaign").first()
-    )
+    campaign_label_infos = LabelInfos.objects.filter(campaign__year=timezone.localdate().year - 1).first()
     label_data = campaign_label_infos.data if campaign_label_infos else []
     for geiq_data in label_data:
         if current_siret in [geiq_data["siret"], *(antenna["siret"] for antenna in geiq_data["antennes"])]:
@@ -64,11 +68,16 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
     else:
         geiq_info = None
 
-    if geiq_info is not None:
-        antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
-        create_form = CreateForm(antenna_names=antenna_names, geiq_name=geiq_info["nom"], data=request.POST or None)
-    else:
-        create_form = None
+    context = {
+        "siret": current_siret,
+        "campaign_label_infos": campaign_label_infos,
+        "geiq_info": geiq_info,
+    }
+    if geiq_info is None:
+        return render(request, template_name, context)
+
+    antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
+    create_form = CreateForm(antenna_names=antenna_names, geiq_name=geiq_info["nom"], data=request.POST or None)
 
     conflicting_antennas = []
     if request.method == "POST" and create_form and create_form.is_valid():
@@ -79,9 +88,11 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
             if create_form.cleaned_data.get(create_form.get_antenna_field(antenna_id)):
                 label_antennas.append({"id": antenna_id, "name": antenna_name})
 
+        # Take a lock on the campaign to prevent concurrent creation
+        campaign = AssessmentCampaign.objects.select_for_update().get(pk=campaign_label_infos.campaign_id)
         # Check existing assessments
         for existing_assessment in Assessment.objects.filter(
-            campaign=campaign_label_infos.campaign,
+            campaign=campaign,
             label_geiq_id=geiq_info["id"],
         ).only("label_antennas"):
             existing_antenna_ids = existing_assessment.label_antenna_ids()
@@ -99,7 +110,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
                 name_for_geiq_parts.append(f"DDETS {ddets.department}")
 
             assessment = Assessment.objects.create(
-                campaign=campaign_label_infos.campaign,
+                campaign=campaign,
                 name_for_institution=geiq_info["nom"],
                 name_for_geiq="/".join(name_for_geiq_parts),
                 label_geiq_id=geiq_info["id"],
@@ -134,13 +145,8 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
                 )
             return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
 
-    context = {
-        "conflicting_antennas": conflicting_antennas,
-        "campaign_label_infos": campaign_label_infos,
-        "geiq_info": geiq_info,
-        "siret": current_siret,
-        "form": create_form,
-    }
+    context["conflicting_antennas"] = conflicting_antennas
+    context["form"] = create_form
     return render(request, template_name, context)
 
 
