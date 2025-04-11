@@ -27,6 +27,8 @@ from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.db import or_queries
@@ -1003,6 +1005,18 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 )
             self.user.jobseeker_profile.pe_obfuscated_nir = id_national
             self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+            IdentityCertification.objects.bulk_create(
+                [
+                    IdentityCertification(
+                        jobseeker_profile=self.user.jobseeker_profile,
+                        certifier=IdentityCertificationAuthorities.API_RECHERCHE_INDIVIDU_CERTIFIE,
+                        certified_at=now,
+                    )
+                ],
+                update_conflicts=True,
+                update_fields=["certified_at"],
+                unique_fields=["certifier", "jobseeker_profile"],
+            )
             self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
         return self.pe_maj_pass(
