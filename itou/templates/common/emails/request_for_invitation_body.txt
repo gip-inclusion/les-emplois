@@ -6,7 +6,7 @@ Bonjour {{ to.get_full_name }},
 
 {{ full_name|title }} a demandé à rejoindre votre organisation « {{ organization.display_name }} ».
 
-Accédez aux invitations {{ invitation_url }} pour confirmer cette demande.
+Accédez à la rubrique d’ajout des collaborateurs {{ invitation_url }} pour confirmer cette demande.
 Vous avez aussi la possibilité de contacter cette personne via son adresse e-mail {{ email }}
 
 En cas de refus, vous pouvez simplement ignorer ce mail.

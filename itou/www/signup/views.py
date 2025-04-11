@@ -405,8 +405,8 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
         prescriber_membership.request_for_invitation(requestor).send()
 
         message = (
-            f"Votre demande d'invitation à rejoindre « {prescriber_membership.organization.display_name} »"
-            " a été envoyée par courriel."
+            f"Votre demande d'ajout pour rejoindre « {prescriber_membership.organization.display_name} »"
+            " a bien été envoyée."
         )
         messages.success(request, message)
 
