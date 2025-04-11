@@ -328,6 +328,7 @@ LOGGING = {
 }
 
 DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"django_datadog_logger\.middleware\.request_log"
+DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"itou\.[a-z\_]+\.management\.commands"
 
 AUTH_USER_MODEL = "users.User"
 

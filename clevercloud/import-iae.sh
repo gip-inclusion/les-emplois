@@ -35,5 +35,8 @@ time ./manage.py import_siae --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/imp
 # Destroy the data
 rm -rf "$FLUX_IAE_DIR"
 
+# Rename the flux IAE file
+mv "$FLUX_IAE_FILE" "${FLUX_IAE_FILE}.imported"
+
 # Remove files older than 3 weeks
-find asp_riae_shared_bucket/ -name "$FLUX_IAE_FILE_GLOB" -type f -mtime +20 -delete
+find asp_riae_shared_bucket/ -name "${FLUX_IAE_FILE_GLOB}.imported" -type f -mtime +20 -delete
