@@ -477,10 +477,10 @@ class TestJobDescriptionQuerySet:
         job = JobDescriptionFactory(company=company, is_active=False)
         assert JobDescription.objects.active().count() == 0
         job.is_active = True
-        job.save(update_fields=["is_active"])
+        job.save(update_fields=["is_active", "updated_at"])
         assert JobDescription.objects.active().count() == 0
         company.kind = CompanyKind.GEIQ
-        company.save(update_fields=["kind"])
+        company.save(update_fields=["kind", "updated_at"])
         assert JobDescription.objects.active().count() == 1
 
 
@@ -547,7 +547,7 @@ def test_jobdescription_is_active_field_history():
 
     # modify the field
     job.is_active = True
-    job.save(update_fields=["is_active"])
+    job.save(update_fields=["is_active", "updated_at"])
     job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {
@@ -560,7 +560,7 @@ def test_jobdescription_is_active_field_history():
 
     # non-modifying "change"
     job.is_active = True
-    job.save(update_fields=["is_active"])
+    job.save(update_fields=["is_active", "updated_at"])
     job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {

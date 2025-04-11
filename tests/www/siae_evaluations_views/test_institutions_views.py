@@ -1010,7 +1010,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         )
         # Check without phone now
         evaluated_siae.siae.phone = ""
-        evaluated_siae.siae.save(update_fields=("phone",))
+        evaluated_siae.siae.save(update_fields=("phone", "updated_at"))
         response = client.get(url)
         assertContains(
             response, """<p>Numéro de téléphone à utiliser au besoin :<span>Non renseigné</span>""", html=True

@@ -336,7 +336,7 @@ class TestProcessViews:
         gilles = EmployerFactory(first_name="Gilles", last_name="Pardoux")
         to_company.members.add(gilles)
         job_application.archived_by = gilles
-        job_application.save(update_fields=["archived_by"])
+        job_application.save(update_fields=["archived_by", "updated_at"])
         response = client.get(
             reverse(
                 "apply:details_for_company",
@@ -1135,7 +1135,7 @@ class TestProcessViews:
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
-        job_application.sender_prescriber_organization.save(update_fields=["authorization_status"])
+        job_application.sender_prescriber_organization.save(update_fields=["authorization_status", "updated_at"])
 
         response = client.get(refusal_reason_url)
         assertContains(
@@ -1157,7 +1157,7 @@ class TestProcessViews:
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
         job_application.sender_prescriber_organization = None
-        job_application.save(update_fields=["sender_prescriber_organization"])
+        job_application.save(update_fields=["sender_prescriber_organization", "updated_at"])
 
         response = client.get(refusal_reason_url)
         assertContains(
@@ -1626,7 +1626,7 @@ class TestProcessViews:
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
-        job_application.sender_prescriber_organization.save(update_fields=["authorization_status"])
+        job_application.sender_prescriber_organization.save(update_fields=["authorization_status", "updated_at"])
         response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
@@ -1639,7 +1639,7 @@ class TestProcessViews:
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
         job_application.sender_prescriber_organization = None
-        job_application.save(update_fields=["sender_prescriber_organization"])
+        job_application.save(update_fields=["sender_prescriber_organization", "updated_at"])
         response = client.get(
             reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         )
@@ -1664,7 +1664,7 @@ class TestProcessViews:
 
         # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
-        job_application.save(update_fields=["resume_link"])
+        job_application.save(update_fields=["resume_link", "updated_at"])
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
@@ -1689,7 +1689,7 @@ class TestProcessViews:
 
         # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
-        job_application.save(update_fields=["resume_link"])
+        job_application.save(update_fields=["resume_link", "updated_at"])
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
@@ -1751,7 +1751,7 @@ class TestProcessViews:
 
             # Unset resume, should now update the timestamp and send the mail
             job_application.resume_link = ""
-            job_application.save(update_fields=["resume_link"])
+            job_application.save(update_fields=["resume_link", "updated_at"])
             frozen_time.tick()
             initial_invite_time = frozen_time()
             response = client.post(
@@ -3506,7 +3506,7 @@ def test_details_sender_email_display_for_job_seeker(client):
     employer = job_application.to_company.members.first()
     job_application.sender = employer
     job_application.sender_kind = job_applications_enums.SenderKind.EMPLOYER
-    job_application.save(update_fields=["sender", "sender_kind"])
+    job_application.save(update_fields=["sender", "sender_kind", "updated_at"])
     response = client.get(url)
     assertNotContains(
         response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
@@ -3516,7 +3516,7 @@ def test_details_sender_email_display_for_job_seeker(client):
     # Email shown for job seeker
     job_application.sender = job_seeker
     job_application.sender_kind = job_applications_enums.SenderKind.JOB_SEEKER
-    job_application.save(update_fields=["sender", "sender_kind"])
+    job_application.save(update_fields=["sender", "sender_kind", "updated_at"])
     response = client.get(url)
     assertContains(
         response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
@@ -3544,7 +3544,7 @@ def test_accept_button(client):
     assertNotContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
     job_application.to_company.kind = CompanyKind.AI
-    job_application.to_company.save(update_fields=("kind",))
+    job_application.to_company.save(update_fields=("kind", "updated_at"))
 
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
@@ -3600,7 +3600,7 @@ def test_add_prior_action_processing(client, snapshot):
     # State is accepted
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.processed_at = timezone.now()
-    job_application.save(update_fields=("state", "processed_at"))
+    job_application.save(update_fields=("state", "processed_at", "updated_at"))
     today = timezone.localdate()
     response = client.post(
         add_prior_action_url,
@@ -3661,7 +3661,7 @@ def test_modify_prior_action(client):
 
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.processed_at = timezone.now()
-    job_application.save(update_fields=("state", "processed_at"))
+    job_application.save(update_fields=("state", "processed_at", "updated_at"))
     response = client.post(
         modify_prior_action_url,
         data={
@@ -4153,12 +4153,12 @@ class TestJobApplicationSenderLeftOrg:
 
         # membership is inactive
         prescriber_membership.is_active = False
-        prescriber_membership.save(update_fields=["is_active"])
+        prescriber_membership.save(update_fields=["is_active", "updated_at"])
         assert job_application_sender_left_org(job_app) is True
 
         # prescriber is inactive
         prescriber_membership.is_active = True
-        prescriber_membership.save(update_fields=["is_active"])
+        prescriber_membership.save(update_fields=["is_active", "updated_at"])
         prescriber_membership.user.is_active = False
         prescriber_membership.user.save(update_fields=["is_active"])
         assert job_application_sender_left_org(job_app) is True
@@ -4176,12 +4176,12 @@ class TestJobApplicationSenderLeftOrg:
 
         # membership is inactive
         company_membership.is_active = False
-        company_membership.save(update_fields=["is_active"])
+        company_membership.save(update_fields=["is_active", "updated_at"])
         assert job_application_sender_left_org(job_app) is True
 
         # prescriber is inactive
         company_membership.is_active = True
-        company_membership.save(update_fields=["is_active"])
+        company_membership.save(update_fields=["is_active", "updated_at"])
         company_membership.user.is_active = False
         company_membership.user.save(update_fields=["is_active"])
         assert job_application_sender_left_org(job_app) is True

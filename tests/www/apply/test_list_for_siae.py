@@ -209,7 +209,7 @@ class TestProcessListSiae:
         for kind in CompanyKind:
             with subtests.test(kind=kind.label):
                 company.kind = kind
-                company.save(update_fields=("kind",))
+                company.save(update_fields=("kind", "updated_at"))
                 response = client.get(
                     reverse("apply:list_for_siae"), data={"display": JobApplicationsDisplayKind.LIST}
                 )
@@ -456,7 +456,7 @@ class TestProcessListSiae:
         diagnosis.expires_at = timezone.localdate() - datetime.timedelta(
             days=diagnosis.EXPIRATION_DELAY_MONTHS * 31 + 1
         )
-        diagnosis.save(update_fields=("expires_at",))
+        diagnosis.save(update_fields=("expires_at", "updated_at"))
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
         assert response.context["job_applications_page"].object_list == []
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_pending": True})
@@ -664,7 +664,7 @@ def test_list_for_siae_no_apply_button(client):
     assertContains(response, APPLY_TXT)
     for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
         company.kind = kind
-        company.save(update_fields=("kind",))
+        company.save(update_fields=("kind", "updated_at"))
         response = client.get(reverse("apply:list_for_siae"))
         assertNotContains(response, APPLY_TXT)
 
@@ -685,7 +685,7 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
     }
     for kind in CompanyKind:
         company.kind = kind
-        company.save(update_fields=("kind",))
+        company.save(update_fields=("kind", "updated_at"))
         response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
         assert response.status_code == 200
         filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
@@ -815,7 +815,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
     for kind in CompanyKind:
         with subtests.test(kind=kind.label):
             company.kind = kind
-            company.save(update_fields=("kind",))
+            company.save(update_fields=("kind", "updated_at"))
             response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
             if expect_to_see_criteria[kind]:
                 assertContains(response, TITLE, html=True)
@@ -1427,7 +1427,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
 
     # Check as GEIQ
     company.kind = CompanyKind.GEIQ
-    company.save(update_fields={"kind"})
+    company.save(update_fields={"kind", "updated_at"})
     simulate_applications_selection([postponed_app.pk, postponable_app_1.pk])
     # No modal & linked button
     assert get_postpone_modal() is None
@@ -1524,7 +1524,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
 
     # Check as GEIQ
     company.kind = CompanyKind.GEIQ
-    company.save(update_fields={"kind"})
+    company.save(update_fields={"kind", "updated_at"})
     simulate_applications_selection([refused_app.pk, refusable_app_1.pk])
     refuse_button = get_refuse_button()
     assert str(refuse_button) == snapshot(name="inactive refuse button as GEIQ")

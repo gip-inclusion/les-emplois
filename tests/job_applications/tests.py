@@ -690,7 +690,7 @@ class TestJobApplicationQuerySet:
         job_application.process()
         # User account is deleted.
         job_application.sender = None
-        job_application.save(update_fields=["sender"])
+        job_application.save(update_fields=["sender", "updated_at"])
         employer = job_application.to_company.members.first()
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=employer)
@@ -733,7 +733,7 @@ class TestJobApplicationQuerySet:
 
         membership = job_application.to_company.memberships.filter(user=user).get()
         membership.is_active = False
-        membership.save(update_fields=("is_active",))
+        membership.save(update_fields=("is_active", "updated_at"))
 
         assert JobApplication.objects.is_active_company_member(user).count() == 0
 
@@ -976,7 +976,7 @@ class TestJobApplicationNotifications:
         job_application.process()
         # User account is deleted.
         job_application.sender = None
-        job_application.save(update_fields=["sender"])
+        job_application.save(update_fields=["sender", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
             job_application.refuse(user=job_application.to_company.members.first())
         [email] = mailoutbox
@@ -1177,7 +1177,7 @@ class TestJobApplicationNotifications:
         )
         # User account is deleted.
         job_application.sender = None
-        job_application.save(update_fields=["sender"])
+        job_application.save(update_fields=["sender", "updated_at"])
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
             job_application.cancel(user=cancellation_user)
