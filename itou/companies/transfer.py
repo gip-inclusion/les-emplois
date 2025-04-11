@@ -182,10 +182,12 @@ def transfer_company_data(
 
                 if not spec.get("report_only"):
                     setattr(item, spec["related_model_field"], to_company)
-                    item.save(update_fields=[spec["related_model_field"]])
+                    update_fields = [spec["related_model_field"], "updated_at"]
+                    item.save(update_fields=update_fields)
                 reporter.add(transfer_field, _format_model(item))
 
     if save_update_fields:
+        save_update_fields.append("updated_at")
         to_company.save(update_fields=save_update_fields)
 
     if disable_from_company:
