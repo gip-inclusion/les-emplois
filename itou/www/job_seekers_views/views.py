@@ -311,7 +311,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             return reverse("gps:group_list")
         if self.standalone_creation and self.is_job_seeker_in_user_jobseekers_list(job_seeker) and not created:
             params = {
-                "job_seeker": job_seeker.public_id,
+                "job_seeker_public_id": job_seeker.public_id,
                 "city": job_seeker.city_slug if can_view_personal_information(self.request, job_seeker) else "",
             }
             return add_url_params(reverse("search:employers_results"), params)
@@ -868,7 +868,7 @@ class UpdateJobSeekerStartView(View):
 
         try:
             job_seeker = get_object_or_404(
-                User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=request.GET.get("job_seeker")
+                User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=request.GET.get("job_seeker_public_id")
             )
         except ValidationError:
             raise Http404("Aucun candidat n'a été trouvé")

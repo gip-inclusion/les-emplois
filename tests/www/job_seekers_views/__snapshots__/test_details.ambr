@@ -29,7 +29,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -274,7 +274,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -503,7 +503,7 @@
                           <span>Valider son éligibilité IAE</span>
                       
                   </a>
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -690,7 +690,7 @@
                           <span>Mettre à jour son éligibilité IAE</span>
                       
                   </a>
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -960,7 +960,7 @@
               
                   
               
-              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                   <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                   <span>Postuler pour ce candidat</span>
               </a>
@@ -1906,7 +1906,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -2159,7 +2159,7 @@
                           <span>Valider son éligibilité IAE</span>
                       
                   </a>
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -2386,7 +2386,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -2567,7 +2567,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -2798,7 +2798,7 @@
                           <span>Mettre à jour son éligibilité IAE</span>
                       
                   </a>
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -3023,7 +3023,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>
@@ -3204,7 +3204,7 @@
                   
               
               
-                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
+                  <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&amp;city=rennes-35">
                       <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
                       <span>Postuler pour ce candidat</span>
                   </a>

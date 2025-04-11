@@ -43,7 +43,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:list"))
-        next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
+        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(
             response,
             f"""
@@ -64,7 +64,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
+        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(
             response,
             (
@@ -92,7 +92,7 @@ class TestApplyAsPrescriber:
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{guerande_company.get_card_url()}?job_seeker={job_seeker.public_id}"
+            f"{guerande_company.get_card_url()}?job_seeker_public_id={job_seeker.public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
@@ -104,7 +104,8 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         apply_company_url = (
-            reverse("apply:start", kwargs={"company_pk": guerande_company.pk}) + f"?job_seeker={job_seeker.public_id}"
+            reverse("apply:start", kwargs={"company_pk": guerande_company.pk})
+            + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
 
@@ -123,7 +124,10 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{guerande_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -203,7 +207,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:list"))
-        next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
+        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(response, "A… Z…")
         assertContains(
             response,
@@ -225,7 +229,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
+        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(response, "A… Z…")
         assertContains(
             response,
@@ -253,7 +257,7 @@ class TestApplyAsPrescriber:
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{guerande_company.get_card_url()}?job_seeker={job_seeker.public_id}"
+            f"{guerande_company.get_card_url()}?job_seeker_public_id={job_seeker.public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
@@ -265,7 +269,8 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         apply_company_url = (
-            reverse("apply:start", kwargs={"company_pk": guerande_company.pk}) + f"?job_seeker={job_seeker.public_id}"
+            reverse("apply:start", kwargs={"company_pk": guerande_company.pk})
+            + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
 
@@ -284,7 +289,10 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{guerande_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -346,7 +354,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         apply_company_url_incorrect_uuid = (
-            reverse("apply:start", kwargs={"company_pk": company.pk}) + "?job_seeker=123"
+            reverse("apply:start", kwargs={"company_pk": company.pk}) + "?job_seeker_public_id=123"
         )
         response = client.get(apply_company_url_incorrect_uuid)
         assert response.status_code == 404
@@ -356,7 +364,7 @@ class TestApplyAsPrescriber:
 
         apply_job_description_url_incorrect_uuid = (
             reverse("apply:start", kwargs={"company_pk": company.pk})
-            + f"?job_description_id={job_description.pk}&job_seeker=123"
+            + f"?job_description_id={job_description.pk}&job_seeker_public_id=123"
         )
 
         response = client.get(apply_job_description_url_incorrect_uuid)
@@ -398,7 +406,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        next_url = f"{reverse('search:employers_results')}?job_seeker={job_seeker.public_id}"
+        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(
             response,
             (
@@ -425,7 +433,7 @@ class TestApplyAsCompany:
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{other_company.get_card_url()}?job_seeker={job_seeker.public_id}"
+            f"{other_company.get_card_url()}?job_seeker_public_id={job_seeker.public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(
@@ -437,7 +445,8 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         apply_company_url = (
-            reverse("apply:start", kwargs={"company_pk": other_company.pk}) + f"?job_seeker={job_seeker.public_id}"
+            reverse("apply:start", kwargs={"company_pk": other_company.pk})
+            + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
 
@@ -456,7 +465,10 @@ class TestApplyAsCompany:
         selected_job = other_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{other_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -514,7 +526,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         apply_company_url_incorrect_uuid = (
-            reverse("apply:start", kwargs={"company_pk": other_company.pk}) + "?job_seeker=123"
+            reverse("apply:start", kwargs={"company_pk": other_company.pk}) + "?job_seeker_public_id=123"
         )
         response = client.get(apply_company_url_incorrect_uuid)
         assert response.status_code == 404
@@ -524,7 +536,7 @@ class TestApplyAsCompany:
 
         apply_job_description_url_incorrect_uuid = (
             reverse("apply:start", kwargs={"company_pk": other_company.pk})
-            + f"?job_description_id={job_description.pk}&job_seeker=123"
+            + f"?job_description_id={job_description.pk}&job_seeker_public_id=123"
         )
 
         response = client.get(apply_job_description_url_incorrect_uuid)
@@ -548,7 +560,8 @@ class TestApplyAsJobSeeker:
         # ----------------------------------------------------------------------
 
         apply_company_url_other_uuid = (
-            reverse("apply:start", kwargs={"company_pk": company.pk}) + f"?job_seeker={other_job_seeker.public_id}"
+            reverse("apply:start", kwargs={"company_pk": company.pk})
+            + f"?job_seeker_public_id={other_job_seeker.public_id}"
         )
         response = client.get(apply_company_url_other_uuid, follow=True)
         assert response.request["PATH_INFO"] == check_info_url
@@ -560,7 +573,7 @@ class TestApplyAsJobSeeker:
 
         apply_job_description_url_other_uuid = (
             reverse("apply:start", kwargs={"company_pk": company.pk})
-            + f"?job_description_id={job_description.pk}&job_seeker=123"
+            + f"?job_description_id={job_description.pk}&job_seeker_public_id=123"
         )
 
         response = client.get(apply_job_description_url_other_uuid, follow=True)

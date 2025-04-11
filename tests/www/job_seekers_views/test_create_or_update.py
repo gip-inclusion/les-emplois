@@ -463,7 +463,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
@@ -472,7 +472,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
@@ -481,7 +481,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
                 JobApplicationFactory(
                     job_seeker=existing_job_seeker,
@@ -541,7 +541,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
@@ -550,7 +550,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
@@ -559,7 +559,7 @@ class TestStandaloneCreateAsPrescriber:
                     reverse(
                         "search:employers_results",
                     ),
-                    {"job_seeker": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
                 )
                 JobApplicationFactory(
                     job_seeker=existing_job_seeker,
@@ -834,7 +834,7 @@ class TestUpdateAsOther:
         client.force_login(institution_member)
 
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -848,7 +848,7 @@ class TestUpdateAsOther:
         client.force_login(user)
 
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -859,7 +859,7 @@ class TestUpdateAsOther:
         job_seeker = JobSeekerFactory()
 
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -880,7 +880,7 @@ class TestUpdateForJobSeeker:
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "company": company_pk,
             "from_url": from_url,
         }
@@ -928,7 +928,7 @@ class TestUpdateForSender:
             from_url = None
 
         params = {
-            "job_seeker": job_seeker_public_id,
+            "job_seeker_public_id": job_seeker_public_id,
             "from_url": from_url,
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -995,7 +995,7 @@ class TestUpdateForSender:
 
         # Init session
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -1042,7 +1042,7 @@ class TestUpdateForSender:
 
         # Init session
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -1085,7 +1085,7 @@ class TestUpdateForSender:
 
         # Init session
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},

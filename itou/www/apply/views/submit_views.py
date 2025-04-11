@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
@@ -67,7 +67,8 @@ def _check_job_seeker_approval(request, job_seeker, siae):
 def _get_job_seeker_to_apply_for(request):
     job_seeker = None
 
-    if job_seeker_public_id := request.GET.get("job_seeker"):
+    # FIXME(alaurent) Remove or clause in a week
+    if job_seeker_public_id := request.GET.get("job_seeker_public_id") or request.GET.get("job_seeker"):
         try:
             job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id).get()
         except (
@@ -76,6 +77,129 @@ def _get_job_seeker_to_apply_for(request):
         ):
             raise Http404("Aucun candidat n'a été trouvé.")
     return job_seeker
+
+
+def initialize_apply_session(request, company, data):
+    apply_session = SessionNamespace(request.session, f"job_application-{company.pk}")
+    apply_session.init(data)
+    return apply_session
+
+
+class StartView(View):
+    def setup(self, request, company_pk, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+        self.hire_process = kwargs.pop("hire_process", False)
+        self.auto_prescription_process = (
+            not self.hire_process and request.user.is_employer and self.company == request.current_organization
+        )
+
+        if request.user.is_job_seeker:
+            self.tunnel = "job_seeker"
+        elif self.hire_process:
+            self.tunnel = "hire"
+        else:
+            self.tunnel = "sender"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.hire_process and request.user.kind != UserKind.EMPLOYER:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+        if self.hire_process and not self.company.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+        if request.user.kind not in [
+            UserKind.JOB_SEEKER,
+            UserKind.PRESCRIBER,
+            UserKind.EMPLOYER,
+        ]:
+            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+        if not self.company.has_active_members:
+            raise PermissionDenied(
+                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+            )
+        if self.auto_prescription_process or self.hire_process:
+            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+                raise PermissionDenied(
+                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                    "a posteriori. " + suspension_explanation
+                )
+        # Refuse all applications except those made by an SIAE member
+        if self.company.block_job_applications and not self.company.has_member(request.user):
+            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_reset_url(self):
+        if self.apply_session.exists():
+            return self.apply_session.get("reset_url", reverse("dashboard:index"))
+        return reverse("dashboard:index")
+
+    def init_job_seeker_session(self, request):
+        job_seeker_session = SessionNamespace.create_uuid_namespace(
+            request.session,
+            data={
+                "config": {
+                    "from_url": self.get_reset_url(),
+                    "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
+                },
+                "apply": {"company_pk": self.company.pk},
+            },
+        )
+        return job_seeker_session
+
+    def get(self, request, *args, **kwargs):
+        session_data = {
+            "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
+        }
+        # Store away the selected job in the session to avoid passing it
+        # along the many views before ApplicationJobsView.
+        if job_description_id := request.GET.get("job_description_id"):
+            try:
+                job_description = self.company.job_description_through.active().get(pk=job_description_id)
+            except (JobDescription.DoesNotExist, ValueError):
+                pass
+            else:
+                session_data["selected_jobs"] = [job_description.pk]
+
+        self.apply_session = initialize_apply_session(request, self.company, session_data)
+
+        # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
+        if self.tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
+            return HttpResponseRedirect(
+                add_url_params(
+                    reverse(
+                        "apply:application_jobs",
+                        kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
+                    ),
+                    {"job_description_id": job_description_id},
+                )
+            )
+
+        # Warn message if prescriber's authorization is pending
+        if (
+            request.user.is_prescriber
+            and request.current_organization
+            and request.current_organization.has_pending_authorization()
+        ):
+            return HttpResponseRedirect(
+                reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
+            )
+
+        if self.tunnel == "job_seeker":
+            # Init a job_seeker_session needed for job_seekers_views
+            job_seeker_session = self.init_job_seeker_session(request)
+
+            return HttpResponseRedirect(
+                reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session.name})
+            )
+
+        params = {
+            "tunnel": self.tunnel,
+            "company": self.company.pk,
+            "from_url": self.get_reset_url(),
+        }
+
+        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        return HttpResponseRedirect(next_url)
 
 
 class ApplyStepBaseView(TemplateView):
@@ -100,6 +224,7 @@ class ApplyStepBaseView(TemplateView):
 
         super().setup(request, *args, **kwargs)
 
+    # FIXME(alaurent) remove once we are sure that we went through this code in StartView first
     def dispatch(self, request, *args, **kwargs):
         if self.hire_process and request.user.kind != UserKind.EMPLOYER:
             raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
@@ -125,19 +250,6 @@ class ApplyStepBaseView(TemplateView):
         if self.apply_session.exists():
             return self.apply_session.get("reset_url", reverse("dashboard:index"))
         return reverse("dashboard:index")
-
-    def init_job_seeker_session(self, request):
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session,
-            data={
-                "config": {
-                    "from_url": self.get_reset_url(),
-                    "session_kind": JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
-                },
-                "apply": {"company_pk": self.company.pk},
-            },
-        )
-        return job_seeker_session
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -223,80 +335,6 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         return HttpResponseRedirect(
             reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id})
         )
-
-
-class StartView(ApplyStepBaseView):
-    def get(self, request, *args, **kwargs):
-        if request.user.is_job_seeker:
-            tunnel = "job_seeker"
-        elif self.hire_process:
-            tunnel = "hire"
-        else:
-            tunnel = "sender"
-
-        if self.auto_prescription_process or self.hire_process:
-            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-                raise PermissionDenied(
-                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                    "a posteriori. " + suspension_explanation
-                )
-
-        # Refuse all applications except those made by an SIAE member
-        if self.company.block_job_applications and not self.company.has_member(request.user):
-            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
-
-        self.apply_session.init({})
-        if back_url := get_safe_url(request, "back_url"):
-            self.apply_session.set("reset_url", back_url)
-
-        # Store away the selected job in the session to avoid passing it
-        # along the many views before ApplicationJobsView.
-        if job_description_id := request.GET.get("job_description_id"):
-            try:
-                job_description = self.company.job_description_through.active().get(pk=job_description_id)
-            except (JobDescription.DoesNotExist, ValueError):
-                pass
-            else:
-                self.apply_session.set("selected_jobs", [job_description.pk])
-
-        # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
-        if tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
-            return HttpResponseRedirect(
-                add_url_params(
-                    reverse(
-                        "apply:application_jobs",
-                        kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
-                    ),
-                    {"job_description_id": job_description_id},
-                )
-            )
-
-        # Warn message if prescriber's authorization is pending
-        if (
-            request.user.is_prescriber
-            and request.current_organization
-            and request.current_organization.has_pending_authorization()
-        ):
-            return HttpResponseRedirect(
-                reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
-            )
-
-        if tunnel == "job_seeker":
-            # Init a job_seeker_session needed for job_seekers_views
-            job_seeker_session = self.init_job_seeker_session(request)
-
-            return HttpResponseRedirect(
-                reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session.name})
-            )
-
-        params = {
-            "tunnel": tunnel,
-            "company": self.company.pk,
-            "from_url": self.get_reset_url(),
-        }
-
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
-        return HttpResponseRedirect(next_url)
 
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
@@ -390,6 +428,7 @@ class ApplicationJobsView(ApplicationBaseView):
         super().setup(request, *args, **kwargs)
 
         if not self.apply_session.exists():
+            logger.warning("We should not automatically initialize the session", exc_info=True)
             self.apply_session.init({})
 
         self.form = ApplicationJobsForm(
@@ -970,4 +1009,6 @@ class ApplyForJobSeekerMixin:
         }
 
     def get_job_seeker_query_string(self):
-        return {"job_seeker": self.request.GET.get("job_seeker")} if self.request.GET.get("job_seeker", None) else {}
+        # FIXME(alaurent) remove or clause in a week
+        job_seeker_public_id = self.request.GET.get("job_seeker_public_id") or self.request.GET.get("job_seeker")
+        return {"job_seeker_public_id": job_seeker_public_id} if job_seeker_public_id else {}

@@ -160,6 +160,11 @@ urlpatterns = [
         name="job_application_external_transfer_step_1_job_description_card",
     ),
     path(
+        "<uuid:job_application_id>/siae/external-transfer/2/start_session/<int:company_pk>",
+        process_views.job_application_external_transfer_start_view,
+        name="job_application_external_transfer_start_session",
+    ),
+    path(
         "<uuid:job_application_id>/siae/external-transfer/2/<int:company_pk>",
         process_views.JobApplicationExternalTransferStep2View.as_view(),
         name="job_application_external_transfer_step_2",

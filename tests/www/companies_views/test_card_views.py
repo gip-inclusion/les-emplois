@@ -290,7 +290,10 @@ class TestCardView:
         EXIT_URL_EMPLOYER = reverse("apply:list_prescriptions")
         EXIT_URL_PRESCRIBER = reverse("job_seekers_views:list")
 
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk}) + f"?job_seeker={job_seeker_public_id}"
+        url = (
+            reverse("companies_views:card", kwargs={"siae_id": company.pk})
+            + f"?job_seeker_public_id={job_seeker_public_id}"
+        )
 
         # If anonymous user, return a 200 without the banner
         response = client.get(url)
@@ -325,25 +328,26 @@ class TestCardView:
 
         # Has link to job description with job_seeker public_id
         job_description_url_with_job_seeker_id = (
-            f"{job_description.get_absolute_url()}?job_seeker={job_seeker_public_id}"
+            f"{job_description.get_absolute_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, job_description_url_with_job_seeker_id)
 
         # Has link to apply with job_seeker public_id
         apply_url_with_job_seeker_id = add_url_params(
-            reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_seeker": job_seeker_public_id}
+            reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_seeker_public_id": job_seeker_public_id}
         )
         assertContains(response, apply_url_with_job_seeker_id, count=2)
 
         # When UUID is broken in GET parameters
-        broken_url = reverse("companies_views:card", kwargs={"siae_id": company.pk}) + "?job_seeker=123"
+        broken_url = reverse("companies_views:card", kwargs={"siae_id": company.pk}) + "?job_seeker_public_id=123"
         response = client.get(broken_url)
         assert response.status_code == 404
 
         # When uuid is not a job_seeker one
         not_job_seeker_url = (
-            reverse("companies_views:card", kwargs={"siae_id": company.pk}) + f"?job_seeker={prescriber.public_id}"
+            reverse("companies_views:card", kwargs={"siae_id": company.pk})
+            + f"?job_seeker_public_id={prescriber.public_id}"
         )
         response = client.get(not_job_seeker_url)
         assert response.status_code == 404
@@ -487,7 +491,7 @@ class TestJobDescriptionCardView:
 
         url = (
             reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-            + f"?job_seeker={job_seeker_public_id}"
+            + f"?job_seeker_public_id={job_seeker_public_id}"
         )
 
         # If anonymous user, return a 200 without banner
@@ -524,7 +528,7 @@ class TestJobDescriptionCardView:
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
-            f"{company.get_card_url()}?job_seeker={job_seeker_public_id}"
+            f"{company.get_card_url()}?job_seeker_public_id={job_seeker_public_id}"
             f"&amp;back_url={quote(response.wsgi_request.get_full_path())}"
         )
         assertContains(response, company_url_with_job_seeker_id)
@@ -532,14 +536,14 @@ class TestJobDescriptionCardView:
         # Has link to apply with job_seeker public_id
         apply_url_with_job_seeker_id = (
             f"{reverse('apply:start', kwargs={'company_pk': company.pk})}"
-            f"?job_description_id={job_description.pk}&amp;job_seeker={job_seeker_public_id}"
+            f"?job_description_id={job_description.pk}&amp;job_seeker_public_id={job_seeker_public_id}"
         )
         assertContains(response, apply_url_with_job_seeker_id)
 
         # When UUID is broken in GET parameters
         broken_url = (
             reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-            + "?job_seeker=123"
+            + "?job_seeker_public_id=123"
         )
         response = client.get(broken_url)
         assert response.status_code == 404
@@ -547,7 +551,7 @@ class TestJobDescriptionCardView:
         # When uuid is not a job_seeker one
         not_job_seeker_url = (
             reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-            + f"?job_seeker={prescriber.public_id}"
+            + f"?job_seeker_public_id={prescriber.public_id}"
         )
         response = client.get(not_job_seeker_url)
         assert response.status_code == 404

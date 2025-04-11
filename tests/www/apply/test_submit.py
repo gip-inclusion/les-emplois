@@ -404,8 +404,10 @@ class TestApply:
     @pytest.mark.parametrize(
         "job_description_id,back_url,expected_session",
         [
-            pytest.param("", "", {}, id="empty"),
-            pytest.param(1, "", {"selected_jobs": [1]}, id="with_selected_jobs"),
+            pytest.param("", "", {"reset_url": reverse("dashboard:index")}, id="empty"),
+            pytest.param(
+                1, "", {"selected_jobs": [1], "reset_url": reverse("dashboard:index")}, id="with_selected_jobs"
+            ),
             pytest.param(
                 1,
                 "/une/url/quelconque",
@@ -479,7 +481,7 @@ class TestHire:
         prescriber = PrescriberFactory()
         client.force_login(company.members.first())
         params = {
-            "job_seeker": prescriber.public_id,
+            "job_seeker_public_id": prescriber.public_id,
             "from_url": reverse("dashboard:index"),
         }
         url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -520,7 +522,7 @@ class TestHire:
         "back_url,expected_session",
         [
             pytest.param("/une/url/quelconque", {"reset_url": "/une/url/quelconque"}, id="with_back_url"),
-            pytest.param("", {}, id="empty"),
+            pytest.param("", {"reset_url": reverse("dashboard:index")}, id="empty"),
         ],
     )
     def test_start_view_initializes_session(self, client, back_url, expected_session):
@@ -3822,7 +3824,7 @@ class TestLastCheckedAtView:
         assert response.status_code == 200
 
         params = {
-            "job_seeker": self.job_seeker.public_id,
+            "job_seeker_public_id": self.job_seeker.public_id,
             "from_url": url,
         }
         update_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -3891,7 +3893,7 @@ class UpdateJobSeekerTestMixin:
         )
 
         params = {
-            "job_seeker": self.job_seeker.public_id,
+            "job_seeker_public_id": self.job_seeker.public_id,
             "from_url": from_url,
         }
         self.start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -4490,7 +4492,7 @@ class TestUpdateJobSeekerStep3View:
 
         # START to setup jobseeker session
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -5293,7 +5295,7 @@ class TestCheckJobSeekerInformationsForHire:
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Éligibilité IAE à valider")
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": url_check_infos,
         }
         url_update = f"""
@@ -5332,7 +5334,7 @@ class TestCheckJobSeekerInformationsForHire:
         assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         params = {
-            "job_seeker": job_seeker.public_id,
+            "job_seeker_public_id": job_seeker.public_id,
             "from_url": url_check_infos,
         }
         url_update = f"""
