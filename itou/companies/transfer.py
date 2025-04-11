@@ -1,4 +1,4 @@
-from django.db.models import TextChoices
+from django.db.models import OuterRef, TextChoices
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
@@ -67,7 +67,9 @@ TRANSFER_SPECS = {
         "related_model": models.CompanyMembership,
         "related_model_field": "company",
         "to_filter": lambda qs, to_company: qs.exclude(
-            user__in=users_models.User.objects.filter(companymembership__company=to_company)
+            user__in=users_models.User.objects.filter(
+                companymembership__company=to_company, companymembership__is_admin=OuterRef("is_admin")
+            )
         ),
     },
     TransferField.INVITATIONS: {
@@ -162,6 +164,15 @@ def transfer_company_data(
                     f"{job_application.pk}: {selected_jobs}",
                 )
             job_application.selected_jobs.clear()
+
+    if TransferField.MEMBERSHIPS in fields_to_transfer:
+        for from_company_membership in get_transfer_queryset(
+            from_company, to_company, TRANSFER_SPECS[TransferField.MEMBERSHIPS]
+        ):
+            if to_company_membership := models.CompanyMembership.objects.filter(
+                company=to_company, user=from_company_membership.user
+            ):
+                to_company_membership.delete()
 
     save_update_fields = []
     for transfer_field in fields_to_transfer:
