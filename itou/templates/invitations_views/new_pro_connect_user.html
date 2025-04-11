@@ -1,13 +1,20 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
-    <p>
-        Vous allez rejoindre le tableau de bord de <span class="fw-bold">{{ invitation.target.display_name }}</span>
-    </p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>
+                Vous allez rejoindre le tableau de bord de <span class="fw-bold">{{ invitation.target.display_name }}</span>
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

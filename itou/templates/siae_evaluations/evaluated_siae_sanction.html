@@ -1,12 +1,17 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load str_filters %}
 
 {% block title %}Notification de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>
-        Notification de sanction pour <span class="text-info">{{ evaluated_siae.siae }}</span>
-    </h1>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Notification de sanction pour <span class="text-info">{{ evaluated_siae.siae }}</span>
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

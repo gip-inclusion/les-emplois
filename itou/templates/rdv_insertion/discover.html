@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load static %}
 
 {% block title_prevstep %}
@@ -12,20 +13,21 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="row">
-        <div class="col-12 col-lg-8">
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
             <h1>Vous souhaitez inviter votre candidat à un entretien de recrutement ?</h1>
-        </div>
-        <div class="col-12 col-lg-4">
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             <iframe data-tally-src="https://tally.so/embed/mRVYed?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&company_id={{ request.current_organization.pk }}&user_id={{ request.user.pk }}"
                     loading="lazy"
                     width="100%"
                     height="300"
                     frameborder="0"
                     marginheight="0"
-                    marginwidth="0"></iframe>
-        </div>
-    </div>
+                    marginwidth="0">
+            </iframe>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

@@ -1,16 +1,29 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% if invitation.has_expired %}
-        <h1>Invitation expirée</h1>
-        <p>
-            Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.
-        </p>
+        {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+            {% fragment as c_title__main %}
+                <h1>Invitation expirée</h1>
+            {% endfragment %}
+            {% fragment as c_title__secondary %}
+                <p>
+                    Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.
+                </p>
+            {% endfragment %}
+        {% endcomponent_title %}
     {% elif invitation.accepted_at %}
-        <h1>Invitation acceptée</h1>
-        <p>Cette invitation a déjà été acceptée.</p>
+        {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+            {% fragment as c_title__main %}
+                <h1>Invitation acceptée</h1>
+            {% endfragment %}
+            {% fragment as c_title__secondary %}
+                <p>Cette invitation a déjà été acceptée.</p>
+            {% endfragment %}
+        {% endcomponent_title %}
     {% endif %}
 {% endblock %}

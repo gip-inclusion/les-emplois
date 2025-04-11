@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Calendrier {{ block.super }}{% endblock %}
 
@@ -7,8 +8,14 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Calendrier</h1>
-    <span class="d-block badge badge-base rounded-pill bg-emploi-light text-primary">Contrôle a posteriori</span>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Calendrier
+                <span class="badge badge-base rounded-pill bg-emploi-light text-primary">Contrôle a posteriori</span>
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
