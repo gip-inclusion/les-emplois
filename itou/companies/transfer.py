@@ -1,6 +1,8 @@
 from django.core.exceptions import FieldDoesNotExist
+from django.db import IntegrityError, transaction
 from django.db.models import TextChoices
 from django.utils import timezone
+from psycopg.errors import UniqueViolation
 
 from itou.approvals import models as approvals_models
 from itou.companies import enums, models
@@ -67,9 +69,13 @@ TRANSFER_SPECS = {
     TransferField.MEMBERSHIPS: {
         "related_model": models.CompanyMembership,
         "related_model_field": "company",
-        "to_filter": lambda qs, to_company: qs.exclude(
-            user__in=users_models.User.objects.filter(companymembership__company=to_company)
-        ),
+        "upsert": {
+            "key": {"user", "company"},
+            "fields": {
+                "is_admin": lambda from_value, to_value: any([from_value, to_value]),
+                "is_active": lambda from_value, to_value: any([from_value, to_value]),
+            },
+        },
     },
     TransferField.INVITATIONS: {
         "related_model": invitations_models.EmployerInvitation,
@@ -190,7 +196,25 @@ def transfer_company_data(
                         pass
                     else:
                         update_fields.append("updated_at")
-                    item.save(update_fields=update_fields)
+
+                    try:
+                        with transaction.atomic():
+                            item.save(update_fields=update_fields)
+                    except IntegrityError as e:
+                        if not isinstance(e.__cause__, UniqueViolation):
+                            raise
+
+                        to_item = spec["related_model"].objects.get(
+                            **{field: getattr(item, field) for field in spec["upsert"]["key"]}
+                        )
+                        for field, merge_function in spec["upsert"]["fields"].items():
+                            final_value = merge_function(
+                                getattr(item, field),
+                                getattr(to_item, field),
+                            )
+                            setattr(to_item, field, final_value)
+                        to_item.save()
+
                 reporter.add(transfer_field, _format_model(item))
 
     if save_update_fields:
