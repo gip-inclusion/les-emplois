@@ -1772,3 +1772,9 @@ def test_create_fake_postcode():
 )
 def test_duration(timedelta, expected):
     assert duration(timedelta) == expected
+
+
+def test_missing_auto_now_check_escape_hatch():
+    orga = PrescriberOrganizationFactory()
+    orga.name = "Never crash"
+    orga.save(update_fields=["name"])  # disable_missing_auto_now_check
