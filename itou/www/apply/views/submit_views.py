@@ -88,8 +88,6 @@ class StartView(View):
             not self.hire_process and request.user.is_employer and self.company == request.current_organization
         )
 
-        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
-
         if request.user.is_job_seeker:
             self.tunnel = "job_seeker"
         elif self.hire_process:
@@ -142,10 +140,9 @@ class StartView(View):
         return job_seeker_session
 
     def get(self, request, *args, **kwargs):
-        self.apply_session.init({})
-        if back_url := get_safe_url(request, "back_url"):
-            self.apply_session.set("reset_url", back_url)
-
+        session_data = {
+            "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
+        }
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
         if job_description_id := request.GET.get("job_description_id"):
@@ -154,7 +151,10 @@ class StartView(View):
             except (JobDescription.DoesNotExist, ValueError):
                 pass
             else:
-                self.apply_session.set("selected_jobs", [job_description.pk])
+                session_data["selected_jobs"] = [job_description.pk]
+
+        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
+        self.apply_session.init(session_data)
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
         if self.tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
