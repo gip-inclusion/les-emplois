@@ -105,7 +105,7 @@ class TestExportJobApplications:
             job_app.save()
             ProlongationFactory(
                 for_snapshot=True,
-                validated_by=PrescriberFactory(membership__organization__is_authorized=True),
+                validated_by=PrescriberFactory(membership__organization__authorized=True),
                 declared_by_siae=siae,
                 approval=approval,
             )

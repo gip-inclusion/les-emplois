@@ -240,7 +240,7 @@ class TestDataInclusionPrescriberStructure:
         assert response.status_code == 401
 
     def test_list_structures(self):
-        orga = PrescriberOrganizationFactory(is_authorized=True)
+        orga = PrescriberOrganizationFactory(authorized=True)
 
         with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(

@@ -98,7 +98,7 @@ class TestAdminForm:
 
     def user_factory(self, kind, user_kind):
         if user_kind == UserKind.PRESCRIBER:
-            return PrescriberFactory(membership=True, membership__organization__is_authorized=True)
+            return PrescriberFactory(membership=True, membership__organization__authorized=True)
         if kind == "iae":
             return EmployerFactory(with_company=True)
         return EmployerFactory(with_company=True, with_company__company__kind=CompanyKind.GEIQ)
@@ -143,7 +143,7 @@ class TestAdminForm:
         assert diagnostic.administrative_criteria.count() == 1
 
     def test_add_eligibility_diagnostic_no_criteria(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__is_authorized=True)
+        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
         post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -153,7 +153,7 @@ class TestAdminForm:
         assert diagnostic.administrative_criteria.count() == 0
 
     def test_add_eligibility_diagnostic_bad_job_seeker(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__is_authorized=True)
+        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
         post_data = self.build_post_data(kind, author, PrescriberFactory(), with_administrative_criteria=False)
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -175,7 +175,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_bad_author_kind(self, admin_client, kind):
-        author = PrescriberFactory(membership=True, membership__organization__is_authorized=True)
+        author = PrescriberFactory(membership=True, membership__organization__authorized=True)
         post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
         post_data["author_kind"] = "geiq" if kind == "iae" else "employer"
 
