@@ -234,9 +234,9 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         job_app = campaign_eligible_job_app_objects["job_app"]
         new_start = timezone.localdate() - relativedelta(months=10)
         job_app.hiring_start_at = new_start
-        job_app.save(update_fields=["hiring_start_at"])
+        job_app.save(update_fields=["hiring_start_at", "updated_at"])
         job_app.approval.start_at = new_start
-        job_app.approval.save(update_fields=["start_at"])
+        job_app.approval.save(update_fields=["start_at", "updated_at"])
         assert [] == list(evaluation_campaign.eligible_job_applications())
         # Eligibility assessment disregards dates, as the calendar can be a mess.
         assert _eligible_to_siae_evaluations(job_app) == "oui"
