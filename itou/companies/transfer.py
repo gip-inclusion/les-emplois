@@ -67,8 +67,11 @@ TRANSFER_SPECS = {
     TransferField.MEMBERSHIPS: {
         "related_model": models.CompanyMembership,
         "related_model_field": "company",
+        # Overwrite non admin memberships
         "to_filter": lambda qs, to_company: qs.exclude(
-            user__in=users_models.User.objects.filter(companymembership__company=to_company)
+            user__in=users_models.User.objects.filter(
+                companymembership__company=to_company, companymembership__is_admin=True
+            )
         ),
     },
     TransferField.INVITATIONS: {
@@ -163,6 +166,18 @@ def transfer_company_data(
                     f"{job_application.pk}: {selected_jobs}",
                 )
             job_application.selected_jobs.clear()
+
+    if TransferField.MEMBERSHIPS in fields_to_transfer:
+        for from_company_membership in get_transfer_queryset(
+            from_company, to_company, TRANSFER_SPECS[TransferField.MEMBERSHIPS]
+        ):
+            # Overwrite non admin memberships
+            if to_company_membership := models.CompanyMembership.objects.filter(
+                company=to_company, user=from_company_membership.user, is_admin=False
+            ):
+                to_company_membership.delete()
+            else:
+                continue
 
     save_update_fields = []
     for transfer_field in fields_to_transfer:
