@@ -129,19 +129,6 @@ class ApplyStepBaseView(TemplateView):
             return self.apply_session.get("reset_url", reverse("dashboard:index"))
         return reverse("dashboard:index")
 
-    def init_job_seeker_session(self, request):
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session,
-            JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
-            data={
-                "config": {
-                    "from_url": self.get_reset_url(),
-                },
-                "apply": {"company_pk": self.company.pk},
-            },
-        )
-        return job_seeker_session
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
@@ -229,6 +216,19 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
 
 class StartView(ApplyStepBaseView):
+    def init_job_seeker_session(self, request):
+        job_seeker_session = SessionNamespace.create_uuid_namespace(
+            request.session,
+            JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
+            data={
+                "config": {
+                    "from_url": self.get_reset_url(),
+                },
+                "apply": {"company_pk": self.company.pk},
+            },
+        )
+        return job_seeker_session
+
     def get(self, request, *args, **kwargs):
         if request.user.is_job_seeker:
             tunnel = "job_seeker"
