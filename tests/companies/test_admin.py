@@ -345,3 +345,81 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+    def test_transfer_data_memberships_with_is_admin(self, admin_client):
+        user = EmployerFactory()
+
+        # 1. user is in from_company only: transfer to to_company
+        from_company = CompanyFactory(with_membership=True, membership__user=user, membership__is_admin=False)
+        to_company = CompanyFactory(with_membership=False)
+
+        transfer_url = reverse(
+            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+        assertContains(response, str(from_company.memberships.get(user=user)))
+
+        response = admin_client.post(
+            transfer_url,
+            data={"fields_to_transfer": ["memberships"], "disable_from_company": False},
+        )
+        assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
+
+        from_company.refresh_from_db()
+        to_company.refresh_from_db()
+        assert from_company.memberships.count() == 0
+        assert to_company.memberships.count() == 1
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.INFO, f"Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}."
+                ),
+            ],
+        )
+
+        # 2. user is in both companies with the same is_admin status: do not transfer to to_company
+        from_company = CompanyFactory(with_membership=True, membership__user=user, membership__is_admin=True)
+        to_company = CompanyFactory(with_membership=True, membership__user=user, membership__is_admin=True)
+
+        transfer_url = reverse(
+            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+        assertNotContains(response, str(from_company.memberships.get(user=user)))
+
+        # 3. user is in both companies with a different is_admin status: transfer to to_company
+        from_company = CompanyFactory(with_membership=True, membership__user=user, membership__is_admin=True)
+        to_company = CompanyFactory(with_membership=True, membership__user=user, membership__is_admin=False)
+
+        transfer_url = reverse(
+            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+        assertContains(response, str(from_company.memberships.get(user=user)))
+
+        response = admin_client.post(
+            transfer_url,
+            data={"fields_to_transfer": ["memberships"], "disable_from_company": False},
+        )
+        assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
+
+        from_company.refresh_from_db()
+        to_company.refresh_from_db()
+        assert from_company.memberships.count() == 0
+        assert to_company.memberships.count() == 1
+        assert to_company.memberships.first().is_admin
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.INFO, f"Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}."
+                ),
+            ],
+        )
