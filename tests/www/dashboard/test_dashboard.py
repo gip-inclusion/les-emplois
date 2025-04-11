@@ -782,7 +782,7 @@ class TestDashboardView:
 
             # Make sure the diag is still valid
             diag.expires_at = timezone.localdate() + timedelta(days=1)
-            diag.save(update_fields=("expires_at",))
+            diag.save(update_fields=("expires_at", "updated_at"))
             assert diag.is_valid
             response = client.get(url)
             assertContains(response, "Numéro de PASS IAE")

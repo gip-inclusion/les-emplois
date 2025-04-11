@@ -915,7 +915,7 @@ class TestJobDescriptionSearchView:
         assertContains(response, job3_name, html=True)
 
         other_company.convention = None
-        other_company.save(update_fields=["convention"])
+        other_company.save(update_fields=["convention", "updated_at"])
 
         # no filter: returns everything.
         response = client.get(
@@ -1023,7 +1023,7 @@ class TestJobDescriptionSearchView:
         assertContains(response, displayed_job_name_3, html=True)
 
         other_company.convention = None
-        other_company.save(update_fields=["convention"])
+        other_company.save(update_fields=["convention", "updated_at"])
 
         # no filter: returns everything.
         response = client.get(
@@ -1140,7 +1140,7 @@ class TestJobDescriptionSearchView:
         assertNotContains(response, RESERVED_PEC)
 
         job_pec.contract_nature = ContractNature.PEC_OFFER
-        job_pec.save(update_fields=["contract_nature"])
+        job_pec.save(update_fields=["contract_nature", "updated_at"])
         response = client.get(
             self.URL,
             {"city": city.slug},
@@ -1219,7 +1219,7 @@ class TestJobDescriptionSearchView:
 
         # Show external company name
         job_pec.market_context_description = "MaPetiteEntreprise"
-        job_pec.save(update_fields=["market_context_description"])
+        job_pec.save(update_fields=["market_context_description", "updated_at"])
         response = client.get(
             self.URL,
             {"city": city.slug},
