@@ -137,7 +137,7 @@ class CommonApprovalMixin(models.Model):
         ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
     def _get_human_readable_estimate(self, delta: datetime.timedelta) -> str:
-        res = timeuntil(timezone.localdate() + delta)
+        res = timeuntil(timezone.localdate() + delta, now=timezone.localdate())
         res = res.replace("année", "an")
         res = res.split(", ")
         if any(v in res[0] for v in ["an", "mois"]):
