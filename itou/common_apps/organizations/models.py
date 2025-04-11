@@ -114,7 +114,7 @@ class OrganizationAbstract(models.Model):
             action = "Reactivating"
             membership.is_active = True
             membership.is_admin = should_be_admin
-            membership.save(update_fields=["is_active", "is_admin"])
+            membership.save(update_fields=["is_active", "is_admin", "updated_at"])
         self.expire_invitations(user)
         logger.info(
             "%(action)s %(membership)s of organization_id=%(organization_id)d "
@@ -148,7 +148,7 @@ class OrganizationAbstract(models.Model):
         # Remove admin rights as a precaution.
         membership.is_admin = False
         membership.updated_by = updated_by
-        membership.save(update_fields=["is_active", "is_admin", "updated_by"])
+        membership.save(update_fields=["is_active", "is_admin", "updated_by", "updated_at"])
         self.expire_invitations(membership.user)
         self.member_deactivation_email(membership.user).send()
         logger.info(
@@ -171,7 +171,7 @@ class OrganizationAbstract(models.Model):
             )
         membership.is_admin = admin
         membership.updated_by = updated_by
-        membership.save(update_fields=["is_admin", "updated_by"])
+        membership.save(update_fields=["is_admin", "updated_by", "updated_at"])
         if admin:
             self.add_admin_email(membership.user).send()
         else:

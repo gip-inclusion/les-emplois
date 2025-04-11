@@ -231,7 +231,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         ]
         if all(extend_conditions):
             eligibility_diagnosis.expires_at = cls._expiration_date(author)
-            eligibility_diagnosis.save(update_fields=["expires_at"])
+            eligibility_diagnosis.save(update_fields=["expires_at", "updated_at"])
             return eligibility_diagnosis
 
         # Otherwise, we create a new one...
@@ -243,7 +243,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         )
         # and mark the current one as expired
         eligibility_diagnosis.expires_at = timezone.localdate(new_eligibility_diagnosis.created_at)
-        eligibility_diagnosis.save(update_fields=["expires_at"])
+        eligibility_diagnosis.save(update_fields=["expires_at", "updated_at"])
         return new_eligibility_diagnosis
 
 

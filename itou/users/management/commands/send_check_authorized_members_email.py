@@ -81,7 +81,7 @@ class Command(BaseCommand):
                         company.pk,
                     )
                 company.active_members_email_reminder_last_sent_at = NOW
-                company.save(update_fields=["active_members_email_reminder_last_sent_at"])
+                company.save(update_fields=["active_members_email_reminder_last_sent_at", "updated_at"])
 
         # Prescriber organizations
         prescriber_organizations = self.build_query(PrescriberOrganization.objects.all())
@@ -102,7 +102,9 @@ class Command(BaseCommand):
                         prescriber_organization.pk,
                     )
                 prescriber_organization.active_members_email_reminder_last_sent_at = NOW
-                prescriber_organization.save(update_fields=["active_members_email_reminder_last_sent_at"])
+                prescriber_organization.save(
+                    update_fields=["active_members_email_reminder_last_sent_at", "updated_at"]
+                )
 
         # Institutions
         institutions = self.build_query(Institution.objects.all())
@@ -121,4 +123,4 @@ class Command(BaseCommand):
                         "Sent reminder notification to user %d for institution %d", member.pk, institution.pk
                     )
                 institution.active_members_email_reminder_last_sent_at = NOW
-                institution.save(update_fields=["active_members_email_reminder_last_sent_at"])
+                institution.save(update_fields=["active_members_email_reminder_last_sent_at", "updated_at"])
