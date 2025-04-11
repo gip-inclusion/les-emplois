@@ -154,7 +154,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             # link this diagnosis to the current job application
             if valid_diagnosis:
                 job_application.geiq_eligibility_diagnosis = valid_diagnosis
-                job_application.save(update_fields=["geiq_eligibility_diagnosis"])
+                job_application.save(update_fields=["geiq_eligibility_diagnosis", "updated_at"])
 
         if creating and company.is_subject_to_eligibility_rules and job_application.approval:
             final_url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})

@@ -710,7 +710,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
         self.job_application.external_transfer(target_company=self.company, user=self.request.user)
         if self.form.cleaned_data.get("keep_original_resume"):
             new_job_application.resume_link = self.job_application.resume_link
-            new_job_application.save(update_fields={"resume_link"})
+            new_job_application.save(update_fields={"resume_link", "updated_at"})
         return new_job_application
 
     def get_next_url(self, job_application):
@@ -786,7 +786,7 @@ def send_diagoriente_invite(request, job_application_id):
         else:
             job_application.email_diagoriente_invite_for_job_seeker.send()
         job_application.diagoriente_invite_sent_at = timezone.now()
-        job_application.save(update_fields=["diagoriente_invite_sent_at"])
+        job_application.save(update_fields=["diagoriente_invite_sent_at", "updated_at"])
         messages.success(request, "L'invitation à utiliser Diagoriente a été envoyée.")
 
     redirect_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})

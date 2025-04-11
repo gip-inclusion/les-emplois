@@ -56,7 +56,7 @@ class Command(BaseCommand):
                     ).send()
 
                 prolongation_request.reminder_sent_at = timezone.now()
-                prolongation_request.save(update_fields=["reminder_sent_at"])
+                prolongation_request.save(update_fields=["reminder_sent_at", "updated_at"])
                 prolongation_reminded += 1
         self.logger.info(f"{prolongation_reminded}/{len(queryset)} prolongation request{pluralize(queryset)} reminded")
 

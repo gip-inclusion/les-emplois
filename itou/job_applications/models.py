@@ -976,7 +976,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
         if is_eligibility_diagnosis_made_by_siae:
             self.eligibility_diagnosis = None
-            self.save(update_fields={"eligibility_diagnosis"})
+            self.save(update_fields={"eligibility_diagnosis", "updated_at"})
             eligibility_diagnosis.delete()
 
         notification_context = {
