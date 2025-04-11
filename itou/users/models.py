@@ -23,7 +23,6 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
-from itou.approvals.models import PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -40,7 +39,14 @@ from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
+from itou.users.enums import (
+    IdentityCertificationAuthorities,
+    IdentityProvider,
+    LackOfNIRReason,
+    LackOfPoleEmploiId,
+    Title,
+    UserKind,
+)
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
@@ -517,6 +523,8 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def latest_pe_approval(self):
+        from itou.approvals.models import PoleEmploiApproval
+
         if not self.is_job_seeker:
             return None
 
@@ -1391,3 +1399,18 @@ class JobSeekerProfile(models.Model):
             return result
 
         return "Adresse HEXA incomplète"
+
+
+class IdentityCertification(models.Model):
+    jobseeker_profile = models.ForeignKey(
+        JobSeekerProfile,
+        related_name="identity_certifications",
+        on_delete=models.CASCADE,
+    )
+    certifier = models.CharField(max_length=32, choices=IdentityCertificationAuthorities)
+    certified_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("jobseeker_profile", "certifier", name="uniq_jobseeker_profile_certifier"),
+        ]
