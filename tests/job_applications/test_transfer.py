@@ -137,7 +137,7 @@ def test_transfer_to_without_sender():
     )
     # Sender user account is deleted.
     job_application.sender = None
-    job_application.save(update_fields=["sender"])
+    job_application.save(update_fields=["sender", "updated_at"])
 
     job_application.transfer(user=origin_user, target_company=target_company)
     job_application.refresh_from_db()

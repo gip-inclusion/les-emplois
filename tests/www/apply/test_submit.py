@@ -334,7 +334,7 @@ class TestApply:
         jobs = company.job_description_through.all()
         inactive_job = jobs[0]
         inactive_job.is_active = False
-        inactive_job.save(update_fields=["is_active"])
+        inactive_job.save(update_fields=["is_active", "updated_at"])
 
         session[f"job_application-{company.pk}"] = {"selected_jobs": [jobs[0].pk, jobs[1].pk]}
         session.save()
@@ -5021,7 +5021,7 @@ class TestCheckPreviousApplicationsView:
 
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
-        job_application.save(update_fields=("created_at",))
+        job_application.save(update_fields=("created_at", "updated_at"))
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Vous avez déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
@@ -5055,7 +5055,7 @@ class TestCheckPreviousApplicationsView:
         )
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
-        job_application.save(update_fields=("created_at",))
+        job_application.save(update_fields=("created_at", "updated_at"))
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
@@ -5116,7 +5116,7 @@ class TestCheckPreviousApplicationsView:
         )
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
-        job_application.save(update_fields=("created_at",))
+        job_application.save(update_fields=("created_at", "updated_at"))
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})

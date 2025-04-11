@@ -1165,7 +1165,7 @@ def test_populate_job_descriptions():
 
     # modify the field
     job.is_active = True
-    job.save(update_fields=["is_active"])
+    job.save(update_fields=["is_active", "updated_at"])
     job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {

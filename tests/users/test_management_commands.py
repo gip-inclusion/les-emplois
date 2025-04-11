@@ -1219,9 +1219,9 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Update company and institution creation dates far in the past
         caplog.clear()
         self.employer_1.company.created_at -= relativedelta(months=5)
-        self.employer_1.company.save(update_fields=["created_at"])
+        self.employer_1.company.save(update_fields=["created_at", "updated_at"])
         self.labor_inspector_1.institution.created_at -= relativedelta(months=5)
-        self.labor_inspector_1.institution.save(update_fields=["created_at"])
+        self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
         assert caplog.messages == [
@@ -1252,18 +1252,22 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         NOW = timezone.now()
         self.employer_1.company.created_at = NOW - relativedelta(months=6)
         self.employer_1.company.active_members_email_reminder_last_sent_at = NOW - relativedelta(months=3)
-        self.employer_1.company.save(update_fields=["created_at", "active_members_email_reminder_last_sent_at"])
+        self.employer_1.company.save(
+            update_fields=["created_at", "active_members_email_reminder_last_sent_at", "updated_at"]
+        )
         self.prescriber_1.organization.created_at = NOW - relativedelta(months=6, days=-1)
         self.prescriber_1.organization.active_members_email_reminder_last_sent_at = NOW - relativedelta(
             months=3, days=-1
         )
-        self.prescriber_1.organization.save(update_fields=["created_at", "active_members_email_reminder_last_sent_at"])
+        self.prescriber_1.organization.save(
+            update_fields=["created_at", "active_members_email_reminder_last_sent_at", "updated_at"]
+        )
         self.labor_inspector_1.institution.created_at = NOW - relativedelta(months=6, days=1)
         self.labor_inspector_1.institution.active_members_email_reminder_last_sent_at = NOW - relativedelta(
             months=3, days=1
         )
         self.labor_inspector_1.institution.save(
-            update_fields=["created_at", "active_members_email_reminder_last_sent_at"]
+            update_fields=["created_at", "active_members_email_reminder_last_sent_at", "updated_at"]
         )
 
         # Should send 4 notifications to the 2 employers and the 2 labor inspectors
@@ -1301,7 +1305,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Should not send any notification: only active_members_email_reminder_last_sent_at must be considered
         caplog.clear()
         self.prescriber_1.organization.created_at -= relativedelta(days=1)
-        self.prescriber_1.organization.save(update_fields=["created_at"])
+        self.prescriber_1.organization.save(update_fields=["created_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
         assert caplog.messages == [
@@ -1315,7 +1319,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         # Should now send notification to prescribers
         caplog.clear()
         self.prescriber_1.organization.active_members_email_reminder_last_sent_at -= relativedelta(days=1)
-        self.prescriber_1.organization.save(update_fields=["active_members_email_reminder_last_sent_at"])
+        self.prescriber_1.organization.save(update_fields=["active_members_email_reminder_last_sent_at", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
         assert caplog.messages == [
@@ -1370,9 +1374,9 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
         InstitutionMembershipFactory(institution=self.labor_inspector_1.institution, is_admin=False)
         self.employer_1.company.created_at -= relativedelta(months=3)
-        self.employer_1.company.save(update_fields=["created_at"])
+        self.employer_1.company.save(update_fields=["created_at", "updated_at"])
         self.labor_inspector_1.institution.created_at -= relativedelta(days=1)
-        self.labor_inspector_1.institution.save(update_fields=["created_at"])
+        self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
 
         with django_capture_on_commit_callbacks(execute=True):
             command.handle()
@@ -1388,9 +1392,9 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
         InstitutionMembershipFactory(institution=self.labor_inspector_1.institution, is_admin=False)
         self.employer_1.company.created_at -= relativedelta(months=3)
-        self.employer_1.company.save(update_fields=["created_at"])
+        self.employer_1.company.save(update_fields=["created_at", "updated_at"])
         self.labor_inspector_1.institution.created_at -= relativedelta(days=1)
-        self.labor_inspector_1.institution.save(update_fields=["created_at"])
+        self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
 
         # Create other organizations with same users
         DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)

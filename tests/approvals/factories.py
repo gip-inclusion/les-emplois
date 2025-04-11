@@ -241,7 +241,7 @@ class ProlongationFactory(BaseProlongationFactory):
                 }
                 | kwargs,
             )
-            self.save(update_fields=("request",))
+            self.save(update_fields=("request", "updated_at"))
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

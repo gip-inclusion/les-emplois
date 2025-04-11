@@ -754,7 +754,7 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     @freezegun.freeze_time("2025-02-25")
     def test_hiring_starts_in_future(self, client, snapshot):
         self.job_application.hiring_start_at = timezone.localdate() + datetime.timedelta(days=1)
-        self.job_application.save(update_fields={"hiring_start_at"})
+        self.job_application.save(update_fields={"hiring_start_at", "updated_at"})
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
         assert employee_record.status == Status.NEW
 
@@ -867,7 +867,7 @@ class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
         # Reject employee record
         self.employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
         self.employee_record.status = Status.REJECTED
-        self.employee_record.save(update_fields={"status"})
+        self.employee_record.save(update_fields={"status", "updated_at"})
 
     def test_submit_after_rejection(self, client):
         client.post(self.url)

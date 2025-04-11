@@ -80,7 +80,7 @@ class TestApprovalDetailView:
 
         # Tweak origin for following snapshots
         approval.origin = Origin.DEFAULT
-        approval.save(update_fields=("origin",))
+        approval.save(update_fields=("origin", "updated_at"))
 
         # Suspended
         suspension = SuspensionFactory(
@@ -99,7 +99,7 @@ class TestApprovalDetailView:
 
         # Expired
         approval.end_at = approval.start_at + datetime.timedelta(days=1)
-        approval.save(update_fields=("end_at",))
+        approval.save(update_fields=("end_at", "updated_at"))
         for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
@@ -109,7 +109,7 @@ class TestApprovalDetailView:
         # Future
         approval.start_at = datetime.date(2025, 1, 1)
         approval.end_at = datetime.date(2025, 1, 2)
-        approval.save(update_fields=("start_at", "end_at"))
+        approval.save(update_fields=("start_at", "end_at", "updated_at"))
         for user in (job_seeker, employer, prescriber):
             client.force_login(user)
             response = client.get(url)
@@ -410,7 +410,7 @@ class TestApprovalDetailView:
 
         # suspension now is inactive
         suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
-        suspension.save(update_fields=["end_at"])
+        suspension.save(update_fields=["end_at", "updated_at"])
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
@@ -526,7 +526,7 @@ class TestApprovalDetailView:
 
         # No accepted job application, but still a job application
         job_application.state = JobApplicationState.REFUSED
-        job_application.save(update_fields=("state",))
+        job_application.save(update_fields=("state", "updated_at"))
         response = client.get(url)
         assertContains(response, format_approval_number(job_application.approval.number))
         assertNotContains(response, PROLONG_BUTTON_LABEL, html=True)

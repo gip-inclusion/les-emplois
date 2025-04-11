@@ -1016,7 +1016,7 @@ class TestBatchRefuse:
         assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
         refusable_app.to_company = CompanyFactory()
-        refusable_app.save(update_fields=("to_company",))
+        refusable_app.save(update_fields=("to_company", "updated_at"))
 
         post_data = {
             "refusal_reason": reason,

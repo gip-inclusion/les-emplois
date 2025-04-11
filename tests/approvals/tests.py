@@ -691,16 +691,16 @@ class TestApprovalModel:
     def test_date_modification_causes_notification_pending(self):
         approval = ApprovalFactory(pe_notification_status=api_enums.PEApiNotificationStatus.SUCCESS)
         approval.start_at += datetime.timedelta(days=1)
-        approval.save(update_fields=("start_at",))
+        approval.save(update_fields=("start_at", "updated_at"))
         approval.refresh_from_db()
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
 
         approval.pe_notification_status = api_enums.PEApiNotificationStatus.ERROR
-        approval.save(update_fields=("pe_notification_status",))
+        approval.save(update_fields=("pe_notification_status", "updated_at"))
 
         approval.refresh_from_db()
         approval.end_at += datetime.timedelta(days=1)
-        approval.save(update_fields=("end_at",))
+        approval.save(update_fields=("end_at", "updated_at"))
         approval.refresh_from_db()
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
 
