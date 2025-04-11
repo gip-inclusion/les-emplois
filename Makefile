@@ -86,10 +86,13 @@ populate_db: populate_db_with_reference_data
 # Tests.
 # =============================================================================
 
-.PHONY: test
+.PHONY: test test-failfast
 
 test: $(VIRTUAL_ENV)
 	pytest --numprocesses=logical --create-db $(TARGET)
+
+test-failfast: $(VIRTUAL_ENV)
+	pytest --numprocesses=logical --create-db --exitfirst $(TARGET)
 
 # Docker shell.
 # =============================================================================
