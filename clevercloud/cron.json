@@ -1,7 +1,7 @@
 [
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
-  "*/5 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
+  "*/5 0-22 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_pec_offers --wet-run",
