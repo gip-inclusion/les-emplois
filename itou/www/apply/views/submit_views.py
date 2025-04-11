@@ -79,10 +79,10 @@ def _get_job_seeker_to_apply_for(request):
 
 
 class StartView(View):
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, company_pk, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         self.hire_process = kwargs.pop("hire_process", False)
         self.auto_prescription_process = (
             not self.hire_process and request.user.is_employer and self.company == request.current_organization
