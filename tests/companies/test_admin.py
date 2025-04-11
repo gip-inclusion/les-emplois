@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.models import Company, CompanyMembership
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import (
     assert_set_admin_role_creation,
@@ -355,6 +355,69 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+    @pytest.mark.parametrize("field", {"is_admin", "is_active"})
+    @pytest.mark.parametrize(
+        "value_in_from_company,value_in_to_company,expected",
+        [
+            (None, False, False),
+            (False, None, False),
+            (None, True, True),
+            (True, None, True),
+            (False, False, False),
+            (True, False, True),
+            (False, True, True),
+            (True, True, True),
+        ],
+    )
+    def test_transfer_data_memberships(
+        self, admin_client, field, value_in_from_company, value_in_to_company, expected
+    ):
+        user = EmployerFactory()
+        default_args = {"user": user, "is_active": False, "is_admin": False}
+        from_company = CompanyFactory(with_membership=False)
+        if value_in_from_company is not None:
+            CompanyMembership(company=from_company, **{**default_args, field: value_in_from_company}).save()
+
+        to_company = CompanyFactory(with_membership=False)
+        if value_in_to_company is not None:
+            CompanyMembership(company=to_company, **{**default_args, field: value_in_to_company}).save()
+
+        transfer_url = reverse(
+            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+
+        if value_in_from_company is not None:
+            assertContains(response, str(from_company.memberships.get(user=user)))
+
+            response = admin_client.post(
+                transfer_url,
+                data={"fields_to_transfer": ["memberships"], "disable_from_company": False},
+            )
+            assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.INFO,
+                        f"Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
+                    ),
+                ],
+            )
+
+        from_company.refresh_from_db()
+        to_company.refresh_from_db()
+
+        if value_in_to_company is None or value_in_from_company is None:
+            # Real transfer, membership in from_company is moved
+            assert from_company.memberships.count() == 0
+        else:
+            assert from_company.memberships.count() == 1
+        assert to_company.memberships.count() == 1
+        assert getattr(to_company.memberships.first(), field) is expected
 
 
 class TestJobDescriptionAdmin:
