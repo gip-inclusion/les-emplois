@@ -144,6 +144,30 @@ class Assessment(models.Model):
     class Meta:
         verbose_name = "bilan d’exécution"
         verbose_name_plural = "bilans d’exécution"
+        constraints = [
+            models.CheckConstraint(
+                name="geiq_assessment_submission_before_review",
+                violation_error_message=(
+                    "Impossible d'avoir une date de contrôle antérieure à la date de transmission"
+                ),
+                condition=(
+                    models.Q(reviewed_at__isnull=True)
+                    | Q(submitted_at__isnull=False, submitted_at__lt=models.F("reviewed_at"))
+                ),
+            ),
+            models.CheckConstraint(
+                name="geiq_assessment_review_before_dreets_review",
+                violation_error_message=(
+                    "Impossible d'avoir une date de contrôle DREETS antérieure à la date de contrôle"
+                ),
+                condition=(
+                    models.Q(dreets_reviewed_at__isnull=True)
+                    | Q(
+                        reviewed_at__isnull=False, reviewed_at__lte=models.F("dreets_reviewed_at")
+                    )  # Both can be equal
+                ),
+            ),
+        ]
 
     def action_financial_assessment_filename(self):
         return f"Bilan financier action {self.campaign.year}.pdf"
