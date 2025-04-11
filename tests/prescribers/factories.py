@@ -107,9 +107,8 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
-    is_authorized = True
+    authorized = True
     kind = PrescriberOrganizationKind.FT
-    authorization_status = PrescriberAuthorizationStatus.VALIDATED
 
 
 class PrescriberPoleEmploiWithMembershipFactory(PrescriberPoleEmploiFactory):

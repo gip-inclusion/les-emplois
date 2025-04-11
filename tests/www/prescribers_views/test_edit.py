@@ -13,7 +13,7 @@ from tests.utils.test import assert_previous_step, parse_response_to_soup
 
 class TestCardView:
     def test_card(self, client):
-        prescriber_org = PrescriberOrganizationFactory(is_authorized=True)
+        prescriber_org = PrescriberOrganizationFactory(authorized=True)
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
         response = client.get(url)
         assert response.status_code == 200
@@ -37,7 +37,7 @@ class TestCardView:
 
     def test_card_render_markdown(self, client):
         prescriber_org = PrescriberOrganizationFactory(
-            is_authorized=True,
+            authorized=True,
             description="*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr).",
         )
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
@@ -51,7 +51,7 @@ class TestCardView:
 
     def test_card_render_markdown_forbidden_tags(self, client):
         prescriber_org = PrescriberOrganizationFactory(
-            is_authorized=True,
+            authorized=True,
             description='# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>',
         )
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})

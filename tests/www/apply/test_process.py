@@ -1804,10 +1804,7 @@ class TestProcessViews:
             assert len(mailoutbox) == 1
 
     def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client, mailoutbox):
-        job_application = JobApplicationFactory(
-            sender_prescriber_organization__is_authorized=False,
-            resume_link="",
-        )
+        job_application = JobApplicationFactory(resume_link="")
         company = job_application.to_company
         employee = company.members.first()
         client.force_login(employee)
