@@ -680,6 +680,38 @@ def detect_silent_date_cast():
     DateField.pre_save = strict_pre_save
 
 
+@pytest.fixture(autouse=True, scope="session")
+def detect_missing_auto_now_in_update_fields():
+    from django.apps import apps
+    from django.db.models import Model
+
+    auto_now_fields = {}
+    for model in apps.get_models():
+        for field in model._meta.get_fields():
+            if getattr(field, "auto_now", False):
+                auto_now_fields.setdefault(model._meta.label, []).append(field.name)
+
+    original_save = Model.save
+
+    def strict_save(
+        self,
+        *args,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+    ):
+        if update_fields:
+            for auto_now_field in auto_now_fields.get(self._meta.label, []):
+                if auto_now_field not in update_fields:
+                    raise ValueError(f"Calling save with update_fields without {auto_now_field}")
+        return original_save(
+            self, *args, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
+        )
+
+    Model.save = strict_save
+
+
 @pytest.fixture(name="updown_respx_mock")
 def updown_respx_mock_fixture(respx_mock):
     json = {
