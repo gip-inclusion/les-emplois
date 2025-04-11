@@ -218,31 +218,44 @@ class StartView(View):
         super().setup(request, *args, **kwargs)
 
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
-        self.prescription_process = not self.hire_process and (
-            request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
-        )
         self.auto_prescription_process = (
             not self.hire_process and request.user.is_employer and self.company == request.current_organization
         )
 
+        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
+
+        if request.user.is_job_seeker:
+            self.tunnel = "job_seeker"
+        elif self.hire_process:
+            self.tunnel = "hire"
+        else:
+            self.tunnel = "sender"
+
     def dispatch(self, request, *args, **kwargs):
         if self.hire_process and request.user.kind != UserKind.EMPLOYER:
             raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-        elif self.hire_process and not self.company.has_member(request.user):
+        if self.hire_process and not self.company.has_member(request.user):
             raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-        elif request.user.kind not in [
+        if request.user.kind not in [
             UserKind.JOB_SEEKER,
             UserKind.PRESCRIBER,
             UserKind.EMPLOYER,
         ]:
             raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-
         if not self.company.has_active_members:
             raise PermissionDenied(
                 "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
             )
+        if self.auto_prescription_process or self.hire_process:
+            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+                raise PermissionDenied(
+                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                    "a posteriori. " + suspension_explanation
+                )
+        # Refuse all applications except those made by an SIAE member
+        if self.company.block_job_applications and not self.company.has_member(request.user):
+            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
         return super().dispatch(request, *args, **kwargs)
 
     def get_reset_url(self):
@@ -264,24 +277,6 @@ class StartView(View):
         return job_seeker_session
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_job_seeker:
-            tunnel = "job_seeker"
-        elif self.hire_process:
-            tunnel = "hire"
-        else:
-            tunnel = "sender"
-
-        if self.auto_prescription_process or self.hire_process:
-            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-                raise PermissionDenied(
-                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                    "a posteriori. " + suspension_explanation
-                )
-
-        # Refuse all applications except those made by an SIAE member
-        if self.company.block_job_applications and not self.company.has_member(request.user):
-            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
-
         self.apply_session.init({})
         if back_url := get_safe_url(request, "back_url"):
             self.apply_session.set("reset_url", back_url)
@@ -297,7 +292,7 @@ class StartView(View):
                 self.apply_session.set("selected_jobs", [job_description.pk])
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
-        if tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
+        if self.tunnel == "sender" and (job_seeker := _get_job_seeker_to_apply_for(self.request)):
             return HttpResponseRedirect(
                 add_url_params(
                     reverse(
@@ -318,7 +313,7 @@ class StartView(View):
                 reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
             )
 
-        if tunnel == "job_seeker":
+        if self.tunnel == "job_seeker":
             # Init a job_seeker_session needed for job_seekers_views
             job_seeker_session = self.init_job_seeker_session(request)
 
@@ -327,7 +322,7 @@ class StartView(View):
             )
 
         params = {
-            "tunnel": tunnel,
+            "tunnel": self.tunnel,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
         }
