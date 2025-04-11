@@ -8,16 +8,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from itou.companies.models import Company
 from itou.rdv_insertion.api import get_invitation_status
 from itou.rdv_insertion.models import Appointment, Invitation, InvitationRequest, Location, Participation, WebhookEvent
-from itou.utils.auth import check_user
-from itou.utils.urls import get_safe_url
 
 
 logger = logging.getLogger("itou.rdv_insertion")
@@ -167,14 +163,3 @@ def webhook(request):
         else:
             response.status_code = 400
         return response
-
-
-@check_user(lambda user: user.is_employer)
-def discover(request):
-    return render(
-        request,
-        "rdv_insertion/discover.html",
-        {
-            "back_url": get_safe_url(request, "back_url", fallback_url=reverse("apply:list_for_siae")),
-        },
-    )
