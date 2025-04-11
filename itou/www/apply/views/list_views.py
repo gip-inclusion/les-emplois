@@ -205,6 +205,11 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     try:
+        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
+    except ValueError:
+        display_kind = JobApplicationsDisplayKind.LIST
+
+    try:
         order = JobApplicationOrder(request.GET.get("order"))
     except ValueError:
         order = JobApplicationOrder.CREATED_AT_DESC
@@ -213,17 +218,21 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
     ).order_by(*order.order_by)
 
+    if display_kind == JobApplicationsDisplayKind.LIST:
+        job_applications = (
+            job_applications.with_next_appointment_start_at()
+            .with_upcoming_participations_count()
+            .annotate(
+                other_participations_count=F("upcoming_participations_count") - 1,  # Exclude the next appointment
+            )
+        )
+
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(
         job_applications_page, functools.partial(can_view_personal_information, request)
     )
     _add_administrative_criteria(job_applications_page)
-
-    try:
-        display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
-    except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
 
     context = {
         "title": title,
