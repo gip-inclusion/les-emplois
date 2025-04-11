@@ -830,11 +830,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="jobseekerprofile",
-            constraint=itou.utils.models.UniqueConstraintWithErrorCode(
+            constraint=models.UniqueConstraint(
                 models.F("nir"),
                 condition=models.Q(("nir", ""), _negated=True),
                 name="jobseekerprofile_unique_nir_if_not_empty",
-                validation_error_code="unique_nir_if_not_empty",
+                violation_error_code="unique_nir_if_not_empty",
                 violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
         ),

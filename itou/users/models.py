@@ -43,7 +43,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
 from itou.utils.db import or_queries
-from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -1133,11 +1132,11 @@ class JobSeekerProfile(models.Model):
                     "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
                 ),
             ),
-            UniqueConstraintWithErrorCode(
+            models.UniqueConstraint(
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",
                 condition=~Q(nir=""),
-                validation_error_code="unique_nir_if_not_empty",
+                violation_error_code="unique_nir_if_not_empty",
                 violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
         ]

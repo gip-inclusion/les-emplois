@@ -3,7 +3,6 @@ from datetime import timedelta
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateRangeField, ranges
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Func, Transform
 
@@ -80,24 +79,3 @@ class PkSupportRemark(AbstractSupportRemark):
 
 class UUIDSupportRemark(AbstractSupportRemark):
     object_id = models.UUIDField()
-
-
-# This class can be dropped once https://github.com/django/django/pull/16560 is merged & released
-class UniqueConstraintWithErrorCode(models.UniqueConstraint):
-    def __init__(self, *args, validation_error_code, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.validation_error_code = validation_error_code
-
-    def validate(self, *args, **kwargs):
-        try:
-            return super().validate(*args, **kwargs)
-        except ValidationError as ve:
-            if not ve.code:
-                ve.code = self.validation_error_code
-            raise ve
-
-    def deconstruct(self):
-        path, args, kwargs = super().deconstruct()
-        if self.validation_error_code:
-            kwargs["validation_error_code"] = self.validation_error_code
-        return path, args, kwargs
