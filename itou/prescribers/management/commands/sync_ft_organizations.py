@@ -129,7 +129,6 @@ class Command(BaseCommand):
                 obj = PrescriberOrganization(
                     kind=PrescriberOrganizationKind.FT,
                     code_safir_pole_emploi=safir,
-                    is_authorized=True,
                     authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                 )
                 fill_organization_from_api_data(obj, siret, item.raw)

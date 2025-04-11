@@ -355,7 +355,7 @@ class Command(BaseCommand):
                 "sender_prescriber_organization__kind",
                 "sender_prescriber_organization__name",
                 "sender_prescriber_organization__code_safir_pole_emploi",
-                "sender_prescriber_organization__is_authorized",
+                "sender_prescriber_organization__authorization_status",
                 "sender__last_name",
                 "sender__first_name",
                 "state",

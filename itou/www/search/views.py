@@ -12,6 +12,7 @@ from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, ContractNature, JobSource
 from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
@@ -299,7 +300,9 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         distance = form.cleaned_data["distance"]
 
         prescriber_orgs = (
-            PrescriberOrganization.objects.filter(is_authorized=True)
+            PrescriberOrganization.objects.filter(
+                authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
             .within(city.coords, distance)
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")

@@ -12,6 +12,7 @@ from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.models import User
 from itou.utils.admin import (
     InconsistencyCheckMixin,
@@ -61,6 +62,26 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
         return queryset
 
 
+class FromAuthorizedPrescriberOrganizationFilter(admin.SimpleListFilter):
+    title = "habilitation"
+    parameter_name = "is_authorized"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(
+                sender_prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
+            )
+        if value == "no":
+            return queryset.exclude(
+                sender_prescriber_organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
+            )
+        return queryset
+
+
 class EmployeeRecordInline(ReadonlyMixin, ItouStackedInline):
     model = employee_record_models.EmployeeRecord
     extra = 0
@@ -98,7 +119,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "state",
         "approval_number_sent_by_email",
         "approval_delivery_mode",
-        "sender_prescriber_organization__is_authorized",
+        FromAuthorizedPrescriberOrganizationFilter,
         "to_company__department",
         "origin",
     )

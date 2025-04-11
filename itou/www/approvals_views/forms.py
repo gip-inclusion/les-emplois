@@ -24,6 +24,7 @@ from itou.approvals.models import (
 from itou.files.forms import ItouFileField
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -323,7 +324,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                     members__email=email,
                     members__is_active=True,
                     prescribermembership__is_active=True,
-                    is_authorized=True,
+                    authorization_status=PrescriberAuthorizationStatus.VALIDATED,
                 )
                 self.fields["prescriber_organization"].queryset = orgs
                 self.fields["prescriber_organization"].disabled = False

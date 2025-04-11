@@ -29,6 +29,7 @@ from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
 from tests.approvals.factories import (
@@ -1553,7 +1554,9 @@ class TestProlongationModel:
         prolongation.clean()  # With an authorized prescriber
 
         # Unauthorize the prescriber organization
-        prolongation.validated_by.prescriberorganization_set.update(is_authorized=False)
+        prolongation.validated_by.prescriberorganization_set.update(
+            authorization_status=PrescriberAuthorizationStatus.REFUSED
+        )
         del prolongation.validated_by.is_prescriber_with_authorized_org_memberships
 
         with pytest.raises(ValidationError) as error:

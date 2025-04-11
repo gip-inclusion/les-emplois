@@ -38,6 +38,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.notifications import JobSeekerCreatedByProxyNotification
@@ -597,7 +598,9 @@ class User(AbstractUser, AddressMixin):
         return (
             self.is_prescriber
             and self.prescribermembership_set.filter(
-                is_active=True, organization__is_authorized=True, user__is_active=True
+                is_active=True,
+                organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+                user__is_active=True,
             ).exists()
         )
 

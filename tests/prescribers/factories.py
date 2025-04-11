@@ -20,7 +20,6 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
 
     class Params:
         authorized = factory.Trait(
-            is_authorized=True,
             authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         with_pending_authorization = factory.Trait(

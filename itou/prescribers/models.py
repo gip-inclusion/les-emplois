@@ -50,7 +50,11 @@ class PrescriberOrganizationManager(models.Manager):
         Returns organizations accredited by the given organization.
         """
         if org.kind == PrescriberOrganizationKind.DEPT and org.is_authorized:
-            return self.filter(department=org.department, is_brsa=True, is_authorized=True)
+            return self.filter(
+                department=org.department,
+                is_brsa=True,
+                authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+            )
         return self.none()
 
     def create_organization(self, attributes):
@@ -139,11 +143,6 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         through="PrescriberMembership",
         blank=True,
         through_fields=("organization", "user"),
-    )
-    is_authorized = models.BooleanField(
-        verbose_name="habilitation",
-        default=False,
-        help_text="Précise si l'organisation est habilitée.",
     )
     code_safir_pole_emploi = models.CharField(
         verbose_name="code Safir",
@@ -252,6 +251,10 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
                 raise ValidationError({"siret": "Le SIRET est obligatoire."})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
                 raise ValidationError({"siret": f"Ce SIRET est déjà utilisé avec le type '{self.kind}'."})
+
+    @property
+    def is_authorized(self):
+        return self.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     @property
     def accept_survey_url(self):

@@ -422,7 +422,6 @@ class TestPrescriberOrganizationAdmin:
             post_code="14000",
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
-            is_authorized=False,
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -526,7 +525,6 @@ class TestPrescriberOrganizationAdmin:
             post_code="14000",
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
-            is_authorized=False,
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -562,7 +560,6 @@ class TestPrescriberOrganizationAdmin:
             post_code="14000",
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.REFUSED,
-            is_authorized=False,
         )
 
         url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
@@ -661,7 +658,6 @@ class TestPrescriberOrganizationAdmin:
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
             kind=PrescriberOrganizationKind.ODC,
-            is_authorized=False,
             is_brsa=False,
         )
 
@@ -700,7 +696,6 @@ class TestPrescriberOrganizationAdmin:
             post_code="14000",
             authorization_updated_at=datetime.now(tz=timezone.get_current_timezone()),
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
-            is_authorized=False,
             kind=PrescriberOrganizationKind.OTHER,
         )
 

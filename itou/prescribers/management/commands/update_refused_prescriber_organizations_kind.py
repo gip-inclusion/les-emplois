@@ -63,7 +63,6 @@ class Command(XlsxExportMixin, BaseCommand):
                 "organization__siret",
                 "organization__kind",
                 "organization__authorization_status",
-                "organization__is_authorized",
                 "user__first_name",
                 "user__last_name",
                 "user__email",

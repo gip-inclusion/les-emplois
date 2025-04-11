@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
@@ -278,7 +279,9 @@ class TestGroupLists:
 
         # If the organization is authorized
         group.memberships.update(can_view_personal_information=False)
-        PrescriberOrganization.objects.all().update(is_authorized=True)
+        PrescriberOrganization.objects.all().update(
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
         my_groups_url = reverse("gps:group_list")
         response = client.get(my_groups_url)
         assertContains(response, full_name)
@@ -604,7 +607,9 @@ class TestGroupDetailsBeneficiaryTab:
         assert str(html_details) == snapshot(name="no_diagnostic")
 
         # When he is in an authorized organization
-        PrescriberOrganization.objects.update(is_authorized=True)
+        PrescriberOrganization.objects.update(
+            authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
         response = client.get(url)
         html_details = parse_response_to_soup(
             response,

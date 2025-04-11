@@ -56,6 +56,22 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
         return queryset
 
 
+class IsAuthorizedFilter(admin.SimpleListFilter):
+    title = "habilitation"
+    parameter_name = "is_authorized"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(authorization_status=PrescriberAuthorizationStatus.VALIDATED)
+        if value == "no":
+            return queryset.exclude(authorization_status=PrescriberAuthorizationStatus.VALIDATED)
+        return queryset
+
+
 class AuthorizationValidationRequired(admin.SimpleListFilter):
     title = "Validation de l'habilitation requise"
     parameter_name = "authorization_validation_required"
@@ -148,7 +164,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
         TmpMissingSiretFilter,
         TmpCanBeDeletedFilter,
         HasMembersFilter,
-        "is_authorized",
+        IsAuthorizedFilter,
         "kind",
         "is_brsa",
         "department",
@@ -216,7 +232,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                     )
                     self.message_user(request, msg, messages.ERROR)
                     return HttpResponseRedirect(request.get_full_path())
-                obj.is_authorized = False
                 obj.authorization_status = PrescriberAuthorizationStatus.REFUSED
                 obj.authorization_updated_at = now()
                 obj.authorization_updated_by = request.user
@@ -234,7 +249,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                     msg = "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”."
                     self.message_user(request, msg, messages.ERROR)
                     return HttpResponseRedirect(request.get_full_path())
-                obj.is_authorized = True
                 obj.authorization_status = PrescriberAuthorizationStatus.VALIDATED
                 obj.authorization_updated_at = now()
                 obj.authorization_updated_by = request.user
@@ -244,3 +258,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                 raise PermissionDenied()
 
         return super().response_change(request, obj)
+
+    @admin.display(description="Habilitation")
+    def is_authorized(self, obj):
+        return obj.is_authorized
