@@ -54,7 +54,7 @@
 # ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -911,6 +911,25 @@
       }),
       dict({
         'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          '_accept[www/apply/views/common.py]',
+          'hire_confirmation[www/apply/views/submit_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           '_accept[www/apply/views/common.py]',
           'hire_confirmation[www/apply/views/submit_views.py]',
@@ -1312,7 +1331,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1525,6 +1544,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -2292,7 +2328,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2559,6 +2595,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3419,7 +3472,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -3632,6 +3685,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -4399,7 +4469,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -4666,6 +4736,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5526,7 +5613,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5739,6 +5826,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -6506,7 +6610,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -6773,6 +6877,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -7633,7 +7754,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -7846,6 +7967,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8613,7 +8751,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -8880,6 +9018,23 @@
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
           LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

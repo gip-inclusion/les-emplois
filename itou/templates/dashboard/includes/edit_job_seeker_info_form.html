@@ -13,6 +13,7 @@
 
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
 
+    {% include "includes/job_seekers/readonly_form.html" with form=form ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
     {% bootstrap_form_errors form type='non_fields' %}
     {% bootstrap_field form.email %}
     {% bootstrap_field form.title %}

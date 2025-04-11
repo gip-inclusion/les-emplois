@@ -9,8 +9,13 @@ from django.utils import crypto, timezone
 from django.utils.html import format_html
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
-from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
+from itou.users.enums import (
+    IDENTITY_PROVIDER_SUPPORTED_USER_KIND,
+    IdentityProvider,
+    UserKind,
+)
 from itou.users.models import User
+from itou.utils.apis import api_particulier
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 
 
@@ -191,15 +196,26 @@ class OIDConnectUserData:
         self.check_valid_kind(user, user_data_dict, is_login)
 
         if not created:
-            for key, value in user_data_dict.items():
+            user_update_dict = user_data_dict.copy()
+            readonly_pii_fields = user.jobseeker_profile.readonly_pii_fields() if user.is_job_seeker else set()
+            if readonly_pii_fields:
+                for field in readonly_pii_fields:
+                    user_update_dict.pop(field, None)
+                logger.info(
+                    "Not updating fields %s on job seeker pk=%d because their identity has been certified.",
+                    ", ".join(api_particulier.USER_REQUIRED_FIELDS),
+                    user.pk,
+                )
+            else:
+                if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
+                    user.jobseeker_profile.birthdate = birthdate
+                    user.jobseeker_profile.save(update_fields={"birthdate"})
+            for key, value in user_update_dict.items():
                 # Don't update kind on login, it allows prescribers to log through employer form
                 # which happens a lot...
                 if is_login and key == "kind":
                     continue
                 setattr(user, key, value)
-            if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
-                user.jobseeker_profile.birthdate = birthdate
-                user.jobseeker_profile.save(update_fields={"birthdate"})
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)

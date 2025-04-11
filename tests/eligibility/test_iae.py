@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import (
     CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
@@ -20,6 +21,8 @@ from itou.eligibility.models.common import (
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification, JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
     aah_certified_mocker,
     asf_certified_mocker,
@@ -599,6 +602,13 @@ def test_eligibility_diagnosis_certify_criteria(
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == api_returned_payload
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
+    certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
+    assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
+    with freeze_time("2025-10-15"):
+        eligibility_diagnosis.certify_criteria()
+    updated_certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
+    assert updated_certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
+    assert updated_certification.certified_at > certification.certified_at
 
 
 @pytest.mark.parametrize(
@@ -625,14 +635,17 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     )
     eligibility_diagnosis.certify_criteria()
     assert len(respx_mock.calls) == 0
+    jobseeker_profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile)
+    assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
 
 @freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory,expected,response_status,response",
+    "EligibilityDiagnosisFactory,identity_certifiers,expected,response_status,response",
     [
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -645,6 +658,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
@@ -657,6 +671,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": None,
                 "certified": False,
@@ -669,6 +684,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": None,
                 "certified": False,
@@ -681,6 +697,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
+            [],
             {
                 "certification_period": None,
                 "certified": None,
@@ -693,6 +710,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         ),
         pytest.param(
             partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            [],
             {
                 "certification_period": None,
                 "certified": None,
@@ -706,7 +724,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
     ],
 )
 def test_selected_administrative_criteria_certified(
-    expected, response, response_status, respx_mock, EligibilityDiagnosisFactory
+    expected, identity_certifiers, response, response_status, respx_mock, EligibilityDiagnosisFactory
 ):
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         certifiable=True,
@@ -726,6 +744,12 @@ def test_selected_administrative_criteria_certified(
     for attrname, value in expected.items():
         assert getattr(criterion, attrname) == value
     assert len(respx_mock.calls) == 1
+    jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+    assertQuerySetEqual(
+        jobseeker_profile.identity_certifications.all(),
+        identity_certifiers,
+        transform=lambda certification: certification.certifier,
+    )
 
 
 def test_with_is_considered_certified():
