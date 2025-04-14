@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load str_filters %}
@@ -7,15 +8,21 @@
 {% block title %}{{ page_title }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>{{ page_title }} !</h1>
-    <p>
-        {% if request.user.is_job_seeker %}
-            Votre candidature
-        {% else %}
-            La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-        {% endif %}
-        <b>a bien été envoyée chez {{ job_application.to_company.display_name }}</b>.
-    </p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>{{ page_title }} !</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <p>
+                {% if request.user.is_job_seeker %}
+                    Votre candidature
+                {% else %}
+                    La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                {% endif %}
+                <b>a bien été envoyée chez {{ job_application.to_company.display_name }}</b>.
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

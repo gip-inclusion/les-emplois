@@ -1,20 +1,23 @@
 {% extends "layout/base.html" %}
 {% load badges %}
+{% load components %}
 {% load matomo %}
 {% load str_filters %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
                 Candidature de
                 {% if with_job_seeker_detail_url|default:False %}
                     <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</a>
                 {% else %}
                     {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
                 {% endif %}
+                {% job_application_state_badge job_application extra_class="badge-base" %}
             </h1>
-            {% job_application_state_badge job_application extra_class="badge-base" %}
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             <button class="btn btn-lg btn-ico-only btn-link"
                     type="button"
                     data-it-action="print"
@@ -22,11 +25,9 @@
                     aria-label="Imprimer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
                 <i class="ri-printer-line fw-normal" aria-hidden="true"></i>
             </button>
-        </div>
-        <div>
             {% block title_inline_actions %}{% endblock %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
     {% block actions %}{% endblock %}
 {% endblock %}
 

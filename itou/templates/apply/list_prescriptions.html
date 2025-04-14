@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
@@ -8,16 +9,18 @@
 {% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-        {% include "apply/includes/list_job_applications_title.html" %}
-        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur les candidatures" %}
+        {% fragment as c_title__main %}
+            {% include "apply/includes/list_job_applications_title.html" %}
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             {% include "apply/includes/job_applications_export_button.html" %}
             <a href="{% url 'search:employers_results' %}" class="btn btn-lg btn-primary btn-ico">
                 <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                 <span>Postuler pour un candidat</span>
             </a>
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

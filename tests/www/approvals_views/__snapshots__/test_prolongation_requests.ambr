@@ -143,7 +143,15 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -372,7 +380,15 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -531,7 +547,15 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -690,7 +714,15 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Refuser la demande de prolongation pour Jane DOE</h1>
+          </div>
+      
+      
+  </div>
+  
   
                               
                                   
@@ -1510,20 +1542,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
                   Demande de prolongation pour Jane DOE
-              </h1>
-              
+                  
       
           <span class="badge rounded-pill badge-base bg-danger">Refusée</span>
       
   
   
+              </h1>
           </div>
-      </div>
       
+      
+  </div>
+  
   
                               
                                   
@@ -1532,6 +1567,8 @@
   
                               
                               
+      
+  
                           </div>
                       </div>
                   </div>
@@ -1765,20 +1802,23 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
                   Demande de prolongation pour Jane DOE
-              </h1>
-              
+                  
       
           <span class="badge rounded-pill badge-base bg-success">Acceptée</span>
       
   
   
+              </h1>
           </div>
-      </div>
       
+      
+  </div>
+  
   
                               
                                   
@@ -1787,6 +1827,8 @@
   
                               
                               
+      
+  
                           </div>
                       </div>
                   </div>
@@ -2020,19 +2062,31 @@
   
   
                               
-      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-          <div class="d-xl-flex align-items-xl-center">
-              <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
                   Demande de prolongation pour Jane DOE
-              </h1>
-              
+                  
       
           <span class="badge rounded-pill badge-base bg-accent-03 text-primary">À traiter</span>
       
   
   
+              </h1>
           </div>
-      </div>
+      
+      
+  </div>
+  
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
       
           <div class="c-box c-box--action">
               <h2 class="visually-hidden">Actions rapides</h2>
@@ -2056,13 +2110,6 @@
           </div>
       
   
-                              
-                                  
-  
-  
-  
-                              
-                              
                           </div>
                       </div>
                   </div>

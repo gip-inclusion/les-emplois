@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 
 {% block title %}
     Transférer une candidature vers une autre structure
@@ -8,11 +9,15 @@
 
 {% block title_content %}
     {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=3 only %}
-    {% if job_app_to_transfer.to_company == company %}
-        <h1>Transfert impossible</h1>
-    {% else %}
-        <h1>Confirmation du transfert</h1>
-    {% endif %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            {% if job_app_to_transfer.to_company == company %}
+                <h1>Transfert impossible</h1>
+            {% else %}
+                <h1>Confirmation du transfert</h1>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
