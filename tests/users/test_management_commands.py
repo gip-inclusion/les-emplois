@@ -31,8 +31,8 @@ from itou.users.models import User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyMembershipFactory
-from tests.institutions.factories import InstitutionMembershipFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -40,7 +40,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -1428,3 +1428,124 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
             assert mailoutbox[idx].subject == (
                 f"[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation {expected_organization_name}"
             )
+
+    def test_check_authorized_members_with_disabled_admin_companies(
+        self, django_capture_on_commit_callbacks, command, mailoutbox
+    ):
+        self.employer_1.company.created_at -= relativedelta(months=3)
+        self.employer_1.company.save(update_fields=["created_at", "updated_at"])
+
+        # Create other company the user was once a member of
+        DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)
+        company_2 = CompanyFactory(name="Company 2", created_at=DT_3_MONTHS_AGO)
+        CompanyMembershipFactory(company=company_2, user=self.employer_1.user, is_admin=False, is_active=False)
+
+        # Add an admin to both companies
+        other_admin = EmployerFactory()
+        admin_membership_1 = CompanyMembershipFactory(user=other_admin, company=self.employer_1.company)
+        admin_membership_2 = CompanyMembershipFactory(user=other_admin, company=company_2)
+
+        # Add another active user so that both companies have 2 or more active users
+        other_active_member = EmployerFactory()
+        CompanyMembershipFactory(user=other_active_member, company=self.employer_1.company, is_admin=False)
+        CompanyMembershipFactory(user=other_active_member, company=company_2, is_admin=False)
+
+        # an inactive user with active membership and admin (that's bad)
+        inactive_admin = EmployerFactory(is_active=False)
+        CompanyMembershipFactory(user=inactive_admin, company=self.employer_1.company)
+        CompanyMembershipFactory(user=inactive_admin, company=company_2)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            command.handle()
+        assert len(mailoutbox) == 3
+        expected_memberships = [self.employer_1, admin_membership_1, admin_membership_2]
+        for idx, expected_membership in enumerate(expected_memberships):
+            assert mailoutbox[idx].subject == (
+                "[DEV] Rappel sécurité : "
+                f"vérifiez la liste des membres de l’organisation {expected_membership.company.name}"
+            )
+            assert mailoutbox[idx].to == [expected_membership.user.email]
+
+    def test_check_authorized_members_with_disabled_admin_organizations(
+        self, django_capture_on_commit_callbacks, command, mailoutbox
+    ):
+        self.prescriber_1.organization.created_at -= relativedelta(months=3)
+        self.prescriber_1.organization.save(update_fields=["created_at", "updated_at"])
+
+        # Create other organization the user was once a member of
+        DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)
+        organization_2 = PrescriberOrganizationFactory(name="Organization 2", created_at=DT_3_MONTHS_AGO)
+        PrescriberMembershipFactory(
+            organization=organization_2, user=self.prescriber_1.user, is_admin=False, is_active=False
+        )
+
+        # Add an admin to both organizations
+        other_admin = PrescriberFactory()
+        admin_membership_1 = PrescriberMembershipFactory(user=other_admin, organization=self.prescriber_1.organization)
+        admin_membership_2 = PrescriberMembershipFactory(user=other_admin, organization=organization_2)
+
+        # Add another active user so that both organizations have 2 or more active users
+        other_active_member = PrescriberFactory()
+        PrescriberMembershipFactory(
+            user=other_active_member, organization=self.prescriber_1.organization, is_admin=False
+        )
+        PrescriberMembershipFactory(user=other_active_member, organization=organization_2, is_admin=False)
+
+        # an inactive user with active membership and admin (that's bad)
+        inactive_admin = PrescriberFactory(is_active=False)
+        PrescriberMembershipFactory(user=inactive_admin, organization=self.prescriber_1.organization)
+        PrescriberMembershipFactory(user=inactive_admin, organization=organization_2)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            command.handle()
+        assert len(mailoutbox) == 3
+        expected_memberships = [self.prescriber_1, admin_membership_1, admin_membership_2]
+        for idx, expected_membership in enumerate(expected_memberships):
+            assert mailoutbox[idx].subject == (
+                "[DEV] Rappel sécurité : "
+                f"vérifiez la liste des membres de l’organisation {expected_membership.organization.name}"
+            )
+            assert mailoutbox[idx].to == [expected_membership.user.email]
+
+    def test_check_authorized_members_with_disabled_admin_institution(
+        self, django_capture_on_commit_callbacks, command, mailoutbox
+    ):
+        self.labor_inspector_1.institution.created_at -= relativedelta(months=3)
+        self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
+
+        # Create other insitution the user was once a member of
+        DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)
+        institution_2 = InstitutionFactory(name="Institution 2", created_at=DT_3_MONTHS_AGO)
+        InstitutionMembershipFactory(
+            institution=institution_2, user=self.labor_inspector_1.user, is_admin=False, is_active=False
+        )
+
+        # Add an admin to both institutions
+        other_admin = LaborInspectorFactory()
+        admin_membership_1 = InstitutionMembershipFactory(
+            user=other_admin, institution=self.labor_inspector_1.institution
+        )
+        admin_membership_2 = InstitutionMembershipFactory(user=other_admin, institution=institution_2)
+
+        # Add another active user so that both institutions have 2 or more active users
+        other_active_member = LaborInspectorFactory()
+        InstitutionMembershipFactory(
+            user=other_active_member, institution=self.labor_inspector_1.institution, is_admin=False
+        )
+        InstitutionMembershipFactory(user=other_active_member, institution=institution_2, is_admin=False)
+
+        # an inactive user with active membership and admin (that's bad)
+        inactive_admin = LaborInspectorFactory(is_active=False)
+        InstitutionMembershipFactory(user=inactive_admin, institution=self.labor_inspector_1.institution)
+        InstitutionMembershipFactory(user=inactive_admin, institution=institution_2)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            command.handle()
+        assert len(mailoutbox) == 3
+        expected_memberships = [self.labor_inspector_1, admin_membership_1, admin_membership_2]
+        for idx, expected_membership in enumerate(expected_memberships):
+            assert mailoutbox[idx].subject == (
+                "[DEV] Rappel sécurité : "
+                f"vérifiez la liste des membres de l’organisation {expected_membership.institution.name}"
+            )
+            assert mailoutbox[idx].to == [expected_membership.user.email]
