@@ -6,6 +6,7 @@ from itou.files.models import File
 from itou.geiq.enums import ReviewState
 from itou.institutions.models import Institution
 from itou.users.enums import Title
+from itou.utils.models import check_nullable_date_order_constraint
 
 
 class ImplementationAssessmentCampaign(models.Model):
@@ -104,14 +105,12 @@ class ImplementationAssessment(models.Model):
                     )
                 ),
             ),
-            models.CheckConstraint(
+            check_nullable_date_order_constraint(
+                "submitted_at",
+                "reviewed_at",
                 name="reviewed_at_only_after_submitted_at",
                 violation_error_message=(
                     "Impossible d'avoir une date de contrôle sans une date de soumission antérieure"
-                ),
-                condition=(
-                    models.Q(reviewed_at__isnull=True)
-                    | models.Q(submitted_at__isnull=False, reviewed_at__gte=models.F("submitted_at"))
                 ),
             ),
             models.CheckConstraint(

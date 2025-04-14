@@ -20,7 +20,7 @@ from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.users.enums import KIND_EMPLOYER
 from itou.utils.emails import send_email_messages
-from itou.utils.models import InclusiveDateRangeField
+from itou.utils.models import InclusiveDateRangeField, check_nullable_date_order_constraint
 from itou.utils.validators import validate_html
 
 
@@ -506,13 +506,13 @@ class EvaluatedSiae(models.Model):
         verbose_name_plural = "entreprises contrôlées"
         unique_together = ("evaluation_campaign", "siae")
         constraints = [
-            models.CheckConstraint(
+            check_nullable_date_order_constraint(
+                "reviewed_at",
+                "final_reviewed_at",
                 name="final_reviewed_at_only_after_reviewed_at",
                 violation_error_message=(
                     "Impossible d'avoir une date de contrôle définitif sans une date de premier contrôle antérieure"
                 ),
-                condition=models.Q(final_reviewed_at__isnull=True)
-                | models.Q(reviewed_at__isnull=False, final_reviewed_at__gte=F("reviewed_at")),
             ),
         ]
 
