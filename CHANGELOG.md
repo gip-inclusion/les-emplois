@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## 2025-04-14
+
+### Ajouté
+
+- [Candidats : Historisation des changements de l'ID unique envoyé à l'ASP](https://github.com/gip-inclusion/les-emplois/pull/5911)
+- [Pilotage : Ouverture du TB "Analyse des candidatures émises et de leur traitement" aux PLIE](https://github.com/gip-inclusion/les-emplois/pull/5922)
+- [Pilotage : Ouvrir les TB pour la DGEFP](https://github.com/gip-inclusion/les-emplois/pull/5893) 🖼
+
+### Modifié
+
+- [A11Y : Mise à jour de la mise en forme et du comportement des liens d'évitements](https://github.com/gip-inclusion/les-emplois/pull/5890) 🖼
+- [Admin : Permettre la suppression des candidatures quand des logs de transitions existent](https://github.com/gip-inclusion/les-emplois/pull/5872)
+- [Data inclusion : Séparation de deux thématiques](https://github.com/gip-inclusion/les-emplois/pull/5919)
+- [Employeur : Empêcher l'envoi de candidatures en cours dès que l'employeur ferme les offres](https://github.com/gip-inclusion/les-emplois/pull/5748) 🖼
+- [GPS : Empêcher les relations en double](https://github.com/gip-inclusion/les-emplois/pull/5868)
+- [GPS : Import du nouveau fichier référents](https://github.com/gip-inclusion/les-emplois/pull/5847)
+- [PASS IAE : Correction de l'affichage de la durée restante du PASS](https://github.com/gip-inclusion/les-emplois/pull/5937) 🖼
+- [Pilotage : Modification des pages “Statistiques” selon le profil utilsateur](https://github.com/gip-inclusion/les-emplois/pull/5807) 🖼
+- [Profil salarié : Correction de la mention du PASS si celui-ci n'a pas démarré dans l'encart Immersion Facilitée](https://github.com/gip-inclusion/les-emplois/pull/5913) 🖼
+- [Sécurité : Empêcher un utilisateur d’accéder aux droits des prescripteurs habilités s’il effectue des démarches depuis une organisation non habilitée](https://github.com/gip-inclusion/les-emplois/pull/5887)
+- [Stabilité : Ajout du composant c-title aux templates account et announcements](https://github.com/gip-inclusion/les-emplois/pull/5920)
+- [Stabilité : Ajout du composant c-title aux templates geiq et job_seekers](https://github.com/gip-inclusion/les-emplois/pull/5925)
+- [Stabilité : Ajout du composant c-title aux templates gps, search et signup](https://github.com/gip-inclusion/les-emplois/pull/5926)
+- [Stabilité : Création du composant c-title et mise à jour des templates static et companies](https://github.com/gip-inclusion/les-emplois/pull/5806)
+
+### Supprimé
+
+- [Candidature : Retrait du sondage sur RDVI](https://github.com/gip-inclusion/les-emplois/pull/5936)
+- [Pilotage : Suppression du TB 327 "Suivre le cofinancement de mon ACI"](https://github.com/gip-inclusion/les-emplois/pull/5883)
+
 ## 2025-04-07
 
 ### Ajouté
