@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load i18n %}
 {% load matomo %}
 
@@ -9,8 +10,8 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div>
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
             <h1>
                 Exporter les candidatures
                 {% if export_for == "siae" %}
@@ -19,18 +20,15 @@
                     envoyées
                 {% endif %}
             </h1>
-        </div>
-        <div>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
             {% if export_for == "siae" %}
-                <a class="btn btn-lg btn-primary btn-ico w-100 w-md-auto"
-                   {% matomo_event "candidature" "exports" "export-siae" %}
-                   aria-label="Télécharger cet export SIAE"
-                   href="{% url 'apply:list_for_siae_exports_download' %}">
+                <a class="btn btn-lg btn-primary btn-ico" {% matomo_event "candidature" "exports" "export-siae" %} aria-label="Télécharger cet export SIAE" href="{% url 'apply:list_for_siae_exports_download' %}">
                     <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                     <span>Télécharger toutes les candidatures</span>
                 </a>
             {% else %}
-                <a class="btn btn-lg btn-primary btn-ico w-100 w-md-auto"
+                <a class="btn btn-lg btn-primary btn-ico"
                    {% matomo_event "candidature" "exports" "export-prescripteur" %}
                    aria-label="Télécharger cet export prescripteur"
                    href="{% url 'apply:list_prescriptions_exports_download' %}">
@@ -38,8 +36,8 @@
                     <span>Télécharger toutes les candidatures</span>
                 </a>
             {% endif %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

@@ -1,22 +1,29 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}{{ page_title }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% if not job_app_to_transfer|default:False %}
-        <div class="d-xl-flex align-items-xl-center">
-            <h1 class="mb-1 mb-xl-0 me-xl-3 text-xl-nowrap">{% include 'apply/includes/_submit_title.html' %}</h1>
-            {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
-        </div>
-        <p>
-            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-            {% if can_view_personal_information and not request.user.is_job_seeker %}
-                <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
-            {% endif %}
-            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
-        </p>
+        {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+            {% fragment as c_title__main %}
+                <h1>
+                    {% include 'apply/includes/_submit_title.html' %}
+                    {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
+                </h1>
+            {% endfragment %}
+            {% fragment as c_title__secondary %}
+                <p>
+                    Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+                    {% if can_view_personal_information and not request.user.is_job_seeker %}
+                        <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
+                    {% endif %}
+                    {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
+                </p>
+            {% endfragment %}
+        {% endcomponent_title %}
     {% endif %}
 {% endblock %}
 
