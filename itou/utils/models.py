@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateRangeField, ranges
 from django.db import models
-from django.db.models import Func, Transform
+from django.db.models import F, Func, Q, Transform
 
 from itou.utils.types import InclusiveDateRange
 
@@ -79,3 +79,24 @@ class PkSupportRemark(AbstractSupportRemark):
 
 class UUIDSupportRemark(AbstractSupportRemark):
     object_id = models.UUIDField()
+
+
+def check_nullable_date_order_constraint(
+    prior_date_field,
+    later_date_field,
+    *,
+    allow_equal=True,
+    name,
+    violation_error_code=None,
+    violation_error_message=None,
+):
+    operator = "gte" if allow_equal else "gt"
+    condition = Q(**{f"{later_date_field}__isnull": True}) | Q(
+        **{f"{prior_date_field}__isnull": False, f"{later_date_field}__{operator}": F(prior_date_field)}
+    )
+    return models.CheckConstraint(
+        name=name,
+        condition=condition,
+        violation_error_code=violation_error_code,
+        violation_error_message=violation_error_message,
+    )
