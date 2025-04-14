@@ -178,9 +178,6 @@ class OIDConnectUserData:
                 # on this behaviour. No need to do a fancy bypass if it's never used.
                 user = User.objects.create_user(**user_data_dict)
                 created = True
-                if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
-                    user.jobseeker_profile.birthdate = birthdate
-                    user.jobseeker_profile.save(update_fields={"birthdate"})
         else:
             other_user = User.objects.exclude(pk=user.pk).filter(email=self.email).first()
             if other_user:
@@ -197,9 +194,9 @@ class OIDConnectUserData:
                 if is_login and key == "kind":
                     continue
                 setattr(user, key, value)
-            if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
-                user.jobseeker_profile.birthdate = birthdate
-                user.jobseeker_profile.save(update_fields={"birthdate"})
+        if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
+            user.jobseeker_profile.birthdate = birthdate
+            user.jobseeker_profile.save(update_fields={"birthdate"})
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
