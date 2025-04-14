@@ -1,7 +1,9 @@
+from django.contrib import messages
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import escape
-from pytest_django.asserts import assertContains
+from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertMessages
 
 from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
@@ -30,6 +32,7 @@ class TestSendSingleCompanyInvitation:
             "form-0-email": self.guest_data["email"],
         }
 
+    @freeze_time("2025-4-10")
     def test_send_one_invitation(self, client, mailoutbox):
         client.force_login(self.sender)
         response = client.get(INVITATION_URL)
@@ -41,7 +44,19 @@ class TestSendSingleCompanyInvitation:
         assertContains(response, form["email"].label)
 
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertContains(response, "Invitation envoyée")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        "Collaborateur ajouté||Pour rejoindre votre organisation, il suffira à votre collaborateur "
+                        "de cliquer sur le lien d'activation contenu dans l'e-mail avant le 24 avril 2025."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
 
         invitations = EmployerInvitation.objects.all()
         assert len(invitations) == 1
@@ -133,6 +148,7 @@ class TestSendMultipleCompanyInvitation:
             "form-1-email": self.second_invited_user.email,
         }
 
+    @freeze_time("2025-04-10")
     def test_send_multiple_invitations(self, client):
         client.force_login(self.sender)
         response = client.get(INVITATION_URL)
@@ -144,6 +160,19 @@ class TestSendMultipleCompanyInvitation:
 
         assert response.status_code == 302
         assert response.url == reverse("companies_views:members")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    (
+                        "Collaborateurs ajoutés||Pour rejoindre votre organisation, il suffira à vos collaborateurs "
+                        "de cliquer sur le lien d'activation contenu dans l'e-mail avant le 24 avril 2025."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
 
     def test_send_multiple_invitations_duplicated_email(self, client):
         client.force_login(self.sender)
