@@ -109,9 +109,6 @@ class OIDConnectState(models.Model):
         return self.expired_at > timezone.now()
 
 
-_no_birthdate = object()
-
-
 @dataclasses.dataclass
 class OIDConnectUserData:
     """
@@ -148,11 +145,17 @@ class OIDConnectUserData:
            we'll replace the account.
          - Otherwise, we'll raise an EmailInUseException (we do not support email overloading).
         """
-        user_data_dict = dataclasses.asdict(self)
-        user_data_dict = {key: value for key, value in user_data_dict.items() if value}
-        birthdate = user_data_dict.pop(
-            "birthdate", _no_birthdate
-        )  # This field is stored on JobSeekerProfile and not User
+        sso_data_dict = {k: v for k, v in dataclasses.asdict(self).items() if v}
+        is_jobseeker = sso_data_dict["kind"] == UserKind.JOB_SEEKER
+        jobseeker_fields = {"birthdate"}
+        jobseeker_data_dict = {}
+        user_data_dict = {}
+        for field, value in sso_data_dict.items():
+            if is_jobseeker and field in jobseeker_fields:
+                jobseeker_data_dict[field] = value
+            else:
+                user_data_dict[field] = value
+
         created = False
         try:
             # Look if a user with the given sub (username) exists for this identity_provider
@@ -194,10 +197,10 @@ class OIDConnectUserData:
                 if is_login and key == "kind":
                     continue
                 setattr(user, key, value)
-        if birthdate is not _no_birthdate and user_data_dict["kind"] == UserKind.JOB_SEEKER:
-            user.jobseeker_profile.birthdate = birthdate
-            user.jobseeker_profile.save(update_fields={"birthdate"})
-
+        if jobseeker_data_dict:
+            for key, value in jobseeker_data_dict.items():
+                setattr(user.jobseeker_profile, key, value)
+            user.jobseeker_profile.save(update_fields=jobseeker_data_dict)
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
         user.save()
