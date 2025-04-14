@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils import timezone
@@ -8,7 +8,6 @@ from django.utils import timezone
 from itou.companies.models import Company
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.models import User
 from itou.users.notifications import OrganizationActiveMembersReminderNotification
 from itou.utils.command import BaseCommand
 from itou.utils.urls import get_absolute_url
@@ -28,16 +27,12 @@ class Command(BaseCommand):
         return (
             queryset.prefetch_related(
                 Prefetch(
-                    "members",
-                    queryset=User.objects.order_by("pk").filter(
-                        Exists(
-                            queryset.model.members.through.objects.filter(
-                                user=OuterRef("pk"), is_active=True, is_admin=True
-                            )
-                        ),
-                        is_active=True,
-                    ),
-                    to_attr="admin_members",
+                    f"{membership_attname}_set",
+                    queryset=queryset.model.members.through.objects.order_by("pk")
+                    .active()
+                    .admin()
+                    .select_related("user"),
+                    to_attr="admin_memberships",
                 )
             )
             .annotate(
@@ -68,16 +63,16 @@ class Command(BaseCommand):
         self.logger.info("Processing %d companies", len(companies))
         for company in companies:
             with transaction.atomic():
-                for member in company.admin_members:
+                for membership in company.admin_memberships:
                     OrganizationActiveMembersReminderNotification(
-                        member,
+                        membership.user,
                         company,
-                        active_admins_count=len(company.admin_members),
+                        active_admins_count=len(company.admin_memberships),
                         members_url=companies_members_url,
                     ).send()
                     self.logger.info(
                         "Sent reminder notification to user %d for company %d",
-                        member.pk,
+                        membership.user.pk,
                         company.pk,
                     )
                 company.active_members_email_reminder_last_sent_at = NOW
@@ -89,16 +84,16 @@ class Command(BaseCommand):
         self.logger.info("Processing %d prescriber organizations", len(prescriber_organizations))
         for prescriber_organization in prescriber_organizations:
             with transaction.atomic():
-                for member in prescriber_organization.admin_members:
+                for membership in prescriber_organization.admin_memberships:
                     OrganizationActiveMembersReminderNotification(
-                        member,
+                        membership.user,
                         prescriber_organization,
-                        active_admins_count=len(prescriber_organization.admin_members),
+                        active_admins_count=len(prescriber_organization.admin_memberships),
                         members_url=prescriber_organizations_members_url,
                     ).send()
                     self.logger.info(
                         "Sent reminder notification to user %d for prescriber organization %d",
-                        member.pk,
+                        membership.user.pk,
                         prescriber_organization.pk,
                     )
                 prescriber_organization.active_members_email_reminder_last_sent_at = NOW
@@ -112,15 +107,15 @@ class Command(BaseCommand):
         self.logger.info("Processing %d institutions", len(institutions))
         for institution in institutions:
             with transaction.atomic():
-                for member in institution.admin_members:
+                for membership in institution.admin_memberships:
                     OrganizationActiveMembersReminderNotification(
-                        member,
+                        membership.user,
                         institution,
-                        active_admins_count=len(institution.admin_members),
+                        active_admins_count=len(institution.admin_memberships),
                         members_url=institutions_members_url,
                     ).send()
                     self.logger.info(
-                        "Sent reminder notification to user %d for institution %d", member.pk, institution.pk
+                        "Sent reminder notification to user %d for institution %d", membership.user.pk, institution.pk
                     )
                 institution.active_members_email_reminder_last_sent_at = NOW
                 institution.save(update_fields=["active_members_email_reminder_last_sent_at", "updated_at"])
