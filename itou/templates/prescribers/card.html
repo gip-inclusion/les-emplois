@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load format_filters %}
 {% load markdownify %}
 {% load static %}
@@ -10,8 +11,14 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Prescripteur habilité</h1>
-    <h2>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</h2>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Prescripteur habilité</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <h2>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</h2>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}

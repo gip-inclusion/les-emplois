@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
@@ -7,11 +8,15 @@
 {% block title %}Sélectionner l’échantillon pour {{ evaluation_campaign }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <h1>Campagne en cours</h1>
-    <h2>
-        Contrôle des auto-prescriptions du {{ evaluation_campaign.evaluated_period_start_at|date:"j F Y" }}
-        au {{ evaluation_campaign.evaluated_period_end_at|date:"j F Y" }}
-    </h2>
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Campagne en cours</h1>
+            <p>
+                Contrôle des auto-prescriptions du {{ evaluation_campaign.evaluated_period_start_at|date:"j F Y" }}
+                au {{ evaluation_campaign.evaluated_period_end_at|date:"j F Y" }}
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
