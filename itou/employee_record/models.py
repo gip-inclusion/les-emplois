@@ -409,6 +409,9 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         if self.status != Status.ARCHIVED:
             raise xwf_models.InvalidTransitionError()
 
+    def was_sent(self):
+        return self.logs.exclude(transition__in=EmployeeRecordTransition.without_asp_exchange()).exists()
+
     @property
     def status_based_on_asp_processing_code(self):
         if not self.asp_processing_code:

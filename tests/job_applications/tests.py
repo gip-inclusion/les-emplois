@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 
 import factory.fuzzy
 import pytest
@@ -13,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
@@ -20,7 +22,7 @@ from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
@@ -1754,6 +1756,18 @@ class TestJobApplicationWorkflow:
         cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
+
+    def test_cancel_delete_employee_record_that_were_not_sent(self, *args, **kwargs):
+        job_application = JobApplicationFactory(with_approval=True)
+        EmployeeRecordTransitionLog.log_transition(
+            transition=random.choice(list(EmployeeRecordTransition.without_asp_exchange())),
+            from_state=random.choice(list(Status)),
+            to_state=random.choice(list(Status)),
+            modified_object=EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED),
+        )
+
+        job_application.cancel(user=job_application.to_company.active_members.first())
+        assertQuerySetEqual(EmployeeRecord.objects.filter(job_application=job_application), [])
 
 
 @pytest.mark.parametrize(

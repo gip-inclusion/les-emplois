@@ -17,7 +17,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
+from itou.employee_record.models import EmployeeRecord
 from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
@@ -840,11 +840,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return False
 
         # If a job application is linked to an employee record then it can only be cancelled if we didn't send any data
-        employee_record_is_blocking_cancellation = any(
-            er.logs.exclude(transition__in=EmployeeRecordTransition.without_asp_exchange()).exists()
-            for er in self.employee_record.all()
-        )
-        if employee_record_is_blocking_cancellation:
+        if any(er.was_sent() for er in self.employee_record.all()):
             return False
 
         return True
@@ -1115,6 +1111,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = None
             self.approval_delivery_mode = ""
             self.approval_manually_delivered_by = None
+
+        for employee_record in self.employee_record.all():
+            if not employee_record.was_sent():
+                employee_record.delete()
 
         # Send notification.
         self.notifications_cancel_for_employer(user).send()
