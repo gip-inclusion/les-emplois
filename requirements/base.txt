@@ -335,8 +335,8 @@ django==5.1.8 \
     #   djangorestframework
     #   drf-spectacular
     #   slippers
-django-allauth==65.6.0 \
-    --hash=sha256:8058298a55c7232f06fd1397a2858498d10d0e710cc4d0db364923f5c75a5748
+django-allauth==65.7.0 \
+    --hash=sha256:eb060692150f39e1529893c2de5f9b46e1dab51153ff6cca7ad72c7c125259ea
     # via -r requirements/base.in
 django-anymail==13.0 \
     --hash=sha256:6da4465eff18f679955f74332501a3a4299e34079015d91e1fce9c049d784d6c \
