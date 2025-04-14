@@ -51,6 +51,12 @@
     ''',
   ])
 # ---
+# name: test_preflight_without_an_accepted_job_application
+  list([
+    'Preflight activated, checking for possible serialization errors...',
+    'No object to check. Exiting preflight.',
+  ])
+# ---
 # name: test_preflight_without_object
   list([
     'Preflight activated, checking for possible serialization errors...',
@@ -101,6 +107,16 @@
     'Starting UPLOAD of employee records',
     'Successfully uploaded: RIAE_FS_20210927000000.json',
     '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)',
+    '[chan 0] sftp session closed.',
+    'Employee records processing done!',
+  ])
+# ---
+# name: test_upload_without_an_accepted_job_application
+  list([
+    '[chan 0] Opened sftp connection (server version 3)',
+    'Connected to "0.0.0.0" as "django_tests"',
+    'Current remote dir is "/"',
+    'Starting UPLOAD of employee records',
     '[chan 0] sftp session closed.',
     'Employee records processing done!',
   ])

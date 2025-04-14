@@ -2,6 +2,7 @@ import json
 import re
 import uuid
 
+import factory.fuzzy
 import freezegun
 import pytest
 from django.test.utils import override_settings
@@ -10,6 +11,7 @@ from django.utils import timezone
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.management.commands import transfer_employee_records
 from itou.employee_record.models import EmployeeRecordBatch
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
@@ -97,6 +99,18 @@ def test_preflight_with_error(snapshot, command, caplog):
     assert caplog.messages == snapshot
 
 
+def test_preflight_without_an_accepted_job_application(caplog, snapshot, command):
+    EmployeeRecordFactory(
+        ready_for_transfer=True,
+        job_application__state=factory.fuzzy.FuzzyChoice(
+            set(JobApplicationState.values) - {JobApplicationState.ACCEPTED}
+        ),
+    )
+
+    command.handle(preflight=True, upload=False, download=False, wet_run=False)
+    assert caplog.messages == snapshot
+
+
 @freezegun.freeze_time("2021-09-27")
 def test_upload_file_error(faker, snapshot, sftp_directory, command, caplog):
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
@@ -128,6 +142,18 @@ def test_upload_only_send_a_limited_number_of_rows(mocker, snapshot, sftp_direct
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
     for file in sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir():
         assert len(file.read_text().splitlines()) == 1
+
+
+def test_upload_without_an_accepted_job_application(caplog, snapshot, command):
+    EmployeeRecordFactory(
+        ready_for_transfer=True,
+        job_application__state=factory.fuzzy.FuzzyChoice(
+            set(JobApplicationState.values) - {JobApplicationState.ACCEPTED}
+        ),
+    )
+
+    command.handle(preflight=False, upload=True, download=False, wet_run=False)
+    assert caplog.messages == snapshot
 
 
 def test_download_file_error(faker, snapshot, sftp_directory, command, caplog):
