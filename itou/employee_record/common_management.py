@@ -11,6 +11,7 @@ from rest_framework.renderers import JSONRenderer
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.command import BaseCommand
 
@@ -153,10 +154,12 @@ class EmployeeRecordTransferCommand(BaseCommand):
         and border it as well as possible."""
         assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
 
-        new_objects = (
+        objects_to_serialize = (
             EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
             if object_class == EmployeeRecordUpdateNotification
-            else EmployeeRecord.objects.filter(status=Status.READY)
+            else EmployeeRecord.objects.filter(
+                status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
+            )
         )
 
         object_serializer = (
@@ -165,18 +168,18 @@ class EmployeeRecordTransferCommand(BaseCommand):
             else EmployeeRecordSerializer
         )
 
-        if not new_objects:
+        if not objects_to_serialize:
             self.logger.info("No object to check. Exiting preflight.")
             return
 
         self.logger.info(
             "Found %d object(s) to check, split in chunks of %d objects.",
-            len(new_objects),
+            len(objects_to_serialize),
             EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS,
         )
 
         errors = False
-        for idx, elements in enumerate(batched(new_objects, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
+        for idx, elements in enumerate(batched(objects_to_serialize, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
             # A batch + serializer must be created with notifications for correct serialization
             batch = EmployeeRecordBatch(elements)
 

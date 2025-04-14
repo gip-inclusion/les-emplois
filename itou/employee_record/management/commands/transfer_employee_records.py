@@ -12,6 +12,7 @@ from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
+from itou.job_applications.enums import JobApplicationState
 from itou.utils import asp as asp_utils
 from itou.utils.iterators import chunks
 
@@ -166,9 +167,11 @@ class Command(EmployeeRecordTransferCommand):
         Upload a file composed of all ready employee records
         """
         self.logger.info("Starting UPLOAD of employee records")
-        ready_employee_records = EmployeeRecord.objects.filter(status=Status.READY)
+        employee_records_to_send = EmployeeRecord.objects.filter(
+            status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
+        )
         for batch in chunks(
-            ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
+            employee_records_to_send, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
         ):
             self._upload_batch_file(sftp, batch, dry_run)
 
