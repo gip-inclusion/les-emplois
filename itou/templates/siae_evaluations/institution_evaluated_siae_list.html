@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 
@@ -10,19 +10,25 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Contrôler les pièces justificatives</h1>
-    <h2 class="h3">
-        Liste des Siae
-        {% if evaluation_campaign.ended_at %}
-            contrôlées
-        {% else %}
-            à contrôler
-        {% endif %}
-    </h2>
-    <p>
-        Contrôle initié le {{ evaluation_campaign.evaluations_asked_at|date:"d F Y" }}
-        {% if evaluation_campaign.ended_at %}, clôturé le {{ evaluation_campaign.ended_at|date:"d F Y" }}{% endif %}
-    </p>
+    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+        {% fragment as c_title__main %}
+            <h1>Contrôler les pièces justificatives</h1>
+        {% endfragment %}
+        {% fragment as c_title__secondary %}
+            <h2 class="h3">
+                Liste des Siae
+                {% if evaluation_campaign.ended_at %}
+                    contrôlées
+                {% else %}
+                    à contrôler
+                {% endif %}
+            </h2>
+            <p>
+                Contrôle initié le {{ evaluation_campaign.evaluations_asked_at|date:"d F Y" }}
+                {% if evaluation_campaign.ended_at %}, clôturé le {{ evaluation_campaign.ended_at|date:"d F Y" }}{% endif %}
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
 {% endblock %}
 
 {% block content %}
