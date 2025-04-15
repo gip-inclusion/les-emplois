@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import TextChoices
 from django.utils import timezone
 
@@ -182,7 +183,13 @@ def transfer_company_data(
 
                 if not spec.get("report_only"):
                     setattr(item, spec["related_model_field"], to_company)
-                    update_fields = [spec["related_model_field"], "updated_at"]
+                    update_fields = [spec["related_model_field"]]
+                    try:
+                        item._meta.get_field("updated_at")
+                    except FieldDoesNotExist:
+                        pass
+                    else:
+                        update_fields.append("updated_at")
                     item.save(update_fields=update_fields)
                 reporter.add(transfer_field, _format_model(item))
 
