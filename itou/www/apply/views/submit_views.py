@@ -79,14 +79,19 @@ def _get_job_seeker_to_apply_for(request):
     return job_seeker
 
 
-class StartView(View):
+def initialize_apply_session(request, company, data):
+    # FIXME: should we put the session_kind in a constant at the start fo this file ?
     session_kind = "apply_session"
+    apply_session = SessionNamespace(request.session, session_kind, f"job_application-{company.pk}")
+    apply_session.init(session_kind, data)
+    return apply_session
 
+
+class StartView(View):
     def setup(self, request, company_pk, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.apply_session = SessionNamespace(request.session, self.session_kind, f"job_application-{self.company.pk}")
         self.hire_process = hire_process
         self.auto_prescription_process = (
             not self.hire_process and request.user.is_employer and self.company == request.current_organization
@@ -137,10 +142,9 @@ class StartView(View):
         return job_seeker_session
 
     def get(self, request, *args, **kwargs):
-        self.apply_session.init(self.session_kind, {})
-        if back_url := get_safe_url(request, "back_url"):
-            self.apply_session.set("reset_url", back_url)
-
+        session_data = {
+            "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
+        }
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
         if job_description_id := request.GET.get("job_description_id"):
@@ -149,7 +153,9 @@ class StartView(View):
             except (JobDescription.DoesNotExist, ValueError):
                 pass
             else:
-                self.apply_session.set("selected_jobs", [job_description.pk])
+                session_data["selected_jobs"] = [job_description.pk]
+
+        self.apply_session = initialize_apply_session(request, self.company, session_data)
 
         if request.user.is_job_seeker:
             tunnel = "job_seeker"

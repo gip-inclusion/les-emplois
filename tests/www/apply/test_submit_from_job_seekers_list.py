@@ -124,7 +124,10 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{guerande_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -286,7 +289,10 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{guerande_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -459,7 +465,10 @@ class TestApplyAsCompany:
         selected_job = other_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": [selected_job.pk]}
+        assert client.session[f"job_application-{other_company.pk}"] == {
+            "selected_jobs": [selected_job.pk],
+            "reset_url": reverse("dashboard:index"),
+        }
 
         next_url = reverse(
             "apply:application_eligibility",
