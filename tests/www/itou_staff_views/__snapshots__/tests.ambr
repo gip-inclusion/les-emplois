@@ -87,7 +87,6 @@
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",

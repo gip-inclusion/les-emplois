@@ -544,7 +544,6 @@ class CompanyMembership(MembershipAbstract):
         on_delete=models.RESTRICT,  # For traceability and accountability
         verbose_name="mis à jour par",
     )
-    notifications = models.JSONField(verbose_name="notifications", default=dict, blank=True, null=True)
 
     class Meta:
         constraints = [
