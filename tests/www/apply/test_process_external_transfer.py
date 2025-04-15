@@ -195,7 +195,7 @@ def test_step_1_same_company(client):
 
 
 def test_step_2_same_company(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     company = job_application.to_company
     client.force_login(company.members.get())
 
@@ -231,7 +231,7 @@ def test_step_2_same_company(client):
 
 
 def test_step_2_internal_transfer(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     employer = job_application.to_company.members.get()
     other_company = CompanyMembershipFactory(user=employer).company
     client.force_login(employer)
@@ -364,7 +364,7 @@ def test_step_3(client, snapshot):
 
 
 def test_step_3_no_previous_CV(client, mocker, pdf_file):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True, resume_link="")
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume_link="")
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -408,7 +408,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
 
 
 def test_step_3_remove_previous_CV(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     assert job_application.resume_link
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
@@ -449,7 +449,7 @@ def test_step_3_remove_previous_CV(client):
 
 
 def test_step_3_replace_previous_CV(client, mocker, pdf_file):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     assert job_application.resume_link
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
@@ -496,7 +496,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
 
 
 def test_access_step_3_without_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True, resume_link="")
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume_link="")
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -523,7 +523,6 @@ def test_full_process(client):
 
     job_application = JobApplicationFactory(
         state=JobApplicationState.REFUSED,
-        for_snapshot=True,
         to_company__post_code="56760",
         to_company__coords=vannes.coords,
         to_company__city=vannes.name,
