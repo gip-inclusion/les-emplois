@@ -1,3 +1,4 @@
+import collections
 import copy
 import datetime
 import io
@@ -685,11 +686,11 @@ def detect_missing_auto_now_in_update_fields():
     from django.apps import apps
     from django.db.models import Model
 
-    auto_now_fields = {}
+    auto_now_fields = collections.defaultdict(list)
     for model in apps.get_models():
         for field in model._meta.get_fields():
             if getattr(field, "auto_now", False):
-                auto_now_fields.setdefault(model._meta.label, []).append(field.name)
+                auto_now_fields[model._meta.label].append(field.name)
 
     original_save = Model.save
 
@@ -702,7 +703,7 @@ def detect_missing_auto_now_in_update_fields():
         update_fields=None,
     ):
         if update_fields:
-            for auto_now_field in auto_now_fields.get(self._meta.label, []):
+            for auto_now_field in auto_now_fields[self._meta.label]:
                 if auto_now_field not in update_fields:
                     raise ValueError(f"Calling save with update_fields without {auto_now_field}")
         return original_save(
