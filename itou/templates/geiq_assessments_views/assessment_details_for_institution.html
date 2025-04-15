@@ -54,11 +54,11 @@
                             <div class="d-flex flex-column gap-3 mb-3">
                                 <div class="d-flex flex-row justify-content-between">
                                     <span>Dont potentiellement éligible à l’aide de 814 €</span>
-                                    <strong>{{ stats.aid_of_814_nb }}</strong>
+                                    <strong>{{ stats.allowance_of_814_nb }}</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
                                     <span>Dont potentiellement éligible à l’aide de 1 400 €</span>
-                                    <strong>{{ stats.aid_of_1400_nb }}</strong>
+                                    <strong>{{ stats.allowance_of_1400_nb }}</strong>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
                                     <span>Nombre de salariés présentés par le GEIQ accompagnés sur une durée > 3 mois sur l’année</span>
@@ -74,7 +74,7 @@
                                 </div>
                                 <div class="d-flex flex-row justify-content-between">
                                     <span>Montant de l’aide potentielle</span>
-                                    <strong>{{ stats.potential_aid_amount|format_int_euros }}</strong>
+                                    <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
                                 </div>
                             </div>
                             {% if not assessment.reviewed_at %}
@@ -130,15 +130,15 @@
                                 <ul class="list-data mb-3">
                                     <li>
                                         <small>Nombre d’aide à 814 €</small>
-                                        <strong>{{ stats.aid_of_814_nb }}</strong>
+                                        <strong>{{ stats.allowance_of_814_nb }}</strong>
                                     </li>
                                     <li>
                                         <small>Nombre d’aide à 1 400 €</small>
-                                        <strong>{{ stats.aid_of_1400_nb }}</strong>
+                                        <strong>{{ stats.allowance_of_1400_nb }}</strong>
                                     </li>
                                     <div class="d-flex flex-column">
                                         <small>Montant total potentiel</small>
-                                        <strong>{{ stats.potential_aid_amount|format_int_euros }}</strong>
+                                        <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
                                     </div>
                                 </ul>
                                 <div class="c-info">

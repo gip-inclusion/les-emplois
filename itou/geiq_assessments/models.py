@@ -206,10 +206,10 @@ class Assessment(models.Model):
             .filter(**{filter_field: True})
             .aggregate(
                 contracts_nb=Count("pk"),
-                aid_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0)),
-                aid_of_814_nb=Count("pk", filter=Q(employee__allowance_amount=814)),
-                aid_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400)),
-                potential_aid_amount=Sum("employee__allowance_amount"),
+                allowance_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0)),
+                allowance_of_814_nb=Count("pk", filter=Q(employee__allowance_amount=814)),
+                allowance_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400)),
+                potential_allowance_amount=Sum("employee__allowance_amount"),
             )
         )
 
