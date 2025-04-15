@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
@@ -215,7 +215,45 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         )
 
 
-class StartView(ApplyStepBaseView):
+class StartView(View):
+    session_kind = "apply_session"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        self.apply_session = SessionNamespace(request.session, self.session_kind, f"job_application-{self.company.pk}")
+        self.hire_process = kwargs.pop("hire_process", False)
+        self.prescription_process = not self.hire_process and (
+            request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
+        )
+        self.auto_prescription_process = (
+            not self.hire_process and request.user.is_employer and self.company == request.current_organization
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.hire_process and request.user.kind != UserKind.EMPLOYER:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+        elif self.hire_process and not self.company.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+        elif request.user.kind not in [
+            UserKind.JOB_SEEKER,
+            UserKind.PRESCRIBER,
+            UserKind.EMPLOYER,
+        ]:
+            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+
+        if not self.company.has_active_members:
+            raise PermissionDenied(
+                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_reset_url(self):
+        if self.apply_session.exists():
+            return self.apply_session.get("reset_url", reverse("dashboard:index"))
+        return reverse("dashboard:index")
+
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session,
