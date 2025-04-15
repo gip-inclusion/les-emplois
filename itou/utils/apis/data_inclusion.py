@@ -13,7 +13,6 @@ API_THEMATIQUES = [
     "equipement-et-alimentation",
     "logement-hebergement",
     "mobilite",
-    "numerique",
     "remobilisation",
 ]
 
