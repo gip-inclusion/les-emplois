@@ -36,7 +36,6 @@ def test_data_inclusion_client(settings, respx_mock):
             "equipement-et-alimentation",
             "logement-hebergement",
             "mobilite",
-            "numerique",
             "remobilisation",
         ],
     }
