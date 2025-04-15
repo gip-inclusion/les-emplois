@@ -1,10 +1,9 @@
 import logging
 
-from django.contrib import admin, messages
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib import admin
 from django.utils.html import format_html
 
-from itou.geiq import models, sync
+from itou.geiq import models
 from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
@@ -12,7 +11,6 @@ from itou.utils.admin import (
     ReadonlyMixin,
     get_admin_view_link,
 )
-from itou.utils.apis import geiq_label
 
 
 logger = logging.getLogger(__name__)
@@ -37,30 +35,6 @@ class ImplementationAssessmentInline(ItouTabularInline):
 
 @admin.register(models.ImplementationAssessmentCampaign)
 class ImplementationAssessmentCampaignAdmin(ItouModelAdmin):
-    @admin.action(description="Synchroniser les bilans des campagnes sélectionnées")
-    def sync_assessments(self, request, queryset):
-        for campaign in queryset:
-            try:
-                creates, updates, deletes = sync.sync_assessments(campaign)
-            except ImproperlyConfigured:
-                messages.error(request, "Synchronisation impossible avec Label: configuration incomplète")
-                return
-            except geiq_label.LabelAPIError:
-                logger.warning("Error while syncing GEIQ campaign %s with Label", campaign)
-                messages.error(request, f"Erreur lors de la synchronisation de la campagne {campaign} avec Label")
-            else:
-                messages.success(request, f"Les bilans de l’année {campaign.year} ont été synchronisés.")
-                if nb_create := len(creates):
-                    s = "s" if nb_create > 1 else ""
-                    messages.success(request, f"{nb_create} bilan{s} créé{s}.")
-                if nb_update := len(updates):
-                    s = "s" if nb_update > 1 else ""
-                    messages.success(request, f"{nb_update} bilan{s} mis à jour.")
-                if nb_delete := len(deletes):
-                    s = "s" if nb_delete > 1 else ""
-                    messages.warning(request, f"{nb_delete} bilan{s} sont liés à des GEIQ n’existant plus dans LABEL.")
-
-    actions = [sync_assessments]
     list_display = (
         "pk",
         "year",
