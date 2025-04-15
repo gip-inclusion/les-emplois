@@ -31,7 +31,7 @@ from itou.utils.urls import add_url_params
 
 class CompanyMembersInline(MembersInline):
     model = models.Company.members.through
-    readonly_fields = MembersInline.readonly_fields + ("notifications",)
+    readonly_fields = MembersInline.readonly_fields
 
 
 class JobsInline(ItouTabularInline):
