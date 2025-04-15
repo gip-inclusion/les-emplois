@@ -474,7 +474,11 @@ def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment
 def list_for_institution(request, template_name="geiq_assessments_views/list_for_institution.html"):
     if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
         raise Http404
-    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
+    assessments = (
+        Assessment.objects.filter(institutions=request.current_organization)
+        .select_related("campaign")
+        .prefetch_related("institution_links__institution")
+    )
     context = {
         "assessments": assessments,
     }
