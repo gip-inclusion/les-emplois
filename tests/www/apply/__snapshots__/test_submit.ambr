@@ -126,8 +126,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -2113,8 +2112,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -2378,8 +2376,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -2732,8 +2729,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -3000,8 +2996,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -4220,8 +4215,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -4485,8 +4479,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -4839,8 +4832,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -5107,8 +5099,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -6327,8 +6318,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -6592,8 +6582,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -6946,8 +6935,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -7214,8 +7202,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -8434,8 +8421,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -8699,8 +8685,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -9053,8 +9038,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
@@ -9321,8 +9305,7 @@
                  "companies_companymembership"."created_at",
                  "companies_companymembership"."updated_at",
                  "companies_companymembership"."company_id",
-                 "companies_companymembership"."updated_by_id",
-                 "companies_companymembership"."notifications"
+                 "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
