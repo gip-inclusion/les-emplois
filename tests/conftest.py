@@ -694,21 +694,12 @@ def detect_missing_auto_now_in_update_fields():
 
     original_save = Model.save
 
-    def strict_save(
-        self,
-        *args,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-    ):
+    def strict_save(self, *args, update_fields=None, **kwargs):
         if update_fields:
             for auto_now_field in auto_now_fields[self._meta.label]:
                 if auto_now_field not in update_fields:
                     raise ValueError(f"Calling save with update_fields without {auto_now_field}")
-        return original_save(
-            self, *args, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
-        )
+        return original_save(self, *args, update_fields=update_fields, **kwargs)
 
     Model.save = strict_save
 
