@@ -11,6 +11,7 @@ from itou.companies.models import Company
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
+from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory
 from tests.utils.test import (
@@ -293,6 +294,7 @@ class TestTransferCompanyData:
         assert from_company.is_searchable
         assert not from_company.block_job_applications
         assert not from_company.job_applications_blocked_at
+        EmployerInvitationFactory(company=from_company)
 
         to_company = CompanyFactory(is_searchable=False)
 
@@ -306,7 +308,10 @@ class TestTransferCompanyData:
 
         response = admin_client.post(
             transfer_url,
-            data={"fields_to_transfer": ["job_applications_received", "is_searchable"], "disable_from_company": True},
+            data={
+                "fields_to_transfer": ["job_applications_received", "invitations", "is_searchable"],
+                "disable_from_company": True,
+            },
         )
         assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
 
