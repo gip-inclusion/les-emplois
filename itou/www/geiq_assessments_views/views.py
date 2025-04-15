@@ -503,9 +503,7 @@ def details_for_institution(
 ):
     if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
         raise Http404
-    assessments = Assessment.objects.filter(
-        submitted_at__isnull=False, institutions=request.current_organization
-    ).select_related("campaign")
+    assessments = Assessment.objects.filter(institutions=request.current_organization).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
     if request.method == "POST":
         try:
