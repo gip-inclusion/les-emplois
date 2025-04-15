@@ -31,7 +31,7 @@ from itou.users.admin_forms import (
     SelectTargetUserForm,
     UserAdminForm,
 )
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -705,20 +705,34 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         return super().save_model(request, obj, form, change)
 
 
-class IsPECertifiedFilter(admin.SimpleListFilter):
-    title = "Certifié par France Travail"
-    parameter_name = "is_pe_certified"
+class CertifierFilter(admin.SimpleListFilter):
+    title = "Identité certifiée par"
+    parameter_name = "certifier"
+    not_certified = "not_certified"
 
     def lookups(self, request, model_admin):
-        return (("yes", "Oui"), ("no", "Non"))
+        certifier_choices = list(IdentityCertificationAuthorities.choices)
+        certifier_choices.append((self.not_certified, "Non certifié"))
+        return certifier_choices
 
     def queryset(self, request, queryset):
-        value = self.value()
-        if value == "yes":
-            return queryset.exclude(pe_obfuscated_nir=None)
-        if value == "no":
-            return queryset.filter(pe_obfuscated_nir=None)
+        filter_value = self.value()
+        if filter_value == self.not_certified:
+            return queryset.exclude(
+                Exists(models.IdentityCertification.objects.filter(jobseeker_profile=OuterRef("pk"))),
+            )
+        elif filter_value:
+            return queryset.filter(identity_certifications__certifier=filter_value)
         return queryset
+
+
+class IdentityCertificationInline(ReadonlyMixin, ItouTabularInline):
+    model = models.IdentityCertification
+    extra = 0
+    fields = ("certifier", "certified_at")
+    readonly_fields = fields
+    verbose_name = "certification d’identité"
+    verbose_name_plural = "certifications d’identité"
 
 
 @admin.register(models.JobSeekerProfile)
@@ -747,10 +761,9 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "birthdate",
         "nir",
         "pole_emploi_id",
-        "is_pe_certified",
     )
 
-    list_filter = (IsPECertifiedFilter,)
+    list_filter = (CertifierFilter,)
 
     list_select_related = ("user",)
 
@@ -760,7 +773,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         "hexa_commune",
         "pe_obfuscated_nir",
         "pe_last_certification_attempt_at",
-        "is_pe_certified",
         "disabled_notifications",
         "fields_history_formatted",
     )
@@ -786,7 +798,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                     "resourceless",
                     "rqth_employee",
                     "oeth_employee",
-                    "is_pe_certified",
                     "pe_obfuscated_nir",
                     "pe_last_certification_attempt_at",
                     "created_by_prescriber_organization",
@@ -837,7 +848,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         ("Audit", {"fields": ("fields_history_formatted",)}),
     )
 
-    inlines = (PkSupportRemarkInline,)
+    inlines = (
+        IdentityCertificationInline,
+        PkSupportRemarkInline,
+    )
 
     INCONSISTENCY_CHECKS = [
         (
@@ -849,10 +863,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
     @admin.display(description="nom complet")
     def username(self, obj):
         return obj.user.get_full_name()
-
-    @admin.display(boolean=True, description="profil certifié par France Travail")
-    def is_pe_certified(self, obj):
-        return obj.pe_obfuscated_nir is not None
 
     @admin.display(description="utilisateur")
     def user_link(self, obj):
