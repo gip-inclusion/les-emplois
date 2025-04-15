@@ -224,8 +224,8 @@ class Assessment(models.Model):
             return []
         return [antenna["id"] for antenna in self.label_antennas]
 
-    def institutions_to_contact(self):
-        conventionned_institutions = sorted(
+    def conventionned_institutions(self):
+        return sorted(
             [
                 institution_link.institution
                 for institution_link in self.institution_links.all()
@@ -233,6 +233,9 @@ class Assessment(models.Model):
             ],
             key=lambda institution: (institution.kind, institution.name),
         )
+
+    def institutions_to_contact(self):
+        conventionned_institutions = self.conventionned_institutions()
         if not conventionned_institutions:
             # This shouldn't happen
             return "l’institution référente"

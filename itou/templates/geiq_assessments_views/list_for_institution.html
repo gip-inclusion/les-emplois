@@ -30,7 +30,10 @@
                                     <tr>
                                         <th scope="col">Nom</th>
                                         <th scope="col">Campagne</th>
+                                        <th scope="col">Référent</th>
                                         <th scope="col">Statut du bilan</th>
+                                        <th scope="col">Nombre de parcours</th>
+                                        <th scope="col">Financement accordé</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,7 +43,26 @@
                                                 <a class="btn btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">{{ assessment.name_for_institution }}</a>
                                             </td>
                                             <td>{{ assessment.campaign.year }}</td>
+                                            <td>
+                                                <ul>
+                                                    {% for institution in assessment.conventionned_institutions %}<li>{{ institution.name }}</li>{% endfor %}
+                                                </ul>
+                                            </td>
                                             <td>{% state_for_institution assessment %}</td>
+                                            <td>
+                                                {% if assessment.submitted_at %}
+                                                    Un nombre à déterminer
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.granted_amount|format_int_euros }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
