@@ -1422,8 +1422,15 @@ class IdentityCertification(models.Model):
         related_name="identity_certifications",
         on_delete=models.CASCADE,
     )
-    certifier = models.CharField(max_length=32, choices=IdentityCertificationAuthorities)
-    certified_at = models.DateTimeField(default=timezone.now)
+    certifier = models.CharField(
+        max_length=32,
+        choices=IdentityCertificationAuthorities,
+        verbose_name="certificateur",
+    )
+    certified_at = models.DateTimeField(
+        default=timezone.now,
+        verbose_name=JobSeekerProfile._meta.verbose_name,
+    )
 
     objects = IdentityCertificationManager()
 

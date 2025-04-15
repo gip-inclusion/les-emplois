@@ -4,7 +4,8 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.users import admin
-from itou.users.models import JobSeekerProfile, User
+from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
@@ -22,38 +23,57 @@ def test_search(admin_client):
 
 
 def test_filter():
-    js_certified = JobSeekerFactory()
-    js_certified.jobseeker_profile.pe_obfuscated_nir = "PRINCEOFBELAIR"
-    js_certified.jobseeker_profile.save()
+    ft_certified = JobSeekerFactory(first_name="FT", last_name="Certified")
+    IdentityCertification.objects.create(
+        certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
+        jobseeker_profile=ft_certified.jobseeker_profile,
+    )
+    api_particulier_certified = JobSeekerFactory(first_name="API Particulier", last_name="Certified")
+    IdentityCertification.objects.create(
+        certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+        jobseeker_profile=api_particulier_certified.jobseeker_profile,
+    )
+    not_certified = JobSeekerFactory(first_name="NOT", last_name="Certified")
 
-    js_non_certified = JobSeekerFactory(jobseeker_profile__pe_obfuscated_nir=None)
-
-    filter = admin.IsPECertifiedFilter(
+    filter = admin.CertifierFilter(
         None,
-        {"is_pe_certified": ["yes"]},
+        {"certifier": [IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE]},
         JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
-    assert list(profiles) == [js_certified.jobseeker_profile]
+    assert list(profiles) == [ft_certified.jobseeker_profile]
 
-    filter = admin.IsPECertifiedFilter(
+    filter = admin.CertifierFilter(
         None,
-        {"is_pe_certified": ["no"]},
+        {"certifier": [IdentityCertificationAuthorities.API_PARTICULIER]},
         JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
-    assert list(profiles) == [js_non_certified.jobseeker_profile]
+    assert list(profiles) == [api_particulier_certified.jobseeker_profile]
 
-    filter = admin.IsPECertifiedFilter(
+    filter = admin.CertifierFilter(
+        None,
+        {"certifier": ["not_certified"]},
+        JobSeekerProfile,
+        admin.JobSeekerProfileAdmin,
+    )
+    profiles = filter.queryset(None, JobSeekerProfile.objects.all())
+    assert list(profiles) == [not_certified.jobseeker_profile]
+
+    filter = admin.CertifierFilter(
         None,
         {},
         JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
-    assert set(profiles) == {js_certified.jobseeker_profile, js_non_certified.jobseeker_profile}
+    assert set(profiles) == {
+        ft_certified.jobseeker_profile,
+        api_particulier_certified.jobseeker_profile,
+        not_certified.jobseeker_profile,
+    }
 
 
 def test_get_fields_to_transfer_for_job_seekers():

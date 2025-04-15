@@ -21,9 +21,16 @@ class Migration(migrations.Migration):
                             ("api_particulier", "API Particulier"),
                         ],
                         max_length=32,
+                        verbose_name="certificateur",
                     ),
                 ),
-                ("certified_at", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "certified_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="profil demandeur d'emploi",
+                    ),
+                ),
                 (
                     "jobseeker_profile",
                     models.ForeignKey(
