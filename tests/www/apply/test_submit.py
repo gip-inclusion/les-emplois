@@ -403,8 +403,10 @@ class TestApply:
     @pytest.mark.parametrize(
         "job_description_id,back_url,expected_session",
         [
-            pytest.param("", "", {}, id="empty"),
-            pytest.param(1, "", {"selected_jobs": [1]}, id="with_selected_jobs"),
+            pytest.param("", "", {"reset_url": reverse("dashboard:index")}, id="empty"),
+            pytest.param(
+                1, "", {"selected_jobs": [1], "reset_url": reverse("dashboard:index")}, id="with_selected_jobs"
+            ),
             pytest.param(
                 1,
                 "/une/url/quelconque",
@@ -519,7 +521,7 @@ class TestHire:
         "back_url,expected_session",
         [
             pytest.param("/une/url/quelconque", {"reset_url": "/une/url/quelconque"}, id="with_back_url"),
-            pytest.param("", {}, id="empty"),
+            pytest.param("", {"reset_url": reverse("dashboard:index")}, id="empty"),
         ],
     )
     def test_start_view_initializes_session(self, client, back_url, expected_session):
