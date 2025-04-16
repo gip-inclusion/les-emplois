@@ -781,18 +781,13 @@ class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
         }
 
 
-class ApplicationEndView(ApplyStepBaseView):
+class ApplicationEndView(TemplateView):
     template_name = "apply/submit/application/end.html"
-
-    def __init__(self):
-        super().__init__()
-
-        self.job_application = None
-        self.form = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
         self.job_application = get_object_or_404(
             JobApplication.objects.select_related("job_seeker", "to_company"),
             pk=kwargs.get("application_pk"),
@@ -800,6 +795,7 @@ class ApplicationEndView(ApplyStepBaseView):
         self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
+        self.auto_prescription_process = request.user.is_employer and self.company == request.current_organization
 
     def post(self, request, *args, **kwargs):
         if not can_edit_personal_information(self.request, self.job_application.job_seeker):
