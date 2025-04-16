@@ -6,6 +6,7 @@ import string
 import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 from django.utils.text import slugify
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, LaneType
@@ -77,6 +78,20 @@ class UserFactory(factory.django.DjangoModelFactory):
         if create and extracted is True:
             settings, _ = NotificationSettings.get_or_create(obj)
             settings.disabled_notifications.set(NotificationRecord.objects.all())
+
+    @factory.post_generation
+    def joined_days_ago(obj, create, extracted, **kwargs):
+        if extracted:
+            obj.date_joined = timezone.now() - datetime.timedelta(days=extracted)
+            if create:
+                obj.save(update_fields=["date_joined"])
+
+    @factory.post_generation
+    def notified_days_ago(obj, create, extracted, **kwargs):
+        if extracted:
+            obj.upcoming_deletion_notified_at = timezone.now() - datetime.timedelta(days=extracted)
+            if create:
+                obj.save(update_fields=["upcoming_deletion_notified_at"])
 
 
 class ItouStaffFactory(UserFactory):

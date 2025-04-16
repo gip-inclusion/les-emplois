@@ -1,0 +1,141 @@
+# serializer version: 1
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
+  list([
+    dict({
+      'birth_year': 1964,
+      'date_joined': datetime.date(2023, 10, 1),
+      'department': '',
+      'first_login': None,
+      'had_nir': True,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_login': None,
+      'nir_sex': 7,
+      'nir_year': 41,
+      'title': 'M',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
+  list([
+    dict({
+      'birth_year': 1990,
+      'date_joined': datetime.date(2021, 12, 1),
+      'department': '',
+      'first_login': datetime.date(2021, 12, 1),
+      'had_nir': True,
+      'had_pole_emploi_id': True,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_login': datetime.date(2021, 12, 1),
+      'nir_sex': 6,
+      'nir_year': 55,
+      'title': 'MME',
+      'user_signup_kind': 'employer',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
+  '''
+  Bonjour Johan ANDERSON,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte candidat'
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
+  list([
+    dict({
+      'birth_year': 1985,
+      'date_joined': datetime.date(2020, 4, 1),
+      'department': '',
+      'first_login': datetime.date(2020, 4, 1),
+      'had_nir': True,
+      'had_pole_emploi_id': True,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_login': datetime.date(2020, 4, 1),
+      'nir_sex': 8,
+      'nir_year': 55,
+      'title': 'MME',
+      'user_signup_kind': 'prescriber',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
+  '''
+  Bonjour Johanna ANDREWS,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte candidat'
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
+  list([
+    dict({
+      'birth_year': None,
+      'date_joined': datetime.date(2022, 11, 1),
+      'department': '',
+      'first_login': None,
+      'had_nir': False,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': 'reason',
+      'last_login': None,
+      'nir_sex': None,
+      'nir_year': None,
+      'title': 'M',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
+  '''
+  Bonjour Martin JACOBSON,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte candidat'
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
+  '''
+  Bonjour Jane DOE,
+  Nous n’avons détecté aucune activité sur votre espace candidat sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Sans connexion de votre part avant le YY/YY/YYYY, votre espace personnel sera supprimé ainsi que toutes les données associées.
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_subject]
+  '[DEV] Information avant suppression de votre compte candidat'
+# ---
