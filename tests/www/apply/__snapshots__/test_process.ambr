@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -255,6 +256,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -453,6 +455,7 @@
                  T3."public_id",
                  T3."address_filled_at",
                  T3."first_login",
+                 T3."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -634,6 +637,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -770,6 +774,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1065,7 +1070,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1282,6 +1288,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1363,6 +1370,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1426,6 +1434,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -1544,6 +1553,7 @@
                  T12."public_id",
                  T12."address_filled_at",
                  T12."first_login",
+                 T12."upcoming_deletion_notified_at",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -1681,6 +1691,7 @@
                  T15."public_id",
                  T15."address_filled_at",
                  T15."first_login",
+                 T15."upcoming_deletion_notified_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -2139,7 +2150,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
@@ -2236,7 +2248,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2453,6 +2466,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2534,6 +2548,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2597,6 +2612,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -2715,6 +2731,7 @@
                  T12."public_id",
                  T12."address_filled_at",
                  T12."first_login",
+                 T12."upcoming_deletion_notified_at",
                  T13."id",
                  T13."address_line_1",
                  T13."address_line_2",
@@ -2852,6 +2869,7 @@
                  T15."public_id",
                  T15."address_filled_at",
                  T15."first_login",
+                 T15."upcoming_deletion_notified_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -3310,7 +3328,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
@@ -3463,7 +3482,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3568,6 +3588,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3649,6 +3670,7 @@
                  T6."public_id",
                  T6."address_filled_at",
                  T6."first_login",
+                 T6."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3712,6 +3734,7 @@
                  T8."public_id",
                  T8."address_filled_at",
                  T8."first_login",
+                 T8."upcoming_deletion_notified_at",
                  T9."user_id",
                  T9."birthdate",
                  T9."birth_place_id",
@@ -3821,6 +3844,7 @@
                  T11."public_id",
                  T11."address_filled_at",
                  T11."first_login",
+                 T11."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -4018,6 +4042,7 @@
                  T4."public_id",
                  T4."address_filled_at",
                  T4."first_login",
+                 T4."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4260,7 +4285,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "job_applications_jobapplicationtransitionlog"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
           WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
