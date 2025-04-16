@@ -15,11 +15,7 @@
                     {% else %}
                         <div class="c-box c-box--summary has-links-inside mb-3">
                             <div class="c-box--summary__header">
-                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                    <div class="flex-grow-1">
-                                        <h3 class="m-0">Documents</h3>
-                                    </div>
-                                </div>
+                                <h3 class="m-0">Documents</h3>
                             </div>
                             <hr class="m-0">
                             <div class="c-box--summary__body">
@@ -47,45 +43,60 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="c-box mb-3">
-                            <div class="d-flex justify-content-between flex-row mb-3">
-                                <h3 class="mb-0">Détail et sélection des parcours</h3>
-                                {% if not assessment.grants_selection_validated_at %}
-                                    {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
-                                {% else %}
-                                    {% include "geiq_assessments_views/includes/badge_checked.html" only %}
-                                {% endif %}
+                        <div class="c-box c-box--summary has-links-inside mb-3">
+                            <div class="c-box--summary__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="flex-grow-1">
+                                        <h3 class="m-0">Détail et sélection des parcours</h3>
+                                    </div>
+                                    <div>
+                                        {% if not assessment.grants_selection_validated_at %}
+                                            {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
+                                        {% else %}
+                                            {% include "geiq_assessments_views/includes/badge_checked.html" only %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="d-flex flex-column gap-3 mb-3">
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Dont potentiellement éligible à l’aide de 814 €</span>
-                                    <strong>{{ stats.allowance_of_814_nb }}</strong>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Dont potentiellement éligible à l’aide de 1 400 €</span>
-                                    <strong>{{ stats.allowance_of_1400_nb }}</strong>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Nombre de salariés présentés par le GEIQ accompagnés sur une durée > 3 mois sur l’année</span>
-                                    <strong>-</strong>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Contrat de professionalisation</span>
-                                    <strong>-</strong>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Contrat d’apprentissage</span>
-                                    <strong>-</strong>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Montant de l’aide potentielle</span>
-                                    <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Dont potentiellement éligible à l’aide de 814 €</span>
+                                            <strong>{{ stats.allowance_of_814_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Dont potentiellement éligible à l’aide de 1 400 €</span>
+                                            <strong>{{ stats.allowance_of_1400_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Nombre de salariés présentés par le GEIQ accompagnés sur une durée > 3 mois sur l’année</span>
+                                            <strong>-</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Contrats de professionalisation</span>
+                                            <strong>-</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Contrats d’apprentissage</span>
+                                            <strong>-</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant de l’aide potentielle</span>
+                                            <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                             {% if not assessment.reviewed_at %}
-                                <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary">
-                                    <span>Contrôler la sélection</span>
-                                </a>
+                                <div class="c-box--summary__footer">
+                                    <div class="d-flex justify-content-end">
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}">
+                                            Contrôler la sélection
+                                        </a>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                         <div class="c-box">
