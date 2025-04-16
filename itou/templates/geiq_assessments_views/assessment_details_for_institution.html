@@ -99,41 +99,56 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="c-box">
-                            <div class="d-flex justify-content-between flex-row mb-3">
-                                <h3 class="mb-0">Décision</h3>
-                                {% if not assessment.decision_validated_at %}
-                                    {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
-                                {% else %}
-                                    {% include "geiq_assessments_views/includes/badge_checked.html" only %}
-                                {% endif %}
-                            </div>
-                            <div class="d-flex flex-column gap-3 mb-3">
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Montant conventionné (convention initiale + avenant)</span>
-                                    <strong>
-                                        {% if assessment.decision_validated_at %}
-                                            {{ assessment.convention_amount|format_int_euros }}
+                        <div class="c-box c-box--summary has-links-inside mb-3">
+                            <div class="c-box--summary__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="flex-grow-1">
+                                        <h3 class="m-0">Décision</h3>
+                                    </div>
+                                    <div>
+                                        {% if not assessment.decision_validated_at %}
+                                            {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
                                         {% else %}
-                                            - €
+                                            {% include "geiq_assessments_views/includes/badge_checked.html" only %}
                                         {% endif %}
-                                    </strong>
+                                    </div>
                                 </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    <span>Montant total accordé</span>
-                                    <strong>
-                                        {% if assessment.decision_validated_at %}
-                                            {{ assessment.granted_amount|format_int_euros }}
-                                        {% else %}
-                                            - €
-                                        {% endif %}
-                                    </strong>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant conventionné (convention initiale + avenant)</span>
+                                            <strong>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.convention_amount|format_int_euros }}
+                                                {% else %}
+                                                    - €
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant total accordé</span>
+                                            <strong>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.granted_amount|format_int_euros }}
+                                                {% else %}
+                                                    - €
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                             {% if not assessment.reviewed_at %}
-                                <a href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}" class="btn btn-primary">
-                                    <span>Saisir la décision</span>
-                                </a>
+                                <div class="c-box--summary__footer">
+                                    <div class="d-flex justify-content-end">
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                            Saisir la décision
+                                        </a>
+                                    </div>
+                                </div>
                             {% endif %}
                         </div>
                     {% endif %}
