@@ -35,9 +35,8 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import (
-    IAEEligibilityDiagnosisFactory,
-)
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.gps.factories import FollowUpGroupFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -1406,3 +1405,65 @@ def test_user_first_login(client):
     user.refresh_from_db()
     assert user.last_login != initial_first_login
     assert user.first_login == initial_first_login
+
+
+@pytest.mark.parametrize(
+    "factory, related_object_factory, expected_last_activity",
+    [
+        pytest.param(
+            JobSeekerFactory,
+            None,
+            lambda jobseeker: jobseeker.date_joined,
+            id="jobseeker_without_login",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now()),
+            None,
+            lambda jobseeker: jobseeker.last_login,
+            id="jobseeker_with_login",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
+            lambda jobseeker: jobseeker.job_applications.last().updated_at,
+            id="jobseeker_with_recent_jobapplication",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda jobseeker: ApprovalFactory(user=jobseeker),
+            lambda jobseeker: jobseeker.approvals.last().updated_at,
+            id="jobseeker_with_recent_approval",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+            lambda jobseeker: jobseeker.eligibility_diagnoses.last().updated_at,
+            id="jobseeker_with_eligibility_diagnosis",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
+            lambda jobseeker: jobseeker.geiq_eligibility_diagnoses.last().updated_at,
+            id="jobseeker_with_geiq_eligibility_diagnosis",
+        ),
+        pytest.param(
+            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
+            lambda jobseeker: jobseeker.follow_up_group.updated_at,
+            id="jobseeker_with_followup_group",
+        ),
+        pytest.param(PrescriberFactory, None, None, id="prescriber"),
+        pytest.param(EmployerFactory, None, None, id="employer"),
+        pytest.param(LaborInspectorFactory, None, None, id="labor_inspector"),
+        pytest.param(ItouStaffFactory, None, None, id="itou_staff"),
+    ],
+)
+def test_jobseeker_with_last_activity(factory, related_object_factory, expected_last_activity):
+    user = factory()
+    if related_object_factory:
+        related_object_factory(user)
+    if expected_last_activity:
+        user_from_qs = User.objects.job_seekers_with_last_activity().get()
+        assert user_from_qs.last_activity == expected_last_activity(user)
+    else:
+        assert User.objects.job_seekers_with_last_activity().exists() is False
