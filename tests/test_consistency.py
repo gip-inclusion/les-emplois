@@ -142,7 +142,7 @@ def test_check_verbose_name_lower():
 def test_check_templates_ordering():
     EXPECTED_BLOCK_ORDER = [
         "title",
-        "title_prevstep",
+        "title_navinfo",
         "title_content",
         "title_messages",
         "title_extra",
