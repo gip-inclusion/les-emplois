@@ -521,7 +521,6 @@
                               </div>
                               <hr/>
                               
-                              
                                   
   
   <div class="row">
@@ -541,9 +540,9 @@
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       
-                          <button aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" name="wizard_goto_step" type="submit" value="/employee_record/add/[UUID of session]/choose-employee">
+                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/add/[UUID of session]/choose-employee">
                               <span>Retour</span>
-                          </button>
+                          </a>
                       
                   </div>
               
@@ -952,7 +951,6 @@
                                   </p>
                               </div>
                               <hr/>
-                              
                               
                                   
   
