@@ -20,22 +20,21 @@
 <!--
 # Catégories changelog
 
- +--------------------------|--------------------------+
- | API                      | Notifications            |
- | Accessibilité            | Page d’accueil           |
- | Admin                    | PASS IAE                 |
- | Annexes financières      | Performances             |
- | Candidature              | Pilotage                 |
- | Connexion                | Profil salarié           |
- | Contrôle a posteriori    | Prescripteur             |
- | Demandes de prolongation | Recherche employeur      |
- | Demandeur d’emploi       | Recherche fiche de poste |
- | Employeur                | Recherche prescripteur   |
- | Fiche de poste           | Stabilité                |
- | Fiche entreprise         | Statistiques             |
- | Fiches salarié           | Tableau de bord          |
- | GEIQ                     | UX/UI                    |
- | Inscription              | Vie privée               |
- +--------------------------|--------------------------+
-
+ +-------------------------|--------------------------+
+| API                      | Interface                |
+| Accessibilité            | Notifications            |
+| Admin                    | Page d’accueil           |
+| Annexes financières      | PASS IAE                 |
+| Candidature              | Performances             |
+| Connexion                | Pilotage                 |
+| Contrôle a posteriori    | Prescripteur             |
+| Demandes de prolongation | Profil salarié           |
+| Demandeur d’emploi       | Recherche employeur      |
+| Employeur                | Recherche fiche de poste |
+| Fiche de poste           | Recherche prescripteur   |
+| Fiche entreprise         | Stabilité                |
+| Fiches salarié           | Statistiques             |
+| GEIQ                     | Tableau de bord          |
+| Inscription              | Vie privée               |
++--------------------------|--------------------------+
 -->
