@@ -11,6 +11,7 @@ class NotificationCategory(StrEnum):
     JOB_APPLICATION = "Candidature"
     GEIQ_IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution GEIQ"
     REGISTRATION = "Inscription"
+    DELETION = "Archivage"
 
 
 class NotificationRegistry:

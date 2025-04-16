@@ -20,3 +20,21 @@ class JobSeekerCreatedByProxyNotification(EmailNotification):
     subject_template = "account/email/email_jobseeker_created_by_third_party_subject.txt"
     body_template = "account/email/email_jobseeker_created_by_third_party_body.txt"
     can_be_disabled = False
+
+
+@notifications_registry.register
+class InactiveJobSeeker(EmailNotification):
+    name = "Information avant suppression d'un compte candidat inactif"
+    category = NotificationCategory.DELETION
+    subject_template = "account/email/email_inactive_jobseeker_subject.txt"
+    body_template = "account/email/email_inactive_jobseeker_body.txt"
+    can_be_disabled = False
+
+
+@notifications_registry.register
+class ArchiveJobSeeker(EmailNotification):
+    name = "Suppression d'un compte candidat"
+    category = NotificationCategory.DELETION
+    subject_template = "account/email/email_archive_jobseeker_subject.txt"
+    body_template = "account/email/email_archive_jobseeker_body.txt"
+    can_be_disabled = False
