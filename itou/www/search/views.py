@@ -40,11 +40,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # An extra GET parameter is used: job_seeker.
-        # It is not part of the form so we pop it.
-        params_get = self.request.GET.copy()
-        params_get.pop("job_seeker", None)
-        kwargs["data"] = params_get or None
+        kwargs["data"] = self.request.GET or None
         return kwargs
 
     def get(self, request, *args, **kwargs):

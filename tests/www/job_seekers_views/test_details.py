@@ -258,7 +258,7 @@ def test_apply_for_button_as_authorized_prescriber(client):
         response,
         (
             f'<a href="{reverse("search:employers_results")}'
-            f'?job_seeker={job_application.job_seeker.public_id}&city={job_application.job_seeker.city_slug}"'
+            f'?job_seeker_public_id={job_application.job_seeker.public_id}&city={job_application.job_seeker.city_slug}"'
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
@@ -277,7 +277,7 @@ def test_apply_for_button_as_authorized_prescriber(client):
         response,
         (
             f'<a href="{reverse("search:employers_results")}'
-            f'?job_seeker={job_application_without_address.job_seeker.public_id}" '
+            f'?job_seeker_public_id={job_application_without_address.job_seeker.public_id}" '
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'
@@ -309,7 +309,7 @@ def test_apply_for_button_as_unauthorized_prescriber(client):
         response,
         (
             f'<a href="{reverse("search:employers_results")}'
-            f'?job_seeker={job_application.job_seeker.public_id}"'
+            f'?job_seeker_public_id={job_application.job_seeker.public_id}"'
             'data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"'
             'data-matomo-option="postuler-pour-ce-candidat" class="btn btn-lg btn-primary btn-ico">'
             '<i class="ri-draft-line fw-medium" aria-hidden="true"></i>'

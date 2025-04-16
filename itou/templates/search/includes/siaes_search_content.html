@@ -8,7 +8,7 @@
                         <div class="col-12">
                             {% include "search/includes/siaes_search_subtitle.html" %}
                             <div class="d-block w-100">
-                                <form hx-get="{% url_add_query request.path job_seeker=job_seeker.public_id|default:'' %}"
+                                <form hx-get="{% url_add_query request.path job_seeker_public_id=job_seeker.public_id|default:'' %}"
                                       hx-trigger="change delay:.5s"
                                       hx-include="#id_city"
                                       hx-indicator="#job-search-results"

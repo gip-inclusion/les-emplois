@@ -67,7 +67,8 @@ def _check_job_seeker_approval(request, job_seeker, siae):
 def _get_job_seeker_to_apply_for(request):
     job_seeker = None
 
-    if job_seeker_public_id := request.GET.get("job_seeker"):
+    # FIXME(alaurent) Remove or clause in a week
+    if job_seeker_public_id := request.GET.get("job_seeker_public_id") or request.GET.get("job_seeker"):
         try:
             job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id).get()
         except (
@@ -972,4 +973,6 @@ class ApplyForJobSeekerMixin:
         }
 
     def get_job_seeker_query_string(self):
-        return {"job_seeker": self.request.GET.get("job_seeker")} if self.request.GET.get("job_seeker", None) else {}
+        # FIXME(alaurent) remove or clause in a week
+        job_seeker_public_id = self.request.GET.get("job_seeker_public_id") or self.request.GET.get("job_seeker")
+        return {"job_seeker_public_id": job_seeker_public_id} if job_seeker_public_id else {}
