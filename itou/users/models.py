@@ -15,8 +15,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Q
-from django.db.models.functions import Upper
+from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
+from django.db.models.functions import Greatest, Upper
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
@@ -76,6 +76,51 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    def job_seekers_with_last_activity(self):
+        from itou.approvals.models import Approval
+        from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
+        from itou.gps.models import FollowUpGroup
+        from itou.job_applications.models import JobApplication
+
+        return self.filter(
+            kind=UserKind.JOB_SEEKER,
+        ).annotate(
+            last_activity=Greatest(
+                "date_joined",
+                "last_login",
+                Subquery(
+                    JobApplication.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    Approval.objects.filter(user_id=OuterRef("pk"))
+                    .values("user_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    EligibilityDiagnosis.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    GEIQEligibilityDiagnosis.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    FollowUpGroup.objects.filter(beneficiary_id=OuterRef("pk"))
+                    .values("beneficiary_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+            )
+        )
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
