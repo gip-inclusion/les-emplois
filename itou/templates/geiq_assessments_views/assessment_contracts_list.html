@@ -38,7 +38,7 @@
         <div class="s-section__container container"> 
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False only %}
+                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
                     {% if request.user.is_employer %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
                         <p>
