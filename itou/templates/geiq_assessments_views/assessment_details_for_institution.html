@@ -156,32 +156,40 @@
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
                     {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token only %}
                     {% if assessment.submitted_at %}
-                        {% with stats=assessment.get_allowance_stats_for_institution %}
-                            <div class="c-box mb-3 mb-md-4">
-                                <ul class="list-data mb-3">
-                                    <li>
-                                        <small>Nombre d’aide à 814 €</small>
-                                        <strong>{{ stats.allowance_of_814_nb }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Nombre d’aide à 1 400 €</small>
-                                        <strong>{{ stats.allowance_of_1400_nb }}</strong>
-                                    </li>
-                                    <div class="d-flex flex-column">
-                                        <small>Montant total potentiel</small>
-                                        <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
-                                    </div>
-                                </ul>
-                                <div class="c-info">
-                                    <span class="c-info__summary">Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible</span>
-                                </div>
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data mb-3">
+                                <li>
+                                    <small>Taux de rupture en période d’essai</small>
+                                    <strong>{{ assessment.label_rates.taux_rupture_periode_essai|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de rupture hors période d’essai</small>
+                                    <strong>{{ assessment.label_rates.taux_rupture_hors_periode_essai|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de sortie emploi durable</small>
+                                    <strong>{{ assessment.label_rates.taux_sortie_emploi_durable|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de sortie emploi</small>
+                                    <strong>{{ assessment.label_rates.taux_sortie_emploi|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux d’obtention de qualification</small>
+                                    <strong>{{ assessment.label_rates.taux_obtention_qualification|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre de salariés sur l’année N-1</small>
+                                    <strong>{{ assessment.employee_nb }}</strong>
+                                </li>
+                            </ul>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Les données présentées ci-dessous sont générées automatiquement par le label. Elles concernent le GEIQ principal et ses antennes.</span>
                             </div>
-                        {% endwith %}
+                        </div>
                     {% endif %}
                     <div class="c-box mb-3 mb-md-4">
-                        <h4>
-                            Structures concernées par la convention
-                        </h5>
+                        <h4>Structures concernées par la convention</h4>
                         <ul>
                             {% for antenna in assessment.label_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
                         </ul>
