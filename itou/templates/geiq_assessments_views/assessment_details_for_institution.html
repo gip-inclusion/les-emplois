@@ -13,32 +13,37 @@
                             <p class="mb-0">Le dossier n’a pas encore été transmis par le GEIQ.</p>
                         </div>
                     {% else %}
-                        <div class="c-box mb-3">
-                            <h3>Documents</h3>
-                            <div class="d-flex flex-column gap-3">
-                                <div class="d-flex flex-row justify-content-between">
-                                    Synthèse du dossier de demande d’appellation GEIQ
-
-                                    <a href="{% url "geiq_assessments_views:summary_document" pk=assessment.pk %}" class="btn-link btn-ico" rel="noopener" target="_blank">
-                                        <span>{{ assessment.summary_document_filename }}</span>
-                                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
-                                    </a>
+                        <div class="c-box c-box--summary has-links-inside mb-3">
+                            <div class="c-box--summary__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="flex-grow-1">
+                                        <h3 class="m-0">Documents</h3>
+                                    </div>
                                 </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    Bilan financier de l’action
-
-                                    <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn-link btn-ico" rel="noopener" target="_blank">
-                                        <span>{{ assessment.action_financial_assessment_filename }}</span>
-                                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
-                                    </a>
-                                </div>
-                                <div class="d-flex flex-row justify-content-between">
-                                    Bilan financier de la structure
-
-                                    <a href="{% url "geiq_assessments_views:structure_financial_assessment" pk=assessment.pk %}" class="btn-link btn-ico" rel="noopener" target="_blank">
-                                        <span>{{ assessment.structure_financial_assessment_filename }}</span>
-                                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
-                                    </a>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Synthèse du dossier de demande d’appellation GEIQ</span>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:summary_document" pk=assessment.pk %}" data-bs-toggle="tooltip" data-bs-title="Télécharger (.pdf)">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.summary_document_filename }}"></i>
+                                            </a>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Bilan financier de l’action</span>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" data-bs-toggle="tooltip" data-bs-title="Télécharger (.pdf)">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.action_financial_assessment_filename }}"></i>
+                                            </a>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Bilan financier de la structure</span>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:structure_financial_assessment" pk=assessment.pk %}" data-bs-toggle="tooltip" data-bs-title="Télécharger (.pdf)">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.structure_financial_assessment_filename }}"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
