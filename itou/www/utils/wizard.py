@@ -25,7 +25,7 @@ class WizardView(TemplateView):
     @classmethod
     def initialize_session_and_start(cls, request, reset_url, extra_session_data=None):
         if reset_url is None:
-            # This is somewhat extreme but will force developpers to always provide a proper next_url
+            # This is somewhat extreme but will force developers to always provide a proper next_url
             raise Http404
         session_data = {
             "config": {
