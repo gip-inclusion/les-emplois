@@ -67,7 +67,7 @@ STEPS = [
 
 @check_user(lambda user: user.is_employer)
 def start_add_wizard(request):
-    return AddView.initiliaze_session_and_start(request, reset_url=get_safe_url(request, "reset_url"))
+    return AddView.initialize_session_and_start(request, reset_url=get_safe_url(request, "reset_url"))
 
 
 class AddViewStep(enum.StrEnum):

@@ -201,7 +201,7 @@ def _start_refuse_wizard(request, *, application_ids, next_url, from_detail_view
     if not application_ids:
         return HttpResponseRedirect(next_url)
 
-    return RefuseWizardView.initiliaze_session_and_start(
+    return RefuseWizardView.initialize_session_and_start(
         request,
         reset_url=next_url,
         extra_session_data={
