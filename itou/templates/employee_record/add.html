@@ -66,9 +66,8 @@
                                 </p>
                             </div>
                             <hr>
-                            {% url "employee_record_views:list" as reset_url %}
                             {% if wizard_steps.prev %}
-                                {% itou_buttons_form primary_label=wizard_steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url secondary_name="wizard_goto_step" secondary_value=wizard_steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_name="création" %}
+                                {% itou_buttons_form primary_label=wizard_steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url secondary_url=wizard_steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_name="création" %}
                             {% else %}
                                 {% itou_buttons_form primary_label=wizard_steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url %}
                             {% endif %}
