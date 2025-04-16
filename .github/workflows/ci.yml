@@ -8,7 +8,7 @@ on:
   merge_group:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     env:
       CELLAR_ADDON_HOST_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}
@@ -18,14 +18,13 @@ jobs:
       REDIS_URL: redis://127.0.0.1:6379
       REQUIREMENTS_PATH: requirements/test.txt
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      group: ${{ github.workflow }}-test-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
       cancel-in-progress: true
     services:
       redis:
         image: redis
         ports:
           - 6379:6379
-
       postgres:
         # Docker Hub image
         image: postgis/postgis:17-master
@@ -39,11 +38,36 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - uses: ./.github/actions/setup
-    - name: ✨ Verify quality
-      run: make quality
     - name: 🤹 Django tests
       run: make test
+
+  quality:
+      runs-on: ubuntu-latest
+      env:
+        DJANGO_SETTINGS_MODULE: config.settings.test
+        REQUIREMENTS_PATH: requirements/test.txt
+      concurrency:
+        group: ${{ github.workflow }}-quality-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+        cancel-in-progress: true
+      services:
+        postgres:
+          # Docker Hub image
+          image: postgis/postgis:17-master
+          env:
+            POSTGRES_PASSWORD: password
+          volumes:
+            - /var/run/postgresql:/var/run/postgresql
+          # Set health checks to wait until postgres has started
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+      steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./.github/actions/setup
+      - name: ✨ Verify quality
+        run: make quality
