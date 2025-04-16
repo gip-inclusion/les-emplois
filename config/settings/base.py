@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     "itou.communications",
     "itou.gps",
     "itou.rdv_insertion",
+    "itou.archive",
 ]
 
 # TODO: Remove with Django 6.0
