@@ -3,7 +3,7 @@
 {% load dict_filters %}
 {% load django_bootstrap5 %}
 
-{% block title_prevstep %}
+{% block title_navinfo %}
     {% if not form.available_jobs %}
         {% url "companies_views:card" siae_id=siae.pk as default_back_url %}
         {% include "layout/previous_step.html" with back_url=back_url|default:default_back_url only %}

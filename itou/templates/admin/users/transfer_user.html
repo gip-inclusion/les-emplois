@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
 {% endblock %}
 
-{% block title_prevstep %}
+{% block title_navinfo %}
     <div class="breadcrumbs">
         <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
         &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
