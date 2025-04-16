@@ -70,7 +70,7 @@
                     {% else %}
                         <div class="form-group col-12 col-lg-auto">
                             {% url "apply:start" company_pk=siae.pk as apply_url %}
-                            <a href="{% url_add_query apply_url job_description_id=job.pk job_seeker=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
+                            <a href="{% url_add_query apply_url job_description_id=job.pk job_seeker_public_id=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "start_application" %}
                                aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">

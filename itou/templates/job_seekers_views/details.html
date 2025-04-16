@@ -22,9 +22,9 @@
         {% fragment as c_title__cta %}
             {% url 'search:employers_results' as search_url %}
             {% if can_view_personal_information %}
-                {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+                {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}
             {% else %}
-                {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
+                {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
             {% endif %}
             {% if can_edit_iae_eligibility %}
                 <a href="{% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">

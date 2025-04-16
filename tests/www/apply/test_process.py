@@ -214,7 +214,7 @@ class TestProcessViews:
         employer = company.members.first()
         client.force_login(employer)
 
-        back_url = f"{reverse('apply:list_for_siae')}?job_seeker={job_application.job_seeker.id}"
+        back_url = f"{reverse('apply:list_for_siae')}?job_seeker_public_id={job_application.job_seeker.id}"
         url = add_url_params(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},

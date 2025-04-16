@@ -44,9 +44,9 @@
                             <td class="text-end {% if request.current_organization.is_authorized %}w-100px{% else %}w-50px{% endif %}">
                                 {% url "search:employers_results" as search_url %}
                                 {% if job_seeker.user_can_view_personal_information %}
-                                    {% url_add_query search_url job_seeker=job_seeker.public_id city=job_seeker.city_slug as url_query %}
+                                    {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}
                                 {% else %}
-                                    {% url_add_query search_url job_seeker=job_seeker.public_id as url_query %}
+                                    {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                 {% endif %}
                                 <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour ce candidat" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
                                     <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>

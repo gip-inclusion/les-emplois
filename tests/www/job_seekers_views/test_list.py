@@ -45,7 +45,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True):
                 data-matomo-event="true"
                 data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
-                href="{reverse("search:employers_results")}?job_seeker={job_seeker.public_id}{city}">
+                href="{reverse("search:employers_results")}?job_seeker_public_id={job_seeker.public_id}{city}">
                 <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
             </a>
         """,
