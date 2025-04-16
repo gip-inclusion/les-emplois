@@ -94,7 +94,7 @@ class AddView(UserPassesTestMixin, WizardView):
         hiring_of_the_company = JobApplication.objects.accepted().filter(to_company=self.company)
         if step == AddViewStep.CHOOSE_EMPLOYEE:
             employees = []
-            # Add job seekers in order, whithout duplicates
+            # Add job seekers in order, without duplicates
             for job_app in hiring_of_the_company.eligible_as_employee_record(self.company).select_related(
                 "job_seeker"
             ):
