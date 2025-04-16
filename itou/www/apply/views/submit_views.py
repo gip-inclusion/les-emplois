@@ -39,6 +39,8 @@ logger = logging.getLogger(__name__)
 
 JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
 
+APPLY_SESSION_KIND = "apply_session"
+
 
 def _check_job_seeker_approval(request, job_seeker, siae):
     if job_seeker.new_approval_blocked_by_waiting_period(
@@ -80,10 +82,8 @@ def _get_job_seeker_to_apply_for(request):
 
 
 def initialize_apply_session(request, company, data):
-    # FIXME: should we put the session_kind in a constant at the start fo this file ?
-    session_kind = "apply_session"
-    apply_session = SessionNamespace(request.session, session_kind, f"job_application-{company.pk}")
-    apply_session.init(session_kind, data)
+    apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, f"job_application-{company.pk}")
+    apply_session.init(APPLY_SESSION_KIND, data)
     return apply_session
 
 
@@ -205,8 +205,6 @@ class StartView(View):
 
 
 class ApplyStepBaseView(TemplateView):
-    session_kind = "apply_session"
-
     def __init__(self):
         super().__init__()
         self.company = None
@@ -217,7 +215,9 @@ class ApplyStepBaseView(TemplateView):
 
     def setup(self, request, *args, **kwargs):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-        self.apply_session = SessionNamespace(request.session, self.session_kind, f"job_application-{self.company.pk}")
+        self.apply_session = SessionNamespace(
+            request.session, APPLY_SESSION_KIND, f"job_application-{self.company.pk}"
+        )
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
             request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
@@ -432,7 +432,7 @@ class ApplicationJobsView(ApplicationBaseView):
 
         if not self.apply_session.exists():
             logger.warning("We should not automatically initialize the session", exc_info=True)
-            self.apply_session.init(self.session_kind, {})
+            self.apply_session.init(APPLY_SESSION_KIND, {})
 
         self.form = ApplicationJobsForm(
             self.company,
