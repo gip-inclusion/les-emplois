@@ -478,6 +478,9 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
         Assessment.objects.filter(institutions=request.current_organization)
         .select_related("campaign")
         .prefetch_related("institution_links__institution")
+        .annotate(
+            contracts_nb=Count("employees__contracts", filter=Q(employees__contracts__allowance_requested=True)),
+        )
     )
     context = {
         "assessments": assessments,

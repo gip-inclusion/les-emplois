@@ -32,7 +32,7 @@
                                         <th scope="col">Campagne</th>
                                         <th scope="col">Référent</th>
                                         <th scope="col">Statut du bilan</th>
-                                        <th scope="col">Nombre de parcours</th>
+                                        <th scope="col">Nombre de contrats</th>
                                         <th scope="col">Financement accordé</th>
                                     </tr>
                                 </thead>
@@ -51,7 +51,7 @@
                                             <td>{% state_for_institution assessment %}</td>
                                             <td>
                                                 {% if assessment.submitted_at %}
-                                                    Un nombre à déterminer
+                                                    {{ assessment.contracts_nb }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
