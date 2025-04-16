@@ -23,7 +23,7 @@ class WizardView(TemplateView):
     template_name = None
 
     @classmethod
-    def initiliaze_session_and_start(cls, request, reset_url, extra_session_data=None):
+    def initialize_session_and_start(cls, request, reset_url, extra_session_data=None):
         if reset_url is None:
             # This is somewhat extreme but will force developpers to always provide a proper next_url
             raise Http404
