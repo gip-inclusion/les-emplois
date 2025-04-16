@@ -212,7 +212,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -385,6 +386,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -560,6 +562,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -630,6 +633,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -730,6 +734,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -799,7 +804,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -1046,7 +1052,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1115,6 +1122,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1278,6 +1286,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1348,6 +1357,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1448,6 +1458,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1517,7 +1528,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -1618,7 +1630,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1738,6 +1751,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1913,6 +1927,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -1983,6 +1998,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -2083,6 +2099,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -2152,7 +2169,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -2516,7 +2534,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2689,6 +2708,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2952,6 +2972,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -3022,6 +3043,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3122,6 +3144,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -3191,7 +3214,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -3351,7 +3375,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3420,6 +3445,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3583,6 +3609,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -3653,6 +3680,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3753,6 +3781,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -3822,7 +3851,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
@@ -3923,7 +3953,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4043,6 +4074,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -4218,6 +4250,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -4288,6 +4321,7 @@
                  T5."public_id",
                  T5."address_filled_at",
                  T5."first_login",
+                 T5."upcoming_deletion_notified_at",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -4388,6 +4422,7 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -4457,7 +4492,8 @@
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
-                 T6."first_login"
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at"
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongationrequest"."declared_by_id" = "users_user"."id")
