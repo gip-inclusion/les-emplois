@@ -71,3 +71,5 @@ jobs:
       - uses: ./.github/actions/setup
       - name: ✨ Verify quality
         run: make quality
+      - name: ✨ Verify DB initialization (migrations, fixtures, ...)
+        run: python manage.py migrate && make populate_db
