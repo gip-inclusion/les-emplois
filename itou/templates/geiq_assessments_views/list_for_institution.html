@@ -59,6 +59,13 @@
                                             <td>
                                                 {% if assessment.decision_validated_at %}
                                                     {{ assessment.granted_amount|format_int_euros }}
+                                                    {% if assessment.convention_amount %}
+                                                        {% if assessment.granted_amount == assessment.convention_amount %}
+                                                            <span class="badge badge-sm rounded-pill bg-success-lighter text-success">100%</span>
+                                                        {% else %}
+                                                            <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning"><100%</span>
+                                                        {% endif %}
+                                                    {% endif %}
                                                 {% else %}
                                                     -
                                                 {% endif %}
