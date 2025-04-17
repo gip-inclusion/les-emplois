@@ -54,7 +54,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -209,7 +210,8 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at"
           FROM "users_user"
           INNER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."user_id")
           WHERE ("approvals_approval"."id" IN
@@ -369,7 +371,8 @@
                           "users_user"."last_checked_at",
                           "users_user"."public_id",
                           "users_user"."address_filled_at",
-                          "users_user"."first_login"
+                          "users_user"."first_login",
+                          "users_user"."upcoming_deletion_notified_at"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           WHERE EXISTS
