@@ -368,7 +368,7 @@ class AssessmentContractDetailsTab(models.TextChoices):
     EXIT = "exit", "Sortie"
 
 
-@check_user(lambda user: user.is_employer)
+@check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
 ):
@@ -376,9 +376,16 @@ def assessment_contracts_details(
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
         raise Http404
-    contract_qs = EmployeeContract.objects.filter(
-        employee__assessment__companies=request.current_organization
-    ).select_related("employee__assessment__campaign")
+    if request.user.is_employer:
+        filter_kwargs = {"employee__assessment__companies": request.current_organization}
+    elif request.user.is_labor_inspector:
+        filter_kwargs = {
+            "employee__assessment__institutions": request.current_organization,
+            "employee__assessment__submitted_at__isnull": False,
+        }
+    else:
+        raise Http404  # This should never happen thanks to check_user
+    contract_qs = EmployeeContract.objects.filter(**filter_kwargs).select_related("employee__assessment__campaign")
     if details_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING:
         contract_qs = contract_qs.prefetch_related("employee__prequalifications")
     contract = get_object_or_404(contract_qs, pk=contract_pk)
