@@ -270,13 +270,7 @@ class TestApply:
             post_data,
         )
         assert JobApplication.objects.exists() is False
-        assertRedirects(
-            response,
-            reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        assertRedirects(response, reverse("dashboard:index"))
         assertMessages(
             response,
             [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
