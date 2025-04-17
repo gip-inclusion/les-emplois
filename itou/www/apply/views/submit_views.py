@@ -123,9 +123,7 @@ class StartView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_reset_url(self):
-        if self.apply_session.exists():
-            return self.apply_session.get("reset_url", reverse("dashboard:index"))
-        return reverse("dashboard:index")
+        return self.apply_session.get("reset_url")
 
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
