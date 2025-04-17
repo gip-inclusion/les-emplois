@@ -1,4 +1,5 @@
 from django.core.exceptions import FieldDoesNotExist
+from django.db import IntegrityError, transaction
 from django.db.models import TextChoices
 from django.utils import timezone
 
@@ -67,12 +68,13 @@ TRANSFER_SPECS = {
     TransferField.MEMBERSHIPS: {
         "related_model": models.CompanyMembership,
         "related_model_field": "company",
-        # Overwrite non admin memberships
-        "to_filter": lambda qs, to_company: qs.exclude(
-            user__in=users_models.User.objects.filter(
-                companymembership__company=to_company, companymembership__is_admin=True
-            )
-        ),
+        "upsert": {
+            "key": {"user", "company"},
+            "fields": {
+                "is_admin": lambda from_value, to_value: any([from_value, to_value]),
+                "is_active": lambda from_value, to_value: any([from_value, to_value]),
+            },
+        },
     },
     TransferField.INVITATIONS: {
         "related_model": invitations_models.EmployerInvitation,
@@ -167,18 +169,6 @@ def transfer_company_data(
                 )
             job_application.selected_jobs.clear()
 
-    if TransferField.MEMBERSHIPS in fields_to_transfer:
-        for from_company_membership in get_transfer_queryset(
-            from_company, to_company, TRANSFER_SPECS[TransferField.MEMBERSHIPS]
-        ):
-            # Overwrite non admin memberships
-            if to_company_membership := models.CompanyMembership.objects.filter(
-                company=to_company, user=from_company_membership.user, is_admin=False
-            ):
-                to_company_membership.delete()
-            else:
-                continue
-
     save_update_fields = []
     for transfer_field in fields_to_transfer:
         spec = TRANSFER_SPECS[transfer_field]
@@ -205,7 +195,25 @@ def transfer_company_data(
                         pass
                     else:
                         update_fields.append("updated_at")
-                    item.save(update_fields=update_fields)
+
+
+                    try:
+                        item.save(update_fields=update_fields)
+                    except IntegrityError as e:
+                        if "unique constraint" not in e.args[0]:
+                            raise
+
+                        to_item = spec["related_model"].objects.get(
+                            **{field: getattr(item, field) for field in spec["upsert"]["key"]}
+                        )
+                        for field, merge_function in spec["upsert"]["fields"].items():
+                            final_value = merge_function(
+                                getattr(item, field),
+                                getattr(to_item, field),
+                            )
+                            setattr(item, field, final_value)
+                        item.delete()
+
                 reporter.add(transfer_field, _format_model(item))
 
     if save_update_fields:
