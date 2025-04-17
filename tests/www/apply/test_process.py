@@ -2677,7 +2677,7 @@ class TestProcessAcceptViews:
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_iae__criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
+    def test_accept_iae_criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=api_returned_payload,
@@ -2773,7 +2773,7 @@ class TestProcessAcceptViews:
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_geiq__criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
+    def test_accept_geiq_criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=api_returned_payload,
@@ -2843,7 +2843,7 @@ class TestProcessAcceptViews:
             assert criterion.certified_at
 
     @freeze_time("2024-09-11")
-    def test_accept_no_siae__criteria_can_be_certified(self, client, mocker):
+    def test_accept_no_siae_criteria_can_be_certified(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=rsa_certified_mocker(),

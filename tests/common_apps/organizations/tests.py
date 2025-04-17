@@ -1,7 +1,7 @@
 from itou.companies.enums import CompanyKind
 
 
-def assert_set_admin_role__creation(user, organization, mailoutbox):
+def assert_set_admin_role_creation(user, organization, mailoutbox):
     # New admin.
     assert user in organization.active_admin_members
 
@@ -31,7 +31,7 @@ def assert_set_admin_role__creation(user, organization, mailoutbox):
         raise AssertionError("Invalid user kind")
 
 
-def assert_set_admin_role__removal(user, organization, mailoutbox):
+def assert_set_admin_role_removal(user, organization, mailoutbox):
     # Admin removal.
     assert user not in organization.active_admin_members
 

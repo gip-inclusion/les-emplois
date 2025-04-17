@@ -10,7 +10,7 @@ from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRed
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.invitations.models import LaborInspectorInvitation
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -172,7 +172,7 @@ def test_remove_last_admin_status(admin_client, mailoutbox):
         ),
     )
 
-    assert_set_admin_role__removal(membership.user, institution, mailoutbox)
+    assert_set_admin_role_removal(membership.user, institution, mailoutbox)
 
 
 def test_deactivate_admin(admin_client, caplog, mailoutbox):
@@ -261,7 +261,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__creation(labor_inspector, institution, mailoutbox)
+    assert_set_admin_role_creation(labor_inspector, institution, mailoutbox)
     assert (
         f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
         f"for user_id={labor_inspector.pk} is_admin=True."
