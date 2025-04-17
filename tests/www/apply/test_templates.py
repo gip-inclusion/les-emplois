@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import pytest
 from django.template import Context
@@ -7,7 +8,11 @@ from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML
 
-from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
+from itou.eligibility.enums import (
+    CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+)
 from itou.eligibility.tasks import certify_criteria
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
@@ -378,19 +383,14 @@ class TestCertifiedBadgeGEIQ:
             job_application.save()
         return job_application
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, id="rsa"),
-        ],
-    )
     @pytest.mark.ignore_unknown_variable_template_error("request")
-    def test_diag_from_prescriber(self, criteria_kind, mocker):
+    def test_diag_from_prescriber(self, mocker):
         """
         Nominal case
         Eligibility diagnosis is from a prescriber.
         Don't display a "certified" badge.
         """
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -407,18 +407,13 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, id="rsa"),
-        ],
-    )
     @freeze_time("2024-10-04")
-    def test_nominal_case(self, criteria_kind, mocker):
+    def test_nominal_case(self, mocker):
         """
         Eligibility diagnosis is from an employer.
         Display a "certified" badge.
         """
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -433,14 +428,9 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, id="rsa"),
-        ],
-    )
     @freeze_time("2024-10-04")
-    def test_hiring_date_nearly_out_of_boundaries(self, criteria_kind, mocker):
+    def test_hiring_date_nearly_out_of_boundaries(self, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         # Hiring start at starts 20 days after the certification period ending.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
@@ -454,14 +444,9 @@ class TestCertifiedBadgeGEIQ:
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, id="rsa"),
-        ],
-    )
     @freeze_time("2024-08-01")
-    def test_hiring_date_out_of_boundaries(self, criteria_kind, mocker):
+    def test_hiring_date_out_of_boundaries(self, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         # Hiring start at starts more than 90 days after the certification period ending.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
