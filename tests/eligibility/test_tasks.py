@@ -8,11 +8,12 @@ from freezegun import freeze_time
 from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
+    ENDPOINTS,
     RESPONSES,
     ResponseKind,
 )
@@ -28,30 +29,11 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
     ],
 )
 class TestCertifyCriteria:
-    @pytest.mark.parametrize(
-        "endpoint,criteria_kind",
-        [
-            pytest.param(
-                f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
-                AdministrativeCriteriaKind.RSA,
-                id="rsa",
-            ),
-            pytest.param(
-                f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
-                AdministrativeCriteriaKind.AAH,
-                id="aah",
-            ),
-            pytest.param(
-                f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
-                AdministrativeCriteriaKind.PI,
-                id="pi",
-            ),
-        ],
-    )
+    @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
     @freeze_time("2025-01-06")
-    def test_queue_task(self, endpoint, criteria_kind, factory, respx_mock):
+    def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        respx_mock.get(endpoint).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
+        respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
 
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
 

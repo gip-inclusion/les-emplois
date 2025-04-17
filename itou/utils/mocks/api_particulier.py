@@ -1,6 +1,15 @@
 import enum
 
+from django.conf import settings
+
 from itou.eligibility.enums import AdministrativeCriteriaKind
+
+
+ENDPOINTS = {
+    AdministrativeCriteriaKind.RSA: f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
+    AdministrativeCriteriaKind.AAH: f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
+    AdministrativeCriteriaKind.PI: f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
+}
 
 
 class ResponseKind(enum.Enum):
