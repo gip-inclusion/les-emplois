@@ -1,6 +1,5 @@
 import datetime
 import io
-import re
 import zipfile
 
 import pytest
@@ -62,7 +61,24 @@ def archive_file_fixture():
     return archive
 
 
-def test_retrieve_archive_of_the_week(faker, sftp_directory, command):
+def extract_logs(caplog, keys, replacement=None):
+    return [
+        {
+            key: (
+                getattr(record, key).replace(replacement[0], replacement[1])
+                if replacement and isinstance(getattr(record, key), str)
+                else [item.replace(replacement[0], replacement[1]) for item in getattr(record, key)]
+                if replacement and isinstance(getattr(record, key), list)
+                else getattr(record, key)
+            )
+            for key in keys
+            if hasattr(record, key)
+        }
+        for record in caplog.records
+    ]
+
+
+def test_retrieve_archive_of_the_week(caplog, snapshot, faker, sftp_directory, command):
     monday = monday_of_the_week()
     monday_archive = sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(monday))
     monday_archive.write_bytes(faker.zip())
@@ -71,8 +87,23 @@ def test_retrieve_archive_of_the_week(faker, sftp_directory, command):
 
     assert command.retrieve_archive_of_the_week().getvalue()
 
+    keys_to_extract = [
+        "module",
+        "funcName",
+        "levelno",
+        "message",
+        "host",
+        "user",
+        "remote_dir",
+        "monday",
+        "files",
+        "file",
+    ]
+    logs = extract_logs(caplog, keys_to_extract, (monday.strftime("%Y%m%d"), "monday"))
+    assert logs == snapshot(name="logs")
 
-def test_retrieve_archive_of_the_week_errors(faker, sftp_directory, command):
+
+def test_retrieve_archive_of_the_week_errors(caplog, snapshot, faker, sftp_directory, command):
     monday = monday_of_the_week()
 
     with pytest.raises(RuntimeError, match="No file for this week: "):
@@ -93,7 +124,7 @@ def test_retrieve_archive_of_the_week_errors(faker, sftp_directory, command):
         command.retrieve_archive_of_the_week()
 
 
-def test_clean_old_archives(faker, mocker, sftp_directory, command):
+def test_clean_old_archives(caplog, snapshot, faker, mocker, sftp_directory, command):
     expected_files = set()
     for day in range(3):
         filename = faker.asp_ea2_filename(datetime.date(2024, 8, 1 + day))
@@ -110,23 +141,34 @@ def test_clean_old_archives(faker, mocker, sftp_directory, command):
         faker.asp_ea2_filename(datetime.date(2024, 8, 3))
     }
 
+    keys_to_extract = ["module", "funcName", "levelno", "message", "file"]
+    logs = extract_logs(caplog, keys_to_extract)
+    assert logs == snapshot(name="logs")
 
-def test_clean_old_archives_dry_run(faker, mocker, sftp_directory, command):
+
+def test_clean_old_archives_dry_run(caplog, snapshot, faker, mocker, sftp_directory, command):
     mocker.patch.object(command, "NUMBER_OF_ARCHIVES_TO_KEEP", 0)
-    sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(monday_of_the_week())).touch()
+    fake_asp_ea2_filename = faker.asp_ea2_filename(monday_of_the_week())
+    sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, fake_asp_ea2_filename).touch()
 
     assert len(set(sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir())) == 1
     command.clean_old_archives(wet_run=False)
     assert len(set(sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir())) == 1
 
+    keys_to_extract = ["module", "funcName", "levelno", "message", "file"]
+    logs = extract_logs(caplog, keys_to_extract, (fake_asp_ea2_filename, "filename_of_monday.zip"))
+    assert logs == snapshot(name="logs")
 
-def test_process_file_from_archive(capsys, snapshot, settings, command, archive_file):
+
+def test_process_file_from_archive(caplog, snapshot, settings, command, archive_file):
     settings.ASP_EA2_UNZIP_PASSWORD = "password"
 
     command.handle(from_archive=archive_file, wet_run=True)
-    assert re.sub(r"siae.id=\d+", "siae.id=[ID]", capsys.readouterr()[0] + command.stdout.getvalue()) == snapshot(
-        name="output"
-    )
+
+    keys_to_extract = ["module", "funcName", "levelno", "message", "count"]
+    logs = extract_logs(caplog, keys_to_extract)
+    assert logs == snapshot(name="logs")
+
     filled_fields = [
         "kind",
         "siret",

@@ -1,4 +1,101 @@
 # serializer version: 1
+# name: test_clean_old_archives[logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 1] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_20240802.zip',
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Going to delete the old archive',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_20240802.zip',
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Old archive was deleted',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_20240801.zip',
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Going to delete the old archive',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_20240801.zip',
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Old archive was deleted',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 1] sftp session closed.',
+      'module': 'sftp',
+    }),
+  ])
+# ---
+# name: test_clean_old_archives_dry_run[logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'file': 'filename_of_monday.zip',
+      'funcName': 'clean_old_archives',
+      'levelno': 20,
+      'message': 'Going to delete the old archive',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+  ])
+# ---
 # name: test_process_file_from_archive[data]
   list([
     tuple(
@@ -33,35 +130,281 @@
     ),
   ])
 # ---
-# name: test_process_file_from_archive[output]
-  '''
-  Loaded 2 EA_EATT from export.
-  1 EA_EATT will be created.
-  0 EA_EATT will be updated when needed.
-  0 EA_EATT will be deleted when possible.
-  EA_EATT siret=00000000000001 will be created.
-  EA_EATT siret=00000000000001 has been created with siae.id=[ID].
-  EA_EATT siret=00000000000001 will be created.
-  EA_EATT siret=00000000000001 has been created with siae.id=[ID].
-  0 EA_EATT can and will be deleted.
-  0 EA_EATT cannot be deleted as they have data.
-  --------------------------------------------------------------------------------
-  Rows in file: 4
-  Rows after kind filter: 3
-  Rows after deduplication: 2
-  Rows used: 2
-   > With a SIRET: 2
-   > With an empty email: 0
-   > Creatable: 1
-   >> Created: 2
-   > Updatable: 0
-   >> Updated: 0
-   > Deletable: 0
-   >> Deleted: 0
-   >> Undeletable: 0
-   >> Skipped: 0
-  --------------------------------------------------------------------------------
-  Done.
-  
-  '''
+# name: test_process_file_from_archive[logs]
+  list([
+    dict({
+      'count': 4,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows in file',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 3,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows after kind filter',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 2,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows after deduplication',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 2,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows used',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 2,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows used with a SIRET',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows used with an empty email',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 1,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows creatable',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 2,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows created',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows updatable',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows updated',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows deletable',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows deleted',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows undeletable',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'count': 0,
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': 'Rows deletable skipped',
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
+# name: test_retrieve_archive_of_the_week[logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'host': '0.0.0.0',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+      'remote_dir': '/',
+      'user': 'django_tests',
+    }),
+    dict({
+      'files': list([
+        'FLUX_EA2_ITOU_monday.zip',
+      ]),
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Files matching for this monday',
+      'module': 'import_ea_eatt',
+      'monday': 'monday',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_monday.zip',
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Found the archive of the week',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+  ])
+# ---
+# name: test_retrieve_archive_of_the_week_errors[logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'host': '0.0.0.0',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+      'remote_dir': '/',
+      'user': 'django_tests',
+    }),
+    dict({
+      'files': list([
+      ]),
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Files matching for this monday',
+      'module': 'import_ea_eatt',
+      'monday': 'monday',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 1] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'host': '0.0.0.0',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+      'remote_dir': '/',
+      'user': 'django_tests',
+    }),
+    dict({
+      'files': list([
+      ]),
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Files matching for this monday',
+      'module': 'import_ea_eatt',
+      'monday': 'monday',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 1] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 2] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'host': '0.0.0.0',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+      'remote_dir': '/',
+      'user': 'django_tests',
+    }),
+    dict({
+      'files': list([
+        'FLUX_EA2_ITOU_monday.zip',
+      ]),
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Files matching for this monday',
+      'module': 'import_ea_eatt',
+      'monday': 'monday',
+    }),
+    dict({
+      'file': 'FLUX_EA2_ITOU_monday.zip',
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Found the archive of the week',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 2] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 3] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'host': '0.0.0.0',
+      'levelno': 20,
+      'message': 'Connected SFTP server',
+      'module': 'import_ea_eatt',
+      'remote_dir': '/',
+      'user': 'django_tests',
+    }),
+    dict({
+      'files': list([
+        'FLUX_EA2_ITOU_20250415.zip',
+        'FLUX_EA2_ITOU_monday.zip',
+      ]),
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Files matching for this monday',
+      'module': 'import_ea_eatt',
+      'monday': 'monday',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 3] sftp session closed.',
+      'module': 'sftp',
+    }),
+  ])
 # ---
