@@ -3628,11 +3628,15 @@
                           <form class="js-prevent-multiple-submit js-format-nir" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               
-  <div class="alert alert-danger" role="alert">
-      
-          <strong>Veuillez vérifier le nom ou l’e-mail.</strong><br/>Un compte bénéficiaire avec un nom différent existe déjà pour cette adresse e-mail.
-          
-      
+  
+  
+  <div class="alert alert-danger" data-emplois-give-focus-if-exist="" role="alert" tabindex="0">
+      <p>
+          <strong>Votre formulaire contient une erreur</strong>
+      </p>
+      <ul class="mb-0">
+          <li><strong>Veuillez vérifier le nom ou l’e-mail.</strong><br/>Un compte bénéficiaire avec un nom différent existe déjà pour cette adresse e-mail.</li>
+      </ul>
   </div>
   <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/></div><div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/></div><div class="form-group form-group-required"><label class="form-label" for="id_email">Email</label><input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/></div>
                               

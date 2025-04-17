@@ -49,10 +49,7 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from itou.www.apply.views.process_views import job_application_sender_left_org
-from tests.approvals.factories import (
-    ApprovalFactory,
-    SuspensionFactory,
-)
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -2977,8 +2974,13 @@ class TestProcessAcceptViews:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>Votre formulaire contient une erreur</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Si le pays de naissance est la France, la commune de naissance est obligatoire.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,
@@ -3008,8 +3010,13 @@ class TestProcessAcceptViews:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Il n'est pas possible de saisir une commune de naissance hors de France.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>Votre formulaire contient une erreur</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Il n'est pas possible de saisir une commune de naissance hors de France.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,
