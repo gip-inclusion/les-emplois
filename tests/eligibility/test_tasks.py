@@ -12,7 +12,10 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
-from itou.utils.mocks.api_particulier import aah_certified_mocker, asf_certified_mocker, rsa_certified_mocker
+from itou.utils.mocks.api_particulier import (
+    RESPONSES,
+    ResponseKind,
+)
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 
@@ -26,32 +29,29 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 )
 class TestCertifyCriteria:
     @pytest.mark.parametrize(
-        "endpoint,criteria_kind,api_returned_payload",
+        "endpoint,criteria_kind",
         [
             pytest.param(
                 f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
                 AdministrativeCriteriaKind.RSA,
-                rsa_certified_mocker(),
                 id="rsa",
             ),
             pytest.param(
                 f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
                 AdministrativeCriteriaKind.AAH,
-                aah_certified_mocker(),
                 id="aah",
             ),
             pytest.param(
                 f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
                 AdministrativeCriteriaKind.PI,
-                asf_certified_mocker(),
                 id="pi",
             ),
         ],
     )
     @freeze_time("2025-01-06")
-    def test_queue_task(self, endpoint, criteria_kind, api_returned_payload, factory, respx_mock):
+    def test_queue_task(self, endpoint, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        respx_mock.get(endpoint).respond(json=api_returned_payload)
+        respx_mock.get(endpoint).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
 
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
 
@@ -63,7 +63,7 @@ class TestCertifyCriteria:
         ).get()
         assert criterion.certified is True
         assert criterion.certified_at is not None
-        assert criterion.data_returned_by_api == api_returned_payload
+        assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
         assert criterion.certification_period == InclusiveDateRange(
             datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
