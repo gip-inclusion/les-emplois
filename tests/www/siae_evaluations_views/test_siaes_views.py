@@ -7,7 +7,7 @@ from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
@@ -284,7 +284,7 @@ class TestSiaeJobApplicationListView:
         self, client, state, approval_number, expected_jobapp_html, expected_criteria_html
     ):
         institution = InstitutionFactory(name="DDETS 01", department="01")
-        brsa = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
+        brsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
         evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
             evaluation_campaign__calendar__adversarial_stage_start=timezone.localdate() - relativedelta(days=5),

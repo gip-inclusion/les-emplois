@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
@@ -134,13 +134,13 @@ class TestProcessListSiae:
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         criteria = AdministrativeCriteria.objects.filter(
-            name__in=[
+            kind__in=[
                 # Level 1 criteria
-                "Allocataire AAH",
-                "Allocataire ASS",
-                "Bénéficiaire du RSA",
+                AdministrativeCriteriaKind.AAH,
+                AdministrativeCriteriaKind.ASS,
+                AdministrativeCriteriaKind.RSA,
                 # Level 2 criterion
-                "Senior (+50 ans)",
+                AdministrativeCriteriaKind.SENIOR,
             ]
         )
         assert len(criteria) == 4
@@ -162,7 +162,9 @@ class TestProcessListSiae:
         assertContains(response, SENIOR_CRITERION, html=True)
 
         # Add a 5th criterion to the diagnosis
-        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)"))
+        diagnosis.administrative_criteria.add(
+            AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.DETLD)
+        )
 
         response = client.get(reverse("apply:list_for_siae"))
         # Only the 3 first are shown (ordered by level & name)
@@ -183,7 +185,7 @@ class TestProcessListSiae:
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         # Level 1 criteria
-        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
+        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
         JobApplicationFactory(
             job_seeker=diagnosis.job_seeker,
             to_company=company,
@@ -789,7 +791,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
 
     diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
     # Level 1 criteria
-    diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
+    diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
     JobApplicationFactory(
         job_seeker=diagnosis.job_seeker,
         to_company=company,
