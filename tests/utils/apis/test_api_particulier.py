@@ -8,11 +8,8 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
-    aah_not_certified_mocker,
-    asf_not_certified_mocker,
-    rsa_data_provider_error,
-    rsa_not_certified_mocker,
-    rsa_not_found_mocker,
+    RESPONSES,
+    ResponseKind,
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
@@ -45,32 +42,29 @@ def test_build_params_from(snapshot):
     ],
 )
 @pytest.mark.parametrize(
-    "endpoint,criteria_kind,api_returned_payload",
+    "endpoint,criteria_kind",
     [
         pytest.param(
             f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
             AdministrativeCriteriaKind.RSA,
-            rsa_not_certified_mocker(),
             id="rsa",
         ),
         pytest.param(
             f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
             AdministrativeCriteriaKind.AAH,
-            aah_not_certified_mocker(),
             id="aah",
         ),
         pytest.param(
             f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
             AdministrativeCriteriaKind.PI,
-            asf_not_certified_mocker(),
-            id="aah",
+            id="pi",
         ),
     ],
 )
 @freeze_time("2025-01-06")
-def test_not_certified(endpoint, criteria_kind, api_returned_payload, factory, respx_mock):
+def test_not_certified(endpoint, criteria_kind, factory, respx_mock):
     eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-    respx_mock.get(endpoint).respond(json=api_returned_payload)
+    respx_mock.get(endpoint).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
 
     eligibility_diagnosis.certify_criteria()
 
@@ -82,18 +76,18 @@ def test_not_certified(endpoint, criteria_kind, api_returned_payload, factory, r
     )
     assert criterion.certified is False
     assert criterion.certified_at == timezone.now()
-    assert criterion.data_returned_by_api == api_returned_payload
+    assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     assert criterion.certification_period is None
 
 
 def test_not_found(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
-        404, json=rsa_not_found_mocker()
+        404, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     )
     diag = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
     certify_criteria(diag)
     crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == rsa_not_found_mocker()
+    assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     assert crit.certified is None
     assert crit.certification_period is None
     assert "Dossier allocataire inexistant. Le document ne peut être édité." in caplog.text
@@ -102,12 +96,12 @@ def test_not_found(respx_mock, caplog):
 
 def test_service_unavailable(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
-        503, json=rsa_data_provider_error()
+        503, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     )
     diag = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
     certify_criteria(diag)
     crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == rsa_data_provider_error()
+    assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     assert crit.certified is None
     assert crit.certification_period is None
     assert (
