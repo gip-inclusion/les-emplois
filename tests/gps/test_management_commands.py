@@ -55,7 +55,7 @@ class TestSyncGroupsManagementCommand:
         geiq_diag_1 = GEIQEligibilityDiagnosisFactory(
             job_seeker=beneficiary,
             author=employer,
-            from_geiq=True,
+            from_employer=True,
         )
         iae_diag_1 = IAEEligibilityDiagnosisFactory(
             job_seeker=beneficiary,

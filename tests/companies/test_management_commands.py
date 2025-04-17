@@ -49,7 +49,7 @@ class TestMoveCompanyData:
         assert stderr == "Objets impossibles à transférer hors-IAE: Diagnostics IAE créés\n"
 
     def test_prevent_move_outside_geiq(self, capsys):
-        company_1 = eligibility_factories.GEIQEligibilityDiagnosisFactory(from_geiq=True).author_geiq
+        company_1 = eligibility_factories.GEIQEligibilityDiagnosisFactory(from_employer=True).author_geiq
         company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.members.count() == 2

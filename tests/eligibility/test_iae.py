@@ -619,7 +619,7 @@ def test_eligibility_diagnosis_certify_criteria(
             id="test_selected_administrative_criteria_certify_iae",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             id="test_selected_administrative_criteria_certify_geiq",
         ),
     ],
@@ -657,7 +657,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
@@ -683,7 +683,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-not-certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": None,
@@ -709,7 +709,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
             id="iae-not-found",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_geiq=True),
+            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             [],
             {
                 "certification_period": None,
@@ -816,7 +816,7 @@ def test_with_is_considered_certified():
 
 
 def test_is_from_employer():
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     assert diagnosis.is_from_employer
 
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)

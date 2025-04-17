@@ -61,6 +61,11 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             origin_sender_kind=SenderKind.EMPLOYER,
             origin_prescriber_organization_kind="",
         )
+        with_diagnosis_from_employer = factory.Trait(
+            eligibility_diagnosis=factory.SubFactory(
+                IAEEligibilityDiagnosisFactory, from_employer=True, job_seeker=factory.SelfAttribute("..user")
+            )
+        )
 
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)

@@ -182,7 +182,7 @@ class TestJobApplicationGEIQEligibilityDetails:
         assert response.context["geiq_eligibility_diagnosis"] == diagnosis
 
     def test_with_valid_diagnosis_no_allowance(self, client):
-        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
         job_application = JobApplicationFactory(
             to_company=diagnosis.author_geiq,
             job_seeker=diagnosis.job_seeker,
@@ -205,7 +205,7 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
 
     def test_with_expired_diagnosis_no_allowance(self, client):
-        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True, expired=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, expired=True)
         job_application = JobApplicationFactory(
             to_company=diagnosis.author_geiq,
             job_seeker=diagnosis.job_seeker,
@@ -247,13 +247,13 @@ def test_get_geiq_eligibility_diagnosis(subtests):
     )
     job_seeker = expired_prescriber_diagnosis.job_seeker
     expired_company_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_geiq=True,
+        from_employer=True,
         expired=True,
         job_seeker=job_seeker,
     )
     geiq = expired_company_diagnosis.author_geiq
     newer_company_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_geiq=True,
+        from_employer=True,
         job_seeker=job_seeker,
         author_geiq=geiq,
     )
@@ -313,7 +313,7 @@ def test_get_geiq_eligibility_diagnosis(subtests):
     # the hiring company and jobseeker get the most recent diagnosis
     # a prescriber get the most revent among prescriber diangoses
     valid_prescriber_diagnosis.delete()
-    _valid_diagnois_from_other_company = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_seeker)
+    _valid_diagnois_from_other_company = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
     assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=False) == newer_company_diagnosis
     assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=True) == expired_prescriber_diagnosis
 
@@ -324,7 +324,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_job_seeker_not_resident_in_qpv_or_zrr(self, client):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
         job_seeker = JobSeekerFactory()
-        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_seeker)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
         job_application = JobApplicationFactory(job_seeker=job_seeker, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
         client.force_login(diagnosis.author_geiq.members.first())
@@ -356,7 +356,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_job_seeker_qpv_details_display(self, client):
         # Check QPV fragment is displayed:
         job_seeker_in_qpv = JobSeekerFactory(with_address_in_qpv=True)
-        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_seeker_in_qpv)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker_in_qpv)
         job_application = JobApplicationFactory(job_seeker=job_seeker_in_qpv, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
@@ -391,7 +391,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_job_seeker_zrr_details_display(self, client):
         # Check ZRR fragment is displayed
         job_seeker_in_zrr = JobSeekerFactory(with_city_in_zrr=True)
-        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_seeker_in_zrr)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker_in_zrr)
         job_application = JobApplicationFactory(job_seeker=job_seeker_in_zrr, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
