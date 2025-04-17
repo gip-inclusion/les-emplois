@@ -54,9 +54,6 @@ def get_dora_url(source, id, original_url=None):
 
 
 def get_data_inclusion_services(code_insee):
-    """Returns 3 random DI services, in a 'stable' way: for a given city and day so that an user
-    who refreshes the page or shares the URL would not get different services in the same day.
-    """
     if not settings.API_DATA_INCLUSION_BASE_URL or not code_insee:
         return []
     cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{timezone.localdate()}"
@@ -68,28 +65,50 @@ def get_data_inclusion_services(code_insee):
             settings.API_DATA_INCLUSION_TOKEN,
         )
         try:
-            services = client.search_services(code_insee)
+            raw_services = client.search_services(code_insee)
         except DataInclusionApiException:
             # 15 minutes seems like a reasonable amount of time for DI to get back on track
             cache.set(cache_key, [], 60 * 15)
             return []
 
-        services = [s for s in services if s["modes_accueil"] == ["en-presentiel"]]
-        results = random.sample(services, min(len(services), 3))
-        results = [
-            r
-            | {
-                "thematiques_display": {displayable_thematique(t) for t in r["thematiques"]},
-                "dora_service_redirect_url": reverse(
-                    "companies_views:dora_service_redirect",
-                    kwargs={
-                        "source": r["source"],
-                        "service_id": r["id"],
-                    },
-                ),
-            }
-            for r in results
-        ]
+        services = []
+        for s in raw_services:
+            if s["modes_accueil"] != ["en-presentiel"]:
+                continue
+            s["thematiques_display"] = {displayable_thematique(t) for t in s["thematiques"]}
+            s["dora_service_redirect_url"] = reverse(
+                "companies_views:dora_service_redirect",
+                kwargs={
+                    "source": s["source"],
+                    "service_id": s["id"],
+                },
+            )
+            services.append(s)
+
+        random.shuffle(services)
+
+        results = []
+        department = code_insee[:2]
+        if department in ["59", "67"]:
+            for svc in services:
+                if svc["source"] == "soliguide":
+                    results.append(svc)
+                    services.remove(svc)
+                    break
+
+        while len(results) < 3 and services:
+            for service in services:
+                if service["thematiques_display"] - set().union(
+                    *[prev_service["thematiques_display"] for prev_service in results]
+                ):
+                    results.append(service)
+                    break
+            else:
+                results.append(services[0])
+            services.remove(results[-1])
+
+        random.shuffle(results)
+
         # 6 hours is reasonable enough to get fresh results while still avoiding
         # hitting the API too much. The API content is updated daily or hourly;
         # we want changes to be propagated at a reasonable time.
