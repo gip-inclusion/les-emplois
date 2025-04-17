@@ -203,20 +203,38 @@ class StartView(View):
         return HttpResponseRedirect(next_url)
 
 
-class ApplyStepBaseView(TemplateView):
+class RequireApplySessionMixin:
+    def __init__(self):
+        self.apply_session = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.apply_session = SessionNamespace(
+            request.session, APPLY_SESSION_KIND, f"job_application-{self.company.pk}"
+        )
+        if not self.apply_session.exists():
+            raise Http404
+
+    def get_reset_url(self):
+        return self.apply_session.get("reset_url")
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "reset_url": self.get_reset_url(),
+        }
+
+
+class ApplyStepBaseView(RequireApplySessionMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None
-        self.apply_session = None
         self.hire_process = None
         self.prescription_process = None
         self.auto_prescription_process = None
 
     def setup(self, request, *args, **kwargs):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-        self.apply_session = SessionNamespace(
-            request.session, APPLY_SESSION_KIND, f"job_application-{self.company.pk}"
-        )
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
             request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
@@ -248,11 +266,6 @@ class ApplyStepBaseView(TemplateView):
     def get_back_url(self):
         return None
 
-    def get_reset_url(self):
-        if self.apply_session.exists():
-            return self.apply_session.get("reset_url", reverse("dashboard:index"))
-        return reverse("dashboard:index")
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "siae": self.company,
@@ -260,7 +273,6 @@ class ApplyStepBaseView(TemplateView):
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
-            "reset_url": self.get_reset_url(),
             "page_title": "Postuler",
         }
 
@@ -450,10 +462,6 @@ class ApplicationJobsView(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if not self.apply_session.exists():
-            logger.warning("We should not automatically initialize the session", exc_info=True)
-            self.apply_session.init(APPLY_SESSION_KIND, {})
-
         self.form = ApplicationJobsForm(
             self.company,
             initial=self.get_initial(),
@@ -483,7 +491,7 @@ class ApplicationJobsView(ApplicationBaseView):
         }
 
 
-class RequireValidApplySessionMixin:
+class CheckApplySessionMixin:
     def get_redirect_url(self):
         return reverse(
             "apply:application_jobs",
@@ -494,9 +502,6 @@ class RequireValidApplySessionMixin:
         )
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.apply_session.exists():
-            return HttpResponseRedirect(self.get_redirect_url())
-
         # Application must not be blocked by the employer at time of access
         if not self.company.has_member(request.user):
             if self.company.block_job_applications:
@@ -522,7 +527,7 @@ class RequireValidApplySessionMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseView):
+class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/eligibility.html"
 
     def __init__(self):
@@ -600,7 +605,7 @@ class ApplicationEligibilityView(RequireValidApplySessionMixin, ApplicationBaseV
         return context
 
 
-class ApplicationGEIQEligibilityView(RequireValidApplySessionMixin, ApplicationBaseView):
+class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/geiq_eligibility.html"
 
     def __init__(self):
@@ -678,7 +683,7 @@ class ApplicationGEIQEligibilityView(RequireValidApplySessionMixin, ApplicationB
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
-class ApplicationResumeView(RequireValidApplySessionMixin, ApplicationBaseView):
+class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/resume.html"
     form_class = SubmitJobApplicationForm
 
