@@ -278,17 +278,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
     )
     ordering = ("-id",)
     raw_id_fields = ("created_by",)
-    readonly_fields = (
-        "pk",
-        "public_id",
-        "identity_provider",
-        "address_in_qpv",
-        "birthdate",
-        "is_staff",
-        "jobseeker_profile_link",
-        "disabled_notifications",
-        "follow_up_groups_or_members",
-    )
 
     add_fieldsets = (
         (
@@ -441,15 +430,28 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         Staff (not superusers) should not manage perms of Users.
         https://code.djangoproject.com/ticket/23559
         """
-        rof = super().get_readonly_fields(request, obj)
+        rof = list(super().get_readonly_fields(request, obj))
+        rof.extend(
+            [
+                "pk",
+                "public_id",
+                "identity_provider",
+                "address_in_qpv",
+                "birthdate",
+                "is_staff",
+                "jobseeker_profile_link",
+                "disabled_notifications",
+                "follow_up_groups_or_members",
+            ]
+        )
         if not request.user.is_superuser:
-            rof += ("is_staff", "is_superuser", "groups", "user_permissions")
+            rof.extend(["is_staff", "is_superuser", "groups", "user_permissions"])
         if obj and obj.has_sso_provider:
-            rof += ("username",)
+            rof.append("username")
             if obj.identity_provider != IdentityProvider.PE_CONNECT:
-                rof += ("first_name", "last_name", "email")
+                rof.extend(["first_name", "last_name", "email"])
         if obj:
-            rof += ("kind",)  # kind is never editable, but still addable
+            rof.append("kind")  # kind is never editable, but still addable
         return rof
 
     def get_fieldsets(self, request, obj=None):
