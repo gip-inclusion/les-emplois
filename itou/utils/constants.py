@@ -20,3 +20,5 @@ MATOMO_SITE_PILOTAGE_ID = "146"
 MB = 1024 * 1024
 
 SUPPORTED_IMAGE_FILE_TYPES = {"image/png": "png", "image/jpeg": "jpeg", "image/jpg": "jpg", "image/gif": "gif"}
+
+BREVO_API_URL = "https://api.brevo.com/v3"
