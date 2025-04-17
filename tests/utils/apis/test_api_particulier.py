@@ -4,10 +4,11 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.asp.models import Commune
-from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
+    ENDPOINTS,
     RESPONSES,
     ResponseKind,
 )
@@ -41,30 +42,11 @@ def test_build_params_from(snapshot):
         pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
     ],
 )
-@pytest.mark.parametrize(
-    "endpoint,criteria_kind",
-    [
-        pytest.param(
-            f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
-            AdministrativeCriteriaKind.RSA,
-            id="rsa",
-        ),
-        pytest.param(
-            f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-adulte-handicape",
-            AdministrativeCriteriaKind.AAH,
-            id="aah",
-        ),
-        pytest.param(
-            f"{settings.API_PARTICULIER_BASE_URL}v2/allocation-soutien-familial",
-            AdministrativeCriteriaKind.PI,
-            id="pi",
-        ),
-    ],
-)
+@pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
 @freeze_time("2025-01-06")
-def test_not_certified(endpoint, criteria_kind, factory, respx_mock):
+def test_not_certified(criteria_kind, factory, respx_mock):
     eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-    respx_mock.get(endpoint).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
+    respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
 
     eligibility_diagnosis.certify_criteria()
 
