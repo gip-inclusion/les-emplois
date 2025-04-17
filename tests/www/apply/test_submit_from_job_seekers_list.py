@@ -7,6 +7,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationState
+from itou.utils.urls import add_url_params
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -64,7 +65,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(
             response,
             (
@@ -85,9 +85,7 @@ class TestApplyAsPrescriber:
         # Step search company
         # ----------------------------------------------------------------------
 
-        response = client.get(
-            reverse("search:employers_results"), {"city": guerande.slug, "job_seeker": job_seeker.public_id}
-        )
+        response = client.get(add_url_params(next_url, {"city": guerande.slug}))
         assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
 
         # Has link to company card with job_seeker public_id
@@ -226,7 +224,6 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
         assertContains(response, "A… Z…")
         assertContains(
             response,
@@ -247,9 +244,7 @@ class TestApplyAsPrescriber:
         # Step search company
         # ----------------------------------------------------------------------
 
-        response = client.get(
-            reverse("search:employers_results"), {"city": guerande.slug, "job_seeker": job_seeker.public_id}
-        )
+        response = client.get(add_url_params(next_url, {"city": guerande.slug}))
         assertContains(response, "Vous postulez actuellement pour A… Z…")
 
         # Has link to company card with job_seeker public_id
@@ -420,9 +415,7 @@ class TestApplyAsCompany:
         # Step search company
         # ----------------------------------------------------------------------
 
-        response = client.get(
-            reverse("search:employers_results"), {"city": guerande.slug, "job_seeker": job_seeker.public_id}
-        )
+        response = client.get(add_url_params(next_url, {"city": guerande.slug}))
         assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
 
         # Has link to company card with job_seeker public_id
