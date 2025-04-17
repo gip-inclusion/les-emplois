@@ -32,7 +32,7 @@
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box c-box--summary mb-3">
                         <div class="c-box--summary__header">
-                            <h3 class="m-3">Récapitulatif</h3>
+                            <h3 class="m-0">Récapitulatif</h3>
                         </div>
                         <hr class="m-0">
                         <div class="c-box--summary__body">
@@ -112,9 +112,6 @@
                                     </div>
                                 </div>
                                 {% bootstrap_field form.review_comment %}
-                                <div class="c-info">
-                                    <span class="c-info__summary">Si vous validez cette décision, le GEIQ sera notifié par mail avec les détails renseignés.</span>
-                                </div>
                             </div>
                             {% itou_buttons_form primary_label="Valider la décision" reset_url=back_url %}
                         </form>
