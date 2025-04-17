@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 from tests.companies.factories import CompanyFactory
@@ -128,8 +128,8 @@ class TestAdministrativeCriteriaForm:
         """
         Test ERROR_SENIOR_JUNIOR.
         """
-        criterion1 = AdministrativeCriteria.objects.get(name="Senior (+50 ans)")
-        criterion2 = AdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
+        criterion1 = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.SENIOR)
+        criterion2 = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.JEUNE)
 
         form_data = {
             f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion1.pk}": "true",
@@ -143,8 +143,8 @@ class TestAdministrativeCriteriaForm:
         """
         Test ERROR_LONG_TERM_JOB_SEEKER.
         """
-        criterion1 = AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)")
-        criterion2 = AdministrativeCriteria.objects.get(name="DELD (12-24 mois)")
+        criterion1 = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.DETLD)
+        criterion2 = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.DELD)
 
         form_data = {
             # Level 1.

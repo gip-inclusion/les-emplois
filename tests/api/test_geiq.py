@@ -13,6 +13,7 @@ from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import CompanyToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory
@@ -151,7 +152,7 @@ def test_candidatures_geiq_nominal(snapshot):
     # prequalification
     PriorActionFactory(job_application=job_application, action="PREQUALIFICATION_AFPR")
 
-    crit = GEIQAdministrativeCriteria.objects.get(name="Jeune (-26 ans)")
+    crit = GEIQAdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.JEUNE)
     job_seeker.geiq_eligibility_diagnoses.first().administrative_criteria.add(crit)
 
     with assertSnapshotQueries(snapshot(name="SQL queries without filter")):

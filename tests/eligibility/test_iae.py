@@ -322,9 +322,9 @@ class TestEligibilityDiagnosisModel:
 
         level1 = AdministrativeCriteriaLevel.LEVEL_1
         level2 = AdministrativeCriteriaLevel.LEVEL_2
-        criteria1 = AdministrativeCriteria.objects.get(level=level1, name="Bénéficiaire du RSA")
-        criteria2 = AdministrativeCriteria.objects.get(level=level2, name="Niveau d'étude 3 (CAP, BEP) ou infra")
-        criteria3 = AdministrativeCriteria.objects.get(level=level2, name="Senior (+50 ans)")
+        criteria1 = AdministrativeCriteria.objects.get(level=level1, kind=AdministrativeCriteriaKind.RSA)
+        criteria2 = AdministrativeCriteria.objects.get(level=level2, kind=AdministrativeCriteriaKind.CAP_BEP)
+        criteria3 = AdministrativeCriteria.objects.get(level=level2, kind=AdministrativeCriteriaKind.SENIOR)
 
         diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
@@ -388,7 +388,9 @@ class TestEligibilityDiagnosisModel:
         assert first_diagnosis.expires_at >= previous_expires_at
 
         criteria = [
-            AdministrativeCriteria.objects.get(level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"),
+            AdministrativeCriteria.objects.get(
+                level=AdministrativeCriteriaLevel.LEVEL_1, kind=AdministrativeCriteriaKind.RSA
+            ),
         ]
         # Same author, different criteria
         second_diagnosis = EligibilityDiagnosis.update_diagnosis(
@@ -501,7 +503,7 @@ class TestAdministrativeCriteriaModel:
         user = company.members.first()
 
         criteria1 = AdministrativeCriteria.objects.get(
-            level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
+            level=AdministrativeCriteriaLevel.LEVEL_1, kind=AdministrativeCriteriaKind.RSA
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
