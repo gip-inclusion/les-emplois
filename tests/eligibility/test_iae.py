@@ -24,11 +24,8 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification, JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
-    aah_certified_mocker,
-    asf_certified_mocker,
-    rsa_certified_mocker,
-    rsa_not_certified_mocker,
-    rsa_not_found_mocker,
+    RESPONSES,
+    ResponseKind,
 )
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -572,20 +569,18 @@ def test_certifiable(AdministrativeCriteriaClass):
     "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
 @pytest.mark.parametrize(
-    "criteria_kind,api_returned_payload",
+    "criteria_kind",
     [
-        pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
-        pytest.param(AdministrativeCriteriaKind.AAH, aah_certified_mocker(), id="aah"),
-        pytest.param(AdministrativeCriteriaKind.PI, asf_certified_mocker(), id="pi"),
+        pytest.param(AdministrativeCriteriaKind.RSA, id="rsa"),
+        pytest.param(AdministrativeCriteriaKind.AAH, id="aah"),
+        pytest.param(AdministrativeCriteriaKind.PI, id="pi"),
     ],
 )
 @freeze_time("2024-09-12")
-def test_eligibility_diagnosis_certify_criteria(
-    mocker, EligibilityDiagnosisFactory, criteria_kind, api_returned_payload
-):
+def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory, criteria_kind):
     mocker.patch(
         "itou.utils.apis.api_particulier._request",
-        return_value=api_returned_payload,
+        return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
     )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
@@ -600,7 +595,7 @@ def test_eligibility_diagnosis_certify_criteria(
     )
     assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
-    assert criterion.data_returned_by_api == api_returned_payload
+    assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
     certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
@@ -650,10 +645,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_certified_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
             },
             200,
-            rsa_certified_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
             id="iae-certified",
         ),
         pytest.param(
@@ -663,10 +658,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_certified_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
             },
             200,
-            rsa_certified_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
             id="geiq-certified",
         ),
         pytest.param(
@@ -676,10 +671,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": None,
                 "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_not_certified_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED],
             },
             200,
-            rsa_not_certified_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED],
             id="iae-not-certified",
         ),
         pytest.param(
@@ -689,10 +684,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": None,
                 "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_not_certified_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED],
             },
             200,
-            rsa_not_certified_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED],
             id="geiq-not-certified",
         ),
         pytest.param(
@@ -702,10 +697,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": None,
                 "certified": None,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_not_found_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND],
             },
             404,
-            rsa_not_found_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND],
             id="iae-not-found",
         ),
         pytest.param(
@@ -715,10 +710,10 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
                 "certification_period": None,
                 "certified": None,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": rsa_not_found_mocker(),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND],
             },
             404,
-            rsa_not_found_mocker(),
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND],
             id="geiq-not-found",
         ),
     ],

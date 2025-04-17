@@ -42,7 +42,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from itou.utils.mocks.api_particulier import rsa_certified_mocker
+from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.urls import add_url_params
@@ -2069,22 +2069,19 @@ class TestProcessAcceptViews:
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
     @pytest.mark.parametrize(
-        "criteria_kind,api_returned_payload",
+        "criteria_kind",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
-                rsa_certified_mocker(),
                 id="rsa",
             ),
         ],
     )
     @freeze_time("2024-09-11")
-    def test_select_other_job_description_for_job_application(
-        self, criteria_kind, api_returned_payload, client, mocker
-    ):
+    def test_select_other_job_description_for_job_application(self, criteria_kind, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=api_returned_payload,
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
         )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -2667,20 +2664,19 @@ class TestProcessAcceptViews:
         assert job_application.state.is_accepted
 
     @pytest.mark.parametrize(
-        "criteria_kind,api_returned_payload",
+        "criteria_kind",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
-                rsa_certified_mocker(),
                 id="rsa",
             ),
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_iae_criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
+    def test_accept_iae_criteria_can_be_certified(self, criteria_kind, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=api_returned_payload,
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
         )
         ######### Case 1: if CRITERIA_KIND is one of the diagnosis criteria,
         ######### birth place and birth country are required.
@@ -2756,27 +2752,26 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == api_returned_payload
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
             assert criterion.certified_at
 
     @pytest.mark.parametrize(
-        "criteria_kind,api_returned_payload",
+        "criteria_kind",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
-                rsa_certified_mocker(),
                 id="rsa",
             ),
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_geiq_criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
+    def test_accept_geiq_criteria_can_be_certified(self, criteria_kind, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=api_returned_payload,
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
         )
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
@@ -2836,7 +2831,7 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == api_returned_payload
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
@@ -2846,7 +2841,7 @@ class TestProcessAcceptViews:
     def test_accept_no_siae_criteria_can_be_certified(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
         )
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -2883,7 +2878,7 @@ class TestProcessAcceptViews:
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=rsa_certified_mocker(),
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
         )
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
