@@ -244,8 +244,8 @@ class Assessment(models.Model):
         else:
             return (
                 "la "
-                + ", la ".join(institution for institution in conventionned_institutions[:-1])
-                + f"ou la {conventionned_institutions[-1]}"
+                + ", la ".join(str(institution) for institution in conventionned_institutions[:-1])
+                + f" ou la {conventionned_institutions[-1]}"
             )
 
 
