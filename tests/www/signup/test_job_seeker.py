@@ -410,8 +410,10 @@ class TestJobSeekerSignup:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <ul class="list-unstyled mb-0">
+                    <li>Si le pays de naissance est la France, la commune de naissance est obligatoire.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,
@@ -446,8 +448,10 @@ class TestJobSeekerSignup:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Il n'est pas possible de saisir une commune de naissance hors de France.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <ul class="list-unstyled mb-0">
+                    <li>Il n'est pas possible de saisir une commune de naissance hors de France.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,

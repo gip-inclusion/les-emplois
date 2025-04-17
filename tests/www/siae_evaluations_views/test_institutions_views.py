@@ -2313,7 +2313,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
                 )
                 assertContains(
                     response,
-                    f'<div class="alert alert-danger" role="alert">{error}</div>',
+                    f"""
+                    <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                        <ul class="list-unstyled mb-0">
+                            <li>{error}</li>
+                        </ul>
+                    </div>""",
                     html=True,
                     count=1,
                 )
@@ -2480,8 +2485,10 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-             La date de fin de suspension ne peut pas être avant la date de début de suspension.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <ul class="list-unstyled mb-0">
+                    <li>La date de fin de suspension ne peut pas être avant la date de début de suspension.</li>
+                </ul>
             </div>
             """,
             html=True,
