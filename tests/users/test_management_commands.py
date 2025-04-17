@@ -21,14 +21,14 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.management.commands.send_users_to_brevo import (
+from itou.users.models import User
+from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
+from itou.utils.brevo import (
     BREVO_API_URL,
     BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID,
     BREVO_CANDIDATS_LIST_ID,
     BREVO_LES_EMPLOIS_LIST_ID,
 )
-from itou.users.models import User
-from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -931,7 +931,7 @@ class TestCommandSendUsersToBrevo:
                 'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 400 Bad Request"',
             ),
             (
-                "itou.users.management.commands.send_users_to_brevo",
+                "itou.utils.brevo",
                 logging.ERROR,
                 "Brevo API: Some emails were not imported, status_code=400, content={}",
             ),
