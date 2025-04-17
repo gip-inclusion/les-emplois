@@ -13,7 +13,10 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.utils.models import PkSupportRemark
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import (
+    assert_set_admin_role_creation,
+    assert_set_admin_role_removal,
+)
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -79,7 +82,7 @@ class TestCompanyAdmin:
             ),
         )
 
-        assert_set_admin_role__removal(membership.user, company, mailoutbox)
+        assert_set_admin_role_removal(membership.user, company, mailoutbox)
 
     def test_deactivate_admin(self, admin_client, caplog, mailoutbox):
         company = CompanyFactory(with_membership=True)
@@ -170,7 +173,7 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url, fetch_redirect_response=False)
         response = admin_client.get(change_url)
 
-        assert_set_admin_role__creation(employer, company, mailoutbox)
+        assert_set_admin_role_creation(employer, company, mailoutbox)
         assert (
             f"Creating companies.CompanyMembership of organization_id={company.pk} "
             f"for user_id={employer.pk} is_admin=True."

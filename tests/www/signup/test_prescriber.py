@@ -747,7 +747,7 @@ class TestPrescriberSignup:
         assert invitation_url in mail_body
 
     @respx.mock
-    def test_prescriber_already_exists__simple_signup(self, client, pro_connect):
+    def test_prescriber_already_exists_simple_signup(self, client, pro_connect):
         """
         He does not want to join an organization, only create an account.
         He likely forgot he had an account.
@@ -784,7 +784,7 @@ class TestPrescriberSignup:
         assert user.has_sso_provider
 
     @respx.mock
-    def test_prescriber_already_exists__create_organization(self, client, pro_connect):
+    def test_prescriber_already_exists_create_organization(self, client, pro_connect):
         """
         User is already a prescriber.
         We should update his account and make him join this new organization.
@@ -1128,7 +1128,7 @@ class TestProConnectPrescribersViewsExceptions:
         assert not user.prescriberorganization_set.exists()
 
     @respx.mock
-    def test_prescriber_signup__ft_organization_wrong_email(self, client, pro_connect):
+    def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with Inclusion Connect.
         He wants to join a Pôle emploi organization

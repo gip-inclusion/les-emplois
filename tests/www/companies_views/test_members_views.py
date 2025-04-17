@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -312,7 +312,7 @@ class TestCompanyAdminMembersManagement:
         assert response.status_code == 302
 
         company.refresh_from_db()
-        assert_set_admin_role__creation(guest, company, mailoutbox)
+        assert_set_admin_role_creation(guest, company, mailoutbox)
 
     def test_remove_admin(self, client, mailoutbox):
         """
@@ -339,7 +339,7 @@ class TestCompanyAdminMembersManagement:
         assert response.status_code == 302
 
         company.refresh_from_db()
-        assert_set_admin_role__removal(guest, company, mailoutbox)
+        assert_set_admin_role_removal(guest, company, mailoutbox)
 
     def test_admin_management_permissions(self, client):
         """
