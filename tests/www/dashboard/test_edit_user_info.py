@@ -13,10 +13,7 @@ from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
-from tests.users.factories import (
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
@@ -515,8 +512,13 @@ class TestEditUserInfoView:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Si le pays de naissance est la France, la commune de naissance est obligatoire.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>Votre formulaire contient une erreur</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Si le pays de naissance est la France, la commune de naissance est obligatoire.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,
@@ -551,8 +553,13 @@ class TestEditUserInfoView:
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert">
-            Il n'est pas possible de saisir une commune de naissance hors de France.
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>Votre formulaire contient une erreur</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Il n'est pas possible de saisir une commune de naissance hors de France.</li>
+                </ul>
             </div>""",
             html=True,
             count=1,

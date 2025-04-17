@@ -906,8 +906,14 @@ class TestApplyAsJobSeeker:
             response,
             """
             <div id="form_errors">
-                <div class="alert alert-danger" role="alert">
-                    L&#x27;extension de fichier « txt » n’est pas autorisée. Les extensions autorisées sont : pdf.
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p>
+                        <strong>Votre formulaire contient une erreur</strong>
+                    </p>
+                    <ul class="mb-0">
+                        <li>L&#x27;extension de fichier « txt » n’est pas autorisée.
+                        Les extensions autorisées sont : pdf.</li>
+                    </ul>
                 </div>
             </div>
             """,
@@ -942,8 +948,13 @@ class TestApplyAsJobSeeker:
             response,
             """
             <div id="form_errors">
-                <div class="alert alert-danger" role="alert">
-                    Le fichier doit être un fichier PDF valide.
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p>
+                        <strong>Votre formulaire contient une erreur</strong>
+                    </p>
+                    <ul class="mb-0">
+                        <li>Le fichier doit être un fichier PDF valide.</li>
+                    </ul>
                 </div>
             </div>
             """,
@@ -978,8 +989,13 @@ class TestApplyAsJobSeeker:
             response,
             """
             <div id="form_errors">
-                <div class="alert alert-danger" role="alert">
-                    Le fichier doit faire moins de 5,0 Mo.
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p>
+                        <strong>Votre formulaire contient une erreur</strong>
+                    </p>
+                    <ul class="mb-0">
+                        <li>Le fichier doit faire moins de 5,0 Mo.</li>
+                    </ul>
                 </div>
             </div>
             """,

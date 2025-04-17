@@ -16,9 +16,7 @@ from itou.users.enums import Title
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationWith2MembershipFactory,
@@ -305,8 +303,13 @@ def test_archived(client):
     assertContains(
         response,
         """
-        <div class="alert alert-danger" role="alert">
-            Sélectionnez un choix valide. invalid n’en fait pas partie.
+        <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+            <p>
+                <strong>Votre formulaire contient une erreur</strong>
+            </p>
+            <ul class="mb-0">
+                <li>Sélectionnez un choix valide. invalid n’en fait pas partie.</li>
+            </ul>
         </div>
         """,
         html=True,

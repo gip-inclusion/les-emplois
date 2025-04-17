@@ -198,14 +198,15 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
               
-  <div class="alert alert-danger" role="alert">
-      
-          Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
-          <br/>
-      
-          Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
-          
-      
+  
+  
+  <div class="alert alert-danger" data-emplois-give-focus-if-exist="" role="alert" tabindex="0">
+      <p>
+          <strong>Votre formulaire contient quelques erreurs</strong>
+      </p>
+      <ul class="mb-0">
+          <li>Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.</li><li>Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</li>
+      </ul>
   </div>
   
   
