@@ -430,8 +430,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
         Staff (not superusers) should not manage perms of Users.
         https://code.djangoproject.com/ticket/23559
         """
-        rof = list(super().get_readonly_fields(request, obj))
-        rof.extend(
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        readonly_fields.extend(
             [
                 "pk",
                 "public_id",
@@ -445,14 +445,14 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             ]
         )
         if not request.user.is_superuser:
-            rof.extend(["is_staff", "is_superuser", "groups", "user_permissions"])
+            readonly_fields.extend(["is_staff", "is_superuser", "groups", "user_permissions"])
         if obj and obj.has_sso_provider:
-            rof.append("username")
+            readonly_fields.append("username")
             if obj.identity_provider != IdentityProvider.PE_CONNECT:
-                rof.extend(["first_name", "last_name", "email"])
+                readonly_fields.extend(["first_name", "last_name", "email"])
         if obj:
-            rof.append("kind")  # kind is never editable, but still addable
-        return rof
+            readonly_fields.append("kind")  # kind is never editable, but still addable
+        return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj=obj)
