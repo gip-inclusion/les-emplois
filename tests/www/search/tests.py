@@ -1295,7 +1295,8 @@ class TestJobDescriptionSearchView:
         client.force_login(prescriber)
 
         response = client.get(
-            self.URL, {"city": guerande.slug, "distance": 100, "job_seeker": job_application.job_seeker.public_id}
+            self.URL,
+            {"city": guerande.slug, "distance": 100, "job_seeker_public_id": job_application.job_seeker.public_id},
         )
         assertContains(response, f"Vous postulez actuellement pour {job_application.job_seeker.get_full_name()}")
 

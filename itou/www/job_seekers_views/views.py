@@ -863,10 +863,8 @@ class UpdateJobSeekerStartView(View):
         super().setup(request, *args, **kwargs)
 
         try:
-            # FIXME(alaurent) remove or clause in a week
             job_seeker = get_object_or_404(
-                User.objects.filter(kind=UserKind.JOB_SEEKER),
-                public_id=request.GET.get("job_seeker_public_id") or request.GET.get("job_seeker"),
+                User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=request.GET.get("job_seeker_public_id")
             )
         except ValidationError:
             raise Http404("Aucun candidat n'a été trouvé")
