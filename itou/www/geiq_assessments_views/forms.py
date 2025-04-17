@@ -123,7 +123,12 @@ class ReviewForm(forms.ModelForm):
         ]
         labels = {
             "review_comment": "Commentaire",
+            "convention_amount": "Montant conventionné (convention initiale + avenants)",
+            "advance_amount": "Premier versement déjà réalisé",
         }
+
+    balance_amount = forms.IntegerField(label="Deuxième versement à prévoir", required=False, disabled=True)
+    refund_amount = forms.IntegerField(label="Remboursement attendu", required=False, disabled=True)
 
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
@@ -132,6 +137,21 @@ class ReviewForm(forms.ModelForm):
             "granted_amount",
             "advance_amount",
         ]
+        try:
+            advance_amount = int(self["advance_amount"].value())
+        except (ValueError, TypeError):
+            advance_amount = None
+        try:
+            granted_amount = int(self["granted_amount"].value())
+        except (ValueError, TypeError):
+            granted_amount = None
+        if advance_amount is not None and granted_amount is not None:
+            balance_amount = granted_amount - advance_amount
+            if balance_amount >= 0:
+                self.initial["balance_amount"] = balance_amount
+            else:
+                self.initial["refund_amount"] = -balance_amount
+
         for amount_field in amount_fields:
             self.fields[amount_field].widget.attrs.update(
                 {
@@ -164,11 +184,11 @@ class ReviewForm(forms.ModelForm):
                     ),
                 )
 
-    def balance_amount(self):
-        if (
-            self.cleaned_data
-            and self.cleaned_data.get("granted_amount") is not None
-            and self.cleaned_data.get("advance_amount") is not None
-        ):
-            return self.cleaned_data.get("granted_amount") - self.cleaned_data.get("advance_amount")
-        return None
+    # def balance_amount(self):
+    #    if (
+    #        self.cleaned_data
+    #        and self.cleaned_data.get("granted_amount") is not None
+    #        and self.cleaned_data.get("advance_amount") is not None
+    #    ):
+    #        return self.cleaned_data.get("granted_amount") - self.cleaned_data.get("advance_amount")
+    #    return None

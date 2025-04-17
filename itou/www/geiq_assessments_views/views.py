@@ -4,6 +4,7 @@ import logging
 import operator
 import uuid
 
+from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
@@ -550,6 +551,10 @@ def details_for_institution(
 def assessment_review(request, pk, template_name="geiq_assessments_views/assessment_review.html"):
     assessments = Assessment.objects.filter(institutions=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
+    if not assessment.grants_selection_validated_at:
+        messages.warning(
+            request, "Attention, il est conseillé de commencer par contrôler la sélection avant de saisir la décision."
+        )
     back_url = get_safe_url(
         request,
         "back_url",
@@ -558,15 +563,12 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
     if request.htmx and request.method == "GET":
         form = ReviewForm(instance=assessment, data=request.GET)
         form.full_clean()
-        balance_amount = form.balance_amount
     else:
         form = ReviewForm(instance=assessment, data=request.POST if request.method == "POST" else None)
-        balance_amount = assessment.granted_amount - assessment.advance_amount
     context = {
         "assessment": assessment,
         "form": form,
         "back_url": back_url,
-        "balance_amount": balance_amount,
     }
     if request.method == "POST" and form.is_valid() and not assessment.reviewed_at:
         form.save()

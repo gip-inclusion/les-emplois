@@ -59,60 +59,40 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="c-info mt-3 mt-lg-4">
-                                <span class="c-info__summary">Ces données ont été calculées suite à la selection que vous avez effectuée</span>
-                            </div>
+                            {% if has_common_approval_in_waiting_period %}
+                                <div class="c-info mt-3 mt-lg-4">
+                                    <span class="c-info__summary">Ces données ont été calculées suite à la selection que vous avez effectuée</span>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit" id="review_form">
                             {% csrf_token %}
 
-                            Utiliser des fieldsets ?
-                            <h3 class="mb-3">Conventionnement</h3>
-                            <div class="d-flex flex-column gap-3 mb-3">
-                                <div class="d-flex flex-row justify-content-between">
-                                    <label for="id_convention_amount">Montant conventionné (convention initiale + avenant)</label>
-                                    {% bootstrap_field form.convention_amount show_label='skip' %}
+                            {% bootstrap_form_errors form type='non_fields' %}
+
+                            <fieldset>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <legend>Conventionnement</legend>
+                                        {% bootstrap_field form.convention_amount %}
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <hr>
-                            <div id="decision-box" class="c-box mb-3">
-                                <h3 class="mb-3">Décision</h3>
-                                {% bootstrap_form_errors form type='non_fields' %}
-                                <div class="d-flex flex-column gap-3 mb-3">
-                                    <div class="d-flex flex-row justify-content-between">
-                                        <label for="id_granted_amount">Montant total accordé</label>
-                                        {% bootstrap_field form.granted_amount show_label='skip' %}
-                                    </div>
-                                    <div class="d-flex flex-row justify-content-between">
-                                        <label for="id_advance_amount">Premier versement déjà réalisé</label>
-                                        {% bootstrap_field form.advance_amount show_label='skip' %}
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex flex-row justify-content-between">
-                                        <span>Deuxième versement à prévoir</span>
-                                        <strong>
-                                            {% if balance_amount >= 0 %}
-                                                {{ balance_amount|format_int_euros }}
-                                            {% else %}
-                                                - €
-                                            {% endif %}
-                                        </strong>
-                                    </div>
-                                    <div class="d-flex flex-row justify-content-between">
-                                        <span>Remboursement attendu</span>
-                                        <strong>
-                                            {% if balance_amount < 0 %}
-                                                {{ balance_amount|format_int_euros }}
-                                            {% else %}
-                                                - €
-                                            {% endif %}
-                                        </strong>
+                            <fieldset id="decision-box">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <legend>Décision</legend>
+                                        {% bootstrap_field form.granted_amount %}
+                                        {% bootstrap_field form.advance_amount %}
+                                        {% bootstrap_field form.balance_amount %}
+                                        {% bootstrap_field form.refund_amount %}
                                     </div>
                                 </div>
-                                {% bootstrap_field form.review_comment %}
-                            </div>
+                            </fieldset>
+                            {% bootstrap_field form.review_comment %}
                             {% itou_buttons_form primary_label="Valider la décision" reset_url=back_url %}
                         </form>
                     </div>
