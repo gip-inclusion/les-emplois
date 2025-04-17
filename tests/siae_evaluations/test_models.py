@@ -50,12 +50,12 @@ from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries
 
 
-def create_batch_of_job_applications(company):
+def create_batch_of_job_applications(company, *, size=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):
     start = timezone.localdate() - relativedelta(months=2)
-    for _ in range(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):
+    for _ in range(size):
         approval = ApprovalFactory(
             start_at=start,
-            eligibility_diagnosis__from_employer=True,
+            with_diagnosis_from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         JobApplicationFactory.create(
@@ -353,14 +353,7 @@ class TestEvaluationCampaignManager:
 
         # company_1 got 1 job application
         company_1 = CompanyFactory(department="14", with_membership=True)
-        JobApplicationFactory(
-            with_approval=True,
-            to_company=company_1,
-            sender_company=company_1,
-            eligibility_diagnosis__from_employer=True,
-            eligibility_diagnosis__author_siae=company_1,
-            hiring_start_at=timezone.localdate() - relativedelta(months=2),
-        )
+        create_batch_of_job_applications(company_1, size=1)
 
         # company_2 got 2 job applications
         company_2 = CompanyFactory(department="14", with_membership=True)
@@ -392,7 +385,7 @@ class TestEvaluationCampaignManager:
         before_evaluated_period = datetime.date(2022, 4, 4)
         approval1 = ApprovalFactory(
             start_at=before_evaluated_period,  # Before evaluated period.
-            eligibility_diagnosis__from_employer=True,
+            with_diagnosis_from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         job_app_approval1_args = {
@@ -411,7 +404,7 @@ class TestEvaluationCampaignManager:
         within_evaluated_period = datetime.date(2023, 2, 1)
         approval2 = ApprovalFactory(
             start_at=within_evaluated_period,
-            eligibility_diagnosis__from_employer=True,
+            with_diagnosis_from_employer=True,
             eligibility_diagnosis__author_siae=company,
         )
         JobApplicationFactory.create(

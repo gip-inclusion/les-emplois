@@ -2784,7 +2784,7 @@ class TestProcessAcceptViews:
         diagnosis = GEIQEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_geiq=self.company,
-            from_geiq=True,
+            from_employer=True,
             criteria_kinds=[CRITERIA_KIND],
         )
         job_application = self.create_job_application(
