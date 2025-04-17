@@ -2068,17 +2068,9 @@ class TestProcessAcceptViews:
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(
-                AdministrativeCriteriaKind.RSA,
-                id="rsa",
-            ),
-        ],
-    )
     @freeze_time("2024-09-11")
-    def test_select_other_job_description_for_job_application(self, criteria_kind, client, mocker):
+    def test_select_other_job_description_for_job_application(self, client, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -2663,17 +2655,9 @@ class TestProcessAcceptViews:
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(
-                AdministrativeCriteriaKind.RSA,
-                id="rsa",
-            ),
-        ],
-    )
     @freeze_time("2024-09-11")
-    def test_accept_iae_criteria_can_be_certified(self, criteria_kind, client, mocker):
+    def test_accept_iae_criteria_can_be_certified(self, client, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -2758,17 +2742,9 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
-    @pytest.mark.parametrize(
-        "criteria_kind",
-        [
-            pytest.param(
-                AdministrativeCriteriaKind.RSA,
-                id="rsa",
-            ),
-        ],
-    )
     @freeze_time("2024-09-11")
-    def test_accept_geiq_criteria_can_be_certified(self, criteria_kind, client, mocker):
+    def test_accept_geiq_criteria_can_be_certified(self, client, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
