@@ -86,15 +86,17 @@ def initialize_apply_session(request, company, data):
     return apply_session
 
 
-class StartView(View):
-    def setup(self, request, company_pk, *args, hire_process=False, **kwargs):
-        super().setup(request, *args, **kwargs)
+class ApplicationPermissionMixin:
+    """
+    This mixin requires the following arguments that must be setup by the child view
 
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.hire_process = hire_process
-        self.auto_prescription_process = (
-            not self.hire_process and request.user.is_employer and self.company == request.current_organization
-        )
+    company: Company
+    hire_process: bool
+    auto_prescription_process: bool
+    """
+
+    def get_reset_url(self):
+        raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
         if self.hire_process and request.user.kind != UserKind.EMPLOYER:
@@ -119,11 +121,24 @@ class StartView(View):
                 )
         # Refuse all applications except those made by an SIAE member
         if self.company.block_job_applications and not self.company.has_member(request.user):
-            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+            messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
+            return HttpResponseRedirect(self.get_reset_url())
         return super().dispatch(request, *args, **kwargs)
 
+
+class StartView(ApplicationPermissionMixin, View):
+    def setup(self, request, company_pk, *args, hire_process=False, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+        self.hire_process = hire_process
+        self.auto_prescription_process = (
+            not self.hire_process and request.user.is_employer and self.company == request.current_organization
+        )
+        self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+
     def get_reset_url(self):
-        return self.apply_session.get("reset_url")
+        return self.reset_url
 
     def init_job_seeker_session(self, request):
         job_seeker_session = SessionNamespace.create_uuid_namespace(
@@ -139,9 +154,7 @@ class StartView(View):
         return job_seeker_session
 
     def get(self, request, *args, **kwargs):
-        session_data = {
-            "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
-        }
+        session_data = {"reset_url": self.reset_url}
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
         if job_description_id := request.GET.get("job_description_id"):
@@ -223,7 +236,7 @@ class RequireApplySessionMixin:
         }
 
 
-class ApplyStepBaseView(RequireApplySessionMixin, TemplateView):
+class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None
@@ -242,24 +255,6 @@ class ApplyStepBaseView(RequireApplySessionMixin, TemplateView):
         )
 
         super().setup(request, *args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.hire_process and request.user.kind != UserKind.EMPLOYER:
-            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-        elif self.hire_process and not self.company.has_member(request.user):
-            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
-        elif request.user.kind not in [
-            UserKind.JOB_SEEKER,
-            UserKind.PRESCRIBER,
-            UserKind.EMPLOYER,
-        ]:
-            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-
-        if not self.company.has_active_members:
-            raise PermissionDenied(
-                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
-            )
-        return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):
         return None
@@ -501,11 +496,8 @@ class CheckApplySessionMixin:
 
     def dispatch(self, request, *args, **kwargs):
         # Application must not be blocked by the employer at time of access
-        if not self.company.has_member(request.user):
-            if self.company.block_job_applications:
-                messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
-                return HttpResponseRedirect(self.get_redirect_url())
-
+        # self.company.block_job_applications is handled in ApplicationPermissionMixin
+        if not self.company.has_member(request.user) and not self.company.block_job_applications:
             # Spontaneous application blocked
             if (
                 not self.apply_session.get("selected_jobs", [])
