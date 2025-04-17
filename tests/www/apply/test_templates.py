@@ -227,26 +227,23 @@ class TestCertifiedBadgeIae:
         for criterion in diagnosis.administrative_criteria.all():
             assert escape(criterion.name) in rendered
 
-    @pytest.mark.parametrize(
-        "criteria_kind,criteria_level",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, AdministrativeCriteriaLevel.LEVEL_1, id="rsa"),
-        ],
-    )
-    def test_nominal_case(self, criteria_kind, criteria_level, mocker):
+    def test_nominal_case(self, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         # Eligibility diagnosis made by an employer and job application not sent by an authorized prescriber.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
         )
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[criteria_kind])
+        criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
+
         certify_criteria(diagnosis)
+
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
-
-        assert "Critères administratifs" in rendered
-        assert criteria_level.label in rendered
+        assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
+        assert AdministrativeCriteriaLevel(criteria.level).label in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
@@ -255,17 +252,12 @@ class TestCertifiedBadgeIae:
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
         )
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
-        assert criteria_level.label not in rendered
+        assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT in rendered
 
-    @pytest.mark.parametrize(
-        "criteria_kind,criteria_level",
-        [
-            pytest.param(AdministrativeCriteriaKind.RSA, AdministrativeCriteriaLevel.LEVEL_1, id="rsa"),
-        ],
-    )
-    def test_diag_from_prescriber(self, criteria_kind, criteria_level, mocker):
+    def test_diag_from_prescriber(self, mocker):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         # Diagnosis from prescriber but job application not sent by an authorized prescriber.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
@@ -276,15 +268,17 @@ class TestCertifiedBadgeIae:
             criteria_kinds=[criteria_kind],
             from_prescriber=True,
         )
+        criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
+
         certify_criteria(diagnosis)
+
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
-
         assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
-        assert criteria_level.label in rendered
+        assert AdministrativeCriteriaLevel(criteria.level).label in rendered
 
         # Diagnosis from prescriber and application sent by an authorized prescriber.
         rendered = self.template.render(
@@ -293,7 +287,7 @@ class TestCertifiedBadgeIae:
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert self.CERTIFIED_BADGE_TEXT not in rendered
-        assert criteria_level.label not in rendered
+        assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
 
     def test_no_certifiable_criteria(self):
         # No certifiable criteria
