@@ -326,7 +326,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         response = client.post(self.edit_details_url, data=post_data)
         assertRedirects(response, self.edit_preview_url)
         expected_session_data.update(post_data)
-        expected_session_data["is_qpv_mandatory"] = False
         assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 3: preview and validation
@@ -448,7 +447,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         response = client.post(self.edit_details_url, data=post_data)
         assertRedirects(response, self.edit_preview_url)
         expected_session_data.update(post_data)
-        expected_session_data["is_qpv_mandatory"] = False
         assert client.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] == expected_session_data
 
         # Step 3: preview
