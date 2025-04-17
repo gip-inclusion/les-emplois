@@ -50,3 +50,19 @@ class BrevoClient:
         for batch in batched(users, self.IMPORT_BATCH_SIZE):
             if batch:
                 self._import_contacts(batch, list_id, serializer)
+
+    def _delete_contact(self, email):
+        response = self.client.delete(
+            f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id",
+            headers={"Content-Type": "application/json"},
+        )
+        if response.status_code != 204:
+            logger.error(
+                "Brevo API: Something went wrong when trying to delete email",
+                extra={"status_code": response.status_code, "content": response.content.decode(), "email": email},
+            )
+
+        return {email: response.status_code}
+
+    def delete_users(self, users):
+        return [self._delete_contact(user.email) for user in users]
