@@ -10,7 +10,7 @@
 
 const data = document.currentScript.dataset;
 
-tallyConfig = {
+const tallyConfig = {
   "formId": "3qzqeO",
   "popup": {
     "width": 300,
