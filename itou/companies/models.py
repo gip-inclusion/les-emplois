@@ -914,7 +914,7 @@ class SiaeFinancialAnnex(models.Model):
 
     It is often abbreviated as AF ("Annexe Financière") in the codebase.
 
-    A SiaeFinancialAnnex is considered active if and only if it has an active stats and an end_date in the future.
+    A SiaeFinancialAnnex is considered active if and only if it has an active state and an end_date in the future.
     """
 
     STATE_VALID = "VALIDE"

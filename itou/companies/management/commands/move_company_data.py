@@ -8,12 +8,12 @@ from itou.utils.command import BaseCommand
 
 HELP_TEXT = """
     Move all data from company A to company B (or only the job applications if `only-job-applications` option is set).
-    After this move compay A is no longer supposed to be used or even accessible.
+    After this move company A is no longer supposed to be used or even accessible.
     Members of company A are detached, geolocalization is removed and new job applications are blocked.
 
     This command should be used when users have been using the wrong company A instead of using the correct company B.
 
-    COmpany A is *not* deleted at the end. This is because it might not always be possible or make sense to do so
+    Company A is *not* deleted at the end. This is because it might not always be possible or make sense to do so
     and because cleaning up irrelevant companies is actually the job of the import_siae command.
 
     You will most likely still have manual actions to do after the move, typically deactivating the convention
