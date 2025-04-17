@@ -1,7 +1,7 @@
 import pytest  # noqa
 from django.urls import reverse
 
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 
 
@@ -26,7 +26,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert_set_admin_role__creation(guest, organization, mailoutbox)
+        assert_set_admin_role_creation(guest, organization, mailoutbox)
 
     def test_remove_admin(self, client, mailoutbox):
         """
@@ -53,7 +53,7 @@ class TestPrescribersOrganizationAdminMembersManagement:
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert_set_admin_role__removal(guest, organization, mailoutbox)
+        assert_set_admin_role_removal(guest, organization, mailoutbox)
 
     def test_admin_management_permissions(self, client):
         """

@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -94,7 +94,7 @@ class TestMembers:
         assert response.status_code == 302
 
         institution.refresh_from_db()
-        assert_set_admin_role__creation(guest, institution, mailoutbox)
+        assert_set_admin_role_creation(guest, institution, mailoutbox)
 
     def test_deactivate_user(self, caplog, client, mailoutbox, snapshot):
         institution = InstitutionFactory(name="DDETS 14")
@@ -246,7 +246,7 @@ class TestMembers:
         assert response.status_code == 302
 
         institution.refresh_from_db()
-        assert_set_admin_role__removal(guest, institution, mailoutbox)
+        assert_set_admin_role_removal(guest, institution, mailoutbox)
 
     def test_suspicious_action(self, client):
         suspicious_action = "h4ckm3"

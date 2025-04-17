@@ -26,7 +26,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
-from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
+from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.job_applications import factories as job_applications_factories
@@ -928,7 +928,7 @@ def test_remove_last_admin_status(admin_client, mailoutbox):
         ),
     )
 
-    assert_set_admin_role__removal(membership.user, organization, mailoutbox)
+    assert_set_admin_role_removal(membership.user, organization, mailoutbox)
 
 
 def test_deactivate_admin(admin_client, caplog, mailoutbox):
@@ -1033,7 +1033,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
-    assert_set_admin_role__creation(prescriber, organization, mailoutbox)
+    assert_set_admin_role_creation(prescriber, organization, mailoutbox)
     assert (
         f"Creating prescribers.PrescriberMembership of organization_id={organization.pk} "
         f"for user_id={prescriber.pk} is_admin=True."
