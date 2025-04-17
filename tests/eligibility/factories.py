@@ -37,6 +37,10 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
                 lambda obj: faker.date_time(tzinfo=timezone.get_current_timezone(), end_datetime=obj.expires_at)
             ),
         )
+        certifiable = factory.Trait(
+            job_seeker__born_in_france=True,
+            from_employer=True,
+        )
 
     created_at = factory.LazyFunction(timezone.now)
     expires_at = factory.LazyAttribute(
@@ -56,14 +60,10 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         skip_postgeneration_save = True
 
     class Params:
-        from_geiq = factory.Trait(
+        from_employer = factory.Trait(
             author_kind=AuthorKind.GEIQ,
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
-        )
-        certifiable = factory.Trait(
-            job_seeker__born_in_france=True,
-            from_geiq=True,
         )
 
     @factory.post_generation
@@ -84,12 +84,7 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         from_employer = factory.Trait(
             author_kind=AuthorKind.EMPLOYER,
             author_siae=factory.SubFactory(CompanyFactory, subject_to_eligibility=True, with_membership=True),
-            author_prescriber_organization=None,
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
-        )
-        certifiable = factory.Trait(
-            job_seeker__born_in_france=True,
-            from_employer=True,
         )
 
     @factory.post_generation

@@ -165,7 +165,7 @@ def test_both_diag_from_company(client, snapshot):
     )
     GEIQEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
-        from_geiq=True,
+        from_employer=True,
         author_geiq=geiq_membership.company,
         author=geiq_membership.user,
     )
