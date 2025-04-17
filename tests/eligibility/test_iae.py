@@ -572,7 +572,7 @@ def test_certifiable(AdministrativeCriteriaClass):
     "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
 @pytest.mark.parametrize(
-    "CRITERIA_KIND,api_returned_payload",
+    "criteria_kind,api_returned_payload",
     [
         pytest.param(AdministrativeCriteriaKind.RSA, rsa_certified_mocker(), id="rsa"),
         pytest.param(AdministrativeCriteriaKind.AAH, aah_certified_mocker(), id="aah"),
@@ -581,7 +581,7 @@ def test_certifiable(AdministrativeCriteriaClass):
 )
 @freeze_time("2024-09-12")
 def test_eligibility_diagnosis_certify_criteria(
-    mocker, EligibilityDiagnosisFactory, CRITERIA_KIND, api_returned_payload
+    mocker, EligibilityDiagnosisFactory, criteria_kind, api_returned_payload
 ):
     mocker.patch(
         "itou.utils.apis.api_particulier._request",
@@ -589,13 +589,13 @@ def test_eligibility_diagnosis_certify_criteria(
     )
     job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
-        job_seeker=job_seeker, certifiable=True, criteria_kinds=[CRITERIA_KIND]
+        job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
     eligibility_diagnosis.certify_criteria()
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.get(
-        administrative_criteria__kind=CRITERIA_KIND,
+        administrative_criteria__kind=criteria_kind,
         eligibility_diagnosis=eligibility_diagnosis,
     )
     assert criterion.certified is True

@@ -2069,7 +2069,7 @@ class TestProcessAcceptViews:
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
     @pytest.mark.parametrize(
-        "CRITERIA_KIND,api_returned_payload",
+        "criteria_kind,api_returned_payload",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
@@ -2080,7 +2080,7 @@ class TestProcessAcceptViews:
     )
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(
-        self, CRITERIA_KIND, api_returned_payload, client, mocker
+        self, criteria_kind, api_returned_payload, client, mocker
     ):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
@@ -2091,7 +2091,7 @@ class TestProcessAcceptViews:
             job_seeker=self.job_seeker,
             author_siae=self.company,
             certifiable=True,
-            criteria_kinds=[CRITERIA_KIND],
+            criteria_kinds=[criteria_kind],
         )
         job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
 
@@ -2667,7 +2667,7 @@ class TestProcessAcceptViews:
         assert job_application.state.is_accepted
 
     @pytest.mark.parametrize(
-        "CRITERIA_KIND,api_returned_payload",
+        "criteria_kind,api_returned_payload",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
@@ -2677,7 +2677,7 @@ class TestProcessAcceptViews:
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_iae__criteria_can_be_certified(self, CRITERIA_KIND, api_returned_payload, client, mocker):
+    def test_accept_iae__criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=api_returned_payload,
@@ -2689,14 +2689,14 @@ class TestProcessAcceptViews:
             job_seeker=self.job_seeker,
             author_siae=self.company,
             certifiable=True,
-            criteria_kinds=[CRITERIA_KIND, AdministrativeCriteriaKind.CAP_BEP],
+            criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
         )
         job_application = self.create_job_application(
             eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
-            administrative_criteria__kind__in=CRITERIA_KIND
+            administrative_criteria__kind__in=criteria_kind
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -2763,7 +2763,7 @@ class TestProcessAcceptViews:
             assert criterion.certified_at
 
     @pytest.mark.parametrize(
-        "CRITERIA_KIND,api_returned_payload",
+        "criteria_kind,api_returned_payload",
         [
             pytest.param(
                 AdministrativeCriteriaKind.RSA,
@@ -2773,7 +2773,7 @@ class TestProcessAcceptViews:
         ],
     )
     @freeze_time("2024-09-11")
-    def test_accept_geiq__criteria_can_be_certified(self, CRITERIA_KIND, api_returned_payload, client, mocker):
+    def test_accept_geiq__criteria_can_be_certified(self, criteria_kind, api_returned_payload, client, mocker):
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=api_returned_payload,
@@ -2785,7 +2785,7 @@ class TestProcessAcceptViews:
             job_seeker=self.job_seeker,
             author_geiq=self.company,
             from_employer=True,
-            criteria_kinds=[CRITERIA_KIND],
+            criteria_kinds=[criteria_kind],
         )
         job_application = self.create_job_application(
             geiq_eligibility_diagnosis=diagnosis,

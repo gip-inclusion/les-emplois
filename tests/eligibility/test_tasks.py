@@ -26,7 +26,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 )
 class TestCertifyCriteria:
     @pytest.mark.parametrize(
-        "endpoint,CRITERIA_KIND,api_returned_payload",
+        "endpoint,criteria_kind,api_returned_payload",
         [
             pytest.param(
                 f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active",
@@ -49,8 +49,8 @@ class TestCertifyCriteria:
         ],
     )
     @freeze_time("2025-01-06")
-    def test_queue_task(self, endpoint, CRITERIA_KIND, api_returned_payload, factory, respx_mock):
-        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[CRITERIA_KIND])
+    def test_queue_task(self, endpoint, criteria_kind, api_returned_payload, factory, respx_mock):
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
         respx_mock.get(endpoint).respond(json=api_returned_payload)
 
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
@@ -58,7 +58,7 @@ class TestCertifyCriteria:
         assert len(respx_mock.calls) == 1
         SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
         criterion = SelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind=CRITERIA_KIND,
+            administrative_criteria__kind=criteria_kind,
             eligibility_diagnosis=eligibility_diagnosis,
         ).get()
         assert criterion.certified is True
