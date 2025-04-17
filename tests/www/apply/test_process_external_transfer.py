@@ -105,13 +105,13 @@ def test_step_1(client, snapshot):
     )
 
     # Check outgoing links
-    transfer_step_2_base_url = reverse(
-        "apply:job_application_external_transfer_step_2",
+    transfer_start_session_base_url = reverse(
+        "apply:job_application_external_transfer_start_session",
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
     assertContains(
         response,
-        f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}",
+        f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}",
         count=1,
     )
 
@@ -138,7 +138,7 @@ def test_step_1(client, snapshot):
     assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(
         response,
-        f"{transfer_step_2_base_url}?back_url={quote(company_card_url)}",
+        f"{transfer_start_session_base_url}?back_url={quote(company_card_url)}",
         count=2,
     )
     assertContains(response, job_card_url, count=1)
@@ -154,7 +154,7 @@ def test_step_1(client, snapshot):
     assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(
         response,
-        f"{transfer_step_2_base_url}?job_description_id={job.pk}&back_url={quote(job_card_url)}",
+        f"{transfer_start_session_base_url}?job_description_id={job.pk}&back_url={quote(job_card_url)}",
         count=1,
     )
     assertContains(response, company_card_url, count=1)
@@ -194,6 +194,120 @@ def test_step_1_same_company(client):
     )
 
 
+def test_start_session_same_company(client):
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    company = job_application.to_company
+    client.force_login(company.members.get())
+
+    transfer_step_1_url = reverse(
+        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
+    )
+    transfer_start_session_base_url = reverse(
+        "apply:job_application_external_transfer_start_session",
+        kwargs={"job_application_id": job_application.pk, "company_pk": job_application.to_company.pk},
+    )
+    transfer_start_session_url = f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}"
+    response = client.get(transfer_start_session_url, follow=True)
+
+    internal_transfer_url = reverse(
+        "apply:job_application_internal_transfer",
+        kwargs={"job_application_id": job_application.pk, "company_pk": job_application.to_company.pk},
+    )
+    assertRedirects(response, f"{internal_transfer_url}?back_url={quote(transfer_step_1_url, safe='')}")
+    assertNotContains(response, INTERNAL_TRANSFER_CONFIRM_BUTTON, html=True)
+    assertContains(response, "<h1>Transfert impossible</h1>")
+
+    internal_transfer_post_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+    response = client.post(
+        internal_transfer_post_url,
+        data={"target_company_id": job_application.to_company.pk},
+        follow=True,
+    )
+    assertContains(response, "Une erreur est survenue lors du transfert de la candidature")
+
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.REFUSED
+
+
+def test_start_session_internal_transfer(client):
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    employer = job_application.to_company.members.get()
+    other_company = CompanyMembershipFactory(user=employer).company
+    client.force_login(employer)
+
+    # This will set the session back url
+    list_url_with_params = reverse("apply:list_for_siae") + "?pass_iae_active=on"
+    client.get(
+        reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        + f"?back_url={quote(list_url_with_params)}"
+    )
+
+    transfer_step_1_url = reverse(
+        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
+    )
+    transfer_start_session_base_url = reverse(
+        "apply:job_application_external_transfer_start_session",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+    transfer_start_session_url = f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}"
+    response = client.get(transfer_start_session_url, follow=True)
+
+    internal_transfer_url = reverse(
+        "apply:job_application_internal_transfer",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+    assertRedirects(response, f"{internal_transfer_url}?back_url={quote(transfer_step_1_url, safe='')}")
+    assertContains(response, INTERNAL_TRANSFER_CONFIRM_BUTTON, html=True)
+    assertContains(response, "<h1>Confirmation du transfert</h1>")
+    internal_transfer_post_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+    assertContains(response, f'<form method="post" action="{internal_transfer_post_url}">')
+
+    response = client.post(internal_transfer_post_url, data={"target_company_id": other_company.pk})
+    assertRedirects(response, list_url_with_params)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.NEW
+    assert job_application.to_company == other_company
+
+
+def test_start_session(client):
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    employer = job_application.to_company.members.get()
+    other_company = CompanyFactory(with_membership=True, with_jobs=True)
+    job_id = other_company.job_description_through.first().pk
+    client.force_login(employer)
+
+    transfer_step_1_url = reverse(
+        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
+    )
+    transfer_start_session_base_url = reverse(
+        "apply:job_application_external_transfer_start_session",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+    transfer_step_2_base_url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+
+    # No selected job
+    transfer_start_session_url = f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}"
+    response = client.get(transfer_start_session_url)
+    transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
+    assertRedirects(response, transfer_step_2_url)
+    assert client.session[f"job_application-{other_company.pk}"] == {"reset_url": transfer_step_1_url}
+
+    # With selected job
+    transfer_start_session_url = (
+        f"{transfer_start_session_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
+    )
+    response = client.get(transfer_start_session_url)
+    transfer_step_2_url = (
+        f"{transfer_step_2_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
+    )
+    assertRedirects(response, transfer_step_2_url)
+    assert client.session[f"job_application-{other_company.pk}"] == {"reset_url": transfer_step_1_url}
+
+
+# FIXME(alaurent) remove next week
 def test_step_2_same_company(client):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     company = job_application.to_company
@@ -230,6 +344,7 @@ def test_step_2_same_company(client):
     assert job_application.state == JobApplicationState.REFUSED
 
 
+# FIXME(alaurent) remove next week
 def test_step_2_internal_transfer(client):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     employer = job_application.to_company.members.get()
@@ -285,11 +400,69 @@ def test_step_2(client, snapshot):
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
 
+    session = client.session
+    session[f"job_application-{other_company.pk}"] = {"reset_url": transfer_step_1_url}
+    session.save()
+
     # No selected job
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
     response = client.get(transfer_step_2_url)
 
     assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
+
+    response = client.post(transfer_step_2_url, data={"spontaneous_application": "on"})
+    transfer_step_3_base_url = reverse(
+        "apply:job_application_external_transfer_step_3",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+    transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
+    assertRedirects(response, transfer_step_3_url)
+    assert client.session[f"job_application-{other_company.pk}"] == {
+        "selected_jobs": [],
+        "reset_url": transfer_step_1_url,
+    }
+
+    # With selected job
+    transfer_step_2_url = (
+        f"{transfer_step_2_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
+    )
+    response = client.get(transfer_step_2_url)
+
+    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assert response.context["form"].initial == {"selected_jobs": [str(job_id)]}
+
+    response = client.post(transfer_step_2_url, data={"selected_jobs": [job_id]})
+    transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
+    assertRedirects(response, transfer_step_3_url)
+    assert client.session[f"job_application-{other_company.pk}"] == {
+        "selected_jobs": [job_id],
+        "reset_url": transfer_step_1_url,
+    }
+
+
+# FIXME(alaurent) replace with assert 404 next week
+def test_step_2_without_session(client):
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
+    employer = job_application.to_company.members.get()
+    other_company = CompanyFactory(with_membership=True, with_jobs=True)
+    job_id = other_company.job_description_through.first().pk
+    client.force_login(employer)
+
+    transfer_step_1_url = reverse(
+        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
+    )
+    transfer_step_2_base_url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+
+    # No selected job
+    transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
+    response = client.get(transfer_step_2_url)
+
     assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
     assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
 
@@ -308,7 +481,6 @@ def test_step_2(client, snapshot):
     )
     response = client.get(transfer_step_2_url)
 
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
     assert response.context["form"].initial == {"selected_jobs": [str(job_id)]}
 
@@ -325,7 +497,7 @@ def test_step_3(client, snapshot):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
     session.save()
 
     transfer_step_2_url = reverse(
@@ -369,7 +541,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
     session.save()
 
     transfer_step_2_url = reverse(
@@ -414,7 +586,7 @@ def test_step_3_remove_previous_CV(client):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
     session.save()
 
     transfer_step_2_url = reverse(
@@ -455,7 +627,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
     session.save()
 
     transfer_step_2_url = reverse(
@@ -495,6 +667,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assert new_job_application.state == JobApplicationState.NEW
 
 
+# FIXME(alaurent) replace with assert 404 next week
 def test_access_step_3_without_session(client):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume_link="")
     employer = job_application.to_company.members.get()
@@ -538,18 +711,27 @@ def test_full_process(client):
     assertRedirects(response, transfer_step_1_url + "?city=vannes-56")
     assertContains(response, "<h1>Rechercher un emploi inclusif</h1>", html=True)
 
+    transfer_start_session_base_url = reverse(
+        "apply:job_application_external_transfer_start_session",
+        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+    )
+    transfer_start_session_url = f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}"
+    assertContains(response, transfer_start_session_url)
+
+    # Start session
+    response = client.get(transfer_start_session_url)
     transfer_step_2_base_url = reverse(
         "apply:job_application_external_transfer_step_2",
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
-    assertContains(response, transfer_step_2_url)
+    assertRedirects(response, transfer_step_2_url)
 
     # STEP 2
     response = client.get(transfer_step_2_url)
     assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
     assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
-    # CHeck back_url
+    # Check back_url
     assertContains(response, transfer_step_1_url)
 
     response = client.post(transfer_step_2_url, data={"spontaneous_application": "on"})
@@ -560,7 +742,10 @@ def test_full_process(client):
     )
     transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
     assertRedirects(response, transfer_step_3_url)
-    assert client.session[f"job_application-{other_company.pk}"] == {"selected_jobs": []}
+    assert client.session[f"job_application-{other_company.pk}"] == {
+        "selected_jobs": [],
+        "reset_url": transfer_step_1_url,
+    }
 
     # STEP 3
     response = client.get(transfer_step_3_url)

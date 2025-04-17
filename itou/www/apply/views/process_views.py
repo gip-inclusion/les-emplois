@@ -39,7 +39,12 @@ from itou.www.apply.forms import (
     TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
+from itou.www.apply.views.submit_views import (
+    ApplicationEndView,
+    ApplicationJobsView,
+    ApplicationResumeView,
+    initialize_apply_session,
+)
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
 
@@ -615,6 +620,36 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(JobDescriptionCa
         }
 
 
+@check_user(lambda user: user.is_employer)  # redondant with is_active_company_member() but more obvious
+def job_application_external_transfer_start_view(request, job_application_id, company_pk, **kwargs):
+    job_application = get_object_or_404(
+        JobApplication.objects.is_active_company_member(request.user), pk=job_application_id
+    )
+    company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+
+    if company in request.organizations:
+        # This is not an external transfer
+        url = reverse(
+            "apply:job_application_internal_transfer",
+            kwargs={"job_application_id": job_application.pk, "company_pk": company.pk},
+        )
+        if params := request.GET.urlencode():
+            url = f"{url}?{params}"
+        return HttpResponseRedirect(url)
+
+    # It's an external transfer : initialize the apply_session
+    data = {"reset_url": get_safe_url(request, "back_url", reverse("dashboard:index"))}
+    initialize_apply_session(request, company, data)
+
+    url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "company_pk": company.pk},
+    )
+    if params := request.GET.urlencode():
+        url = f"{url}?{params}"
+    return HttpResponseRedirect(url)
+
+
 class ApplicationOverrideMixin:
     additionnal_related_models = []
 
@@ -630,6 +665,7 @@ class ApplicationOverrideMixin:
 
 
 class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
+    # FIXME(alaurent) remove next week : now handled by job_application_external_transfer_start_view
     def dispatch(self, request, *args, **kwargs):
         if self.company in request.organizations:
             # This is not an external transfer
