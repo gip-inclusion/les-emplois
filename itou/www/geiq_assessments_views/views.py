@@ -553,10 +553,9 @@ def assessment_details_for_institution(
             assessment.reviewed_at = None
             assessment.reviewed_by = None
             assessment.save(update_fields=("reviewed_at", "reviewed_by"))
-        if action:
-            return HttpResponseRedirect(
-                reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
-            )
+        return HttpResponseRedirect(
+            reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+        )
 
     context = {
         "assessment": assessment,
