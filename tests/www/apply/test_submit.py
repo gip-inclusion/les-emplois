@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import storages
+from django.template.defaultfilters import date, time
 from django.urls import resolve, reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -1372,8 +1373,8 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
     @freeze_time()
-    def test_apply_as_authorized_prescriber(self, client, pdf_file):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    def test_apply_as_authorized_prescriber(self, client, pdf_file, snapshot):
+        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), for_snapshot=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         # test ZRR / QPV template loading
@@ -1388,6 +1389,8 @@ class TestApplyAsAuthorizedPrescriber:
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            first_name="John",
+            last_name="DOE",
         )
         existing_job_seeker = JobSeekerFactory()
 
@@ -1630,13 +1633,41 @@ class TestApplyAsAuthorizedPrescriber:
         # Simulate address in qpv. If the address is in qpv, the known_criteria template
         # should be used
         with mock.patch(
-            "itou.common_apps.address.models.AddressMixin.address_in_qpv",
+            "itou.common_apps.address.models.QPV.in_qpv",
             return_value=True,
         ):
             response = client.get(next_url)
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+
+        expected_snapshot = str(
+            parse_response_to_soup(
+                response,
+                "#main",
+                replace_in_attr=[
+                    (
+                        "href",
+                        f"apply%2F{company.pk}%2Fcreate%2F{new_job_seeker.public_id}",
+                        "apply%2F[PK of Company]%2Fcreate%2F[Public ID of JobSeeker]",
+                    ),
+                    (
+                        "href",
+                        f"job_seeker_public_id={new_job_seeker.public_id}",
+                        "job_seeker_public_id=[Public ID of JobSeeker]",
+                    ),
+                    (
+                        "href",
+                        f"/apply/{company.pk}/create/{new_job_seeker.public_id}",
+                        "apply/[PK of Company]/create/[Public ID of JobSeeker]",
+                    ),
+                    ("href", f"/company/{company.pk}", "company/[PK of Company]"),
+                ],
+            )
+        )
+        now = timezone.localtime()
+        expected_snapshot = expected_snapshot.replace(f"{date(now)} à {time(now)}", "Day Month Year à HH:MM")
+        assert expected_snapshot == snapshot(name="eligibility_step")
 
         response = client.post(next_url, {"level_1_1": True})
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)

@@ -1,0 +1,405 @@
+# serializer version: 1
+# name: TestApplyAsPrescriber.test_apply_as_prescriber[eligibility_step]
+  '''
+  <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              
+      
+          
+  <div class="c-title">
+      <div class="c-title__main">
+                  <h1>
+                      
+  
+  
+      Postuler
+      pour Alain ZORRO
+  
+  
+                      
+  
+      
+          
+                      <span class="badge badge-base rounded-pill bg-warning-lighter text-warning">
+              <i aria-hidden="true" class="ri-error-warning-line"></i>
+              Éligibilité IAE à valider
+          </span>
+          
+      
+  
+  
+                  </h1>
+              </div>
+      
+      <div class="c-title__secondary">
+                  <p>
+                      Dernière actualisation du profil : 3 avril 2025 à 12:03
+                      
+                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=11111111-2222-3333-4444-555566667777&amp;from_url=%2Fapply%2F[PK of Company]%2Fcreate%2F11111111-2222-3333-4444-555566667777%2Feligibility">Vérifier le profil</a>
+                      
+                      
+                  </p>
+              </div>
+  </div>
+  
+      
+  
+                              
+      
+                                  
+  
+  
+  
+                              
+      
+          
+      
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="container">
+              
+                  <div class="row">
+                      <div class="col-12 col-lg-8">
+                          <div class="c-stepper mb-3 mb-lg-5">
+                              <div class="progress">
+                                  <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
+                                  </div>
+                              </div>
+                              <p>
+                                  
+                                      
+                                          Postuler
+                                      
+                                   - Éligibilité IAE
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-form">
+                          
+  
+  <div class="c-box c-box--structure mb-3 mb-lg-5">
+      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+          <i aria-hidden="true" class="ri-community-line"></i>
+          <div>
+              <button data-bs-title="Association intermédiaire" data-bs-toggle="tooltip" type="button">
+                  AI
+              </button>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 44350 Paris</address>
+                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 44350 Paris" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              </li>
+              
+                  
+      <li>
+      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          
+              
+                  
+                  
+                      
+                  
+                  <a class="btn btn-secondary btn-block mt-4" href="company/[PK of Company]/card" target="_blank">Voir la fiche de l'entreprise</a>
+              
+          
+      </div>
+  </div>
+  
+                          
+      
+  
+      
+  
+  
+                          <h2>
+                              Préciser la situation administrative du candidat (facultatif)
+                          </h2>
+                          <hr class="mt-5"/>
+  
+                          
+                              <div id="form_errors"></div>
+                          
+  
+                          <form method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              
+      
+          <div class="c-info mb-3">
+              <button class="c-info__summary">
+                  <span>Pour valider l'éligibilité IAE du candidat</span>
+              </button>
+              <div class="c-info__detail">
+                  <ul>
+                      <li>
+                          Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                          Vous pouvez vous appuyer sur le document
+                          <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://communaute.inclusion.gouv.fr/surveys/dsp/create/?proconnect_login=true" rel="noreferrer noopener" target="_blank">diagnostic socio-professionnel de référence</a>.
+                      </li>
+                      <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
+                  </ul>
+              </div>
+          </div>
+      
+  
+      <div class="">
+          <fieldset>
+              <legend class="h3">Critères administratifs de niveau 1</legend>
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_1_1_helptext" class="form-check-input" id="id_level_1_1" name="level_1_1" type="checkbox"/><label class="form-check-label" for="id_level_1_1">Bénéficiaire du RSA</label><div class="form-text" id="id_level_1_1_helptext">Revenu de solidarité active</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_1_2_helptext" class="form-check-input" id="id_level_1_2" name="level_1_2" type="checkbox"/><label class="form-check-label" for="id_level_1_2">Allocataire ASS</label><div class="form-text" id="id_level_1_2_helptext">Allocation de solidarité spécifique</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_1_3_helptext" class="form-check-input" id="id_level_1_3" name="level_1_3" type="checkbox"/><label class="form-check-label" for="id_level_1_3">Allocataire AAH</label><div class="form-text" id="id_level_1_3_helptext">Allocation aux adultes handicapés</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_1_4_helptext" class="form-check-input" id="id_level_1_4" name="level_1_4" type="checkbox"/><label class="form-check-label" for="id_level_1_4">DETLD (+ 24 mois)</label><div class="form-text" id="id_level_1_4_helptext">Demandeur d'emploi de très longue durée (inscrit à France Travail)</div>
+  </div></div>
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+          </fieldset>
+  
+          <fieldset>
+              <legend class="h3">Critères administratifs de niveau 2</legend>
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_5" name="level_2_5" type="checkbox"/><label class="form-check-label" for="id_level_2_5">Niveau d'étude 3 (CAP, BEP) ou infra</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_6" name="level_2_6" type="checkbox"/><label class="form-check-label" for="id_level_2_6">Senior (+50 ans)</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_7" name="level_2_7" type="checkbox"/><label class="form-check-label" for="id_level_2_7">Jeune (-26 ans)</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_2_8_helptext" class="form-check-input" id="id_level_2_8" name="level_2_8" type="checkbox"/><label class="form-check-label" for="id_level_2_8">Sortant de l'ASE</label><div class="form-text" id="id_level_2_8_helptext">Aide sociale à l'enfance</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_2_9_helptext" class="form-check-input" id="id_level_2_9" name="level_2_9" type="checkbox"/><label class="form-check-label" for="id_level_2_9">DELD (12-24 mois)</label><div class="form-text" id="id_level_2_9_helptext">Demandeur d'emploi de longue durée (inscrit à France Travail)</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_10" name="level_2_10" type="checkbox"/><label class="form-check-label" for="id_level_2_10">Travailleur handicapé</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_11" name="level_2_11" type="checkbox"/><label class="form-check-label" for="id_level_2_11">Parent isolé</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_12" name="level_2_12" type="checkbox"/><label class="form-check-label" for="id_level_2_12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_13" name="level_2_13" type="checkbox"/><label class="form-check-label" for="id_level_2_13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_2_14_helptext" class="form-check-input" id="id_level_2_14" name="level_2_14" type="checkbox"/><label class="form-check-label" for="id_level_2_14">Résident ZRR</label><div class="form-text" id="id_level_2_14_helptext">Zone de revitalisation rurale</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input aria-describedby="id_level_2_15_helptext" class="form-check-input" id="id_level_2_15" name="level_2_15" type="checkbox"/><label class="form-check-label" for="id_level_2_15">Résident QPV</label><div class="form-text" id="id_level_2_15_helptext">Quartier prioritaire de la politique de la ville</div>
+  </div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_16" name="level_2_16" type="checkbox"/><label class="form-check-label" for="id_level_2_16">Sortant de détention ou personne placée sous main de justice</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_17" name="level_2_17" type="checkbox"/><label class="form-check-label" for="id_level_2_17">Maîtrise de la langue française</label></div></div>
+                  
+              
+                  
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_level_2_18" name="level_2_18" type="checkbox"/><label class="form-check-label" for="id_level_2_18">Mobilité</label></div></div>
+                  
+              
+          </fieldset>
+  
+          <input data-shroud-input="" name="shrouded" type="hidden" value="1"/>
+      </div>
+  
+  
+                              
+                                  
+                                      
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      
+                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </button>
+                  
+              </div>
+              
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      
+                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/apply/[PK of Company]/create/11111111-2222-3333-4444-555566667777/select_jobs">
+                              <span>Retour</span>
+                          </a>
+                      
+                  </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+      <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                      
+                          <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
+                      
+                  </div>
+              </div>
+          </div>
+      </div>
+  
+  
+                                  
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+          </main>
+  '''
+# ---
