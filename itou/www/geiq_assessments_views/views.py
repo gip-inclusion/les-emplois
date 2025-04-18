@@ -106,9 +106,9 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
             dreets = create_form.cleaned_data["dreets"]
             name_for_geiq_parts = []
             if dreets:
-                name_for_geiq_parts.append(f"DREETS {dreets.region}")
+                name_for_geiq_parts.append(dreets.name)
             if ddets:
-                name_for_geiq_parts.append(f"DDETS {ddets.department}")
+                name_for_geiq_parts.append(ddets.name)
 
             assessment = Assessment.objects.create(
                 campaign=campaign,
