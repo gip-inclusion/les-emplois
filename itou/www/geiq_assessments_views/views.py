@@ -5,6 +5,7 @@ import operator
 import uuid
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
@@ -519,18 +520,30 @@ def details_for_institution(
         try:
             action = InstitutionAction(request.POST.get("action"))
         except ValueError:
-            action = None
+            raise Http404
         if action is InstitutionAction.REVIEW:
+            if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and assessment.dreets_reviewed_at:
+                raise PermissionDenied
             now = timezone.now()
             if not assessment.reviewed_at:
                 assessment.reviewed_at = now
                 assessment.reviewed_by = request.user
                 assessment.save(update_fields=("reviewed_at", "reviewed_by"))
+            elif request.current_organization.kind == InstitutionKind.DDETS_GEIQ:
+                # DDETS trying to review an already reviewed assessment
+                raise PermissionDenied
             if request.current_organization.kind == InstitutionKind.DREETS_GEIQ:
-                assessment.dreets_reviewed_at = now
-                assessment.dreets_reviewed_by = request.user
-                assessment.save(update_fields=("dreets_reviewed_at", "dreets_reviewed_by"))
+                if not assessment.dreets_reviewed_at:
+                    assessment.dreets_reviewed_at = now
+                    assessment.dreets_reviewed_by = request.user
+                    assessment.save(update_fields=("dreets_reviewed_at", "dreets_reviewed_by"))
+                else:
+                    # DREETS trying to review an already dreets_reviewed assessment
+                    raise PermissionDenied
+
         elif action is InstitutionAction.FIX:
+            if request.current_organization.kind != InstitutionKind.DREETS_GEIQ or assessment.dreets_reviewed_at:
+                raise PermissionDenied
             assessment.reviewed_at = None
             assessment.reviewed_by = None
             assessment.save(update_fields=("reviewed_at", "reviewed_by"))

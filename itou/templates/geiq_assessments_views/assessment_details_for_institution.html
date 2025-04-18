@@ -183,7 +183,7 @@
                     {% endif %}
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                    {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token only %}
+                    {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token request=request InstitutionKind=InstitutionKind only %}
                     {% if assessment.submitted_at %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data mb-3">
