@@ -118,15 +118,20 @@
                                     </ul>
                                 </div>
                             </div>
-                            {% if not assessment.reviewed_at %}
-                                <div class="c-box--summary__footer">
-                                    <div class="d-flex justify-content-end">
+                            <div class="c-box--summary__footer">
+                                <div class="d-flex justify-content-end">
+                                    {% if not assessment.reviewed_at and not assessment.grants_selection_validated_at %}
                                         <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}">
                                             Contrôler la sélection
                                         </a>
-                                    </div>
+                                    {% else %}
+                                        <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}">
+                                            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                                            <span>Consulter ma sélection</span>
+                                        </a>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
                         <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
                             <div class="c-box--summary__header">
