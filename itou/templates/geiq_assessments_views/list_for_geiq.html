@@ -43,7 +43,7 @@
                                     {% for assessment in assessments %}
                                         <tr>
                                             <td>
-                                                <a class="btn btn-link" href="{% url "geiq_assessments_views:details" pk=assessment.pk %}">{{ assessment.name_for_geiq }}</a>
+                                                <a class="btn btn-link" href="{% url "geiq_assessments_views:details_for_geiq" pk=assessment.pk %}">{{ assessment.name_for_geiq }}</a>
                                             </td>
                                             <td>{{ assessment.submitted_at|date:"d/m/Y"|default:"-" }}</td>
                                             <td>{% state_for_geiq assessment %}</td>

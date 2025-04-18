@@ -13,7 +13,7 @@
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item">
-            <a class="nav-link{% if active_tab == active_tab.MAIN %} active{% endif %}" href="{% url 'geiq_assessments_views:details' pk=assessment.pk %}">{{ active_tab.MAIN.label }}</a>
+            <a class="nav-link{% if active_tab == active_tab.MAIN %} active{% endif %}" href="{% url 'geiq_assessments_views:details_for_geiq' pk=assessment.pk %}">{{ active_tab.MAIN.label }}</a>
         </li>
         {% include "geiq_assessments_views/includes/assessment_kpi_tab.html" with active_tab=active_tab assessment=assessment request_htmx=False only %}
     </ul>

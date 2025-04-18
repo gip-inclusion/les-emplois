@@ -145,7 +145,9 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
                 AssessmentInstitutionLink.objects.create(
                     assessment=assessment, institution=ddets_dreets, with_convention=False
                 )
-            return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
+            return HttpResponseRedirect(
+                reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
+            )
 
     context["conflicting_antennas"] = conflicting_antennas
     context["form"] = create_form
@@ -159,7 +161,7 @@ class AssessmentDetailsTab(models.TextChoices):
 
 
 @check_user(lambda user: user.is_employer)
-def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
+def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
     assessment = Assessment.objects.prefetch_related(
@@ -177,7 +179,7 @@ def assessment_details(request, pk, template_name="geiq_assessments_views/assess
         EmployeeContract.objects.filter(employee__assessment=assessment).update(
             allowance_granted=F("allowance_requested")
         )
-        return HttpResponseRedirect(reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk}))
+        return HttpResponseRedirect(reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
 
     context = {
         "assessment": assessment,
@@ -256,7 +258,9 @@ def upload_action_financial_assessment(
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
     back_url = get_safe_url(
-        request, "back_url", fallback_url=reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+        request,
+        "back_url",
+        fallback_url=reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
     )
     form = ActionFinancialAssessmentForm(data=request.POST or None, files=request.FILES or None)
     context = {
@@ -278,7 +282,9 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
     assessments = Assessment.objects.filter(companies=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
     back_url = get_safe_url(
-        request, "back_url", fallback_url=reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+        request,
+        "back_url",
+        fallback_url=reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
     )
     form = GeiqCommentForm(instance=assessment, data=request.POST or None)
     context = {
@@ -326,7 +332,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
     back_url, readonly_access, stats = None, False, None  # defined to please the linters
     if request.user.is_employer:
-        back_url = reverse("geiq_assessments_views:details", kwargs={"pk": assessment.pk})
+        back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         readonly_access = assessment.submitted_at
     elif request.user.is_labor_inspector:
         back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
@@ -509,7 +515,7 @@ class InstitutionAction(enum.StrEnum):
 
 
 @check_user(lambda user: user.is_labor_inspector)
-def details_for_institution(
+def assessment_details_for_institution(
     request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
 ):
     if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):

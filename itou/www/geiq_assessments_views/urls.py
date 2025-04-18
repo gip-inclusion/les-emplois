@@ -9,7 +9,7 @@ urlpatterns = [
     # GEIQ urls
     path("", views.list_for_geiq, name="list_for_geiq"),
     path("create", views.create_assessment, name="create"),
-    path("<uuid:pk>", views.assessment_details, name="details"),
+    path("<uuid:pk>", views.assessment_details_for_geiq, name="details_for_geiq"),
     path("<uuid:pk>/kpi", views.assessment_kpi, name="assessment_kpi"),
     # path("details/<uuid:pk>/result", views.assessment_result, name="assessment_result"),
     path(
@@ -81,6 +81,6 @@ urlpatterns = [
     ),
     # institution urls
     path("institution/", views.list_for_institution, name="list_for_institution"),
-    path("institution/<uuid:pk>", views.details_for_institution, name="details_for_institution"),
+    path("institution/<uuid:pk>", views.assessment_details_for_institution, name="details_for_institution"),
     path("institution/<uuid:pk>/review", views.assessment_review, name="assessment_review"),
 ]
