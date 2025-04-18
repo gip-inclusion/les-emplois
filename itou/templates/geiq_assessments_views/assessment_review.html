@@ -123,9 +123,9 @@
         const refundAmountInput = document.getElementById("id_refund_amount")
 
         function cleanAmount(amountStr) {
-            let trimmedStr = amountStr.replaceAll(" ", "").trim()
-            if (trimmedStr[-1] === "€") {
-                trimmedStr = trimmedStr.slice(0, -1)
+            let trimmedStr = amountStr.replaceAll(" ", "").replaceAll(" ", "").trim()
+            if (trimmedStr.slice(-1) === "€") {
+                trimmedStr = trimmedStr.slice(0, -1).trim()
             }
             return parseInt(trimmedStr)
         }

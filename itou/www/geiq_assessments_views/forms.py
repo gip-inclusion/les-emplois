@@ -6,6 +6,7 @@ from itou.geiq_assessments.models import Assessment
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
+from itou.utils.templatetags.format_filters import format_int_euros
 
 
 class CreateForm(forms.Form):
@@ -122,14 +123,20 @@ class ReviewForm(forms.ModelForm):
         ]
         labels = {
             "review_comment": "Commentaire",
-            "convention_amount": "Montant conventionné (convention initiale + avenants)",
-            "advance_amount": "Premier versement déjà réalisé",
         }
-        widgets = {
-            "advance_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
-            "convention_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
-            "granted_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
-        }
+
+    advance_amount = forms.CharField(
+        label="Premier versement déjà réalisé",
+        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+    )
+    convention_amount = forms.CharField(
+        label="Montant conventionné (convention initiale + avenants)",
+        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+    )
+    granted_amount = forms.CharField(
+        label="Montant total accordé",
+        widget=forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+"}),
+    )
 
     balance_amount = forms.CharField(label="Deuxième versement à prévoir", required=False, disabled=True)
     refund_amount = forms.CharField(label="Remboursement attendu", required=False, disabled=True)
@@ -137,33 +144,40 @@ class ReviewForm(forms.ModelForm):
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
         self.fields["review_comment"].required = True
+        if instance.reviewed_at:
+            for field in self.fields.values():
+                field.disabled = True
+            for field in ["advance_amount", "convention_amount", "granted_amount"]:
+                self.initial[field] = format_int_euros(getattr(instance, field))
+
+    def _clean_int_amount(self, field):
+        amount = self.cleaned_data[field].replace(" ", "")
         try:
-            advance_amount = int(self["advance_amount"].value())
-        except (ValueError, TypeError):
-            advance_amount = None
-        try:
-            granted_amount = int(self["granted_amount"].value())
-        except (ValueError, TypeError):
-            granted_amount = None
-        if advance_amount is not None and granted_amount is not None:
-            balance_amount = granted_amount - advance_amount
-            if balance_amount >= 0:
-                self.initial["balance_amount"] = balance_amount
-            else:
-                self.initial["refund_amount"] = -balance_amount
+            return int(amount)
+        except ValueError:
+            raise forms.ValidationError("Vous devez renseigner un nombre entier")
+
+    def clean_advance_amount(self):
+        return self._clean_int_amount("advance_amount")
+
+    def clean_convention_amount(self):
+        return self._clean_int_amount("convention_amount")
+
+    def clean_granted_amount(self):
+        return self._clean_int_amount("granted_amount")
 
     def clean(self):
         super().clean()
-        if (convention_amount := self.cleaned_data["convention_amount"]) is not None:
+        if (convention_amount := self.cleaned_data.get("convention_amount")) is not None:
             if (
-                granted_amount := self.cleaned_data["granted_amount"]
+                granted_amount := self.cleaned_data.get("granted_amount")
             ) is not None and granted_amount > convention_amount:
                 self.add_error(
                     "granted_amount",
                     forms.ValidationError("Le montant total accordé ne peut être supérieur au montant conventionné."),
                 )
             if (
-                advance_amount := self.cleaned_data["advance_amount"]
+                advance_amount := self.cleaned_data.get("advance_amount")
             ) is not None and advance_amount > convention_amount:
                 self.add_error(
                     "advance_amount",
@@ -171,12 +185,3 @@ class ReviewForm(forms.ModelForm):
                         "Le montant du premier versement ne peut être supérieur au montant conventionné."
                     ),
                 )
-
-    # def balance_amount(self):
-    #    if (
-    #        self.cleaned_data
-    #        and self.cleaned_data.get("granted_amount") is not None
-    #        and self.cleaned_data.get("advance_amount") is not None
-    #    ):
-    #        return self.cleaned_data.get("granted_amount") - self.cleaned_data.get("advance_amount")
-    #    return None
