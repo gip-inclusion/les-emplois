@@ -28,7 +28,7 @@
                 {% if employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-lg btn-white btn-block btn-ico">
-                            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+                            <i class="ri-file-close-line font-weight-medium" aria-hidden="true"></i>
                             <span>Désactiver la fiche salarié</span>
                         </a>
                     </div>
@@ -36,21 +36,21 @@
                 {% if employee_record.status == "NEW" %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-lg btn-white btn-block btn-ico">
-                            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+                            <i class="ri-file-edit-line font-weight-medium" aria-hidden="true"></i>
                             <span>Compléter la fiche salarié</span>
                         </a>
                     </div>
                 {% elif employee_record.status == "REJECTED" %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED" class="btn btn-lg btn-white btn-block btn-ico">
-                            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+                            <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
                             <span>Modifier la fiche salarié</span>
                         </a>
                     </div>
                 {% elif employee_record.status == "DISABLED" %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:reactivate" employee_record.pk %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
-                            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+                            <i class="ri-reset-right-line font-weight-medium" aria-hidden="true"></i>
                             <span>Réactiver la fiche salarié</span>
                         </a>
                     </div>
