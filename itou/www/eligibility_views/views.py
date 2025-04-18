@@ -14,13 +14,14 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 class UpdateEligibilityView(UserPassesTestMixin, FormView):
     template_name = "eligibility/update.html"
     form_class = AdministrativeCriteriaForm
-    standalone = None
+    standalone_process = None
 
-    def setup(self, request, *args, job_seeker_public_id, **kwargs):
+    def setup(self, request, *args, job_seeker_public_id, tunnel=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        # FIXME: Add more tunnels
-        self.standalone = True
+        if tunnel not in ("standalone_process"):
+            raise Http404
+        setattr(self, tunnel, True)
 
         self.job_seeker = get_object_or_404(
             User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
@@ -32,7 +33,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
         self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, self.company)
 
     def test_func(self):
-        if self.standalone:
+        if self.standalone_process:
             return self.request.from_authorized_prescriber
         return False
 
@@ -63,7 +64,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
                 author_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            if self.standalone:
+            if self.standalone_process:
                 message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été validée."
         elif self.eligibility_diagnosis and not form.data.get("shrouded"):
             EligibilityDiagnosis.update_diagnosis(
@@ -72,7 +73,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
                 author_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            if self.standalone:
+            if self.standalone_process:
                 message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été mise à jour."
         if message:
             messages.success(self.request, message, extra_tags="toast")
@@ -80,7 +81,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def get_back_url(self):
         back_url = None
-        if self.standalone:
+        if self.standalone_process:
             back_url = get_safe_url(self.request, "back_url")
         # Force developpers to always provide a proper back_url
         if back_url:
@@ -89,7 +90,7 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
 
     def get_success_url(self):
         # FIXME: it depends on the tunnel
-        if self.standalone:
+        if self.standalone_process:
             return self.get_back_url()
 
     def get_context_data(self, **kwargs):
