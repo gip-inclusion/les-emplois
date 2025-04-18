@@ -127,6 +127,19 @@
         <script src="{% static "django_select2/django_select2.js" %}"></script>
 
         <script nonce="{{ CSP_NONCE }}">
+            // Gives focus and scroll to a specific element
+            const thisElToFocus = document.querySelector("[data-emplois-give-focus-if-exist]");
+            const focusAndScrollTo = () => {
+                thisElToFocus.focus();
+                window.scrollTo({
+                    top: thisElToFocus.offsetTop,
+                    behavior: "smooth"
+                });
+            };
+            focusAndScrollTo();
+        </script>
+
+        <script nonce="{{ CSP_NONCE }}">
             // Tarteaucitron's language is set according to the browser configuration
             // but a lot of users don't know how to change it.
             // This can be forced only by using a global `var` statement.
