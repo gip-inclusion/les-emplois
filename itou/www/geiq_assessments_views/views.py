@@ -625,7 +625,9 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
         "form": form,
         "back_url": back_url,
     }
-    if request.method == "POST" and form.is_valid() and not assessment.reviewed_at:
+    if request.method == "POST" and form.is_valid():
+        if assessment.reviewed_at:
+            raise PermissionDenied
         form.save()
         assessment.decision_validated_at = timezone.now()
         assessment.save(update_fields=("decision_validated_at",))
