@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, Max, OuterRef
+from django.db.models import Exists, F, Max, OuterRef, Subquery
 from django.db.models.functions import Greatest
 from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
@@ -188,6 +188,13 @@ class EmployeeRecordQuerySet(models.QuerySet):
             ),
         ).filter(
             last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
+        )
+
+    def with_siret_from_asp_source(self):
+        return self.annotate(convention=F("job_application__to_company__convention")).annotate(
+            mother_company_siret=Subquery(
+                Company.objects.filter(source=Company.SOURCE_ASP, convention=OuterRef("convention")).values("siret")
+            )
         )
 
 
@@ -465,6 +472,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
+
+    @property
+    def is_siret_different_from_asp_source(self):
+        return self.siret != self.siret_from_asp_source(self.job_application.to_company)
 
     @staticmethod
     def siret_from_asp_source(siae):
