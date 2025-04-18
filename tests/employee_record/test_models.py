@@ -667,6 +667,18 @@ class TestEmployeeRecordQueryset:
             == employee_record_2
         )
 
+    def test_with_siret_from_asp_source(self):
+        employee_record = EmployeeRecordFactory()
+        company = employee_record.job_application.to_company
+        EmployeeRecordFactory(
+            job_application__to_company__convention=company.convention,
+            job_application__to_company__source=Company.SOURCE_USER_CREATED,
+        )
+
+        assert set(
+            EmployeeRecord.objects.with_siret_from_asp_source().values_list("siret_from_asp_source", flat=True)
+        ) == {company.siret}
+
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])
 @pytest.mark.parametrize(
