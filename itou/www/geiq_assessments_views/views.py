@@ -456,7 +456,7 @@ def assessment_contracts_details(
 
 @require_POST
 @check_user(lambda user: user.is_employer or user.is_labor_inspector)
-def _assessment_contracts_toggle(
+def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
     if request.user.is_employer:
