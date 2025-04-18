@@ -16,13 +16,15 @@ class UpdateEligibilityView(UserPassesTestMixin, FormView):
     form_class = AdministrativeCriteriaForm
     standalone = None
 
-    def setup(self, request, *args, public_id, **kwargs):
+    def setup(self, request, *args, job_seeker_public_id, **kwargs):
         super().setup(request, *args, **kwargs)
 
         # FIXME: Add more tunnels
         self.standalone = True
 
-        self.job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=public_id)
+        self.job_seeker = get_object_or_404(
+            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+        )
 
         # FIXME: in other tunnels we need the company
         self.company = None

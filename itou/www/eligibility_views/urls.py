@@ -6,5 +6,5 @@ from itou.www.eligibility_views import views
 app_name = "eligibility_views"
 
 urlpatterns = [
-    path("update/<uuid:public_id>", views.UpdateEligibilityView.as_view(), name="update"),
+    path("update/<uuid:job_seeker_public_id>", views.UpdateEligibilityView.as_view(), name="update"),
 ]

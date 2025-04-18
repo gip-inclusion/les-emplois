@@ -27,7 +27,7 @@
                 {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
             {% endif %}
             {% if can_edit_iae_eligibility %}
-                <a href="{% url 'eligibility_views:update' public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">
+                <a href="{% url 'eligibility_views:update' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-secondary">
                     <i class="ri-checkbox-circle-line fw-medium" aria-hidden="true"></i>
                     {% if iae_eligibility_diagnosis %}
                         <span>Mettre à jour son éligibilité IAE</span>
