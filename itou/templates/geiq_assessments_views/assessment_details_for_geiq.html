@@ -15,7 +15,7 @@
                     {% include "geiq_assessments_views/includes/geiq_comment_box.html" with assessment=assessment request=request only %}
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                    {% include "geiq_assessments_views/includes/assessment_status_box.html" with assessment=assessment csrf_token=csrf_token request=request only %}
+                    {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment csrf_token=csrf_token request=request only %}
                     {% if assessment.contracts_selection_validated_at %}
                         {% with stats=assessment.get_allowance_stats_for_geiq %}
                             <div class="c-box mb-3 mb-md-4">

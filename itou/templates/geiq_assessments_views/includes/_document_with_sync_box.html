@@ -53,5 +53,5 @@
     </div>
 </div>
 {% if request.htmx %}
-    {% include "geiq_assessments_views/includes/assessment_status_box.html" with assessment=assessment request=request only %}
+    {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment request=request only %}
 {% endif %}
