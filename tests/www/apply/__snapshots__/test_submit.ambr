@@ -67,17 +67,19 @@
                               
       
           
+  
+  
   <div class="c-title">
       <div class="c-title__main">
-                  <h1>
-                      
+          <h1>
+              
   
   
       Postuler
       pour John DOE
   
   
-                      
+              
   
       
           
@@ -89,19 +91,20 @@
       
   
   
-                  </h1>
-              </div>
+          </h1>
+      </div>
       
       <div class="c-title__secondary">
-                  <p>
-                      Dernière actualisation du profil : Day Month Year à HH:MM
-                      
-                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&amp;from_url=%2Fapply%2F[PK of Company]%2Fcreate%2F[Public ID of JobSeeker]%2Feligibility">Vérifier le profil</a>
-                      
-                      
-                  </p>
-              </div>
+          <p>
+              Dernière actualisation du profil : Day Month Year à HH:MM
+              
+                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&amp;from_url=%2Fapply%2F[PK of Company]%2Fcreate%2F[Public ID of JobSeeker]%2Feligibility">Vérifier le profil</a>
+              
+              
+          </p>
+      </div>
   </div>
+  
   
       
   
