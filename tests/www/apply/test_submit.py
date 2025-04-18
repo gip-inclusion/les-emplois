@@ -44,6 +44,7 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views import constants as apply_view_constants
+from itou.www.apply.views.submit_views import initialize_apply_session
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import (
@@ -78,6 +79,13 @@ LINK_RESET_MARKUP = (
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+
+
+def fake_session_initialization(client, company, data):
+    data.setdefault("reset_url", reverse("dashboard:index"))
+    # The first argument is supposed to be a request, but we only need it to have a session attribute so client works
+    session = initialize_apply_session(client, company, data)
+    session.save()
 
 
 def assert_contains_apply_nir_modal(response, job_seeker, with_personal_information=True):
@@ -237,13 +245,7 @@ class TestApply:
             {"message": "Hire me?"},
         )
         assert JobApplication.objects.exists() is False
-        assertRedirects(
-            response,
-            reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        assert response.status_code == 404
 
     @pytest.mark.parametrize(
         "view_name,post_data",
@@ -257,9 +259,7 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.post(
             reverse(
@@ -269,13 +269,7 @@ class TestApply:
             post_data,
         )
         assert JobApplication.objects.exists() is False
-        assertRedirects(
-            response,
-            reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        assertRedirects(response, reverse("dashboard:index"))
         assertMessages(
             response,
             [messages.Message(messages.ERROR, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)],
@@ -292,9 +286,7 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.post(
             reverse(
@@ -328,15 +320,12 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True)
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
-        session = client.session
 
         jobs = company.job_description_through.all()
         inactive_job = jobs[0]
         inactive_job.is_active = False
         inactive_job.save(update_fields=["is_active", "updated_at"])
-
-        session[f"job_application-{company.pk}"] = {"selected_jobs": [jobs[0].pk, jobs[1].pk]}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": [jobs[0].pk, jobs[1].pk]})
 
         response = client.post(
             reverse(
@@ -367,9 +356,7 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
         job_seeker = JobSeekerFactory()
         client.force_login(company.members.first())
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         client.post(
             reverse(
@@ -384,9 +371,7 @@ class TestApply:
         company = CompanyFactory(with_jobs=True, with_membership=True)
         job_seeker = JobSeekerFactory()
         client.force_login(job_seeker)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
         response = client.post(
             reverse(
                 "apply:application_resume",
@@ -507,6 +492,7 @@ class TestHire:
         company = CompanyFactory(with_membership=True)
         job_seeker = user_with_approval_in_waiting_period()
         client.force_login(company.members.first())
+        fake_session_initialization(client, company, {})
         for viewname in (
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
@@ -855,9 +841,7 @@ class TestApplyAsJobSeeker:
         CompanyMembershipFactory(company=company, user__is_active=False)
         user = JobSeekerFactory()
         client.force_login(user)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -888,10 +872,7 @@ class TestApplyAsJobSeeker:
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         client.force_login(user)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
-        client.session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"Plain text") as text_file:
             text_file.name = "cv.txt"
             response = client.post(
@@ -925,9 +906,7 @@ class TestApplyAsJobSeeker:
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         client.force_login(user)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"Plain text") as text_file:
             text_file.name = "cv.pdf"
             response = client.post(
@@ -961,9 +940,7 @@ class TestApplyAsJobSeeker:
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         client.force_login(user)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"A" * (5 * 1024 * 1024 + 1)) as text_file:
             text_file.name = "cv.pdf"
             response = client.post(
@@ -1002,11 +979,11 @@ class TestApplyAsJobSeeker:
             "contacter plus facilement.</p>"
         )
         client.force_login(application.job_seeker)
-        session = client.session
-        session[f"job_application-{application.to_company.pk}"] = {
-            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
-        }
-        session.save()
+        fake_session_initialization(
+            client,
+            application.to_company,
+            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
+        )
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -1027,11 +1004,11 @@ class TestApplyAsJobSeeker:
             "la prise de contact avec le candidat.</p>"
         )
         client.force_login(application.to_company.members.first())
-        session = client.session
-        session[f"job_application-{application.to_company.pk}"] = {
-            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
-        }
-        session.save()
+        fake_session_initialization(
+            client,
+            application.to_company,
+            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
+        )
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -1054,11 +1031,11 @@ class TestApplyAsJobSeeker:
             "la prise de contact avec le candidat.</p>"
         )
         client.force_login(application.sender_prescriber_organization.members.first())
-        session = client.session
-        session[f"job_application-{application.to_company.pk}"] = {
-            "reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})
-        }
-        session.save()
+        fake_session_initialization(
+            client,
+            application.to_company,
+            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
+        )
         response = client.get(
             reverse(
                 "apply:application_end",
@@ -1757,9 +1734,7 @@ class TestApplyAsAuthorizedPrescriber:
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         prescriber = prescriber_organization.members.get()
         client.force_login(prescriber)
-        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
-        apply_session.init("apply_session", {"selected_jobs": []})
-        apply_session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_eligibility",
@@ -2207,6 +2182,7 @@ class TestApplyAsPrescriber:
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
         user = PrescriberFactory()
         client.force_login(user)
+        fake_session_initialization(client, company, {})
 
         dummy_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_hexa_address=True,
@@ -2827,6 +2803,7 @@ class TestApplyAsCompany:
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
         employer = EmployerFactory(with_company=True)
         client.force_login(employer)
+        fake_session_initialization(client, company, {})
 
         dummy_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_hexa_address=True,
@@ -3471,24 +3448,13 @@ class TestApplicationView:
     spontaneous_application_field = "spontaneous_application"
     spontaneous_application_label = "Candidature spontanée"
 
-    @staticmethod
-    def apply_session_key(company):
-        return f"job_application-{company.pk}"
-
-    def setup_session(self, session, company, data):
-        apply_session = SessionNamespace(session, "apply_session", self.apply_session_key(company))
-        apply_session.init("apply_session", data)
-        apply_session.save()
-
     def test_application_jobs_use_previously_selected_jobs(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
         client.force_login(company.members.first())
         selected_job = company.job_description_through.first()
         job_seeker = JobSeekerFactory()
-        session = client.session
-        session[self.apply_session_key(company)] = {"selected_jobs": [selected_job.pk]}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": [selected_job.pk]})
 
         response = client.get(
             reverse(
@@ -3505,6 +3471,7 @@ class TestApplicationView:
 
         client.force_login(company.members.first())
         job_seeker = JobSeekerFactory()
+        fake_session_initialization(client, company, {})
 
         response = client.get(
             reverse(
@@ -3520,6 +3487,7 @@ class TestApplicationView:
         company = CompanyFactory(with_membership=True, spontaneous_applications_open_since=None)
         client.force_login(company.members.first())
         job_seeker = JobSeekerFactory()
+        fake_session_initialization(client, company, {})
 
         response = client.get(
             reverse(
@@ -3564,20 +3532,14 @@ class TestApplicationView:
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
-        assertRedirects(
-            response,
-            reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        assert response.status_code == 404
 
     def test_application_resume_hidden_fields(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
 
         client.force_login(company.members.first())
-        self.setup_session(client.session, company, {"selected_jobs": company.job_description_through.all()})
+        fake_session_initialization(client, company, {"selected_jobs": company.job_description_through.all()})
 
         response = client.get(
             reverse(
@@ -3591,9 +3553,7 @@ class TestApplicationView:
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
         client.force_login(job_seeker)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.get(
             reverse(
@@ -3611,9 +3571,7 @@ class TestApplicationView:
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
         client.force_login(company.members.first())
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.get(
             reverse(
@@ -3632,9 +3590,7 @@ class TestApplicationView:
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
         job_seeker = JobSeekerFactory()
         client.force_login(prescriber)
-        session = client.session
-        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
-        session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.get(
             reverse(
@@ -3653,7 +3609,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory()
 
         client.force_login(company.members.first())
-        self.setup_session(client.session, company, {})
+        fake_session_initialization(client, company, {})
 
         response = client.get(
             reverse(
@@ -3676,7 +3632,7 @@ class TestApplicationView:
         job_seeker = JobSeekerFactory()
 
         client.force_login(prescriber)
-        self.setup_session(client.session, company, {})
+        fake_session_initialization(client, company, {})
 
         response = client.get(
             reverse(
@@ -3698,7 +3654,7 @@ class TestApplicationView:
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         client.force_login(company.members.first())
-        self.setup_session(client.session, company, {})
+        fake_session_initialization(client, company, {})
 
         response = client.get(
             reverse(
@@ -3721,7 +3677,7 @@ class TestApplicationView:
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         client.force_login(prescriber)
-        self.setup_session(client.session, company, {})
+        fake_session_initialization(client, company, {})
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
         response = client.post(
@@ -4666,13 +4622,6 @@ class TestApplicationGEIQEligibilityView:
         self.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
         self.company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
 
-    def _setup_session(self, client, company_pk=None):
-        apply_session = SessionNamespace(
-            client.session, "apply_session", f"job_application-{company_pk or self.geiq.pk}"
-        )
-        apply_session.init("apply_session", {"selected_jobs": self.geiq.job_description_through.all()})
-        apply_session.save()
-
     def test_bypass_geiq_eligibility_diagnosis_form_for_orienter(self, client):
         # When creating a job application, should bypass GEIQ eligibility form step:
         # - if user is an authorized prescriber
@@ -4681,7 +4630,7 @@ class TestApplicationGEIQEligibilityView:
 
         # Redirect orienter
         client.force_login(self.orienter)
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4703,7 +4652,7 @@ class TestApplicationGEIQEligibilityView:
     def test_bypass_geiq_diagnosis_for_staff_members(self, client):
         job_seeker = JobSeekerFactory()
         client.force_login(self.geiq.members.first())
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4726,7 +4675,7 @@ class TestApplicationGEIQEligibilityView:
         # A job seeker must not have access to GEIQ eligibility form
         job_seeker = JobSeekerFactory()
         client.force_login(job_seeker)
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4750,7 +4699,7 @@ class TestApplicationGEIQEligibilityView:
         # See comment im previous test:
         # assert we're not somewhere we don't belong to (non-GEIQ)
         client.force_login(self.company.members.first())
-        self._setup_session(client, company_pk=self.company.pk)
+        fake_session_initialization(client, self.company, {"selected_jobs": self.geiq.job_description_through.all()})
 
         response = client.get(
             reverse(
@@ -4763,7 +4712,7 @@ class TestApplicationGEIQEligibilityView:
     def test_access_as_authorized_prescriber(self, client):
         job_seeker = JobSeekerFactory()
         client.force_login(self.prescriber_org.members.first())
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
 
         geiq_eligibility_url = reverse(
             "apply:application_geiq_eligibility",
@@ -4788,7 +4737,7 @@ class TestApplicationGEIQEligibilityView:
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
         client.force_login(self.prescriber_org.members.get())
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4809,7 +4758,7 @@ class TestApplicationGEIQEligibilityView:
         prescriber = self.prescriber_org.members.get()
 
         client.force_login(prescriber)
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(url)
         assertContains(response, "Éligibilité GEIQ non confirmée")
         assertNotContains(response, self.DIAG_VALIDITY_TXT)
@@ -4841,19 +4790,13 @@ class TestApplicationGEIQEligibilityView:
                 kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
-        assertRedirects(
-            response,
-            reverse(
-                "apply:application_jobs",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
-            ),
-        )
+        assert response.status_code == 404
 
     def test_geiq_eligibility_badge(self, client):
         client.force_login(self.prescriber_org.members.first())
 
         # Badge OK if job seeker has a valid eligibility diagnosis
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4871,7 +4814,7 @@ class TestApplicationGEIQEligibilityView:
 
         # Badge KO if job seeker has no diagnosis
         job_seeker_without_diagnosis = JobSeekerFactory()
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4888,7 +4831,9 @@ class TestApplicationGEIQEligibilityView:
         assert diagnosis.allowance_amount == 0
 
         client.force_login(self.prescriber_org.members.first())
-        self._setup_session(client, diagnosis.author_geiq.pk)
+        fake_session_initialization(
+            client, diagnosis.author_geiq, {"selected_jobs": self.geiq.job_description_through.all()}
+        )
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -4904,7 +4849,7 @@ class TestApplicationGEIQEligibilityView:
 
     def test_geiq_diagnosis_form_validation(self, client, subtests):
         client.force_login(self.prescriber_org.members.first())
-        self._setup_session(client)
+        fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
 
         response = client.post(
             reverse(
@@ -4976,12 +4921,11 @@ class TestCheckPreviousApplicationsView:
 
     def _login_and_setup_session(self, client, user):
         client.force_login(user)
-        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{self.company.pk}")
-        apply_session.init(
-            "apply_session",
+        fake_session_initialization(
+            client,
+            self.company,
             {"selected_jobs": [], "reset_url": reverse("companies_views:card", kwargs={"siae_id": self.company.pk})},
         )
-        apply_session.save()
 
     def test_no_previous_as_job_seeker(self, client):
         self._login_and_setup_session(client, self.job_seeker)
@@ -5268,6 +5212,7 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
+        fake_session_initialization(client, company, {})
         url_check_infos = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -5308,6 +5253,7 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
+        fake_session_initialization(client, company, {})
         url_check_infos = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -5348,6 +5294,7 @@ class TestCheckPreviousApplicationsForHireView:
     def test_no_previous_as_employer(self, client):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {})
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
         assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
@@ -5356,6 +5303,7 @@ class TestCheckPreviousApplicationsForHireView:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {})
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
         assertTemplateNotUsed(response, "approvals/includes/box.html")
@@ -5368,6 +5316,7 @@ class TestCheckPreviousApplicationsForHireView:
     def test_no_previous_as_geiq_staff(self, client):
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {})
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
         assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
@@ -5376,6 +5325,7 @@ class TestCheckPreviousApplicationsForHireView:
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {})
 
         response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
