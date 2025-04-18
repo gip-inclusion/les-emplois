@@ -2,6 +2,7 @@
 {% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load str_filters %}
 
 {% block title %}Détail du contrat : {{ contract.employee.get_full_name }} - {{ block.super }}{% endblock %}
 
@@ -120,7 +121,7 @@
                                 </li>
                                 <li>
                                     <small>Durée du contrat</small>
-                                    <strong># Quelle durée ? du début à la fin ou uniquement sur 2024 ?</strong>
+                                    <strong>{{ contract.duration.days }} {{ contract.duration.days|pluralizefr:"jour,jours" }}</strong>
                                 </li>
                                 <li>
                                     <small>Dont 3 mois sur 2024</small>

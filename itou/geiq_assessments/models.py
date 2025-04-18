@@ -357,6 +357,10 @@ class EmployeeContract(models.Model):
             self.start_at, self.end_at or self.planned_end_at, year=self.employee.assessment.campaign.year
         )
 
+    def duration(self):
+        end = self.end_at or self.planned_end_at
+        return end - self.start_at
+
 
 class EmployeePrequalification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
