@@ -226,10 +226,10 @@ def assessment_sync_file(request, pk, *, file_field):
     match file_field:
         case "summary_document_file":
             api_method = "get_synthese_pdf"
-            template_name = "geiq_assessments_views/includes/summary_document_section.html"
+            template_name = "geiq_assessments_views/includes/summary_document_box.html"
         case "structure_financial_assessment_file":
             api_method = "get_compte_pdf"
-            template_name = "geiq_assessments_views/includes/structure_financial_assessment_section.html"
+            template_name = "geiq_assessments_views/includes/structure_financial_assessment_box.html"
         case _:
             raise Http404
     try:
@@ -306,7 +306,7 @@ def assessment_contracts_sync(request, pk):
         # but letting other exceptions slip breaks the interface so better catch them all
         logger.exception("Exception while trying to retrieve contracts infos from label API - exception=%s", e)
         context["error"] = True
-    return render(request, "geiq_assessments_views/includes/contracts_section.html", context)
+    return render(request, "geiq_assessments_views/includes/contracts_box.html", context)
 
 
 @check_user(lambda user: user.is_employer or user.is_labor_inspector)
