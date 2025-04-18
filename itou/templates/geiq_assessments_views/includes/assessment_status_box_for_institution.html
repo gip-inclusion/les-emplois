@@ -23,6 +23,10 @@
             <button type="button" class="btn btn-primary btn-block" disabled>
                 <span>Contrôler le dossier</span>
             </button>
+        {% elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+            <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#dreets_review_modal">
+                Valider le dossier
+            </button>
         {% else %}
             <form method="POST">
                 {% csrf_token %}
@@ -45,10 +49,10 @@
                 <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.FIX }}">
                     Corriger le dossier
                 </button>
-                <button type="submit" class="btn btn-primary btn-block" name="action" value="{{ InstitutionAction.REVIEW }}">
-                    Valider le dossier
-                </button>
             </form>
+            <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#dreets_review_modal">
+                Valider le dossier
+            </button>
         {% endif %}
     </div>
 {% else %}

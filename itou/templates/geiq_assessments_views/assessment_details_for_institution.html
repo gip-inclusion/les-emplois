@@ -247,3 +247,30 @@
         </form>
     </section>
 {% endblock %}
+
+
+{% block modals %}
+    {{ block.super }}
+    {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and not assessment.dreets_reviewed_at %}
+        <div id="dreets_review_modal" class="modal" tabindex="-1" aria-labelledby="dreets_review_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="dreets_review_modal_title">Valider le bilan d’exécution</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_int_euros }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-primary" name="action" value="{{ InstitutionAction.REVIEW }}">Confirmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
