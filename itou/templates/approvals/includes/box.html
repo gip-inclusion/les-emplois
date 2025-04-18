@@ -19,16 +19,17 @@ Arguments:
             <small>Numéro {{ approval.is_pass_iae|yesno:"de PASS IAE,d’agrément" }}</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
+        <li class="order-2">
+            <small>Date de début</small>
+            <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
+        </li>
         {% if approval.state == "EXPIRED" %}
-            <li class="order-2">
+            <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
                 <small>A expiré le</small>
                 <strong class="text-danger">{{ approval.end_at|date:"d/m/Y" }}</strong>
             </li>
+            <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}"></li>
         {% else %}
-            <li class="order-2">
-                <small>Date de début</small>
-                <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
-            </li>
             <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
                 <small>Date de fin prévisionnelle
                     <i class="ri-information-line ri-xl text-info"

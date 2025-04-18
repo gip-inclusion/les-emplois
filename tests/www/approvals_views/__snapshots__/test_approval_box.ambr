@@ -15,11 +15,16 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -53,11 +58,16 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -103,11 +113,16 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -153,11 +168,16 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -203,11 +223,16 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -253,11 +278,16 @@
               <small>Numéro d’agrément</small>
               <strong><span>12345</span><span class="ms-1">67</span><span class="ms-1">89012</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2022</strong>
+          </li>
           
-              <li class="order-2">
+              <li class="order-3">
                   <small>A expiré le</small>
                   <strong class="text-danger">31/12/2023</strong>
               </li>
+              <li class="order-4"></li>
           
       </ul>
       
@@ -286,11 +316,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2025</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2025</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i class="ri-information-line ri-xl text-info"
@@ -349,11 +379,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2024</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2024</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i class="ri-information-line ri-xl text-info"
@@ -424,11 +454,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2024</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2024</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i class="ri-information-line ri-xl text-info"
@@ -486,11 +516,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2024</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2024</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i class="ri-information-line ri-xl text-info"
@@ -563,11 +593,11 @@
               <small>Numéro d’agrément</small>
               <strong><span>12345</span><span class="ms-1">67</span><span class="ms-1">89012</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2024</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2024</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i class="ri-information-line ri-xl text-info"
