@@ -213,7 +213,13 @@
                                     <strong>{{ contract.other_data.mise_en_situation_professionnelle_precision|default:"-" }}</strong>
                                 </li>
                                 <li>
-                                    <small>Préqualifications</small>
+                                    <small>
+                                        Préqualifications
+                                        <i class="ri-error-warning-line text-info"
+                                           aria-label="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"></i>
+                                    </small>
                                     <strong>
                                         {% with prior_actions=contract.employee.get_prior_actions %}
                                             {% if prior_actions %}
