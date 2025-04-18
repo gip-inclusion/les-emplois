@@ -391,6 +391,8 @@ def sync_employee_and_contracts(assessment, new_mode=False):
         contract_infos.append(contract_info)
         employee_support_periods.setdefault(employee_info["id"], []).append((contract_info["date_debut"], end_date))
 
+    prequalif_limit_end_date = datetime.date(assessment.campaign.year - 2, 1, 1)
+
     for prequalification_info in client.get_all_prequalifications(geiq_id):
         employee_info = prequalification_info["salarie"]
         _cleanup_employee_info(employee_info)
@@ -405,6 +407,12 @@ def sync_employee_and_contracts(assessment, new_mode=False):
         prequalification_info["salarie"] = employee_info["id"]
         prequalification_info["date_debut"] = convert_iso_datetime_to_date(prequalification_info["date_debut"])
         prequalification_info["date_fin"] = convert_iso_datetime_to_date(prequalification_info["date_fin"])
+        if prequalification_info["date_debut"].year > assessment.campaign.year:
+            # Ignoring prequalifications starting after assessment year
+            continue
+        if prequalification_info["date_fin"] < prequalif_limit_end_date:
+            # Ignoring prequalifications ending before the year preceding the assessment
+            continue
         prequalification_infos.append(prequalification_info)
         employee_support_periods.setdefault(employee_info["id"], []).append(
             (prequalification_info["date_debut"], prequalification_info["date_fin"])
