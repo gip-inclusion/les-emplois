@@ -1654,11 +1654,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2000</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2000</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -1914,11 +1914,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2000</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2000</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -2187,11 +2187,11 @@
               <small>Numéro de PASS IAE</small>
               <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
           </li>
+          <li class="order-2">
+              <small>Date de début</small>
+              <strong>01/01/2000</strong>
+          </li>
           
-              <li class="order-2">
-                  <small>Date de début</small>
-                  <strong>01/01/2000</strong>
-              </li>
               <li class="order-3">
                   <small>Date de fin prévisionnelle
                       <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
