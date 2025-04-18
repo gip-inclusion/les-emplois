@@ -4,7 +4,6 @@ import logging
 import operator
 import uuid
 
-from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import models
@@ -611,9 +610,7 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
     assessments = Assessment.objects.filter(institutions=request.current_organization)
     assessment = get_object_or_404(assessments, pk=pk)
     if not assessment.grants_selection_validated_at:
-        messages.warning(
-            request, "Attention, il est conseillé de commencer par contrôler la sélection avant de saisir la décision."
-        )
+        raise Http404
     back_url = get_safe_url(
         request,
         "back_url",

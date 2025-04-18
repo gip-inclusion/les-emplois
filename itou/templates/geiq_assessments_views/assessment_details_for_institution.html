@@ -178,9 +178,20 @@
                             {% if not assessment.reviewed_at %}
                                 <div class="c-box--summary__footer">
                                     <div class="d-flex justify-content-end">
-                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
-                                            Saisir la décision
-                                        </a>
+                                        {% if assessment.grants_selection_validated_at %}
+                                            {% if assessment.decision_validated_at %}
+                                                <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                                    <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                                                    <span>Consulter ma décision</span>
+                                                </a>
+                                            {% else %}
+                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                                    Saisir la décision
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <span>Vous devez d’abord contrôler la sélection</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}
