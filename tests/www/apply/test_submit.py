@@ -401,28 +401,31 @@ class TestApply:
         )
 
     @pytest.mark.parametrize(
-        "job_description_id,back_url,expected_session",
+        "with_job_description,back_url",
         [
-            pytest.param("", "", {"reset_url": reverse("dashboard:index")}, id="empty"),
+            pytest.param(False, "", id="empty"),
+            pytest.param(True, "", id="with_selected_jobs"),
             pytest.param(
-                1, "", {"selected_jobs": [1], "reset_url": reverse("dashboard:index")}, id="with_selected_jobs"
-            ),
-            pytest.param(
-                1,
+                True,
                 "/une/url/quelconque",
-                {"selected_jobs": [1], "reset_url": "/une/url/quelconque"},
                 id="with_selected_jobs_and_reset_url",
             ),
-            pytest.param("", "/une/url/quelconque", {"reset_url": "/une/url/quelconque"}, id="with_reset_url"),
+            pytest.param(False, "/une/url/quelconque", id="with_reset_url"),
         ],
     )
-    def test_start_view_initializes_session(self, client, job_description_id, back_url, expected_session):
+    def test_start_view_initializes_session(self, client, with_job_description, back_url):
         company = CompanyFactory(with_jobs=True, with_membership=True)
-        if job_description_id:
-            JobDescriptionFactory(pk=job_description_id, company=company)
+
+        params = {"back_url": back_url}
+        expected_session = {"reset_url": back_url if back_url else reverse("dashboard:index")}
+        if with_job_description:
+            job_description = JobDescriptionFactory(company=company)
+            params |= {"job_description_id": job_description.pk}
+            expected_session |= {"selected_jobs": [job_description.pk]}
+
         client.force_login(PrescriberFactory())
         url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(url, {"job_description_id": job_description_id, "back_url": back_url})
+        client.get(url, params)
 
         assert client.session[f"job_application-{company.pk}"] == expected_session
 
