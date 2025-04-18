@@ -1,6 +1,29 @@
-{% extends "geiq_assessments_views/_assessment_base_for_institution.html" %}
+{% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load geiq_assessments_badges %}
+
+{% block title %}Bilan d’exécution - {{ assessment.name_for_institution }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
+                Bilan d’exécution - {{ assessment.name_for_institution }} {% state_for_institution assessment extra_class="badge-base" %}
+            </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+                <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+            </button>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

@@ -496,11 +496,6 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
     return render(request, template_name, context)
 
 
-class AssessmentContractDetailsForInstitutionTab(models.TextChoices):
-    FILE = "file", "Dossier transmis par le GEIQ"
-    CONTRACTS = "contracts", "Données salariés"
-
-
 class InstitutionAction(enum.StrEnum):
     REVIEW = "review"
     FIX = "fix"
@@ -546,7 +541,6 @@ def details_for_institution(
 
     context = {
         "assessment": assessment,
-        "active_tab": AssessmentContractDetailsForInstitutionTab.FILE,
         "back_url": reverse("geiq_assessments_views:list_for_institution"),
         "stats": assessment.get_allowance_stats_for_institution() if assessment.submitted_at else None,
         "InstitutionAction": InstitutionAction,
