@@ -55,7 +55,7 @@
                                     <h5>Contacts {{ institution_link.institution.kind }}</h5>
                                 {% endif %}
                                 <ul>
-                                    {% for member in institution_link.institution.members.all %}<li>{{ member.email }}</li>{% endfor %}
+                                    {% for member in institution_link.institution.active_members.all %}<li>{{ member.email }}</li>{% endfor %}
                                 </ul>
                             {% endif %}
                         {% endfor %}
