@@ -3,7 +3,7 @@
 <div id="contracts-list-stats" class="c-box mb-3"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <div class="d-flex flex-column">
-            <strong>{{ stats.contracts_nb }}</strong>
+            <strong>{{ stats.contracts_nb }} / {{ stats.all_contracts_nb }}</strong>
             {% if request.user.is_employer %}
                 Contrats présentés
             {% elif request.user.is_labor_inspector %}

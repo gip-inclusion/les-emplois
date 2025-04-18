@@ -200,24 +200,28 @@ class Assessment(models.Model):
             actions.append("Saisir la décision")
         return actions
 
-    def _get_allowance_stats(self, filter_field):
-        return (
-            EmployeeContract.objects.filter(employee__assessment=self)
-            .filter(**{filter_field: True})
-            .aggregate(
-                contracts_nb=Count("pk"),
-                allowance_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0)),
-                allowance_of_814_nb=Count("pk", filter=Q(employee__allowance_amount=814)),
-                allowance_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400)),
-                potential_allowance_amount=Sum("employee__allowance_amount"),
-            )
+    def _get_allowance_stats(self, contracts_qs, select_filter_field):
+        selected_contract_filter = Q(**{select_filter_field: True})
+        return contracts_qs.aggregate(
+            all_contracts_nb=Count("pk"),
+            contracts_nb=Count("pk", filter=selected_contract_filter),
+            allowance_of_0_nb=Count("pk", filter=Q(employee__allowance_amount=0) & selected_contract_filter),
+            allowance_of_814_nb=Count("pk", filter=Q(employee__allowance_amount=814) & selected_contract_filter),
+            allowance_of_1400_nb=Count("pk", filter=Q(employee__allowance_amount=1400) & selected_contract_filter),
+            potential_allowance_amount=Sum("employee__allowance_amount", filter=selected_contract_filter),
         )
 
     def get_allowance_stats_for_geiq(self):
-        return self._get_allowance_stats(filter_field="allowance_requested")
+        return self._get_allowance_stats(
+            contracts_qs=EmployeeContract.objects.filter(employee__assessment=self),
+            select_filter_field="allowance_requested",
+        )
 
     def get_allowance_stats_for_institution(self):
-        return self._get_allowance_stats(filter_field="allowance_granted")
+        return self._get_allowance_stats(
+            contracts_qs=EmployeeContract.objects.filter(employee__assessment=self, allowance_requested=True),
+            select_filter_field="allowance_granted",
+        )
 
     def label_antenna_ids(self):
         if not self.label_antennas:
