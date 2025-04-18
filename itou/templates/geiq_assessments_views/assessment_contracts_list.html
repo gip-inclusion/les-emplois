@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
             <h1>
                 Détail et sélection des parcours
@@ -29,6 +29,16 @@
                     {% endif %}
                 {% endif %}
             </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if can_unvalidate %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.UNVALIDATE }}">
+                        Modifier la sélection
+                    </button>
+                </form>
+            {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -84,9 +94,9 @@
                                         <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
                                             {% if request.user.is_employer %}
-                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True readonly_access=readonly_access only %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
                                             {% elif request.user.is_labor_inspector %}
-                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True readonly_access=readonly_access only %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -96,11 +106,11 @@
                     </div
                     {% include "includes/pagination.html" with page=contracts_page boost=True %}
 
-                    {% if not readonly_access %}
+                    {% if can_validate %}
 
                         <form method="POST" class="js-prevent-multiple-submit">
                             {% csrf_token %}
-                            {% itou_buttons_form primary_label="Valider la sélection" reset_url=back_url show_mandatory_fields_mention=False %}
+                            {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
                         </form>
                     {% endif %}
                 </div>

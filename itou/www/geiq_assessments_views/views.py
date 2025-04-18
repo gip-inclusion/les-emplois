@@ -316,6 +316,17 @@ def assessment_contracts_sync(request, pk):
     return render(request, "geiq_assessments_views/includes/contracts_box.html", context)
 
 
+class ContractsAction(enum.StrEnum):
+    VALIDATE = "validate"
+    UNVALIDATE = "unvalidate"
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
+
+
 @check_user(lambda user: user.is_employer or user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     # TODO: should this part be extracted in a `for_request() queryset method ?
@@ -330,21 +341,48 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     assessments = Assessment.objects.filter(**filter_kwargs)
     assessment = get_object_or_404(assessments, pk=pk)
 
-    back_url, readonly_access, stats = None, False, None  # defined to please the linters
+    back_url, can_validate, can_unvalidate, stats = None, False, False, None  # defined to please the linters
     if request.user.is_employer:
         back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
-        readonly_access = assessment.submitted_at
+        if not assessment.submitted_at:
+            can_validate = not assessment.contracts_selection_validated_at
+            can_unvalidate = not can_validate
     elif request.user.is_labor_inspector:
         back_url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
-        readonly_access = assessment.reviewed_at
-    if request.method == "POST" and not readonly_access:
-        if request.user.is_employer:
-            assessment.contracts_selection_validated_at = timezone.now()
-            assessment.save(update_fields=("contracts_selection_validated_at",))
-        elif request.user.is_labor_inspector:
-            assessment.grants_selection_validated_at = timezone.now()
-            assessment.save(update_fields=("grants_selection_validated_at",))
-        return HttpResponseRedirect(back_url)
+        if not assessment.reviewed_at:
+            can_validate = not assessment.grants_selection_validated_at
+            can_unvalidate = not can_validate
+    if request.method == "POST":
+        try:
+            action = ContractsAction(request.POST.get("action"))
+        except ValueError:
+            raise Http404
+        if action == ContractsAction.VALIDATE:
+            if not can_validate:
+                raise PermissionDenied
+            if request.user.is_employer:
+                assessment.contracts_selection_validated_at = timezone.now()
+                assessment.save(update_fields=("contracts_selection_validated_at",))
+            elif request.user.is_labor_inspector:
+                assessment.grants_selection_validated_at = timezone.now()
+                assessment.save(update_fields=("grants_selection_validated_at",))
+            next_url = back_url
+        elif action == ContractsAction.UNVALIDATE:
+            if not can_unvalidate:
+                raise PermissionDenied
+            if request.user.is_employer:
+                assessment.contracts_selection_validated_at = None
+                assessment.save(update_fields=("contracts_selection_validated_at",))
+            elif request.user.is_labor_inspector:
+                assessment.grants_selection_validated_at = None
+                assessment.decision_validated_at = None
+                assessment.save(update_fields=("decision_validated_at", "grants_selection_validated_at"))
+            next_url = request.path
+        else:
+            # Unreachable code
+            raise Http404
+
+        return HttpResponseRedirect(next_url)
 
     if request.user.is_employer:
         stats = assessment.get_allowance_stats_for_geiq()
@@ -361,8 +399,10 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "assessment": assessment,
         "back_url": back_url,
         "contracts_page": contracts_page,
-        "readonly_access": readonly_access,
+        "can_validate": can_validate,
+        "can_unvalidate": can_unvalidate,
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
+        "ContractsAction": ContractsAction,
         "stats": stats,
     }
     return render(request, template_name, context)
@@ -458,7 +498,7 @@ def _assessment_contracts_toggle(
         "assessment": assessment,
         "contract": contract,
         "from_list": from_list,
-        "readonly_access": False,
+        "editable": True,
         "value": new_value,
         "stats": stats,
     }

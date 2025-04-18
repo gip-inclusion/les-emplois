@@ -12,7 +12,7 @@
       class="js-prevent-multiple-submit">
     {% csrf_token %}
     <div class="form-check form-switch">
-        <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if readonly_access %}disabled{% endif %} />
+        <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
         <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_for_contract_{{ contract.pk }}">
             {% if request.user.is_employer %}
                 Obtenir l’aide
