@@ -158,7 +158,7 @@ class AssessmentDetailsTab(models.TextChoices):
 
 
 @check_user(lambda user: user.is_employer)
-def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details.html"):
+def assessment_details(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
     if request.current_organization.kind != CompanyKind.GEIQ:
         raise Http404
     assessment = Assessment.objects.prefetch_related(
