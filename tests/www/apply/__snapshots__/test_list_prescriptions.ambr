@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_as_unauthorized_prescriber[SQL queries for prescriptions list]
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -573,7 +573,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -912,7 +912,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -953,7 +953,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -981,6 +981,28 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s,
+                                                            %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
         ''',
       }),
       dict({
@@ -1022,7 +1044,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -1071,7 +1096,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -2480,13 +2508,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -2563,13 +2598,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -2646,13 +2688,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -2758,13 +2807,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       
@@ -2829,13 +2885,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       
@@ -2900,13 +2963,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       
@@ -2999,7 +3069,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -3581,7 +3651,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -3922,7 +3992,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -3963,7 +4033,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -3991,6 +4061,28 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s,
+                                                            %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
         ''',
       }),
       dict({
@@ -4048,7 +4140,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -4097,7 +4192,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -4178,7 +4276,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -4760,7 +4858,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -5101,7 +5199,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -5142,7 +5240,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_prescriptions[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -5170,6 +5268,28 @@
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s,
+                                                            %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
         ''',
       }),
       dict({
@@ -5227,7 +5347,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
@@ -5278,7 +5401,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',

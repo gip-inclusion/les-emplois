@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 30,
+    'num_queries': 31,
     'queries': list([
       dict({
         'origin': list([
@@ -777,7 +777,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1151,7 +1151,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1192,7 +1192,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1208,7 +1208,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1227,7 +1227,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1274,7 +1274,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -1302,6 +1302,27 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s,
+                                                            %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
         ''',
       }),
       dict({
@@ -1370,7 +1391,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -1418,7 +1442,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -1466,7 +1493,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IfNode[apply/includes/list_card_body.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -1546,7 +1576,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 27,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -2286,7 +2316,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2624,7 +2654,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2665,7 +2695,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2681,7 +2711,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2700,7 +2730,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2747,7 +2777,7 @@
       }),
       dict({
         'origin': list([
-          '_add_pending_for_weeks[www/apply/views/list_views.py]',
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
@@ -2775,6 +2805,27 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          '_prefetch_jobseeker_valid_eligibility_diagnoses[www/apply/views/list_views.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s,
+                                                            %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
         ''',
       }),
       dict({
@@ -2843,7 +2894,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
@@ -2893,7 +2947,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
@@ -2943,7 +3000,10 @@
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
           'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
@@ -5280,13 +5340,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -5358,13 +5425,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -5436,13 +5510,20 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                                  
-                              
+              
+          
+      
+  
+  
                           
                           
   
@@ -5560,13 +5641,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       
@@ -5637,13 +5725,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       
@@ -5711,13 +5806,20 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+  
+      
+          
+              
+              
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
               <i aria-hidden="true" class="ri-check-line"></i>
               Éligible à l’IAE
           </span>
-                      
-                  
+              
+          
+      
+  
+  
               
           </td>
       

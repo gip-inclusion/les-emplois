@@ -1,11 +1,24 @@
 {% load badges %}
 {% with badge_size|default:"badge-base" as badge_class %}
     {% if is_subject_to_eligibility_rules %}
-        {% if job_seeker.has_valid_approval %}
-            {% approval_state_badge job_seeker.latest_approval force_valid=force_valid span_extra_class=badge_class %}
-        {% else %}
-            {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class=badge_class %}
-        {% endif %}
+        {% with approval=job_seeker.latest_common_approval %}
+            {% comment %}
+             1) Use the approval if it's valid, force_valid will mask suspended or future status and display valid instead
+             2) if not, use a valid prescriber diagnosis
+             3) if there's no diagnosis, or it's an employer diagnosis, check if there's an expired approval and we can display it
+                We only disply the waiting period for some users
+             4) fallback on any valid diagnosis (from an employer)
+            {% endcomment %}
+            {% if approval and approval.is_valid %}
+                {% approval_state_badge approval force_valid=force_valid span_extra_class=badge_class %}
+            {% elif eligibility_diagnosis and eligibility_diagnosis.author_kind == "prescriber" %}
+                {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class=badge_class %}
+            {% elif approval and not force_valid %}
+                {% approval_state_badge approval span_extra_class=badge_class %}
+            {% else %}
+                {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class=badge_class %}
+            {% endif %}
+        {% endwith %}
     {% elif is_subject_to_geiq_eligibility_rules %}
         {% if geiq_eligibility_diagnosis.is_valid and geiq_eligibility_diagnosis.allowance_amount %}
             {% geiq_eligibility_badge is_eligible=True extra_class=badge_class %}
