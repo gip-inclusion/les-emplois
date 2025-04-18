@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
@@ -554,19 +554,22 @@ class TestJobApplicationQuerySet:
         diagnosis.save()
 
         criteria = [level1_criterion.pk, level2_criterion.pk, level1_other_criterion.pk]
-        qs = JobApplication.objects.with_list_related_data(criteria).get(pk=job_app.pk)
+        obj = JobApplication.objects.with_list_related_data(criteria).get(pk=job_app.pk)
 
-        assert hasattr(qs, "approval")
-        assert hasattr(qs, "job_seeker")
-        assert hasattr(qs, "sender")
-        assert hasattr(qs, "sender_company")
-        assert hasattr(qs, "sender_prescriber_organization")
-        assert hasattr(qs, "to_company")
-        assert hasattr(qs, "selected_jobs")
-        assert hasattr(qs, "jobseeker_eligibility_diagnosis")
-        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
-        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
-        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+        with assertNumQueries(0):
+            # select / prefetch
+            assert hasattr(obj, "approval")
+            assert hasattr(obj, "job_seeker")
+            assert hasattr(obj, "sender")
+            assert hasattr(obj, "sender_company")
+            assert hasattr(obj, "sender_prescriber_organization")
+            assert hasattr(obj, "to_company")
+            assert hasattr(obj, "selected_jobs")
+            # annotations
+            assert hasattr(obj, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+            assert hasattr(obj, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+            assert hasattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+            assert hasattr(obj, "jobseeker_eligibility_diagnosis")
 
     def test_eligible_as_employee_record(self):
         # A valid job application:
