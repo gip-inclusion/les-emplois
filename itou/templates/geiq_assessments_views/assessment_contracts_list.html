@@ -32,12 +32,18 @@
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if can_unvalidate %}
-                <form method="post">
-                    {% csrf_token %}
-                    <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.UNVALIDATE }}">
+                {% if assessment.decision_validated_at %}
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#unvalidate_modal">
                         Modifier la sélection
                     </button>
-                </form>
+                {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.UNVALIDATE }}">
+                            Modifier la sélection
+                        </button>
+                    </form>
+                {% endif %}
             {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
@@ -117,4 +123,33 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+
+{% block modals %}
+    {{ block.super }}
+    {% if can_unvalidate and assessment.decision_validated_at %}
+        <div id="unvalidate_modal" class="modal" tabindex="-1" aria-labelledby="unvalidate_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="unvalidate_modal_title">Modifier la sélection</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        En modifiant cette sélection, votre décision actuelle sera annulée.
+                        Vous devrez valider de nouveau les informations pour enregistrer votre choix.
+                        Les montants et le commentaire saisis dans la rubrique “Décision” seront conservés, vous pourrez les modifier en cas besoin.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.UNVALIDATE }}">Continuer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
