@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import widgets
-from django.urls import reverse
 
 from itou.files.forms import ItouFileField
 from itou.geiq_assessments.models import Assessment
@@ -126,17 +125,18 @@ class ReviewForm(forms.ModelForm):
             "convention_amount": "Montant conventionné (convention initiale + avenants)",
             "advance_amount": "Premier versement déjà réalisé",
         }
+        widgets = {
+            "advance_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
+            "convention_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
+            "granted_amount": forms.TextInput(attrs={"inputmode": "numeric", "pattern": "[0-9 ]+€?"}),
+        }
 
-    balance_amount = forms.IntegerField(label="Deuxième versement à prévoir", required=False, disabled=True)
-    refund_amount = forms.IntegerField(label="Remboursement attendu", required=False, disabled=True)
+    balance_amount = forms.CharField(label="Deuxième versement à prévoir", required=False, disabled=True)
+    refund_amount = forms.CharField(label="Remboursement attendu", required=False, disabled=True)
 
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
-        amount_fields = [
-            "convention_amount",
-            "granted_amount",
-            "advance_amount",
-        ]
+        self.fields["review_comment"].required = True
         try:
             advance_amount = int(self["advance_amount"].value())
         except (ValueError, TypeError):
@@ -151,18 +151,6 @@ class ReviewForm(forms.ModelForm):
                 self.initial["balance_amount"] = balance_amount
             else:
                 self.initial["refund_amount"] = -balance_amount
-
-        for amount_field in amount_fields:
-            self.fields[amount_field].widget.attrs.update(
-                {
-                    "hx-trigger": "change",
-                    "hx-get": reverse("geiq_assessments_views:assessment_review", kwargs={"pk": instance.pk}),
-                    "hx-swap": "outerHTML",
-                    "hx-include": ",".join(f"#id_{field}" for field in amount_fields),
-                    "hx-select": "#decision-box",
-                    "hx-target": "#decision-box",
-                },
-            )
 
     def clean(self):
         super().clean()

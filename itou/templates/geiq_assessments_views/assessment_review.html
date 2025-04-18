@@ -111,3 +111,51 @@
         </div>
     </section>
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        // Inputs
+        const advanceAmountInput = document.getElementById("id_advance_amount")
+        const grantedAmountInput = document.getElementById("id_granted_amount")
+        // Outputs
+        const balanceAmountInput = document.getElementById("id_balance_amount")
+        const refundAmountInput = document.getElementById("id_refund_amount")
+
+        function cleanAmount(amountStr) {
+            let trimmedStr = amountStr.replaceAll(" ", "").trim()
+            if (trimmedStr[-1] === "€") {
+                trimmedStr = trimmedStr.slice(0, -1)
+            }
+            return parseInt(trimmedStr)
+        }
+
+        function compute_balance() {
+            const advanceAmount = cleanAmount(advanceAmountInput.value)
+            const grantedAmount = cleanAmount(grantedAmountInput.value)
+            if (!isNaN(advanceAmount) && !isNaN(grantedAmount)) {
+                const balance = grantedAmount - advanceAmount
+                const formatter = new Intl.NumberFormat("fr-FR", {
+                    style: "currency",
+                    currency: "EUR",
+                    maximumFractionDigits: 0,
+                })
+                if (balance >= 0) {
+                    balanceAmountInput.value = formatter.format(balance)
+                    refundAmountInput.value = "-"
+                } else {
+                    balanceAmountInput.value = "-"
+                    refundAmountInput.value = formatter.format(-balance)
+                }
+            } else {
+                balanceAmountInput.value = "-"
+                refundAmountInput.value = "-"
+            }
+        }
+
+        for (const input of [advanceAmountInput, grantedAmountInput]) {
+            input.addEventListener("change", compute_balance)
+        }
+        document.addEventListener("DOMContentLoaded", compute_balance)
+    </script>
+{% endblock %}

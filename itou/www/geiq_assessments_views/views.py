@@ -619,11 +619,7 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
         "back_url",
         fallback_url=reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk}),
     )
-    if request.htmx and request.method == "GET":
-        form = ReviewForm(instance=assessment, data=request.GET)
-        form.full_clean()
-    else:
-        form = ReviewForm(instance=assessment, data=request.POST if request.method == "POST" else None)
+    form = ReviewForm(instance=assessment, data=request.POST if request.method == "POST" else None)
     context = {
         "assessment": assessment,
         "form": form,
@@ -634,22 +630,22 @@ def assessment_review(request, pk, template_name="geiq_assessments_views/assessm
         assessment.decision_validated_at = timezone.now()
         assessment.save(update_fields=("decision_validated_at",))
         return HttpResponseRedirect(back_url)
-    if not request.htmx:
-        context["stats"] = (
-            EmployeeContract.objects.filter(employee__assessment=assessment)
-            .filter(allowance_requested=True)
-            .aggregate(
-                allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
-                allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
-                refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
-                potential_allowance_amount=Sum(
-                    Case(
-                        When(allowance_granted=True, then="employee__allowance_amount"),
-                        default=0,
-                        output_field=models.IntegerField(),
-                    )
-                ),
-            )
+    # Avoid stats computation on successful POST
+    context["stats"] = (
+        EmployeeContract.objects.filter(employee__assessment=assessment)
+        .filter(allowance_requested=True)
+        .aggregate(
+            allowance_of_814_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=814)),
+            allowance_of_1400_nb=Count("pk", filter=Q(allowance_granted=True, employee__allowance_amount=1400)),
+            refused_allowance_nb=Count("pk", filter=Q(allowance_granted=False)),
+            potential_allowance_amount=Sum(
+                Case(
+                    When(allowance_granted=True, then="employee__allowance_amount"),
+                    default=0,
+                    output_field=models.IntegerField(),
+                )
+            ),
         )
+    )
 
     return render(request, template_name, context)
