@@ -36,7 +36,7 @@
                             <p class="mb-0">Le dossier n’a pas encore été transmis par le GEIQ.</p>
                         </div>
                     {% else %}
-                        <div class="c-box c-box--summary has-links-inside mb-3">
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
                             <div class="c-box--summary__header">
                                 <h3 class="m-0">Documents</h3>
                             </div>
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="c-box c-box--summary has-links-inside mb-3">
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
                             <div class="c-box--summary__header">
                                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
                                     <div class="flex-grow-1">
@@ -128,7 +128,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="c-box c-box--summary has-links-inside mb-3">
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
                             <div class="c-box--summary__header">
                                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
                                     <div class="flex-grow-1">
@@ -182,7 +182,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
                     {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token only %}
                     {% if assessment.submitted_at %}
                         <div class="c-box mb-3 mb-md-4">
