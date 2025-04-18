@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
@@ -72,6 +73,16 @@ class JobApplicationOrder(OrderEnum):
 def _add_user_can_view_personal_information(job_applications, can_view):
     for job_application in job_applications:
         job_application.user_can_view_personal_information = can_view(job_application.job_seeker)
+
+
+def _prefetch_jobseeker_valid_eligibility_diagnoses(job_applications):
+    pks = [job_application.jobseeker_valid_eligibility_diagnosis for job_application in job_applications]
+    eligibility_diagnoses = {diag.pk: diag for diag in EligibilityDiagnosis.objects.filter(pk__in=pks)}
+    for job_application in job_applications:
+        if job_application.jobseeker_valid_eligibility_diagnosis:
+            job_application.jobseeker_valid_eligibility_diagnosis = eligibility_diagnoses[
+                job_application.jobseeker_valid_eligibility_diagnosis
+            ]
 
 
 def _add_pending_for_weeks(job_applications):
@@ -214,6 +225,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     ).order_by(*order.order_by)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
+    _prefetch_jobseeker_valid_eligibility_diagnoses(job_applications_page)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(
         job_applications_page, functools.partial(can_view_personal_information, request)
@@ -335,6 +347,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     ).order_by(*order.order_by)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
+    _prefetch_jobseeker_valid_eligibility_diagnoses(job_applications_page)
     _add_pending_for_weeks(job_applications_page)
 
     # SIAE members have access to personal info
