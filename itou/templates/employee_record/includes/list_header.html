@@ -34,4 +34,25 @@
             </div>
         </div>
     {% endif %}
+    {% if one_siret_different_from_company %}
+        <div class="alert alert-warning alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Incohérence de numéro SIRET détectée</strong>
+                    </p>
+                    <p class="mb-0">
+                        Il semble que le numéro de SIRET associé à certaines fiches salarié déjà intégrées diffère de votre numéro de SIRET actuel.
+                        Cela peut empêcher ces fiches salarié d'apparaître dans votre espace Extranet IAE 2.0 de l'ASP.
+                        Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
+                        <a href="{{ ITOU_HELP_CENTER_URL }}/" rel="noopener" target="_blank" aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)" class="has-external-link">Consulter le mode d'emploi</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
