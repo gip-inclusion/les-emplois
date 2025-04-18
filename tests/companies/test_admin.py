@@ -1,3 +1,4 @@
+import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
@@ -7,7 +8,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.models import Company, CompanyMembership
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
@@ -350,3 +351,64 @@ class TestTransferCompanyData:
         assert "Candidatures reçues" in remark
         assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
+
+    @pytest.mark.parametrize(
+        "is_admin_in_from_company,is_admin_in_to_company",
+        [
+            (False, None),
+            (True, None),
+            (False, False),
+            (True, False),
+            (False, True),
+            (True, True),
+        ],
+    )
+    def test_transfer_data_memberships_with_is_admin(
+        self, admin_client, is_admin_in_from_company, is_admin_in_to_company
+    ):
+        user = EmployerFactory()
+
+        from_company = CompanyFactory(
+            with_membership=True, membership__user=user, membership__is_admin=is_admin_in_from_company
+        )
+        to_company = CompanyFactory(with_membership=False)
+        if is_admin_in_to_company is not None:
+            membership = CompanyMembership()
+            membership.user = user
+            membership.company = to_company
+            membership.is_admin = is_admin_in_to_company
+            membership.save()
+
+        transfer_url = reverse(
+            "admin:transfer_company_data", kwargs={"from_company_pk": from_company.pk, "to_company_pk": to_company.pk}
+        )
+
+        response = admin_client.get(transfer_url)
+        assertContains(response, "Choisissez les objets à transférer")
+
+        if is_admin_in_to_company:
+            # Don't overwrite an existing admin membership
+            assertNotContains(response, str(from_company.memberships.get(user=user)))
+        else:
+            assertContains(response, str(from_company.memberships.get(user=user)))
+
+            response = admin_client.post(
+                transfer_url,
+                data={"fields_to_transfer": ["memberships"], "disable_from_company": False},
+            )
+            assertRedirects(response, reverse("admin:companies_company_change", kwargs={"object_id": from_company.pk}))
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.INFO,
+                        f"Transfert effectué avec succès de l’entreprise {from_company} vers {to_company}.",
+                    ),
+                ],
+            )
+
+        from_company.refresh_from_db()
+        to_company.refresh_from_db()
+        assert from_company.memberships.count() == (1 if is_admin_in_to_company else 0)
+        assert to_company.memberships.count() == 1
+        assert to_company.memberships.first().is_admin == any([is_admin_in_from_company, is_admin_in_to_company])
