@@ -19,6 +19,25 @@
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
+
+    {% if is_siret_different_from_company and employee_record.status == "PROCESSED" %}
+        <div class="alert alert-warning alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Incohérence de numéro SIRET détectée</strong>
+                    </p>
+                    <p class="mb-0">
+                        Il semble que le numéro de SIRET associé à cette fiche salarié soit différent de votre numéro de SIRET actuel. Vous pouvez actualiser le numéro de SIRET en cliquant sur "<b>Renvoyer cette fiche salarié</b>".
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block title_extra %}
