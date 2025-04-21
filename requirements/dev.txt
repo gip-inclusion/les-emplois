@@ -1696,9 +1696,9 @@ segno==1.6.6 \
     --hash=sha256:28c7d081ed0cf935e0411293a465efd4d500704072cdb039778a2ab8736190c7 \
     --hash=sha256:e60933afc4b52137d323a4434c8340e0ce1e58cec71439e46680d4db188f11b3
     # via -r requirements/test.txt
-sentry-sdk==2.25.1 \
-    --hash=sha256:60b016d0772789454dc55a284a6a44212044d4a16d9f8448725effee97aaf7f6 \
-    --hash=sha256:f9041b7054a7cf12d41eadabe6458ce7c6d6eea7a97cfe1b760b6692e9562cf0
+sentry-sdk==2.26.1 \
+    --hash=sha256:759e019c41551a21519a95e6cef6d91fb4af1054761923dadaee2e6eca9c02c7 \
+    --hash=sha256:e99390e3f217d13ddcbaeaed08789f1ca614d663b345b9da42e35ad6b60d696a
     # via -r requirements/test.txt
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
