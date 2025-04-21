@@ -1686,9 +1686,9 @@ ruff==0.11.6 \
     --hash=sha256:f2959049faeb5ba5e3b378709e9d1bf0cab06528b306b9dd6ebd2a312127964a \
     --hash=sha256:f55844e818206a9dd31ff27f91385afb538067e2dc0beb05f82c293ab84f7d55
     # via -r requirements/test.txt
-s3transfer==0.11.4 \
-    --hash=sha256:559f161658e1cf0a911f45940552c696735f5c74e64362e515f333ebed87d679 \
-    --hash=sha256:ac265fa68318763a03bf2dc4f39d5cbd6a9e178d81cc9483ad27da33637e320d
+s3transfer==0.11.5 \
+    --hash=sha256:757af0f2ac150d3c75bc4177a32355c3862a98d20447b69a0161812992fe0bd4 \
+    --hash=sha256:8c8aad92784779ab8688a61aefff3e28e9ebdce43142808eaa3f0b0f402f68b7
     # via
     #   -r requirements/test.txt
     #   boto3
