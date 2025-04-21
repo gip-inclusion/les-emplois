@@ -52,6 +52,6 @@
     {{ filters_form.media.js }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
-    <script async src="https://tally.so/widgets/embed.js"></script>
+    <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
     <script src='{% static "js/nps_popup.js" %}' data-delaypopup="true" data-userkind="prescripteur" data-page="liste-candidatures"></script>
 {% endblock %}

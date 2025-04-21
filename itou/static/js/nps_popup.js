@@ -3,7 +3,7 @@
 
   Example use:
   {% load static %}
-  <script async src="https://tally.so/widgets/embed.js"></script>
+  <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
   <script src='{% static "js/nps_popup.js" %}' data-delaypopup="true" data-userkind="employeur" data-page="liste-candidatures"></script>
 
 ********************************************************************/
