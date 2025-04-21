@@ -130,7 +130,7 @@
     {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
     {{ form.media.js }}
     {% if request.user.is_employer or request.user.is_prescriber %}
-        <script async src="https://tally.so/widgets/embed.js"></script>
+        <script async src="{{ TALLY_URL }}/widgets/embed.js"></script>
         <script src='{% static "js/nps_popup.js" %}' data-delaypopup="false" data-userkind="{% if request.user.is_employer %}employeur{% else %}prescripteur{% endif %}" data-page="depot-candidature">
         </script>
     {% endif %}
