@@ -980,7 +980,8 @@ class TestUtilsUrls:
         url = "https://emplois.inclusion.beta.gouv.fr"
         text = "Lien vers une ressource externe"
         expected = (
-            f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
+            f'<a href="{url}" rel="noopener" target="_blank" class="has-external-link" '
+            f'aria-label="Ouverture dans un nouvel onglet">{text}</a>'
         )
         assert get_external_link_markup(url=url, text=text) == expected
 
