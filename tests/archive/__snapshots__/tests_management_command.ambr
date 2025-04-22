@@ -123,6 +123,22 @@
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte candidat'
 # ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
+  '''
+  Bonjour Jane DOE,
+  Nous n’avons détecté aucune activité sur votre espace candidat sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Sans connexion de votre part avant le YY/YY/YYYY, votre espace personnel sera supprimé ainsi que toutes les données associées.
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_subject]
+  '[DEV] Information avant suppression de votre compte candidat'
+# ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,

@@ -4,8 +4,9 @@ import pytest
 from django.core.management import call_command
 from django.utils import timezone
 
-from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD
+from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedJobSeeker
+from itou.gps.models import FollowUpGroup
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import (
@@ -137,10 +138,18 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
+                lambda jobseeker: FollowUpGroupFactory(
+                    beneficiary=jobseeker, updated_at=timezone.now() - INACTIVITY_PERIOD
+                ),
+                True,
+                id="jobseeker_in_followup_group_without_recent_activity",
+            ),
+            pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
                 False,
-                id="jobseeker_with_recent_follow_up_group",
+                id="jobseeker_in_followup_group_with_recent_activity",
             ),
             pytest.param(
                 lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),

@@ -6,9 +6,10 @@ from django.utils import timezone
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
-class FollowUpGroupFactory(factory.django.DjangoModelFactory):
+class FollowUpGroupFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     """Generates FollowUpGroup() objects for unit tests."""
 
     class Meta:
