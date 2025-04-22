@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_as_unauthorized_prescriber[SQL queries for prescriptions list]
   dict({
-    'num_queries': 21,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -1015,104 +1015,6 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'ForNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'ForNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
         ''',
       }),
       dict({
@@ -2480,13 +2382,17 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+          
+      
+  
+  
                           
                           
   
@@ -2563,13 +2469,17 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+          
+      
+  
+  
                           
                           
   
@@ -2646,13 +2556,17 @@
                           
                           
                               
-                                  
-                                              <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                                  
-                              
+          
+      
+  
+  
                           
                           
   
@@ -2758,13 +2672,17 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+          
+      
+  
+  
               
           </td>
       
@@ -2829,13 +2747,17 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+          
+      
+  
+  
               
           </td>
       
@@ -2900,13 +2822,17 @@
               </span>
               
                   
-                      
-                                  <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+  
+      
+          
+                      <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
               <i aria-hidden="true" class="ri-error-warning-line"></i>
               Éligibilité IAE à valider
           </span>
-                      
-                  
+          
+      
+  
+  
               
           </td>
       
@@ -2999,7 +2925,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 22,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -4041,104 +3967,6 @@
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'ForNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IfNode[apply/includes/list_card_body.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'ForNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
         ''',
       }),
       dict({
@@ -4178,7 +4006,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 19,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -5220,108 +5048,6 @@
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
-          'IfNode[apply/includes/list_tr.html]',
-          'IfNode[apply/includes/list_tr.html]',
-          'IncludeNode[apply/includes/list_table.html]',
-          'ForNode[apply/includes/list_table.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
-          'WithNode[apply/includes/list_tr.html]',
-          'IfNode[apply/includes/list_tr.html]',
-          'IfNode[apply/includes/list_tr.html]',
-          'IncludeNode[apply/includes/list_table.html]',
-          'ForNode[apply/includes/list_table.html]',
-          'IncludeNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IfNode[apply/includes/list_job_applications.html]',
-          'IncludeNode[apply/list_prescriptions.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/list_prescriptions.html]',
-          'list_prescriptions[www/apply/views/list_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."nir" = %s
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
         ''',
       }),
       dict({

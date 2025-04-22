@@ -23,13 +23,7 @@
                             </span>
                         {% endif %}
                         {% if job_application.to_company.is_subject_to_eligibility_rules %}
-                            {% with approval=job_application.job_seeker.latest_common_approval %}
-                                {% if approval %}
-                                    {% approval_state_badge approval span_extra_class="badge-xs" %}
-                                {% else %}
-                                    {% iae_eligibility_badge is_eligible=job_application.jobseeker_valid_eligibility_diagnosis extra_class="badge-xs" %}
-                                {% endif %}
-                            {% endwith %}
+                            {% include "apply/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
                         {% endif %}
                         {% include "apply/includes/next_appointment.html" with job_application=job_application only %}
                     </div>
