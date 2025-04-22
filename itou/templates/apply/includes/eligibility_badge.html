@@ -2,7 +2,7 @@
 {% with badge_size|default:"badge-base" as badge_class %}
     {% if is_subject_to_eligibility_rules %}
         {% if job_seeker.has_valid_approval %}
-            {% approval_state_badge job_seeker.latest_approval force_valid=force_valid span_extra_class=badge_class %}
+            {% approval_state_badge job_seeker.latest_approval force_valid=force_valid_approval span_extra_class=badge_class %}
         {% else %}
             {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_class=badge_class %}
         {% endif %}

@@ -8,7 +8,7 @@
         {% fragment as c_title__main %}
             <h1>
                 Informations personnelles de {{ job_seeker.get_full_name }}
-                {% include 'apply/includes/eligibility_badge.html' with force_valid=True %}
+                {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
             </h1>
             <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
         {% endfragment %}
