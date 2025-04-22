@@ -37,37 +37,14 @@
                             {% bootstrap_form_errors form type="all" %}
 
                             {% bootstrap_field form.description %}
-                            <div class="alert alert-info" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-2">
-                                            <strong>Conseil</strong>
-                                        </p>
-                                        <p class="mb-0">
-                                            Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.
-                                        </p>
-                                    </div>
-                                </div>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.</span>
                             </div>
                             <hr>
                             {% bootstrap_field form.provided_support %}
-                            <div class="alert alert-info" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-2">
-                                            <strong>Conseil</strong>
-                                        </p>
-                                        <p class="mb-0">Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever.</p>
-                                    </div>
-                                </div>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever</span>
                             </div>
-
                             {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url secondary_aria_label="Retourner à l'édition des coordonnées" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-description-structure" %}
                         </form>
                     </div>
