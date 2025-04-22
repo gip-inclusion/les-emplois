@@ -113,7 +113,7 @@ class EditCompanyForm(forms.ModelForm):
             "brand": "Nom à afficher",
             "post_code": "Code postal",
             "city": "Ville",
-            "email": "Email",
+            "email": "Adresse e-mail",
         }
         help_texts = {
             "brand": "Nom présent sur la fiche et dans les résultats de recherche.",

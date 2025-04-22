@@ -60,12 +60,12 @@
                             {% bootstrap_field form.address_line_1 %}
                             {% bootstrap_field form.address_line_2 %}
 
-                            {% bootstrap_field form.post_code %}
+                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
                             {% bootstrap_field form.city %}
 
                             <hr>
-                            {% bootstrap_field form.phone %}
-                            {% bootstrap_field form.email %}
+                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
                             {% bootstrap_field form.website %}
 
                             {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-contact-structure" reset_url=reset_url %}
