@@ -77,7 +77,7 @@ class FollowUpGroup(models.Model):
         verbose_name="bénéficiaire",
         null=False,
         blank=False,
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
         related_name="follow_up_group",
     )
 
@@ -154,14 +154,14 @@ class FollowUpGroupMembership(models.Model):
         FollowUpGroup,
         verbose_name="groupe de suivi",
         related_name="memberships",
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
     )
 
     member = models.ForeignKey(
         User,
         verbose_name="membre du groupe de suivi",
         related_name="follow_up_groups",
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
     )
 
     # Keep track of who created this entry
