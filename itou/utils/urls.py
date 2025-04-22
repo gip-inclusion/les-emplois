@@ -45,7 +45,8 @@ def get_absolute_url(path=""):
 
 def get_external_link_markup(url, text):
     return mark_safe(
-        f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
+        f'<a href="{url}" rel="noopener" target="_blank" class="has-external-link" '
+        f'aria-label="Ouverture dans un nouvel onglet">{text}</a>'
     )
 
 
