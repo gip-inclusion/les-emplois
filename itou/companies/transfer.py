@@ -33,7 +33,7 @@ class TransferField(TextChoices):
 
 class ReportSection(TextChoices):
     JOB_UNLINK = "job_unlink", "Désassociation de fiche de poste"
-    COMPANY_DEACTIVATION = "company_deactivation", "Désactivation entreprise"
+    COMPANY_DEACTIVATION = "company_deactivation", "Désactivation entreprise avec désactivation des membres"
 
 
 TRANSFER_SPECS = {
@@ -227,5 +227,6 @@ def transfer_company_data(
             job_applications_blocked_at=timezone.now(),
             is_searchable=False,
         )
+        models.CompanyMembership.objects.filter(company=from_company).update(is_active=False)
         reporter.add(ReportSection.COMPANY_DEACTIVATION, _format_model(from_company))
     return reporter
