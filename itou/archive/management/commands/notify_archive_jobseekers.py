@@ -33,9 +33,6 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
     geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
         job_seeker=OuterRef("pk"),
     )
-    follow_up_group = FollowUpGroup.objects.filter(
-        beneficiary=OuterRef("pk"),
-    )
 
     return (
         User.objects.filter(
@@ -47,7 +44,6 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
             ~Exists(approval),
             ~Exists(eligibility_diagnosis),
             ~Exists(geiq_eligibility_diagnosis),
-            ~Exists(follow_up_group),
         )
         .job_seekers_with_last_activity()
         .filter(last_activity__lt=inactive_since)[:batch_size]
