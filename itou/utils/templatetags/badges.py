@@ -43,10 +43,11 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
 def approval_state_badge(
     approval, *, force_valid=False, in_approval_box=False, span_extra_class="badge-sm", icon_extra_class=""
 ):
-    # If force_valid is set to True, ignore the provided approval and display a VALID state
+    # If force_valid is set to True & approval.is_valid(), ignore the provided approval and display a VALID state
     # It is mainly used to show a VALID state to employers instead of SUSPENDED
     # which can be confusing.
-    approval_state = ApprovalStatus.VALID if force_valid else approval.state
+    # If the approval is expired, force_valid is ignored.
+    approval_state = ApprovalStatus.VALID if force_valid and approval.is_valid() else approval.state
     if in_approval_box:
         span_class = {
             ApprovalStatus.EXPIRED: "bg-danger text-white",
