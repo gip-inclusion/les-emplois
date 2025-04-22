@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## 2025-04-21
+
+### Ajouté
+
+- [admin: Ajouter les certificateurs d’identité au profil demandeur d’emploi](https://github.com/gip-inclusion/les-emplois/pull/5969)
+
+### Modifié
+
+- [Ajout du composant c-title aux templates dashboard et employees](https://github.com/gip-inclusion/les-emplois/pull/5924)
+- [Candidature: Uniformisation du nom d'un paramètre GET](https://github.com/gip-inclusion/les-emplois/pull/5971)
+- [Fiches salarié : Correction des actions "Annuler" et "Retour" pour le tunnel "Créer une fiche salarié"](https://github.com/gip-inclusion/les-emplois/pull/5974)
+- [Notifications: Correction de la liste d'envoi de la notification de rappel périodique pour s'assurer que les membres de sa structure sont bien actifs et autorisés](https://github.com/gip-inclusion/les-emplois/pull/5956)
+- [PASS IAE: Ajouter des informations sur l'affichage d'un PASS IAE expiré](https://github.com/gip-inclusion/les-emplois/pull/5991) 🖼
+- [Stabilité: Ajout du composant c-title aux templates apply et approvals](https://github.com/gip-inclusion/les-emplois/pull/5921)
+- [Stabilité: Ajout du composant c-title aux templates invitations, prescribers, siae et rdvi](https://github.com/gip-inclusion/les-emplois/pull/5928)
+- [Statistiques : Migrer le NPS de Hotjar vers Tally](https://github.com/gip-inclusion/les-emplois/pull/5959) 🖼
+
+### Supprimé
+
+- [GEIQ: suppression de la 1ère version du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/5968)
+
+### Tech
+
+- [Vérification systématique du type de session dans SessionNamespace](https://github.com/gip-inclusion/les-emplois/pull/5933)
+
 ## 2025-04-14
 
 ### Ajouté
