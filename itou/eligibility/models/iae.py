@@ -9,12 +9,11 @@ from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
     AbstractSelectedAdministrativeCriteria,
-    AdministrativeCriteriaQuerySet,
     CommonEligibilityDiagnosisQuerySet,
 )
 from itou.gps.models import FollowUpGroup
@@ -257,38 +256,6 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
 
     Warning : any change to the criteria must be notified to C2 members (names are used in Metabase)
     """
-
-    MAX_UI_RANK = 32767
-
-    level = models.CharField(
-        verbose_name="niveau",
-        max_length=1,
-        choices=AdministrativeCriteriaLevel.choices,
-        default=AdministrativeCriteriaLevel.LEVEL_1,
-    )
-
-    name = models.CharField(verbose_name="nom", max_length=255)
-    desc = models.CharField(verbose_name="description", max_length=255, blank=True)
-    written_proof = models.CharField(verbose_name="justificatif", max_length=255, blank=True)
-    written_proof_url = models.URLField(
-        verbose_name="lien d'aide à propos du justificatif", max_length=200, blank=True
-    )
-    written_proof_validity = models.CharField(
-        verbose_name="durée de validité du justificatif", max_length=255, blank=True, default=""
-    )
-    # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
-    # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
-    ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
-    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name="créé par",
-        null=True,
-        blank=True,
-        on_delete=models.RESTRICT,  # For traceability and accountability
-    )
-
-    objects = AdministrativeCriteriaQuerySet.as_manager()
 
     class Meta:
         verbose_name = "critère administratif IAE"

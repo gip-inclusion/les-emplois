@@ -2206,13 +2206,13 @@
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
                  "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."level",
                  "eligibility_administrativecriteria"."name",
                  "eligibility_administrativecriteria"."desc",
                  "eligibility_administrativecriteria"."written_proof",
                  "eligibility_administrativecriteria"."written_proof_url",
                  "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
                  "eligibility_administrativecriteria"."created_at",
                  "eligibility_administrativecriteria"."created_by_id"

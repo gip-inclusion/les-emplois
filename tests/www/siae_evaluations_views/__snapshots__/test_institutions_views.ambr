@@ -179,13 +179,13 @@
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."level",
                  "eligibility_administrativecriteria"."name",
                  "eligibility_administrativecriteria"."desc",
                  "eligibility_administrativecriteria"."written_proof",
                  "eligibility_administrativecriteria"."written_proof_url",
                  "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
                  "eligibility_administrativecriteria"."created_at",
                  "eligibility_administrativecriteria"."created_by_id"
