@@ -31,6 +31,9 @@ class CreateCompanyForm(forms.ModelForm):
             "website",
             "description",
         ]
+        labels = {
+            "email": "Adresse e-mail",
+        }
         help_texts = {
             "siret": ("Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."),
             "kind": "Votre nouvelle structure doit avoir le même type que votre structure actuelle.",

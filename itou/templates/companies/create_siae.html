@@ -2,6 +2,7 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load str_filters %}
 
 {% block title %}Créer une nouvelle structure {{ block.super }}{% endblock %}
 
@@ -33,22 +34,23 @@
                     <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
+                            {% bootstrap_form_errors form type="all" %}
 
-                            {% if form.non_field_errors %}
-                                <div class="alert alert-danger alert-dismissible" role="status">
-                                    <p class="mb-0">
-                                        {% for error in form.non_field_errors %}
-                                            {{ error | safe }}
-                                            {% if not forloop.last %}<br>{% endif %}
-                                        {% endfor %}
-                                    </p>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                                </div>
-                            {% endif %}
-
-                            {% for field in form %}
-                                {% bootstrap_field field %}
-                            {% endfor %}
+                            {% bootstrap_field form.siret %}
+                            {% bootstrap_field form.kind %}
+                            {% bootstrap_field form.name %}
+                            {% bootstrap_field form.brand %}
+                            <hr>
+                            {% bootstrap_field form.address_line_1 %}
+                            {% bootstrap_field form.address_line_2 %}
+                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.city %}
+                            {% bootstrap_field form.department %}
+                            <hr>
+                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% bootstrap_field form.website %}
+                            {% bootstrap_field form.description %}
 
                             <hr>
                             <div class="alert alert-warning" role="status">
@@ -63,6 +65,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregister la fiche structure" %}
                         </form>
                     </div>
