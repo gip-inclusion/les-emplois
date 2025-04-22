@@ -299,6 +299,7 @@ class TestTransferCompanyData:
         assert from_company.is_searchable
         assert not from_company.block_job_applications
         assert not from_company.job_applications_blocked_at
+        assert from_company.memberships.filter(is_active=True).count() == 1
         EmployerInvitationFactory(company=from_company)
 
         to_company = CompanyFactory(is_searchable=False)
@@ -331,11 +332,12 @@ class TestTransferCompanyData:
             ],
         )
 
-        # Check that from_company has been properly disable
+        # Check that from_company has been properly disabled and that the memberships have been disabled
         from_company.refresh_from_db()
         assert not from_company.is_searchable
         assert from_company.block_job_applications
         assert from_company.job_applications_blocked_at
+        assert from_company.memberships.filter(is_active=True).count() == 0
 
         # and to_company should now be searchable
         to_company.refresh_from_db()
@@ -353,7 +355,10 @@ class TestTransferCompanyData:
         remark = to_user_remark.remark
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "Candidatures reçues" in remark
-        assert f"Désactivation entreprise:\n  * companies.Company[{from_company.pk}]" in remark
+        assert (
+            f"Désactivation entreprise avec désactivation des membres:\n  * companies.Company[{from_company.pk}]"
+            in remark
+        )
         assert "Peut apparaître dans la recherche:\n  * is_searchable: False remplacé par True" in remark
 
     @pytest.mark.parametrize("field", {"is_admin", "is_active"})
