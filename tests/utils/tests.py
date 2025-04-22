@@ -1609,15 +1609,18 @@ def test_approval_state_badge(snapshot):
     )
     assert approval.state == ApprovalStatus.EXPIRED
     assert badges.approval_state_badge(approval) == snapshot(name="expired")
+    assert badges.approval_state_badge(approval, force_valid=True) == snapshot(name="expired")
 
     approval.start_at = today + datetime.timedelta(days=10)
     approval.end_at = today + datetime.timedelta(days=100)
     assert approval.state == ApprovalStatus.FUTURE
     assert badges.approval_state_badge(approval) == snapshot(name="future")
+    assert badges.approval_state_badge(approval, force_valid=True) == snapshot(name="valid")
 
     approval.start_at = today - datetime.timedelta(days=10)
     assert approval.state == ApprovalStatus.VALID
     assert badges.approval_state_badge(approval) == snapshot(name="valid")
+    assert badges.approval_state_badge(approval, force_valid=True) == snapshot(name="valid")
 
     SuspensionFactory(
         approval=approval,
@@ -1627,6 +1630,7 @@ def test_approval_state_badge(snapshot):
     del approval.is_suspended  # Invalidate cache
     assert approval.state == ApprovalStatus.SUSPENDED
     assert badges.approval_state_badge(approval) == snapshot(name="suspended")
+    assert badges.approval_state_badge(approval, force_valid=True) == snapshot(name="valid")
 
 
 @pytest.mark.parametrize("is_eligible", [True, False])
