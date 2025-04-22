@@ -141,10 +141,15 @@ class Command(BaseCommand):
                     user,
                     job_seeker=user,
                 ).send()
+
             ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
-            User.objects.filter(id__in=[user.id for user in users_to_archive]).delete()
+            self._delete_with_related_objects(users_to_archive)
 
         self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
+
+    def _delete_with_related_objects(self, users):
+        FollowUpGroup.objects.filter(beneficiary__in=users).delete()
+        User.objects.filter(id__in=[user.id for user in users]).delete()
 
     @monitor(
         monitor_slug="notify_archive_jobseekers",

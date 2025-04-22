@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedJobSeeker
-from itou.gps.models import FollowUpGroup
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import (
@@ -474,3 +474,23 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             assert body == snapshot(name="archived_jobseeker_email_body")
         else:
             assert not mailoutbox
+
+    def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks):
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=365,
+            notified_days_ago=31,
+        )
+        FollowUpGroupFactory(beneficiary=jobseeker, memberships=2, updated_at=timezone.now() - INACTIVITY_PERIOD)
+
+        assert User.objects.filter(id=jobseeker.id).exists()
+        assert FollowUpGroup.objects.exists()
+        assert FollowUpGroupMembership.objects.exists()
+        assert not ArchivedJobSeeker.objects.exists()
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_jobseekers", wet_run=True)
+
+        assert not User.objects.filter(id=jobseeker.id).exists()
+        assert not FollowUpGroup.objects.exists()
+        assert not FollowUpGroupMembership.objects.exists()
+        assert ArchivedJobSeeker.objects.exists()
