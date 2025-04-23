@@ -1,3 +1,0 @@
-{% extends "layout/base_email_text_subject.txt" %}
-
-{% block subject %}Suppression de votre compte candidat{% endblock subject %}

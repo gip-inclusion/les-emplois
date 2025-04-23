@@ -1,0 +1,3 @@
+{% extends "layout/base_email_text_subject.txt" %}
+
+{% block subject %}Suppression de votre compte sur les Emplois de l’inclusion{% endblock subject %}

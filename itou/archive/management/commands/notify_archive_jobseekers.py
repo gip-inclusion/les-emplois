@@ -100,7 +100,6 @@ class Command(BaseCommand):
             for user in users:
                 InactiveJobSeeker(
                     user,
-                    job_seeker=user,
                     end_of_grace_period=now + GRACE_PERIOD,
                 ).send()
             User.objects.filter(id__in=[user.id for user in users]).update(upcoming_deletion_notified_at=now)
@@ -139,7 +138,6 @@ class Command(BaseCommand):
             for user in users_to_archive:
                 ArchiveJobSeeker(
                     user,
-                    job_seeker=user,
                 ).send()
 
             ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
