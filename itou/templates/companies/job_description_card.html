@@ -19,15 +19,13 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block title_navinfo %}
-    <div class="d-flex justify-content-between align-items-center">
-        {# Wrap previous_step in a div to ensure that second div is justified right #}
-        <div>{% include "layout/previous_step.html" with back_url=back_url only %}</div>
-        <div>
-            {% if job.last_employer_update_at %}
-                <span class="fs-sm text-muted">Mise à jour le {{ job.last_employer_update_at|date:"d/m/Y" }}</span>
-            {% endif %}
-        </div>
-    </div>
+    {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info %}
+        {% if job.last_employer_update_at %}
+            {% fragment as c_navinfo__info %}
+                Mise à jour le {{ job.last_employer_update_at|date:"d/m/Y" }}
+            {% endfragment %}
+        {% endif %}
+    {% endcomponent_navinfo %}
 {% endblock %}
 
 {% block title_content %}
@@ -39,9 +37,7 @@
             <h1>
                 {{ job.display_name }}
                 {% if job.is_active %}
-                    <span class="badge badge-base rounded-pill bg-success">
-                        {{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement
-                    </span>
+                    <span class="badge badge-base rounded-pill bg-success">{{ job.open_positions }} {{ job.open_positions|pluralizefr:"poste ouvert,postes ouverts" }} au recrutement</span>
                 {% endif %}
             </h1>
         {% endfragment %}

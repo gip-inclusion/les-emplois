@@ -16,7 +16,8 @@
 {% endblock %}
 
 {% block title_navinfo %}
-    {% include "layout/previous_step.html" with back_url=back_url only %}
+    {% component_navinfo c_navinfo__back_url=back_url %}
+    {% endcomponent_navinfo %}
 {% endblock %}
 
 {% block title_content %}

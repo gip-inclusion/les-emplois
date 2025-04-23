@@ -14,7 +14,7 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 class TestCardView:
@@ -223,7 +223,7 @@ class TestCardView:
 
         assertNotContains(response, self.APPLY)
 
-    def test_card_flow(self, client):
+    def test_card_flow(self, client, snapshot):
         company = CompanyFactory(with_jobs=True)
         list_url = reverse("search:employers_results")
         company_card_base_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -232,7 +232,8 @@ class TestCardView:
             {"back_url": list_url},
         )
         response = client.get(company_card_initial_url)
-        assert_previous_step(response, list_url, back_to_list=True)
+        navinfo = parse_response_to_soup(response, selector=".c-navinfo")
+        assert str(navinfo) == snapshot(name="navinfo-company-card")
 
         # Has link to job description
         job = company.job_description_through.first()
@@ -241,7 +242,9 @@ class TestCardView:
 
         # Job description card has link back to list again
         response = client.get(job_description_link)
-        assert_previous_step(response, list_url, back_to_list=True)
+        navinfo = parse_response_to_soup(response, selector=".c-navinfo")
+        assert str(navinfo) == snapshot(name="navinfo-job-description")
+
         # And also a link to the company card with a return link to list_url (the same as the first visited page)
         company_card_url_other_formatting = f"{company_card_base_url}?back_url={urlencode(list_url)}"
         assertContains(response, company_card_url_other_formatting)
@@ -389,7 +392,8 @@ class TestJobDescriptionCardView:
             assertContains(response, other_active_job.display_name, html=True)
 
         response = client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
-        assert_previous_step(response, reverse("companies_views:job_description_list"), back_to_list=True)
+        navinfo = parse_response_to_soup(response, selector=".c-navinfo")
+        assert str(navinfo) == snapshot(name="navinfo")
 
     def test_job_description_card_render_markdown(self, client):
         company = CompanyWithMembershipAndJobsFactory()
