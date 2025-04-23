@@ -85,7 +85,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         return self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
 
     def criteria_can_be_certified(self):
-        return self.is_from_employer and self.administrative_criteria.certifiable().exists()
+        return self.administrative_criteria.certifiable().exists()
 
     def get_author_kind_display(self):
         if self.sender_kind == SenderKind.PRESCRIBER and (

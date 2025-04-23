@@ -41,11 +41,11 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
         )
         certifiable = factory.Trait(
             job_seeker__born_in_france=True,
-            from_employer=True,
-        )
-        not_certifiable = factory.Trait(
-            job_seeker__born_in_france=True,
-            from_prescriber=True,
+            from_employer=factory.Maybe(
+                "from_prescriber",
+                yes_declaration=None,
+                no_declaration=True,
+            ),
         )
 
     created_at = factory.LazyFunction(timezone.now)
