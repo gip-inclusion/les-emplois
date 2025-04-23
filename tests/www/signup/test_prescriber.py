@@ -715,7 +715,9 @@ class TestPrescriberSignup:
 
     def test_form_to_request_for_an_invitation(self, client, mailoutbox):
         siret = "26570134200148"
-        prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)
+        prescriber_org = PrescriberOrganizationWithMembershipFactory(
+            siret=siret, membership__user__for_snapshot=True, for_snapshot=True
+        )
         prescriber_membership = prescriber_org.prescribermembership_set.first()
 
         url = reverse("signup:prescriber_check_already_exists")
@@ -725,10 +727,23 @@ class TestPrescriberSignup:
         }
         response = client.post(url, data=post_data)
         assertContains(response, prescriber_org.display_name)
+        assertContains(
+            response,
+            escape(
+                "Si vous souhaitez rejoindre cette organisation, demandez à Pierre D. de vous ajouter "
+                "en tant que collaborateur."
+            ),
+            html=True,
+        )
 
         url = reverse("signup:prescriber_request_invitation", kwargs={"membership_id": prescriber_membership.id})
         response = client.get(url)
         assertContains(response, prescriber_org.display_name)
+        assertContains(
+            response,
+            "Renseignez vos coordonnées afin d'être ajouté à l'organisation « Pres. Org. » par Pierre D.",
+            html=True,
+        )
 
         response = client.post(url, data={"first_name": "Bertrand", "last_name": "Martin", "email": "beber"})
         assertContains(response, "Saisissez une adresse e-mail valide.")

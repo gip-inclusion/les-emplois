@@ -110,6 +110,25 @@ class TestCompanySignup:
         )
         assertContains(response, escape(expected_message))
 
+    def test_join_company_with_member(self, client):
+        company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True, for_snapshot=True)
+        assert company.members.count() > 0
+
+        url = reverse("signup:company_select")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        # Find a company by SIREN.
+        response = client.get(url, {"siren": company.siret[:9]})
+        assert response.status_code == 200
+        assertContains(response, " Pour rejoindre cette structure, <b>veuillez contacter John D.</b>")
+
+        # Choose a company between results.
+        # Joining without invitation is impossible.
+        post_data = {"siaes": company.pk}
+        response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
+        assert response.status_code == 200
+
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
