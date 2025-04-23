@@ -33,46 +33,34 @@
                         </div>
 
                         <form method="post" class="js-prevent-multiple-submit">
-                            {% bootstrap_form_errors form type="all" %}
                             {% csrf_token %}
+                            {% bootstrap_form_errors form type="all" %}
+
                             {% bootstrap_field form.description %}
-                            <div class="alert alert-info" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-2">
-                                            <strong>Conseil</strong>
-                                        </p>
-                                        <p class="mb-0">
-                                            Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" aria-label="Référentiel des codes ROME" rel="noopener" target="_blank" class="has-external-link">Répertoire Opérationnel des Métiers et des Emplois (ROME)</a>.
-                                        </p>
-                                    </div>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Conseil</span>
+                                <div class="c-info__detail">
+                                    <p>
+                                        Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" aria-label="Référentiel des codes ROME" rel="noopener" target="_blank" class="has-external-link">Répertoire Opérationnel des Métiers et des Emplois (ROME)</a>.
+                                    </p>
                                 </div>
                             </div>
+
                             {% bootstrap_field form.profile_description %}
-                            <div class="alert alert-info" role="status">
-                                <div class="row">
-                                    <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                            <div class="c-info mb-3">
+                                {% if is_opcs %}
+                                    <span class="c-info__summary">Conseil</span>
+                                    <div class="c-info__detail">
+                                        <p>
+                                            Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
+                                        </p>
                                     </div>
-                                    <div class="col">
-                                        {% if is_opcs %}
-                                            <p class="mb-2">
-                                                <strong>Conseil</strong>
-                                            </p>
-                                            <p class="mb-0">
-                                                Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
-                                            </p>
-                                        {% else %}
-                                            <p class="mb-2">
-                                                <strong>Exemple</strong>
-                                            </p>
-                                            <p class="mb-0">« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
-                                        {% endif %}
+                                {% else %}
+                                    <span class="c-info__summary">Exemple</span>
+                                    <div class="c-info__detail">
+                                        <p>« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
 
                             {% bootstrap_field form.is_resume_mandatory %}

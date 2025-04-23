@@ -33,9 +33,8 @@
                         </div>
 
                         <form method="post" class="js-prevent-multiple-submit">
-                            {% bootstrap_form_errors form alert_error_type="all" %}
-
                             {% csrf_token %}
+                            {% bootstrap_form_errors form alert_error_type="all" %}
 
                             {# Not using compact form because of `other_contract_type` field dynamic behaviour #}
                             {% bootstrap_field form.appellation %}
@@ -44,10 +43,10 @@
                             {% if form.market_context_description %}
                                 {% bootstrap_field form.market_context_description %}
                             {% endif %}
-                            {% bootstrap_field form.contract_type %}
+                            {% bootstrap_field form.contract_type wrapper_class="form-group form-group-input-w-lg-66" %}
                             <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
-                            {% bootstrap_field form.hours_per_week %}
-                            {% bootstrap_field form.open_positions %}
+                            {% bootstrap_field form.hours_per_week wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.open_positions wrapper_class="form-group form-group-input-w-lg-33" %}
 
                             {% url "companies_views:job_description_list" as reset_url %}
                             {% itou_buttons_form primary_label="Suivant" reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_name="edit-infos-fiche-poste" %}
