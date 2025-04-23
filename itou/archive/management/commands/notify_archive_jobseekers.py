@@ -18,8 +18,9 @@ from itou.utils.command import BaseCommand
 
 logger = logging.getLogger(__name__)
 
-INACTIVITY_PERIOD = datetime.timedelta(days=365)
 GRACE_PERIOD = datetime.timedelta(days=30)
+INACTIVITY_PERIOD = datetime.timedelta(days=365) * 2 - GRACE_PERIOD
+
 BATCH_SIZE = 100
 
 
