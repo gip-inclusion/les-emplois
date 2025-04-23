@@ -23,7 +23,7 @@
                 {# For security, display only the first char of the last name. #}
                 <i>
                     Si vous souhaitez rejoindre cette organisation, demandez à
-                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1|upper }}
+                    {{ membership.user.get_truncated_full_name }}
                     de vous ajouter en tant que collaborateur.
                 </i>
                 <br>

@@ -155,7 +155,7 @@
                                             {# note: memberships.first does not work, it does not take the prefetch into account. #}
                                             {% with siae.memberships.all.0.user as admin %}
                                                 {# For security, display only the first char of the last name. #}
-                                                Pour rejoindre cette structure, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1|upper }}</b>.
+                                                Pour rejoindre cette structure, <b>veuillez contacter {{ admin.get_truncated_full_name }}</b>
                                             {% endwith %}
                                         </p>
                                     </li>
