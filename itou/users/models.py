@@ -494,6 +494,15 @@ class User(AbstractUser, AddressMixin):
         full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
         return full_name.strip()[:70]
 
+    def get_truncated_full_name(self):
+        """
+        Return first name but display only last name's first letter for privacy.
+        """
+        name = self.first_name.strip().title()
+        if name and self.last_name:
+            name = f"{name} {self.last_name[0].upper()}."
+        return name
+
     def get_redacted_full_name(self):
         """
         Return full name in redacted form for privacy, e.g. J** H***h

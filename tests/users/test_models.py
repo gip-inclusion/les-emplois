@@ -723,6 +723,22 @@ class TestModel:
             override_full_name(name)
             assert user.get_redacted_full_name() == expected_output
 
+    @pytest.mark.parametrize(
+        "first_name,last_name,expected",
+        [
+            ("Johan Sebastian", "Bach", "Johan Sebastian B."),
+            ("Max", "Weber", "Max W."),
+            ("Charlemagne", "", "Charlemagne"),
+            ("Salvador Felipe Jacinto", "Dalí y Domenech", "Salvador Felipe Jacinto D."),
+            ("Harald", "Blue-tooth", "Harald B."),
+            ("", "", ""),
+            ("", "Dalí", ""),
+        ],
+    )
+    def test_get_truncated_full_name(self, first_name, last_name, expected):
+        user = JobSeekerFactory(first_name=first_name, last_name=last_name)
+        assert user.get_truncated_full_name() == expected
+
 
 class TestJobSeekerProfileModel:
     def setup_method(self):
