@@ -40,8 +40,8 @@
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
   '''
   Bonjour Johan ANDERSON,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
   
   ---
@@ -51,7 +51,7 @@
   '''
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte candidat'
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
   list([
@@ -75,8 +75,8 @@
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
   '''
   Bonjour Johanna ANDREWS,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
   
   ---
@@ -86,7 +86,7 @@
   '''
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte candidat'
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
   list([
@@ -110,8 +110,8 @@
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
   '''
   Bonjour Martin JACOBSON,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte candidat sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
   
   ---
@@ -121,14 +121,14 @@
   '''
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte candidat'
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre espace candidat sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
-  Sans connexion de votre part avant le YY/YY/YYYY, votre espace personnel sera supprimé ainsi que toutes les données associées.
-  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur https://emplois.inclusion.beta.gouv.fr/ .
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
@@ -137,14 +137,14 @@
   '''
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_subject]
-  '[DEV] Information avant suppression de votre compte candidat'
+  '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre espace candidat sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
-  Sans connexion de votre part avant le YY/YY/YYYY, votre espace personnel sera supprimé ainsi que toutes les données associées.
-  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur https://emplois.inclusion.beta.gouv.fr/ .
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
@@ -153,5 +153,5 @@
   '''
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_subject]
-  '[DEV] Information avant suppression de votre compte candidat'
+  '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
