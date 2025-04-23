@@ -1,7 +1,7 @@
 <li>
     <div class="d-flex align-items-center">
         <span>{{ criterion.administrative_criteria.name }}</span>
-        {% if diagnosis.is_from_employer %}
+        {% if request.user.is_employer or request.from_authorized_prescriber %}
             {% if criterion.is_considered_certified %}
                 <span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-3">
                     <i class="ri-verified-badge-fill" aria-hidden="true"></i>

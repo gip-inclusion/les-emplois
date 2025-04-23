@@ -1037,7 +1037,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -1956,6 +1956,33 @@
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s))
+          LIMIT 1
         ''',
       }),
       dict({
@@ -2216,7 +2243,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -3135,6 +3162,33 @@
           FROM "eligibility_selectedadministrativecriteria"
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s))
+          LIMIT 1
         ''',
       }),
       dict({

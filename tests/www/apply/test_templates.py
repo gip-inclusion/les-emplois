@@ -218,6 +218,9 @@ class TestIAEEligibilityDetail:
             eligibility_diagnosis=diagnosis,
             hiring_start_at=datetime.date(2024, 8, 3),
         )
+        request = RequestFactory()
+        request.user = diagnosis.author
+        request.from_authorized_prescriber = diagnosis.author.is_prescriber_with_authorized_org_memberships
         if diagnosis.is_from_employer:
             job_application.to_company = diagnosis.author_siae
             job_application.save()
@@ -225,7 +228,7 @@ class TestIAEEligibilityDetail:
         diagnosis.criteria_display = diagnosis.get_criteria_display_qs(hiring_start_at=job_application.hiring_start_at)
         return {
             "eligibility_diagnosis": diagnosis,
-            "request": RequestFactory(),
+            "request": request,
             "siae": job_application.to_company,
             "job_seeker": diagnosis.job_seeker,
             "itou_help_center_url": "https://help.com",
@@ -334,9 +337,12 @@ class TestGEIQEligibilityDetail:
         return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
 
     def default_params_geiq(self, diagnosis, job_application):
+        request = RequestFactory()
+        # Force the value to not have to deal with the template heavily relying on user.is_employer
+        request.from_authorized_prescriber = True
         diagnosis.criteria_display = diagnosis.get_criteria_display_qs(hiring_start_at=job_application.hiring_start_at)
         return {
-            "request": RequestFactory(),
+            "request": request,
             "diagnosis": diagnosis,
             "itou_help_center_url": "https://help.com",
         }
@@ -410,6 +416,7 @@ class TestCertifiedBadge:
     CERTIFIED_BADGE_TEXT = "Certifié"
 
     def _render(self, **kwargs):
+        kwargs.setdefault("request", {"from_authorized_prescriber": True})
         return load_template("apply/includes/selected_administrative_criteria_display.html").render(Context(kwargs))
 
     def test_certifiable_diagnosis_without_certifiable_criteria(self, factory):
@@ -422,7 +429,7 @@ class TestCertifiedBadge:
         )
 
         criterion = diagnosis.selected_administrative_criteria.get()
-        rendered = self._render(diagnosis=diagnosis, criterion=criterion)
+        rendered = self._render(criterion=criterion)
         assert escape(criterion.administrative_criteria.name) in rendered
         assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
@@ -449,7 +456,7 @@ class TestCertifiedBadge:
         criterion = diagnosis.selected_administrative_criteria.with_is_considered_certified(
             hiring_start_at=hiring_start_at
         ).get()
-        rendered = self._render(diagnosis=diagnosis, criterion=criterion)
+        rendered = self._render(criterion=criterion)
         assert escape(criterion.administrative_criteria.name) in rendered
         if expected:
             assertInHTML(CERTIFIED_BADGE_HTML, rendered)
@@ -458,19 +465,31 @@ class TestCertifiedBadge:
             assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
             assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
-    def test_not_certifiable_diagnosis_with_certifiable_criteria(self, mocker, factory):
+    @pytest.mark.parametrize("employer", [True, False])
+    @pytest.mark.parametrize("authorized_prescriber", [True, False])
+    @pytest.mark.parametrize("is_considered_certified", [True, False])
+    def test_badge_is_only_displayed_to_employer_or_authorized_prescriber(
+        self, factory, employer, authorized_prescriber, is_considered_certified
+    ):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
-        diagnosis = factory(not_certifiable=True, criteria_kinds=[criteria_kind])
-        mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+        diagnosis = factory(
+            certifiable=True, criteria_kinds=[criteria_kind], from_prescriber=random.choice([None, True])
         )
-        certify_criteria(diagnosis)
+        criterion = diagnosis.selected_administrative_criteria.get()
+        criterion.is_considered_certified = is_considered_certified
 
-        criterion = diagnosis.selected_administrative_criteria.with_is_considered_certified(
-            hiring_start_at=datetime.date(2024, 8, 1)
-        ).get()
-        rendered = self._render(diagnosis=diagnosis, criterion=criterion)
-        assert escape(criterion.administrative_criteria.name) in rendered
-        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
-        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
+        rendered = self._render(
+            request={"user": {"is_employer": employer}, "from_authorized_prescriber": authorized_prescriber},
+            criterion=criterion,
+        )
+        if any([employer, authorized_prescriber]):
+            expected, not_expected = (
+                (CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML)
+                if is_considered_certified
+                else (NOT_CERTIFIED_BADGE_HTML, CERTIFIED_BADGE_HTML)
+            )
+            assertInHTML(expected, rendered)
+            assertNotInHTML(not_expected, rendered)
+        else:
+            assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+            assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
