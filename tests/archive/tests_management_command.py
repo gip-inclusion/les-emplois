@@ -23,23 +23,26 @@ from tests.users.factories import (
 )
 
 
+DAYS_OF_INACTIVITY = 730 - 30
+
+
 class TestNotifyArchiveJobSeekersManagementCommand:
     @pytest.mark.parametrize("wet_run", [True, False])
     @pytest.mark.parametrize(
         "kwargs, model",
         [
             pytest.param(
-                {"joined_days_ago": 365},
+                {"joined_days_ago": DAYS_OF_INACTIVITY},
                 "user",
                 id="jobseeker_to_notify",
             ),
             pytest.param(
-                {"joined_days_ago": 365, "notified_days_ago": 1, "last_login": timezone.now()},
+                {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": timezone.now()},
                 "user",
                 id="notified_jobseeker_to_reset",
             ),
             pytest.param(
-                {"joined_days_ago": 365, "notified_days_ago": 30},
+                {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
                 "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
@@ -60,12 +63,12 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         "kwargs, model",
         [
             pytest.param(
-                {"joined_days_ago": 365},
+                {"joined_days_ago": DAYS_OF_INACTIVITY},
                 "user",
                 id="jobseeker_to_notify",
             ),
             pytest.param(
-                {"joined_days_ago": 365, "notified_days_ago": 30},
+                {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
                 "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
@@ -86,73 +89,79 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         "factory, related_object_factory, updated_notification_date",
         [
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, for_snapshot=True),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 None,
                 True,
                 id="jobseeker_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, is_active=False),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, is_active=False),
                 None,
                 True,
                 id="deactivated_jobseeker_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now()),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True),
+                None,
+                False,
+                id="jobseeker_soon_without_recent_activity",
+            ),
+            pytest.param(
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now()),
                 None,
                 False,
                 id="jobseeker_with_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 False,
                 id="jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: ApprovalFactory(user=jobseeker),
                 False,
                 id="jobseeker_with_recent_approval",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 False,
                 id="jobseeker_with_recent_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 False,
                 id="jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
                 False,
                 id="jobseeker_with_recent_follow_up_group",
             ),
             pytest.param(
-                lambda: PrescriberFactory(joined_days_ago=365),
+                lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 None,
                 False,
                 id="prescriber_without_recent_activity",
             ),
             pytest.param(
-                lambda: EmployerFactory(joined_days_ago=365),
+                lambda: EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 None,
                 False,
                 id="employer_without_recent_activity",
             ),
             pytest.param(
-                lambda: LaborInspectorFactory(joined_days_ago=365),
+                lambda: LaborInspectorFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 None,
                 False,
                 id="labor_inspector_without_recent_activity",
             ),
             pytest.param(
-                lambda: ItouStaffFactory(joined_days_ago=365),
+                lambda: ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 None,
                 False,
                 id="itou_staff_without_recent_activity",
@@ -204,7 +213,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         [
             pytest.param(
                 lambda: JobSeekerFactory(
-                    joined_days_ago=365,
+                    joined_days_ago=DAYS_OF_INACTIVITY,
                     notified_days_ago=29,
                 ),
                 None,
@@ -212,7 +221,9 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="notified_jobseeker",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                lambda: JobSeekerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+                ),
                 None,
                 True,
                 id="notified_jobseeker_with_recent_login",
@@ -227,61 +238,69 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="notified_jobseeker_with_recent_date_joined",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1, is_active=False),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, is_active=False),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 True,
                 id="inactive_jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: ApprovalFactory(user=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_approval",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 True,
                 id="notified_jobseeker_with_recent_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 True,
                 id="notified_jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=365, notified_days_ago=1),
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_follow_up_group",
             ),
             pytest.param(
-                lambda: ItouStaffFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                lambda: ItouStaffFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+                ),
                 None,
                 False,
                 id="itoustaff_with_recent_login",
             ),
             pytest.param(
-                lambda: LaborInspectorFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                lambda: LaborInspectorFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+                ),
                 None,
                 False,
                 id="labor_inspector_with_recent_login",
             ),
             pytest.param(
-                lambda: EmployerFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                lambda: EmployerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+                ),
                 None,
                 False,
                 id="employer_with_recent_login",
             ),
             pytest.param(
-                lambda: PrescriberFactory(joined_days_ago=365, notified_days_ago=1, last_login=timezone.now()),
+                lambda: PrescriberFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+                ),
                 None,
                 False,
                 id="prescriber_with_recent_login",
