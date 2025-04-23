@@ -388,46 +388,6 @@ class TestEligibilityDiagnosisModel:
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 
-    @pytest.mark.parametrize(
-        "factory_params,expected",
-        [
-            # Criteria selected by prescribers are never certified, whatever the kind.
-            pytest.param(
-                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-                False,
-                id="prescriber_certified_criteria",
-            ),
-            pytest.param(
-                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-                False,
-                id="prescriber_no_certified_criteria",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-                False,
-                id="employer_no_certified_criteria",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-                True,
-                id="employer_certified_criteria__rsa",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
-                True,
-                id="employer_certified_criteria__aah",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.PI]},
-                True,
-                id="employer_certified_criteria__pi",
-            ),
-        ],
-    )
-    def test_criteria_can_be_certified(self, factory_params, expected):
-        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker__born_in_france=True, **factory_params)
-        assert diagnosis.criteria_can_be_certified() == expected
-
 
 class TestAdministrativeCriteriaModel:
     def test_levels_queryset(self):
