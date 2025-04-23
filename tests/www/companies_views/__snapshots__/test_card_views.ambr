@@ -178,6 +178,44 @@
                       </div>
   '''
 # ---
+# name: TestCardView.test_card_flow[navinfo-company-card]
+  '''
+  <div class="c-navinfo">
+          
+              <div class="c-navinfo__prevstep">
+                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
+                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+                      <span>
+                          Retour
+                          à la liste
+                      </span>
+                  </a>
+              </div>
+          
+          
+          
+      </div>
+  '''
+# ---
+# name: TestCardView.test_card_flow[navinfo-job-description]
+  '''
+  <div class="c-navinfo">
+          
+              <div class="c-navinfo__prevstep">
+                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
+                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+                      <span>
+                          Retour
+                          à la liste
+                      </span>
+                  </a>
+              </div>
+          
+          
+          
+      </div>
+  '''
+# ---
 # name: TestCardView.test_card_no_active_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
@@ -269,6 +307,7 @@
                           <div class="s-title-02__col col-12">
                               
       
+  
   
   
   
@@ -900,4 +939,23 @@
       }),
     ]),
   })
+# ---
+# name: TestJobDescriptionCardView.test_job_description_card[navinfo]
+  '''
+  <div class="c-navinfo">
+          
+              <div class="c-navinfo__prevstep">
+                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/company/job_description_list">
+                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+                      <span>
+                          Retour
+                          à la liste
+                      </span>
+                  </a>
+              </div>
+          
+          
+          
+      </div>
+  '''
 # ---

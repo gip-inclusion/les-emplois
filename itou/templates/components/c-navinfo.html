@@ -1,0 +1,38 @@
+{% load previous_step %}
+
+{% comment %}
+    This component should only be used in the .s-title-02 <section>.
+    The c_navinfo__back_url, c_navinfo__prevnext_url and c_navinfo__info chidren are optional.
+    If c_navinfo__prev_url or c_navinfo__next_url is filled in, the labels must also be filled in.
+    c_navinfo__prev_url or c_navinfo__next_url can be disabled with .disabled class
+    See examples -> https://zeroheight.com/85c89893b/p/9217c1-navinfo
+{% endcomment %}
+{% if c_navinfo__back_url or c_navinfo__info %}
+    <div class="c-navinfo">
+        {% if c_navinfo__back_url %}
+            <div class="c-navinfo__prevstep">
+                <a href="{{ c_navinfo__back_url }}" class="btn btn-ico btn-link ps-0" aria-label={% if c_navinfo__back_url|is_list %}"Retour à la liste"{% else %}"Retour à la page précédente"{% endif %}>
+                    <i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>
+                    <span>
+                        Retour
+                        {% if c_navinfo__back_url|is_list %}à la liste{% endif %}
+                    </span>
+                </a>
+            </div>
+        {% endif %}
+        {% if c_navinfo__prev_url or c_navinfo__next_url %}
+            {% comment %} The logic will be completed soon, when the need arises {% endcomment %}
+            <div class="c-navinfo__prevnext">
+                <a href="{{ c_navinfo__prev_url }}" class="btn btn-ico-only btn-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ c_navinfo__prev_label }}">
+                    <span class="visually-hidden">{{ c_navinfo__prev_label }}</span>
+                    <i class="ri-arrow-left-circle-line ri-xl fw-medium" aria-hidden="true"></i>
+                </a>
+                <a href="{{ c_navinfo__next_url }}" class="btn btn-ico-only btn-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ c_navinfo__next_label }}">
+                    <span class="visually-hidden">{{ c_navinfo__next_label }}</span>
+                    <i class="ri-arrow-right-circle-line ri-xl fw-medium" aria-hidden="true"></i>
+                </a>
+            </div>
+        {% endif %}
+        {% if c_navinfo__info %}<div class="c-navinfo__info">{{ c_navinfo__info }}</div>{% endif %}
+    </div>
+{% endif %}
