@@ -1181,11 +1181,13 @@ class TestSessionNamespace:
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
             session[ns_name] = value_to_test
+            session[f"{ns_name}_session_kind"] = "test_session"
             assert "unknown" not in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
         for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:
             session[ns_name] = value_to_test
+            session[f"{ns_name}_session_kind"] = "test_session"
             assert "value" in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
@@ -1250,46 +1252,6 @@ class TestSessionNamespace:
         assert str(uuid.UUID(ns.name)) == ns.name
         assert ns.name in session
         assert session[ns.name] == {"content": "a nice content"}
-
-    def test_load_legacy_session(self):
-        session = self._get_session_store()
-        data = {"config": {"session_kind": "test_session"}, "data": "data"}
-        session["namespace"] = data
-        ns = itou.utils.session.SessionNamespace(session, "test_session", "namespace")
-
-        assert "data" in ns
-        ns.kind_verified = False
-
-        assert ns.exists()
-        ns.kind_verified = False
-
-        assert ns.get("data") == "data"
-        ns.kind_verified = False
-
-        assert ns.as_dict() == data
-        ns.kind_verified = False
-
-        ns.set("foo", "bar")
-        ns.kind_verified = False
-
-        ns.update({"a": "b"})
-        ns.kind_verified = False
-
-        ns = itou.utils.session.SessionNamespace(session, "other_session_kind", "namespace")
-        with pytest.raises(Http404):
-            assert ns.exists()
-        with pytest.raises(Http404):
-            assert "data" in ns
-        with pytest.raises(Http404):
-            assert ns.get("data")
-        with pytest.raises(Http404):
-            assert ns.set("foo", "bar")
-        with pytest.raises(Http404):
-            assert ns.update({"foo": "bar"})
-        with pytest.raises(Http404):
-            assert ns.as_dict()
-        with pytest.raises(Http404):
-            assert ns.delete()
 
     def test_load_polluted_session(self):
         session = self._get_session_store()

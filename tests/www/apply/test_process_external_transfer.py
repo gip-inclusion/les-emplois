@@ -324,6 +324,7 @@ def test_step_2(client, snapshot):
 
     session = client.session
     session[f"job_application-{other_company.pk}"] = {"reset_url": transfer_step_1_url}
+    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
     session.save()
 
     # No selected job
@@ -392,6 +393,7 @@ def test_step_3(client, snapshot):
     client.force_login(employer)
     session = client.session
     session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
+    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
     session.save()
 
     transfer_step_2_url = reverse(
@@ -436,6 +438,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     client.force_login(employer)
     session = client.session
     session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
+    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
     session.save()
 
     transfer_step_2_url = reverse(
@@ -481,6 +484,7 @@ def test_step_3_remove_previous_CV(client):
     client.force_login(employer)
     session = client.session
     session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
+    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
     session.save()
 
     transfer_step_2_url = reverse(
@@ -522,6 +526,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     client.force_login(employer)
     session = client.session
     session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
+    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
     session.save()
 
     transfer_step_2_url = reverse(
