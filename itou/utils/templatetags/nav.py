@@ -205,7 +205,6 @@ NAV_ENTRIES = {
     "gps": NavItem(
         label="GPS",
         icon="ri-compass-line",
-        is_new=True,  # TODO(alaurent) Remove on 2025/04/01
         target=reverse("gps:group_list"),
         active_view_names=[
             "gps:group_list",
