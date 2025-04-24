@@ -493,7 +493,9 @@ class Company(AddressMixin, OrganizationAbstract):
 
     @property
     def is_aci_convergence(self):
-        return self.kind == CompanyKind.ACI and self.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST
+        return (
+            self.kind == CompanyKind.ACI and self.canonical_company.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST
+        )
 
     def convention_can_be_accessed_by(self, user):
         """
