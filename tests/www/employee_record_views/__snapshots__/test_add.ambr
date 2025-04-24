@@ -515,12 +515,14 @@
                               <div class="c-info">
                                   <span class="c-info__summary">
                                       
-                                          <strong>Vous ne trouvez pas le PASS souhaité ?</strong>
+                                          Vous ne trouvez pas le PASS souhaité ?
                                       
                                   </span>
-                                  <p class="c-info__detail mb-0">
-                                      <a href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-approval">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
-                                  </p>
+                                  <div class="c-info__detail">
+                                      <p>
+                                          Vous pouvez faire <a aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure" href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-approval">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
+                                      </p>
+                                  </div>
                               </div>
                               <hr/>
                               
@@ -948,12 +950,14 @@
                               <div class="c-info">
                                   <span class="c-info__summary">
                                       
-                                          <strong>Vous ne trouvez pas votre salarié ?</strong>
+                                          Vous ne trouvez pas votre salarié ?
                                       
                                   </span>
-                                  <p class="c-info__detail mb-0">
-                                      <a href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-employee">Cliquez-ici</a> pour faire une recherche avancée parmi l’ensemble des candidats ou salariés de votre structure.
-                                  </p>
+                                  <div class="c-info__detail">
+                                      <p>
+                                          Vous pouvez faire <a aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure" href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-employee">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
+                                      </p>
+                                  </div>
                               </div>
                               <hr/>
                               
