@@ -1,6 +1,3 @@
-from django.conf import settings
-
-from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -57,7 +54,7 @@ TABLE.add_columns(
             "name": "convergence_france",
             "type": "boolean",
             "comment": "Convergence France (contrats PHC et CVG)",
-            "fn": lambda o: o.kind == CompanyKind.ACI and o.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST,
+            "fn": lambda o: o.is_aci_convergence,
         },
     ]
 )
