@@ -11,13 +11,11 @@ from itou.utils.widgets import JobSeekerAddressAutocompleteWidget
 
 
 class JobSeekerAddressForm(forms.ModelForm):
-    address_line_1 = forms.CharField(
-        label="Adresse", widget=forms.TextInput(attrs={"placeholder": "102 Quai de Jemmapes"})
-    )
+    address_line_1 = forms.CharField(label="Adresse", help_text=("Par exemple: 102 Quai de Jemmapes"))
     address_line_2 = forms.CharField(
-        label="Complément d'adresse", widget=forms.TextInput(attrs={"placeholder": "Appartement 16"}), required=False
+        label="Complément d'adresse", required=False, help_text=("Par exemple: Appartement 16")
     )
-    post_code = forms.CharField(label="Code postal", widget=forms.TextInput(attrs={"placeholder": "75010"}))
+    post_code = forms.CharField(label="Code postal", help_text=("Par exemple: 75010"))
     insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
     ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
     fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
