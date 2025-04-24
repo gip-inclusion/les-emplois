@@ -5,7 +5,7 @@ import factory
 import factory.fuzzy
 
 from itou.companies.enums import CompanyKind
-from itou.geiq.sync import _nb_days
+from itou.geiq.sync import _nb_days_in_year
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -91,8 +91,9 @@ class EmployeeContractFactory(factory.django.DjangoModelFactory):
     )
     other_data = factory.LazyFunction(dict)
     nb_days_in_campaign_year = factory.LazyAttribute(
-        lambda obj: _nb_days(
-            [(obj.start_at, obj.end_at or obj.planned_end_at)],
+        lambda obj: _nb_days_in_year(
+            obj.start_at,
+            obj.end_at or obj.planned_end_at,
             year=obj.employee.assessment.campaign.year,
         )
     )

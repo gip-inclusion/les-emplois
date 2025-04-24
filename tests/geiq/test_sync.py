@@ -2,31 +2,14 @@ import datetime
 
 import pytest
 
-from itou.eligibility.models import GEIQAdministrativeCriteria
-from itou.geiq import models, sync
+from itou.geiq import sync
+from itou.geiq_assessments import models
 from itou.utils.apis import geiq_label
 from tests.geiq.factories import (
-    ImplementationAssessmentFactory,
     SalarieContratLabelDataFactory,
     SalariePreQualificationLabelDataFactory,
 )
-
-
-@pytest.mark.parametrize(
-    "periods, year, expected",
-    [
-        ([], 2024, 0),
-        ([("2023-01-01", "2023-01-31")], 2023, 31),
-        ([("2023-01-01", "2023-01-31")], 2024, 0),
-        ([("2022-01-01", "2024-01-31")], 2023, 365),
-        ([("2022-01-01", "2023-01-31"), ("2023-01-15", "2023-01-20")], 2023, 31),
-        ([("2022-01-01", "2023-01-31"), ("2023-01-15", "2023-01-20"), ("2023-02-01", "2023-02-20")], 2023, 51),
-        ([("2022-01-01", "2023-01-31"), ("2023-01-15", "2023-02-10"), ("2023-02-01", "2023-02-20")], 2023, 51),
-    ],
-)
-def test_nb_days(periods, year, expected):
-    parsed_periods = [(datetime.date.fromisoformat(start), datetime.date.fromisoformat(end)) for start, end in periods]
-    assert sync._nb_days(parsed_periods, year=year) == expected
+from tests.geiq_assessments.factories import AssessmentFactory
 
 
 @pytest.fixture
@@ -37,26 +20,30 @@ def label_settings(settings):
 
 
 def test_sync_employee_and_contracts(caplog, label_settings, mocker):
-    assessment = ImplementationAssessmentFactory(campaign__year=2023)
+    assessment = AssessmentFactory(campaign__year=2023, label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}])
 
     prequal_only = SalariePreQualificationLabelDataFactory(
-        salarie__geiq_id=assessment.label_id,
+        salarie__geiq_id=assessment.label_geiq_id,
         date_debut="2023-01-01T00:00:00+01:00",
         date_fin="2023-01-31:00:00+01:00",
     )
     contract = SalarieContratLabelDataFactory(
-        salarie__geiq_id=assessment.label_id,
-        salarie__statuts_prioritaire=[
-            {"id": 13, "libelle": "Bénéficiaire du RSA", "libelle_abr": "RSA", "niveau": 1},
-        ],
+        salarie__geiq_id=assessment.label_geiq_id,
+        salarie__montant_aide=1400,
+        antenne={"id": 0, "name": "Un Joli GEIQ"},
+        date_debut="2023-01-01T00:00:00+01:00",
+        date_fin="2024-01-31:00:00+01:00",
+    )
+    contract_of_antenna = SalarieContratLabelDataFactory(
+        salarie__geiq_id=assessment.label_geiq_id,
+        antenne={"id": 1, "name": "Antenne 1"},
         date_debut="2023-01-01T00:00:00+01:00",
         date_fin="2024-01-31:00:00+01:00",
     )
     contract_with_prequal = SalarieContratLabelDataFactory(
-        salarie__geiq_id=assessment.label_id,
-        salarie__statuts_prioritaire=[
-            {"id": 21, "libelle": "Travailleur handicapé", "libelle_abr": "TH", "niveau": 2},
-        ],
+        salarie__geiq_id=assessment.label_geiq_id,
+        salarie__montant_aide=814,
+        antenne={"id": 0, "name": "Un Joli GEIQ"},
         date_debut="2023-01-15:00:00+01:00",
         date_fin="2023-01-31:00:00+01:00",
         date_fin_contrat="2023-01-31:00:00+01:00",
@@ -67,22 +54,36 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
         date_fin="2023-01-10:00:00+01:00",
     )
     contract_ending_before_2023 = SalarieContratLabelDataFactory(
-        salarie__geiq_id=assessment.label_id,
+        salarie__geiq_id=assessment.label_geiq_id,
         date_debut="2022-01-01T00:00:00+01:00",
         date_fin="2023-01-31:00:00+01:00",
         date_fin_contrat="2022-01-31:00:00+01:00",
     )
 
-    def _fake_get_all_contracts(self, geiq_id):
-        assert geiq_id == assessment.label_id
-        return [dict(contract), dict(contract_with_prequal)]
+    def _fake_get_all_contracts(self, geiq_id, date_fin=None):
+        assert geiq_id == assessment.label_geiq_id
+        return [dict(contract), dict(contract_with_prequal), dict(contract_of_antenna)]
 
     def _fake_get_all_prequalifications(self, geiq_id):
-        assert geiq_id == assessment.label_id
+        assert geiq_id == assessment.label_geiq_id
         return [prequal_only, prequal_of_contract]
+
+    FAKE_LABEL_RATES = {
+        "geiq_id": assessment.label_geiq_id,
+        "taux_sortie_emploi": "82.8",
+        "taux_rupture_periode_essai": "",
+        "taux_sortie_emploi_durable": "51.7",
+        "taux_obtention_qualification": "91.4",
+        "taux_rupture_hors_periode_essai": "14.3",
+    }
+
+    def _fake_get_taux_geiq(self, geiq_id):
+        assert geiq_id == assessment.label_geiq_id
+        return [FAKE_LABEL_RATES]
 
     mocker.patch.object(geiq_label.LabelApiClient, "get_all_contracts", _fake_get_all_contracts)
     mocker.patch.object(geiq_label.LabelApiClient, "get_all_prequalifications", _fake_get_all_prequalifications)
+    mocker.patch.object(geiq_label.LabelApiClient, "get_taux_geiq", _fake_get_taux_geiq)
     sync.sync_employee_and_contracts(assessment)
     employees = models.Employee.objects.order_by("label_id")
     assert len(employees) == 2
@@ -91,19 +92,21 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
     assert contract["salarie"]["id"] == employees[0].label_id
     assert contract_with_prequal["salarie"]["id"] == employees[1].label_id
 
-    assert employees[0].support_days_nb == 365
-    assert employees[0].annex1_nb == 0
-    assert employees[0].annex2_level1_nb == 1
-    assert employees[0].annex2_level2_nb == 0
     assert employees[0].allowance_amount == 1400
+    contract0 = employees[0].contracts.first()
+    assert contract0.nb_days_in_campaign_year == 365
+    assert contract0.allowance_requested is True
+    assert contract0.allowance_granted is False
+    assert employees[1].allowance_amount == 814
+    contract1 = employees[1].contracts.first()
+    assert contract1.nb_days_in_campaign_year == 17
+    assert contract1.allowance_requested is False  # Since less than 90 days
+    assert contract1.allowance_granted is False
 
-    assert employees[1].support_days_nb == 17 + 10  # contract + prequal
-    assert employees[1].annex1_nb == 1
-    assert employees[1].annex2_level1_nb == 0
-    assert employees[1].annex2_level2_nb == 1
-    assert employees[1].allowance_amount == 0  # Since less than 90 days
-
-    assert assessment.last_synced_at is not None
+    assessment.refresh_from_db()
+    assert assessment.contracts_synced_at is not None
+    assert assessment.label_rates == FAKE_LABEL_RATES
+    assert assessment.employee_nb == 2
 
     assert caplog.messages == [
         "Label sync will create nb=2 type=employé",
@@ -119,39 +122,20 @@ def test_sync_employee_and_contracts(caplog, label_settings, mocker):
 
 
 @pytest.mark.parametrize(
-    "api_codes, support_days_nb, annex1_nb, annex2_level1_nb, annex2_level2_nb, allowance_amount",
+    "start, end, year, expected",
     [
-        (set(), 100, 0, 0, 0, 0),
-        ({"TH"}, 100, 1, 0, 1, 814),
-        ({"Pers. SH"}, 100, 1, 0, 1, 814),
-        ({"Pers. SH", "TH"}, 100, 1, 0, 1, 814),
-        ({"RS/PS/DA"}, 100, 0, 0, 1, 0),
-        ({"Refug."}, 100, 1, 0, 1, 814),
-        ({"Refug.", "RS/PS/DA"}, 100, 1, 0, 1, 814),
-        ({"QPV/ZRR"}, 100, 1, 0, 1, 814),
-        ({"ZRR"}, 100, 1, 0, 1, 814),
-        ({"ZRR", "QPV/ZRR"}, 100, 1, 0, 1, 814),
-        ({"QPV", "QPV/ZRR"}, 100, 1, 0, 1, 814),
-        ({"Prison"}, 100, 1, 0, 1, 814),
-        ({"Detention/MJ"}, 100, 1, 0, 1, 814),
-        ({"Detention/MJ", "Prison"}, 100, 1, 0, 1, 814),
-        ({"Prescrit"}, 90, 0, 0, 0, 1400),  # Authorized prescriber criteria
-        ({"Prescrit"}, 10, 0, 0, 0, 0),  # Less than 90 days
-        ({"RSA"}, 100, 0, 1, 0, 1400),
-        ({"RSA", "ASS", "AAH"}, 100, 0, 3, 0, 1400),
-        ({"TH", "+50"}, 100, 1, 0, 2, 1400),
-        ({"TH", "+50", "Pers. SH", "Aucun"}, 100, 1, 0, 2, 1400),
+        ("2023-01-01", "2023-03-31", 2023, 90),
+        ("2023-01-01", "2023-03-31", 2024, 0),
+        ("2022-01-01", "2023-03-31", 2023, 90),
+        ("2022-01-02", "2023-01-31", 2023, 31),
+        ("2023-10-01", "2024-03-31", 2023, 92),
+        ("2023-10-02", "2024-01-31", 2023, 91),
+        ("2023-02-14", "2023-05-13", 2023, 89),
+        ("2023-06-14", "2023-09-12", 2023, 91),
+        ("2023-06-14", "2023-06-14", 2023, 1),
     ],
 )
-def test_compute_eligibility_fields(
-    api_codes, support_days_nb, annex1_nb, annex2_level1_nb, annex2_level2_nb, allowance_amount
-):
-    code_to_criteria = {
-        criteria.api_code: criteria for criteria in GEIQAdministrativeCriteria.objects.exclude(api_code="")
-    }
-    assert sync._compute_eligibility_fields(api_codes, code_to_criteria, support_days_nb) == {
-        "annex1_nb": annex1_nb,
-        "annex2_level1_nb": annex2_level1_nb,
-        "annex2_level2_nb": annex2_level2_nb,
-        "allowance_amount": allowance_amount,
-    }
+def test_nb_days_in_year(start, end, year, expected):
+    start = datetime.date.fromisoformat(start)
+    end = datetime.date.fromisoformat(end)
+    assert sync._nb_days_in_year(start, end, year=year) == expected
