@@ -61,5 +61,86 @@
     },
     "model": "gps.followupgroup",
     "pk": 7
+  },
+  {
+    "fields": {
+      "beneficiary": 89,
+      "created_at": "2025-04-24T12:25:42.955Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "beneficiary": 90,
+      "created_at": "2025-04-24T12:29:53.331Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "beneficiary": 91,
+      "created_at": "2025-04-24T12:30:55.416Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "beneficiary": 92,
+      "created_at": "2025-04-24T12:32:02.809Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "beneficiary": 93,
+      "created_at": "2025-04-24T12:34:07.008Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "beneficiary": 94,
+      "created_at": "2025-04-24T12:38:50.669Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "beneficiary": 112,
+      "created_at": "2025-04-25T14:46:32.011Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "beneficiary": 113,
+      "created_at": "2025-04-25T14:48:42.200Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "beneficiary": 114,
+      "created_at": "2025-04-25T14:50:11.928Z",
+      "created_in_bulk": false
+    },
+    "model": "gps.followupgroup",
+    "pk": 16
   }
 ]

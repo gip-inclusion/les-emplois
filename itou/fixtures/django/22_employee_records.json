@@ -82,5 +82,194 @@
     },
     "model": "employee_record.employeerecord",
     "pk": 4
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787942",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:36:09.350Z",
+      "financial_annex": 148214,
+      "job_application": "ce968f11-86a5-4130-a359-619a9ee212d7",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600027",
+      "status": "SENT"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787941",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:36:41.815Z",
+      "financial_annex": 148214,
+      "job_application": "cb15426b-d9b4-466e-8643-0a95744bd97c",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600027",
+      "status": "NEW"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787939",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:37:02.168Z",
+      "financial_annex": 148214,
+      "job_application": "a5dfedc9-fc32-43de-abf8-dd614d892697",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600025",
+      "status": "PROCESSED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787940",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:37:19.753Z",
+      "financial_annex": 148205,
+      "job_application": "1ed3f3e1-a671-46fa-8fdd-e5a37d638b8f",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600027",
+      "status": "REJECTED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787943",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:40:03.408Z",
+      "financial_annex": 148214,
+      "job_application": "446ad77a-80f3-4841-9d21-8102cea25f36",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600027",
+      "status": "PROCESSED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX8787944",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-24T12:40:30.378Z",
+      "financial_annex": 148214,
+      "job_application": "9ff4936d-164c-4241-bfd2-5ef88f250f91",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600027",
+      "status": "READY"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX9663815",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-25T14:51:42.241Z",
+      "financial_annex": 148214,
+      "job_application": "094a1335-ccef-41e8-9455-2086e96d00d2",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600025",
+      "status": "PROCESSED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX9663816",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-25T14:52:02.672Z",
+      "financial_annex": 148214,
+      "job_application": "cca6c829-10a3-47f9-851d-1707cac56946",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600025",
+      "status": "PROCESSED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "approval_number": "XXXXX9663817",
+      "archived_json": null,
+      "asp_batch_file": null,
+      "asp_batch_line_number": null,
+      "asp_id": 3411,
+      "asp_measure": "ETTI_DC",
+      "asp_processing_code": null,
+      "asp_processing_label": null,
+      "created_at": "2025-04-25T14:52:25.310Z",
+      "financial_annex": 148214,
+      "job_application": "0c971801-3d01-4052-9afd-6f77a24f320a",
+      "processed_as_duplicate": false,
+      "processed_at": null,
+      "siret": "50010961600025",
+      "status": "DISABLED"
+    },
+    "model": "employee_record.employeerecord",
+    "pk": 13
   }
 ]
