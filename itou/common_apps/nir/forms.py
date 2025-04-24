@@ -121,17 +121,10 @@ class JobSeekerNIRUpdateMixin:
         else:
             return None
         return f"""
-            <div class="alert alert-danger" role="alert">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-danger"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>{title}</strong>
-                        </p>
-                        <p class="mb-0">{details}</p>
-                    </div>
-                </div>
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>{title}</strong>
+                </p>
+                <p class="mb-0">{details}</p>
             </div>
         """
