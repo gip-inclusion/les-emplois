@@ -20,13 +20,13 @@
         {% bootstrap_field form.address_for_autocomplete %}
         {% bootstrap_field form.address_line_1 %}
         {% bootstrap_field form.address_line_2 %}
-        {% bootstrap_field form.post_code %}
+        {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form.city %}
 
         {% bootstrap_field form.insee_code %}
         {% bootstrap_field form.ban_api_resolved_address %}
         {% bootstrap_field form.fill_mode %}
-        {% bootstrap_field form.phone %}
+        {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
     </fieldset>
 {% endblock %}
 {% block script %}

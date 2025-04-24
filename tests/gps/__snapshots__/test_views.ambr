@@ -3815,7 +3815,8 @@
                       <div class="c-form">
                           <form class="js-prevent-multiple-submit js-format-nir" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <div class="form-group form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale du bénéficiaire</label><input class="form-control" id="id_nir" maxlength="21" name="nir" placeholder="2 69 05 49 588 157 80" required="" type="text"/></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale du bénéficiaire</label><input aria-describedby="id_nir_helptext" class="form-control" id="id_nir" maxlength="21" name="nir" placeholder="2 69 05 49 588 157 80" required="" type="text"/><div class="form-text" id="id_nir_helptext">Par exemple: 2 69 05 49 588 157 80</div>
+  </div>
                               
                               
   
