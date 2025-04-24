@@ -36,6 +36,8 @@ class LabelApiClient:
         command = LabelCommand(command)
         if command in (LabelCommand.DownloadCompte, LabelCommand.SynthesePDF):
             raise ValueError(f"{command} does not return JSON data")
+        if "where" in params and isinstance(params["where"], list):
+            params["where[]"] = params.pop("where")
         try:
             response_data = (
                 self.client.get(
@@ -98,16 +100,19 @@ class LabelApiClient:
             raise LabelAPIError(f"Unexpected content-type: {response_data.headers.get('content-type')}")
         return response_data.content
 
-    def get_all_contracts(self, geiq_id, *, page_size=100):
+    def get_all_contracts(self, geiq_id, *, page_size=100, date_fin=None):
         data = []
         p = 1
+        where = f"s.geiq,=,{geiq_id}"
+        if date_fin:
+            where = [where, f"salariecontrat.date_fin,>,{date_fin}"]
         expected_nb = self._command(
-            LabelCommand.SalarieContrat, join="salariecontrat.salarie,s", where=f"s.geiq,=,{geiq_id}", count=True
+            LabelCommand.SalarieContrat, join="salariecontrat.salarie,s", where=where, count=True
         )
         while new_values := self._command(
             LabelCommand.SalarieContrat,
             join="salariecontrat.salarie,s",
-            where=f"s.geiq,=,{geiq_id}",
+            where=where,
             sort="salariecontrat.id",
             n=page_size,
             p=p,
