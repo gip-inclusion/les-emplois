@@ -219,12 +219,9 @@ class TestTransferCompanyData:
         response = client.get(reverse("admin:companies_company_change", kwargs={"object_id": company.pk}))
         assertNotContains(response, transfer_url)
 
-        # A superuser, the button appears
-        # TODO(xfernandez): in a few weeks, show the buttons to user with change permission
-        # perms = Permission.objects.filter(codename="change_company")
-        # admin_user.user_permissions.add(*perms)
-        admin_user.is_superuser = True
-        admin_user.save(update_fields=("is_superuser",))
+        # With change permission, the button appears
+        perms = Permission.objects.filter(codename="change_company")
+        admin_user.user_permissions.add(*perms)
         response = client.get(reverse("admin:companies_company_change", kwargs={"object_id": company.pk}))
         assertContains(response, transfer_url)
 
