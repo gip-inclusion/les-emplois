@@ -330,6 +330,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(diagnosis.author_geiq.members.first())
         session = client.session
         session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
+        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
         session.save()
         response = client.get(url)
 
@@ -343,6 +344,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(prescriber)
         session = client.session
         session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
+        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
         session.save()
         response = client.get(
             reverse(
@@ -363,6 +365,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(diagnosis.author_geiq.members.first())
         session = client.session
         session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
+        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
         session.save()
         response = client.get(url)
 
@@ -377,6 +380,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(prescriber)
         session = client.session
         session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
+        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
         session.save()
         response = client.get(
             reverse(
@@ -398,6 +402,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(diagnosis.author_geiq.members.first())
         session = client.session
         session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
+        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
         session.save()
         response = client.get(url)
 
@@ -412,6 +417,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(prescriber)
         session = client.session
         session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
+        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
         session.save()
         response = client.get(
             reverse(
@@ -428,6 +434,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         client.force_login(job_application.job_seeker)
         session = client.session
         session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
+        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
         session.save()
         # Needed to setup session
         response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))

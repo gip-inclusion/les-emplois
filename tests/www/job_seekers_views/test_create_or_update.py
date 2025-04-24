@@ -115,6 +115,7 @@ class TestGetOrCreateForJobSeeker:
                 },
                 "apply": {"company_pk": company.pk},
             }
+            session[f"{session_name}_session_kind"] = "job-seeker-get-or-create"
             session.save()
             response = client.get(
                 reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": session_name})
@@ -293,6 +294,7 @@ class TestGetOrCreateForSender:
             },
             "apply": {"company_pk": company.pk},
         }
+        session[f"{session_name}_session_kind"] = "job-seeker-check-nir-job-seeker"
         session.save()
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": session_name})

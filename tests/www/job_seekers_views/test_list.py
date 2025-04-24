@@ -411,6 +411,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
             "lack_of_pole_emploi_id_reason": "NOT_REGISTERED",
         },
     }
+    session[f"{session_name}_session_kind"] = "job-seeker-get-or-create"
     session.save()
 
     # Create job seeker step end

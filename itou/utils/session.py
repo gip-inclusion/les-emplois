@@ -42,18 +42,13 @@ class SessionNamespace:
             try:
                 session_kind = self._session[self.session_kind_key]
             except KeyError:
-                # TODO(François): Raise an Http404 if self.session_kind_key is not defined.
-                try:
-                    session_kind = self._session[self.name]["config"]["session_kind"]
-                except (
-                    KeyError,
-                    TypeError,  # data is not a dict.
-                ):
-                    session_kind = None
-            if session_kind is not None and session_kind != self.expected_session_kind:
-                logger.warning(f"Loading a {session_kind} while expecting a {self.expected_session_kind}.")
+                logger.warning(f"Failed to load session, missing {self.session_kind_key}.")
                 raise Http404
-            self.kind_verified = True
+            else:
+                if session_kind != self.expected_session_kind:
+                    logger.warning(f"Loading a {session_kind} while expecting a {self.expected_session_kind}.")
+                    raise Http404
+                self.kind_verified = True
 
     def __contains__(self, item):
         self.verify_kind()
@@ -89,8 +84,7 @@ class SessionNamespace:
         self.verify_kind()
 
         del self._session[self.name]
-        # TODO(François): Convert to del next week.
-        self._session.pop(self.session_kind_key, None)
+        del self._session[self.session_kind_key]
         self._session.modified = True
 
     def save(self):
