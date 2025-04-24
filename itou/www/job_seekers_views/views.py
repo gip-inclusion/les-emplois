@@ -1192,6 +1192,12 @@ class CheckJobSeekerInformations(ApplicationBaseView):
 
         self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
 
+    def get_redirect_url(self):
+        return reverse(
+            "apply:step_check_prev_applications",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
     def get(self, request, *args, **kwargs):
         # Check required info that will allow us to find a pre-existing approval.
         has_required_info = self.job_seeker.jobseeker_profile.birthdate and (
@@ -1199,24 +1205,14 @@ class CheckJobSeekerInformations(ApplicationBaseView):
             or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
         )
         if has_required_info:
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(self.get_redirect_url())
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             self.form.save()
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(self.get_redirect_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
