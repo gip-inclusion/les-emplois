@@ -8,13 +8,13 @@
             <form method="post" class="js-prevent-multiple-submit" data-matomo-name="employee-record-identity">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>Etat civil du salarié</legend>
+                    <legend class="h3">Etat civil du salarié</legend>
                     {% bootstrap_form_errors form type="all" %}
 
-                    {% bootstrap_field form.title %}
+                    {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.first_name %}
                     {% bootstrap_field form.last_name %}
-                    {% bootstrap_field form.birthdate %}
+                    {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.birth_country %}
                     {% bootstrap_field form.birth_place %}
                 </fieldset>

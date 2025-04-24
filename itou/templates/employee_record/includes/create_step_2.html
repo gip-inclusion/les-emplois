@@ -8,7 +8,7 @@
             <form method="post" action="{% url "employee_record_views:create_step_2" job_application.id %}">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>Domiciliation du salarié</legend>
+                    <legend class="h3">Domiciliation du salarié</legend>
                     {% bootstrap_form_errors form type="all" %}
                     <div class="mb-3">
                         <p>
@@ -24,7 +24,7 @@
                             </li>
                         </ul>
                         {% if profile.hexa_address_filled %}
-                            <p class="mb-0">
+                            <p>
                                 <i class="ri-error-warning-line ri-lg me-1" aria-hidden="true"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
                             </p>
                         {% else %}
@@ -44,9 +44,7 @@
                         {% endif %}
                     </div>
                     <div class="c-info mb-3 mb-md-5">
-                        <button class="c-info__summary">
-                            <span>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</span>
-                        </button>
+                        <span class="c-info__summary">Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</span>
                         <div class="c-info__detail">
                             {% if address_filled %}
                                 <ul class="list-unstyled mb-0">
@@ -60,12 +58,12 @@
                         </div>
                     </div>
 
-                    {% bootstrap_field form.hexa_lane_number %}
-                    {% bootstrap_field form.hexa_std_extension %}
-                    {% bootstrap_field form.hexa_lane_type %}
+                    {% bootstrap_field form.hexa_lane_number wrapper_class="form-group form-group-input-w-lg-33" %}
+                    {% bootstrap_field form.hexa_std_extension wrapper_class="form-group form-group-input-w-lg-33" %}
+                    {% bootstrap_field form.hexa_lane_type wrapper_class="form-group form-group-input-w-lg-66" %}
                     {% bootstrap_field form.hexa_lane_name %}
                     {% bootstrap_field form.hexa_additional_address %}
-                    {% bootstrap_field form.hexa_post_code %}
+                    {% bootstrap_field form.hexa_post_code wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.hexa_commune %}
 
                     <button class="btn btn-outline-primary mb-3">Valider cette adresse</button>
