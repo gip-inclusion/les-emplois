@@ -476,6 +476,22 @@ class Company(AddressMixin, OrganizationAbstract):
         """
         return self.kind == CompanyKind.AI
 
+    @property
+    def canonical_company(self):
+        """
+        Return the canonical company of the current company.
+        If the current company has no parent, it is itself its canonical company.
+        If the current company has a parent, that parent is the canonical company.
+        """
+        if self.convention_id and self.source == self.SOURCE_USER_CREATED:
+            # Iterate on all() to take advantage of a potential prefetch_related upstream
+            # e.g. by populate_metabase_emplois.
+            for convention_siae in self.convention.siaes.all():
+                if convention_siae.source == self.SOURCE_ASP:
+                    return convention_siae
+        return self
+
+
     def convention_can_be_accessed_by(self, user):
         """
         Decides whether the user can show the siae convention or not.
