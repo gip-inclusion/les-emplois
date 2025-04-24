@@ -75,7 +75,7 @@
 # ---
 # name: TestApprovalProlongation.test_prolongation_approval_view_with_disabled_values[RQTH & SENIOR disabled]
   '''
-  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-indicator="#mainForm" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
       
           
           
@@ -114,7 +114,7 @@
 # ---
 # name: TestApprovalProlongation.test_prolongation_approval_view_with_disabled_values[RQTH disabled]
   '''
-  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-indicator="#mainForm" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
       
           
           
