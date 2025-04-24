@@ -166,6 +166,7 @@ class SalarieLabelDataFactory(factory.DictFactory):
     )
     is_bac_general = factory.fuzzy.FuzzyChoice([None, True, False])
     geiq_id = factory.fuzzy.FuzzyInteger(1, 1000)
+    montant_aide = factory.fuzzy.FuzzyChoice([0, 814, 1400])
     statuts_prioritaire = factory.LazyFunction(
         lambda: random.sample(
             [
