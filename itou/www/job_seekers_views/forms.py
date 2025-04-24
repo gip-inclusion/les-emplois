@@ -136,6 +136,7 @@ class CheckJobSeekerNirForm(forms.Form):
         required=True,
         strip=True,
         validators=[validate_nir],
+        help_text=("Par exemple: 2 69 05 49 588 157 80"),
         widget=forms.TextInput(
             attrs={
                 "placeholder": "2 69 05 49 588 157 80",
@@ -202,7 +203,8 @@ class JobSeekerExistsForm(forms.Form):
 
     email = forms.EmailField(
         label="Adresse e-mail personnelle du candidat",
-        widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
+        help_text=("Par exemple: julie@example.com"),
+        widget=forms.EmailInput(attrs={"autocomplete": "off"}),
     )
 
     def clean_email(self):
