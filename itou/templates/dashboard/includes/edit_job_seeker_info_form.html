@@ -14,26 +14,28 @@
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
 
     {% bootstrap_form_errors form type='non_fields' %}
-    {% bootstrap_field form.email %}
-    {% bootstrap_field form.title %}
+    {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+    {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.first_name %}
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.nir %}
     {% bootstrap_field form.lack_of_nir %}
-    {% bootstrap_field form.lack_of_nir_reason wrapper_class=form.lack_of_nir_reason.field.form_group_class %}
-    {% bootstrap_field form.birthdate %}
+    <div class="ps-3 pb-1 mb-3 border-start border-primary collapse lack_of_nir_reason_group">
+        {% bootstrap_field form.lack_of_nir_reason %}
+    </div>
+    {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.birth_place %}
     {% bootstrap_field form.birth_country %}
-    {% bootstrap_field form.phone %}
+    {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.address_for_autocomplete %}
     {% bootstrap_field form.address_line_1 %}
     {% bootstrap_field form.address_line_2 %}
-    {% bootstrap_field form.post_code %}
+    {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
     {% bootstrap_field form.city %}
     {% bootstrap_field form.insee_code %}
     {% bootstrap_field form.ban_api_resolved_address %}
     {% bootstrap_field form.fill_mode %}
-    {% bootstrap_field form.pole_emploi_id %}
+    {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
     {% itou_buttons_form primary_label=submit_label reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_name="edit_jobseeker_infos_submit" %}
