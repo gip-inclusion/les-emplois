@@ -670,19 +670,6 @@ class ApplicationOverrideMixin:
 
 
 class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
-    # FIXME(alaurent) remove next week : now handled by job_application_external_transfer_start_view
-    def dispatch(self, request, *args, **kwargs):
-        if self.company in request.organizations:
-            # This is not an external transfer
-            url = reverse(
-                "apply:job_application_internal_transfer",
-                kwargs={"job_application_id": self.job_application.pk, "company_pk": self.company.pk},
-            )
-            if params := request.GET.urlencode():
-                url = f"{url}?{params}"
-            return HttpResponseRedirect(url)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_initial(self):
         selected_jobs = []
         if job_id := self.request.GET.get("job_description_id"):
