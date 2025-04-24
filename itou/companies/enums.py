@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 
 
@@ -61,7 +60,7 @@ class ContractType(models.TextChoices):
 
     @classmethod
     def choices_for_company(cls, company):
-        return cls.choices_for_company_kind(company.kind, company.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST)
+        return cls.choices_for_company_kind(company.kind, company.is_aci_convergence)
 
     @classmethod
     def choices_for_company_kind(cls, kind, aci_convergence=False):
@@ -93,7 +92,7 @@ class ContractType(models.TextChoices):
                 choices.remove(cls.FIXED_TERM_I_PHC)
                 choices.remove(cls.FIXED_TERM_I_CVG)
 
-        if kind == CompanyKind.ACI and aci_convergence:
+        if aci_convergence:
             choices[-1:-1] = [
                 cls.FIXED_TERM_I_PHC,
                 cls.FIXED_TERM_I_CVG,
