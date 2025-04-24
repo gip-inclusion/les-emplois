@@ -62,17 +62,9 @@ TABLE.add_columns(
     ]
 )
 
-
-def get_parent_company(company):
-    if company.convention_id and company.source == Company.SOURCE_USER_CREATED:
-        # NOTE: siae.convention.siaes should absolutely be prefetched !
-        for convention_siae in company.convention.siaes.all():
-            if convention_siae.source == Company.SOURCE_ASP:
-                return convention_siae
-    return company
-
-
-TABLE.add_columns(get_address_columns(comment_suffix=" de la structure mère", custom_fn=get_parent_company))
+TABLE.add_columns(
+    get_address_columns(comment_suffix=" de la structure mère", custom_fn=(lambda o: o.canonical_company))
+)
 TABLE.add_columns(get_address_columns(name_suffix="_c1", comment_suffix=" de la structure C1"))
 
 TABLE.add_columns(
