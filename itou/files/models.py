@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from django.db import models
 from django.utils import timezone
 
@@ -15,3 +18,13 @@ class File(models.Model):
 
     class Meta:
         verbose_name = "fichier"
+
+    @staticmethod
+    def anonymized_filename(filename):
+        """Really simple method to just change the file name.
+        Don't check extension validity as it's already done in the form.
+        See itou.files.forms.ContentTypeValidator
+        """
+        obfuscated_name = f"{uuid.uuid4()}"
+        _, extension = os.path.splitext(filename)
+        return f"{obfuscated_name}{extension}"
