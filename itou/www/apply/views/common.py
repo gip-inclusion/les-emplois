@@ -231,7 +231,7 @@ def _geiq_eligibility(
         },
     )
 
-    if request.method == "POST" and form.is_valid() and request.htmx:
+    if request.method == "POST" and form.is_valid():
         if form.cleaned_data["choice"]:
             return HttpResponseRedirect(geiq_criteria_form_url)
         else:
