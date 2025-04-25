@@ -11,6 +11,7 @@ jobs:
       github.event.pull_request.merged == true
       && !contains(github.event.pull_request.labels.*.name, 'dependencies')
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: "📢 Notify the #mep-c1 channel"
         # Can't use `!contains(...)` because it give us a "tag suffix cannot contain flow indicator characters" error.

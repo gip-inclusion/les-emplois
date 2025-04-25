@@ -8,6 +8,7 @@ on:
 jobs:
   require-label:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: Verify changelog label
         uses: mheap/github-action-required-labels@388fd6af37b34cdfe5a23b37060e763217e58b03 # v5.5
