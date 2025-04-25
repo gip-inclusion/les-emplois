@@ -187,3 +187,19 @@ def test_purge_files(caplog):
         "Purged 2 files",
     ]
     assert caplog.messages[-1].startswith("Management command itou.files.management.commands.purge_files succeeded in")
+
+
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("resume.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("something-very-long EVEN WITH SPACES! YUK!.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("spreadsheet.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("spreadsheet.pdf.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("open-office.odt", "11111111-1111-1111-1111-111111111111.odt"),
+        ("folder/file.pdf", "folder/11111111-1111-1111-1111-111111111111.pdf"),
+    ],
+)
+def test_anonymised_filename(mocker, filename, expected):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    assert File.anonymized_filename(filename) == expected
