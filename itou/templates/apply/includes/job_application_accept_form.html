@@ -6,7 +6,7 @@
 <div class="c-form" id="acceptFormDiv">
     <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">
         {% if has_form_error %}
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
                 <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
             </div>
         {% endif %}
@@ -19,13 +19,14 @@
             {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
 
             {% bootstrap_form_errors form_personal_data type='non_fields' %}
-            {% bootstrap_field form_personal_data.nir %}
+            {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
             {% bootstrap_field form_personal_data.lack_of_nir %}
-            {% bootstrap_field form_personal_data.lack_of_nir_reason wrapper_class=form_personal_data.lack_of_nir_reason.field.form_group_class %}
-
+            <div class="ps-3 pb-1 mb-3 border-start border-primary collapse lack_of_nir_reason_group">
+                {% bootstrap_field form_personal_data.lack_of_nir_reason %}
+            </div>
             {% bootstrap_field form_personal_data.pole_emploi_id %}
             {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
-            {% bootstrap_field form_personal_data.birthdate %}
+            {% bootstrap_field form_personal_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
             {% bootstrap_field form_personal_data.birth_place %}
             {% bootstrap_field form_personal_data.birth_country %}
         {% endif %}
@@ -38,7 +39,7 @@
             {% bootstrap_field form_user_address.address_for_autocomplete %}
             {% bootstrap_field form_user_address.address_line_1 %}
             {% bootstrap_field form_user_address.address_line_2 %}
-            {% bootstrap_field form_user_address.post_code %}
+            {% bootstrap_field form_user_address.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
             {% bootstrap_field form_user_address.city %}
 
             {% bootstrap_field form_user_address.insee_code %}
@@ -58,14 +59,14 @@
         {# job description: mandatory for GEIQ, optional for other types #}
         {% include "apply/includes/job_description_fields.html" %}
 
-        {% bootstrap_field form_accept.hiring_start_at %}
+        {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-33" %}
 
         {# reloadable training and qualification for GEIQ #}
         {% if company.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
         {% endif %}
 
-        {% bootstrap_field form_accept.hiring_end_at %}
+        {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form_accept.answer %}
 
         {% itou_buttons_form primary_label="Valider l'embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information reset_url=back_url %}
