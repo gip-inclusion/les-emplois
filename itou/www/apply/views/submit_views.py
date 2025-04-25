@@ -1,5 +1,4 @@
 import logging
-import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -716,7 +715,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
-            key = f"resume/{uuid.uuid4()}.pdf"
+            key = f"resume/{File.anonymized_filename(resume.name)}"
             File.objects.create(key=key)
             public_storage = storages["public"]
             name = public_storage.save(key, resume)

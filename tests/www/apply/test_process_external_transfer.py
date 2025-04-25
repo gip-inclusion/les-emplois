@@ -451,7 +451,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     assertNotContains(response, PREVIOUS_RESUME_TEXT)
 
     mocker.patch(
-        "itou.www.apply.views.submit_views.uuid.uuid4",
+        "itou.files.models.uuid.uuid4",
         return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
     )
     response = client.post(transfer_step_3_url, data={"message": "blah", "resume": pdf_file})
@@ -537,7 +537,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assertContains(response, PREVIOUS_RESUME_TEXT)
 
     mocker.patch(
-        "itou.www.apply.views.submit_views.uuid.uuid4",
+        "itou.files.models.uuid.uuid4",
         return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
     )
     response = client.post(

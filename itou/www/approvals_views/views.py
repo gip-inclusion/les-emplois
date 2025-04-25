@@ -340,6 +340,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
             # The file cannot be re-submitted and is stored for the duration of the preview.
             try:
                 prolongation_report = form.cleaned_data["report_file"]
+                prolongation_report.name = File.anonymized_filename(prolongation_report.name)
             except KeyError:
                 pass
             else:
