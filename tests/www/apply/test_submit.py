@@ -5398,7 +5398,7 @@ class TestGEIQEligibilityForHire:
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
         self.company = diagnosis.author_geiq
         client.force_login(self.company.members.first())
-        response = client.get(self._reverse("apply:eligibility_for_hire"))
+        response = client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
     def test_job_seeker_without_valid_diagnosis(self, client):
