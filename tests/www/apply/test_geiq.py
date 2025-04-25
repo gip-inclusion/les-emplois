@@ -11,6 +11,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
+from tests.www.apply.test_submit import fake_session_initialization
 
 
 @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
@@ -328,10 +329,6 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         job_application = JobApplicationFactory(job_seeker=job_seeker, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
         client.force_login(diagnosis.author_geiq.members.first())
-        session = client.session
-        session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
-        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
-        session.save()
         response = client.get(url)
 
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -342,10 +339,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        session = client.session
-        session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
-        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
-        session.save()
+        fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -363,10 +357,6 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(diagnosis.author_geiq.members.first())
-        session = client.session
-        session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
-        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
-        session.save()
         response = client.get(url)
 
         assertTemplateUsed(response, "apply/includes/known_criteria.html")
@@ -378,10 +368,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         client.force_login(prescriber)
-        session = client.session
-        session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
-        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
-        session.save()
+        fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -400,10 +387,6 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(diagnosis.author_geiq.members.first())
-        session = client.session
-        session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
-        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
-        session.save()
         response = client.get(url)
 
         assertTemplateUsed(response, "apply/includes/known_criteria.html")
@@ -415,10 +398,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        session = client.session
-        session[f"job_application-{geiq.pk}"] = {"selected_jobs": []}
-        session[f"job_application-{geiq.pk}_session_kind"] = "apply_session"
-        session.save()
+        fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -432,11 +412,6 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_jobseeker_cannot_create_geiq_diagnosis(self, client):
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
         client.force_login(job_application.job_seeker)
-        session = client.session
-        session[f"job_application-{job_application.to_company_id}"] = {"selected_jobs": []}
-        session[f"job_application-{job_application.to_company_id}_session_kind"] = "apply_session"
-        session.save()
-        # Needed to setup session
         response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 403
         response = client.post(
