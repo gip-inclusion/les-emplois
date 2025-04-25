@@ -286,6 +286,7 @@ def _geiq_eligibility_criteria(
         data=request.POST or None,
     )
     next_url = get_safe_url(request, "next_url")
+    back_url = get_safe_url(request, "back_url")
     allowance_amount = None
 
     if request.method == "POST" and form.is_valid():
@@ -304,10 +305,7 @@ def _geiq_eligibility_criteria(
         "form": form,
         "allowance_amount": allowance_amount,
         "progress": 66,
-        "back_url": reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"job_seeker_public_id": job_seeker.public_id, "company_pk": company.pk},
-        ),
+        "back_url": back_url,
     }
 
     geo_criteria_detected = job_seeker.address_in_qpv or job_seeker.zrr_city_name
