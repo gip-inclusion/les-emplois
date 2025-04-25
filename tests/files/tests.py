@@ -134,7 +134,7 @@ def test_copy(pdf_file):
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
-    with default_storage.open(key) as old, default_storage.open(new_file.key) as new:
+    with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 
 
@@ -203,3 +203,29 @@ def test_purge_files(caplog):
 def test_anonymised_filename(mocker, filename, expected):
     mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
     assert File.anonymized_filename(filename) == expected
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"key": "folder/file.txt"},
+        {"key_prefix": "folder/", "filename": "file.txt"},
+        {"key_prefix": "folder", "filename": "file.txt"},
+    ],
+)
+def test_create(mocker, params):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    file = File.objects.create(**params)
+    assert file.key == "folder/11111111-1111-1111-1111-111111111111.txt"
+
+
+def test_create_raises_exception():
+    with pytest.raises(KeyError):
+        File.objects.create(filename="file.txt", key="folder/file.txt")
+
+    with pytest.raises(ValueError) as exc:
+        File.objects.create(key="folder/subfolder/file.txt")
+        assert (
+            str(exc) == "<ExceptionInfo ValueError('File tree depth is too deep. Only one level is allowed.', "
+            "'folder/subfolder/file.txt') tblen=2>"
+        )

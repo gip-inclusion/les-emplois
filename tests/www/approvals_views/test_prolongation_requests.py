@@ -365,10 +365,10 @@ class TestProlongationReportFileView:
     def test_ok(self, client, xlsx_file):
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)
-        key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
-        file = FileFactory(key=key)
+        report_file = FileFactory(key="prolongation_report/empty.xlsx")
+        default_storage.save(report_file.key, xlsx_file)
         request = approvals_factories.ProlongationRequestFactory(
-            prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=file
+            prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=report_file
         )
         client.force_login(prescriber)
         # Boto3 signed requests depend on the current date, with a second resolution.
@@ -381,6 +381,6 @@ class TestProlongationReportFileView:
                     kwargs={"prolongation_request_id": request.pk},
                 )
             )
-            assertRedirects(response, default_storage.url(file.key), fetch_redirect_response=False)
+            assertRedirects(response, default_storage.url(report_file.key), fetch_redirect_response=False)
         xlsx_file.seek(0)
         assert httpx.get(response.url).content == xlsx_file.read()
