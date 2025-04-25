@@ -27,14 +27,9 @@
             </div>
         {% endif %}
     </div>
-    {% include "apply/includes/siae_actions.html" with batch_mode=False %}
-{% endblock %}
-
-{% block title_messages %}
-    {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
 
     {% if request.user.is_employer %}
-        <div id="employer-interview-2025-04" class="alert alert-important alert-dismissible-once d-none my-5" role="status">
+        <div id="employer-interview-2025-04" class="alert alert-important alert-dismissible-once d-none" role="status">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
             <div class="row">
                 <div class="col-auto pe-0">
@@ -54,6 +49,12 @@
             </div>
         </div>
     {% endif %}
+
+    {% include "apply/includes/siae_actions.html" with batch_mode=False %}
+{% endblock %}
+
+{% block title_messages %}
+    {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
 {% endblock title_messages %}
 
 {% block content %}
