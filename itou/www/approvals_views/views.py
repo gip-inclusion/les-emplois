@@ -340,6 +340,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
             # The file cannot be re-submitted and is stored for the duration of the preview.
             try:
                 prolongation_report = form.cleaned_data["report_file"]
+                prolongation_report.name = File.anonymized_filename(prolongation_report.name)
             except KeyError:
                 pass
             else:
@@ -354,12 +355,12 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                     pass
                 else:
                     filename = pathlib.Path(tmpfile_key).name
+                    prolongation.report_file = File.objects.create(
+                        key_prefix="prolongation_report/", filename=filename
+                    )
                     with default_storage.open(tmpfile_key) as prolongation_report:
-                        prolongation_report_key = default_storage.save(
-                            f"prolongation_report/{filename}", prolongation_report
-                        )
+                        default_storage.save(prolongation.report_file.key, prolongation_report)
                     default_storage.delete(tmpfile_key)
-                    prolongation.report_file = File.objects.create(key=prolongation_report_key)
             prolongation.save()
             prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")
