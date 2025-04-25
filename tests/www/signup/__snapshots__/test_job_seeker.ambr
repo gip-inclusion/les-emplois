@@ -94,7 +94,7 @@
                   </div>
               </div>
   
-              <div class="form-group form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input aria-describedby="id_nir_helptext" class="form-control" id="id_nir" maxlength="21" name="nir" required="" type="text"/><div class="form-text" id="id_nir_helptext">Par exemple 2 69 05 49 588 157 80</div>
+              <div class="form-group form-group-input-w-lg-66 form-group-required"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input aria-describedby="id_nir_helptext" class="form-control" id="id_nir" maxlength="21" name="nir" required="" type="text"/><div class="form-text" id="id_nir_helptext">Par exemple 2 69 05 49 588 157 80</div>
   </div>
   
               
@@ -228,7 +228,7 @@
     <option selected="" value="91">FRANCE</option>
   
   </select></div>
-              <div class="form-group"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" type="text" value="290010101010125"/></div>
+              <div class="form-group form-group-input-w-lg-66"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" type="text" value="290010101010125"/></div>
               <div class="form-group form-group-input-w-lg-66"><label class="form-label" for="id_email">Adresse e-mail</label><input class="form-control" disabled="" id="id_email" maxlength="320" name="email" type="email" value="jane.doe@test.local"/></div>
   
               <p class="text-secondary fs-sm">
