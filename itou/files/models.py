@@ -1,3 +1,4 @@
+import os
 import pathlib
 import uuid
 
@@ -30,3 +31,13 @@ class File(models.Model):
         with default_storage.open(self.key) as file:
             default_storage.save(new_key, file)
         return self.__class__.objects.create(key=new_key)
+
+    @staticmethod
+    def anonymized_filename(filename):
+        """Really simple method to just change the file name.
+        Don't check extension validity as it's already done in the form.
+        See itou.files.forms.ContentTypeValidator
+        """
+        obfuscated_name = f"{uuid.uuid4()}"
+        _, extension = os.path.splitext(filename)
+        return f"{obfuscated_name}{extension}"
