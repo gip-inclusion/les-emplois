@@ -18,6 +18,7 @@ jobs:
   delete:
     runs-on: ubuntu-latest
     if: github.event.label.name == '1-recette-jetable' || contains( github.event.pull_request.labels.*.name, '1-recette-jetable')
+    permissions: {}
 
     steps:
     - name: 📥 Checkout to the PR branch
