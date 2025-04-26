@@ -887,6 +887,11 @@ def hire_confirmation(
     job_seeker_public_id,
     template_name="apply/submit/hire_confirmation.html",
 ):
+    # RequireApplySessionMixin
+    apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, f"job_application-{company_pk}")
+    if not apply_session.exists():
+        raise Http404
+
     company = get_object_or_404(
         Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
     )
@@ -935,6 +940,7 @@ def hire_confirmation(
             "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
             "is_subject_to_geiq_eligibility_rules": company.kind == CompanyKind.GEIQ,
         },
+        session=apply_session,
     )
 
 

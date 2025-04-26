@@ -84,6 +84,7 @@ def fake_session_initialization(client, company, data):
     # The first argument is supposed to be a request, but we only need it to have a session attribute so client works
     session = initialize_apply_session(client, company, data)
     session.save()
+    return session
 
 
 def assert_contains_apply_nir_modal(response, job_seeker, with_personal_information=True):
@@ -5475,6 +5476,7 @@ class TestHireConfirmation:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, {"selected_jobs": []})
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(self._reverse("apply:hire_confirmation"))
@@ -5529,9 +5531,12 @@ class TestHireConfirmation:
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
 
+        assert apply_session.name not in client.session
+
     def test_cannot_hire_start_date_after_approval_expires(self, client):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, {"selected_jobs": []})
 
         today = timezone.localdate()
         approval = ApprovalFactory(end_at=today + datetime.timedelta(days=1))
@@ -5563,12 +5568,14 @@ class TestHireConfirmation:
             "hiring_start_at",
             JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
         )
+        assert apply_session.name in client.session
 
     def test_as_company_elibility_diagnosis_from_another_company(self, client, snapshot):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
         ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.get())
+        apply_session = fake_session_initialization(client, self.company, {"selected_jobs": []})
 
         response = client.get(self._reverse("apply:hire_confirmation"))
         assertContains(response, "Déclarer l’embauche de Clara SION")
@@ -5615,11 +5622,15 @@ class TestHireConfirmation:
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
 
+        assert apply_session.name not in client.session
+
     def test_as_geiq(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
         self.company = diagnosis.author_geiq
         client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, {"selected_jobs": []})
+
         response = client.get(self._reverse("apply:hire_confirmation"))
         assertContains(response, "Déclarer l’embauche de Clara SION")
         assertContains(response, "Éligibilité GEIQ confirmée")
@@ -5669,6 +5680,8 @@ class TestHireConfirmation:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+
+        assert apply_session.name not in client.session
 
 
 class TestNewHireProcessInfo:
