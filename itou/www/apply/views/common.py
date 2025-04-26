@@ -32,7 +32,17 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
-def _accept(request, company, job_seeker, error_url, back_url, template_name, extra_context, job_application=None):
+def _accept(
+    request,
+    company,
+    job_seeker,
+    error_url,
+    back_url,
+    template_name,
+    extra_context,
+    job_application=None,
+    session=None,
+):
     forms = []
 
     # Ask the SIAE to verify the job seeker's Pôle emploi status.
@@ -162,6 +172,9 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
             final_url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})
         else:
             final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        if session:
+            session.delete()
 
         return HttpResponseClientRedirect(final_url)
 
