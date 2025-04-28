@@ -40,3 +40,62 @@ class ArchivedJobSeeker(models.Model):
         verbose_name = "candidat archivé"
         verbose_name_plural = "candidats archivés"
         ordering = ["-archived_at"]
+
+
+class ArchivedApplication(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # job_seeker
+    job_seeker_birth_year = models.PositiveSmallIntegerField(
+        verbose_name="année de naissance du candidat", blank=True, null=True
+    )
+    job_seeker_department_same_as_company_department = models.BooleanField(
+        verbose_name="le candidat a le même département que celui l'entreprise", default=False
+    )
+
+    # sender
+    sender_kind = models.CharField(verbose_name="type de l'émetteur")
+    sender_company_kind = models.CharField(verbose_name="type de l'entreprise émettrice", blank=True, null=True)
+    sender_prescriber_organization_kind = models.CharField(
+        verbose_name="type de l'organisation prescriptrice de l'émetteur", blank=True, null=True
+    )
+    sender_prescriber_organization_authorization_status = models.CharField(
+        verbose_name="état de l'habilitation de l'organisme prescripteur de l'émetteur", blank=True, null=True
+    )
+
+    # company
+    company_kind = models.CharField(verbose_name="type d'entreprise")
+    company_department = models.CharField(verbose_name="département de l'entreprise")
+    company_naf = models.CharField(verbose_name="code NAF de l'entreprise")
+    company_has_convention = models.BooleanField(verbose_name="l'entreprise a une convention", default=False)
+
+    # application
+    archived_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    applied_at = models.DateField(verbose_name="année et mois de la candidature")
+    processed_at = models.DateField(verbose_name="année et mois de traitement", blank=True, null=True)
+    last_transition_at = models.DateField(
+        verbose_name="année et mois de la dernière transition", blank=True, null=True
+    )
+    had_resume = models.BooleanField(verbose_name="candidature avec un CV", default=False)
+    origin = models.CharField(verbose_name="origine de la candidature")
+    state = models.CharField(verbose_name="état de la candidature")
+    refusal_reason = models.CharField(verbose_name="raison du refus", blank=True, null=True)
+    has_been_transferred = models.BooleanField(verbose_name="a été transférée", default=False)
+    number_of_jobs_applied_for = models.PositiveIntegerField(
+        verbose_name="nombre d'offres d'emploi pour lesquelles le candidat a postulé", default=0
+    )
+    has_diagoriente_invitation = models.BooleanField(
+        verbose_name="a reçu une invitation à un diagnostic d'orientation", default=False
+    )
+
+    # hiring
+    hiring_rome = models.CharField(verbose_name="code ROME de l'embauche", blank=True, null=True)
+    hiring_contract_type = models.CharField(verbose_name="type de contrat de l'embauche", blank=True, null=True)
+    hiring_contract_nature = models.CharField(verbose_name="nature du contrat de l'embauche", blank=True, null=True)
+    hiring_start_date = models.DateField(verbose_name="année et mois de début de l'embauche", blank=True, null=True)
+    hiring_without_approval = models.BooleanField(verbose_name="embauche sans PASS IAE", default=False)
+
+    class Meta:
+        verbose_name = "candidature archivée"
+        verbose_name_plural = "candidatures archivées"
+        ordering = ["-archived_at"]

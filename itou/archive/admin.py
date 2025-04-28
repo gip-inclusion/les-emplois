@@ -27,3 +27,37 @@ class ArchiveJobSeekerAdmin(ItouModelAdmin):
     )
 
     readonly_fields = fields
+
+
+@admin.register(models.ArchivedApplication)
+class ArchiveApplicationAdmin(ItouModelAdmin):
+    fields = (
+        "job_seeker_birth_year",
+        "job_seeker_department_same_as_company_department",
+        "sender_kind",
+        "sender_company_kind",
+        "sender_prescriber_organization_kind",
+        "sender_prescriber_organization_authorization_status",
+        "company_kind",
+        "company_department",
+        "company_naf",
+        "company_has_convention",
+        "archived_at",
+        "applied_at",
+        "processed_at",
+        "last_transition_at",
+        "had_resume",
+        "origin",
+        "state",
+        "refusal_reason",
+        "has_been_transferred",
+        "number_of_jobs_applied_for",
+        "has_diagoriente_invitation",
+        "hiring_rome",
+        "hiring_contract_type",
+        "hiring_contract_nature",
+        "hiring_start_date",
+        "hiring_without_approval",
+    )
+
+    readonly_fields = fields
