@@ -22,7 +22,8 @@ env:
 jobs:
   create:
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      pull-requests: write
     if: github.event.action == 'labeled' && github.event.label.name == '1-recette-jetable'
 
     steps:
