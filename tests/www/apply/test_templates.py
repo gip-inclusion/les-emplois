@@ -323,7 +323,7 @@ class TestCertifiedBadgeIae:
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
         )
-        certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
+        certified_help_text = "Pourquoi certains critères peuvent-ils être certifiés"
         # No certifiable criteria
         diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
@@ -468,7 +468,7 @@ class TestCertifiedBadgeGEIQ:
 
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
-        certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
+        certified_help_text = "Pourquoi certains critères peuvent-ils être certifiés"
         diagnosis = GEIQEligibilityDiagnosisFactory(
             certifiable=True,
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
