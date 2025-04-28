@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class ArchivedJobSeeker(models.Model):
@@ -11,7 +10,7 @@ class ArchivedJobSeeker(models.Model):
     date_joined = models.DateField(verbose_name="année et mois d'inscription")
     first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
     last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
-    archived_at = models.DateTimeField(auto_now_add=True, verbose_name=_("archived at"))
+    archived_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
     user_signup_kind = models.CharField(
         max_length=50, verbose_name="créé par un utilisateur de type", blank=True, null=True
     )
