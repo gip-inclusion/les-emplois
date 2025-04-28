@@ -6,9 +6,6 @@ from itou.utils.admin import ItouModelAdmin
 
 @admin.register(models.ArchivedJobSeeker)
 class ArchiveJobSeekerAdmin(ItouModelAdmin):
-    class Media:
-        css = {"all": ("css/itou-admin.css",)}
-
     fields = (
         "date_joined",
         "first_login",
