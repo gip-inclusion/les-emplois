@@ -6,7 +6,7 @@ from django.template import Context
 from django.test.client import RequestFactory
 from django.utils.html import escape
 from freezegun import freeze_time
-from pytest_django.asserts import assertInHTML
+from pytest_django.asserts import assertInHTML, assertNotInHTML
 
 from itou.eligibility.enums import (
     CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
@@ -195,8 +195,17 @@ def test_known_criteria_template_with_partial_zrr_criterion():
     assert escape(job_seeker.city) in rendered
 
 
+CERTIFIED_BADGE_HTML = """\
+<span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-3">
+    <i class="ri-verified-badge-fill" aria-hidden="true"></i>
+    Certifié</span>"""
+NOT_CERTIFIED_BADGE_HTML = """\
+<span class="badge badge-xs rounded-pill bg-warning-lighter text-warning ms-3">
+    <i class="ri-error-warning-fill" aria-hidden="true"></i>
+    Non certifié</span>"""
+
+
 class TestCertifiedBadgeIae:
-    CERTIFIED_BADGE_TEXT = "Certifié"
     ELIGIBILITY_TITLE_FROM_PRESCRIBER = "Situation administrative du candidat"
     ELIGIBILITY_TITLE_FROM_EMPLOYER = "Critères administratifs"
 
@@ -245,7 +254,8 @@ class TestCertifiedBadgeIae:
         assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
         assert AdministrativeCriteriaLevel(criteria.level).label in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT in rendered
+        assertInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
         # Eligibility diagnosis made by an employer but job application sent by an authorized prescriber.
         rendered = self.template.render(
@@ -254,7 +264,8 @@ class TestCertifiedBadgeIae:
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
         assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT in rendered
+        assertInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     def test_diag_from_prescriber(self, mocker):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
@@ -277,7 +288,8 @@ class TestCertifiedBadgeIae:
         )
         assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
         assert AdministrativeCriteriaLevel(criteria.level).label in rendered
 
         # Diagnosis from prescriber and application sent by an authorized prescriber.
@@ -286,7 +298,8 @@ class TestCertifiedBadgeIae:
         )
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
         assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
 
     def test_no_certifiable_criteria(self):
@@ -299,7 +312,18 @@ class TestCertifiedBadgeIae:
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
+
+    def test_criteria_not_certified(self):
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.AAH],
+        )
+        rendered = self.template.render(Context(self.default_params(diagnosis)))
+        self.assert_criteria_name_in_rendered(diagnosis, rendered)
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     def test_expired_diagnosis(self):
         # Expired Eligibility Diagnosis
@@ -314,7 +338,8 @@ class TestCertifiedBadgeIae:
         )
         assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER not in rendered
         assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
         assert "Le diagnostic d'éligibilité IAE de ce candidat a expiré" in rendered
 
     def test_info_box(self, mocker):
@@ -323,7 +348,7 @@ class TestCertifiedBadgeIae:
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
         )
-        certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
+        certified_help_text = "Pourquoi certains critères peuvent-ils être certifiés"
         # No certifiable criteria
         diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
@@ -345,7 +370,6 @@ class TestCertifiedBadgeIae:
 
 
 class TestCertifiedBadgeGEIQ:
-    CERTIFIED_BADGE_TEXT = "Certifié"
     ELIGIBILITY_TITLE = "Situation administrative du candidat"
 
     @property
@@ -399,7 +423,8 @@ class TestCertifiedBadgeGEIQ:
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     @freeze_time("2024-10-04")
     def test_nominal_case(self, mocker):
@@ -420,7 +445,8 @@ class TestCertifiedBadgeGEIQ:
         )
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT in rendered
+        assertInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     @freeze_time("2024-10-04")
     def test_hiring_date_nearly_out_of_boundaries(self, mocker):
@@ -436,7 +462,7 @@ class TestCertifiedBadgeGEIQ:
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT in rendered
+        assertInHTML(CERTIFIED_BADGE_HTML, rendered)
 
     @freeze_time("2024-08-01")
     def test_hiring_date_out_of_boundaries(self, mocker):
@@ -452,7 +478,8 @@ class TestCertifiedBadgeGEIQ:
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     def test_no_certified_criteria(self):
         # No certified criteria
@@ -464,11 +491,23 @@ class TestCertifiedBadgeGEIQ:
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert self.CERTIFIED_BADGE_TEXT not in rendered
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
+
+    def test_criteria_not_certified(self):
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=[AdministrativeCriteriaKind.AAH],
+        )
+        job_application = self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
+        self.assert_criteria_name_in_rendered(diagnosis, rendered)
+        assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
+        assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
-        certified_help_text = "Pourquoi certains de mes critères peuvent-ils être certifiés"
+        certified_help_text = "Pourquoi certains critères peuvent-ils être certifiés"
         diagnosis = GEIQEligibilityDiagnosisFactory(
             certifiable=True,
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
