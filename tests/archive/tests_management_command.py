@@ -114,6 +114,14 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="jobseeker_with_recent_activity",
             ),
             pytest.param(
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
+                lambda jobseeker: JobApplicationFactory(
+                    job_seeker=jobseeker, eligibility_diagnosis=None, updated_at=timezone.now() - INACTIVITY_PERIOD
+                ),
+                True,
+                id="jobseeker_with_job_application_without_recent_activity",
+            ),
+            pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 False,
