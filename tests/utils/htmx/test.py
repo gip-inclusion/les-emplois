@@ -45,22 +45,25 @@ def _get_hx_attribute(element, attribute, default=None):
 
 
 def update_page_with_htmx(page, select_htmx_element, htmx_response):
-    [htmx_element] = page.select(select_htmx_element)
-    request_method = htmx_response.request["REQUEST_METHOD"]
-    if request_method not in ("GET", "POST", "PUT", "DELETE", "PATCH"):
-        raise ValueError(f"Unsupported method {request_method}")
-    attribute = f"hx-{htmx_response.request['REQUEST_METHOD'].lower()}"
-    if attribute not in htmx_element.attrs:
-        raise ValueError(f"No {attribute} attribute on provided HTMX element")
-    url = htmx_element[attribute]
-    if url:
-        # If url is "", it means that HTMX will have targeted the current URL
-        # https://github.com/bigskysoftware/htmx/blob/v1.8.6/src/htmx.js#L2799-L2802
-        # Let's not assert anything in that case, since we currently don't have that info in our test
-        parsed_url = urlparse(url)
-        assert htmx_response.request["PATH_INFO"] == parsed_url.path
     # We only support HTMX responses that do not try to swap the whole HTML body
     parsed_response = parse_response_to_soup(htmx_response, no_html_body=True)
+
+    if select_htmx_element:
+        [htmx_element] = page.select(select_htmx_element)
+        request_method = htmx_response.request["REQUEST_METHOD"]
+        if request_method not in ("GET", "POST", "PUT", "DELETE", "PATCH"):
+            raise ValueError(f"Unsupported method {request_method}")
+        attribute = f"hx-{htmx_response.request['REQUEST_METHOD'].lower()}"
+        if attribute not in htmx_element.attrs:
+            raise ValueError(f"No {attribute} attribute on provided HTMX element")
+        url = htmx_element[attribute]
+        if url:
+            # If url is "", it means that HTMX will have targeted the current URL
+            # https://github.com/bigskysoftware/htmx/blob/v1.8.6/src/htmx.js#L2799-L2802
+            # Let's not assert anything in that case, since we currently don't have that info in our test
+            parsed_url = urlparse(url)
+            assert htmx_response.request["PATH_INFO"] == parsed_url.path
+
     out_of_band_swaps = [element.extract() for element in parsed_response.select("[hx-swap-oob]")]
     for out_of_band_swap in out_of_band_swaps:
         oob_swap = out_of_band_swap["hx-swap-oob"]
@@ -78,12 +81,14 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
         targets = page.select(target_selector)
         for target in targets:
             _handle_swap(page, target=target, new_elements=[out_of_band_swap], mode=mode)
-    _handle_swap(
-        page,
-        target=_get_hx_attribute(htmx_element, "hx-target", default=htmx_element),
-        new_elements=parsed_response.contents,
-        mode=_get_hx_attribute(htmx_element, "hx-swap", default="innerHTML"),
-    )
+
+    if select_htmx_element:
+        _handle_swap(
+            page,
+            target=_get_hx_attribute(htmx_element, "hx-target", default=htmx_element),
+            new_elements=parsed_response.contents,
+            mode=_get_hx_attribute(htmx_element, "hx-swap", default="innerHTML"),
+        )
 
 
 def assertSoupEqual(soup1, soup2):
