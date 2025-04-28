@@ -25,7 +25,6 @@ BATCH_SIZE = 100
 
 
 def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
-    job_applications = JobApplication.objects.filter(job_seeker=OuterRef("pk"))
     approval = Approval.objects.filter(user_id=OuterRef("pk"))
     eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
         job_seeker=OuterRef("pk"),
@@ -40,7 +39,6 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
             upcoming_deletion_notified_at__isnull=True,
         )
         .filter(
-            ~Exists(job_applications),
             ~Exists(approval),
             ~Exists(eligibility_diagnosis),
             ~Exists(geiq_eligibility_diagnosis),
