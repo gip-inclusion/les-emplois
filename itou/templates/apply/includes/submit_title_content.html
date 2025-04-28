@@ -1,0 +1,19 @@
+{% load components %}
+
+{% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+    {% fragment as c_title__main %}
+        <h1>
+            {% include 'apply/includes/_submit_title.html' %}
+            {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
+        </h1>
+    {% endfragment %}
+    {% fragment as c_title__secondary %}
+        <p>
+            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+            {% if can_view_personal_information and not request.user.is_job_seeker %}
+                <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
+            {% endif %}
+            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
+        </p>
+    {% endfragment %}
+{% endcomponent_title %}

@@ -1,29 +1,12 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
-{% load components %}
 {% load django_bootstrap5 %}
 
 {% block title %}{{ page_title }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% if not job_app_to_transfer|default:False %}
-        {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
-            {% fragment as c_title__main %}
-                <h1>
-                    {% include 'apply/includes/_submit_title.html' %}
-                    {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
-                </h1>
-            {% endfragment %}
-            {% fragment as c_title__secondary %}
-                <p>
-                    Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-                    {% if can_view_personal_information and not request.user.is_job_seeker %}
-                        <a class="btn-link ms-3" href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Vérifier le profil</a>
-                    {% endif %}
-                    {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>{% endif %}
-                </p>
-            {% endfragment %}
-        {% endcomponent_title %}
+        {% include "apply/includes/submit_title_content.html" %}
     {% endif %}
 {% endblock %}
 
@@ -31,22 +14,7 @@
     {{ block.super }}
     {% if not job_app_to_transfer|default:False %}
         {% if new_check_needed %}
-            <div class="alert alert-warning alert-dismissible fade show" role="status">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Veuillez vérifier les informations du candidat</strong>
-                        </p>
-                        <p class="mb-0">
-                            La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {% include "apply/includes/submit_new_check_needed.html" %}
         {% endif %}
     {% endif %}
 {% endblock %}
