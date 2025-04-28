@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 2025-05-05
+
+### Modifié
+
+- [Demandeur d’emploi : Empêcher l’édition de l’identité pivot pour les candidats identifiés par l’API Particulier](https://github.com/gip-inclusion/les-emplois/pull/5749)
+
 ## 2025-04-28
 
 ### Ajouté
