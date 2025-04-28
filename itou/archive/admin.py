@@ -21,6 +21,9 @@ class ArchiveJobSeekerAdmin(ItouModelAdmin):
         "nir_sex",
         "nir_year",
         "birth_year",
+        "count_accepted_applications",
+        "count_IAE_applications",
+        "count_total_applications",
     )
 
     readonly_fields = fields

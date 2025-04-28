@@ -30,6 +30,11 @@ class ArchivedJobSeeker(models.Model):
     nir_sex = models.PositiveSmallIntegerField(verbose_name="sexe du NIR", blank=True, null=True)
     nir_year = models.PositiveSmallIntegerField(verbose_name="année du NIR", blank=True, null=True)
     birth_year = models.PositiveSmallIntegerField(verbose_name="année de naissance", blank=True, null=True)
+    count_accepted_applications = models.PositiveIntegerField(
+        verbose_name="nombre de candidatures acceptées", default=0
+    )
+    count_IAE_applications = models.PositiveIntegerField(verbose_name="nombre de candidatures dans l'IAE", default=0)
+    count_total_applications = models.PositiveIntegerField(verbose_name="nombre de candidatures totales", default=0)
 
     class Meta:
         verbose_name = "candidat archivé"
