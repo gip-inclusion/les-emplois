@@ -1,5 +1,32 @@
 # Journal des modifications
 
+## 2025-04-28
+
+### Ajouté
+
+- [Candidature : En tant que prescripteur je vois tous les rendez-vous pris depuis les pages de candidatures](https://github.com/gip-inclusion/les-emplois/pull/5760)
+- [Fiche de poste : Affichage de la date de dernière mise à jour](https://github.com/gip-inclusion/les-emplois/pull/5768)
+- [Fiche de poste : Suivi de la date de dernière modification d'une fiche de poste par un employeur](https://github.com/gip-inclusion/les-emplois/pull/5932)
+- [Vie privée : Notifier puis archiver les comptes candidats sans candidature inactifs depuis plus de 12 mois](https://github.com/gip-inclusion/les-emplois/pull/5861)
+
+### Modifié
+
+- [Accessibilité : Amélioration de l'affichage des erreurs de formulaire](https://github.com/gip-inclusion/les-emplois/pull/5977) 🖼
+- [Admin : conserver le statut d'administrateur lors du transfert d'une SIAE à une autre, et supprimer les membres lors de la désactivation](https://github.com/gip-inclusion/les-emplois/pull/5943)
+- [Candidature : Correction du badge d'éligibilité quand le PASS IAE est expiré](https://github.com/gip-inclusion/les-emplois/pull/5987)
+- [GPS : Suppression du badge nouveau à côté du menu latéral pour le département du Gard](https://github.com/gip-inclusion/les-emplois/pull/6022)
+- [Interface : Optimisation des formulaires d'éligibilité et d'acceptation](https://github.com/gip-inclusion/les-emplois/pull/6034)
+- [Interface : Optimisation des formulaires de création et d'édition de fiches poste](https://github.com/gip-inclusion/les-emplois/pull/6016)
+- [Interface : Optimisation des formulaires de création et d'édition de salarié ASP](https://github.com/gip-inclusion/les-emplois/pull/6024)
+- [Interface : Optimisation des formulaires de création et d'édition de structures](https://github.com/gip-inclusion/les-emplois/pull/6011)
+- [Interface : Optimisation du formulaire de création de candidat](https://github.com/gip-inclusion/les-emplois/pull/6031)
+- [Interface : Optimisation du formulaire de modification de fiche salarié ASP](https://github.com/gip-inclusion/les-emplois/pull/6026)
+- [Invitations : « Inviter un collaborateur » devient « Ajouter un collaborateur »](https://github.com/gip-inclusion/les-emplois/pull/5934) 🖼
+- [Prolongations : Affichage du _spinner_ sur la totalité du formulaire](https://github.com/gip-inclusion/les-emplois/pull/6028) 🖼
+- [Vie privée : Allonger la durée d'inactivité à 24 mois avant la notification des comptes candidats sans candidature inactifs](https://github.com/gip-inclusion/les-emplois/pull/6015)
+- [Vie privée : Harmoniser le contenu des notifications avant archivage pour les candidats et les professionnels](https://github.com/gip-inclusion/les-emplois/pull/6019)
+- [Vie privée : Notifier puis archiver les comptes candidats avec groupe GPS sans candidatures inactifs depuis plus de 24 mois](https://github.com/gip-inclusion/les-emplois/pull/6010)
+
 ## 2025-04-21
 
 ### Ajouté
