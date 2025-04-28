@@ -1,11 +1,18 @@
 <li>
     <div class="d-flex align-items-center">
         <span>{{ criterion.administrative_criteria.name }}</span>
-        {% if diagnosis.is_from_employer and criterion.is_considered_certified %}
-            <span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-3">
-                <i class="ri-verified-badge-fill" aria-hidden="true"></i>
-                Certifié
-            </span>
+        {% if diagnosis.is_from_employer %}
+            {% if criterion.is_considered_certified %}
+                <span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-3">
+                    <i class="ri-verified-badge-fill" aria-hidden="true"></i>
+                    Certifié
+                </span>
+            {% elif criterion.administrative_criteria.is_certifiable %}
+                <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning ms-3">
+                    <i class="ri-error-warning-fill" aria-hidden="true"></i>
+                    Non certifié
+                </span>
+            {% endif %}
         {% endif %}
     </div>
 </li>

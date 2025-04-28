@@ -8,11 +8,52 @@
                 aria-controls="collapse-certif-help-text">
             <div>
                 <i class="ri-lightbulb-line fw-medium pe-2" aria-hidden="true"></i>
-                <span>Pourquoi certains de mes critères peuvent-ils être certifiés ?</span>
+                <span>Pourquoi certains critères peuvent-ils être certifiés ?</span>
             </div>
         </button>
         <div id="collapse-certif-help-text" class="collapse justify-content-between pb-4 ps-5 pe-3">
-            <span>Nous sommes en train de nous connecter progressivement aux différents services de l’État qui délivrent les justificatifs correspondant aux critères administratifs. Retrouvez le détail des conditions dans <a href="{{ itou_help_center_url }}/articles/14733921254161--Les-crit%C3%A8res-d-%C3%A9ligibilit%C3%A9-IAE#h_01J28K61VYBEBMK0CRVSHWRKRG" class="has-external-link" target="_blank" rel="noreferrer">notre documentation</a>.</span>
+            <span>
+                Nous développons progressivement nos connexions avec les
+                différents services de l’État qui fournissent les justificatifs
+                correspondant aux critères administratifs. Après interrogation
+                du système d’information de l’État, deux types de badges
+                peuvent être affichés :
+                <dl>
+                    <div class="my-3 ms-3">
+                        <dt class="d-inline">Certifié</dt>
+                        <dd class="d-inline">
+                            Aucune action n’est nécessaire.
+                        </dd>
+                    </div>
+
+                    <div class="my-3 ms-3">
+                        <dt class="d-inline">Non certifié</dt>
+                        <dd class="d-inline">
+                            Nous n’avons pas trouvé d’information permettant de
+                            valider ce critère administratif.
+                        </dd>
+                    </div>
+                </dl>
+
+                <p>
+                    <strong>
+                        Lorsqu’un critère n’est pas certifié dans le cadre d’une
+                        auto-prescription, nous recommandons à l’employeur de
+                        récupérer et conserver une copie du justificatif
+                        administratif.
+                    </strong>
+                    Pour rappel, les critères déclarés par les prescripteurs habilités ne nécessitent aucun justificatif.
+                </p>
+                <p>
+                    L’absence de badge signifie que nous ne sommes pas encore en
+                    mesure d’interroger le système d’information de l’État pour ce
+                    critère.
+                </p>
+                <p class="mb-0">
+                    Retrouvez le détail des conditions dans
+                    <a href="{{ itou_help_center_url }}/articles/14733921254161--Les-crit%C3%A8res-d-%C3%A9ligibilit%C3%A9-IAE#h_01J28K61VYBEBMK0CRVSHWRKRG" class="has-external-link" target="_blank" rel="noreferrer">notre documentation</a>.
+                </p>
+            </span>
         </div>
     </div>
 {% endif %}
