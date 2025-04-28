@@ -536,7 +536,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
     archived_at = models.DateTimeField(blank=True, null=True, verbose_name="archivée le", db_index=True)
     archived_by = models.ForeignKey(
-        "users.User",
+        settings.AUTH_USER_MODEL,
         blank=True,
         null=True,
         on_delete=models.RESTRICT,  # For traceability and accountability.
