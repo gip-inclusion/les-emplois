@@ -101,6 +101,11 @@ class TestSummaryEmployeeRecords:
                     "/employee_record/create/[Pk of JobApplication]",
                 ),
                 (
+                    "action",
+                    f"/employee_record/create_step_5/{self.employee_record.job_application_id}",
+                    "/employee_record/create_step_5/[Pk of JobApplication]",
+                ),
+                (
                     "href",
                     f"/employee_record/disable/{self.employee_record.pk}",
                     "/employee_record/disable/[Pk of EmployeeRecord]",

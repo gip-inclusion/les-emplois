@@ -517,3 +517,6 @@
               </form>
   '''
 # ---
+# name: TestResendProcessedEmployeeRecord.test_resubmit_processed_record
+  Message(level=25, message="La fiche salarié a été renvoyée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
+# ---
