@@ -119,7 +119,11 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
     CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
     transitions = (
-        (EmployeeRecordTransition.READY, [Status.NEW, Status.REJECTED, Status.DISABLED], Status.READY),
+        (
+            EmployeeRecordTransition.READY,
+            [Status.NEW, Status.REJECTED, Status.DISABLED, Status.PROCESSED],
+            Status.READY,
+        ),
         (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, Status.READY, Status.SENT),
         (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
         (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
