@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestSummaryEmployeeRecords.test_action_bar[ARCHIVED]
+# name: TestSummaryEmployeeRecords.test_action_bar[ARCHIVED-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -37,6 +37,8 @@
   </div>
   
   
+      
+  
                               
                                   
   
@@ -49,7 +51,7 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[DISABLED]
+# name: TestSummaryEmployeeRecords.test_action_bar[DISABLED-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -87,6 +89,8 @@
   </div>
   
   
+      
+  
                               
                                   
   
@@ -113,7 +117,7 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[NEW]
+# name: TestSummaryEmployeeRecords.test_action_bar[NEW-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -149,6 +153,8 @@
   </div>
   
   
+      
+  
                               
                                   
   
@@ -182,7 +188,7 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[PROCESSED]
+# name: TestSummaryEmployeeRecords.test_action_bar[PROCESSED-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -219,6 +225,8 @@
       
   </div>
   
+  
+      
   
                               
                                   
@@ -259,7 +267,103 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[READY]
+# name: TestSummaryEmployeeRecords.test_action_bar[PROCESSED-True]
+  '''
+  <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Fiche salarié ASP : Lauren MATA
+                  
+      <span class="badge rounded-pill badge-base text-nowrap bg-success">
+          Intégrée par l'ASP le 29/04/2025 13:11
+      </span>
+  
+  
+              </h1>
+          </div>
+      
+      
+  </div>
+  
+  
+      
+          <div class="alert alert-warning alert-dismissible fade show" role="status">
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          <strong>Incohérence de numéro SIRET détectée</strong>
+                      </p>
+                      <p class="mb-0">
+                          Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel. Vous pouvez actualiser le numéro SIRET en cliquant sur "<b>Renvoyer cette fiche salarié</b>".
+                      </p>
+                  </div>
+              </div>
+          </div>
+      
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
+      
+          <div class="c-box c-box--action">
+              <div class="form-row align-items-center gx-3">
+                  
+                      <div class="form-group col-12 col-lg-auto">
+                          <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="send_back_button" type="button">
+                              Renvoyer cette fiche salarié
+                          </button>
+                          <div class="dropdown-menu">
+                              <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
+                              </form>
+                              <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
+                          </div>
+                      </div>
+                  
+                  
+                      <div class="form-group col-12 col-lg-auto">
+                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
+                              <span>Désactiver</span>
+                          </a>
+                      </div>
+                  
+              </div>
+          </div>
+      
+  
+                          </div>
+  '''
+# ---
+# name: TestSummaryEmployeeRecords.test_action_bar[READY-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -297,6 +401,8 @@
   </div>
   
   
+      
+  
                               
                                   
   
@@ -309,7 +415,59 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[REJECTED]
+# name: TestSummaryEmployeeRecords.test_action_bar[READY-True]
+  '''
+  <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>
+                  Fiche salarié ASP : Lauren MATA
+                  
+      <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
+          Complétée le 29/04/2025 13:11
+      </span>
+  
+  
+              </h1>
+          </div>
+      
+      
+  </div>
+  
+  
+      
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
+      
+  
+                          </div>
+  '''
+# ---
+# name: TestSummaryEmployeeRecords.test_action_bar[REJECTED-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -347,6 +505,8 @@
   </div>
   
   
+      
+  
                               
                                   
   
@@ -380,7 +540,7 @@
                           </div>
   '''
 # ---
-# name: TestSummaryEmployeeRecords.test_action_bar[SENT]
+# name: TestSummaryEmployeeRecords.test_action_bar[SENT-False]
   '''
   <div class="s-title-02__col col-12">
                               
@@ -417,6 +577,8 @@
       
   </div>
   
+  
+      
   
                               
                                   
