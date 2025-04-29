@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from django.core.management import call_command
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
@@ -233,6 +234,28 @@ class TestImportSiaeManagementCommands:
             f"[DEV] Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
             for (kind, name) in Company.objects.values_list("kind", "name")
         )
+
+    def test_create_siae_raise_if_siret_mismatch(self, django_capture_on_commit_callbacks):
+        siret_to_siae = get_siret_to_siae_row(get_vue_structure_df())
+
+        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True):
+            call_command("import_siae", wet_run=True)
+        assert Company.objects.count() == len(siret_to_siae)
+
+        # Now let's change a company SIRET on the ASP side.
+        company = Company.objects.first()
+        new_siret = f"{company.siren}11111"
+        siret_to_siae[new_siret] = siret_to_siae[company.siret]
+        siret_to_siae[new_siret]["siret"] = new_siret
+        siret_to_siae[new_siret]["siret_signature"] = new_siret
+        del siret_to_siae[company.siret]
+
+        # It should raise an error message and break.
+        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True):
+            error_message = f"SIRET mismatch: existing_siae.siret='{company.siret}', row.siret='{new_siret}'"
+            with pytest.raises(AssertionError, match=error_message):
+                create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
+        assert not Company.objects.filter(siret=new_siret).exists()
 
 
 @override_settings(METABASE_HASH_SALT="foobar2000")

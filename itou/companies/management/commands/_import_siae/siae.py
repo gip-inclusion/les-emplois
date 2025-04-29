@@ -6,6 +6,8 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
 
+import logging
+
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -13,6 +15,9 @@ from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
+
+
+logger = logging.getLogger(__name__)
 
 
 def build_siae(row, kind, *, is_active):
@@ -133,11 +138,9 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
         # Siaes with this asp_id already exist, no need to create one more.
         for existing_siae in existing_siaes:
             assert existing_siae.should_have_convention
-            if existing_siae.source == Company.SOURCE_ASP:
-                # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
-                assert existing_siae.siret == row.siret
-                continue
-
+            # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
+            if existing_siae.source == Company.SOURCE_ASP and existing_siae.siret != row.siret:
+                raise AssertionError(f"SIRET mismatch: {existing_siae.siret=}, {row.siret=}")
         try:
             existing_siae = Company.objects.get(siret=row.siret, kind=kind)
         except Company.DoesNotExist:
