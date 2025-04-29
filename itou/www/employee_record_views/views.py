@@ -480,11 +480,16 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = job_application.employee_record.full_fetch().latest("created_at")
 
     if request.method == "POST" and not job_application.hiring_starts_in_future:
-        back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
+        previous_status = employee_record.status
+        back_url = f"{reverse('employee_record_views:list')}?status={previous_status}"
         employee_record.ready(user=request.user)
-        toast_title, toast_message = (
-            "La création de cette fiche salarié est terminée",
-            "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
+        toast_title = (
+            "La fiche salarié a été renvoyée"
+            if previous_status == Status.PROCESSED
+            else "La création de cette fiche salarié est terminée"
+        )
+        toast_message = (
+            "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts."
         )
         messages.success(
             request,
