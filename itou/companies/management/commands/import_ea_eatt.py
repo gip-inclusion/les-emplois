@@ -73,8 +73,8 @@ class Command(BaseCommand):
         FILENAME_PREFIX = "FLUX_EA2_ITOU_"
 
         with asp_utils.get_sftp_connection() as sftp:
-            self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-            self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
+            self.logger.info('Connected to "%s" as "%s"', settings.ASP_SFTP_HOST, settings.ASP_SFTP_USER)
+            self.logger.info('Current remote dir is "%s"', sftp.normalize("."))
             sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
 
             monday = monday_of_the_week().strftime("%Y%m%d")
@@ -83,30 +83,30 @@ class Command(BaseCommand):
                 for filename in sftp.listdir()
                 if filename.startswith(FILENAME_PREFIX) and filename > f"{FILENAME_PREFIX}{monday}"
             ]
-            self.stdout.write(f"Files matching for this {monday=}: {files_of_the_week}")
+            self.logger.info("Files matching for this monday '%s': %s", monday, ", ".join(files_of_the_week))
             if not files_of_the_week:
                 raise RuntimeError(f"No file for this week: {monday}")
             if len(files_of_the_week) > 1:
                 raise RuntimeError(f"Too many files for this week: {files_of_the_week}")
 
             archive_of_the_week = files_of_the_week[0]
-            self.stdout.write(f"Found the {archive_of_the_week=}")
+            self.logger.info("Found the archive_of_the_week: '%s'", archive_of_the_week)
             archive = io.BytesIO()
             sftp.getfo(archive_of_the_week, archive)
             return archive
 
     def clean_old_archives(self, *, wet_run):
         with asp_utils.get_sftp_connection() as sftp:
-            self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
-            self.stdout.write(f'''Current remote dir is "{sftp.normalize(".")}"''')
+            self.logger.info('Connected to "%s" as "%s"', settings.ASP_SFTP_HOST, settings.ASP_SFTP_USER)
+            self.logger.info('Current remote dir is "%s"', sftp.normalize("."))
 
             sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
             filenames = list(sorted(sftp.listdir(), reverse=True))
             for filename in filenames[max(self.NUMBER_OF_ARCHIVES_TO_KEEP, 0) :]:
-                self.stdout.write(f"Going to delete the old archive {filename!r}")
+                self.logger.info("Going to delete the old archive '%s'", filename)
                 if wet_run:
                     sftp.remove(filename)
-                    self.stdout.write(f"Old archive {filename!r} was deleted")
+                    self.logger.info("Old archive '%s' was deleted", filename)
 
     @transaction.atomic
     def process_file(self, file, *, wet_run=False):
@@ -198,27 +198,19 @@ class Command(BaseCommand):
         )
 
         # Display some "stats" about the dataset
-        self.stdout.write("-" * 80)
-        self.stdout.write(f"Rows in file: {info_stats['rows_in_file']}")
-        self.stdout.write(f"Rows after kind filter: {info_stats['rows_after_kind_filter']}")
-        self.stdout.write(f"Rows after deduplication: {info_stats['rows_after_deduplication']}")
-        self.stdout.write(f"Rows used: {len(ea_eatt_df)}")
-        self.stdout.write(f" > With a SIRET: {info_stats['rows_with_a_siret']}")
-        self.stdout.write(f" > With an empty email: {info_stats['rows_with_empty_email']}")
-        self.stdout.write(f" > Creatable: {info_stats['creatable_sirets']}")
-        self.stdout.write(f" >> Created: {info_stats['structures_created']}")
+        info_stats["rows_used"] = len(ea_eatt_df)
+        self.logger.info(
+            "%d structures created, %d structures updated, %d structures deleted",
+            info_stats["structures_created"],
+            info_stats["structures_updated"],
+            info_stats["structures_deleted"],
+            extra={"info_stats": info_stats},
+        )
         if info_stats["not_created_because_of_missing_email"]:
-            self.stdout.write(
-                f" >> Not created because of missing email: {info_stats['not_created_because_of_missing_email']}"
+            self.logger.warning(
+                "%d structures not created because of missing email",
+                info_stats["not_created_because_of_missing_email"],
             )
-        self.stdout.write(f" > Updatable: {info_stats['updatable_sirets']}")
-        self.stdout.write(f" >> Updated: {info_stats['structures_updated']}")
-        self.stdout.write(f" > Deletable: {info_stats['deletable_sirets']}")
-        self.stdout.write(f" >> Deleted: {info_stats['structures_deleted']}")
-        self.stdout.write(f" >> Undeletable: {info_stats['structures_undeletable']}")
-        self.stdout.write(f" >> Skipped: {info_stats['structures_deletable_skipped']}")
-        self.stdout.write("-" * 80)
-        self.stdout.write("Done.")
 
     @monitor(
         monitor_slug="import-ea-eatt",
