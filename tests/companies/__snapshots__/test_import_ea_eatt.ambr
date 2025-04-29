@@ -35,25 +35,27 @@
 # ---
 # name: test_process_file_from_archive[output]
   '''
-  Loaded 2 EA_EATT from export.
-  1 EA_EATT will be created.
+  Loaded 3 EA_EATT from export.
+  2 EA_EATT will be created.
   0 EA_EATT will be updated when needed.
   0 EA_EATT will be deleted when possible.
   EA_EATT siret=00000000000001 will be created.
   EA_EATT siret=00000000000001 has been created with siae.id=[ID].
   EA_EATT siret=00000000000001 will be created.
   EA_EATT siret=00000000000001 has been created with siae.id=[ID].
+  EA_EATT siret=00000000000002 will not been created as it has no email.
   0 EA_EATT can and will be deleted.
   0 EA_EATT cannot be deleted as they have data.
   --------------------------------------------------------------------------------
-  Rows in file: 4
-  Rows after kind filter: 3
-  Rows after deduplication: 2
-  Rows used: 2
-   > With a SIRET: 2
+  Rows in file: 5
+  Rows after kind filter: 4
+  Rows after deduplication: 3
+  Rows used: 3
+   > With a SIRET: 3
    > With an empty email: 0
-   > Creatable: 1
+   > Creatable: 2
    >> Created: 2
+   >> Not created because of missing email: 1
    > Updatable: 0
    >> Updated: 0
    > Deletable: 0

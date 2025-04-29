@@ -51,6 +51,9 @@ def archive_file_fixture():
         # EA duplicate (by SIRET) - Should be ignored
         "ITOU|Entreprise Adaptée|00000001|4|00000000000001|Dumas SA|legerdenise@example.org"
         "|00000000000001|Dumas SA|4||1||Rue|DE LA MOTTE|77550|77296|",
+        # EA with missing email
+        "ITOU|Entreprise Adaptée|00000001|5|00000000000002|Nomail SA|"
+        "|00000000000002|Nomail SA|5||1||Rue|DE LA MOTTE|77550|77296|",
         # File footer
         "Z|ASP|EA|20241231|235959|4|7|",
     ]
