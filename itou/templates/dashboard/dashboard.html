@@ -208,8 +208,8 @@
                                     {% if request.current_organization.is_subject_to_eligibility_rules %}
                                         {% include "dashboard/includes/employer_employees_card.html" %}
                                     {% endif %}
-                                    {% include "dashboard/includes/employer_company_card.html" %}
                                     {% include "dashboard/includes/employer_prescription_card.html" %}
+                                    {% include "dashboard/includes/employer_company_card.html" %}
                                     {% if active_campaigns or evaluated_siae_notifications %}
                                         {% include "dashboard/includes/employer_evaluation_campaigns_card.html" %}
                                     {% endif %}
