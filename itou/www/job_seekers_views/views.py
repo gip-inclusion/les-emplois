@@ -1234,4 +1234,8 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
+            "next_url": reverse(
+                "apply:check_prev_applications_for_hire",
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            ),
         }
