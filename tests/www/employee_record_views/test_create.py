@@ -16,6 +16,7 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -912,3 +913,25 @@ class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.READY
+
+
+class TestResendProcessedEmployeeRecord(CreateEmployeeRecordTestMixin):
+    URL_NAME = "employee_record_views:create_step_5"
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self, client):
+        self.pass_step_4(client)
+
+        # Set employee record as PROCESSED
+        self.employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        self.employee_record.status = Status.PROCESSED
+        self.employee_record.save(update_fields={"status", "updated_at"})
+
+    def test_resubmit_processed_record(self, client, snapshot):
+        response = client.post(self.url)
+
+        self.employee_record.refresh_from_db()
+        assert self.employee_record.status == Status.READY
+        assertRedirects(response, add_url_params(reverse("employee_record_views:list"), {"status": "PROCESSED"}))
+        [message] = list(get_messages(response.wsgi_request))
+        assert message == snapshot
