@@ -5651,21 +5651,17 @@ class TestNewHireProcessInfo:
 
     def test_as_job_seeker(self, client):
         client.force_login(self.job_seeker)
-        response = client.get(reverse("apply:start", kwargs={"company_pk": self.company.pk}), follow=True)
-        assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
-        assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(reverse("apply:start", kwargs={"company_pk": self.geiq.pk}), follow=True)
-        assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
-        assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}), follow=True)
+        assert response.status_code == 403
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.geiq.pk}), follow=True)
+        assert response.status_code == 403
 
     def test_as_prescriber(self, client):
         client.force_login(PrescriberFactory())
-        response = client.get(reverse("apply:start", kwargs={"company_pk": self.company.pk}), follow=True)
-        assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
-        assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(reverse("apply:start", kwargs={"company_pk": self.geiq.pk}), follow=True)
-        assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
-        assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}), follow=True)
+        assert response.status_code == 403
+        response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}), follow=True)
+        assert response.status_code == 403
 
     def test_as_employer(self, client):
         client.force_login(self.company.members.first())
@@ -5673,14 +5669,18 @@ class TestNewHireProcessInfo:
         # Init session
         response = client.get(reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}), follow=True)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
+        check_nir_for_hire_url = reverse(
+            "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name}
         )
+        check_nir_for_sender_url = reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
+        )
+        assertRedirects(response, check_nir_for_hire_url)
+
+        response = client.get(check_nir_for_sender_url)
         assertContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name})
-        )
+        response = client.get(check_nir_for_hire_url)
         assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
         assertContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
 
@@ -5691,13 +5691,17 @@ class TestNewHireProcessInfo:
         job_seeker_session_name_geiq = get_session_name(
             client.session, JobSeekerSessionKinds.GET_OR_CREATE, ignore=[job_seeker_session_name]
         )
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name_geiq})
+        check_nir_for_hire_url = reverse(
+            "job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name_geiq}
         )
+        check_nir_for_sender_url = reverse(
+            "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name_geiq}
+        )
+        assertRedirects(response, check_nir_for_hire_url)
+
+        response = client.get(check_nir_for_sender_url)
         assertContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_hire", kwargs={"session_uuid": job_seeker_session_name_geiq})
-        )
+        response = client.get(check_nir_for_hire_url)
         assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         assertContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
