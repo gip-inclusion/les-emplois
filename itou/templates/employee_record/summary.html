@@ -25,7 +25,20 @@
     {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
         <div class="c-box c-box--action">
             <div class="form-row align-items-center gx-3">
-                {% if employee_record.status == "NEW" %}
+                {% if employee_record.status == "PROCESSED" %}
+                    <div class="form-group col-12 col-lg-auto">
+                        <button id="send_back_button" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                            Renvoyer cette fiche salarié
+                        </button>
+                        <div class="dropdown-menu">
+                            <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.pk %}" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
+                            </form>
+                            <a class="dropdown-item" href="{% url "employee_record_views:create" employee_record.job_application.pk %}">Modifier et renvoyer</a>
+                        </div>
+                    </div>
+                {% elif employee_record.status == "NEW" %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-lg btn-white btn-block btn-ico">
                             <i class="ri-file-edit-line font-weight-medium" aria-hidden="true"></i>
