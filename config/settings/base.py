@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 import datetime
 import json
 import os
+import re
 import warnings
 
 from botocore.config import Config
@@ -328,7 +329,14 @@ LOGGING = {
     },
 }
 
-DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"django_datadog_logger\.middleware\.request_log"
+DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = re.compile(
+    r"""
+    ^(
+        django_datadog_logger\.middleware\.request_log  # Built-in datadog logger.
+        |itou(\..+)?  # Itou root logger and children.
+    )$""",
+    re.VERBOSE,
+)
 
 AUTH_USER_MODEL = "users.User"
 
