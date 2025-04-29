@@ -38,10 +38,27 @@
                 <div class="col-12 col-lg-8">
                     <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit">
-
                             {% csrf_token %}
+                            {% bootstrap_form_errors form type="all" %}
 
-                            {% bootstrap_form form alert_error_type="all" %}
+                            {% if form.siret %}
+                                {% bootstrap_field form.siret %}
+                            {% endif %}
+
+                            {% if form.name %}
+                                {% bootstrap_field form.name %}
+                            {% endif %}
+
+                            {% bootstrap_field form.address_line_1 %}
+                            {% bootstrap_field form.address_line_2 %}
+                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.city %}
+                            {% bootstrap_field form.department %}
+
+                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% bootstrap_field form.website %}
+                            {% bootstrap_field form.description %}
 
                             {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer la modification" %}
                         </form>
