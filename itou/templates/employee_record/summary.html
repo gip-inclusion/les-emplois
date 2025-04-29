@@ -47,7 +47,7 @@
                         </a>
                     </div>
                 {% endif %}
-                {% if employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}
+                {% if employee_record.disable.is_available %}
                     <div class="form-group col-12 col-lg-auto">
                         <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
                             <i class="ri-file-close-line font-weight-medium" aria-hidden="true"></i>

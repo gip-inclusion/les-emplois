@@ -168,6 +168,13 @@
                       </div>
                   
                   
+                      <div class="form-group col-12 col-lg-auto">
+                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
+                              <span>Désactiver</span>
+                          </a>
+                      </div>
+                  
               </div>
           </div>
       
