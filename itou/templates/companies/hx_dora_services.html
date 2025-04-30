@@ -35,6 +35,9 @@
                                                     {% for thematique in service.thematiques_display %}
                                                         <span class="badge badge-sm bg-info-lighter text-info text-uppercase text-decoration-none">{{ thematique }}</span>
                                                     {% endfor %}
+                                                    <div class="float-lg-end">
+                                                        <span class="text-secondary fs-xs text-decoration-none">Source : {{ service.source|title }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
