@@ -96,7 +96,7 @@
                   <p>
                       Dernière actualisation du profil : Day Month Year à HH:MM
                       
-                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&amp;from_url=%2Fapply%2F[PK of Company]%2Fcreate%2F[Public ID of JobSeeker]%2Feligibility">Vérifier le profil</a>
+                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&amp;from_url=%2Fapply%2F[SessionUUID]%2Fcreate%2F[Public ID of JobSeeker]%2Feligibility">Vérifier le profil</a>
                       
                       
                   </p>
@@ -432,7 +432,7 @@
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="apply/[PK of Company]/create/[Public ID of JobSeeker]/select_jobs">
+                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/apply/[SessionUUID]/create/[Public ID of JobSeeker]/select_jobs">
                               <span>Retour</span>
                           </a>
                       
