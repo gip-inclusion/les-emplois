@@ -586,9 +586,6 @@ class JobDescriptionQuerySet(models.QuerySet):
         )
         return annotation
 
-    def order_by_most_recent(self):
-        return self.order_by("-updated_at", "-created_at")
-
     def active(self):
         subquery = Subquery(
             Company.unfiltered_objects.filter(

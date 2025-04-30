@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.core.cache import caches
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Q
+from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -197,7 +198,7 @@ def job_description_list(request, template_name="companies/job_description_list.
         JobDescription.objects.filter(company__pk=company.pk)
         .select_related("location", "company")
         .prefetch_related("appellation", "appellation__rome")
-        .order_by_most_recent()
+        .order_by("-is_active", Coalesce("last_employer_update_at", "updated_at").desc(), "-created_at")
     )
     page = int(request.GET.get("page") or 1)
 
