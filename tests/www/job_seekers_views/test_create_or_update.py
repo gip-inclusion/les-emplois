@@ -176,12 +176,13 @@ class TestGetOrCreateForJobSeeker:
         )
         assertRedirects(response, next_url, fetch_redirect_response=False)
 
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
         response = client.get(next_url)
         assertRedirects(
             response,
             reverse(
                 "job_seekers_views:check_job_seeker_info",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
+                kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": user.public_id},
             ),
         )
 

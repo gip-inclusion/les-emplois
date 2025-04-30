@@ -43,7 +43,7 @@
                   <p>
                       Dernière actualisation du profil : 3 avril 2025 à 12:03
                       
-                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=11111111-2222-3333-4444-555566667777&amp;from_url=%2Fapply%2F[PK of Company]%2Fcreate%2F11111111-2222-3333-4444-555566667777%2Feligibility">Vérifier le profil</a>
+                          <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=11111111-2222-3333-4444-555566667777&amp;from_url=%2Fapply%2F[Session UUID]%2Fcreate%2F11111111-2222-3333-4444-555566667777%2Feligibility">Vérifier le profil</a>
                       
                       
                   </p>
@@ -351,7 +351,7 @@
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/apply/[PK of Company]/create/11111111-2222-3333-4444-555566667777/select_jobs">
+                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/apply/[Session UUID]/create/11111111-2222-3333-4444-555566667777/select_jobs">
                               <span>Retour</span>
                           </a>
                       
