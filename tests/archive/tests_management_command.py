@@ -1,14 +1,22 @@
 import datetime
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.management import call_command
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD, INACTIVITY_PERIOD
-from itou.archive.models import ArchivedJobSeeker
+from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
+from itou.jobs.models import Appellation, Rome
+from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory
+from tests.companies.factories import JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -376,7 +384,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         assert not ArchivedJobSeeker.objects.exists()
 
     @pytest.mark.parametrize(
-        "kwargs",
+        "kwargs,jobapplication_kwargs_list",
         [
             pytest.param(
                 {
@@ -392,6 +400,16 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                     "jobseeker_profile__lack_of_nir_reason": "",
                     "jobseeker_profile__birthdate": datetime.date(1985, 6, 8),
                 },
+                [
+                    {
+                        "state": JobApplicationState.ACCEPTED,
+                        "sent_by_authorized_prescriber_organisation": True,
+                    },
+                    {
+                        "state": JobApplicationState.POSTPONED,
+                        "sent_by_authorized_prescriber_organisation": True,
+                    },
+                ],
                 id="jobseeker_with_all_datas_created_by_prescriber",
             ),
             pytest.param(
@@ -408,6 +426,18 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                     "jobseeker_profile__lack_of_nir_reason": "",
                     "jobseeker_profile__birthdate": datetime.date(1990, 12, 15),
                 },
+                [
+                    {
+                        "state": JobApplicationState.NEW,
+                        "to_company__kind": CompanyKind.EA,
+                        "sent_by_another_employer": True,
+                    },
+                    {
+                        "state": JobApplicationState.ACCEPTED,
+                        "to_company__kind": CompanyKind.EA,
+                        "sent_by_another_employer": True,
+                    },
+                ],
                 id="jobseeker_with_all_datas_created_by_employer",
             ),
             pytest.param(
@@ -424,6 +454,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                     "jobseeker_profile__lack_of_nir_reason": "reason",
                     "jobseeker_profile__birthdate": None,
                 },
+                [],
                 id="jobseeker_with_very_few_datas",
             ),
             pytest.param(
@@ -436,22 +467,34 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                     "jobseeker_profile__birthdate": datetime.date(1964, 5, 30),
                     "is_active": False,
                 },
+                [],
                 id="jobseeker_not_is_active",
             ),
         ],
     )
     def test_archive_inactive_jobseekers_after_grace_period(
-        self, kwargs, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot
+        self, kwargs, jobapplication_kwargs_list, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot
     ):
         if kwargs.get("created_by"):
             kwargs["created_by"] = kwargs["created_by"]()
 
         jobseeker = JobSeekerFactory(notified_days_ago=31, **kwargs)
 
+        for jobapplication_kwargs in jobapplication_kwargs_list:
+            JobApplicationFactory(
+                job_seeker=jobseeker,
+                approval=None,
+                eligibility_diagnosis=None,
+                geiq_eligibility_diagnosis=None,
+                updated_at=timezone.now() - INACTIVITY_PERIOD,
+                **jobapplication_kwargs,
+            )
+
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_archive_jobseekers", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
+        assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
 
         archived_jobseeker = ArchivedJobSeeker.objects.all().values(
             "date_joined",
@@ -467,6 +510,9 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             "nir_sex",
             "nir_year",
             "birth_year",
+            "count_accepted_applications",
+            "count_IAE_applications",
+            "count_total_applications",
         )
         assert list(archived_jobseeker) == snapshot(name="archived_jobseeker")
 
@@ -490,10 +536,8 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         )
         FollowUpGroupFactory(beneficiary=jobseeker, memberships=2, updated_at=timezone.now() - INACTIVITY_PERIOD)
 
-        assert User.objects.filter(id=jobseeker.id).exists()
         assert FollowUpGroup.objects.exists()
         assert FollowUpGroupMembership.objects.exists()
-        assert not ArchivedJobSeeker.objects.exists()
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_archive_jobseekers", wet_run=True)
@@ -502,3 +546,157 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
         assert ArchivedJobSeeker.objects.exists()
+
+    @freeze_time("2025-02-15")
+    @pytest.mark.parametrize(
+        "kwargs,has_transitions,selected_jobs_count",
+        [
+            pytest.param(
+                {
+                    "sender__kind": UserKind.JOB_SEEKER,
+                    "to_company__kind": CompanyKind.GEIQ,
+                    "to_company__department": 76,
+                    "to_company__naf": "1234Z",
+                    "to_company__convention__is_active": True,
+                    "was_hired": True,
+                    "hired_job__contract_type": ContractType.FIXED_TERM_TREMPLIN,
+                    "hired_job__contract_nature": ContractNature.PEC_OFFER,
+                    "to_company__romes": ["N1101"],
+                    "hiring_start_at": datetime.date(2025, 2, 2),
+                    "hiring_without_approval": True,
+                },
+                True,
+                3,
+                id="hired_jobseeker_with_3_jobs",
+            ),
+            pytest.param(
+                {
+                    "sender__kind": UserKind.JOB_SEEKER,
+                    "to_company__kind": CompanyKind.OPCS,
+                    "to_company__department": 76,
+                    "to_company__naf": "4567A",
+                    "to_company__convention__is_active": False,
+                    "to_company__romes": ["N1102"],
+                    "state": JobApplicationState.REFUSED,
+                    "refusal_reason": "reason",
+                    "resume_link": "",
+                },
+                False,
+                1,
+                id="refused_application_with_1_jobs",
+            ),
+            pytest.param(
+                {
+                    "sender__kind": UserKind.EMPLOYER,
+                    "to_company__kind": CompanyKind.EI,
+                    "to_company__department": 76,
+                    "to_company__naf": "4567A",
+                    "to_company__convention": None,
+                    "state": JobApplicationState.PROCESSING,
+                },
+                False,
+                0,
+                id="application_sent_by_company",
+            ),
+            pytest.param(
+                {
+                    "to_company__department": 14,
+                    "to_company__kind": CompanyKind.EITI,
+                    "to_company__naf": "8888Y",
+                    "sent_by_authorized_prescriber_organisation": True,
+                    "state": JobApplicationState.PRIOR_TO_HIRE,
+                },
+                False,
+                0,
+                id="application_sent_by_authorized_prescriber",
+            ),
+            pytest.param(
+                {
+                    "sender__kind": UserKind.EMPLOYER,
+                    "to_company__kind": CompanyKind.EI,
+                    "to_company__department": 76,
+                    "to_company__naf": "4567A",
+                    "transferred_at": timezone.make_aware(datetime.datetime(2025, 2, 2)),
+                    "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2025, 2, 3)),
+                    "state": JobApplicationState.POSTPONED,
+                },
+                False,
+                0,
+                id="transferred_application_with_diagoriente_invitation",
+            ),
+        ],
+    )
+    def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(
+        self,
+        kwargs,
+        has_transitions,
+        selected_jobs_count,
+        django_capture_on_commit_callbacks,
+        caplog,
+        snapshot,
+    ):
+        job_seeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
+            post_code="76160",
+        )
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            approval=None,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=None,
+            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            **kwargs,
+        )
+        if has_transitions:
+            for from_state, to_state, months in [
+                (JobApplicationState.NEW, JobApplicationState.PROCESSING, 0),
+                (JobApplicationState.PROCESSING, JobApplicationState.ACCEPTED, 1),
+            ]:
+                JobApplicationTransitionLog.objects.create(
+                    user=job_seeker,
+                    from_state=from_state,
+                    to_state=to_state,
+                    job_application=job_application,
+                    timestamp=job_application.created_at + relativedelta(months=months),
+                )
+        if selected_jobs_count > 0:
+            rome = Rome.objects.create(code="I1304", name="Rome 1304")
+            Appellation.objects.create(code="I13042", name="Doer", rome=rome)
+            selected_jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
+            job_application.selected_jobs.set(selected_jobs)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_jobseekers", wet_run=True)
+
+        archived_application = ArchivedApplication.objects.all().values(
+            "job_seeker_birth_year",
+            "job_seeker_department_same_as_company_department",
+            "sender_kind",
+            "sender_company_kind",
+            "sender_prescriber_organization_kind",
+            "sender_prescriber_organization_authorization_status",
+            "company_kind",
+            "company_department",
+            "company_naf",
+            "company_has_convention",
+            "applied_at",
+            "processed_at",
+            "last_transition_at",
+            "had_resume",
+            "origin",
+            "state",
+            "refusal_reason",
+            "has_been_transferred",
+            "number_of_jobs_applied_for",
+            "has_diagoriente_invitation",
+            "hiring_rome",
+            "hiring_contract_type",
+            "hiring_contract_nature",
+            "hiring_start_date",
+            "hiring_without_approval",
+        )
+        assert list(archived_application) == snapshot(name="archived_application")
+        assert not JobApplication.objects.filter(id=job_application.id).exists()
+        assert "Archived job applications after grace period, count: 1" in caplog.messages

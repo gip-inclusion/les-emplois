@@ -3,6 +3,9 @@
   list([
     dict({
       'birth_year': 1964,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 0,
+      'count_total_applications': 0,
       'date_joined': datetime.date(2023, 10, 1),
       'department': '',
       'first_login': None,
@@ -22,6 +25,9 @@
   list([
     dict({
       'birth_year': 1990,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 1,
+      'count_total_applications': 2,
       'date_joined': datetime.date(2021, 12, 1),
       'department': '',
       'first_login': datetime.date(2021, 12, 1),
@@ -57,6 +63,9 @@
   list([
     dict({
       'birth_year': 1985,
+      'count_IAE_applications': 2,
+      'count_accepted_applications': 1,
+      'count_total_applications': 2,
       'date_joined': datetime.date(2020, 4, 1),
       'department': '',
       'first_login': datetime.date(2020, 4, 1),
@@ -92,6 +101,9 @@
   list([
     dict({
       'birth_year': None,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 0,
+      'count_total_applications': 0,
       'date_joined': datetime.date(2022, 11, 1),
       'department': '',
       'first_login': None,
@@ -122,6 +134,161 @@
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '14',
+      'company_has_convention': True,
+      'company_kind': 'EITI',
+      'company_naf': '8888Y',
+      'had_resume': True,
+      'has_been_transferred': False,
+      'has_diagoriente_invitation': False,
+      'hiring_contract_nature': None,
+      'hiring_contract_type': None,
+      'hiring_rome': None,
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': False,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': False,
+      'last_transition_at': datetime.date(2025, 2, 1),
+      'number_of_jobs_applied_for': 0,
+      'origin': 'default',
+      'processed_at': None,
+      'refusal_reason': '',
+      'sender_company_kind': None,
+      'sender_kind': 'prescriber',
+      'sender_prescriber_organization_authorization_status': 'VALIDATED',
+      'sender_prescriber_organization_kind': 'FT',
+      'state': 'prior_to_hire',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '76',
+      'company_has_convention': False,
+      'company_kind': 'EI',
+      'company_naf': '4567A',
+      'had_resume': True,
+      'has_been_transferred': False,
+      'has_diagoriente_invitation': False,
+      'hiring_contract_nature': None,
+      'hiring_contract_type': None,
+      'hiring_rome': None,
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': False,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': True,
+      'last_transition_at': datetime.date(2025, 2, 1),
+      'number_of_jobs_applied_for': 0,
+      'origin': 'default',
+      'processed_at': None,
+      'refusal_reason': '',
+      'sender_company_kind': None,
+      'sender_kind': 'employer',
+      'sender_prescriber_organization_authorization_status': None,
+      'sender_prescriber_organization_kind': None,
+      'state': 'processing',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '76',
+      'company_has_convention': True,
+      'company_kind': 'GEIQ',
+      'company_naf': '1234Z',
+      'had_resume': True,
+      'has_been_transferred': False,
+      'has_diagoriente_invitation': False,
+      'hiring_contract_nature': 'PEC_OFFER',
+      'hiring_contract_type': 'FIXED_TERM_TREMPLIN',
+      'hiring_rome': "Conduite d'engins de déplacement des charges (N1101)",
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': True,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': True,
+      'last_transition_at': datetime.date(2025, 3, 1),
+      'number_of_jobs_applied_for': 3,
+      'origin': 'default',
+      'processed_at': datetime.date(2025, 2, 1),
+      'refusal_reason': '',
+      'sender_company_kind': None,
+      'sender_kind': 'job_seeker',
+      'sender_prescriber_organization_authorization_status': None,
+      'sender_prescriber_organization_kind': None,
+      'state': 'accepted',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '76',
+      'company_has_convention': True,
+      'company_kind': 'OPCS',
+      'company_naf': '4567A',
+      'had_resume': True,
+      'has_been_transferred': False,
+      'has_diagoriente_invitation': False,
+      'hiring_contract_nature': None,
+      'hiring_contract_type': None,
+      'hiring_rome': None,
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': False,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': True,
+      'last_transition_at': datetime.date(2025, 2, 1),
+      'number_of_jobs_applied_for': 1,
+      'origin': 'default',
+      'processed_at': datetime.date(2025, 2, 1),
+      'refusal_reason': 'reason',
+      'sender_company_kind': None,
+      'sender_kind': 'job_seeker',
+      'sender_prescriber_organization_authorization_status': None,
+      'sender_prescriber_organization_kind': None,
+      'state': 'refused',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '76',
+      'company_has_convention': True,
+      'company_kind': 'EI',
+      'company_naf': '4567A',
+      'had_resume': True,
+      'has_been_transferred': True,
+      'has_diagoriente_invitation': True,
+      'hiring_contract_nature': None,
+      'hiring_contract_type': None,
+      'hiring_rome': None,
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': False,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': True,
+      'last_transition_at': datetime.date(2025, 2, 1),
+      'number_of_jobs_applied_for': 0,
+      'origin': 'default',
+      'processed_at': None,
+      'refusal_reason': '',
+      'sender_company_kind': None,
+      'sender_kind': 'employer',
+      'sender_prescriber_organization_authorization_status': None,
+      'sender_prescriber_organization_kind': None,
+      'state': 'postponed',
+    }),
+  ])
 # ---
 # name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
   '''
