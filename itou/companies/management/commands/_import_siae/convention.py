@@ -190,7 +190,7 @@ def create_conventions(siret_to_siae_row, conventions_by_siae_key):
         convention.save()
         assert convention.siaes.count() == 0
         siae.convention = convention
-        siae.save(update_fields={"convention"})
+        siae.save(update_fields={"convention", "updated_at"})
         assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
 
 
