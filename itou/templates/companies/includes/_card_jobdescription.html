@@ -33,9 +33,10 @@
                 <div class="d-flex flex-column flex-md-row justify-content-md-between">
                     <div class="order-2 order-md-1">
                         <a href="{% url_add_query job_description.get_absolute_url job_seeker_public_id=job_seeker.public_id|default:'' back_url=request.get_full_path %}"
-                           class="fw-bold text-decoration-none {% if job_description.is_external %}has-external-link{% else %}stretched-link{% endif %}"
+                           class="fw-bold text-decoration-none stretched-link"
                            {% if job_description.is_external %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte-externe" %} rel="noopener" target="_blank" aria-label="Visiter l'offre sur le site d'origine" {% else %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte" %} aria-label="Aller vers la description de ce poste" {% endif %}>
                             {{ job_description.display_name | capfirst }}
+                            {% if job_description.is_external %}<i class="ri-external-link-line" aria-hidden="true"></i>{% endif %}
                         </a>
                         {% if job_description.is_overwhelmed %}
                             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
