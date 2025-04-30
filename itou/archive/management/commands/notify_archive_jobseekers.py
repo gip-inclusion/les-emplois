@@ -48,11 +48,21 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
     )
 
 
+def get_year_month_or_none(date=None):
+    if not date:
+        return None
+
+    if isinstance(date, datetime.datetime):
+        return timezone.localdate(date).replace(day=1)
+
+    return date.replace(day=1)
+
+
 def anonymized_jobseeker(user):
     return ArchivedJobSeeker(
-        date_joined=timezone.localdate(user.date_joined).replace(day=1),
-        first_login=timezone.localdate(user.first_login).replace(day=1) if user.first_login else None,
-        last_login=timezone.localdate(user.last_login).replace(day=1) if user.last_login else None,
+        date_joined=get_year_month_or_none(user.date_joined),
+        first_login=get_year_month_or_none(user.first_login),
+        last_login=get_year_month_or_none(user.last_login),
         user_signup_kind=getattr(user.created_by, "kind", None),
         department=user.department,
         title=user.title,
