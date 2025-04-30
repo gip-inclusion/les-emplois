@@ -2,15 +2,18 @@ import datetime
 import logging
 
 from django.db import transaction
-from django.db.models import Exists, F, OuterRef
+from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
-from itou.archive.models import ArchivedJobSeeker
+from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.companies.enums import CompanyKind
+from itou.companies.models import JobDescription
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
-from itou.job_applications.models import JobApplication
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
 from itou.utils.command import BaseCommand
@@ -73,6 +76,49 @@ def anonymized_jobseeker(user):
         nir_sex=user.jobseeker_profile.nir[0] if user.jobseeker_profile.nir else None,
         nir_year=user.jobseeker_profile.nir[1:3] if user.jobseeker_profile.nir else None,
         birth_year=user.jobseeker_profile.birthdate.year if user.jobseeker_profile.birthdate else None,
+        count_accepted_applications=user.count_accepted_applications,
+        count_IAE_applications=user.count_IAE_applications,
+        count_total_applications=user.count_total_applications,
+    )
+
+
+def anonymized_jobapplication(obj):
+    return ArchivedApplication(
+        job_seeker_birth_year=(
+            obj.job_seeker.jobseeker_profile.birthdate.year if obj.job_seeker.jobseeker_profile.birthdate else None
+        ),
+        job_seeker_department_same_as_company_department=obj.job_seeker.department == obj.to_company.department,
+        sender_kind=obj.sender.kind,
+        sender_company_kind=obj.sender_company.kind if obj.sender_company else None,
+        sender_prescriber_organization_kind=(
+            obj.sender_prescriber_organization.kind if obj.sender_prescriber_organization else None
+        ),
+        sender_prescriber_organization_authorization_status=(
+            obj.sender_prescriber_organization.authorization_status if obj.sender_prescriber_organization else None
+        ),
+        company_kind=obj.to_company.kind,
+        company_department=obj.to_company.department,
+        company_naf=obj.to_company.naf,
+        company_has_convention=obj.to_company.convention is not None,
+        applied_at=get_year_month_or_none(obj.created_at),
+        processed_at=get_year_month_or_none(obj.processed_at),
+        last_transition_at=(
+            get_year_month_or_none(obj.last_transition_at)
+            if obj.last_transition_at
+            else get_year_month_or_none(obj.created_at)
+        ),
+        had_resume=obj.resume_link is not None,
+        origin=obj.origin,
+        state=obj.state,
+        refusal_reason=obj.refusal_reason,
+        has_been_transferred=obj.transferred_at is not None,
+        number_of_jobs_applied_for=obj.number_of_jobs_applied_for or 0,
+        has_diagoriente_invitation=obj.diagoriente_invite_sent_at is not None,
+        hiring_rome=obj.hired_job.appellation.rome if obj.hired_job else None,
+        hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
+        hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
+        hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
+        hiring_without_approval=obj.hiring_without_approval,
     )
 
 
@@ -133,12 +179,55 @@ class Command(BaseCommand):
         grace_period_since = now - GRACE_PERIOD
         self.logger.info("Archiving job seekers after grace period, notified before: %s", grace_period_since)
 
+        # jobseekers
         users_to_archive = list(
-            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__lte=grace_period_since)[
-                : self.batch_size
-            ]
+            User.objects.filter(
+                kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__lte=grace_period_since
+            ).annotate(
+                count_accepted_applications=Count(
+                    "job_applications__id", filter=Q(job_applications__state=JobApplicationState.ACCEPTED)
+                ),
+                count_IAE_applications=Count(
+                    "job_applications__id", filter=Q(job_applications__to_company__kind__in=CompanyKind.siae_kinds())
+                ),
+                count_total_applications=Count("job_applications__id"),
+            )[: self.batch_size]
         )
+
         archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
+
+        # job applications
+        number_of_jobs_applied_for_subquery = (
+            JobDescription.objects.filter(jobapplication__id=OuterRef("id"))
+            .values("jobapplication")
+            .annotate(number_of_jobs_applied_for=Count("pk"))
+            .values("number_of_jobs_applied_for")
+        )
+        last_transition_at_subquery = (
+            JobApplicationTransitionLog.objects.filter(job_application__id=OuterRef("id"))
+            .values("job_application")
+            .annotate(last_transition_at=Max("timestamp"))
+            .values("last_transition_at")
+        )
+        jobapplications_to_archive = (
+            JobApplication.objects.filter(job_seeker__in=users_to_archive)
+            .annotate(
+                number_of_jobs_applied_for=Subquery(number_of_jobs_applied_for_subquery),
+                last_transition_at=Subquery(last_transition_at_subquery),
+            )
+            .select_related(
+                "job_seeker",
+                "sender",
+                "sender_company",
+                "sender_prescriber_organization",
+                "to_company",
+                "hired_job",
+                "hired_job__appellation",
+            )
+        )
+        archived_jobapplications = [
+            anonymized_jobapplication(job_application) for job_application in jobapplications_to_archive
+        ]
 
         if self.wet_run:
             for user in users_to_archive:
@@ -147,12 +236,15 @@ class Command(BaseCommand):
                 ).send()
 
             ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
+            ArchivedApplication.objects.bulk_create(archived_jobapplications)
             self._delete_with_related_objects(users_to_archive)
 
         self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
+        self.logger.info("Archived job applications after grace period, count: %d", len(archived_jobapplications))
 
     def _delete_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
+        JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
     @monitor(
