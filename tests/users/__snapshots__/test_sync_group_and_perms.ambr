@@ -192,6 +192,8 @@
     'change_prescriberorganization',
     'delete_prescriberorganization',
     'view_prescriberorganization',
+    'add_calendar',
+    'change_calendar',
     'view_calendar',
     'view_evaluatedadministrativecriteria',
     'view_evaluatedjobapplication',

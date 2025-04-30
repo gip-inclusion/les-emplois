@@ -81,7 +81,7 @@ def get_permissions_dict():
         jobs_models.Rome: PERMS_READ,
         prescribers_models.PrescriberMembership: PERMS_ADD,
         prescribers_models.PrescriberOrganization: PERMS_ALL,
-        siae_evaluations_models.Calendar: PERMS_READ,
+        siae_evaluations_models.Calendar: PERMS_ADD,
         siae_evaluations_models.EvaluationCampaign: PERMS_READ,
         siae_evaluations_models.EvaluatedSiae: PERMS_READ,
         siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
