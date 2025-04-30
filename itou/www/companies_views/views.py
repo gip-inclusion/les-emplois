@@ -89,6 +89,8 @@ def get_data_inclusion_services(code_insee):
 
         results = []
         department = code_insee[:2]
+        if code_insee.startswith("97") or code_insee.startswith("98"):
+            department = code_insee[:3]
         if department in ["59", "67"]:
             for svc in services:
                 if svc["source"] == "soliguide":

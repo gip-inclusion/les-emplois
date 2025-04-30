@@ -11,6 +11,9 @@
                                                       
                                                           <span class="badge badge-sm bg-info-lighter text-info text-uppercase text-decoration-none">A</span>
                                                       
+                                                      <div class="float-lg-end">
+                                                          <span class="text-secondary fs-xs text-decoration-none">Source : Dora</span>
+                                                      </div>
                                                   </div>
                                               </div>
   '''
@@ -31,6 +34,9 @@
                                                       
                                                           <span class="badge badge-sm bg-info-lighter text-info text-uppercase text-decoration-none">A</span>
                                                       
+                                                      <div class="float-lg-end">
+                                                          <span class="text-secondary fs-xs text-decoration-none">Source : Dora</span>
+                                                      </div>
                                                   </div>
                                               </div>
   '''
