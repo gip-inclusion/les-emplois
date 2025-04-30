@@ -119,6 +119,46 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                     count=2,
                 )
 
+    def test_ordering(self, client, subtests):
+        self.company.job_description_through.all().delete()
+        first = JobDescriptionFactory(company=self.company, last_employer_update_at=None)
+        second = JobDescriptionFactory(company=self.company, last_employer_update_at=None)
+        third = JobDescriptionFactory(company=self.company, last_employer_update_at=None)
+
+        client.force_login(self.user)
+
+        with subtests.test(order="default"):
+            response = client.get(self.list_url)
+            assert response.context["job_pager"].object_list == [third, second, first]
+
+        with subtests.test(order="with-inactive"):
+            second.is_active = False
+            second.save(update_fields=["is_active", "updated_at"])
+            response = client.get(self.list_url)
+            assert response.context["job_pager"].object_list == [third, first, second]
+
+        with subtests.test(order="with-recent-updated-at"):
+            first.save(update_fields=["updated_at"])
+            response = client.get(self.list_url)
+            assert response.context["job_pager"].object_list == [first, third, second]
+
+        with subtests.test(order="with-inactive-last-employer-update-at"):
+            second.last_employer_update_at = timezone.now()
+            second.save(update_fields=["updated_at", "last_employer_update_at"])
+            response = client.get(self.list_url)
+            assert response.context["job_pager"].object_list == [first, third, second]
+
+        with subtests.test(order="with-active-last-employer-update-at"):
+            first.last_employer_update_at = timezone.now()
+            first.save(update_fields=["updated_at", "last_employer_update_at"])
+            third.save(update_fields=["updated_at"])
+            response = client.get(self.list_url)
+            assert response.context["job_pager"].object_list == [third, first, second]
+
+            # Refresh updated_at, last_employer_update_at takes precedence
+            first.save(update_fields=["updated_at"])
+            assert response.context["job_pager"].object_list == [third, first, second]
+
     @pytest.mark.parametrize("no_job_descriptions", [True, False])
     def test_block_job_applications(self, client, no_job_descriptions):
         if no_job_descriptions:
