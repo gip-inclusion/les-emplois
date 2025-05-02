@@ -17,12 +17,10 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
 from itou.utils.command import BaseCommand
+from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 logger = logging.getLogger(__name__)
-
-GRACE_PERIOD = datetime.timedelta(days=30)
-INACTIVITY_PERIOD = datetime.timedelta(days=365) * 2 - GRACE_PERIOD
 
 BATCH_SIZE = 100
 
