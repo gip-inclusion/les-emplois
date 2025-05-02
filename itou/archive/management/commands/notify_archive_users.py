@@ -240,6 +240,21 @@ class Command(BaseCommand):
             reset_nb = users_to_reset_qs.count()
         self.logger.info("Reset notified job seekers with recent activity: %s", reset_nb)
 
+    def reset_notified_professionals_with_recent_activity(self):
+        self.logger.info("Reseting inactive professionals with recent activity")
+
+        users_to_reset_qs = User.objects.filter(
+            kind__in=UserKind.professionals(),
+            upcoming_deletion_notified_at__isnull=False,
+            last_login__gte=F("upcoming_deletion_notified_at"),
+        )
+
+        if self.wet_run:
+            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
+        else:
+            reset_nb = users_to_reset_qs.count()
+        self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
+
     @transaction.atomic
     def archive_jobseekers_after_grace_period(self):
         now = timezone.now()
@@ -331,6 +346,7 @@ class Command(BaseCommand):
         self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
+        self.reset_notified_professionals_with_recent_activity()
 
         self.notify_inactive_jobseekers()
         self.notify_inactive_professionals()
