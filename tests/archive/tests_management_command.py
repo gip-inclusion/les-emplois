@@ -15,6 +15,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.jobs.models import Appellation, Rome
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import JobDescriptionFactory
 from tests.eligibility.factories import (
@@ -30,9 +31,6 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-
-
-DAYS_OF_INACTIVITY = 730 - 30
 
 
 class TestNotifyArchiveJobSeekersManagementCommand:
