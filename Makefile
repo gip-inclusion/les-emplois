@@ -110,7 +110,7 @@ shell_on_postgres_container:
 
 .PHONY: dumpcreate dumprestore resetdb restore_latest_backup
 
-dumpcreate: $(VIRTUALENV)
+dumpcreate: $(VIRTUAL_ENV)
 	dropdb --if-exists $(PGDATABASE)
 	createdb $(PGDATABASE)
 	python manage.py migrate
@@ -119,7 +119,7 @@ dumpcreate: $(VIRTUALENV)
 	pg_dump --format=c --dbname=$(PGDATABASE) --file=$(DBDUMP)
 
 # There are no dependencies on fixtures, allowing developers to manage their DB dump manually.
-dumprestore: $(VIRTUALENV)
+dumprestore: $(VIRTUAL_ENV)
 	dropdb --if-exists $(PGDATABASE)
 	createdb $(PGDATABASE)
 	pg_restore --dbname=$(PGDATABASE) $(DBDUMP)
