@@ -22,6 +22,12 @@
                 <div class="col-12">
                     <div class="c-info mb-3 mb-md-4">
                         <span class="c-info__summary">Seuls les administrateurs peuvent voir cette liste.</span>
+                        <div class="c-info__detail">
+                            <p>
+                                Vous constatez qu’une organisation de cette liste n’est plus conventionnée ?
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" class="has-external-link" aria-label="Contactez-nous pour demander son retrait (ouverture dans un nouvel onglet).">Contactez-nous pour demander son retrait</a>.
+                            </p>
+                        </div>
                     </div>
                     {% if not accredited_orgs %}
                         <div class="alert alert-info" role="status">
