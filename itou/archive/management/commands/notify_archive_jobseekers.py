@@ -15,7 +15,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
-from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
+from itou.users.notifications import ArchiveUser, InactiveUser
 from itou.utils.command import BaseCommand
 from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
@@ -148,7 +148,7 @@ class Command(BaseCommand):
 
         if self.wet_run:
             for user in users:
-                InactiveJobSeeker(
+                InactiveUser(
                     user,
                     end_of_grace_period=now + GRACE_PERIOD,
                 ).send()
@@ -229,7 +229,7 @@ class Command(BaseCommand):
 
         if self.wet_run:
             for user in users_to_archive:
-                ArchiveJobSeeker(
+                ArchiveUser(
                     user,
                 ).send()
 
