@@ -76,6 +76,11 @@ class TestNotifyArchiveUsersManagementCommand:
                 {"last_login_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": timezone.now()},
                 id="notified_professional_to_reset",
             ),
+            pytest.param(
+                PrescriberFactory,
+                {"last_login_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
+                id="professional_to_archive",
+            ),
         ],
     )
     def test_dry_run(self, factory, kwargs, django_capture_on_commit_callbacks, mailoutbox):
@@ -504,20 +509,32 @@ class TestNotifyArchiveUsersManagementCommand:
                 id="jobseeker_never_notified",
             ),
             pytest.param(
-                lambda: EmployerFactory(is_active=False, notified_days_ago=30),
-                id="employer",
+                lambda: EmployerFactory(notified_days_ago=29),
+                id="employer_notified_still_in_grace_period",
             ),
             pytest.param(
-                lambda: PrescriberFactory(notified_days_ago=30),
-                id="prescriber",
+                lambda: EmployerFactory(upcoming_deletion_notified_at=None),
+                id="employer_never_notified",
+            ),
+            pytest.param(
+                lambda: PrescriberFactory(notified_days_ago=29),
+                id="prescriber_notified_still_in_grace_period",
+            ),
+            pytest.param(
+                lambda: PrescriberFactory(upcoming_deletion_notified_at=None),
+                id="prescriber_never_notified",
+            ),
+            pytest.param(
+                lambda: LaborInspectorFactory(notified_days_ago=29),
+                id="laborinspector_notified_still_in_grace_period",
+            ),
+            pytest.param(
+                lambda: LaborInspectorFactory(upcoming_deletion_notified_at=None),
+                id="laborinspector_never_notified",
             ),
             pytest.param(
                 lambda: ItouStaffFactory(notified_days_ago=30),
                 id="itou_staff",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(notified_days_ago=30),
-                id="laborinspector",
             ),
         ],
     )
@@ -528,6 +545,8 @@ class TestNotifyArchiveUsersManagementCommand:
         expected_user = User.objects.get()
         assert user == expected_user
         assert not ArchivedJobSeeker.objects.exists()
+        assert not ArchivedApplication.objects.exists()
+        assert not ArchivedProfessional.objects.exists()
 
     @pytest.mark.parametrize(
         "kwargs,jobapplication_kwargs_list",
@@ -846,3 +865,46 @@ class TestNotifyArchiveUsersManagementCommand:
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Archived job applications after grace period, count: 1" in caplog.messages
+
+    @pytest.mark.parametrize("factory", [EmployerFactory, LaborInspectorFactory, PrescriberFactory])
+    @pytest.mark.parametrize("is_active", [True, False])
+    @pytest.mark.parametrize("few_datas", [True, False])
+    def test_archive_inactive_professionals_after_grace_period(
+        self, factory, is_active, few_datas, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot
+    ):
+        user = factory(
+            notified_days_ago=30,
+            last_login=None if few_datas else timezone.now() - relativedelta(days=DAYS_OF_INACTIVITY),
+            first_login=None if few_datas else timezone.now() - relativedelta(days=DAYS_OF_INACTIVITY),
+            created_by=None if few_datas else ItouStaffFactory(),
+            is_active=is_active,
+            for_snapshot=True,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_users", wet_run=True)
+
+        assert not User.objects.filter(id=user.id).exists()
+
+        archived_professional = ArchivedProfessional.objects.values(
+            "date_joined",
+            "first_login",
+            "last_login",
+            "user_signup_kind",
+            "department",
+            "title",
+            "identity_provider",
+        )
+        assert list(archived_professional) == snapshot(name="archived_professional")
+        assert "Archived professionals after grace period, count: 1" in caplog.messages
+        if user.is_active:
+            [mail] = mailoutbox
+            assert user.email == mail.to[0]
+            assert mail.subject == snapshot(name="archived_professional_email_subject")
+
+            body = mail.body.replace(
+                timezone.localdate(user.upcoming_deletion_notified_at).strftime("%d/%m/%Y"), "XX/XX/XXXX"
+            )
+            assert body == snapshot(name="archived_professional_email_body")
+        else:
+            assert not mailoutbox

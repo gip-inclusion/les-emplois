@@ -135,6 +135,258 @@
 # name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-False-EmployerFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'PC',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-False-LaborInspectorFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'DJANGO',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-False-PrescriberFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'PC',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-EmployerFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'PC',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-EmployerFactory][archived_professional_email_body]
+  '''
+  Bonjour John DOE,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-EmployerFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-LaborInspectorFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'DJANGO',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-LaborInspectorFactory][archived_professional_email_body]
+  '''
+  Bonjour John DOE,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-LaborInspectorFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-PrescriberFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': datetime.date(2023, 6, 1),
+      'identity_provider': 'PC',
+      'last_login': datetime.date(2023, 6, 1),
+      'title': '',
+      'user_signup_kind': 'itou_staff',
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-PrescriberFactory][archived_professional_email_body]
+  '''
+  Bonjour Pierre DUPONT,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[False-True-PrescriberFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-False-EmployerFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'PC',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-False-LaborInspectorFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'DJANGO',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-False-PrescriberFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'PC',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-EmployerFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'PC',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-EmployerFactory][archived_professional_email_body]
+  '''
+  Bonjour John DOE,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-EmployerFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-LaborInspectorFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'DJANGO',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-LaborInspectorFactory][archived_professional_email_body]
+  '''
+  Bonjour John DOE,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-LaborInspectorFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-PrescriberFactory][archived_professional]
+  list([
+    dict({
+      'date_joined': datetime.date(2025, 5, 1),
+      'department': '',
+      'first_login': None,
+      'identity_provider': 'PC',
+      'last_login': None,
+      'title': '',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-PrescriberFactory][archived_professional_email_body]
+  '''
+  Bonjour Pierre DUPONT,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_professionals_after_grace_period[True-True-PrescriberFactory][archived_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
 # name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
   list([
     dict({
