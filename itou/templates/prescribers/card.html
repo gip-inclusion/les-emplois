@@ -14,7 +14,10 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>Prescripteur habilité</h1>
-            <p>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</p>
+            <p>
+                {% if prescriber_org.kind != "FT" %}{{ prescriber_org.get_kind_display }} -{% endif %}
+                {{ prescriber_org.name }}
+            </p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
