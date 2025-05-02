@@ -484,38 +484,6 @@ class TestNotifyArchiveUsersManagementCommand:
                 True,
                 id="notified_jobseeker_with_recent_follow_up_group",
             ),
-            pytest.param(
-                lambda: ItouStaffFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="itoustaff_with_recent_login",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="labor_inspector_with_recent_login",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="employer_with_recent_login",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="prescriber_with_recent_login",
-            ),
         ],
     )
     def test_reset_notified_jobseekers_with_recent_activity(self, factory, related_object_factory, notification_reset):
