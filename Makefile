@@ -114,7 +114,7 @@ dumpcreate: $(VIRTUAL_ENV)
 	dropdb --if-exists $(PGDATABASE)
 	createdb $(PGDATABASE)
 	python manage.py migrate
-	$(MAKE) populate_db
+	$(MAKE) populate_db --assume-old=$(REQUIREMENTS_PATH)
 	mkdir --parents $(CACHEDIR)
 	pg_dump --format=c --dbname=$(PGDATABASE) --file=$(DBDUMP)
 
@@ -127,12 +127,12 @@ dumprestore: $(VIRTUAL_ENV)
 
 DBREADY := 0
 $(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/siae_evaluations/fixtures.py
-	$(MAKE) dumpcreate
+	$(MAKE) dumpcreate --assume-old=$(REQUIREMENTS_PATH)
 	$(eval DBREADY := 1)
 
 # Recreate the database when fixtures change.
 resetdb: $(DBDUMP)
-	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore; fi
+	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore --assume-old=$(REQUIREMENTS_PATH); fi
 
 restore_latest_backup:
 	./scripts/restore_latest_backup.sh $(PGDATABASE)
