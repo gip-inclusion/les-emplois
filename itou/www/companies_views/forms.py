@@ -69,7 +69,7 @@ class CreateCompanyForm(forms.ModelForm):
 
         if existing_siae_query.exists():
             error_message = (
-                "Le numéro de SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne, "
+                "Le numéro SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne, "
                 "nous vous invitons à réessayer avec un autre numéro. "
                 "Si besoin vous pouvez consulter "
             )

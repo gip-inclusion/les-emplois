@@ -241,7 +241,7 @@ class CompanySiaeSelectForm(forms.Form):
 
 class CheckAlreadyExistsForm(forms.Form):
     siret = forms.CharField(
-        label="Numéro de SIRET de votre organisation",
+        label="Numéro SIRET de votre organisation",
         # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         min_length=14,
         help_text=mark_safe(

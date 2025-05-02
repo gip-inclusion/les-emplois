@@ -13,7 +13,7 @@ from tests.companies.factories import (
 
 class TestCreateCompanyView:
     STRUCTURE_ALREADY_EXISTS_MSG = escape(
-        "Le numéro de SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne,"
+        "Le numéro SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne,"
     )
 
     @staticmethod
