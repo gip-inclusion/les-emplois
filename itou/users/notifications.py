@@ -23,8 +23,8 @@ class JobSeekerCreatedByProxyNotification(EmailNotification):
 
 
 @notifications_registry.register
-class InactiveJobSeeker(EmailNotification):
-    name = "Information avant suppression d'un compte candidat inactif"
+class InactiveUser(EmailNotification):
+    name = "Information avant suppression d'un compte utilisateur inactif"
     category = NotificationCategory.DELETION
     subject_template = "account/email/email_inactive_user_subject.txt"
     body_template = "account/email/email_inactive_user_body.txt"
@@ -32,8 +32,8 @@ class InactiveJobSeeker(EmailNotification):
 
 
 @notifications_registry.register
-class ArchiveJobSeeker(EmailNotification):
-    name = "Suppression d'un compte candidat"
+class ArchiveUser(EmailNotification):
+    name = "Suppression d'un compte utilisateur"
     category = NotificationCategory.DELETION
     subject_template = "account/email/email_archive_user_subject.txt"
     body_template = "account/email/email_archive_user_body.txt"
