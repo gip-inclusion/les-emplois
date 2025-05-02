@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.urls import reverse
+from factory.fuzzy import FuzzyChoice
 from pytest_django.asserts import assertContains
 
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -34,6 +35,21 @@ class TestCardView:
         )
         response = client.get(url)
         assert_previous_step(response, reverse("dashboard:index"))
+
+    def test_card_subtitle_ft(self, client):
+        prescriber_org = PrescriberOrganizationFactory(authorized=True, kind=PrescriberOrganizationKind.FT)
+        url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
+        response = client.get(url)
+        assertContains(response, f"<p>{prescriber_org.name}</p>", html=True)
+
+    def test_card_subtitle(self, client):
+        prescriber_org = PrescriberOrganizationFactory(
+            authorized=True,
+            kind=FuzzyChoice(set(PrescriberOrganizationKind.values) - {PrescriberOrganizationKind.FT}),
+        )
+        url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
+        response = client.get(url)
+        assertContains(response, f"<p>{prescriber_org.get_kind_display()} - {prescriber_org.name}</p>", html=True)
 
     def test_card_render_markdown(self, client):
         prescriber_org = PrescriberOrganizationFactory(
