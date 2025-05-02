@@ -9,7 +9,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
-from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.archive.models import ArchivedApplication, ArchivedJobSeeker, ArchivedProfessional
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership, SiaeConvention
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
@@ -173,6 +173,18 @@ def anonymized_jobapplication(obj):
     )
 
 
+def anonymized_professional(user):
+    return ArchivedProfessional(
+        date_joined=timezone.localdate(user.date_joined).replace(day=1),
+        first_login=timezone.localdate(user.first_login).replace(day=1) if user.first_login else None,
+        last_login=timezone.localdate(user.last_login).replace(day=1) if user.last_login else None,
+        user_signup_kind=getattr(user.created_by, "kind", None),
+        department=user.department,
+        title=user.title,
+        identity_provider=user.identity_provider,
+    )
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
@@ -304,6 +316,31 @@ class Command(BaseCommand):
         JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
+    @transaction.atomic
+    def archive_professionals_after_grace_period(self):
+        now = timezone.now()
+        grace_period_since = now - GRACE_PERIOD
+        self.logger.info("Archiving professionals after grace period, notified before: %s", grace_period_since)
+
+        users_to_archive = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__lte=grace_period_since
+            )[: self.batch_size]
+        )
+
+        archived_professionals = [anonymized_professional(user) for user in users_to_archive]
+
+        if self.wet_run:
+            for user in users_to_archive:
+                ArchiveUser(
+                    user,
+                ).send()
+
+            ArchivedProfessional.objects.bulk_create(archived_professionals)
+            User.objects.filter(id__in=[user.id for user in users_to_archive]).delete()
+
+        self.logger.info("Archived professionals after grace period, count: %d", len(archived_professionals))
+
     @monitor(
         monitor_slug="notify_archive_users",
         monitor_config={
@@ -327,3 +364,4 @@ class Command(BaseCommand):
         self.notify_inactive_professionals()
 
         self.archive_jobseekers_after_grace_period()
+        self.archive_professionals_after_grace_period()
