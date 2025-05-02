@@ -284,6 +284,34 @@ class TestEmployeeRecordModel:
         employee_record = BareEmployeeRecordFactory(asp_processing_code=code)
         assert employee_record.status_based_on_asp_processing_code is expected
 
+    def test_has_siret_different_form_asp_source(self):
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret="10000000000001")
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=company)
+        employee_record = EmployeeRecordFactory(job_application=job_application)
+        employee_record._fill_denormalized_fields()  # to run siret_from_asp_source(main_company)
+
+        assert employee_record.has_siret_different_from_asp_source() is False
+
+        company.siret = "20000000000001"
+        company.save()
+
+        assert employee_record.has_siret_different_from_asp_source() is True
+
+    def test_has_siret_different_form_asp_source_for_antenna(self):
+        main_company = CompanyFactory(source=Company.SOURCE_ASP, siret="10000000000001")
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+            to_company__source=Company.SOURCE_USER_CREATED, to_company__convention=main_company.convention
+        )
+        employee_record = EmployeeRecordFactory(job_application=job_application)
+        employee_record._fill_denormalized_fields()  # to run siret_from_asp_source(main_company)
+
+        assert employee_record.has_siret_different_from_asp_source() is False
+
+        main_company.siret = "20000000000001"
+        main_company.save()
+
+        assert employee_record.has_siret_different_from_asp_source() is True
+
 
 @pytest.mark.parametrize(
     "factory,expected",

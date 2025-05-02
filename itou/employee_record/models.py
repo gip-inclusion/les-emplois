@@ -475,6 +475,14 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
 
+    def has_siret_different_from_asp_source(self):
+        siret_from_asp_source = (
+            self.siret_from_asp_source
+            if hasattr(self, "siret_from_asp_source")
+            else self.siret_from_asp_source(self.job_application.to_company)
+        )
+        return self.siret != siret_from_asp_source
+
     @staticmethod
     def siret_from_asp_source(siae):
         """
