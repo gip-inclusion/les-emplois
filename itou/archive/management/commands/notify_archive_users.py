@@ -10,7 +10,7 @@ from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
 from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
-from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.archive.models import ArchivedApplication, ArchivedJobSeeker, ArchivedProfessional
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership, JobDescription, SiaeConvention
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
@@ -57,32 +57,32 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
 
 def inactive_professionals_without_related_objects(inactive_since, batch_size):
     related_objects_filters = [
-        Approval.objects.filter(created_by_id=OuterRef("pk")),
-        Suspension.objects.filter(created_by_id=OuterRef("pk")),
-        Suspension.objects.filter(updated_by_id=OuterRef("pk")),
-        ProlongationRequest.objects.filter(created_by_id=OuterRef("pk")),
-        ProlongationRequest.objects.filter(updated_by_id=OuterRef("pk")),
-        ProlongationRequest.objects.filter(processed_by_id=OuterRef("pk")),
-        Prolongation.objects.filter(created_by_id=OuterRef("pk")),
-        Prolongation.objects.filter(updated_by_id=OuterRef("pk")),
-        FollowUpGroupMembership.objects.filter(creator=OuterRef("pk")),
-        Company.objects.filter(created_by_id=OuterRef("pk")),
-        CompanyMembership.objects.filter(updated_by_id=OuterRef("pk")),
-        SiaeConvention.objects.filter(reactivated_by_id=OuterRef("pk")),
-        EligibilityDiagnosis.objects.filter(author_id=OuterRef("pk")),
-        GEIQEligibilityDiagnosis.objects.filter(author_id=OuterRef("pk")),
-        EmployeeRecordTransitionLog.objects.filter(user_id=OuterRef("pk")),
-        ImplementationAssessment.objects.filter(submitted_by_id=OuterRef("pk")),
-        ImplementationAssessment.objects.filter(reviewed_by_id=OuterRef("pk")),
-        InstitutionMembership.objects.filter(updated_by_id=OuterRef("pk")),
-        JobApplication.objects.filter(sender_id=OuterRef("pk")),
-        JobApplication.objects.filter(approval_manually_delivered_by_id=OuterRef("pk")),
-        JobApplication.objects.filter(approval_manually_refused_by=OuterRef("pk")),
-        JobApplication.objects.filter(transferred_by_id=OuterRef("pk")),
-        JobApplicationTransitionLog.objects.filter(user_id=OuterRef("pk")),
-        PrescriberOrganization.objects.filter(created_by_id=OuterRef("pk")),
-        PrescriberOrganization.objects.filter(authorization_updated_by_id=OuterRef("pk")),
-        PrescriberMembership.objects.filter(updated_by_id=OuterRef("pk")),
+        Approval.objects.filter(created_by_id=OuterRef("id")),
+        Suspension.objects.filter(created_by_id=OuterRef("id")),
+        Suspension.objects.filter(updated_by_id=OuterRef("id")),
+        ProlongationRequest.objects.filter(created_by_id=OuterRef("id")),
+        ProlongationRequest.objects.filter(updated_by_id=OuterRef("id")),
+        ProlongationRequest.objects.filter(processed_by_id=OuterRef("id")),
+        Prolongation.objects.filter(created_by_id=OuterRef("id")),
+        Prolongation.objects.filter(updated_by_id=OuterRef("id")),
+        FollowUpGroupMembership.objects.filter(creator=OuterRef("id")),
+        Company.objects.filter(created_by_id=OuterRef("id")),
+        CompanyMembership.objects.filter(updated_by_id=OuterRef("id")),
+        SiaeConvention.objects.filter(reactivated_by_id=OuterRef("id")),
+        EligibilityDiagnosis.objects.filter(author_id=OuterRef("id")),
+        GEIQEligibilityDiagnosis.objects.filter(author_id=OuterRef("id")),
+        EmployeeRecordTransitionLog.objects.filter(user_id=OuterRef("id")),
+        ImplementationAssessment.objects.filter(submitted_by_id=OuterRef("id")),
+        ImplementationAssessment.objects.filter(reviewed_by_id=OuterRef("id")),
+        InstitutionMembership.objects.filter(updated_by_id=OuterRef("id")),
+        JobApplication.objects.filter(sender_id=OuterRef("id")),
+        JobApplication.objects.filter(approval_manually_delivered_by_id=OuterRef("id")),
+        JobApplication.objects.filter(approval_manually_refused_by=OuterRef("id")),
+        JobApplication.objects.filter(transferred_by_id=OuterRef("id")),
+        JobApplicationTransitionLog.objects.filter(user_id=OuterRef("id")),
+        PrescriberOrganization.objects.filter(created_by_id=OuterRef("id")),
+        PrescriberOrganization.objects.filter(authorization_updated_by_id=OuterRef("id")),
+        PrescriberMembership.objects.filter(updated_by_id=OuterRef("id")),
     ]
     # `reduce` function applies the `and_` operator (logical AND) across all the negated `Exists` conditions
     filters = reduce(and_, (~Exists(related_filter) for related_filter in related_objects_filters))
@@ -163,6 +163,18 @@ def anonymized_jobapplication(obj):
         hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
         hiring_without_approval=obj.hiring_without_approval,
+    )
+
+
+def anonymized_professional(user):
+    return ArchivedProfessional(
+        date_joined=get_year_month_or_none(user.date_joined),
+        first_login=get_year_month_or_none(user.first_login),
+        last_login=get_year_month_or_none(user.last_login),
+        user_signup_kind=getattr(user.created_by, "kind", None),
+        department=user.department,
+        title=user.title,
+        identity_provider=user.identity_provider,
     )
 
 
@@ -325,6 +337,31 @@ class Command(BaseCommand):
         JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
+    @transaction.atomic
+    def archive_professionals_after_grace_period(self):
+        now = timezone.now()
+        grace_period_since = now - GRACE_PERIOD
+        self.logger.info("Archiving professionals after grace period, notified before: %s", grace_period_since)
+
+        users_to_archive = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__lte=grace_period_since
+            )[: self.batch_size]
+        )
+
+        archived_professionals = [anonymized_professional(user) for user in users_to_archive]
+
+        if self.wet_run:
+            for user in users_to_archive:
+                ArchiveUser(
+                    user,
+                ).send()
+
+            ArchivedProfessional.objects.bulk_create(archived_professionals)
+            User.objects.filter(id__in=[user.id for user in users_to_archive]).delete()
+
+        self.logger.info("Archived professionals after grace period, count: %d", len(archived_professionals))
+
     @monitor(
         monitor_slug="notify_archive_users",
         monitor_config={
@@ -348,3 +385,4 @@ class Command(BaseCommand):
         self.notify_inactive_professionals()
 
         self.archive_jobseekers_after_grace_period()
+        self.archive_professionals_after_grace_period()
