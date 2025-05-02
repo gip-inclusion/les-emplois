@@ -8,7 +8,7 @@
 
 {% block body %}
 Bonjour {{ user.get_full_name }},
-Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le {{ user.last_activity|date:"d/m/Y" }}.
+Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le {% if user.last_activity %}{{ user.last_activity|date:"d/m/Y" }}{% else %}{{ user.last_login|date:"d/m/Y" }}{% endif %}.
 Sans connexion de votre part avant le {{ end_of_grace_period|date:"d/m/Y" }}, votre compte sera supprimé ainsi que toutes les données associées.
 Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur https://emplois.inclusion.beta.gouv.fr/ .
 {% endblock body %}
