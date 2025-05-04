@@ -5,12 +5,13 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 from itou.companies.models import Company
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
@@ -269,15 +270,37 @@ class EvaluationCampaign(models.Model):
                 for pk in self.eligible_siaes_under_ratio()
             )
 
-            EvaluatedJobApplication.objects.bulk_create(
-                [
-                    EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
-                    for evaluated_siae in evaluated_siaes
-                    for job_application in select_min_max_job_applications(
-                        self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
+            for evaluated_siae in evaluated_siaes:
+                for job_application in select_min_max_job_applications(
+                    self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
+                ).prefetch_related(
+                    Prefetch(
+                        "eligibility_diagnosis__selected_administrative_criteria",
+                        queryset=SelectedAdministrativeCriteria.objects.filter(certified=True),
+                        to_attr="certified_administrative_criteria",
                     )
-                ]
-            )
+                ):
+                    evaluated_job_app = EvaluatedJobApplication.objects.create(
+                        evaluated_siae=evaluated_siae,
+                        job_application=job_application,
+                    )
+                    criteria = []
+                    for selected_criterion in job_application.eligibility_diagnosis.certified_administrative_criteria:
+                        criteria.append(
+                            EvaluatedAdministrativeCriteria(
+                                evaluated_job_application=evaluated_job_app,
+                                administrative_criteria=selected_criterion.administrative_criteria,
+                                uploaded_at=set_at,
+                                submitted_at=set_at,
+                                review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                            )
+                        )
+                        # TODO: Allow users to select more criteria when only a
+                        # level 2 criterion is certified.
+                        assert (
+                            selected_criterion.administrative_criteria.level == AdministrativeCriteriaLevel.LEVEL_1
+                        ), f"AdministrativeCriteria pk={selected_criterion.pk} has level {selected_criterion.level}."
+                    EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
 
             emails = [SIAEEmailFactory(evaluated_siae).selected() for evaluated_siae in evaluated_siaes]
             emails += [CampaignEmailFactory(self).selected_siae()]
