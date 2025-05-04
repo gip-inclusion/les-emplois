@@ -91,7 +91,7 @@
 # ---
 # name: TestEvaluationCampaignManager.test_populate
   dict({
-    'num_queries': 15,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -446,11 +446,43 @@
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."created_at",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
+          FROM "eligibility_selectedadministrativecriteria"
+          WHERE ("eligibility_selectedadministrativecriteria"."certified"
+                 AND "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
+                                                                                                 %s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
           INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
                                                                   "evaluated_siae_id",
                                                                   "labor_inspector_explanation")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
+                                                                  "evaluated_siae_id",
+                                                                  "labor_inspector_explanation")
+          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
         ''',
       }),
       dict({
