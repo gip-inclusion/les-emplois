@@ -10,7 +10,9 @@ from django.utils import dateformat, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.job_applications.enums import SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import (
@@ -24,7 +26,7 @@ from itou.utils.types import InclusiveDateRange
 from itou.utils.urls import add_url_params
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelectedAdministrativeCriteriaFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -34,6 +36,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
@@ -3270,6 +3273,7 @@ class TestInstitutionEvaluatedJobApplicationView:
     btn_modifier_html = """
     <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
     """
+    change_admin_criteria_text = "certains critères ne sont pas nécessaires pour valider cette auto-prescription"
     save_text = "Enregistrer le commentaire et retourner à la liste des auto-prescriptions"
 
     @pytest.fixture(autouse=True)
@@ -3437,7 +3441,62 @@ class TestInstitutionEvaluatedJobApplicationView:
             + f"#{evaluated_job_application.pk}"
         )
         assertContains(response, self.save_text, count=1)
+        assertContains(response, self.change_admin_criteria_text, count=1)
         assertNotContains(response, DDETS_refusal_comment_txt)
+
+    def test_content_with_certified_criteria(self, client):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        siae = membership.company
+        job_seeker = JobSeekerFactory()
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=user,
+            author_organization=siae,
+            administrative_criteria=[],
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis=eligibility_diagnosis,
+            administrative_criteria=rsa,
+            certified=True,
+        )
+        certified_job_app = JobApplicationFactory(
+            with_approval=True,
+            to_company=siae,
+            sender_company=siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        now = timezone.now()
+        campaign_start = now - datetime.timedelta(days=180)
+        evaluation_campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=campaign_start,
+            institution=self.institution,
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=certified_job_app,
+            evaluated_siae=evaluated_siae,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=rsa,
+            uploaded_at=campaign_start,
+            submitted_at=campaign_start,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            criteria_certified=True,
+        )
+
+        client.force_login(self.user)
+        response = client.get(
+            reverse(
+                "siae_evaluations_views:evaluated_job_application",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+        assertNotContains(response, self.change_admin_criteria_text)
 
     def test_get_before_new_criteria_submitted(self, client):
         now = timezone.now()
@@ -3793,6 +3852,58 @@ class TestInstitutionEvaluatedAdministrativeCriteriaView:
                 kwargs={
                     "evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk,
                     "action": "dummy",
+                },
+            )
+        )
+        assert response.status_code == 404
+
+    def test_access_certified_criteria(self, client):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now(),
+        )
+        membership = CompanyMembershipFactory(company__department=evaluation_campaign.institution.department)
+        user = membership.user
+        siae = membership.company
+        job_seeker = JobSeekerFactory()
+        administrative_criteria = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=user,
+            author_organization=siae,
+            administrative_criteria=[administrative_criteria],
+        )
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            to_company=siae,
+            sender_company=siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            siae=siae,
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=job_application,
+            evaluated_siae=evaluated_siae,
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            submitted_at=timezone.now(),
+            uploaded_at=timezone.now(),
+            criteria_certified=True,
+        )
+        client.force_login(self.user)
+        response = client.post(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_administrative_criteria",
+                kwargs={
+                    "evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk,
+                    "action": "reinit",
                 },
             )
         )
