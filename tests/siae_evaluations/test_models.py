@@ -32,7 +32,7 @@ from itou.siae_evaluations.models import (
 from itou.utils.models import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelectedAdministrativeCriteriaFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -467,6 +467,30 @@ class TestEvaluationCampaignManager:
         # retry on populated campaign
         with pytest.raises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
+
+    def test_populate_with_certified_job_applications(self):
+        evaluation_campaign = EvaluationCampaignFactory()
+        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        create_batch_of_job_applications(company)
+        certified_job_app = JobApplication.objects.first()
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis_id=certified_job_app.eligibility_diagnosis_id,
+            certified=True,
+        )
+        now = timezone.now()
+        evaluation_campaign.populate(now)
+        evaluation_campaign.refresh_from_db()
+
+        assert now == evaluation_campaign.percent_set_at
+        assert now == evaluation_campaign.evaluations_asked_at
+        [evaluated_siae] = EvaluatedSiae.objects.all()
+        [other_job_app] = EvaluatedJobApplication.objects.exclude(job_application=certified_job_app)
+
+        criteria = EvaluatedAdministrativeCriteria.objects.get()
+        assert criteria.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        assert criteria.uploaded_at == now
+        assert criteria.submitted_at == now
+        assert criteria.evaluated_job_application.job_application_id == certified_job_app.pk
 
     @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
