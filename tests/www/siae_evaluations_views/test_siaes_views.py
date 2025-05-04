@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -9,11 +11,13 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.job_applications.enums import SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.companies.factories import CompanyMembershipFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelectedAdministrativeCriteriaFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -24,7 +28,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 DDETS_refusal_comment_txt = "Commentaire de la DDETS"
@@ -545,6 +549,73 @@ class TestSiaeJobApplicationListView:
         response = client.get(select_criteria)
         assert response.status_code == 403
 
+    def test_content_with_certified_criteria(self, client, snapshot):
+        job_seeker = JobSeekerFactory()
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=self.user,
+            author_organization=self.siae,
+            administrative_criteria=[],
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis=eligibility_diagnosis,
+            administrative_criteria=rsa,
+            certified=True,
+        )
+        certified_job_app = JobApplicationFactory(
+            with_approval=True,
+            to_company=self.siae,
+            sender_company=self.siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+            for_snapshot=True,
+        )
+        now = timezone.now()
+        campaign_start = now - datetime.timedelta(days=180)
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=campaign_start)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            pk=1,
+            job_application=certified_job_app,
+            evaluated_siae=evaluated_siae,
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            pk=1,
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=rsa,
+            uploaded_at=campaign_start,
+            submitted_at=campaign_start,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            criteria_certified=True,
+        )
+        siae_select_criteria_url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        siae_upload_doc_url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+
+        def asserts():
+            assertNotContains(response, siae_select_criteria_url)
+            assertNotContains(response, siae_upload_doc_url)
+            soup = parse_response_to_soup(response)
+            [results_card] = soup.find_all(class_="c-box--results")
+            assert results_card.prettify() == snapshot(name="state_accepted")
+
+        asserts()
+
+        # Freeze submission
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        asserts()
+
     def test_shows_labor_inspector_explanation_when_refused(self, client):
         explanation = "Justificatif invalide au moment de l’embauche."
         evaluated_siae = EvaluatedSiaeFactory(
@@ -564,6 +635,69 @@ class TestSiaeJobApplicationListView:
         client.force_login(self.user)
         response = client.get(self.url(evaluated_siae))
         assertContains(response, explanation)
+
+    def test_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory(first_name="Manuel", last_name="Calavera")
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=self.user,
+            author_organization=self.siae,
+            administrative_criteria=[rsa],
+        )
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            job_seeker=job_seeker,
+            to_company=self.siae,
+            sender_company=self.siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=job_application, evaluated_siae=evaluated_siae
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=rsa,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            uploaded_at=timezone.now(),
+            submitted_at=timezone.now(),
+            criteria_certified=True,
+            proof=None,
+        )
+        siae_select_criteria_url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        siae_upload_doc_url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertNotContains(response, siae_select_criteria_url)
+        assertNotContains(response, siae_upload_doc_url)
+        assertContains(
+            response,
+            """\
+            <div class="fs-sm">
+              <p class="mb-1">
+                <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
+              </p>
+              <p class="mb-1">
+                <strong>Bénéficiaire du RSA</strong>
+                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                  <i class="ri-verified-badge-fill" aria-hidden="true"></i> Certifié
+                </span>
+              </p>
+              <p class="mb-1">Ce critère administratif est certifié par l’État, aucun justificatif n’est requis.</p>
+            </div>
+            """,
+            html=True,
+        )
 
 
 class TestSiaeSelectCriteriaView:
@@ -772,6 +906,48 @@ class TestSiaeSelectCriteriaView:
                 f"{response.context['level_2_fields'][i].name} should not be checked"
             )
 
+    def test_with_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory()
+        administrative_criteria = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker=job_seeker,
+            author=self.user,
+            author_organization=self.siae,
+            administrative_criteria=[administrative_criteria],
+        )
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            with_approval=True,
+            to_company=self.siae,
+            sender_company=self.siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=job_application,
+            evaluated_siae=evaluated_siae,
+        )
+        EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            uploaded_at=timezone.now(),
+            submitted_at=timezone.now(),
+            criteria_certified=True,
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        client.force_login(self.user)
+        response = client.get(url)
+        assert response.status_code == 403
+        response = client.post(url)
+        assert response.status_code == 403
+
 
 class TestSiaeUploadDocsView:
     def setup_method(self):
@@ -937,6 +1113,48 @@ class TestSiaeUploadDocsView:
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.uploaded_at == fake_now - relativedelta(days=1)
         assert evaluated_administrative_criteria.proof == proof
+
+    def test_with_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory()
+        administrative_criteria = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker=job_seeker,
+            author=self.user,
+            author_organization=self.siae,
+            administrative_criteria=[administrative_criteria],
+        )
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            with_approval=True,
+            to_company=self.siae,
+            sender_company=self.siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=job_application,
+            evaluated_siae=evaluated_siae,
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            uploaded_at=timezone.now(),
+            submitted_at=timezone.now(),
+            criteria_certified=True,
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        client.force_login(self.user)
+        response = client.get(url)
+        assert response.status_code == 403
+        response = client.post(url)
+        assert response.status_code == 403
 
 
 class TestSiaeSubmitProofsView:
@@ -1176,6 +1394,60 @@ class TestSiaeEvaluatedSiaeDetailView:
         response = client.get(url)
         assert response.status_code == 200
 
+    def test_with_certified_criteria(self, client):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        siae = membership.company
+        job_seeker = JobSeekerFactory()
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=user,
+            author_organization=siae,
+            administrative_criteria=[],
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis=eligibility_diagnosis,
+            administrative_criteria=rsa,
+            certified=True,
+        )
+        certified_job_app = JobApplicationFactory(
+            with_approval=True,
+            to_company=siae,
+            sender_company=siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        now = timezone.now()
+        campaign_start = now - datetime.timedelta(days=180)
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=campaign_start, ended_at=now)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=certified_job_app,
+            evaluated_siae=evaluated_siae,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            uploaded_at=campaign_start,
+            submitted_at=campaign_start,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            criteria_certified=True,
+        )
+
+        client.force_login(user)
+        response = client.get(
+            reverse(
+                "siae_evaluations_views:evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assertContains(
+            response,
+            '<div><span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span></div>',
+            html=True,
+        )
+
 
 class TestSiaeEvaluatedJobApplicationView:
     def test_access(self, client):
@@ -1211,3 +1483,71 @@ class TestSiaeEvaluatedJobApplicationView:
         evaluated_siae.save(update_fields=["reviewed_at"])
         response = client.get(url)
         assertContains(response, DDETS_refusal_comment_txt)
+
+    def test_accepted_from_certified_criteria(self, client):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        siae = membership.company
+        job_seeker = JobSeekerFactory()
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker,
+            author=user,
+            author_organization=siae,
+            administrative_criteria=[],
+        )
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis=eligibility_diagnosis,
+            administrative_criteria=rsa,
+            certified=True,
+        )
+        certified_job_app = JobApplicationFactory(
+            with_approval=True,
+            to_company=siae,
+            sender_company=siae,
+            sender_kind=SenderKind.EMPLOYER,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        now = timezone.now()
+        campaign_start = now - datetime.timedelta(days=180)
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=campaign_start, ended_at=now)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=certified_job_app,
+            evaluated_siae=evaluated_siae,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=rsa,
+            uploaded_at=campaign_start,
+            submitted_at=campaign_start,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            criteria_certified=True,
+        )
+
+        client.force_login(user)
+        response = client.get(
+            reverse(
+                "siae_evaluations_views:evaluated_job_application",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+            )
+        )
+        assertContains(
+            response,
+            """\
+            <div class="fs-sm">
+              <p class="mb-1">
+                <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
+              </p>
+              <p class="mb-1">
+                <strong>Bénéficiaire du RSA</strong>
+                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                  <i class="ri-verified-badge-fill" aria-hidden="true"></i> Certifié
+                </span>
+              </p>
+              <p class="mb-1">Ce critère administratif est certifié par l’État, aucun justificatif n’est requis.</p>
+            </div>
+            """,
+            html=True,
+        )

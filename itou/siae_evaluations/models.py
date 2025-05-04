@@ -5,12 +5,14 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
-from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 from itou.companies.models import Company
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
+from itou.eligibility.utils import iae_has_required_criteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
@@ -269,17 +271,62 @@ class EvaluationCampaign(models.Model):
                 for pk in self.eligible_siaes_under_ratio()
             )
 
-            EvaluatedJobApplication.objects.bulk_create(
-                [
-                    EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
-                    for evaluated_siae in evaluated_siaes
-                    for job_application in select_min_max_job_applications(
-                        self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
+            evaluated_siaes_pks = []
+            for evaluated_siae in evaluated_siaes:
+                evaluated_siaes_pks.append(evaluated_siae.pk)
+                for job_application in select_min_max_job_applications(
+                    self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
+                ).prefetch_related(
+                    Prefetch(
+                        "eligibility_diagnosis__selected_administrative_criteria",
+                        queryset=SelectedAdministrativeCriteria.objects.filter(certified=True),
+                        to_attr="certified_administrative_criteria",
                     )
-                ]
-            )
+                ):
+                    evaluated_job_app = EvaluatedJobApplication.objects.create(
+                        evaluated_siae=evaluated_siae,
+                        job_application=job_application,
+                    )
+                    criteria = []
+                    for selected_criterion in job_application.eligibility_diagnosis.certified_administrative_criteria:
+                        criteria.append(
+                            EvaluatedAdministrativeCriteria(
+                                evaluated_job_application=evaluated_job_app,
+                                administrative_criteria=selected_criterion.administrative_criteria,
+                                uploaded_at=set_at,
+                                submitted_at=set_at,
+                                review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                                criteria_certified=True,
+                            )
+                        )
+                        # TODO: For the 2026 campaign on auto-prescriptions
+                        # hires in 2025, this should be updated to handle
+                        # LEVEL_2.
+                        # Generating an accepted administrative criteria with
+                        # level 2 will significantly break all views in this
+                        # module. Many parts of it rely on the criteria state
+                        # to decide what actions to offer, and the state of the
+                        # evaluated job application.
+                        assert (
+                            selected_criterion.administrative_criteria.level == AdministrativeCriteriaLevel.LEVEL_1
+                        ), (
+                            f"AdministrativeCriteria pk={selected_criterion.pk} has level "
+                            f"{selected_criterion.administrative_criteria.level}."
+                        )
+                    EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
 
-            emails = [SIAEEmailFactory(evaluated_siae).selected() for evaluated_siae in evaluated_siaes]
+            evaluated_siaes_to_notify = []
+            evaluated_siaes = EvaluatedSiae.objects.filter(pk__in=evaluated_siaes_pks).prefetch_related(
+                "evaluated_job_applications__evaluated_administrative_criteria"
+            )
+            for evaluated_siae in evaluated_siaes:
+                if evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
+                    evaluated_siae.reviewed_at = set_at
+                    evaluated_siae.final_reviewed_at = set_at
+                    evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
+                else:
+                    evaluated_siaes_to_notify.append(evaluated_siae)
+            emails = [SIAEEmailFactory(evaluated_siae).selected() for evaluated_siae in evaluated_siaes_to_notify]
             emails += [CampaignEmailFactory(self).selected_siae()]
             send_email_messages(emails)
 
@@ -683,6 +730,8 @@ class EvaluatedJobApplication(models.Model):
 
     def compute_state(self):
         def state_from(criteria):
+            if criteria.criteria_certified:
+                return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
             if criteria.proof_id is None:
                 return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
             if criteria.submitted_at is None:
@@ -723,6 +772,14 @@ class EvaluatedJobApplication(models.Model):
             for crit in self.evaluated_administrative_criteria.all()
         )
         return not state_is_from_phase2
+
+    def accepted_from_certified_criteria(self):
+        certified_criteria = [
+            evaluated_crit.administrative_criteria
+            for evaluated_crit in self.evaluated_administrative_criteria.all()
+            if evaluated_crit.criteria_certified
+        ]
+        return iae_has_required_criteria(certified_criteria, self.evaluated_siae.siae.kind)
 
     @property
     def should_select_criteria(self):
@@ -795,6 +852,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
         choices=evaluation_enums.EvaluatedAdministrativeCriteriaState.choices,
         default=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
     )
+    criteria_certified = models.BooleanField(db_default=False, verbose_name="certifié par un système de l’État")
 
     objects = EvaluatedAdministrativeCriteriaQuerySet.as_manager()
 

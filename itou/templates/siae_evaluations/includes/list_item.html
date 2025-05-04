@@ -30,7 +30,10 @@
                             {% for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
                                 {% with criteria_review_state=evaluated_administrative_criteria.review_state_for_siae %}
                                     <li>
-                                        {% if item.evaluated_siae.reviewed_at %}
+                                        {% if evaluated_administrative_criteria.criteria_certified %}
+                                            {# The criteria is certified, it has been accepted by default. #}
+                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=True only %}
+                                        {% elif item.evaluated_siae.reviewed_at %}
                                             {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state only %}
                                         {% else %}
                                             {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
