@@ -91,7 +91,7 @@
 # ---
 # name: TestEvaluationCampaignManager.test_populate
   dict({
-    'num_queries': 15,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -445,11 +445,113 @@
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."created_at",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
+          FROM "eligibility_selectedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE ("eligibility_selectedadministrativecriteria"."certified"
+                 AND "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
+                                                                                                 %s))
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
           INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
                                                                   "evaluated_siae_id",
                                                                   "labor_inspector_explanation")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
+                                                                  "evaluated_siae_id",
+                                                                  "labor_inspector_explanation")
+          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state",
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state",
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
