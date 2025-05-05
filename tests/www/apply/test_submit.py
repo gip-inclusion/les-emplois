@@ -383,7 +383,7 @@ class TestApply:
         job_application = JobApplication.objects.get()
         assertRedirects(
             response,
-            reverse("apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}),
+            reverse("apply:application_end", kwargs={"application_pk": job_application.pk}),
         )
 
     @pytest.mark.parametrize(
@@ -715,9 +715,7 @@ class TestApplyAsJobSeeker:
 
         assert f"job_application-{company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
         # Step application's end.
@@ -855,7 +853,7 @@ class TestApplyAsJobSeeker:
         job_application = JobApplication.objects.get()
         assertRedirects(
             response,
-            reverse("apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}),
+            reverse("apply:application_end", kwargs={"application_pk": job_application.pk}),
         )
 
         assert JobApplication.objects.filter(sender=user, to_company=company).exists()
@@ -995,15 +993,7 @@ class TestApplyAsJobSeeker:
             application.to_company,
             {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
         )
-        response = client.get(
-            reverse(
-                "apply:application_end",
-                kwargs={
-                    "company_pk": application.to_company.pk,
-                    "application_pk": application.pk,
-                },
-            )
-        )
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assertContains(response, expected_html, html=True)
 
     def test_apply_end_view_wo_phone_number_as_employer(self, client):
@@ -1020,15 +1010,7 @@ class TestApplyAsJobSeeker:
             application.to_company,
             {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
         )
-        response = client.get(
-            reverse(
-                "apply:application_end",
-                kwargs={
-                    "company_pk": application.to_company.pk,
-                    "application_pk": application.pk,
-                },
-            )
-        )
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assertContains(response, expected_html, html=True)
 
     def test_apply_end_view_wo_phone_number_as_prescriber(self, client):
@@ -1047,15 +1029,7 @@ class TestApplyAsJobSeeker:
             application.to_company,
             {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
         )
-        response = client.get(
-            reverse(
-                "apply:application_end",
-                kwargs={
-                    "company_pk": application.to_company.pk,
-                    "application_pk": application.pk,
-                },
-            )
-        )
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
         assertContains(response, expected_html, html=True)
 
 
@@ -1355,9 +1329,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert f"job_application-{company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
         # Step application's end.
@@ -1706,9 +1678,7 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert f"job_application-{company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
         # Step application's end.
@@ -2184,9 +2154,7 @@ class TestApplyAsPrescriber:
 
         assert f"job_application-{company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
         # Step application's end.
@@ -2763,9 +2731,7 @@ class TestApplyAsCompany:
 
         assert f"job_application-{company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
         # Step application's end.
@@ -3740,10 +3706,7 @@ def test_application_end_update_job_seeker(client):
     job_seeker = job_application.job_seeker
     # Ensure sender cannot update job seeker infos
     assert job_seeker.address_line_2 == ""
-    url = reverse(
-        "apply:application_end",
-        kwargs={"company_pk": job_application.to_company.pk, "application_pk": job_application.pk},
-    )
+    url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
     client.force_login(job_application.sender)
     response = client.post(
         url,

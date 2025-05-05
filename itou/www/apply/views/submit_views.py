@@ -687,10 +687,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         self.form = self.form_class(**self.get_form_kwargs())
 
     def get_next_url(self, job_application):
-        return reverse(
-            "apply:application_end",
-            kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
-        )
+        return reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
 
     def form_valid(self):
         # Fill the job application with the required information
@@ -773,11 +770,11 @@ class ApplicationEndView(TemplateView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
         self.job_application = get_object_or_404(
             JobApplication.objects.select_related("job_seeker", "to_company"),
             pk=kwargs.get("application_pk"),
         )
+        self.company = self.job_application.to_company
         self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
@@ -802,10 +799,7 @@ class ApplicationEndView(TemplateView):
             "can_view_personal_information": can_view_personal_information(
                 self.request, self.job_application.job_seeker
             ),
-            "reset_url": reverse(
-                "apply:application_end",
-                kwargs={"company_pk": self.company.pk, "application_pk": self.job_application.pk},
-            ),
+            "reset_url": reverse("apply:application_end", kwargs={"application_pk": self.job_application.pk}),
             "page_title": "Auto-prescription enregistrée" if self.auto_prescription_process else "Candidature envoyée",
         }
 

@@ -48,6 +48,12 @@ urlpatterns = [
         name="application_resume",
     ),
     path(
+        "application/<uuid:application_pk>/end",
+        submit_views.ApplicationEndView.as_view(),
+        name="application_end",
+    ),
+    # FIXME(alaurent) Remove in a week
+    path(
         "<int:company_pk>/application/<uuid:application_pk>/end",
         submit_views.ApplicationEndView.as_view(),
         name="application_end",
