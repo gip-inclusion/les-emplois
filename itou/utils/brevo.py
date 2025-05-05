@@ -24,6 +24,19 @@ class BrevoClient:
             timeout=10,
         )
 
+    # context manager
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.client:
+            self.client.close()
+
+        if exc_type:
+            logger.error("An exception occurred in BrevoClient: %s", exc_val, exc_info=(exc_type, exc_val, exc_tb))
+
+        return False
+
     def _import_contacts(self, users, list_id, serializer):
         try:
             response = self.client.post(
