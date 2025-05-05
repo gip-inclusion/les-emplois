@@ -132,20 +132,21 @@ class Command(BaseCommand):
                 : self.batch_size
             ]
         )
-        archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
 
         if self.wet_run:
             for user in users_to_archive:
                 ArchiveJobSeeker(
                     user,
                 ).send()
+            self.archive_with_related_objects(users_to_archive)
+            self.delete_with_related_objects(users_to_archive)
 
-            ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
-            self._delete_with_related_objects(users_to_archive)
+        self.logger.info("Archived jobseekers after grace period, count: %d", len(users_to_archive))
 
-        self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
+    def archive_with_related_objects(self, users):
+        ArchivedJobSeeker.objects.bulk_create([anonymized_jobseeker(user) for user in users])
 
-    def _delete_with_related_objects(self, users):
+    def delete_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
