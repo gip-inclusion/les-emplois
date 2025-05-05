@@ -60,10 +60,18 @@ class ContractType(models.TextChoices):
 
     @classmethod
     def choices_for_company(cls, company):
-        return cls.choices_for_company_kind(company.kind, company.is_aci_convergence)
+        choices = cls.choices_for_company_kind(company.kind)
+        if company.is_aci_convergence:
+            choices[-1:-1] = cls._choices_from_enums_list(
+                [
+                    cls.FIXED_TERM_I_PHC,
+                    cls.FIXED_TERM_I_CVG,
+                ]
+            )
+        return choices
 
     @classmethod
-    def choices_for_company_kind(cls, kind, aci_convergence=False):
+    def choices_for_company_kind(cls, kind):
         choices = []
 
         match kind:
@@ -91,12 +99,6 @@ class ContractType(models.TextChoices):
                 # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
                 choices.remove(cls.FIXED_TERM_I_PHC)
                 choices.remove(cls.FIXED_TERM_I_CVG)
-
-        if aci_convergence:
-            choices[-1:-1] = [
-                cls.FIXED_TERM_I_PHC,
-                cls.FIXED_TERM_I_CVG,
-            ]
 
         return cls._choices_from_enums_list(choices)
 
