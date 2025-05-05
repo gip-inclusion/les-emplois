@@ -30,6 +30,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.readonly = False
 
         required_fields = ["address_line_1", "post_code", "city", "department"]
         for required_field in required_fields:
@@ -54,6 +55,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         # support asked to disable it, and have them reach out in case of
         # changes.
         if self.instance.kind == PrescriberOrganizationKind.FT:
+            self.readonly = True
             for field in self.fields.values():
                 field.disabled = True
         else:
