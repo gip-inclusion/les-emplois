@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from django.conf import Path, settings
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.backends.utils import CursorDebugWrapper
+from django.http import Http404
 from django.template import Template
 from django.template.base import Node
 from django.template.loader import render_to_string
@@ -23,6 +24,7 @@ from django.test.utils import CaptureQueriesContext, TestContextDecorator
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.utils.session import SessionNamespace
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -30,14 +32,34 @@ BASE_NUM_QUERIES = 2
 
 
 # Used to find the session namespace by elimination
-def session_data_without_known_keys(session):
-    data = dict(session)
-    for k in ["_auth_user_id", "_auth_user_backend", "_auth_user_hash", "current_organization", "_csrftoken"]:
-        data.pop(k, None)
-    for k in list(data):
+def session_names_without_known_keys(session):
+    session_names = []
+    for k in session.keys():
+        if k in ["_auth_user_id", "_auth_user_backend", "_auth_user_hash", "current_organization", "_csrftoken"]:
+            continue
         if k.endswith("_session_kind"):
-            del data[k]
-    return data
+            continue
+        session_names.append(k)
+    return session_names
+
+
+def get_session_name(session, session_kind, ignore=()):
+    data = session_names_without_known_keys(session)
+    found_names = []
+    for session_name in data:
+        if session_name in ignore:
+            continue
+        try:
+            named_session = SessionNamespace(session, session_kind, session_name)
+            named_session.verify_kind()
+            found_names.append(session_name)
+        except Http404:
+            pass
+    if len(found_names) > 1:
+        raise ValueError("Too many sessions with this kind")
+    if len(found_names) == 1:
+        return found_names[0]
+    return None
 
 
 def pprint_html(response, **selectors):
