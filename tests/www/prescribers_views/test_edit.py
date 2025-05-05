@@ -1,8 +1,9 @@
 from unittest import mock
 
+import pytest
 from django.urls import reverse
 from factory.fuzzy import FuzzyChoice
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -232,3 +233,37 @@ class TestEditOrganization:
         organization_refreshed = PrescriberOrganization.objects.get(pk=organization.pk)
         for field in [f for f in PrescriberOrganization._meta.get_fields() if not f.is_relation]:
             assert getattr(organization, field.name) == getattr(organization_refreshed, field.name)
+
+    @pytest.mark.parametrize(
+        "back_url,expected_redirect",
+        [
+            (reverse("dashboard:index"), reverse("dashboard:index")),
+            (reverse("prescribers_views:overview"), reverse("prescribers_views:overview")),
+            ("", reverse("dashboard:index")),
+            ("https://evil.org", reverse("dashboard:index")),
+        ],
+    )
+    def test_redirect_after_edit(self, client, back_url, expected_redirect):
+        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
+        user = organization.members.first()
+
+        client.force_login(user)
+
+        url = reverse("prescribers_views:edit_organization") + f"?back_url={back_url}"
+        response = client.get(url)
+        assert_previous_step(response, expected_redirect)
+
+        post_data = {
+            "siret": organization.siret,
+            "name": "foo",
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+        }
+        with mock.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api",
+            return_value=BAN_GEOCODING_API_RESULT_MOCK,
+        ):
+            response = client.post(url, data=post_data)
+        assertRedirects(response, expected_redirect)
