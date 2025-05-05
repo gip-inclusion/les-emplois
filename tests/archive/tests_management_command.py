@@ -1,5 +1,6 @@
 import datetime
 
+import httpx
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.management import call_command
@@ -14,6 +15,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.jobs.models import Appellation, Rome
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.brevo import BREVO_API_URL
 from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import JobDescriptionFactory
@@ -30,6 +32,11 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+
+
+@pytest.fixture(name="brevo_api_key")
+def brevo_api_key_fixture(settings):
+    settings.BREVO_API_KEY = "BREVO_API_KEY"
 
 
 class TestNotifyArchiveUsersManagementCommand:
@@ -712,3 +719,18 @@ class TestNotifyArchiveUsersManagementCommand:
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Archived job applications after grace period, count: 1" in caplog.messages
+
+    def test_async_delete_contact_is_called_when_archiving_user(
+        self, django_capture_on_commit_callbacks, respx_mock, caplog, brevo_api_key
+    ):
+        jobseekers = JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        for jobseeker in jobseekers:
+            respx_mock.delete(f"{BREVO_API_URL}/contacts/{jobseeker.email}?identifierType=email_id").mock(
+                return_value=httpx.Response(status_code=204)
+            )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_users", wet_run=True)
+
+        assert respx_mock.calls.called
+        assert respx_mock.calls.call_count == len(jobseekers)
