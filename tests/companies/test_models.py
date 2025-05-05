@@ -364,7 +364,7 @@ class TestCompanyQuerySet:
         JobApplicationFactory(to_company=company)
         JobApplicationFactory(to_company=company)
 
-        expected_score = None
+        expected_score = 2.0
         result = Company.objects.with_computed_job_app_score().get(pk=company.pk)
 
         assert expected_score == result.computed_job_app_score
