@@ -52,6 +52,17 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     return render(request, template_name, context)
 
 
+@check_user(lambda user: user.is_prescriber)
+def overview(request, template_name="prescribers/overview.html"):
+    organization = get_current_org_or_404(request)
+
+    context = {
+        "organization": organization,
+        "can_edit": organization.has_admin(request.user),
+    }
+    return render(request, template_name, context)
+
+
 def member_list(request, template_name="prescribers/members.html"):
     """
     List members of a prescriber organization.

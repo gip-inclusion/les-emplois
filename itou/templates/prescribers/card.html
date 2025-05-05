@@ -11,12 +11,10 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
+    {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>Prescripteur habilité</h1>
-        {% endfragment %}
-        {% fragment as c_title__secondary %}
-            <h2>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</h2>
+            <p>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -39,7 +37,7 @@
                                     <strong>Oups ! Aucune information en vue !</strong>
                                 </p>
                                 <p>
-                                    <i>La structure n’a pas encore renseigné son activité.</i>
+                                    <i>L'organisation n’a pas encore renseigné son activité.</i>
                                 </p>
                             </div>
                         {% endif %}

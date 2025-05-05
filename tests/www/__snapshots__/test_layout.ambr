@@ -79,6 +79,13 @@
                       <ul>
                           
                               <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="prescriber-presentation" href="/prescribers/overview">
+                                      Présentation
+                                      
+                                  </a>
+                              </li>
+                          
+                              <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
                                       Collaborateurs
                                       
@@ -1151,6 +1158,13 @@
                       <ul>
                           
                               <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="prescriber-presentation" href="/prescribers/overview">
+                                      Présentation
+                                      
+                                  </a>
+                              </li>
+                          
+                              <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
                                       Collaborateurs
                                       
@@ -1423,6 +1437,13 @@
                   </button>
                   <div class="collapse" id="collapse-nav-organisation">
                       <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="prescriber-presentation" href="/prescribers/overview">
+                                      Présentation
+                                      
+                                  </a>
+                              </li>
                           
                               <li>
                                   <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">

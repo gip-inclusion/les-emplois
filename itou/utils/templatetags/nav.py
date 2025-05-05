@@ -126,6 +126,14 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidatures",
     ),
+    "prescriber-overview": NavItem(
+        label="Présentation",
+        target=reverse("prescribers_views:overview"),
+        active_view_names=["prescribers_views:overview"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="prescriber-presentation",
+    ),
     "prescriber-members": NavItem(
         label="Collaborateurs",
         target=reverse("prescribers_views:members"),
@@ -256,7 +264,10 @@ def nav(request):
                     NavGroup(
                         label="Organisation",
                         icon="ri-team-line",
-                        items=[NAV_ENTRIES["prescriber-members"]],
+                        items=[
+                            NAV_ENTRIES["prescriber-overview"],
+                            NAV_ENTRIES["prescriber-members"],
+                        ],
                     )
                 )
         elif request.user.is_employer and request.current_organization:
