@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from itou.utils.brevo import BREVO_API_URL, BrevoClient
+from itou.utils.brevo import BREVO_API_URL, BrevoClient, async_delete_contact
 from tests.users.factories import JobSeekerFactory
 
 
@@ -72,3 +72,62 @@ def test_import_contacts_request_error(mocker, caplog, brevo_client):
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == "Brevo API: Request failed: Connection timed out"
+
+
+@pytest.mark.parametrize("status_code", [204, 404])
+def test_delete_contact(respx_mock, django_capture_on_commit_callbacks, status_code, caplog, brevo_client):
+    email = "somebody@mail.com"
+    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        return_value=httpx.Response(status_code=status_code)
+    )
+
+    with django_capture_on_commit_callbacks(execute=True):
+        async_delete_contact(email)
+
+    assert [record.levelname for record in caplog.records] == ["INFO"]
+
+
+def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
+    mocker.patch("itou.utils.brevo.httpx.Client.delete", side_effect=httpx.RequestError("Connection timed out"))
+
+    with pytest.raises(httpx.RequestError):
+        # using the client directly to simulate the error, as async_delete_contact does not propagate it,
+        # but catch it for managing retries
+        brevo_client.delete_contact("somebody@mail.com")
+
+    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
+    assert error_record.message == snapshot(name="brevo-api-request-error-connection-timed-out")
+
+
+def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo_client):
+    email = "somebody@mail.com"
+    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        return_value=httpx.Response(status_code=500)
+    )
+
+    with pytest.raises(httpx.HTTPStatusError):
+        # using the client directly to simulate the error, as async_delete_contact does not propagate it
+        # but catch it for managing retries
+        brevo_client.delete_contact("somebody@mail.com")
+
+    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
+    assert error_record.message == snapshot(name="brevo-api-http-error-500")
+
+
+@pytest.mark.parametrize("retries", [1, 100, 200])
+def test_async_delete_contact_retries_warning(
+    respx_mock, django_capture_on_commit_callbacks, retries, caplog, snapshot, brevo_client
+):
+    email = "somebody@email.com"
+    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        return_value=httpx.Response(status_code=503)
+    )
+
+    with django_capture_on_commit_callbacks(execute=True):
+        async_delete_contact(email, retries=retries)
+
+    assert respx_mock.calls.called
+
+    if retries % 100 == 0:
+        warning_record = next(record for record in caplog.records if record.levelname == "WARNING")
+        assert warning_record.message == snapshot(name=f"attempting-to-delete-email-{retries}-retries")

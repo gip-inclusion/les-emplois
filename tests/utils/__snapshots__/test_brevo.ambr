@@ -1,0 +1,16 @@
+# serializer version: 1
+# name: test_async_delete_contact_retries_warning[100][attempting-to-delete-email-100-retries]
+  'Attempting to delete email somebody@email.com, remaining 100 retries'
+# ---
+# name: test_async_delete_contact_retries_warning[200][attempting-to-delete-email-200-retries]
+  'Attempting to delete email somebody@email.com, remaining 200 retries'
+# ---
+# name: test_delete_contact_on_http_status_error[brevo-api-http-error-500]
+  '''
+  Brevo API: HTTP error occurred: Server error '500 Internal Server Error' for url 'https://api.brevo.com/v3/contacts/somebody@mail.com?identifierType=email_id'
+  For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+  '''
+# ---
+# name: test_delete_contact_request_error[brevo-api-request-error-connection-timed-out]
+  'Brevo API: Request failed: Connection timed out'
+# ---
