@@ -1,5 +1,6 @@
 import datetime
 import logging
+from functools import partial
 
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef
@@ -13,6 +14,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
+from itou.utils.brevo import async_delete_contact
 from itou.utils.command import BaseCommand
 
 
@@ -149,6 +151,8 @@ class Command(BaseCommand):
     def delete_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
+        for user in users:
+            transaction.on_commit(partial(async_delete_contact, user.email))
 
     @monitor(
         monitor_slug="notify_archive_jobseekers",
