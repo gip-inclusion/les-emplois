@@ -4,7 +4,7 @@ from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -38,17 +38,18 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     if not organization.has_admin(request.user):
         raise PermissionDenied
 
+    back_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
     form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         try:
             form.save()
             messages.success(request, "Mise à jour effectuée !", extra_tags="toast")
-            return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+            return HttpResponseRedirect(back_url)
         except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
 
-    context = {"form": form, "organization": organization, "back_url": reverse("dashboard:index")}
+    context = {"form": form, "organization": organization, "back_url": back_url}
     return render(request, template_name, context)
 
 
