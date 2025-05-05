@@ -60,7 +60,9 @@
                             {% bootstrap_field form.website %}
                             {% bootstrap_field form.description %}
 
-                            {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer la modification" %}
+                            {% if not form.readonly %}
+                                {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer la modification" %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>

@@ -245,34 +245,6 @@
   </div>
   
                               
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3"/>
-          <small class="d-inline-block mb-3">* champs obligatoires</small>
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/dashboard/">
-                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                          <span>Annuler</span>
-                      </a>
-                  
-              </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <button aria-label="Enregistrer la modification" class="btn btn-block btn-primary" type="submit">
-                          <span>Enregistrer</span>
-                      </button>
-                  
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  
-  
                           </form>
   '''
 # ---
