@@ -805,6 +805,7 @@ class FacilitatorBaseMixin:
             geocoding_score=org_data["geocoding_score"],
             coords=lat_lon_to_coords(org_data.get("latitude"), org_data.get("longitude")),
             created_by=None,
+            is_searchable=False,  # Wait for admin to check the company
         )
 
 

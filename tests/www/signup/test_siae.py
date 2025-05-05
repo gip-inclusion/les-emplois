@@ -336,6 +336,7 @@ class TestCompanySignup:
         company = Company.objects.get(siret=FAKE_SIRET)
         assert company.has_admin(user)
         assert 1 == company.members.count()
+        assert company.is_searchable is False
 
         # No sent email.
         assert len(mailoutbox) == 0
