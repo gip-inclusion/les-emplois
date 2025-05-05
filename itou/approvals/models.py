@@ -1627,6 +1627,11 @@ class ProlongationRequest(CommonProlongation):
             ),
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        field = self._meta.get_field("validated_by")
+        field.verbose_name = "prescripteur habilité qui a reçu la demande de prolongation"
+
     def __str__(self):
         return f"{self.approval} — {self.get_status_display()} — {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
 
