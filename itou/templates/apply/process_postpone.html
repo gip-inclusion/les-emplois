@@ -17,8 +17,18 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    <div class="alert alert-info" role="status">
+        <p class="mb-0">
+            Le changement de statut de la candidature ainsi que le commentaire seront communiqués par e-mail au candidat ainsi qu’à son prescripteur/orienteur.
+        </p>
+        <p class="mb-0">Ils pourront également le consulter dans la page de détail de la candidature.</p>
+    </div>
+{% endblock %}
+
 {% block content_extend %}
-    <div class="c-form mb-4">
+    <div class="c-form mb-3 mb-md-4">
         <form method="post" class="js-prevent-multiple-submit">
 
             {% csrf_token %}
