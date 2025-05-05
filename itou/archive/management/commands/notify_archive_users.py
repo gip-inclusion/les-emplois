@@ -1,5 +1,6 @@
 import datetime
 import logging
+from functools import partial
 
 from django.conf import settings
 from django.db import transaction
@@ -17,6 +18,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser, InactiveUser
+from itou.utils.brevo import async_delete_contact
 from itou.utils.command import BaseCommand
 from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
@@ -245,6 +247,8 @@ class Command(BaseCommand):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
+        for user in users:
+            transaction.on_commit(partial(async_delete_contact, user.email))
 
     @monitor(
         monitor_slug="notify_archive_users",
