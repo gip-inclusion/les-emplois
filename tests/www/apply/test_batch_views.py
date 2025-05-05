@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertRedirect
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.batch_views import RefuseWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -19,7 +20,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
 )
-from tests.utils.test import session_data_without_known_keys
+from tests.utils.test import get_session_name
 
 
 class TestBatchArchive:
@@ -658,7 +659,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",
@@ -756,7 +757,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",
@@ -848,7 +849,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",
@@ -933,7 +934,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",
@@ -991,7 +992,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",
@@ -1058,7 +1059,7 @@ class TestBatchRefuse:
             add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         expected_session = {
             "config": {
                 "tunnel": "batch",

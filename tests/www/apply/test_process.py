@@ -49,6 +49,7 @@ from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
+from itou.www.apply.views.batch_views import RefuseWizardView
 from itou.www.apply.views.process_views import job_application_sender_left_org
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
@@ -74,8 +75,8 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     assert_previous_step,
     assertSnapshotQueries,
+    get_session_name,
     parse_response_to_soup,
-    session_data_without_known_keys,
 )
 
 
@@ -917,7 +918,7 @@ class TestProcessViews:
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         assert client.session[refuse_session_name] == {
             "config": {
                 "tunnel": "single",
@@ -951,9 +952,10 @@ class TestProcessViews:
         job_application_2 = JobApplicationFactory(to_company=job_application.to_company)
         url = reverse("apply:refuse", kwargs={"job_application_id": job_application_2.pk})
         response = client.get(url)
-        [refuse_session_name_2] = [
-            k for k in session_data_without_known_keys(client.session) if k != refuse_session_name
-        ]
+
+        refuse_session_name_2 = get_session_name(
+            client.session, RefuseWizardView.expected_session_kind, ignore=[refuse_session_name]
+        )
         refusal_reason_url_2 = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name_2, "step": "reason"}
         )
@@ -987,7 +989,7 @@ class TestProcessViews:
         client.force_login(employer)
 
         response = client.get(reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}), follow=True)
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1049,7 +1051,7 @@ class TestProcessViews:
 
         refusal_reason_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(refusal_reason_url, follow=True)
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1102,7 +1104,7 @@ class TestProcessViews:
 
         response = client.get(reverse("apply:refuse", kwargs={"job_application_id": job_application.pk}))
 
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -1251,7 +1253,7 @@ class TestProcessViews:
 
         refusal_reason_url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
         response = client.get(refusal_reason_url, follow=True)
-        [refuse_session_name] = session_data_without_known_keys(client.session)
+        refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
         refusal_reason_url = reverse(
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "reason"}
         )
@@ -3404,7 +3406,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
 
     url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
-    [refuse_session_name] = session_data_without_known_keys(client.session)
+    refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
     assert client.session[refuse_session_name] == {
         "config": {
             "tunnel": "single",
