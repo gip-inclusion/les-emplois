@@ -1,0 +1,7 @@
+# serializer version: 1
+# name: test_async_delete_contact_retries_warning[100][attempting-to-delete-email-100-retries]
+  'Attempting to delete email somebody@email.com, remaining 100 retries'
+# ---
+# name: test_async_delete_contact_retries_warning[200][attempting-to-delete-email-200-retries]
+  'Attempting to delete email somebody@email.com, remaining 200 retries'
+# ---
