@@ -2,7 +2,7 @@
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
         <hr class="my-4">
         <h3>{{ is_sent_by_authorized_prescriber|yesno:"Éligibilité à l'IAE,Critères d'éligibilité" }}</h3>
-        <p class="text-success">
+        <p class="text-success mb-1">
             {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validés" }}
             le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
             <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
@@ -18,7 +18,7 @@
 
         {% if eligibility_diagnosis.criteria_display %}
             {% with eligibility_diagnosis.criteria_display as selected_administrative_criteria %}
-                <p>
+                <p class="mb-2">
                     <span class="badge badge-sm rounded-pill bg-secondary">
                         {% if is_sent_by_authorized_prescriber %}
                             Situation administrative du candidat
