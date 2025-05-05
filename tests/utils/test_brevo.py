@@ -11,6 +11,31 @@ def brevo_client_fixture(settings):
     return BrevoClient()
 
 
+@pytest.fixture(name="mock_httpx_client")
+def mock_httpx_client_fixture(mocker):
+    mock_client = mocker.Mock()
+    mocker.patch("itou.utils.brevo.httpx.Client", return_value=mock_client)
+    return mock_client
+
+
+def test_brevo_client_context_manager(mock_httpx_client, caplog, brevo_client):
+    with brevo_client:
+        assert brevo_client.client == mock_httpx_client
+
+    mock_httpx_client.close.assert_called_once()
+
+
+def test_brevo_client_context_manager_with_exception(mock_httpx_client, caplog, brevo_client):
+    with pytest.raises(Exception, match="Test exception"):
+        with brevo_client:
+            raise Exception("Test exception")
+
+    mock_httpx_client.close.assert_called_once()
+
+    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
+    assert "An exception occurred in BrevoClient: Test exception" in error_record.message
+
+
 @pytest.mark.parametrize("status_code,content", [(202, "OK"), (400, "Bad Request"), (500, "Internal Server Error")])
 def test_import_users(respx_mock, caplog, status_code, content, brevo_client):
     user = JobSeekerFactory()
