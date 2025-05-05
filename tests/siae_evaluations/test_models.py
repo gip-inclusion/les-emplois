@@ -449,21 +449,18 @@ class TestEvaluationCampaignManager:
         create_batch_of_job_applications(company)
         fake_now = timezone.now() - relativedelta(weeks=1)
 
-        assert 0 == EvaluatedSiae.objects.all().count()
-        assert 0 == EvaluatedJobApplication.objects.all().count()
-
         with assertSnapshotQueries(snapshot):
             evaluation_campaign.populate(fake_now)
         evaluation_campaign.refresh_from_db()
 
         assert fake_now == evaluation_campaign.percent_set_at
         assert fake_now == evaluation_campaign.evaluations_asked_at
-        assert 1 == EvaluatedSiae.objects.all().count()
-        assert 2 == EvaluatedJobApplication.objects.all().count()
+        [evaluated_siae] = EvaluatedSiae.objects.all()
+        evaluated_job_apps = EvaluatedJobApplication.objects.all()
+        assert len(evaluated_job_apps) == 2
 
         # check links between EvaluatedSiae and EvaluatedJobApplication
-        evaluated_siae = EvaluatedSiae.objects.first()
-        for evaluated_job_application in EvaluatedJobApplication.objects.all():
+        for evaluated_job_application in evaluated_job_apps:
             with subtests.test(evaluated_job_application_pk=evaluated_job_application.pk):
                 assert evaluated_siae == evaluated_job_application.evaluated_siae
 
