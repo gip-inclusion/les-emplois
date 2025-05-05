@@ -188,9 +188,7 @@ class TestApplyAsPrescriber:
 
         assert f"job_application-{guerande_company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": guerande_company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
     def test_apply_as_prescriber_without_seeing_personal_info(self, client):
@@ -336,9 +334,7 @@ class TestApplyAsPrescriber:
 
         assert f"job_application-{guerande_company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": guerande_company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
     def test_cannot_apply_as_prescriber_with_incorrect_public_id(self, client):
@@ -495,9 +491,7 @@ class TestApplyAsCompany:
 
         assert f"job_application-{other_company.pk}" not in client.session
 
-        next_url = reverse(
-            "apply:application_end", kwargs={"company_pk": other_company.pk, "application_pk": job_application.pk}
-        )
+        next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
 
     def test_cannot_apply_as_company_with_incorrect_public_id(self, client):
