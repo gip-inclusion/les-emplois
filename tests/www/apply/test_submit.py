@@ -4959,9 +4959,14 @@ class TestCheckPreviousApplicationsView:
             response, "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
 
+        # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assert response.status_code == 404
+
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
         job_application.save(update_fields=("created_at", "updated_at"))
+        self._login_and_setup_session(client, self.job_seeker)
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Vous avez déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
@@ -4993,9 +4998,15 @@ class TestCheckPreviousApplicationsView:
         assertContains(
             response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
+
+        # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assert response.status_code == 404
+
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
         job_application.save(update_fields=("created_at", "updated_at"))
+        self._login_and_setup_session(client, authorized_prescriber)
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
@@ -5054,9 +5065,15 @@ class TestCheckPreviousApplicationsView:
         assertContains(
             response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
         )
+
+        # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assert response.status_code == 404
+
         # Make it less recent to avoid the 403
         job_application.created_at = timezone.now() - datetime.timedelta(days=2)
         job_application.save(update_fields=("created_at", "updated_at"))
+        self._login_and_setup_session(client, employer)
         response = client.get(self.check_prev_applications_url)
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})

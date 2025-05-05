@@ -123,7 +123,23 @@ class ApplicationPermissionMixin:
         if self.company.block_job_applications and not self.company.has_member(request.user):
             messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
             return HttpResponseRedirect(self.get_reset_url())
+        # Limit the possibility of applying to the same SIAE for 24 hours.
+        if (
+            hasattr(self, "job_seeker")
+            and not (self.auto_prescription_process or self.hire_process)
+            and self.get_previous_applications_queryset().created_in_past(hours=24).exists()
+        ):
+            if request.user == self.job_seeker:
+                msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
+            else:
+                msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
+            self.apply_session.delete()  # Don't allow to re-use the session in another step to skip this check
+            raise PermissionDenied(msg)
         return super().dispatch(request, *args, **kwargs)
+
+    def get_previous_applications_queryset(self):
+        # Also used in CheckPreviousApplications
+        return self.job_seeker.job_applications.filter(to_company=self.company)
 
 
 class StartView(ApplicationPermissionMixin, View):
@@ -333,10 +349,6 @@ class ApplicationBaseView(ApplyStepBaseView):
             ),
         }
 
-    def get_previous_applications_queryset(self):
-        # Useful in CheckPreviousApplications and ApplicationJobsView
-        return self.job_seeker.job_applications.filter(to_company=self.company)
-
 
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
     def __init__(self):
@@ -389,15 +401,6 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     template_name = "apply/submit_step_check_prev_applications.html"
 
-    def __init__(self):
-        super().__init__()
-
-        self.previous_applications = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.previous_applications = self.get_previous_applications_queryset()
-
     def get_next_url(self):
         if self.hire_process:
             view_name = (
@@ -412,20 +415,8 @@ class CheckPreviousApplications(ApplicationBaseView):
         )
 
     def get(self, request, *args, **kwargs):
-        if not self.previous_applications.exists():
+        if not self.get_previous_applications_queryset().exists():
             return HttpResponseRedirect(self.get_next_url())
-
-        # Limit the possibility of applying to the same SIAE for 24 hours.
-        if (
-            not (self.auto_prescription_process or self.hire_process)
-            and self.previous_applications.created_in_past(hours=24).exists()
-        ):
-            if request.user == self.job_seeker:
-                msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
-            else:
-                msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
-            raise PermissionDenied(msg)
-
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -438,7 +429,7 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "prev_application": self.previous_applications.latest("created_at"),
+            "prev_application": self.get_previous_applications_queryset().latest("created_at"),
         }
 
 
