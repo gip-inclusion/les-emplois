@@ -20,7 +20,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, session_data_without_known_keys
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 POSTULER = "Postuler"
@@ -491,7 +491,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         response = client.post(self.edit_preview_url)
         assertRedirects(response, self.list_url)
         assert self.company.job_description_through.count() == 5
-        assert session_data_without_known_keys(client.session) == {}
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
     @freeze_time("2025-04-09 15:16:17.18")
@@ -513,8 +512,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
 
         # Step 1: edit job description
         response = client.get(self.edit_url)
-        assert session_data_without_known_keys(client.session) == {}
-
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
             "market_context_description": "Whatever market description",

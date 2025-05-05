@@ -4,11 +4,12 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
 from itou.utils.urls import add_url_params
+from itou.www.employee_record_views.views import AddView
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, session_data_without_known_keys
+from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
 
 
 def test_wizard(snapshot, client):
@@ -28,7 +29,7 @@ def test_wizard(snapshot, client):
     with assertSnapshotQueries(snapshot(name="start-queries")):
         response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
 
-    [wizard_session_name] = session_data_without_known_keys(client.session)
+    wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     expected_session = {"config": {"reset_url": reset_url}}
     assert client.session[wizard_session_name] == expected_session
     choose_employee_url = reverse(
@@ -137,7 +138,7 @@ def test_employee_list(client):
     reset_url = reverse("employee_record_views:list")
     response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
 
-    [wizard_session_name] = session_data_without_known_keys(client.session)
+    wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     choose_employee_url = reverse(
         "employee_record_views:add", kwargs={"session_uuid": wizard_session_name, "step": "choose-employee"}
     )
@@ -165,7 +166,7 @@ def test_choose_employee_step_with_a_bad_choice(client):
     reset_url = reverse("employee_record_views:list")
     response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
 
-    [wizard_session_name] = session_data_without_known_keys(client.session)
+    wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     choose_employee_url = reverse(
         "employee_record_views:add", kwargs={"session_uuid": wizard_session_name, "step": "choose-employee"}
     )

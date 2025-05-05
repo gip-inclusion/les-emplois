@@ -28,7 +28,7 @@ from tests.prescribers.factories import (
 )
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, session_data_without_known_keys
+from tests.utils.test import get_session_name, parse_response_to_soup
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
 
 
@@ -138,9 +138,7 @@ class TestGetOrCreateForJobSeeker:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url, {"back_url": reset_url})
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
@@ -168,9 +166,7 @@ class TestGetOrCreateForJobSeeker:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url)
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
@@ -254,7 +250,7 @@ class TestGetOrCreateForSender:
         assert response.status_code == expected_status_code
 
         if expected_status_code == 302:
-            [job_seeker_session_name] = session_data_without_known_keys(client.session)
+            job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
             view_name = (
                 "job_seekers_views:check_nir_for_hire"
                 if tunnel == "hire"
@@ -310,9 +306,7 @@ class TestGetOrCreateForSender:
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
         client.get(start_url, follow=True)
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
         response = client.get(
             reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -329,9 +323,7 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -369,9 +361,7 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -410,9 +400,7 @@ class TestGetOrCreateForSender:
 
         # Init session
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
-        [job_seeker_session_name] = [
-            k for k in session_data_without_known_keys(client.session) if not k.startswith("job_application")
-        ]
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
         response = client.post(
             reverse(
@@ -518,7 +506,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         check_nir_url = reverse(
             "job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
@@ -596,7 +584,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         search_by_email_url = reverse(
             "job_seekers_views:search_by_email_for_sender", kwargs={"session_uuid": job_seeker_session_name}
         )
@@ -631,7 +619,7 @@ class TestStandaloneCreateAsPrescriber:
         params = {"tunnel": "standalone", "from_url": from_url}
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
 
         # Step determine the job seeker with a NIR.
@@ -948,7 +936,7 @@ class TestUpdateForSender:
         assert response.status_code == expected_status_code
 
         if expected_status_code == 302:
-            [job_seeker_session_name] = session_data_without_known_keys(client.session)
+            job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
             step_1_url = reverse(
                 "job_seekers_views:update_job_seeker_step_1",
                 kwargs={"session_uuid": job_seeker_session_name},
@@ -1014,7 +1002,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
         url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
         response = client.get(url)
@@ -1061,7 +1049,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
         birthdate = datetime.date(1911, 11, 1)
         response = client.post(
@@ -1109,7 +1097,7 @@ class TestUpdateForSender:
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
         response = client.post(
             reverse(
@@ -1164,7 +1152,7 @@ class TestUpdateForSender:
             ),
         }
         response = client.get(reverse("job_seekers_views:update_job_seeker_start"), params)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
         new_birth_date = datetime.date(1978, 12, 1)
         url = reverse(
             "job_seekers_views:update_job_seeker_step_1",

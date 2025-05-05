@@ -19,6 +19,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 from itou.www.gps.enums import EndReason
+from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
@@ -30,7 +31,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, session_data_without_known_keys
+from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
 
 
 def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
@@ -1190,7 +1191,7 @@ class TestJoinGroupFromNir:
         # unknown NIR :
         dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
         response = client.post(self.URL, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": "1"})
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
@@ -1239,7 +1240,7 @@ class TestJoinGroupFromNir:
         # ----------------------------------------------------------------------
         response = client.post(self.URL, data={"nir": nir, "preview": "1"})
 
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
@@ -1298,7 +1299,7 @@ class TestJoinGroupFromNir:
         # ----------------------------------------------------------------------
         response = client.post(self.URL, data={"nir": nir, "preview": "1"})
 
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
@@ -1356,7 +1357,7 @@ class TestJoinGroupFromNir:
         # ----------------------------------------------------------------------
         response = client.post(self.URL, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": "1"})
 
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse(
             "job_seekers_views:search_by_email_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
@@ -1558,7 +1559,7 @@ class TestJoinGroupFromNameAndEmail:
             "preview": "1",
         }
         response = client.post(self.URL, data=post_data)
-        [job_seeker_session_name] = session_data_without_known_keys(client.session)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse(
             "job_seekers_views:create_job_seeker_step_1_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
