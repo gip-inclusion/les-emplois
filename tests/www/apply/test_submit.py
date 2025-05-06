@@ -58,10 +58,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
-    PrescriberPoleEmploiWithMembershipFactory,
-)
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -978,59 +975,6 @@ class TestApplyAsJobSeeker:
             count=1,
         )
         assert JobApplication.objects.exists() is False
-
-    def test_apply_end_view_wo_phone_number_as_job_seeker(self, client):
-        application = JobApplicationFactory(
-            sender_kind=SenderKind.JOB_SEEKER, sender_company=None, job_seeker__phone=""
-        )
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone permet à l’employeur de vous '
-            "contacter plus facilement.</p>"
-        )
-        client.force_login(application.job_seeker)
-        fake_session_initialization(
-            client,
-            application.to_company,
-            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
-        )
-        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
-
-    def test_apply_end_view_wo_phone_number_as_employer(self, client):
-        application = JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER, sender_company=CompanyFactory(), job_seeker__phone=""
-        )
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
-            "la prise de contact avec le candidat.</p>"
-        )
-        client.force_login(application.to_company.members.first())
-        fake_session_initialization(
-            client,
-            application.to_company,
-            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
-        )
-        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
-
-    def test_apply_end_view_wo_phone_number_as_prescriber(self, client):
-        application = JobApplicationFactory(
-            sender_kind=SenderKind.PRESCRIBER,
-            sender_prescriber_organization=PrescriberPoleEmploiWithMembershipFactory(),
-            job_seeker__phone="",
-        )
-        expected_html = (
-            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
-            "la prise de contact avec le candidat.</p>"
-        )
-        client.force_login(application.sender_prescriber_organization.members.first())
-        fake_session_initialization(
-            client,
-            application.to_company,
-            {"reset_url": reverse("companies_views:card", kwargs={"siae_id": application.to_company.pk})},
-        )
-        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
-        assertContains(response, expected_html, html=True)
 
 
 @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
@@ -3701,26 +3645,63 @@ class TestApplicationView:
         assert new_eligibility_diagnosis.author == prescriber
 
 
-def test_application_end_update_job_seeker(client):
-    job_application = JobApplicationFactory(job_seeker__with_mocked_address=True)
-    job_seeker = job_application.job_seeker
-    # Ensure sender cannot update job seeker infos
-    assert job_seeker.address_line_2 == ""
-    url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
-    client.force_login(job_application.sender)
-    response = client.post(
-        url,
-        data={
-            "address_line_1": job_seeker.address_line_1,
-            "address_line_2": "something new",
-            "post_code": job_seeker.post_code,
-            "city": job_seeker.city,
-            "phone": job_seeker.phone,
-        },
-    )
-    assert response.status_code == 403
-    job_seeker.refresh_from_db()
-    assert job_seeker.address_line_2 == ""
+class TestApplicationEndView:
+    def test_update_job_seeker(self, client):
+        job_application = JobApplicationFactory(job_seeker__with_mocked_address=True)
+        job_seeker = job_application.job_seeker
+        # Ensure sender cannot update job seeker infos
+        assert job_seeker.address_line_2 == ""
+        url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
+        client.force_login(job_application.sender)
+        response = client.post(
+            url,
+            data={
+                "address_line_1": job_seeker.address_line_1,
+                "address_line_2": "something new",
+                "post_code": job_seeker.post_code,
+                "city": job_seeker.city,
+                "phone": job_seeker.phone,
+            },
+        )
+        assert response.status_code == 403
+        job_seeker.refresh_from_db()
+        assert job_seeker.address_line_2 == ""
+
+    def test_wo_phone_number_as_job_seeker(self, client):
+        application = JobApplicationFactory(sent_by_job_seeker=True, job_seeker__phone="")
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone permet à l’employeur de vous '
+            "contacter plus facilement.</p>"
+        )
+        client.force_login(application.job_seeker)
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
+        assertContains(response, expected_html, html=True)
+
+    def test_wo_phone_number_as_employer(self, client):
+        application = JobApplicationFactory(sent_by_another_employer=True, job_seeker__phone="")
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
+            "la prise de contact avec le candidat.</p>"
+        )
+        client.force_login(application.sender)
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
+        assertContains(response, expected_html, html=True)
+
+    def test_wo_phone_number_as_prescriber(self, client):
+        application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, job_seeker__phone="")
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
+            "la prise de contact avec le candidat.</p>"
+        )
+        client.force_login(application.sender)
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
+        assertContains(response, expected_html, html=True)
+
+    def test_not_sender(self, client):
+        application = JobApplicationFactory()
+        client.force_login(application.job_seeker)  # not the sender
+        response = client.get(reverse("apply:application_end", kwargs={"application_pk": application.pk}))
+        assert response.status_code == 404
 
 
 class TestLastCheckedAtView:

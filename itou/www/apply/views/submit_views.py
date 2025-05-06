@@ -773,6 +773,7 @@ class ApplicationEndView(TemplateView):
         self.job_application = get_object_or_404(
             JobApplication.objects.select_related("job_seeker", "to_company"),
             pk=kwargs.get("application_pk"),
+            sender=request.user,
         )
         self.company = self.job_application.to_company
         self.form = CreateOrUpdateJobSeekerStep2Form(
