@@ -77,7 +77,7 @@ urlpatterns = [
     ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility-criteria",
-        submit_views.geiq_eligibility_criteria_for_hire,
+        submit_views.GEIQEligiblityCriteriaForHireView.as_view(),
         name="geiq_eligibility_criteria_for_hire",
     ),
     path(
@@ -142,7 +142,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:job_application_id>/siae/geiq_eligibility_criteria",
-        process_views.geiq_eligibility_criteria,
+        process_views.GEIQEligiblityCriteriaView.as_view(),
         name="geiq_eligibility_criteria",
     ),
     path(
