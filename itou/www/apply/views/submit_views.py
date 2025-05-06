@@ -332,6 +332,7 @@ class ApplicationBaseView(ApplyStepBaseView):
                     "apply:application_eligibility",
                     kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
                 )
+        return None
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
