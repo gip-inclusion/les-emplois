@@ -102,6 +102,10 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             job_seeker__for_snapshot=True,
             approval__for_snapshot=True,
         )
+        sent_by_job_seeker = factory.Trait(
+            sender_kind=SenderKind.JOB_SEEKER,
+            sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
+        )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
     to_company = factory.SubFactory(CompanyFactory, with_membership=True)
