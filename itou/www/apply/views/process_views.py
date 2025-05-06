@@ -680,10 +680,7 @@ class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, Applicat
     def get_next_url(self):
         base_url = reverse(
             "apply:job_application_external_transfer_step_3",
-            kwargs={
-                "job_application_id": self.job_application.pk,
-                "company_pk": self.company.pk,
-            },
+            kwargs=self.get_base_kwargs() | {"job_application_id": self.job_application.pk},
         )
         return f"{base_url}?back_url={quote(self.request.get_full_path())}"
 
@@ -709,7 +706,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
             return HttpResponseRedirect(
                 reverse(
                     "apply:job_application_external_transfer_step_2",
-                    kwargs={"job_application_id": self.job_application.pk, "company_pk": self.company.pk},
+                    kwargs=self.get_base_kwargs() | {"job_application_id": self.job_application.pk},
                 )
             )
         return super().dispatch(request, *args, **kwargs)

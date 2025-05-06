@@ -302,6 +302,9 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
+    def get_apply_kwargs(self):
+        return self.job_seeker_session.get("apply", {})
+
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
             return reverse("gps:group_list")
@@ -314,7 +317,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-        kwargs = {"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id}
+        kwargs = self.get_apply_kwargs() | {"job_seeker_public_id": job_seeker.public_id}
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -388,19 +391,22 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
         if self.job_seeker.jobseeker_profile.nir:
+            next_url = reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs=self.get_apply_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            )  # get_apply_kwargs requires the job_seeker_session
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
             self.job_seeker_session.delete()
-            return HttpResponseRedirect(
-                reverse(
-                    "job_seekers_views:check_job_seeker_info",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(next_url)
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        next_url = reverse(
+            "job_seekers_views:check_job_seeker_info",
+            kwargs=self.get_apply_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+        )
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
@@ -408,17 +414,8 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
             self.job_seeker_session.delete()
-            return HttpResponseRedirect(
-                reverse(
-                    "job_seekers_views:check_job_seeker_info",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(next_url)
         else:
-            next_url = reverse(
-                "job_seekers_views:check_job_seeker_info",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-            )
             kwargs["temporary_nir_url"] = next_url
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -839,8 +836,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             else:
                 user.save()
 
-            self.job_seeker_session.delete()
             url = self.get_exit_url(self.profile.user, created=True)
+            self.job_seeker_session.delete()
 
             if self.is_gps:
                 notify_duplicate = (
@@ -1195,7 +1192,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def get_redirect_url(self):
         return reverse(
             "apply:step_check_prev_applications",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get(self, request, *args, **kwargs):
