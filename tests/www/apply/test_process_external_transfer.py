@@ -10,11 +10,13 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import get_session_name, parse_response_to_soup
+from tests.www.apply.test_submit import fake_old_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 
 
@@ -283,28 +285,34 @@ def test_start_session(client):
         "apply:job_application_external_transfer_start_session",
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
-    transfer_step_2_base_url = reverse(
-        "apply:job_application_external_transfer_step_2",
-        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
-    )
 
     # No selected job
     transfer_start_session_url = f"{transfer_start_session_base_url}?back_url={quote(transfer_step_1_url)}"
     response = client.get(transfer_start_session_url)
+    apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+    transfer_step_2_base_url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "session_uuid": apply_session_name},
+    )
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
     assertRedirects(response, transfer_step_2_url)
-    assert client.session[f"job_application-{other_company.pk}"] == {"reset_url": transfer_step_1_url}
+    assert client.session[apply_session_name] == {"reset_url": transfer_step_1_url, "company_pk": other_company.pk}
 
     # With selected job
     transfer_start_session_url = (
         f"{transfer_start_session_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
     )
     response = client.get(transfer_start_session_url)
+    apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[apply_session_name])
+    transfer_step_2_base_url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "session_uuid": apply_session_name},
+    )
     transfer_step_2_url = (
         f"{transfer_step_2_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
     )
     assertRedirects(response, transfer_step_2_url)
-    assert client.session[f"job_application-{other_company.pk}"] == {"reset_url": transfer_step_1_url}
+    assert client.session[apply_session_name] == {"reset_url": transfer_step_1_url, "company_pk": other_company.pk}
 
 
 def test_step_2(client, snapshot):
@@ -612,12 +620,86 @@ def test_full_process(client):
 
     # Start session
     response = client.get(transfer_start_session_url)
+    transfert_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+    transfer_step_2_base_url = reverse(
+        "apply:job_application_external_transfer_step_2",
+        kwargs={"job_application_id": job_application.pk, "session_uuid": transfert_session_name},
+    )
+    transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
+    assertRedirects(response, transfer_step_2_url)
+
+    # STEP 2
+    response = client.get(transfer_step_2_url)
+    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
+    assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
+    # Check back_url
+    assertContains(response, transfer_step_1_url)
+
+    response = client.post(transfer_step_2_url, data={"spontaneous_application": "on"})
+
+    transfer_step_3_base_url = reverse(
+        "apply:job_application_external_transfer_step_3",
+        kwargs={"job_application_id": job_application.pk, "session_uuid": transfert_session_name},
+    )
+    transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
+    assertRedirects(response, transfer_step_3_url)
+    assert client.session[transfert_session_name] == {
+        "company_pk": other_company.pk,
+        "selected_jobs": [],
+        "reset_url": transfer_step_1_url,
+    }
+
+    # STEP 3
+    response = client.get(transfer_step_3_url)
+    assertContains(response, "<h2>Finaliser la candidature</h2>", html=True)
+    # CHeck back_url
+    assertContains(response, transfer_step_2_url)
+
+    response = client.post(transfer_step_3_url, data={"message": "blah", "keep_original_resume": "True"})
+    new_job_application = JobApplication.objects.filter(to_company=other_company).get()
+    transfer_step_end_url = reverse(
+        "apply:job_application_external_transfer_step_end", kwargs={"job_application_id": new_job_application.pk}
+    )
+    assertRedirects(response, transfer_step_end_url)
+    assert transfert_session_name not in client.session
+
+    assert new_job_application.message == "blah"
+    assert new_job_application.job_seeker == job_application.job_seeker
+    assert new_job_application.sender == employer
+    assert new_job_application.state == JobApplicationState.NEW
+
+    transfer_log = job_application.logs.last()
+    assert transfer_log.transition == "external_transfer"
+    assert transfer_log.user == employer
+    assert transfer_log.target_company == other_company
+
+
+# FIXME(alaurent) remove in a week
+def test_old_session(client):
+    create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
+    vannes = create_city_vannes()
+    COMPANY_VANNES = "Entreprise Vannes"
+    other_company = CompanyFactory(name=COMPANY_VANNES, coords=vannes.coords, post_code="56760", with_membership=True)
+
+    job_application = JobApplicationFactory(
+        state=JobApplicationState.REFUSED,
+        to_company__post_code="56760",
+        to_company__coords=vannes.coords,
+        to_company__city=vannes.name,
+    )
+    employer = job_application.to_company.members.get()
+    client.force_login(employer)
+
+    # STEP 1
+    transfer_step_1_url = reverse(
+        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
+    )
+    fake_old_session_initialization(client, other_company, {"reset_url": transfer_step_1_url})
     transfer_step_2_base_url = reverse(
         "apply:job_application_external_transfer_step_2",
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
-    assertRedirects(response, transfer_step_2_url)
 
     # STEP 2
     response = client.get(transfer_step_2_url)

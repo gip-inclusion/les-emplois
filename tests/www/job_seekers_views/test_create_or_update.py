@@ -16,6 +16,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
@@ -137,13 +138,15 @@ class TestGetOrCreateForJobSeeker:
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url, {"back_url": reset_url})
+        response = client.get(start_url, {"back_url": reset_url})
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
+        response = client.get(next_url)
         assertContains(response, company.display_name)
         assertContains(
             response,
@@ -165,17 +168,21 @@ class TestGetOrCreateForJobSeeker:
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url)
+        response = client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
+        assertRedirects(response, next_url, fetch_redirect_response=False)
+
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        response = client.get(next_url)
         assertRedirects(
             response,
             reverse(
                 "job_seekers_views:check_job_seeker_info",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
+                kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": user.public_id},
             ),
         )
 
