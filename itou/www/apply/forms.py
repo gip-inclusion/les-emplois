@@ -229,7 +229,8 @@ class AnswerForm(forms.Form):
 
     answer = forms.CharField(
         label="Réponse",
-        widget=forms.Textarea(attrs={"placeholder": "Votre réponse sera visible par le candidat et le prescripteur"}),
+        widget=forms.Textarea(),
+        help_text="Votre réponse sera visible par le candidat et le prescripteur",
         required=False,
         strip=True,
     )
