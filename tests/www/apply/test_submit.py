@@ -2879,6 +2879,7 @@ class TestDirectHireFullProcess:
 
         user = company.members.first()
         client.force_login(user)
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         response = client.get(
             reverse(
@@ -5341,6 +5342,7 @@ class TestEligibilityForHire:
     def test_not_subject_to_eligibility(self, client):
         self.company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:eligibility_for_hire"))
         assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
@@ -5348,6 +5350,7 @@ class TestEligibilityForHire:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:eligibility_for_hire"))
         assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
@@ -5355,6 +5358,7 @@ class TestEligibilityForHire:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         assert not self.job_seeker.has_valid_diagnosis(for_siae=self.company)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:eligibility_for_hire"))
         assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         assertContains(response, "Valider l'éligibilité IAE")

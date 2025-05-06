@@ -539,7 +539,7 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
             not self.company.is_subject_to_eligibility_rules,
             # Only "authorized prescribers" can perform an eligibility diagnosis.
             not request.from_authorized_prescriber,
@@ -804,41 +804,36 @@ class ApplicationEndView(TemplateView):
         }
 
 
-@check_user(lambda user: user.is_employer)
-def eligibility_for_hire(
-    request,
-    company_pk,
-    job_seeker_public_id,
-    template_name="apply/submit/eligibility_for_hire.html",
-):
-    company = get_object_or_404(
-        Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
-    )
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
-    _check_job_seeker_approval(request, job_seeker, company)
-    next_url = reverse(
-        "apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
-    )
-    bypass_eligibility_conditions = [
-        # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-        not company.is_subject_to_eligibility_rules,
-        # No need for eligibility diagnosis if the job seeker already has a PASS IAE
-        job_seeker.has_valid_approval,
-    ]
-    if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(for_siae=company):
-        return HttpResponseRedirect(next_url)
-    return common_views._eligibility(
-        request,
-        company,
-        job_seeker,
-        cancel_url=reverse(
+class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibilityView):
+    template_name = "apply/submit/eligibility_for_hire.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
+            not self.company.is_subject_to_eligibility_rules,
+            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+            self.job_seeker.has_valid_approval,
+        ]
+        if any(bypass_eligibility_conditions) or self.job_seeker.has_valid_diagnosis(for_siae=self.company):
+            return HttpResponseRedirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse(
+            "apply:hire_confirmation",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def get_cancel_url(self):
+        return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        ),
-        next_url=next_url,
-        template_name=template_name,
-        extra_context={"hire_process": True},
-    )
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["hire_process"] = True
+        return context
 
 
 @check_user(lambda user: user.is_employer)

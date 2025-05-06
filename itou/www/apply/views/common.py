@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -8,6 +9,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.views.generic import FormView
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
@@ -169,37 +171,50 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
     return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
 
 
-def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name, extra_context):
-    if not siae.is_subject_to_eligibility_rules:
-        raise Http404()
+class BaseIAEEligibilityView(UserPassesTestMixin, FormView):
+    template_name = None
+    form_class = AdministrativeCriteriaForm
 
-    if suspension_explanation := siae.get_active_suspension_text_with_dates():
-        raise PermissionDenied(
-            "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
-            "du contrôle a posteriori. " + suspension_explanation
-        )
+    def test_func(self):
+        return self.request.user.is_employer
 
-    form_administrative_criteria = AdministrativeCriteriaForm(
-        request.from_authorized_prescriber, siae=siae, data=request.POST or None
-    )
-    if request.method == "POST" and form_administrative_criteria.is_valid():
+    def dispatch(self, request, *args, **kwargs):
+        if not self.company.is_subject_to_eligibility_rules:
+            raise Http404()
+
+        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+            raise PermissionDenied(
+                "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
+                "du contrôle a posteriori. " + suspension_explanation
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["is_authorized_prescriber"] = self.request.from_authorized_prescriber
+        kwargs["siae"] = self.company
+        return kwargs
+
+    def get_cancel_url(self):
+        raise NotImplementedError
+
+    def form_valid(self, form):
         EligibilityDiagnosis.create_diagnosis(
-            job_seeker,
-            author=request.user,
-            author_organization=request.current_organization,
-            administrative_criteria=form_administrative_criteria.cleaned_data,
+            self.job_seeker,
+            author=self.request.user,
+            author_organization=self.request.current_organization,
+            administrative_criteria=form.cleaned_data,
         )
-        messages.success(request, "Éligibilité confirmée !", extra_tags="toast")
-        return HttpResponseRedirect(next_url)
+        messages.success(self.request, "Éligibilité confirmée !", extra_tags="toast")
+        return HttpResponseRedirect(self.get_success_url())
 
-    context = {
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "form_administrative_criteria": form_administrative_criteria,
-        "job_seeker": job_seeker,
-        "cancel_url": cancel_url,
-        "matomo_custom_title": "Evaluation de la candidature",
-    } | extra_context
-    return render(request, template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["job_seeker"] = self.job_seeker
+        context["cancel_url"] = self.get_cancel_url()
+        context["matomo_custom_title"] = "Evaluation de la candidature"
+        return context
 
 
 def _geiq_eligibility(

@@ -821,27 +821,31 @@ def send_diagoriente_invite(request, job_application_id):
     return HttpResponseRedirect(redirect_url)
 
 
-@check_user(lambda user: user.is_employer)
-def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
-    """
-    Check eligibility (as an SIAE).
-    """
+class IAEEligibilityView(common_views.BaseIAEEligibilityView):
+    template_name = "apply/process_eligibility.html"
 
-    queryset = JobApplication.objects.is_active_company_member(request.user)
-    job_application = get_object_or_404(
-        queryset,
-        id=job_application_id,
-        state__in=JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
-    )
-    return common_views._eligibility(
-        request,
-        job_application.to_company,
-        job_application.job_seeker,
-        cancel_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
-        next_url=reverse("apply:accept", kwargs={"job_application_id": job_application.id}),
-        template_name=template_name,
-        extra_context={"job_application": job_application},
-    )
+    def setup(self, request, job_application_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        queryset = JobApplication.objects.is_active_company_member(request.user)
+        self.job_application = get_object_or_404(
+            queryset,
+            id=job_application_id,
+            state__in=JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
+        )
+        self.company = self.job_application.to_company
+        self.job_seeker = self.job_application.job_seeker
+
+    def get_success_url(self):
+        return reverse("apply:accept", kwargs={"job_application_id": self.job_application.id})
+
+    def get_cancel_url(self):
+        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["job_application"] = self.job_application
+        return context
 
 
 @check_user(lambda user: user.is_employer)
