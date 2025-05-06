@@ -223,6 +223,7 @@
     'group name=itou-admin-readonly created',
     'group name=pilotage-admin created',
     'group name=pilotage-admin-readonly created',
+    'group name=rdvi created',
     'All done!',
   ])
 # ---
@@ -266,6 +267,13 @@
     'view_prescribermembership',
     'view_prescriberorganization',
     'hijack_user',
+    'view_user',
+  ])
+# ---
+# name: test_command[rdvi]
+  list([
+    'view_company',
+    'view_companymembership',
     'view_user',
   ])
 # ---
