@@ -1420,7 +1420,7 @@ class TestProcessViews:
         }
         response = client.post(url, data=post_data)
         assert response.status_code == 200
-        assert response.context["form_administrative_criteria"].errors
+        assert response.context["form"].errors
 
         post_data = {
             # Administrative criteria level 1.

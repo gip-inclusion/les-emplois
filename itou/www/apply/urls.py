@@ -67,7 +67,7 @@ urlpatterns = [
     ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/eligibility",
-        submit_views.eligibility_for_hire,
+        submit_views.IAEEligibilityForHireView.as_view(),
         name="eligibility_for_hire",
     ),
     path(
@@ -134,7 +134,7 @@ urlpatterns = [
     ),
     path("<uuid:job_application_id>/siae/details", process_views.details_for_company, name="details_for_company"),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
-    path("<uuid:job_application_id>/siae/eligibility", process_views.eligibility, name="eligibility"),
+    path("<uuid:job_application_id>/siae/eligibility", process_views.IAEEligibilityView.as_view(), name="eligibility"),
     path("<uuid:job_application_id>/siae/geiq_eligibility", process_views.geiq_eligibility, name="geiq_eligibility"),
     path(
         "<uuid:job_application_id>/siae/geiq_eligibility_criteria",

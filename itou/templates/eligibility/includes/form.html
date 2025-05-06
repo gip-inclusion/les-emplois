@@ -15,21 +15,21 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form_errors form_administrative_criteria type="all" %}
+    {% bootstrap_form_errors form type="all" %}
 
     {% if request.user.is_employer %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
 
-    {% for field in form_administrative_criteria %}
-        {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+    {% for field in form %}
+        {% if form.LEVEL_1_PREFIX in field.name %}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
         {% endif %}
     {% endfor %}
 
     {% if request.user.is_employer %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
 
-    {% for field in form_administrative_criteria %}
-        {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+    {% for field in form %}
+        {% if form.LEVEL_2_PREFIX in field.name %}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
         {% endif %}
     {% endfor %}
 
