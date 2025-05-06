@@ -3,6 +3,7 @@ from django import forms
 from itou.companies.enums import CompanyKind
 from itou.eligibility import enums as eligibilty_enums
 from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.utils import iae_has_required_criteria
 
 
 class AdministrativeCriteriaForm(forms.Form):
@@ -61,23 +62,13 @@ class AdministrativeCriteriaForm(forms.Form):
         if self.is_authorized_prescriber or not self.siae:
             return selected_objects
 
-        level_1 = [
-            obj for obj in selected_objects if obj.level == eligibilty_enums.AdministrativeCriteriaLevel.LEVEL_1
-        ]
-        level_2 = [
-            obj for obj in selected_objects if obj.level == eligibilty_enums.AdministrativeCriteriaLevel.LEVEL_2
-        ]
-
-        # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
-        if self.siae.kind == CompanyKind.ETTI or self.siae.kind == CompanyKind.AI:
-            len_valid = len(level_1) or len(level_2) >= 2
-            if not len_valid:
-                raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER_ETTI_AI)
-        # Other: 1 criterion level 1 OR 3 level 2 criteria.
-        else:
-            len_valid = len(level_1) or len(level_2) >= 3
-            if not len_valid:
-                raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER)
+        if not iae_has_required_criteria(selected_objects, self.siae.kind):
+            message = (
+                self.ERROR_CRITERIA_NUMBER_ETTI_AI
+                if self.siae.kind in [CompanyKind.AI, CompanyKind.ETTI]
+                else self.ERROR_CRITERIA_NUMBER
+            )
+            raise forms.ValidationError(message)
 
         return selected_objects
 
@@ -90,8 +81,7 @@ class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
         self.job_application = job_application
 
         self.siae = siae
-        if self.siae.kind == CompanyKind.ETTI or self.siae.kind == CompanyKind.AI:
-            self.num_level2_admin_criteria = 2
-        else:
-            self.num_level2_admin_criteria = 3
+        self.num_level2_admin_criteria = eligibilty_enums.ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[
+            siae.kind
+        ]
         super().__init__(user, siae, **kwargs)
