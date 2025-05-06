@@ -202,6 +202,8 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         if administrative_criteria:
             result.administrative_criteria.set(administrative_criteria)
+            if any([criterion.is_certifiable for criterion in administrative_criteria]):
+                result.certify_criteria()
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
@@ -225,6 +227,8 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # - permission management is not handled by the model
         # - only administrative criteria are updatable
         diagnosis.administrative_criteria.set(administrative_criteria)
+        if any([criterion.is_certifiable for criterion in administrative_criteria]):
+            diagnosis.certify_criteria()
 
         return diagnosis
 
