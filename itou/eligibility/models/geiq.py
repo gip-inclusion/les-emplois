@@ -221,7 +221,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     @transaction.atomic()
     def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
         if not issubclass(diagnosis.__class__, cls):
-            raise ValueError("Le diagnositic fourni n'est pas un diagnostic GEIQ")
+            raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
 
         if not diagnosis.is_valid:
             raise ValueError("Impossible de modifier un diagnostic GEIQ expiré")
