@@ -236,7 +236,7 @@ class TestIAEEligibilityDetail:
     def test_nominal_case(self):
         # Eligibility diagnosis made by an employer and job application not sent by an authorized prescriber.
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
+            job_seeker__certifiable=True,
             from_employer=True,
             criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
         )
