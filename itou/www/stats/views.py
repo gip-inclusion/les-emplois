@@ -776,7 +776,7 @@ def stats_dihal_state(request):
     context = {
         "page_title": "Suivi des prescriptions des AHI",
     }
-    return render_stats(request=request, context=context, params=get_params_for_whole_country())
+    return render_stats(request=request, context=context)
 
 
 def stats_drihl_state(request):
