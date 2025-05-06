@@ -139,7 +139,7 @@ def test_create_eligibility_diagnosis_certify_certifiable_criteria(mocker, organ
 
 def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # Updating nothing
-    with pytest.raises(ValueError, match="Le diagnositic fourni n'est pas un diagnostic GEIQ"):
+    with pytest.raises(ValueError, match="Le diagnostic fourni n'est pas un diagnostic GEIQ"):
         GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
 
     # Trying to update an expired diagnosis
