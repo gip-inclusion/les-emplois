@@ -408,7 +408,8 @@
                  "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
                  "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
                  "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
-                 "siae_evaluations_evaluatedadministrativecriteria"."review_state"
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state",
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
           FROM "siae_evaluations_evaluatedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,

@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
+from itou.eligibility.utils import iae_has_required_criteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
@@ -293,6 +294,7 @@ class EvaluationCampaign(models.Model):
                                 uploaded_at=set_at,
                                 submitted_at=set_at,
                                 review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                                criteria_certified=True,
                             )
                         )
                         # TODO: Allow users to select more criteria when only a
@@ -706,6 +708,8 @@ class EvaluatedJobApplication(models.Model):
 
     def compute_state(self):
         def state_from(criteria):
+            if criteria.criteria_certified:
+                return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
             if criteria.proof_id is None:
                 return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
             if criteria.submitted_at is None:
@@ -747,8 +751,18 @@ class EvaluatedJobApplication(models.Model):
         )
         return not state_is_from_phase2
 
+    def accepted_from_certified_criteria(self):
+        certified_criteria = [
+            evaluated_crit.administrative_criteria
+            for evaluated_crit in self.evaluated_administrative_criteria.all()
+            if evaluated_crit.criteria_certified
+        ]
+        return iae_has_required_criteria(certified_criteria, self.evaluated_siae.siae.kind)
+
     @property
     def should_select_criteria(self):
+        if self.accepted_from_certified_criteria():
+            return False
         if not self.evaluated_siae.submission_freezed_at:
             state = self.compute_state()
             if state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
@@ -818,6 +832,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
         choices=evaluation_enums.EvaluatedAdministrativeCriteriaState.choices,
         default=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
     )
+    criteria_certified = models.BooleanField(db_default=False, verbose_name="certifié par un système de l’État")
 
     objects = EvaluatedAdministrativeCriteriaQuerySet.as_manager()
 
@@ -831,7 +846,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
         return f"{self.evaluated_job_application} - {self.administrative_criteria}"
 
     def can_upload(self):
-        if self.evaluated_job_application.evaluated_siae.submission_freezed_at:
+        if self.criteria_certified or self.evaluated_job_application.evaluated_siae.submission_freezed_at:
             return False
         if self.submitted_at is None:
             return True

@@ -27,7 +27,7 @@
                         </div>
                         <hr class="m-0">
                         <div class="c-box--results__body">
-                            {% if request.user.is_labor_inspector %}
+                            {% if request.user.is_labor_inspector and not evaluated_job_application.accepted_from_certified_criteria %}
                                 <p>
                                     Si vous estimez que certains critères ne sont pas nécessaires pour valider cette auto-prescription, <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" rel="noopener" target="_blank" aria-label="Contacter le support (ouverture dans un nouvel onglet)">veuillez contacter notre support technique.</a>
                                 </p>
@@ -59,8 +59,10 @@
                                     <ul class="list-unstyled">
                                         {% for evaluated_administrative_criteria in evaluated_job_application.evaluated_administrative_criteria.all %}
                                             <li>
-                                                {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state only %}
-                                                {% if evaluated_siae.evaluation_is_final %}
+                                                {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=evaluated_administrative_criteria.criteria_certified only %}
+                                                {% if evaluated_administrative_criteria.criteria_certified %}
+                                                    {# Nothing to do. #}
+                                                {% elif evaluated_siae.evaluation_is_final %}
                                                     <div class="text-md-end mt-2">
                                                         <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
                                                            rel="noopener"
@@ -82,7 +84,7 @@
                         </div>
                     </div>
                 </div>
-                {% if not evaluated_siae.evaluation_is_final %}
+                {% if not evaluated_siae.evaluation_is_final and not evaluated_job_application.accepted_from_certified_criteria %}
                     <div class="col-12 col-lg-8">
                         <div class="c-form my-3 my-md-4">
                             <form method="post" class="js-prevent-multiple-submit">

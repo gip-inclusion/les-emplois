@@ -906,6 +906,47 @@ class TestSiaeUploadDocsView:
         assert evaluated_administrative_criteria.uploaded_at == fake_now - relativedelta(days=1)
         assert evaluated_administrative_criteria.proof == proof
 
+    def test_with_certified_criteria(self, client):
+        job_seeker = JobSeekerFactory()
+        administrative_criteria = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker=job_seeker,
+            author=self.user,
+            author_organization=self.siae,
+            administrative_criteria=[administrative_criteria],
+        )
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            with_approval=True,
+            to_company=self.siae,
+            sender_company=self.siae,
+            eligibility_diagnosis=eligibility_diagnosis,
+            hiring_start_at=timezone.localdate() - relativedelta(months=2),
+        )
+        evaluation_campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now())
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=self.siae)
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            job_application=job_application,
+            evaluated_siae=evaluated_siae,
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            uploaded_at=timezone.now(),
+            submitted_at=timezone.now(),
+            criteria_certified=True,
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        client.force_login(self.user)
+        response = client.get(url)
+        assert response.status_code == 403
+        response = client.post(url)
+        assert response.status_code == 403
+
 
 class TestSiaeSubmitProofsView:
     def setup_method(self):
