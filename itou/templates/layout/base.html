@@ -37,6 +37,7 @@
         <link rel="stylesheet" href="{% static "vendor/easymde/easymde.min.css" %}">
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
         <link rel="stylesheet" href="{% static "css/itou.css" %}">
+        <link rel="stylesheet" href="{% static "css/breakpoint-override.css" %}">
         {% block extra_head %}{% endblock %}
     </head>
     <body class="{% if user.is_authenticated %}l-authenticated {% endif %}{% block body_class %}{% endblock %}">

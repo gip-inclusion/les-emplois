@@ -1,0 +1,61 @@
+.l-authenticated #offcanvasNav {
+  width: 260px;
+}
+
+/* Override for the offcanvas that should appear below md */
+@media (min-width: 768px) {
+  /* This makes the offcanvas visible as a sidebar on md and up */
+  #offcanvasNav.offcanvas {
+    visibility: visible !important;
+    transform: none !important;
+    position: fixed !important;
+    left: 0;
+    right: auto;
+    box-shadow: none;
+    background-color: #f8f8f8;
+    transition: none !important;
+  }
+
+  /* Hide the burger menu button on md and up */
+  .s-header__col--burger,
+  .s-header-authenticated__col--burger {
+    display: none !important;
+  }
+
+  /* Show desktop nav on md and up */
+  .s-header__col--nav,
+  .s-header-authenticated__col--nav {
+    display: flex !important;
+  }
+
+  /* Hide the authenticated header on md and up to match the existing behavior */
+  .s-header-authenticated {
+    display: none;
+  }
+}
+
+/* Fix authenticated layout with the offcanvas sidebar */
+@media (min-width: 768px) {
+  .l-authenticated .global-messages-container {
+    margin-left: 260px;
+  }
+
+  .l-authenticated > .s-main .container {
+    margin-left: 260px;
+    max-width: calc(100% - 260px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .l-authenticated #offcanvasNav {
+    width: 320px;
+  }
+  .l-authenticated .global-messages-container {
+    margin-left: 320px;
+  }
+  .l-authenticated > .s-main .container {
+    margin-left: 320px;
+    max-width: calc(100% - 320px);
+  }
+
+}
