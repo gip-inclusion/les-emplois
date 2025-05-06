@@ -172,6 +172,9 @@ class JobSeekerFactory(UserFactory):
     jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
     class Params:
+        certifiable = factory.Trait(
+            born_in_france=True,
+        )
         born_in_france = factory.Trait(
             jobseeker_profile__birth_place=factory.LazyAttribute(
                 lambda instance: Commune.objects.order_by("?")

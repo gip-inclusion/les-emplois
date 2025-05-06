@@ -21,6 +21,6 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 @pytest.mark.parametrize("factory", {IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory})
 def test_criteria_can_be_certified(factory, from_kind, criteria, expected):
     diagnosis = IAEEligibilityDiagnosisFactory(
-        job_seeker__born_in_france=True, criteria_kinds=[criteria], **{f"from_{from_kind}": True}
+        job_seeker__certifiable=True, criteria_kinds=[criteria], **{f"from_{from_kind}": True}
     )
     assert diagnosis.criteria_can_be_certified() == expected
