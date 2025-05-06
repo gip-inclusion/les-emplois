@@ -874,17 +874,14 @@ class GEIQEligibilityView(common_views.BaseGEIQEligibilityView):
         )
 
 
-@check_user(lambda user: user.is_employer)
-def geiq_eligibility_criteria(
-    request,
-    job_application_id,
-    template_name="apply/includes/geiq/check_geiq_eligibility_form.html",
-):
-    """Dynamic GEIQ eligibility criteria form (HTMX)"""
+class GEIQEligiblityCriteriaView(common_views.BaseGEIQEligibilityCriteriaHtmxView):
+    def setup(self, request, job_application_id, *args, **kwargs):
+        queryset = JobApplication.objects.is_active_company_member(request.user)
+        job_application = get_object_or_404(queryset, pk=job_application_id)
+        self.company = job_application.to_company
+        self.job_seeker = job_application.job_seeker
 
-    queryset = JobApplication.objects.is_active_company_member(request.user)
-    job_application = get_object_or_404(queryset, pk=job_application_id)
-    return common_views._geiq_eligibility_criteria(request, job_application.to_company, job_application.job_seeker)
+        return super().setup(request, *args, **kwargs)
 
 
 @require_POST

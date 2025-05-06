@@ -422,4 +422,4 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
             },
         )
         assert not job_application.job_seeker.geiq_eligibility_diagnoses.exists()
-        assert response.status_code == 403
+        assert response.status_code == 404
