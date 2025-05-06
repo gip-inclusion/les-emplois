@@ -18,6 +18,7 @@ from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record.models import EmployeeRecord
+from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications import notifications as job_application_notifications
 from itou.job_applications.enums import (
@@ -494,6 +495,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # The job seeker's resume used for this job application.
     # TODO: Remove the patchy code block of the `test_bucket` fixture when this field become a ForeignKey()
     resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
+    resume = models.OneToOneField(File, null=True, blank=True, verbose_name="CV", on_delete=models.RESTRICT)
 
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(
