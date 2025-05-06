@@ -206,7 +206,7 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             in form.fields.keys()
         )
 
-    @pytest.mark.parametrize("kind", CompanyKind)
+    @pytest.mark.parametrize("kind", CompanyKind.siae_kinds())
     def test_num_level2_admin_criteria(self, kind):
         company = CompanyFactory(kind=kind, with_membership=True)
         user = company.members.first()
