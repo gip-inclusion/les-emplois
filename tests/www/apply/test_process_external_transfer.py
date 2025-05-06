@@ -1,3 +1,4 @@
+import re
 import uuid
 from urllib.parse import quote
 
@@ -5,6 +6,7 @@ import pytest
 from django.conf import settings
 from django.core.files.storage import storages
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
@@ -385,9 +387,14 @@ def test_step_2_without_session(client):
     assert response.status_code == 404
 
 
-@freeze_time("2024-07-15 11:52:23")
-def test_step_3(client, snapshot):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True)
+@freeze_time()
+def test_step_3(client, snapshot, pdf_file):
+    job_application = JobApplicationFactory(
+        state=JobApplicationState.REFUSED,
+        for_snapshot=True,
+        resume__key="resume/old_file.pdf",
+        with_file=pdf_file,
+    )
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -408,7 +415,9 @@ def test_step_3(client, snapshot):
     response = client.get(transfer_step_3_url)
 
     assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
-    expected_message = f"Le 15/07/2024 à 11h52, Pierre DUPONT a écrit :\n\n{job_application.message}"
+    expected_message = (
+        f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, Pierre DUPONT a écrit :\n\n{job_application.message}"
+    )
     assert response.context["form"].initial["message"] == expected_message
 
     response = client.post(transfer_step_3_url, data={"message": expected_message, "keep_original_resume": "True"})
@@ -423,7 +432,8 @@ def test_step_3(client, snapshot):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.state == JobApplicationState.NEW
-    assert new_job_application.resume_link == job_application.resume_link
+    assert new_job_application.resume_link == storages["public"].url(new_job_application.resume.key)
+    assert re.match(r"resume/[-0-9a-z]*.pdf", new_job_application.resume.key)
 
     transfer_log = job_application.logs.last()
     assert transfer_log.transition == "external_transfer"
@@ -471,8 +481,9 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     assert new_job_application.sender == employer
     assert new_job_application.resume_link == (
         f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-        f"/resume/11111111-1111-1111-1111-111111111111.pdf"
+        "/resume/11111111-1111-1111-1111-111111111111.pdf"
     )
+    assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 
@@ -515,6 +526,7 @@ def test_step_3_remove_previous_CV(client):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.resume_link == ""
+    assert new_job_application.resume is None
     assert new_job_application.state == JobApplicationState.NEW
 
 
@@ -561,8 +573,9 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assert new_job_application.sender == employer
     assert new_job_application.resume_link == (
         f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-        f"/resume/11111111-1111-1111-1111-111111111111.pdf"
+        "/resume/11111111-1111-1111-1111-111111111111.pdf"
     )
+    assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 
@@ -580,7 +593,7 @@ def test_access_step_3_without_session(client):
     assert response.status_code == 404
 
 
-def test_full_process(client):
+def test_full_process(client, pdf_file):
     create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
     vannes = create_city_vannes()
     COMPANY_VANNES = "Entreprise Vannes"
@@ -591,6 +604,8 @@ def test_full_process(client):
         to_company__post_code="56760",
         to_company__coords=vannes.coords,
         to_company__city=vannes.name,
+        resume__key="resume/old_file.pdf",
+        with_file=pdf_file,
     )
     employer = job_application.to_company.members.get()
     client.force_login(employer)

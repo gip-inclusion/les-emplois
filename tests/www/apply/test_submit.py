@@ -709,6 +709,7 @@ class TestApplyAsJobSeeker:
             f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
+        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
 
@@ -1270,6 +1271,7 @@ class TestApplyAsAuthorizedPrescriber:
             job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
             f"{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
+        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
 
@@ -1619,6 +1621,7 @@ class TestApplyAsAuthorizedPrescriber:
             f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
+        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
 
@@ -2095,6 +2098,7 @@ class TestApplyAsPrescriber:
             f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
+        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
 
@@ -2672,6 +2676,7 @@ class TestApplyAsCompany:
             f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
+        assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
 
@@ -3162,6 +3167,7 @@ class TestDirectHireFullProcess:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+        assert job_application.resume is None
 
         # Get application detail
         # ----------------------------------------------------------------------
@@ -3321,6 +3327,7 @@ class TestDirectHireFullProcess:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+        assert job_application.resume is None
         assert job_application.qualification_type == QualificationType.STATE_DIPLOMA
         assert job_application.qualification_level == QualificationLevel.LEVEL_4
 
@@ -5511,6 +5518,7 @@ class TestHireConfirmation:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+        assert job_application.resume is None
 
     def test_cannot_hire_start_date_after_approval_expires(self, client):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -5597,6 +5605,7 @@ class TestHireConfirmation:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+        assert job_application.resume is None
 
     def test_as_geiq(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)
@@ -5652,6 +5661,7 @@ class TestHireConfirmation:
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+        assert job_application.resume is None
 
 
 class TestNewHireProcessInfo:
