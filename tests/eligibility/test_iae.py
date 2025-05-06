@@ -35,7 +35,7 @@ from tests.eligibility.factories import (
     IAEEligibilityDiagnosisFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -344,6 +344,30 @@ class TestEligibilityDiagnosisModel:
         assert criteria1 in administrative_criteria
         assert criteria2 in administrative_criteria
         assert criteria3 in administrative_criteria
+
+    @pytest.mark.parametrize("organization_factory", [CompanyFactory, PrescriberOrganizationFactory])
+    def test_create_diagnosis_certify_certifiable_criteria(self, mocker, organization_factory):
+        criterion = AdministrativeCriteria.objects.certifiable().order_by("?").first()
+        mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criterion.kind][ResponseKind.CERTIFIED],
+        )
+        organization = organization_factory(with_membership=True)
+
+        diagnosis = EligibilityDiagnosis.create_diagnosis(
+            JobSeekerFactory(certifiable=True),
+            author=organization.members.first(),
+            author_organization=organization,
+            administrative_criteria=[criterion],
+        )
+        assert (
+            diagnosis.selected_administrative_criteria.with_is_considered_certified(
+                hiring_start_at=timezone.localdate()
+            )
+            .get()
+            .is_considered_certified
+            is True
+        )
 
     @freeze_time("2024-12-03")
     def test_update_diagnosis(self):
