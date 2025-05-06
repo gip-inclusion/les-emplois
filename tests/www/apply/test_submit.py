@@ -5394,6 +5394,7 @@ class TestGEIQEligibilityForHire:
     def test_not_geiq(self, client):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assert response.status_code == 404
 
@@ -5402,6 +5403,7 @@ class TestGEIQEligibilityForHire:
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
         self.company = diagnosis.author_geiq
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
@@ -5409,6 +5411,7 @@ class TestGEIQEligibilityForHire:
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()
         client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         assertContains(response, "Eligibilité GEIQ")
