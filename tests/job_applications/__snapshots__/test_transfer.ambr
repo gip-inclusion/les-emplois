@@ -294,6 +294,7 @@
               "geiq_eligibility_diagnosis_id" = NULL,
               "create_employee_record" = %s,
               "resume_link" = %s,
+              "resume_id" = NULL,
               "sender_id" = %s,
               "sender_kind" = %s,
               "sender_company_id" = %s,

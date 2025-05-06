@@ -2131,6 +2131,7 @@ class TestJobApplicationAdminForm:
             "geiq_eligibility_diagnosis",
             "create_employee_record",
             "resume_link",
+            "resume",
             "sender",
             "sender_kind",
             "sender_company",
