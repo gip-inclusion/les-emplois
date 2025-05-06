@@ -217,45 +217,57 @@ class BaseIAEEligibilityView(UserPassesTestMixin, FormView):
         return context
 
 
-def _geiq_eligibility(
-    request, company, job_seeker, back_url, next_url, geiq_eligibility_criteria_url, template_name, extra_context
-):
-    # Check GEIQ eligibility during job application process
-    # Pass get_full_path to keep back/next_url query params
-    form = CheckJobSeekerGEIQEligibilityForm(hx_post_url=request.get_full_path(), data=request.POST or None)
-    geiq_criteria_form_url = add_url_params(
-        geiq_eligibility_criteria_url,
-        {
-            "back_url": back_url,
-            "next_url": next_url,
-        },
-    )
+class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
+    template_name = None
+    form_class = CheckJobSeekerGEIQEligibilityForm
 
-    if request.method == "POST" and form.is_valid():
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.company.kind != CompanyKind.GEIQ:
+            raise Http404()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["hx_post_url"] = self.request.get_full_path()
+        return kwargs
+
+    def get_next_url(self):
+        raise NotImplementedError
+
+    def get_back_url(self):
+        raise NotImplementedError
+
+    def get_success_url(self):
+        return add_url_params(
+            self.geiq_eligibility_criteria_url, {"back_url": self.get_back_url(), "next_url": self.get_next_url()}
+        )
+
+    def form_valid(self, form):
         if form.cleaned_data["choice"]:
-            return HttpResponseRedirect(geiq_criteria_form_url)
+            return super().form_valid(form)
         else:
             return render(
-                request,
+                self.request,
                 "apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
                 context={
-                    "next_url": next_url,
+                    "next_url": self.get_next_url(),
                     "progress": 66,
                 },
             )
 
-    context = {
-        "progress": 33,
-        "can_view_personal_information": True,
-        "job_seeker": job_seeker,
-        "siae": company,
-        "form": form,
-        "back_url": back_url,
-        "next_url": next_url,
-        "geiq_criteria_form_url": geiq_criteria_form_url,
-    } | extra_context
-
-    return render(request, template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["progress"] = 33
+        context["can_view_personal_information"] = True
+        context["job_seeker"] = self.job_seeker
+        context["siae"] = self.company
+        context["back_url"] = self.get_back_url()
+        context["next_url"] = self.get_next_url()
+        context["geiq_criteria_form_url"] = self.get_success_url()
+        return context
 
 
 # HTMX fragments

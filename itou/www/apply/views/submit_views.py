@@ -837,41 +837,39 @@ class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibi
         return context
 
 
-@check_user(lambda user: user.is_employer)
-def geiq_eligibility_for_hire(
-    request,
-    company_pk,
-    job_seeker_public_id,
-    template_name="apply/submit/geiq_eligibility_for_hire.html",
-):
-    company = get_object_or_404(
-        Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
-    )
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
-    next_url = reverse(
-        "apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
-    )
-    if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).exists():
-        return HttpResponseRedirect(next_url)
-    return common_views._geiq_eligibility(
-        request,
-        company,
-        job_seeker,
-        back_url=reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        ),
-        next_url=next_url,
-        geiq_eligibility_criteria_url=reverse(
+class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityView):
+    template_name = "apply/submit/geiq_eligibility_for_hire.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.geiq_eligibility_criteria_url = reverse(
             "apply:geiq_eligibility_criteria_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        ),
-        template_name=template_name,
-        extra_context={
-            "hire_process": True,
-            "is_subject_to_eligibility_rules": False,
-        },
-    )
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists():
+            return HttpResponseRedirect(self.get_next_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_next_url(self):
+        return reverse(
+            "apply:hire_confirmation",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def get_back_url(self):
+        return reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["hire_process"] = True
+        context["is_subject_to_eligibility_rules"] = False
+        return context
 
 
 @check_user(lambda user: user.is_employer)

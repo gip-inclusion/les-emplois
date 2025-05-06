@@ -848,29 +848,30 @@ class IAEEligibilityView(common_views.BaseIAEEligibilityView):
         return context
 
 
-@check_user(lambda user: user.is_employer)
-def geiq_eligibility(request, job_application_id, template_name="apply/process_geiq_eligibility.html"):
-    queryset = JobApplication.objects.is_active_company_member(request.user)
-    # Check GEIQ eligibility during job application process
-    job_application = get_object_or_404(queryset, pk=job_application_id)
-    back_url = get_safe_url(
-        request,
-        "back_url",
-        fallback_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-    )
-    next_url = get_safe_url(request, "next_url")
-    return common_views._geiq_eligibility(
-        request,
-        job_application.to_company,
-        job_application.job_seeker,
-        back_url=back_url,
-        next_url=next_url,
-        geiq_eligibility_criteria_url=reverse(
-            "apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}
-        ),
-        template_name=template_name,
-        extra_context={},
-    )
+class GEIQEligibilityView(common_views.BaseGEIQEligibilityView):
+    template_name = "apply/process_geiq_eligibility.html"
+
+    def setup(self, request, job_application_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        queryset = JobApplication.objects.is_active_company_member(request.user)
+        self.job_application = get_object_or_404(queryset, pk=job_application_id)
+        self.company = self.job_application.to_company
+        self.job_seeker = self.job_application.job_seeker
+
+        self.geiq_eligibility_criteria_url = reverse(
+            "apply:geiq_eligibility_criteria", kwargs={"job_application_id": self.job_application.pk}
+        )
+
+    def get_next_url(self):
+        return get_safe_url(self.request, "next_url")
+
+    def get_back_url(self):
+        return get_safe_url(
+            self.request,
+            "back_url",
+            fallback_url=reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
+        )
 
 
 @check_user(lambda user: user.is_employer)

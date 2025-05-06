@@ -413,7 +413,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
         client.force_login(job_application.job_seeker)
         response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))
-        assert response.status_code == 403
+        assert response.status_code == 404
         response = client.post(
             reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}),
             data={
