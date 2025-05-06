@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.core.files.storage import storages
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
@@ -737,8 +738,13 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
         new_job_application = super().form_valid()
         self.job_application.external_transfer(target_company=self.company, user=self.request.user)
         if self.form.cleaned_data.get("keep_original_resume"):
-            new_job_application.resume_link = self.job_application.resume_link
-            new_job_application.save(update_fields={"resume_link", "updated_at"})
+            if self.job_application.resume:
+                new_job_application.resume = self.job_application.resume.copy()
+                public_storage = storages["public"]
+                new_job_application.resume_link = public_storage.url(new_job_application.resume.key)
+            else:
+                new_job_application.resume_link = self.job_application.resume_link
+            new_job_application.save(update_fields={"resume_link", "resume", "updated_at"})
         return new_job_application
 
     def get_next_url(self, job_application):
