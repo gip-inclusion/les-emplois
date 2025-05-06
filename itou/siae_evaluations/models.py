@@ -724,16 +724,6 @@ class EvaluatedJobApplication(models.Model):
         )
         return not state_is_from_phase2
 
-    def compute_state_for_siae(self):
-        real_state = self.compute_state()
-        if self.hide_state_from_siae():
-            submitted_state = evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
-            real_state_priority = self.STATES_PRIORITY.index(real_state)
-            submitted_state_priority = self.STATES_PRIORITY.index(submitted_state)
-            if real_state_priority < submitted_state_priority:
-                return submitted_state
-        return real_state
-
     @property
     def should_select_criteria(self):
         if not self.evaluated_siae.submission_freezed_at:
