@@ -7,10 +7,11 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
@@ -36,6 +37,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelec
 from tests.files.factories import FileFactory
 from tests.institutions.factories import (
     InstitutionFactory,
+    InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
@@ -468,13 +470,15 @@ class TestEvaluationCampaignManager:
         with pytest.raises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
 
-    def test_populate_with_certified_job_applications(self):
+    def test_populate_job_application_certified(self):
         evaluation_campaign = EvaluationCampaignFactory()
         company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
         create_batch_of_job_applications(company)
         certified_job_app = JobApplication.objects.first()
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis_id=certified_job_app.eligibility_diagnosis_id,
+            administrative_criteria=rsa,
             certified=True,
         )
         now = timezone.now()
@@ -483,14 +487,69 @@ class TestEvaluationCampaignManager:
 
         assert now == evaluation_campaign.percent_set_at
         assert now == evaluation_campaign.evaluations_asked_at
-        [evaluated_siae] = EvaluatedSiae.objects.all()
-        [other_job_app] = EvaluatedJobApplication.objects.exclude(job_application=certified_job_app)
 
         criteria = EvaluatedAdministrativeCriteria.objects.get()
         assert criteria.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         assert criteria.uploaded_at == now
         assert criteria.submitted_at == now
         assert criteria.evaluated_job_application.job_application_id == certified_job_app.pk
+
+        evaluated_job_app = EvaluatedJobApplication.objects.get(job_application=certified_job_app)
+        assert evaluated_job_app.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+
+        evaluated_siae = evaluated_job_app.evaluated_siae
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.PENDING
+        assert evaluated_siae.reviewed_at is None
+        assert evaluated_siae.final_reviewed_at is None
+
+    def test_populate_all_job_applications_certified(self, django_capture_on_commit_callbacks, mailoutbox):
+        institution_membership = InstitutionMembershipFactory()
+        evaluation_campaign = EvaluationCampaignFactory(institution=institution_membership.institution)
+        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        create_batch_of_job_applications(company)
+        rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
+        certified_job_apps = JobApplication.objects.all()
+        for job_app in certified_job_apps:
+            IAESelectedAdministrativeCriteriaFactory(
+                eligibility_diagnosis_id=job_app.eligibility_diagnosis_id,
+                administrative_criteria=rsa,
+                certified=True,
+            )
+        now = timezone.now()
+        with django_capture_on_commit_callbacks(execute=True):
+            evaluation_campaign.populate(now)
+        evaluation_campaign.refresh_from_db()
+
+        assert now == evaluation_campaign.percent_set_at
+        assert now == evaluation_campaign.evaluations_asked_at
+
+        assertQuerySetEqual(
+            EvaluatedAdministrativeCriteria.objects.select_related("evaluated_job_application"),
+            [
+                (evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED, now, now, job_app.pk)
+                for job_app in certified_job_apps
+            ],
+            transform=lambda crit: (
+                crit.review_state,
+                crit.uploaded_at,
+                crit.submitted_at,
+                crit.evaluated_job_application.job_application_id,
+            ),
+            ordered=False,
+        )
+
+        for evaluated_job_app in EvaluatedJobApplication.objects.all():
+            assert evaluated_job_app.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+
+        evaluated_siae = evaluated_job_app.evaluated_siae
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        assert evaluated_siae.reviewed_at == now
+        assert evaluated_siae.final_reviewed_at == now
+        [email] = mailoutbox
+        assert email.subject == "[DEV] [Contrôle a posteriori] Ouverture de la phase de transmission des justificatifs"
+        assert email.to == [institution_membership.user.email]
 
     @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
