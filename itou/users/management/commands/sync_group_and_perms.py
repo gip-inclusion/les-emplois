@@ -127,6 +127,11 @@ def get_permissions_dict():
         "gps-admin-readonly": {**{model: PERMS_READ for model in group_gps_admin_permissions}},
         "pilotage-admin": {**group_pilotage_admin_permissions},
         "pilotage-admin-readonly": {**{model: PERMS_READ for model in group_pilotage_admin_permissions}},
+        "rdvi": {
+            companies_models.Company: PERMS_READ,
+            companies_models.CompanyMembership: PERMS_READ,
+            users_models.User: PERMS_READ,
+        },
     }
 
 
