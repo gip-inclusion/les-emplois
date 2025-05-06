@@ -539,17 +539,8 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
         )
 
     def dispatch(self, request, *args, **kwargs):
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-            not self.company.is_subject_to_eligibility_rules,
-            # Only "authorized prescribers" can perform an eligibility diagnosis.
-            not request.from_authorized_prescriber,
-            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
-            self.job_seeker.has_valid_approval,
-        ]
-        if any(bypass_eligibility_conditions):
+        if self.get_eligibility_step_url() is None:
             return HttpResponseRedirect(self.get_next_url())
-
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -621,10 +612,8 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
         )
 
     def dispatch(self, request, *args, **kwargs):
-        # GEIQ eligibility form during job application process is only available to authorized prescribers
-        if not request.from_authorized_prescriber:
+        if self.get_eligibility_step_url() is None:
             return HttpResponseRedirect(self.get_next_url())
-
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
