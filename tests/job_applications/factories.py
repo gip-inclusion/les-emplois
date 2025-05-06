@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
+from django.core.files.storage import storages
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
@@ -23,6 +24,7 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
+from tests.files.factories import FileFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiWithMembershipFactory,
@@ -113,7 +115,8 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
-    resume_link = "https://server.com/rockie-balboa.pdf"
+    resume = factory.SubFactory(FileFactory)
+    resume_link = factory.LazyAttribute(lambda o: storages["public"].url(o.resume.key) if o.resume else "")
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
     eligibility_diagnosis = factory.SubFactory(
@@ -151,6 +154,12 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                         company=self.to_company, appellation=job_description
                     )
                 self.selected_jobs.add(job_description)
+
+    @factory.post_generation
+    def with_file(self, create, extracted, **kwargs):
+        if create and extracted:
+            public_storage = storages["public"]
+            public_storage.save(self.resume.key, extracted)
 
 
 class PriorActionFactory(factory.django.DjangoModelFactory):

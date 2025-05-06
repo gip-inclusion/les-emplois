@@ -68,6 +68,7 @@ class TestApprovalsListView:
         # Create another job_application on the same approval / siae
         job_application = approval.jobapplication_set.get()
         job_application.pk = None
+        job_application.resume = None  # It's a OneToOneField
         job_application.save()
 
         employer = job_application.to_company.members.first()
