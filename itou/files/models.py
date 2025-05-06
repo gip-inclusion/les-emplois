@@ -1,3 +1,7 @@
+import pathlib
+import uuid
+
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 
@@ -15,3 +19,11 @@ class File(models.Model):
 
     class Meta:
         verbose_name = "fichier"
+
+    def copy(self):
+        """Return a new File with a copy of the file on the storage"""
+
+        new_key = str(pathlib.Path(self.key).with_stem(str(uuid.uuid4())))
+        with default_storage.open(self.key) as file:
+            default_storage.save(new_key, file)
+        return self.__class__.objects.create(key=new_key)
