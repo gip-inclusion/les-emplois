@@ -91,3 +91,9 @@ class TestCommuneModel:
 def test_department_code(insee_code, expected):
     commune = Commune(code=insee_code)
     assert commune.department_code == expected
+
+
+def test_manager():
+    Commune.objects.create(code="99999", start_date=datetime.date.min, name="Troufignoule-les-Oies", ignore=True)
+    assert Commune.objects.filter(code="99999").count() == 0
+    assert Commune.unfiltered_objects.filter(code="99999").count() == 1
