@@ -872,17 +872,8 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return context
 
 
-@check_user(lambda user: user.is_employer)
-def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
-    company = get_object_or_404(
-        Company.objects.filter(pk__in={org.pk for org in request.organizations}, kind=CompanyKind.GEIQ), pk=company_pk
-    )
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
-    return common_views._geiq_eligibility_criteria(
-        request,
-        company,
-        job_seeker,
-    )
+class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityCriteriaHtmxView):
+    pass
 
 
 @check_user(lambda user: user.is_employer)

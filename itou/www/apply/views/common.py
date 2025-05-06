@@ -270,47 +270,57 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
         return context
 
 
-# HTMX fragments
-
-
-def _geiq_eligibility_criteria(
-    request, company, job_seeker, template_name="apply/includes/geiq/check_geiq_eligibility_form.html"
-):
+class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
-    diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
-    form = GEIQAdministrativeCriteriaForGEIQForm(
-        company,
-        diagnosis.administrative_criteria.all() if diagnosis else [],
-        request.path,
-        data=request.POST or None,
-    )
-    next_url = get_safe_url(request, "next_url")
-    back_url = get_safe_url(request, "back_url")
-    allowance_amount = None
+    template_name = "apply/includes/geiq/check_geiq_eligibility_form.html"
+    form_class = GEIQAdministrativeCriteriaForGEIQForm
 
-    if request.method == "POST" and form.is_valid():
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).first()
+        self.next_url = get_safe_url(request, "next_url")
+        self.back_url = get_safe_url(request, "back_url")
+        self.allowance_amount = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.company.kind != CompanyKind.GEIQ:
+            raise Http404()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["company"] = self.company
+        form_kwargs["administrative_criteria"] = self.diagnosis.administrative_criteria.all() if self.diagnosis else []
+        form_kwargs["form_url"] = self.request.path
+        return form_kwargs
+
+    def form_valid(self, form):
         criteria = form.cleaned_data
-        if request.htmx:
-            allowance_amount = geiq_allowance_amount(request.from_authorized_prescriber, criteria)
+        if self.request.htmx:
+            self.allowance_amount = geiq_allowance_amount(self.request.from_authorized_prescriber, criteria)
+            return self.render_to_response(self.get_context_data(form=form))
+
+        if self.diagnosis:
+            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, criteria)
         else:
-            if diagnosis:
-                GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)
-            else:
-                GEIQEligibilityDiagnosis.create_eligibility_diagnosis(job_seeker, request.user, company, criteria)
+            GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
+                self.job_seeker, self.request.user, self.company, criteria
+            )
+        return HttpResponseRedirect(self.next_url)
 
-            return HttpResponseRedirect(next_url)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["allowance_amount"] = self.allowance_amount
+        context["progress"] = 66
+        context["back_url"] = self.back_url
 
-    context = {
-        "form": form,
-        "allowance_amount": allowance_amount,
-        "progress": 66,
-        "back_url": back_url,
-    }
-
-    geo_criteria_detected = job_seeker.address_in_qpv or job_seeker.zrr_city_name
-    context["geo_criteria_detected"] = geo_criteria_detected
-    if geo_criteria_detected:
-        context["job_seeker"] = job_seeker
-
-    return render(request, template_name, context)
+        geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
+        context["geo_criteria_detected"] = geo_criteria_detected
+        if geo_criteria_detected:
+            context["job_seeker"] = self.job_seeker
+        return context
