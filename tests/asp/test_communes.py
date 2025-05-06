@@ -1,6 +1,7 @@
 import datetime
 from collections import Counter
 
+import pytest
 from django.utils import timezone
 
 from itou.asp.models import Commune
@@ -75,3 +76,18 @@ class TestCommuneModel:
 
         for period in [new_commune.start_date, datetime.date(2022, 11, 28), timezone.localdate()]:
             assert Commune.objects.by_insee_code_and_period(99999, period) == new_commune
+
+
+@pytest.mark.parametrize(
+    "insee_code,expected",
+    [
+        ("13150", "013"),  # Tarascon dans les Bouches-du-Rhône
+        ("32389", "032"),  # Saint-Martin dans le Gers
+        ("97416", "974"),  # Saint-Pierre à La Réunion
+        ("97502", "975"),  # Saint-Pierre à Saint-Pierre-et-Miquelon
+        ("97127", "971"),  # Saint-Martin en Guadeloupe
+    ],
+)
+def test_department_code(insee_code, expected):
+    commune = Commune(code=insee_code)
+    assert commune.department_code == expected
