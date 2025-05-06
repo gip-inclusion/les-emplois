@@ -251,6 +251,9 @@ class RequireApplySessionMixin:
             "reset_url": self.get_reset_url(),
         }
 
+    def get_base_kwargs(self):
+        return {"company_pk": self.company.pk}
+
 
 class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
     def __init__(self):
@@ -316,7 +319,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         if self.company.kind == CompanyKind.GEIQ and self.request.from_authorized_prescriber:
             return reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
             )
         if self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
@@ -330,7 +333,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             if not any(bypass_eligibility_conditions):
                 return reverse(
                     "apply:application_eligibility",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
                 )
         return None
 
@@ -374,7 +377,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
             else "job_seekers_views:check_job_seeker_info"
         )
         return HttpResponseRedirect(
-            reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker_public_id})
+            reverse(view_name, kwargs=self.get_base_kwargs() | {"job_seeker_public_id": job_seeker_public_id})
         )
 
 
@@ -411,9 +414,7 @@ class CheckPreviousApplications(ApplicationBaseView):
             )
         else:
             view_name = "apply:application_jobs"
-        return reverse(
-            view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
-        )
+        return reverse(view_name, kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id})
 
     def get(self, request, *args, **kwargs):
         if not self.get_previous_applications_queryset().exists():
@@ -456,7 +457,7 @@ class ApplicationJobsView(ApplicationBaseView):
     def get_next_url(self):
         return self.get_eligibility_step_url() or reverse(
             "apply:application_resume",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def post(self, request, *args, **kwargs):
@@ -480,10 +481,7 @@ class CheckApplySessionMixin:
     def get_redirect_url(self):
         return reverse(
             "apply:application_jobs",
-            kwargs={
-                "company_pk": self.company.pk,
-                "job_seeker_public_id": self.job_seeker.public_id,
-            },
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -535,7 +533,7 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
     def get_next_url(self):
         return reverse(
             "apply:application_resume",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -570,7 +568,7 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
         context["job_seeker"] = self.job_seeker
         context["back_url"] = reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
         context["full_content_width"] = True
         if self.eligibility_diagnosis:
@@ -600,7 +598,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
             ),
             form_url=reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
             ),
             data=request.POST or None,
         )
@@ -608,7 +606,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
     def get_next_url(self):
         return reverse(
             "apply:application_resume",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -621,7 +619,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
         return super().get_context_data(**kwargs) | {
             "back_url": reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
             ),
             "form": self.form,
             "full_content_width": True,
@@ -739,7 +737,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
     def get_back_url(self):
         return self.get_eligibility_step_url() or reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get_context_data(self, **kwargs):
@@ -813,13 +811,13 @@ class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibi
     def get_success_url(self):
         return reverse(
             "apply:hire_confirmation",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get_cancel_url(self):
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get_context_data(self, **kwargs):
@@ -836,7 +834,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
 
         self.geiq_eligibility_criteria_url = reverse(
             "apply:geiq_eligibility_criteria_for_hire",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -847,13 +845,13 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
     def get_next_url(self):
         return reverse(
             "apply:hire_confirmation",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get_back_url(self):
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def get_context_data(self, **kwargs):
