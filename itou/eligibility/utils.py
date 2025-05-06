@@ -1,5 +1,16 @@
 from collections import Counter
 
+from itou.eligibility.enums import ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND, AdministrativeCriteriaLevel
+
+
+def iae_has_enough_criteria(criteria, company_kind):
+    level_2_count = 0
+    for criterion in criteria:
+        if criterion.level == AdministrativeCriteriaLevel.LEVEL_1:
+            return True
+        level_2_count += 1
+    return level_2_count >= ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[company_kind]
+
 
 def geiq_allowance_amount(is_authorized_prescriber, administrative_criteria) -> int:
     """Amount of granted allowance for job seeker.

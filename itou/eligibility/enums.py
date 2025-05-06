@@ -1,5 +1,6 @@
 from django.db import models
 
+from itou.companies.enums import CompanyKind
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 
 
@@ -18,6 +19,15 @@ class AdministrativeCriteriaLevel(models.TextChoices):
 class AdministrativeCriteriaLevelPrefix(models.TextChoices):
     LEVEL_1_PREFIX = "level_1_"
     LEVEL_2_PREFIX = "level_2_"
+
+
+ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND = {
+    CompanyKind.AI: 2,
+    CompanyKind.ETTI: 2,
+    CompanyKind.ACI: 3,
+    CompanyKind.EI: 3,
+    CompanyKind.EITI: 3,
+}
 
 
 class AuthorKind(models.TextChoices):
