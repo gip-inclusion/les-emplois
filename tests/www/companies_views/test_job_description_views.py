@@ -92,9 +92,9 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
     def setup_method(self):
         self.url = self.list_url + "?page=1"
 
-    def test_job_application_list_response_content(self, client, snapshot, subtests):
+    def test_response_content(self, client, snapshot, subtests):
         client.force_login(self.user)
-        with assertSnapshotQueries(snapshot(name="job applications list")):
+        with assertSnapshotQueries(snapshot(name="job descriptions list")):
             response = client.get(self.url)
 
         assert self.company.job_description_through.count() == 4
