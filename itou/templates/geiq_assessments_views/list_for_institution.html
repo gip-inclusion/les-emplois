@@ -20,7 +20,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12 col-lg-10">
                     {% if assessments %}
                         <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
                         <div class="table-responsive mt-3 mt-md-4">
@@ -28,7 +28,8 @@
                                 <caption class="visually-hidden">Liste des bilans d’exécution</caption>
                                 <thead>
                                     <tr>
-                                        <th scope="col">Nom</th>
+                                        <th scope="col">GEIQ</th>
+                                        <th scope="col">Structures</th>
                                         <th scope="col">Campagne</th>
                                         <th scope="col">Référent</th>
                                         <th scope="col">Statut du bilan</th>
@@ -46,6 +47,8 @@
                                                     {{ assessment.name_for_institution }}
 
                                                 </a>
+                                            </td>
+                                            <td>
                                                 <ul class="mb-0">
                                                     {% for antenna in assessment.label_antennas %}
                                                         <li>
