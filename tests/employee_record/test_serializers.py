@@ -132,12 +132,12 @@ class TestEmployeeRecordUpdateNotificationSerializer:
         assert data.get("mesure") == employee_record.asp_siae_type
         assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
 
-        personnal_data = data.get("personnePhysique")
+        personal_data = data.get("personnePhysique")
 
-        assert personnal_data is not None
-        assert personnal_data.get("passIae") == employee_record.approval_number
-        assert personnal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
-        assert personnal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
+        assert personal_data is not None
+        assert personal_data.get("passIae") == employee_record.approval_number
+        assert personal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
+        assert personal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
 
     def test_batch_serializer(self, subtests):
         # This is the same serializer used for employee record batches.

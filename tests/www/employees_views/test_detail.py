@@ -44,7 +44,7 @@ class TestEmployeeDetailView:
             from_employer=True, job_seeker=approval.user, author_siae=job_application.to_company
         )
 
-        # Another job applcation on the same SIAE, by a non authorized prescriber
+        # Another job application on the same SIAE, by a non authorized prescriber
         same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=job_application.job_seeker,
             to_company=job_application.to_company,

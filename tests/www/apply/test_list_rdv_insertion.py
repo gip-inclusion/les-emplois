@@ -193,7 +193,7 @@ class TestRdvInsertionDisplay:
         profile_login(profile, self.job_application)
 
         # Force job application transition logs creation
-        # This leads to duplicates on agregated results due to the join with transition logs
+        # This leads to duplicates on aggregated results due to the join with transition logs
         # Hence a subquery is required while last_change isn't persisted in a job application column
         self.job_application.process()
         self.job_application.accept(user=self.job_application.to_company.members.first())

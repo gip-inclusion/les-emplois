@@ -588,7 +588,7 @@ class TestJobApplicationQuerySet:
             job_app_with_future_hiring_start_at,
         }
 
-        # Test all disabling criterias
+        # Test all disabling criteria
         # ----------------------------
         def assert_job_app_not_in_queryset(ja):
             assert ja not in JobApplication.objects.eligible_as_employee_record(ja.to_company)

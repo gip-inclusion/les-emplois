@@ -61,10 +61,10 @@ esac
             break
         time.sleep(1)
     else:
-        sys.exit("No new deployment despite successfull push")
+        sys.exit("No new deployment despite successful push")
 
     if len(new_deployments) != 1:
-        print(f"Multiple new deployements - all bets are off: {new_deployments}")
+        print(f"Multiple new deployments - all bets are off: {new_deployments}")
 
     deployment_uid = new_deployments[0]["uuid"]
     print(f"Following deployment {deployment_uid}")
