@@ -33,37 +33,37 @@ from tests.users.factories import (
 
 
 class TestNotifyArchiveUsersManagementCommand:
-    @pytest.mark.parametrize("wet_run", [True, False])
     @pytest.mark.parametrize(
-        "kwargs, model",
+        "factory,kwargs",
         [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY},
-                "user",
                 id="jobseeker_to_notify",
             ),
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": timezone.now()},
-                "user",
                 id="notified_jobseeker_to_reset",
             ),
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
-                "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
         ],
     )
-    def test_dry_run(self, kwargs, model, wet_run):
-        jobseeker = JobSeekerFactory(**kwargs)
-        call_command("notify_archive_users", wet_run=wet_run)
+    def test_dry_run(self, factory, kwargs, django_capture_on_commit_callbacks, mailoutbox):
+        user = factory(**kwargs)
 
-        if not wet_run or model == "user":
-            assert jobseeker == User.objects.get()
-            assert not ArchivedJobSeeker.objects.exists()
-        elif model == "archived_jobseeker":
-            assert ArchivedJobSeeker.objects.count() == 1
-            assert not User.objects.exists()
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_users")
+
+        unmodified_user = User.objects.get()
+        assert user == unmodified_user
+        assert not mailoutbox
+        assert not ArchivedJobSeeker.objects.exists()
+        assert not ArchivedApplication.objects.exists()
 
     @pytest.mark.parametrize(
         "kwargs, model",
