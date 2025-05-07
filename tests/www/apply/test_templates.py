@@ -437,12 +437,11 @@ class TestCertifiedBadge:
     @pytest.mark.parametrize(
         "hiring_start_at,expected",
         [
-            (datetime.date(2024, 7, 31), False),  # Before validity period
-            (datetime.date(2024, 8, 1), True),  # Start of validity period
-            (datetime.date(2024, 11, 1), True),  # End of validity period
-            (datetime.date(2024, 1, 2), False),  # After validity period
+            pytest.param(datetime.date(2024, 7, 31), False, id="Before validity period"),
+            pytest.param(datetime.date(2024, 8, 1), True, id="Start of validity period"),
+            pytest.param(datetime.date(2024, 11, 1), True, id="End of validity period"),
+            pytest.param(datetime.date(2025, 11, 2), False, id="After validity period"),
         ],
-        ids=str,
     )
     def test_certifiable_diagnosis_with_certifiable_criteria(self, mocker, factory, hiring_start_at, expected):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
