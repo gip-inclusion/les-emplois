@@ -66,30 +66,38 @@ class TestNotifyArchiveUsersManagementCommand:
         assert not ArchivedApplication.objects.exists()
 
     @pytest.mark.parametrize(
-        "kwargs, model",
+        "factory,kwargs",
         [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY},
-                "user",
                 id="jobseeker_to_notify",
             ),
+        ],
+    )
+    def test_notify_batch_size(self, factory, kwargs):
+        factory.create_batch(3, **kwargs)
+        call_command("notify_archive_users", batch_size=2, wet_run=True)
+
+        assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
+        assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
+
+    @pytest.mark.parametrize(
+        "factory,kwargs",
+        [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
-                "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
         ],
     )
-    def test_batch_size(self, kwargs, model):
-        JobSeekerFactory.create_batch(3, **kwargs)
+    def test_archive_batch_size(self, factory, kwargs):
+        factory.create_batch(3, **kwargs)
         call_command("notify_archive_users", batch_size=2, wet_run=True)
 
-        if model == "user":
-            assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
-            assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
-        else:
-            assert ArchivedJobSeeker.objects.count() == 2
-            assert User.objects.count() == 1
+        assert ArchivedJobSeeker.objects.count() == 2
+        assert User.objects.count() == 1
 
     @pytest.mark.parametrize(
         "factory, related_object_factory, updated_notification_date",
