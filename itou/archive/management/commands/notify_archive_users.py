@@ -159,6 +159,31 @@ class Command(BaseCommand):
 
         logger.info("Notified inactive job seekers without recent activity: %s", len(users))
 
+    @transaction.atomic
+    def notify_inactive_professionals(self):
+        now = timezone.now()
+        inactive_since = now - INACTIVITY_PERIOD
+        self.logger.info("Notifying inactive professionals without activity before: %s", inactive_since)
+
+        users = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(),
+                upcoming_deletion_notified_at__isnull=True,
+                is_active=True,
+                last_login__lt=inactive_since,
+            )[: self.batch_size]
+        )
+
+        if self.wet_run:
+            for user in users:
+                InactiveUser(
+                    user,
+                    end_of_grace_period=now + GRACE_PERIOD,
+                ).send()
+            User.objects.filter(id__in=[user.id for user in users]).update(upcoming_deletion_notified_at=now)
+
+        logger.info("Notified inactive professionals without recent activity: %s", len(users))
+
     def reset_notified_jobseekers_with_recent_activity(self):
         self.logger.info("Reseting inactive job seekers with recent activity")
 
@@ -277,5 +302,8 @@ class Command(BaseCommand):
         self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
+
         self.notify_inactive_jobseekers()
+        self.notify_inactive_professionals()
+
         self.archive_jobseekers_after_grace_period()
