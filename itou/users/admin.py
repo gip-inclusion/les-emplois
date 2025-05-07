@@ -871,7 +871,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
 
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = [
+        return [
             "hexa_lane_type",
             "hexa_post_code",
             "hexa_commune",
@@ -880,9 +880,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             "disabled_notifications",
             "fields_history_formatted",
         ]
-        if obj:
-            readonly_fields.extend(obj.readonly_pii_fields())
-        return readonly_fields
 
     def get_search_fields(self, request):
         search_fields = []
