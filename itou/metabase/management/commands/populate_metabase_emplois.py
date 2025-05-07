@@ -446,9 +446,7 @@ class Command(BaseCommand):
         populate_table(evaluated_criteria.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_users(self):
-        queryset = User.objects.filter(
-            kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR], is_active=True
-        )
+        queryset = User.objects.filter(kind__in=UserKind.professionals(), is_active=True)
         populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_memberships(self):
