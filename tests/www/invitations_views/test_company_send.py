@@ -99,7 +99,7 @@ class TestSendSingleCompanyInvitation:
         user = JobSeekerFactory(**self.guest_data)
         client.force_login(self.sender)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
+        for kind in UserKind.professionals():
             user.kind = kind
             user.save()
             response = client.post(INVITATION_URL, data=self.post_data)
