@@ -20,7 +20,7 @@ from tests.utils.test import assertSnapshotQueries
 
 def test_transferable_states(subtests):
     # If job application is in ACCEPTED state
-    # it can't be transfered
+    # it can't be transferred
     evil_states = [JobApplicationState.ACCEPTED]
     good_states = [
         JobApplicationState.NEW,
