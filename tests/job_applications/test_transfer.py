@@ -88,7 +88,7 @@ def test_transfer():
         state=JobApplicationState.ACCEPTED,
     )
 
-    # Conditions hould be covered by previous test, but does not hurt (and tests raise)
+    # Conditions should be covered by previous test, but does not hurt (and tests raise)
     with pytest.raises(xworkflows.InvalidTransitionError):
         job_application.transfer(user=lambda_user, target_company=target_company)
     with pytest.raises(xworkflows.InvalidTransitionError):

@@ -214,8 +214,8 @@ def _compute_eligibility_fields(api_codes, code_to_criteria, support_days_nb):
                 raise ValueError(f"Unknown code: {unknown_code}")
 
     annex1_nb = annex2_level1_nb = annex2_level2_nb = 0
-    administrative_criterias = [code_to_criteria[code] for code in emplois_codes]
-    for criteria in administrative_criterias:
+    administrative_criteria = [code_to_criteria[code] for code in emplois_codes]
+    for criteria in administrative_criteria:
         if criteria.annex in (AdministrativeCriteriaAnnex.ANNEX_1, AdministrativeCriteriaAnnex.BOTH_ANNEXES):
             annex1_nb += 1
         if criteria.annex in (AdministrativeCriteriaAnnex.ANNEX_2, AdministrativeCriteriaAnnex.BOTH_ANNEXES):
@@ -228,7 +228,7 @@ def _compute_eligibility_fields(api_codes, code_to_criteria, support_days_nb):
         allowance_amount = 0
     else:
         allowance_amount = geiq_allowance_amount(
-            is_authorized_prescriber=authorized_prescriber, administrative_criteria=administrative_criterias
+            is_authorized_prescriber=authorized_prescriber, administrative_criteria=administrative_criteria
         )
 
     return {

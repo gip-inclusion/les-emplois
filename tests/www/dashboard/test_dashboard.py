@@ -415,7 +415,7 @@ class TestDashboardView:
             siae=membership.company,
             evaluation_campaign__evaluations_asked_at=timezone.now(),
         )
-        # Add jb applications and criterias to check for 1+N
+        # Add jb applications and criteria to check for 1+N
         evaluated_job_app_1 = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_1)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_1)

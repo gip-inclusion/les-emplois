@@ -142,7 +142,7 @@ def test_get_fields_to_transfer_for_job_seekers():
     # Check that all fields have been accounted for
     # If this test fails:
     # - either a new relation has been added
-    #   (and the dev must decide if it needs to be transfered or ignored in the transfer)
+    #   (and the dev must decide if it needs to be transferred or ignored in the transfer)
     # - either an existing relation has been dropped (and the relation can be removed from the relevant list)
     assert not fields_to_transfer & fields_to_ignore, fields_to_transfer & fields_to_ignore
     assert {f.name for f in relation_fields} == fields_to_transfer | fields_to_ignore
