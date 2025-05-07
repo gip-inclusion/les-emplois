@@ -339,9 +339,9 @@ class TestNotifyArchiveUsersManagementCommand:
             pytest.param(lambda user: CompanyMembershipFactory(updated_by=user), id="companymembership_updated_by"),
             pytest.param(lambda user: SiaeConventionFactory(reactivated_by=user), id="siae_convention_reactivated_by"),
             # TODO vincentporte, missing tested objects
-            # pytest.param(lambda user: IAEEligibilityDiagnosisFactory(author=user), id="eligibility_diagnosis_author"),
+            # pytest.param(lambda user: IAEEligibilityDiagnosisFactory(author=user), id="eligibility_diag_author"),
             # pytest.param(
-            #    lambda user: GEIQEligibilityDiagnosisFactory(author=user), id="geiq_eligibility_diagnosis_author"
+            #    lambda user: GEIQEligibilityDiagnosisFactory(author=user), id="geiq_eligibility_diag_author"
             # ),
             # pytest.param(
             #    lambda user: AdministrativeCriteriaFactory(created_by=user), id="administrative_criteria_created_by"
