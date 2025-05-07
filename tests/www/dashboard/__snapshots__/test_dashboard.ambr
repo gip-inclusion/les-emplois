@@ -634,7 +634,7 @@
   </div>
   
                               </form>
-                              <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
+                              <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
                                   
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
@@ -773,7 +773,7 @@
   </div>
   
                               </form>
-                              <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
+                              <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
                                   
                                       <div class="col mb-3 mb-md-5">
       <div class="c-box p-0 h-100">
