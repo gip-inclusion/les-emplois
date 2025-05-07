@@ -453,8 +453,7 @@ def edit_job_description_preview(
     job_description.company = request.current_organization
 
     if request.method == "POST":
-        if job_description.is_active:
-            job_description.last_employer_update_at = timezone.now()
+        job_description.last_employer_update_at = timezone.now()
         job_description.save()
         messages.success(request, "Fiche de poste enregistrée", extra_tags="toast")
         session_namespace.delete()

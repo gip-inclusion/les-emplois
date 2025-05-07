@@ -6,7 +6,7 @@
     {% url 'companies_views:job_description_refresh' job_description.pk as hx_post_url %}
 {% endif %}
 
-<form hx-post="{{ hx_post_url }}" hx-swap="{{ for_detail|yesno:'outerHTML,none' }}" class="{{ for_detail|yesno:',d-inline' }}">
+<form hx-post="{{ hx_post_url }}" hx-swap="outerHTML" class="{{ for_detail|yesno:',d-inline' }}">
     {% csrf_token %}
 
     <button type="submit" class="btn btn-sm btn-link p-0">
