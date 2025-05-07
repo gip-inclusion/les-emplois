@@ -185,7 +185,7 @@ class TestPoleEmploiConnect:
     def test_create_or_update_user_raise_invalid_kind_exception(self):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
+        for kind in UserKind.professionals():
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
 
             with pytest.raises(InvalidKindException):
@@ -306,7 +306,7 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
+        for kind in UserKind.professionals():
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
