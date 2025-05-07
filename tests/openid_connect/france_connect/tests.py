@@ -221,7 +221,7 @@ class TestFranceConnect:
     def test_create_or_update_user_raise_invalid_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
+        for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
 
             with pytest.raises(InvalidKindException):
@@ -285,7 +285,7 @@ class TestFranceConnect:
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
+        for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
