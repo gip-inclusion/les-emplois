@@ -369,6 +369,7 @@ class Command(BaseCommand):
                 "approval_id",
                 "approval_delivery_mode",
                 "contract_type",
+                "resume_link",
             )
             .exclude(origin=Origin.PE_APPROVAL)
             .filter(to_company_id__in=get_active_companies_pks())

@@ -486,6 +486,7 @@ def test_populate_job_applications():
         with_geiq_eligibility_diagnosis=True,
         contract_type=ContractType.APPRENTICESHIP,
         state=JobApplicationState.ACCEPTED,
+        resume_link="https://www.mikescerealshack.co/resume.pdf",
     )
     ja.selected_jobs.add(job)
 
@@ -538,6 +539,7 @@ def test_populate_job_applications():
                 0,
                 "",
                 ja.contract_type,
+                True,
                 datetime.date(2023, 2, 1),
             ),
         ]
