@@ -454,8 +454,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 readonly_fields.extend(["first_name", "last_name", "email"])
         if obj:
             readonly_fields.append("kind")  # kind is never editable, but still addable
-            if obj.kind == UserKind.JOB_SEEKER:
-                readonly_fields.extend(obj.jobseeker_profile.readonly_pii_fields())
         return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
