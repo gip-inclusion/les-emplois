@@ -724,7 +724,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
                 is_active=is_active,
                 last_employer_update_at=frozen_time().replace(tzinfo=datetime.UTC),
             )
-            initial_last_employer_update_at = job_description.last_employer_update_at
             session_data = client.session
             session_data[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
                 "pk": job_description.pk,
@@ -750,9 +749,7 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
             job_description.refresh_from_db()
             assert job_description.is_active == is_active
             assert job_description.updated_at == timezone.now()
-            assert job_description.last_employer_update_at == (
-                initial_last_employer_update_at + datetime.timedelta(seconds=int(is_active))
-            )
+            assert job_description.last_employer_update_at == timezone.now()
 
 
 # TODO(François): Drop next week.
