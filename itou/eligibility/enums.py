@@ -64,17 +64,44 @@ class AdministrativeCriteriaKind(models.TextChoices):
 
     @classmethod
     def common(cls):
-        return set(cls) - {
+        return {
+            cls.AAH,
+            cls.ASE,
+            cls.ASS,
+            cls.CAP_BEP,
+            cls.DELD,
+            cls.DETENTION_MJ,
+            cls.DETLD,
+            cls.FLE,
+            cls.JEUNE,
+            cls.PI,
+            cls.PM,
+            cls.PSH_PR,
+            cls.QPV,
+            cls.REF_DA,
+            cls.RSA,
+            cls.SENIOR,
+            cls.TH,
+            cls.ZRR,
+        }
+
+    @classmethod
+    def for_iae(cls):
+        return cls.common()
+
+    @classmethod
+    def for_geiq(cls):
+        return cls.common() | {
+            cls.AUTRE_MINIMA,
+            cls.DE_45,
+            cls.DELD_12,
+            cls.FT,
             cls.JEUNE_SQ,
             cls.MINIMA,
-            cls.DELD_12,
-            cls.DE_45,
             cls.RECONVERSION,
-            cls.SIAE_CUI,
             cls.RS_PS_DA,
-            cls.AUTRE_MINIMA,
-            cls.FT,
             cls.SANS_TRAVAIL_12,
+            cls.SIAE_CUI,
         }
 
 

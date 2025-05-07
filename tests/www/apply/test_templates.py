@@ -244,7 +244,7 @@ class TestIAEEligibilityDetail:
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker__certifiable=True,
             from_employer=True,
-            criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.common()))],
+            criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
         )
         criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
 
@@ -267,7 +267,7 @@ class TestIAEEligibilityDetail:
         # Diagnosis from prescriber but job application not sent by an authorized prescriber.
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker__certifiable=True,
-            criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.common()))],
+            criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
             from_prescriber=True,
         )
         criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
