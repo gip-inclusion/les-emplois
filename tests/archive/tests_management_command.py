@@ -6,7 +6,6 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -33,7 +32,7 @@ from tests.users.factories import (
 )
 
 
-class TestNotifyArchiveJobSeekersManagementCommand:
+class TestNotifyArchiveUsersManagementCommand:
     @pytest.mark.parametrize("wet_run", [True, False])
     @pytest.mark.parametrize(
         "kwargs, model",
@@ -57,7 +56,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
     )
     def test_dry_run(self, kwargs, model, wet_run):
         jobseeker = JobSeekerFactory(**kwargs)
-        call_command("notify_archive_jobseekers", wet_run=wet_run)
+        call_command("notify_archive_users", wet_run=wet_run)
 
         if not wet_run or model == "user":
             assert jobseeker == User.objects.get()
@@ -83,7 +82,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
     )
     def test_batch_size(self, kwargs, model):
         JobSeekerFactory.create_batch(3, **kwargs)
-        call_command("notify_archive_jobseekers", batch_size=2, wet_run=True)
+        call_command("notify_archive_users", batch_size=2, wet_run=True)
 
         if model == "user":
             assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
@@ -206,7 +205,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             related_object_factory(user)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is not None) == updated_notification_date
@@ -335,7 +334,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         if related_object_factory:
             related_object_factory(user)
 
-        call_command("notify_archive_jobseekers", wet_run=True)
+        call_command("notify_archive_users", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
@@ -375,7 +374,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
     )
     def test_exclude_users_when_archiving(self, user_factory):
         user = user_factory()
-        call_command("notify_archive_jobseekers", wet_run=True)
+        call_command("notify_archive_users", wet_run=True)
 
         expected_user = User.objects.get()
         assert user == expected_user
@@ -489,7 +488,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             )
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
@@ -538,7 +537,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         assert FollowUpGroupMembership.objects.exists()
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not FollowUpGroup.objects.exists()
@@ -666,7 +665,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             job_application.selected_jobs.set(selected_jobs)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         archived_application = ArchivedApplication.objects.all().values(
             "job_seeker_birth_year",
