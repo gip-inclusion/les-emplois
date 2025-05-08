@@ -180,6 +180,7 @@ class TestJobApplicationSearchApi:
                 sender_prescriber_organization__for_snapshot=True,
                 sender_prescriber_organization__membership__user__for_snapshot=True,
                 hired_job__for_snapshot=True,
+                resume_link="https://server.com/rockie-balboa.pdf",
             )
             job_application.selected_jobs.set({job_application.hired_job})
 
