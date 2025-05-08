@@ -23,6 +23,25 @@ class MemberInline(ReadonlyMixin, admin.TabularInline):
     show_change_link = True
 
 
+class ReasonStatusFilter(admin.SimpleListFilter):
+    title = "motif de suivi"
+    parameter_name = "has_reason"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Renseigné"),
+            ("no", "Non renseigné"),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.exclude(reason="")
+        if value == "no":
+            return queryset.filter(reason="")
+        return queryset
+
+
 @admin.register(models.FollowUpGroupMembership)
 class FollowUpGroupMembershipAdmin(ItouModelAdmin):
     list_display = (
@@ -38,6 +57,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "is_referent_certified",
         "is_referent",
         "created_in_bulk",
+        ReasonStatusFilter,
     )
     raw_id_fields = ("follow_up_group", "member")
     fields = (

@@ -75,3 +75,25 @@ def test_create_follow_up_membership(admin_client):
     assertContains(
         response, "Un objet Relation avec ces champs Groupe de suivi et Membre du groupe de suivi existe déjà."
     )
+
+
+def test_reason_status_filter(admin_client):
+    group = FollowUpGroupFactory()
+    membership_with_reason = FollowUpGroupMembershipFactory(
+        follow_up_group=group,
+        reason="This is a reason",
+    )
+    membership_without_reason = FollowUpGroupMembershipFactory(
+        follow_up_group=group,
+        reason="",
+    )
+
+    membership_admin_url = reverse("admin:gps_followupgroupmembership_changelist")
+
+    response = admin_client.get(membership_admin_url + "?has_reason=yes")
+    assertContains(response, str(membership_with_reason.pk))
+    assert str(membership_without_reason.pk) not in response.content.decode()
+
+    response = admin_client.get(membership_admin_url + "?has_reason=no")
+    assertContains(response, str(membership_without_reason.pk))
+    assert str(membership_with_reason.pk) not in response.content.decode()
