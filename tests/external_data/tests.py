@@ -184,7 +184,7 @@ class TestJobSeekerExternalData:
         assert 7 + 1 == len(report.get("fields_updated"))  # fields + history
         assert 12 == len(report.get("fields_fetched"))
 
-        # Just checking birthdate is not overriden
+        # Just checking birthdate is not overridden
         user = JobSeekerFactory()
         birthdate = user.jobseeker_profile.birthdate
 

@@ -43,10 +43,10 @@ class TestJobSeekerSignup:
         response = client.get(situation_url)
         signup_url = reverse("signup:job_seeker")
         assertContains(response, signup_url)
-        criterias_url = reverse("signup:job_seeker_criteria")
-        assertContains(response, criterias_url)
+        criteria_url = reverse("signup:job_seeker_criteria")
+        assertContains(response, criteria_url)
 
-        response = client.get(criterias_url)
+        response = client.get(criteria_url)
         assert response.status_code == 200
 
     def _test_job_seeker_signup_forms(self, client, nir, **extra_signup_kwargs):

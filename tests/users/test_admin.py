@@ -1,17 +1,13 @@
-from datetime import date
-
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.asp.models import Country
 from itou.users import admin
-from itou.users.enums import IdentityCertificationAuthorities, Title
+from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
-from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -80,60 +76,6 @@ def test_filter():
     }
 
 
-def test_readonly_fields_for_certified_job_seekers(admin_client):
-    danemark = Country.objects.get(name="DANEMARK")
-    job_seeker = JobSeekerFactory(
-        title=Title.M,
-        first_name="Arthur",
-        last_name="Dupond",
-        jobseeker_profile__birthdate=date(1978, 1, 1),
-        jobseeker_profile__birth_country=danemark,
-    )
-    IAESelectedAdministrativeCriteriaFactory(certified=True, eligibility_diagnosis__job_seeker=job_seeker)
-    ro_template = """
-    <div class="flex-container">
-        <label>{field} :</label>
-        <div class="readonly">{value}</div>
-    </div>
-    """
-
-    response = admin_client.get(
-        reverse(
-            "admin:users_user_change",
-            kwargs={"object_id": job_seeker.pk},
-        )
-    )
-    for field, value in [
-        ("Prénom", "Arthur"),
-        ("Nom", "Dupond"),
-        ("Civilité", "Monsieur"),
-    ]:
-        assertContains(
-            response,
-            ro_template.format(field=field, value=value),
-            html=True,
-            count=1,
-        )
-
-    response = admin_client.get(
-        reverse(
-            "admin:users_jobseekerprofile_change",
-            kwargs={"object_id": job_seeker.jobseeker_profile.pk},
-        )
-    )
-    danemark_url = reverse("admin:asp_country_change", kwargs={"object_id": danemark.pk})
-    for field, value in [
-        ("Date de naissance", "1 janvier 1978"),
-        ("Pays de naissance", f'<a href="{danemark_url}">DANEMARK</a>'),
-    ]:
-        assertContains(
-            response,
-            ro_template.format(field=field, value=value),
-            html=True,
-            count=1,
-        )
-
-
 def test_get_fields_to_transfer_for_job_seekers():
     # Get list of fields pointing to the User models
     relation_fields = {field for field in User._meta.get_fields() if field.is_relation and not field.many_to_one}
@@ -200,7 +142,7 @@ def test_get_fields_to_transfer_for_job_seekers():
     # Check that all fields have been accounted for
     # If this test fails:
     # - either a new relation has been added
-    #   (and the dev must decide if it needs to be transfered or ignored in the transfer)
+    #   (and the dev must decide if it needs to be transferred or ignored in the transfer)
     # - either an existing relation has been dropped (and the relation can be removed from the relevant list)
     assert not fields_to_transfer & fields_to_ignore, fields_to_transfer & fields_to_ignore
     assert {f.name for f in relation_fields} == fields_to_transfer | fields_to_ignore

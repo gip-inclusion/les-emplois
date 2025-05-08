@@ -65,7 +65,7 @@ def test_init_geiq_administrative_criteria_form_fields_with_parent(new_geiq, cri
         assert form.is_valid()
         assert [criterion.parent.key, criterion.key] == list(map(lambda x: x.key, form.cleaned_data))
 
-    # Check akward case of "pole_emploi_related" field: result of foldable radio set
+    # Check awkward case of "pole_emploi_related" field: result of foldable radio set
     for criterion in criteria_in_radio:
         form = GEIQAdministrativeCriteriaForm(
             new_geiq, (), form_url=_FAKER.url(), data={"pole_emploi_related": criterion.pk}

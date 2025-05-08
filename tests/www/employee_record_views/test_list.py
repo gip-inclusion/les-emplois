@@ -61,7 +61,7 @@ class TestListEmployeeRecords:
 
     def test_new_employee_records_list(self, client):
         """
-        Check if previous_step and back_url parmaeters are where we need them
+        Check if previous_step and back_url parameters are where we need them
         """
         record = employee_record_factories.EmployeeRecordWithProfileFactory(
             job_application__to_company=self.company,

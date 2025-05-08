@@ -469,13 +469,11 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     @staticmethod
     def siret_from_asp_source(siae):
         """
-        Fetch SIRET number of ASP source structure ("mother" SIAE)
+        Fetch SIRET number of authoritative SIAE from ASP source
         """
-        if siae.source != Company.SOURCE_ASP:
-            main_siae = Company.objects.get(convention=siae.convention, source=Company.SOURCE_ASP)
-            return main_siae.siret
-
-        return siae.siret
+        if siae.canonical_company.source == Company.SOURCE_ASP:
+            return siae.canonical_company.siret
+        raise ValidationError("Could not find authoritative SIAE from ASP source")
 
     @classmethod
     def from_job_application(cls, job_application, clean=True):

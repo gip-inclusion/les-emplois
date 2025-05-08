@@ -972,7 +972,7 @@ class TestBatchRefuse:
         response = client.get(prescriber_answer_url)
         assertRedirects(response, job_seeker_answer_url, fetch_redirect_response=False)
 
-    def test_single_app_transfered_concurrently(self, client):
+    def test_single_app_transferred_concurrently(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
@@ -1077,7 +1077,7 @@ class TestBatchRefuse:
         response = client.get(refusal_reason_url)
         assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
-        # One of the application is removed (or transfered)
+        # One of the application is removed (or transferred)
         refusable_apps[0].delete()
 
         post_data = {
@@ -1300,7 +1300,7 @@ class TestBatchTransfer:
             ],
         )
 
-    def test_already_transfered(self, client):
+    def test_already_transferred(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         other_company = CompanyMembershipFactory(user=employer).company
@@ -1358,7 +1358,7 @@ class TestBatchTransfer:
                 to_company=company,
                 state=JobApplicationState.ACCEPTED,
             ),
-            # 1 already transfered application:
+            # 1 already transferred application:
             JobApplicationFactory(
                 job_seeker__first_name="Jean",
                 job_seeker__last_name="Bond",
@@ -1378,7 +1378,7 @@ class TestBatchTransfer:
             },
         )
         assertRedirects(response, next_url)
-        # 2 transferable apps have been successfully transfered despite all the error messages
+        # 2 transferable apps have been successfully transferred despite all the error messages
         apps[0].refresh_from_db()
         assert apps[0].to_company == other_company
         apps[1].refresh_from_db()

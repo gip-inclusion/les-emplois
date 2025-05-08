@@ -1,6 +1,3 @@
-from django.conf import settings
-
-from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -57,22 +54,14 @@ TABLE.add_columns(
             "name": "convergence_france",
             "type": "boolean",
             "comment": "Convergence France (contrats PHC et CVG)",
-            "fn": lambda o: o.kind == CompanyKind.ACI and o.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST,
+            "fn": lambda o: o.is_aci_convergence,
         },
     ]
 )
 
-
-def get_parent_company(company):
-    if company.convention_id and company.source == Company.SOURCE_USER_CREATED:
-        # NOTE: siae.convention.siaes should absolutely be prefetched !
-        for convention_siae in company.convention.siaes.all():
-            if convention_siae.source == Company.SOURCE_ASP:
-                return convention_siae
-    return company
-
-
-TABLE.add_columns(get_address_columns(comment_suffix=" de la structure mère", custom_fn=get_parent_company))
+TABLE.add_columns(
+    get_address_columns(comment_suffix=" de la structure mère", custom_fn=(lambda o: o.canonical_company))
+)
 TABLE.add_columns(get_address_columns(name_suffix="_c1", comment_suffix=" de la structure C1"))
 
 TABLE.add_columns(

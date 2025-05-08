@@ -377,6 +377,20 @@ class CommuneQuerySet(PeriodQuerySet):
         )
 
 
+class UnfilteredCommuneManager(models.Manager.from_queryset(CommuneQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+
+class CommuneManager(models.Manager.from_queryset(CommuneQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(ignore=True)
+
+
 class Commune(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE commune
@@ -410,8 +424,10 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     # What does it mean ? When we autocomplete for an address on the BAN, in 100% of the cases we'll have
     # an INSEE City, thus an ASP Commune and it can be safely used for the employee records.
     city = models.ForeignKey("cities.City", on_delete=models.SET_NULL, verbose_name="ville INSEE", null=True)
+    ignore = models.BooleanField(verbose_name="commune désactivée", default=False, db_default=False)
 
-    objects = CommuneQuerySet.as_manager()
+    objects = CommuneManager()
+    unfiltered_objects = UnfilteredCommuneManager()
 
     class Meta(AbstractPeriod.Meta):
         verbose_name = "commune"

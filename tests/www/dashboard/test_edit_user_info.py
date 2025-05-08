@@ -645,7 +645,7 @@ class TestEditUserInfoView:
         assert user.phone == post_data["phone"]
         self._test_address_autocomplete(user=user, post_data=post_data)
 
-        # Ensure that the job seeker cannot update data retreived from the SSO here.
+        # Ensure that the job seeker cannot update data retrieved from the SSO here.
         assert user.first_name != post_data["first_name"]
         assert user.last_name != post_data["last_name"]
         assert user.jobseeker_profile.birthdate != birthdate

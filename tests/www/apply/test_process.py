@@ -499,7 +499,7 @@ class TestProcessViews:
         assert response.status_code == 200
 
     def test_details_for_unauthorized_prescriber(self, client):
-        """As an unauthorized prescriber I cannot access personnal information of arbitrary job seekers"""
+        """As an unauthorized prescriber I cannot access personal information of arbitrary job seekers"""
         prescriber = PrescriberFactory()
         job_application = JobApplicationFactory(
             job_seeker__first_name="Supersecretname",
@@ -1260,7 +1260,7 @@ class TestProcessViews:
             "apply:batch_refuse_steps", kwargs={"session_uuid": refuse_session_name, "step": "job-seeker-answer"}
         )
         response = client.get(job_seeker_answer_url)
-        # Trying to acess step 2 without providing data for step 1 redirects to step 1
+        # Trying to access step 2 without providing data for step 1 redirects to step 1
         assertRedirects(response, refusal_reason_url)
 
     def test_postpone_from_prescriber(self, client, snapshot, mailoutbox, subtests):

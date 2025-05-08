@@ -20,7 +20,7 @@ from tests.utils.test import assertSnapshotQueries
 
 def test_transferable_states(subtests):
     # If job application is in ACCEPTED state
-    # it can't be transfered
+    # it can't be transferred
     evil_states = [JobApplicationState.ACCEPTED]
     good_states = [
         JobApplicationState.NEW,
@@ -88,7 +88,7 @@ def test_transfer():
         state=JobApplicationState.ACCEPTED,
     )
 
-    # Conditions hould be covered by previous test, but does not hurt (and tests raise)
+    # Conditions should be covered by previous test, but does not hurt (and tests raise)
     with pytest.raises(xworkflows.InvalidTransitionError):
         job_application.transfer(user=lambda_user, target_company=target_company)
     with pytest.raises(xworkflows.InvalidTransitionError):

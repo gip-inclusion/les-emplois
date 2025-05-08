@@ -1065,7 +1065,7 @@ def test_list_for_siae_actions_forced_refresh(client):
     assert not response.headers.get("HX-Refresh")
     response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": [job_application.pk]})
     assert not response.headers.get("HX-Refresh")
-    # If the user checks an application, that either doesn't exist anymore or was transfered to another company
+    # If the user checks an application, that either doesn't exist anymore or was transferred to another company
     # a forced refresh should occur
     response = client.get(reverse("apply:list_for_siae_actions"), {"selected-application": [str(uuid.uuid4())]})
     assert response.headers.get("HX-Refresh") == "true"

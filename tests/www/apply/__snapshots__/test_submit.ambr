@@ -1319,7 +1319,8 @@
                  "asp_commune"."name",
                  "asp_commune"."normalized_name",
                  "asp_commune"."created_at",
-                 "asp_commune"."city_id"
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
           FROM "asp_commune"
           WHERE "asp_commune"."id" = %s
           LIMIT 21
@@ -1503,9 +1504,11 @@
                  "asp_commune"."name",
                  "asp_commune"."normalized_name",
                  "asp_commune"."created_at",
-                 "asp_commune"."city_id"
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
           FROM "asp_commune"
-          WHERE "asp_commune"."id" IN (%s)
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
           ORDER BY RANDOM() ASC
         ''',
       }),

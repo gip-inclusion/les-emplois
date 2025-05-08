@@ -390,11 +390,11 @@ def transfer(request):
         pk=request.POST.get("target_company_id"),
     )
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
-    transfered_ids = []
+    transferred_ids = []
     for job_application in applications:
         try:
             job_application.transfer(user=request.user, target_company=target_company)
-            transfered_ids.append(job_application.pk)
+            transferred_ids.append(job_application.pk)
         except (ValidationError, xwf_models.InvalidTransitionError):
             error_msg = f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être transférée"
             if not job_application.transfer.is_available():
@@ -403,15 +403,15 @@ def transfer(request):
                 error_msg += "."
             messages.error(request, error_msg, extra_tags="toast")
 
-    transfered_nb = len(transfered_ids)
-    if transfered_nb > 1:
-        messages.success(request, f"{transfered_nb} candidatures ont bien été transférées.", extra_tags="toast")
-    elif transfered_nb == 1:
+    transferred_nb = len(transferred_ids)
+    if transferred_nb > 1:
+        messages.success(request, f"{transferred_nb} candidatures ont bien été transférées.", extra_tags="toast")
+    elif transferred_nb == 1:
         messages.success(request, "1 candidature a bien été transférée.", extra_tags="toast")
     logger.info(
-        "user=%s batch transfered %s applications: %s",
+        "user=%s batch transferred %s applications: %s",
         request.user.pk,
-        transfered_nb,
-        ",".join(str(app_uid) for app_uid in transfered_ids),
+        transferred_nb,
+        ",".join(str(app_uid) for app_uid in transferred_ids),
     )
     return HttpResponseRedirect(next_url)

@@ -156,7 +156,7 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
         with django_capture_on_commit_callbacks(execute=True):
             command.handle(command="email_reminder", wet_run=True)
 
-    assert len(mailoutbox) == 11  # prolongation_request.validated_by and 10 collegues
+    assert len(mailoutbox) == 11  # prolongation_request.validated_by and 10 coworkers
 
     assert set(email.to[0] for email in mailoutbox) == {prolongation_request.validated_by.email} | {
         member.email for member in admin_prescribers

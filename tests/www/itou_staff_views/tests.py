@@ -391,7 +391,7 @@ class TestMergeUsers:
         assert not User.objects.filter(pk=prescriber_2.pk).exists()
 
     @freeze_time("2024-11-19")
-    def test_merge_personnal_data(self, client, caplog):
+    def test_merge_personal_data(self, client, caplog):
         prescriber_1 = PrescriberFactory()
         prescriber_2 = PrescriberFactory()
 

@@ -241,7 +241,7 @@ METABASE_DASHBOARDS = {
     # Institution stats - DIHAL - nation level.
     #
     "stats_dihal_state": {
-        "dashboard_id": 310,
+        "dashboard_id": 549,
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
     },

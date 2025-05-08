@@ -454,8 +454,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 readonly_fields.extend(["first_name", "last_name", "email"])
         if obj:
             readonly_fields.append("kind")  # kind is never editable, but still addable
-            if obj.kind == UserKind.JOB_SEEKER:
-                readonly_fields.extend(obj.jobseeker_profile.readonly_pii_fields())
         return readonly_fields
 
     def get_fieldsets(self, request, obj=None):
@@ -636,21 +634,21 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 fields_choices=sorted(fields_choices, key=lambda field: field[1]), data=request.POST or None
             )
             if request.POST and form.is_valid():
-                items_transfered = []
+                transferred_items = []
                 for field_name in form.cleaned_data["fields_to_transfer"]:
                     field = transfer_fields[field_name]
                     for item in transfer_data[field_name]["from"]:
                         setattr(item, field.remote_field.name, to_user)
                         item.save()
-                        items_transfered.append((transfer_data[field_name]["title"], item))
-                if items_transfered:
+                        transferred_items.append((transfer_data[field_name]["title"], item))
+                if transferred_items:
                     summary_text = "\n".join(
                         [
                             "-" * 20,
                             f"Transfert du {timezone.now():%Y-%m-%d %H:%M:%S} effectué par {request.user} ",
                             f"de l'utilisateur {from_user.pk} vers {to_user.pk}:",
                         ]
-                        + [f"- {item_title} {item} transféré " for item_title, item in items_transfered]
+                        + [f"- {item_title} {item} transféré " for item_title, item in transferred_items]
                         + ["-" * 20]
                     )
                     add_support_remark_to_obj(from_user, summary_text)
@@ -873,7 +871,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
 
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = [
+        return [
             "hexa_lane_type",
             "hexa_post_code",
             "hexa_commune",
@@ -882,9 +880,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             "disabled_notifications",
             "fields_history_formatted",
         ]
-        if obj:
-            readonly_fields.extend(obj.readonly_pii_fields())
-        return readonly_fields
 
     def get_search_fields(self, request):
         search_fields = []

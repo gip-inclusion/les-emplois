@@ -378,12 +378,12 @@ class EvaluationCampaign(models.Model):
             emails = []
             for evaluated_siae in evaluated_siaes:
                 if evaluated_siae.final_reviewed_at is None:
-                    criterias = [
+                    criteria = [
                         crit
                         for jobapp in evaluated_siae.evaluated_job_applications.all()
                         for crit in jobapp.evaluated_administrative_criteria.all()
                     ]
-                    if len(criterias) == 0 or any(crit.submitted_at is None for crit in criterias):
+                    if len(criteria) == 0 or any(crit.submitted_at is None for crit in criteria):
                         siae_without_proofs.append(evaluated_siae)
                         has_siae_to_notify = True
 

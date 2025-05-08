@@ -35,7 +35,7 @@ class TestApprovalProlongation:
             yield
 
     def _setup_with_company_kind(self, siae_kind: CompanyKind):
-        # freeze_time does not wotk inside factories
+        # freeze_time does not work inside factories
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
             with_approval=True,

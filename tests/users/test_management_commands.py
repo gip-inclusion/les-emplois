@@ -1513,7 +1513,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         self.labor_inspector_1.institution.created_at -= relativedelta(months=3)
         self.labor_inspector_1.institution.save(update_fields=["created_at", "updated_at"])
 
-        # Create other insitution the user was once a member of
+        # Create other institution the user was once a member of
         DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)
         institution_2 = InstitutionFactory(name="Institution 2", created_at=DT_3_MONTHS_AGO)
         InstitutionMembershipFactory(
