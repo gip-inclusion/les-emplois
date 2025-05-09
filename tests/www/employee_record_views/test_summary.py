@@ -67,33 +67,8 @@ class TestSummaryEmployeeRecords:
         assertContains(response, format_siret(self.employee_record.siret))
         assertContains(response, self.employee_record.asp_measure)
 
-    @freeze_time("2025-04-29 11:11:11")
-    @pytest.mark.parametrize(
-        "status,has_siret_changed",
-        [
-            (Status.NEW, False),
-            (Status.READY, False),
-            (Status.SENT, False),
-            (Status.REJECTED, False),
-            (Status.DISABLED, False),
-            (Status.ARCHIVED, False),
-            (Status.PROCESSED, False),
-            # Changed SIRET
-            (Status.PROCESSED, True),
-            (Status.READY, True),
-        ],
-    )
-    def test_action_bar(self, client, status, has_siret_changed, snapshot):
-        self.employee_record.status = status
-        if has_siret_changed:
-            self.company.siret = "10000000000001"
-            self.employee_record.siret = "10000000000002"
-            self.company.save()
-        self.employee_record.save()
-
-        client.force_login(self.user)
-        response = client.get(self.url)
-        title_section_soup = parse_response_to_soup(
+    def get_title_section_soup(self, response):
+        return parse_response_to_soup(
             response,
             selector=".s-title-02__col",
             replace_in_attr=[
@@ -119,5 +94,52 @@ class TestSummaryEmployeeRecords:
                 ),
             ],
         )
+
+    @freeze_time("2025-04-29 11:11:11")
+    @pytest.mark.parametrize(
+        "status",
+        [
+            Status.NEW,
+            Status.READY,
+            Status.SENT,
+            Status.REJECTED,
+            Status.DISABLED,
+            Status.ARCHIVED,
+            Status.PROCESSED,
+        ],
+    )
+    def test_action_bar(self, client, status, snapshot):
+        self.employee_record.status = status
+        self.employee_record.save()
+
+        client.force_login(self.user)
+        response = client.get(self.url)
+        title_section_soup = self.get_title_section_soup(response)
+
+        assert str(title_section_soup) == snapshot
+
+    @freeze_time("2025-04-29 11:11:11")
+    @pytest.mark.parametrize(
+        "status",
+        [
+            Status.NEW,
+            Status.READY,
+            Status.SENT,
+            Status.REJECTED,
+            Status.DISABLED,
+            Status.ARCHIVED,
+            Status.PROCESSED,
+        ],
+    )
+    def test_action_bar_with_changed_siret(self, client, status, snapshot):
+        self.employee_record.status = status
+        self.company.siret = "10000000000001"
+        self.employee_record.siret = "10000000000002"
+        self.company.save()
+        self.employee_record.save()
+
+        client.force_login(self.user)
+        response = client.get(self.url)
+        title_section_soup = self.get_title_section_soup(response)
 
         assert str(title_section_soup) == snapshot
