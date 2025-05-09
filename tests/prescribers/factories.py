@@ -17,10 +17,16 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PrescriberOrganization
+        skip_postgeneration_save = True
 
     class Params:
         authorized = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+        )
+        with_membership = factory.Trait(
+            membership=factory.RelatedFactory(
+                "tests.prescribers.factories.PrescriberMembershipFactory", "organization"
+            ),
         )
         with_pending_authorization = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,

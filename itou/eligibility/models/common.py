@@ -14,7 +14,6 @@ from itou.eligibility.enums import (
 from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.job_applications.enums import SenderKind
 from itou.utils.models import InclusiveDateRangeField
-from itou.utils.types import InclusiveDateRange
 
 
 logger = logging.getLogger(__name__)
@@ -86,7 +85,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         return self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
 
     def criteria_can_be_certified(self):
-        return self.is_from_employer and self.administrative_criteria.certifiable().exists()
+        return self.administrative_criteria.certifiable().exists()
 
     def get_author_kind_display(self):
         if self.sender_kind == SenderKind.PRESCRIBER and (
@@ -188,11 +187,7 @@ class SelectedAdministrativeCriteriaQuerySet(models.QuerySet):
             # but not validated by UX for the moment.
             is_certified = models.Value(False)
         else:
-            validity_period = InclusiveDateRange(
-                hiring_start_at - datetime.timedelta(days=self.model.CERTIFICATION_GRACE_PERIOD_DAYS),
-                hiring_start_at,
-            )
-            is_certified = models.Q(certification_period__overlap=validity_period, certified=True)
+            is_certified = models.Q(certification_period__contains=hiring_start_at, certified=True)
         return self.annotate(is_considered_certified=is_certified)
 
 
