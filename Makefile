@@ -9,6 +9,7 @@
 LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
+NETWORK_MODE ?= online
 
 ifdef $(XDG_CACHE_HOME)
 	CACHEDIR := $(XDG_CACHE_HOME)
@@ -26,10 +27,12 @@ export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
 
+ifeq "$(NETWORK_MODE)" "online"
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
-	uv venv
-	uv pip sync --require-hashes $^
-	touch $@
+		uv venv
+		uv pip sync --require-hashes $^
+		touch $@
+endif
 
 venv: $(VIRTUAL_ENV)
 
@@ -114,7 +117,7 @@ dumpcreate: $(VIRTUAL_ENV)
 	dropdb --if-exists $(PGDATABASE)
 	createdb $(PGDATABASE)
 	python manage.py migrate
-	$(MAKE) populate_db --assume-old=$(REQUIREMENTS_PATH)
+	$(MAKE) populate_db
 	mkdir --parents $(CACHEDIR)
 	pg_dump --format=c --dbname=$(PGDATABASE) --file=$(DBDUMP)
 
@@ -127,12 +130,12 @@ dumprestore: $(VIRTUAL_ENV)
 
 DBREADY := 0
 $(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/siae_evaluations/fixtures.py
-	$(MAKE) dumpcreate --assume-old=$(REQUIREMENTS_PATH)
+	$(MAKE) dumpcreate
 	$(eval DBREADY := 1)
 
 # Recreate the database when fixtures change.
 resetdb: $(DBDUMP)
-	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore --assume-old=$(REQUIREMENTS_PATH); fi
+	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore; fi
 
 restore_latest_backup:
 	./scripts/restore_latest_backup.sh $(PGDATABASE)
