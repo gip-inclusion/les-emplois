@@ -1,0 +1,161 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+
+{% block title %}Saisir la décision - Bilan d’exécution GEIQ - {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {{ assessment.reviewed_at|yesno:"Décision,Saisir la décision" }}
+                {% if assessment.decision_validated_at %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <div class="c-box c-box--summary mb-3 mb-md-4">
+                        <div class="c-box--summary__header">
+                            <h3 class="m-0">Récapitulatif</h3>
+                        </div>
+                        <hr class="m-0">
+                        <div class="c-box--summary__body">
+                            <div class="c-box--summary__list-data">
+                                <ul class="list-unstyled">
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Nombre d’aides à 814 €</span>
+                                        <strong>{{ stats.allowance_of_814_nb }}</strong>
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Nombre d’aides à 1400 €</span>
+                                        <strong>{{ stats.allowance_of_1400_nb }}</strong>
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Nombre d’aides refusées</span>
+                                        <strong>{{ stats.refused_allowance_nb }}</strong>
+                                    </li>
+                                    <li>
+                                        <hr class="my-3">
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Montant total potentiel</span>
+                                        <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% if assessment.grants_selection_validated_at %}
+                                <div class="c-info mt-3 mt-lg-4">
+                                    <span class="c-info__summary">Ces données ont été calculées suite à la selection que vous avez effectuée</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit" id="review_form">
+                            {% csrf_token %}
+
+                            {% bootstrap_form_errors form type='non_fields' %}
+
+                            <fieldset>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <legend>Conventionnement</legend>
+                                        {% bootstrap_field form.convention_amount %}
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <hr>
+                            <fieldset id="decision-box">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <legend>Décision</legend>
+                                        {% bootstrap_field form.granted_amount %}
+                                        {% bootstrap_field form.advance_amount %}
+                                        {% bootstrap_field form.balance_amount %}
+                                        {% bootstrap_field form.refund_amount %}
+                                    </div>
+                                </div>
+                            </fieldset>
+                            {% bootstrap_field form.review_comment %}
+                            {% if not assessment.reviewed_at %}
+                                {% itou_buttons_form primary_label="Valider la décision" reset_url=back_url %}
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    <div class="c-box mb-3 mb-md-4">
+                        <h4>Structures concernées par la convention</h4>
+                        <ul>
+                            {% for antenna_name in assessment.label_antenna_names %}<li>{{ antenna_name }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        // Inputs
+        const advanceAmountInput = document.getElementById("id_advance_amount")
+        const grantedAmountInput = document.getElementById("id_granted_amount")
+        // Outputs
+        const balanceAmountInput = document.getElementById("id_balance_amount")
+        const refundAmountInput = document.getElementById("id_refund_amount")
+
+        function cleanAmount(amountStr) {
+            let trimmedStr = amountStr.replaceAll(" ", "").replaceAll(" ", "").trim()
+            if (trimmedStr.slice(-1) === "€") {
+                trimmedStr = trimmedStr.slice(0, -1).trim()
+            }
+            return parseInt(trimmedStr)
+        }
+
+        function computeBalance() {
+            const advanceAmount = cleanAmount(advanceAmountInput.value)
+            const grantedAmount = cleanAmount(grantedAmountInput.value)
+            if (!isNaN(advanceAmount) && !isNaN(grantedAmount)) {
+                const balance = grantedAmount - advanceAmount
+                const formatter = new Intl.NumberFormat("fr-FR", {
+                    style: "currency",
+                    currency: "EUR",
+                    maximumFractionDigits: 0,
+                })
+                if (balance >= 0) {
+                    balanceAmountInput.value = formatter.format(balance)
+                    refundAmountInput.value = "-"
+                } else {
+                    balanceAmountInput.value = "-"
+                    refundAmountInput.value = formatter.format(-balance)
+                }
+            } else {
+                balanceAmountInput.value = "-"
+                refundAmountInput.value = "-"
+            }
+        }
+
+        for (const input of [advanceAmountInput, grantedAmountInput]) {
+            input.addEventListener("change", computeBalance)
+        }
+        document.addEventListener("DOMContentLoaded", computeBalance)
+    </script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}Créer un bilan d’exécution {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Créer un bilan d’exécution</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_messages %}
+    {{ block.super }}
+    {% if conflicting_antennas %}
+        <div class="alert alert-danger alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>
+                            {% blocktrans count antennas_nb=conflicting_antennas|length %}
+                                Cette structure a déjà été ajoutée à un bilan d’exécution, vous ne pouvez pas la sélectionner pour créer ce bilan.
+                            {% plural %}
+                                Ces structures ont déjà été ajoutées à un bilan d’exécution, nous ne pouvez pas les sélectionner pour créer ce bilan.
+                            {% endblocktrans %}
+                        </strong>
+                    </p>
+                    <ul class="mb-0">
+                        {% for antenna in conflicting_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if not campaign_label_infos %}
+                        La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
+                    {% elif not geiq_info %}
+                        Le SIRET ({{ siret }}) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                    {% else %}
+                        <div class="c-form">
+                            <form method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form alert_error_type="all" %}
+                                <fieldset>
+                                    <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                    {% bootstrap_field form.convention_with_ddets %}
+                                    {% bootstrap_field form.ddets wrapper_class=form.ddets.field.form_group_class %}
+                                    {% bootstrap_field form.convention_with_dreets %}
+                                    {% bootstrap_field form.dreets wrapper_class=form.dreets.field.form_group_class %}
+                                </fieldset>
+                                <hr>
+                                <fieldset>
+                                    <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
+                                    <h5>GEIQ principal:</h5>
+
+                                    {% if form.main_geiq.field.disabled %}
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input type="checkbox" name="{{ form.main_geiq.name }}" class="form-check-input" disabled id="{{ form.main_geiq.auto_id }}">
+                                                <label class="form-check-label" for="{{ form.main_geiq.auto_id }}">{{ form.main_geiq.field.label }}</label>
+                                                <i class="ri-error-warning-line text-info"
+                                                   aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution."></i>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        {% bootstrap_field form.main_geiq %}
+                                    {% endif %}
+                                    <h5>Antennes:</h5>
+                                    {% for field in form.iter_antenna_field %}
+                                        {% if field.field.disabled %}
+                                            <div class="form-group">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="{{ field.name }}" class="form-check-input" disabled id="{{ field.auto_id }}">
+                                                    <label class="form-check-label" for="{{ field.auto_id }}">{{ field.field.label }}</label>
+                                                    <i class="ri-error-warning-line text-info"
+                                                       aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
+                                                       data-bs-toggle="tooltip"
+                                                       data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution."></i>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            {% bootstrap_field field %}
+                                        {% endif %}
+                                    {% empty %}
+                                        Aucune
+                                    {% endfor %}
+                                </fieldset>
+                                <div class="c-info mt-3 mb-3">
+                                    <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
+                                </div>
+                                {% url "geiq_assessments_views:list_for_geiq" as reset_url %}
+                                {% itou_buttons_form primary_label="Créer le bilan" reset_url=reset_url show_mandatory_fields_mention=False %}
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

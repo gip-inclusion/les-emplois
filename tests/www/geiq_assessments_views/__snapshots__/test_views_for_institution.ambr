@@ -1,0 +1,2586 @@
+# serializer version: 1
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after submission]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Documents
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Synthèse du dossier de demande d’appellation GEIQ
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Synthèse 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document">
+                                          <i aria-label="Télécharger le fichier Synthèse 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de l’action
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier action 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier action 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de la structure
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier structure 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier structure 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                      À contrôler
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 814 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 1 400 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats avec un accompagnement > 3 mois sur l’année
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats de professionalisation
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats d’apprentissage
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant de l’aide potentielle
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                                  <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  Contrôler la sélection
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Commentaire général du GEIQ
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Bonjour, merci, au revoir !
+                          </blockquote>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Décision
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                      À contrôler
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant conventionné (convention initiale + avenant)
+                                      </span>
+                                      <strong>
+                                          - €
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total accordé
+                                      </span>
+                                      <strong>
+                                          - €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <button class="btn btn-primary btn-block w-100 w-md-auto" data-bs-title="Vous devez d’abord contrôler la sélection" data-bs-toggle="tooltip" disabled="" type="button">
+                                  Saisir la décision
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                      <h4>
+                          Bilan d’exécution à contrôler
+                      </h4>
+                      <p>
+                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                      </p>
+                      <p class="mb-0">
+                          Actions restantes :
+                      </p>
+                      <ul>
+                          <li>
+                              <strong>
+                                  Contrôler la sélection
+                              </strong>
+                          </li>
+                          <li>
+                              <strong>
+                                  Saisir la décision
+                              </strong>
+                          </li>
+                      </ul>
+                      <button class="btn btn-primary btn-block" disabled="" type="button">
+                          <span>
+                              Contrôler le dossier
+                          </span>
+                      </button>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Taux de rupture en période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de rupture hors période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi durable
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux d’obtention de qualification
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre de salariés sur l’année N-1
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                      </ul>
+                      <div class="c-info mb-3">
+                          <span class="c-info__summary">
+                              Les taux présentés ci-dessus sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                          <li>
+                              Paul MARTIN - paul.martin@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section for submission]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box">
+                      <p class="mb-0">
+                          Le dossier n’a pas encore été transmis par le GEIQ.
+                      </p>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+                      <h4>
+                          Bilan d’exécution à valider
+                      </h4>
+                      <p class="mb-0">
+                          Le GEIQ a jusqu’au 01/07/2025 pour importer son rapport d’activité et valider le bilan.
+                      </p>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section ready for review]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Documents
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Synthèse du dossier de demande d’appellation GEIQ
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Synthèse 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document">
+                                          <i aria-label="Télécharger le fichier Synthèse 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de l’action
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier action 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier action 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de la structure
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier structure 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier structure 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 814 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 1 400 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats avec un accompagnement > 3 mois sur l’année
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats de professionalisation
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats d’apprentissage
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant de l’aide potentielle
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                                  <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma sélection
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Commentaire général du GEIQ
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Bonjour, merci, au revoir !
+                          </blockquote>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Décision
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant conventionné (convention initiale + avenant)
+                                      </span>
+                                      <strong>
+                                          100 000 €
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total accordé
+                                      </span>
+                                      <strong>
+                                          80 000 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma décision
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                      <h4>
+                          Bilan d’exécution à contrôler
+                      </h4>
+                      <p>
+                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                      </p>
+                      <form method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn btn-ico btn-primary btn-block" name="action" type="submit" value="review">
+                              <i aria-hidden="true" class="ri-check-line">
+                              </i>
+                              <span>
+                                  Valider le contrôle
+                              </span>
+                          </button>
+                      </form>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Taux de rupture en période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de rupture hors période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi durable
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux d’obtention de qualification
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre de salariés sur l’année N-1
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                      </ul>
+                      <div class="c-info mb-3">
+                          <span class="c-info__summary">
+                              Les taux présentés ci-dessus sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                          <li>
+                              Paul MARTIN - paul.martin@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section with final review]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Documents
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Synthèse du dossier de demande d’appellation GEIQ
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Synthèse 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document">
+                                          <i aria-label="Télécharger le fichier Synthèse 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de l’action
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier action 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier action 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de la structure
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier structure 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier structure 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 814 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 1 400 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats avec un accompagnement > 3 mois sur l’année
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats de professionalisation
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats d’apprentissage
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant de l’aide potentielle
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                                  <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma sélection
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Commentaire général du GEIQ
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Bonjour, merci, au revoir !
+                          </blockquote>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Décision
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant conventionné (convention initiale + avenant)
+                                      </span>
+                                      <strong>
+                                          100 000 €
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total accordé
+                                      </span>
+                                      <strong>
+                                          80 000 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
+                      <h4>
+                          Bilan d’exécution traité le 27/05/2025
+                      </h4>
+                      <p>
+                          La décision a été envoyée au GEIQ.
+                      </p>
+                      <a class="btn btn-primary btn-block" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                          <span>
+                              Afficher la décision
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Taux de rupture en période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de rupture hors période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi durable
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux d’obtention de qualification
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre de salariés sur l’année N-1
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                      </ul>
+                      <div class="c-info mb-3">
+                          <span class="c-info__summary">
+                              Les taux présentés ci-dessus sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                          <li>
+                              Paul MARTIN - paul.martin@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section with grants selection validated]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Documents
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Synthèse du dossier de demande d’appellation GEIQ
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Synthèse 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document">
+                                          <i aria-label="Télécharger le fichier Synthèse 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de l’action
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier action 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier action 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de la structure
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier structure 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier structure 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 814 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 1 400 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats avec un accompagnement > 3 mois sur l’année
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats de professionalisation
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats d’apprentissage
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant de l’aide potentielle
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                                  <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma sélection
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Commentaire général du GEIQ
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Bonjour, merci, au revoir !
+                          </blockquote>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Décision
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                      À contrôler
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant conventionné (convention initiale + avenant)
+                                      </span>
+                                      <strong>
+                                          - €
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total accordé
+                                      </span>
+                                      <strong>
+                                          - €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                                  Saisir la décision
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+                      <h4>
+                          Bilan d’exécution à contrôler
+                      </h4>
+                      <p>
+                          Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
+                      </p>
+                      <p class="mb-0">
+                          Actions restantes :
+                      </p>
+                      <ul>
+                          <li>
+                              <strong>
+                                  Saisir la décision
+                              </strong>
+                          </li>
+                      </ul>
+                      <button class="btn btn-primary btn-block" disabled="" type="button">
+                          <span>
+                              Contrôler le dossier
+                          </span>
+                      </button>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Taux de rupture en période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de rupture hors période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi durable
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux d’obtention de qualification
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre de salariés sur l’année N-1
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                      </ul>
+                      <div class="c-info mb-3">
+                          <span class="c-info__summary">
+                              Les taux présentés ci-dessus sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                          <li>
+                              Paul MARTIN - paul.martin@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section with review]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Dossier transmis par le GEIQ
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Documents
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Synthèse du dossier de demande d’appellation GEIQ
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Synthèse 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document">
+                                          <i aria-label="Télécharger le fichier Synthèse 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de l’action
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier action 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier action 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Bilan financier de la structure
+                                      </span>
+                                      <a class="btn-link" data-bs-title="Télécharger (Bilan financier structure 2024.pdf)" data-bs-toggle="tooltip" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment">
+                                          <i aria-label="Télécharger le fichier Bilan financier structure 2024.pdf" class="ri-download-line fw-medium">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 814 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Dont potentiellement éligible à l’aide de 1 400 €
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre de contrats avec un accompagnement > 3 mois sur l’année
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats de professionalisation
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Contrats d’apprentissage
+                                      </span>
+                                      <strong>
+                                          0 / 0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant de l’aide potentielle
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                                  <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma sélection
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Commentaire général du GEIQ
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Bonjour, merci, au revoir !
+                          </blockquote>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Décision
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Contrôlé
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant conventionné (convention initiale + avenant)
+                                      </span>
+                                      <strong>
+                                          100 000 €
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total accordé
+                                      </span>
+                                      <strong>
+                                          80 000 €
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+                      <h4>
+                          Bilan d’exécution à valider
+                      </h4>
+                      <p>
+                          Ce bilan a été contrôlé le 27/05/2025 par Jean DUPONT. Il doit désormais être validé par la DREETS.
+                      </p>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Taux de rupture en période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de rupture hors période d’essai
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi durable
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux de sortie emploi
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Taux d’obtention de qualification
+                              </small>
+                              <strong>
+                                  -
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre de salariés sur l’année N-1
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                      </ul>
+                      <div class="c-info mb-3">
+                          <span class="c-info__summary">
+                              Les taux présentés ci-dessus sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) GEIQ
+                      </h5>
+                      <ul>
+                          <li>
+                              Jean DUPONT - jean.dupont@example.com
+                          </li>
+                          <li>
+                              Paul MARTIN - paul.martin@example.com
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details title after submission]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-accent-03 text-primary">
+                                  À contrôler
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details title waiting for submission]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-warning">
+                                  En attente
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details title]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-accent-03 text-primary">
+                                  À contrôler
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[final reviewed assessment details title]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-success">
+                                  Validé
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[reviewed assessment details title]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/institution/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - Un Joli GEIQ
+                              <span class="badge rounded-pill text-nowrap badge-base bg-info">
+                                  À valider
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentReviewView.test_review_already_reviewed_assessment[disabled assessments review form]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Récapitulatif
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 814 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 1400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides refusées
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <hr class="my-3"/>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info mt-3 mt-lg-4">
+                              <span class="c-info__summary">
+                                  Ces données ont été calculées suite à la selection que vous avez effectuée
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-form">
+                      <form class="js-prevent-multiple-submit" id="review_form" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <fieldset>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Conventionnement
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_convention_amount">
+                                              Montant conventionné (convention initiale + avenants)
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <hr/>
+                          <fieldset id="decision-box">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Décision
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_granted_amount">
+                                              Montant total accordé
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                                      </div>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_advance_amount">
+                                              Premier versement déjà réalisé
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_balance_amount">
+                                              Deuxième versement à prévoir
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_refund_amount">
+                                              Remboursement attendu
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <div class="form-group form-group-required">
+                              <label class="form-label" for="id_review_comment">
+                                  Commentaire
+                              </label>
+                              <textarea class="form-control" cols="40" disabled="" id="id_review_comment" name="review_comment" required="" rows="10">Bravo !</textarea>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2">
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Structures concernées par la convention
+                      </h4>
+                      <ul>
+                          <li>
+                              Siège
+                          </li>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentReviewView.test_review_assessment[assessments review form]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Récapitulatif
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 814 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 1400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides refusées
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <hr class="my-3"/>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info mt-3 mt-lg-4">
+                              <span class="c-info__summary">
+                                  Ces données ont été calculées suite à la selection que vous avez effectuée
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-form">
+                      <form class="js-prevent-multiple-submit" id="review_form" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <fieldset>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Conventionnement
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_convention_amount">
+                                              Montant conventionné (convention initiale + avenants)
+                                          </label>
+                                          <input class="form-control" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <hr/>
+                          <fieldset id="decision-box">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Décision
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_granted_amount">
+                                              Montant total accordé
+                                          </label>
+                                          <input class="form-control" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                      </div>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_advance_amount">
+                                              Premier versement déjà réalisé
+                                          </label>
+                                          <input class="form-control" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="0"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_balance_amount">
+                                              Deuxième versement à prévoir
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_refund_amount">
+                                              Remboursement attendu
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <div class="form-group form-group-required">
+                              <label class="form-label" for="id_review_comment">
+                                  Commentaire
+                              </label>
+                              <textarea class="form-control" cols="40" id="id_review_comment" name="review_comment" required="" rows="10"></textarea>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Valider la décision
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2">
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Structures concernées par la convention
+                      </h4>
+                      <ul>
+                          <li>
+                              Siège
+                          </li>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_complex_list[SQL queries]
+  dict({
+    'num_queries': 11,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_nb",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employee" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_employee"."assessment_id")
+          LEFT OUTER JOIN "geiq_assessments_employeecontract" ON ("geiq_assessments_employee"."id" = "geiq_assessments_employeecontract"."employee_id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE "geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
+          GROUP BY "geiq_assessments_assessment"."id",
+                   "geiq_assessments_assessmentcampaign"."id"
+          ORDER BY "geiq_assessments_assessment"."submitted_at" ASC,
+                   "geiq_assessments_assessment"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessmentinstitutionlink"."id",
+                 "geiq_assessments_assessmentinstitutionlink"."assessment_id",
+                 "geiq_assessments_assessmentinstitutionlink"."institution_id",
+                 "geiq_assessments_assessmentinstitutionlink"."with_convention"
+          FROM "geiq_assessments_assessmentinstitutionlink"
+          WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s,
+                                                                                 %s,
+                                                                                 %s,
+                                                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[geiq_assessments_views/list_for_institution.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_institution.html]',
+          'list_for_institution[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institution"
+          WHERE "institutions_institution"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestListAssessmentsView.test_complex_list[assessments complex list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <p>
+                      4 résultats
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      GEIQ
+                                  </th>
+                                  <th scope="col">
+                                      Structures
+                                  </th>
+                                  <th scope="col">
+                                      Campagne
+                                  </th>
+                                  <th scope="col">
+                                      Référent
+                                  </th>
+                                  <th scope="col">
+                                      Statut du bilan
+                                  </th>
+                                  <th scope="col">
+                                      Nombre de contrats
+                                  </th>
+                                  <th scope="col">
+                                      Montant accordé
+                                  </th>
+                                  <th scope="col">
+                                      Montant conventionné
+                                  </th>
+                                  <th scope="col">
+                                      Taux de réalisation
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/11111111-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Un Beau GEIQ
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary">
+                                          À contrôler
+                                      </span>
+                                  </td>
+                                  <td>
+                                      0
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/22222222-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Un Superbe GEIQ
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-info">
+                                          À valider
+                                      </span>
+                                  </td>
+                                  <td>
+                                      0
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
+                                          100 %
+                                      </span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/33333333-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Un Superbe GEIQ
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-success">
+                                          Validé
+                                      </span>
+                                  </td>
+                                  <td>
+                                      0
+                                  </td>
+                                  <td>
+                                      80 000 €
+                                  </td>
+                                  <td>
+                                      100 000 €
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">
+                                          80 %
+                                      </span>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/institution/00000000-0d2c-4f29-ba5b-a27ffb8ecc84">
+                                          Un Joli GEIQ
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <ul class="mb-0">
+                                          <li>
+                                              Siège
+                                          </li>
+                                          <li>
+                                              Une antenne
+                                          </li>
+                                      </ul>
+                                  </td>
+                                  <td>
+                                      2024
+                                  </td>
+                                  <td>
+                                      Un DREETS GEIQ
+                                  </td>
+                                  <td>
+                                      <span class="badge rounded-pill text-nowrap badge-sm bg-warning">
+                                          En attente
+                                      </span>
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                                  <td>
+                                      -
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestListAssessmentsView.test_empty_list[assessments empty list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="text-center my-3 my-md-4">
+                      <p class="mb-1 mt-3">
+                          <strong>
+                              Aucun bilan pour le moment
+                          </strong>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---

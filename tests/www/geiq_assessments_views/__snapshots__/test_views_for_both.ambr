@@ -1,0 +1,1618 @@
+# serializer version: 1
+# name: TestAssessmentContractsListAndToggle.test_access_as_geiq[SQL queries]
+  dict({
+    'num_queries': 11,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."user_id" = %s
+                 AND "companies_companymembership"."is_active")
+          ORDER BY "companies_companymembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND (NOT ("companies_company"."kind" IN (%s,
+                                                          %s,
+                                                          %s,
+                                                          %s,
+                                                          %s))
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessment_companies" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessment_companies"."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE ("geiq_assessments_assessment_companies"."company_id" = %s
+                 AND "geiq_assessments_assessment"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_allowance_stats_for_geiq[www/geiq_assessments_views/views.py]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_814_selected_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_1400_selected_nb",
+                 SUM("geiq_assessments_employee"."allowance_amount") FILTER (
+                                                                             WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "potential_allowance_amount",
+                 COUNT("geiq_assessments_employeecontract"."id") AS "contracts_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employeecontract"."allowance_requested") AS "contracts_selected_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_0_selected_nb"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          WHERE "geiq_assessments_employee"."assessment_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'pager[utils/pagination.py]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          WHERE "geiq_assessments_employee"."assessment_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_employeecontract"."id",
+                 "geiq_assessments_employeecontract"."label_id",
+                 "geiq_assessments_employeecontract"."employee_id",
+                 "geiq_assessments_employeecontract"."start_at",
+                 "geiq_assessments_employeecontract"."planned_end_at",
+                 "geiq_assessments_employeecontract"."end_at",
+                 "geiq_assessments_employeecontract"."nb_days_in_campaign_year",
+                 "geiq_assessments_employeecontract"."allowance_requested",
+                 "geiq_assessments_employeecontract"."allowance_granted",
+                 "geiq_assessments_employeecontract"."other_data",
+                 "geiq_assessments_employee"."id",
+                 "geiq_assessments_employee"."assessment_id",
+                 "geiq_assessments_employee"."label_id",
+                 "geiq_assessments_employee"."last_name",
+                 "geiq_assessments_employee"."first_name",
+                 "geiq_assessments_employee"."birthdate",
+                 "geiq_assessments_employee"."title",
+                 "geiq_assessments_employee"."allowance_amount",
+                 "geiq_assessments_employee"."other_data",
+                 "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          INNER JOIN "geiq_assessments_assessment" ON ("geiq_assessments_employee"."assessment_id" = "geiq_assessments_assessment"."id")
+          WHERE "geiq_assessments_employee"."assessment_id" = %s
+          ORDER BY "geiq_assessments_employee"."first_name" ASC,
+                   "geiq_assessments_employee"."last_name" ASC
+          LIMIT 3
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_geiq[assessments contracts list readonly]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1 / 3
+                              </strong>
+                              Contrats présentés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0 €
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
+                  </h2>
+                  <p>
+                      Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                      <br/>
+                      Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                  </p>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Obtenir l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          Cécile MARTIN
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/02/2024
+                                  </td>
+                                  <td>
+                                      30/03/2024
+                                  </td>
+                                  <td>
+                                      Non
+                                  </td>
+                                  <td>
+                                      814 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          Jean DUPONT
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/01/2024
+                                  </td>
+                                  <td>
+                                      30/04/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      0 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                          Jean-Pierre DUPOND
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/04/2024
+                                  </td>
+                                  <td>
+                                      30/06/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      1 400 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_geiq[assessments contracts list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1 / 3
+                              </strong>
+                              Contrats présentés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0 €
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
+                  </h2>
+                  <p>
+                      Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                      <br/>
+                      Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                  </p>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Obtenir l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          Cécile MARTIN
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/02/2024
+                                  </td>
+                                  <td>
+                                      30/03/2024
+                                  </td>
+                                  <td>
+                                      Non
+                                  </td>
+                                  <td>
+                                      814 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          Jean DUPONT
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/01/2024
+                                  </td>
+                                  <td>
+                                      30/04/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      0 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                          Jean-Pierre DUPOND
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/04/2024
+                                  </td>
+                                  <td>
+                                      30/06/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      1 400 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                  Obtenir l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <div class="row">
+                          <div class="col-12">
+                              <hr class="mb-3"/>
+                              <div class="form-row align-items-center justify-content-end gx-3">
+                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
+                                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                                          </i>
+                                          <span>
+                                              Annuler
+                                          </span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="action" type="submit" value="validate">
+                                          <span>
+                                              Valider la sélection
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_geiq[assessments empty contracts list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0 / 0
+                              </strong>
+                              Contrats présentés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  -
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide
+                  </h2>
+                  <p>
+                      Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                      <br/>
+                      Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                  </p>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Obtenir l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                      </table>
+                  </div>
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <div class="row">
+                          <div class="col-12">
+                              <hr class="mb-3"/>
+                              <div class="form-row align-items-center justify-content-end gx-3">
+                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
+                                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                                          </i>
+                                          <span>
+                                              Annuler
+                                          </span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="action" type="submit" value="validate">
+                                          <span>
+                                              Valider la sélection
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_institution[SQL queries]
+  dict({
+    'num_queries': 9,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'extract_membership_infos_and_update_session[utils/perms/middleware.py]',
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "institutions_institutionmembership"
+          INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
+          WHERE ("institutions_institutionmembership"."user_id" = %s
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY "institutions_institutionmembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessmentinstitutionlink" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessmentinstitutionlink"."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE ("geiq_assessments_assessmentinstitutionlink"."institution_id" = %s
+                 AND "geiq_assessments_assessment"."submitted_at" IS NOT NULL
+                 AND "geiq_assessments_assessment"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_allowance_stats_for_institution[www/geiq_assessments_views/views.py]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT("geiq_assessments_employeecontract"."id") AS "contracts_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "contracts_selected_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employee"."allowance_amount" = %s) AS "allowance_of_814_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_granted"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_814_selected_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employee"."allowance_amount" = %s) AS "allowance_of_1400_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_granted"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_1400_selected_nb",
+                 SUM("geiq_assessments_employee"."allowance_amount") FILTER (
+                                                                             WHERE "geiq_assessments_employeecontract"."allowance_granted") AS "potential_allowance_amount",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE "geiq_assessments_employee"."allowance_amount" = %s) AS "allowance_of_0_nb",
+                 COUNT("geiq_assessments_employeecontract"."id") FILTER (
+                                                                         WHERE ("geiq_assessments_employeecontract"."allowance_granted"
+                                                                                AND "geiq_assessments_employee"."allowance_amount" = %s)) AS "allowance_of_0_selected_nb"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                 AND "geiq_assessments_employee"."assessment_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
+          'pager[utils/pagination.py]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                 AND "geiq_assessments_employee"."assessment_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_employeecontract"."id",
+                 "geiq_assessments_employeecontract"."label_id",
+                 "geiq_assessments_employeecontract"."employee_id",
+                 "geiq_assessments_employeecontract"."start_at",
+                 "geiq_assessments_employeecontract"."planned_end_at",
+                 "geiq_assessments_employeecontract"."end_at",
+                 "geiq_assessments_employeecontract"."nb_days_in_campaign_year",
+                 "geiq_assessments_employeecontract"."allowance_requested",
+                 "geiq_assessments_employeecontract"."allowance_granted",
+                 "geiq_assessments_employeecontract"."other_data",
+                 "geiq_assessments_employee"."id",
+                 "geiq_assessments_employee"."assessment_id",
+                 "geiq_assessments_employee"."label_id",
+                 "geiq_assessments_employee"."last_name",
+                 "geiq_assessments_employee"."first_name",
+                 "geiq_assessments_employee"."birthdate",
+                 "geiq_assessments_employee"."title",
+                 "geiq_assessments_employee"."allowance_amount",
+                 "geiq_assessments_employee"."other_data",
+                 "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id"
+          FROM "geiq_assessments_employeecontract"
+          INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
+          INNER JOIN "geiq_assessments_assessment" ON ("geiq_assessments_employee"."assessment_id" = "geiq_assessments_assessment"."id")
+          WHERE ("geiq_assessments_employeecontract"."allowance_requested"
+                 AND "geiq_assessments_employee"."assessment_id" = %s)
+          ORDER BY "geiq_assessments_employee"."first_name" ASC,
+                   "geiq_assessments_employee"."last_name" ASC
+          LIMIT 2
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_institution[assessments contracts list readonly]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1 / 2
+                              </strong>
+                              Contrats acceptés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1
+                  / 1
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 1
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  814 €
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
+                  </h2>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Éligible à l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          Cécile MARTIN
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/02/2024
+                                  </td>
+                                  <td>
+                                      30/03/2024
+                                  </td>
+                                  <td>
+                                      Non
+                                  </td>
+                                  <td>
+                                      814 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                  Accorder l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          Jean DUPONT
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/01/2024
+                                  </td>
+                                  <td>
+                                      30/04/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      0 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                  Accorder l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_institution[assessments contracts list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1 / 2
+                              </strong>
+                              Contrats acceptés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  1
+                  / 1
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 1
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  814 €
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
+                  </h2>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Éligible à l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                          Cécile MARTIN
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/02/2024
+                                  </td>
+                                  <td>
+                                      30/03/2024
+                                  </td>
+                                  <td>
+                                      Non
+                                  </td>
+                                  <td>
+                                      814 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                  Accorder l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                              <tr>
+                                  <td>
+                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                          Jean DUPONT
+                                      </a>
+                                  </td>
+                                  <td>
+                                      01/01/2024
+                                  </td>
+                                  <td>
+                                      30/04/2024
+                                  </td>
+                                  <td>
+                                      Oui
+                                  </td>
+                                  <td>
+                                      0 €
+                                  </td>
+                                  <td>
+                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <div class="form-check form-switch">
+                                              <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                  Accorder l’aide
+                                              </label>
+                                          </div>
+                                      </form>
+                                  </td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <div class="row">
+                          <div class="col-12">
+                              <hr class="mb-3"/>
+                              <div class="form-row align-items-center justify-content-end gx-3">
+                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444">
+                                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                                          </i>
+                                          <span>
+                                              Annuler
+                                          </span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="action" type="submit" value="validate">
+                                          <span>
+                                              Valider la sélection
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentContractsListAndToggle.test_access_as_institution[assessments empty contracts list]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12">
+                  <div class="c-box mb-3" id="contracts-list-stats">
+                      <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0 / 0
+                              </strong>
+                              Contrats acceptés
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 0
+                              </strong>
+                              Aides à 814€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 0
+                              </strong>
+                              Aides à 1400€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  0
+                  / 0
+                              </strong>
+                              Aides à 0€
+                          </div>
+                          <div class="d-flex flex-column">
+                              <strong>
+                                  -
+                              </strong>
+                              Montant total potentiel
+                          </div>
+                      </div>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <h2>
+                      Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
+                  </h2>
+                  <p>
+                      L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                              Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                  </p>
+                  <div class="table-responsive mt-3 mt-md-4">
+                      <table class="table table-hover">
+                          <caption class="visually-hidden">
+                              Liste des bilans d’exécution
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col">
+                                      Prénom NOM
+                                  </th>
+                                  <th scope="col">
+                                      Date de début
+                                  </th>
+                                  <th scope="col">
+                                      Date de fin
+                                  </th>
+                                  <th scope="col">
+                                      ≥ 90 jours en 2024
+                                  </th>
+                                  <th scope="col">
+                                      Aide potentielle
+                                  </th>
+                                  <th scope="col">
+                                      Éligible à l’aide
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                      </table>
+                  </div>
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <div class="row">
+                          <div class="col-12">
+                              <hr class="mb-3"/>
+                              <div class="form-row align-items-center justify-content-end gx-3">
+                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444">
+                                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                                          </i>
+                                          <span>
+                                              Annuler
+                                          </span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" name="action" type="submit" value="validate">
+                                          <span>
+                                              Valider la sélection
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---

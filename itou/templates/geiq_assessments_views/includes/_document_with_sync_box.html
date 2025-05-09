@@ -1,0 +1,58 @@
+<div id="{{ section_id }}" class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+    <div class="c-box--summary__header">
+        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="flex-grow-1">
+                <h3 class="m-0">{{ title }}</h3>
+            </div>
+            <div>
+                {% if document_present %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <hr class="m-0">
+    {% if document_present %}
+        <div class="c-box--summary__body">
+            <p class="fs-sm">
+                Ce document a été transmis automatiquement par le site label GEIQ, il présente les données consolidées du GEIQ siège ainsi que de l’ensemble de ses antennes.
+            </p>
+        </div>
+    {% elif error %}
+        <div class="c-box--summary__body">
+            {% if error %}
+                <p class="fs-sm">
+                    <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Le document n’a pas été importé, merci de réessayer
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="c-box--summary__footer">
+        {% if document_present %}
+            <a href="{{ download_url }}" class="btn-link btn-block w-100 w-md-auto" rel="noopener" target="_blank">
+                <span>{{ document_filename }}</span>
+            </a>
+        {% else %}
+            <div class="d-flex justify-content-end">
+                <button type="button"
+                        class="btn btn-ico btn-primary btn-block w-100 w-md-auto"
+                        hx-post="{{ sync_url }}"
+                        hx-swap="outerHTML"
+                        hx-trigger="{{ error|yesno:"click,load" }}"
+                        hx-sync=".s-section:queue all"
+                        hx-include="#label-sync-form"
+                        hx-target="#{{ section_id }}">
+                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                    <span class="stable-text">{{ error|yesno:"Réessayer,Récupération de Label" }}</span>
+                    <span class="loading-text">Récupération en cours</span>
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% if request.htmx %}
+    {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment request=request only %}
+{% endif %}
