@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 import pytest
@@ -433,9 +434,15 @@ class TestApprovalProlongation:
     # TODO: Consider switching to time-machine:
     # https://github.com/adamchainz/time-machine
     @freeze_time()
-    def test_prolongation_report_file(self, client, faker, xlsx_file, mailoutbox):
-        # Check that report file object is saved and linked to prolongation
-        # Bad reason types are checked by UI (JS) and ultimately by DB constraints
+    def test_prolongation_report_file(self, client, faker, mocker, xlsx_file, mailoutbox):
+        """
+        Check that report file object is saved and linked to prolongation
+        Bad reason types are checked by UI (JS) and ultimately by DB constraints
+        """
+        mocker.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        )
 
         self._setup_with_company_kind(CompanyKind.AI)
         client.force_login(self.employer)
@@ -471,7 +478,7 @@ class TestApprovalProlongation:
 
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.report_file
-        assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
+        assert prolongation_request.report_file.key == "prolongation_report/11111111-1111-1111-1111-111111111111.xlsx"
 
         [email] = mailoutbox
         assert email.to == [post_data["email"]]

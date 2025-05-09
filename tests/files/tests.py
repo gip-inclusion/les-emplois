@@ -120,3 +120,18 @@ def test_cellar_does_not_support_checksum_validation():
     client = s3_client()
     client.config = Config()
     client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key="file")
+
+
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("resume.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("something-very-long EVEN WITH SPACES! YUK!.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("spreadsheet.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("spreadsheet.pdf.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("open-office.odt", "11111111-1111-1111-1111-111111111111.odt"),
+    ],
+)
+def test_anonymised_filename(mocker, filename, expected):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    assert File.anonymized_filename(filename) == expected

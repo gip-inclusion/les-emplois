@@ -686,7 +686,7 @@ class TestApplyAsJobSeeker:
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
@@ -834,7 +834,7 @@ class TestApplyAsJobSeeker:
         fake_session_initialization(client, company, {"selected_jobs": []})
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
@@ -1247,7 +1247,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(response, "Postuler")
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
@@ -1596,7 +1596,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
@@ -2071,7 +2071,7 @@ class TestApplyAsPrescriber:
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
@@ -2648,7 +2648,7 @@ class TestApplyAsCompany:
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
 
         with mock.patch(
-            "itou.www.apply.views.submit_views.uuid.uuid4",
+            "itou.files.models.uuid.uuid4",
             return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         ):
             response = client.post(
