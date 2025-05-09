@@ -3,7 +3,7 @@ import datetime
 import pytest
 from django.contrib.auth import get_user
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.utils.urls import add_url_params
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
@@ -92,8 +92,8 @@ def test_reason_status_filter(admin_client):
 
     response = admin_client.get(membership_admin_url + "?has_reason=yes")
     assertContains(response, str(membership_with_reason.member.email))
-    assert str(membership_without_reason.member.email) not in response.content.decode()
+    assertNotContains(response, str(membership_without_reason.member.email))
 
     response = admin_client.get(membership_admin_url + "?has_reason=no")
     assertContains(response, str(membership_without_reason.member.email))
-    assert str(membership_with_reason.member.email) not in response.content.decode()
+    assertNotContains(response, str(membership_with_reason.member.email))
