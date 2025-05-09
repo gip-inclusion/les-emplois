@@ -10,6 +10,7 @@ LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
 PIP_COMPILE_OPTIONS :=
+NETWORK_MODE := online
 
 ifdef $(XDG_CACHE_HOME)
 	CACHEDIR := $(XDG_CACHE_HOME)
@@ -27,10 +28,12 @@ export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
 
+ifeq "$(NETWORK_MODE)" "online"
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
-	uv venv
-	uv pip sync --require-hashes $^
-	touch $@
+		uv venv
+		uv pip sync --require-hashes $^
+		touch $@
+endif
 
 venv: $(VIRTUAL_ENV)
 
