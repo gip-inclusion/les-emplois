@@ -79,7 +79,7 @@
 # ---
 # name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -317,6 +317,27 @@
           'list_employee_records[www/employee_record_views/views.py]',
         ]),
         'sql': '''
+          SELECT %s AS "a"
+          FROM "employee_record_employeerecord"
+          INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          WHERE ("job_applications_jobapplication"."to_company_id" = %s
+                 AND "employee_record_employeerecord"."status" = %s
+                 AND NOT ("employee_record_employeerecord"."siret" =
+                            (SELECT U0."siret"
+                             FROM "companies_company" U0
+                             WHERE (NOT (U0."siret" = %s)
+                                    AND U0."convention_id" = ("companies_company"."convention_id")
+                                    AND U0."source" = %s)
+                             ORDER BY RANDOM() ASC)))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'list_employee_records[www/employee_record_views/views.py]',
+        ]),
+        'sql': '''
           SELECT "job_applications_jobapplication"."job_seeker_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
@@ -349,6 +370,7 @@
           SELECT COUNT(*) AS "__count"
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "employee_record_employeerecord"."status" IN (%s))
         ''',
@@ -407,6 +429,13 @@
                  "employee_record_employeerecord"."asp_measure",
                  "employee_record_employeerecord"."siret",
                  "employee_record_employeerecord"."processed_as_duplicate",
+          
+            (SELECT U0."siret"
+             FROM "companies_company" U0
+             WHERE (NOT (U0."siret" = %s)
+                    AND U0."convention_id" = ("companies_company"."convention_id")
+                    AND U0."source" = %s)
+             ORDER BY RANDOM() ASC) AS "siret_from_asp_source",
                  "job_applications_jobapplication"."id",
                  "job_applications_jobapplication"."job_seeker_id",
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
@@ -540,15 +569,15 @@
                  "asp_country"."name",
                  "asp_country"."group",
                  "asp_country"."department",
-                 T8."id",
-                 T8."start_date",
-                 T8."end_date",
-                 T8."code",
-                 T8."name",
-                 T8."normalized_name",
-                 T8."created_at",
-                 T8."city_id",
-                 T8."ignore",
+                 T9."id",
+                 T9."start_date",
+                 T9."end_date",
+                 T9."code",
+                 T9."name",
+                 T9."normalized_name",
+                 T9."created_at",
+                 T9."city_id",
+                 T9."ignore",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -650,7 +679,7 @@
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
-          LEFT OUTER JOIN "asp_commune" T8 ON ("users_jobseekerprofile"."hexa_commune_id" = T8."id")
+          LEFT OUTER JOIN "asp_commune" T9 ON ("users_jobseekerprofile"."hexa_commune_id" = T9."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")
