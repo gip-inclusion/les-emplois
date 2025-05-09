@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import factory
 import pytest
@@ -31,6 +32,8 @@ from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 class TestListEmployeeRecords:
     URL = reverse_lazy("employee_record_views:list")
+    HEADER_WARNING_TITLE = "Incohérence de numéro SIRET détectée"
+    ITEM_WARNING_TITLE = "Actualisation du numéro SIRET"
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
@@ -269,6 +272,52 @@ class TestListEmployeeRecords:
             )
             == snapshot
         )
+
+    def test_display_alert_when_siret_has_changed(self, client):
+        """
+        For PROCESSED records only
+        """
+        client.force_login(self.user)
+
+        self.employee_record.status = Status.PROCESSED
+        self.company.siret = "10000000000001"
+        self.employee_record.siret = "10000000000002"
+        self.company.save()
+        self.employee_record.save()
+
+        response = client.get(self.URL, data={"status": Status.PROCESSED})
+
+        assertContains(response, self.HEADER_WARNING_TITLE)
+        assertContains(response, self.ITEM_WARNING_TITLE)
+
+    def test_no_alert_when_siret_has_changed(self, client):
+        """
+        Any status except PROCESSED
+        """
+        client.force_login(self.user)
+        status = random.choice(list(set(Status) - {Status.PROCESSED}))
+
+        self.employee_record.status = status
+        self.company.siret = "10000000000001"
+        self.employee_record.siret = "10000000000002"
+        self.company.save()
+        self.employee_record.save()
+
+        response = client.get(self.URL, data={"status": status})
+
+        assertNotContains(response, self.HEADER_WARNING_TITLE)
+        assertNotContains(response, self.ITEM_WARNING_TITLE)
+
+    def test_no_alert_when_siret_has_not_changed(self, client):
+        client.force_login(self.user)
+        status = random.choice(list(set(Status) - {Status.ARCHIVED}))
+
+        self.employee_record.status = status
+        self.employee_record.save()
+        response = client.get(self.URL, data={"status": status})
+
+        assertNotContains(response, self.HEADER_WARNING_TITLE)
+        assertNotContains(response, self.ITEM_WARNING_TITLE)
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self, client, snapshot):

@@ -34,4 +34,29 @@
             </div>
         </div>
     {% endif %}
+    {% if show_siret_has_changed_warning %}
+        <div id="changed-siret-warning" class="alert alert-warning alert-dismissible-once d-none" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Incohérence de numéro SIRET détectée</strong>
+                    </p>
+                    <p class="mb-0">
+                        Le numéro SIRET associé à certaines fiches salarié "Intégrées" est différent de votre numéro SIRET actuel.
+                        Cela peut empêcher l'affichage de ces fiches dans votre espace Extranet IAE 2.0 de l'ASP.
+                        Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
+                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
+                           rel="noopener"
+                           target="_blank"
+                           aria-label="Consulter la documentation sur la mise à jour de fiche salarié (ouverture dans un nouvel onglet)"
+                           class="has-external-link">Consulter le mode d'emploi</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>

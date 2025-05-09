@@ -84,6 +84,26 @@
                 </div>
             </div>
         {% endif %}
+        {# SIRET has changed #}
+        {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
+            <div class="alert alert-warning" role="status">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Actualisation du numéro SIRET</strong>
+                        </p>
+                        <p class="mb-0">
+                            Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
+                            Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
+                            Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {# Actions #}
         {% if employee_record.job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
             <div class="alert alert-warning" role="status">
