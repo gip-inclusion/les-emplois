@@ -4,6 +4,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
+from itou.geiq_assessments.models import AssessmentCampaign
+from itou.institutions.enums import InstitutionKind
+from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 
 
@@ -217,6 +220,26 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
     ),
+    "employer-geiq-assessments": NavItem(
+        label="Bilan d’exécution",
+        icon="ri-list-check-3",
+        is_new=True,  # TODO(xfernandez) Remove on 2025/09/01
+        target=reverse("geiq_assessments_views:list_for_geiq"),
+        active_view_names=[
+            "geiq_assessments_views:list_for_geiq",
+            "geiq_assessments_views:create",
+            "geiq_assessments_views:details_for_geiq",
+            "geiq_assessments_views:assessment_kpi",
+            "geiq_assessments_views:assessment_result",
+            "geiq_assessments_views:upload_action_financial_assessment",
+            "geiq_assessments_views:assessment_comment",
+            "geiq_assessments_views:assessment_contracts_list",
+            "geiq_assessments_views:assessment_contracts_details",
+        ],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="geiq-bilan-execution",
+    ),
     # Labor inspectors.
     "labor-inspector-members": NavItem(
         label="Collaborateurs",
@@ -225,6 +248,19 @@ NAV_ENTRIES = {
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
+    ),
+    "labor-inspector-geiq-assessments": NavItem(
+        label="Bilans d’exécution GEIQ",
+        icon="ri-list-check-3",
+        is_new=True,  # TODO(xfernandez) Remove on 2025/09/01
+        target=reverse("geiq_assessments_views:list_for_institution"),
+        active_view_names=[
+            "geiq_assessments_views:details_for_institution",
+            "geiq_assessments_views:list_for_institution",
+        ],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="institution-geiq-bilan-execution",
     ),
     # GPS (for employers and prescribers with an org in department nb 30)
     "gps": NavItem(
@@ -300,6 +336,12 @@ def nav(request):
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
                 menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
+            elif (
+                company_has_access_to_assessments(request.current_organization)
+                # TODO: remove this condition once the 1st campaign has been created
+                and AssessmentCampaign.objects.exists()
+            ):
+                menu_items.append(NAV_ENTRIES["employer-geiq-assessments"])
             company_group_items = [NAV_ENTRIES["employer-company"], NAV_ENTRIES["employer-jobs"]]
             if request.current_organization.is_active:
                 company_group_items.append(NAV_ENTRIES["employer-members"])
@@ -314,6 +356,8 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
+            if request.current_organization.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+                menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
         if is_allowed_to_use_gps(request) and show_gps_as_a_nav_entry(request):
             menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
