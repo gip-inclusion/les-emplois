@@ -191,9 +191,11 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
     def with_siret_from_asp_source(self):
-        return self.annotate(convention=F("job_application__to_company__convention")).annotate(
-            mother_company_siret=Subquery(
-                Company.objects.filter(source=Company.SOURCE_ASP, convention=OuterRef("convention")).values("siret")
+        return self.annotate(
+            siret_from_asp_source=Subquery(
+                Company.objects.filter(
+                    source=Company.SOURCE_ASP, convention=OuterRef("job_application__to_company__convention")
+                ).values("siret")
             )
         )
 

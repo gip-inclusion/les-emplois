@@ -677,8 +677,9 @@ class TestEmployeeRecordQueryset:
         )
 
         qs = EmployeeRecord.objects.with_siret_from_asp_source()
-        assert qs.get(pk=employee_record.pk).mother_company_siret == company.siret
-        assert qs.get(pk=employee_record_in_antenna.pk).mother_company_siret == company.siret
+
+        assert qs.get(pk=employee_record.pk).siret_from_asp_source == company.siret
+        assert qs.get(pk=employee_record_in_antenna.pk).siret_from_asp_source == company.siret
 
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])
