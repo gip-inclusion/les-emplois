@@ -59,6 +59,10 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         else:
             self.fields["description"].widget = EasyMDEEditor()
 
+        # Description for unauthorized organizations is never seen
+        if not self.instance.is_authorized:
+            self.fields.pop("description")
+
     def clean_siret(self):
         siret = self.cleaned_data["siret"]
         if (
