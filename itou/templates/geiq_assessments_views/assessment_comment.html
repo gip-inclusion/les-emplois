@@ -1,0 +1,45 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+
+{% block title %}Commentaire général - {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Commentaire général
+                {% if assessment.geiq_comment %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" with badge_size="badge-base" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" with badge_size="badge-base" only %}
+                {% endif %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            {% bootstrap_form form alert_error_type="all" %}
+                            {% if not assessment.submitted_at %}
+                                {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=back_url %}
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

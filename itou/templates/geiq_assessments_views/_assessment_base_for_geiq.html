@@ -1,0 +1,39 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load geiq_assessments_badges %}
+
+{% block title %}Bilan d’exécution - {{ assessment.name_for_geiq }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>Bilan d’exécution - {{ assessment.name_for_geiq }} {% state_for_geiq assessment extra_class="badge-base" %}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+                <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+            </button>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link{% if active_tab == active_tab.MAIN %} active{% endif %}" href="{% url 'geiq_assessments_views:details_for_geiq' pk=assessment.pk %}">{{ active_tab.MAIN.label }}</a>
+        </li>
+        {% include "geiq_assessments_views/includes/assessment_kpi_tab.html" with active_tab=active_tab assessment=assessment request_htmx=False only %}
+
+        {% if assessment.final_reviewed_at %}
+            <li class="nav-item">
+                <a class="nav-link{% if active_tab == active_tab.RESULT %} active{% endif %}" href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">{{ active_tab.RESULT.label }}</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}

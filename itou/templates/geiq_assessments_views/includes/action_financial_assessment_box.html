@@ -1,0 +1,34 @@
+<div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+    <div class="c-box--summary__header">
+        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="flex-grow-1">
+                <h3 class="m-0">Bilan financier de l’action</h3>
+            </div>
+            <div>
+                {% if assessment.action_financial_assessment_file %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <hr class="m-0">
+    <div class="c-box--summary__footer">
+        {% if assessment.action_financial_assessment_file %}
+            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                <a href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}" class="btn-link mb-3 mb-md-0" rel="noopener" target="_blank">
+                    <span>{{ assessment.action_financial_assessment_filename }}</span>
+                </a>
+                {% if not assessment.submitted_at %}
+                    <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto"><i class="ri-pencil-line fw-medium" aria-hidden="true"></i><span>Modifier</span></a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-end">
+                <a href="{% url "geiq_assessments_views:upload_action_financial_assessment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-primary btn-block w-100 w-md-auto">Compléter</a>
+            </div>
+        {% endif %}
+    </div>
+</div>

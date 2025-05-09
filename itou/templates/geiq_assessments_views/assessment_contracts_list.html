@@ -1,0 +1,171 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+
+{% block title %}Détail et sélection des contrats {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
+                Détail et sélection des contrats
+                {% if request.user.is_employer %}
+                    {% if assessment.contracts_selection_validated_at %}
+                        {% include "geiq_assessments_views/includes/badge_completed.html" with badge_size="badge-base" only %}
+                    {% else %}
+                        {% include "geiq_assessments_views/includes/badge_to_complete.html" with badge_size="badge-base" only %}
+                    {% endif %}
+                {% elif request.user.is_labor_inspector %}
+                    {% if assessment.grants_selection_validated_at %}
+                        {% include "geiq_assessments_views/includes/badge_checked.html" with badge_size="badge-base" only %}
+                    {% else %}
+                        {% include "geiq_assessments_views/includes/badge_to_check.html" with badge_size="badge-base" only %}
+                    {% endif %}
+                {% endif %}
+            </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if can_invalidate %}
+                {% if assessment.decision_validated_at %}
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
+                        Modifier la sélection
+                    </button>
+                {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
+                            Modifier la sélection
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
+                    {% if request.user.is_employer %}
+                        <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
+                        <p>
+                            Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
+                            <br>
+                            Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
+                        </p>
+                        <p>
+                            L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                            Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
+                        </p>
+                    {% elif request.user.is_labor_inspector %}
+                        <h2>Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide</h2>
+                        <p>
+                            L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
+                            Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
+                        </p>
+                    {% endif %}
+                    <div class="table-responsive mt-3 mt-md-4">
+                        <table class="table table-hover">
+                            <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Prénom NOM</th>
+                                    <th scope="col">Date de début</th>
+                                    <th scope="col">Date de fin</th>
+                                    <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
+                                    <th scope="col">Aide potentielle</th>
+                                    {% if request.user.is_employer %}
+                                        <th scope="col">Obtenir l’aide</th>
+                                    {% elif request.user.is_labor_inspector %}
+                                        <th scope="col">Éligible à l’aide</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contract in contracts_page %}
+                                    <tr>
+                                        <td>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee }}</a>
+                                        </td>
+                                        <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                                        <td>
+                                            {% if contract.end_at %}
+                                                {{ contract.end_at|date:"d/m/Y" }}
+                                            {% else %}
+                                                {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if contract.nb_days_in_campaign_year >= 90 %}
+                                                Oui
+                                            {% else %}
+                                                Non
+                                            {% endif %}
+
+                                        </td>
+                                        <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
+                                        <td>
+                                            {% if request.user.is_employer %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
+                                            {% elif request.user.is_labor_inspector %}
+                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% include "includes/pagination.html" with page=contracts_page boost=True %}
+
+                    {% if can_validate %}
+
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
+{% block modals %}
+    {{ block.super }}
+    {% if can_invalidate and assessment.decision_validated_at %}
+        <div id="invalidate_modal" class="modal" tabindex="-1" aria-labelledby="invalidate_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="invalidate_modal_title">Modifier la sélection</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        En modifiant cette sélection, votre décision actuelle sera annulée.
+                        <br>
+                        Vous devrez valider de nouveau les informations pour enregistrer votre choix.
+                        Les montants et le commentaire saisis dans la rubrique “Décision” seront conservés, vous pourrez les modifier en cas de besoin.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-link" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">Continuer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

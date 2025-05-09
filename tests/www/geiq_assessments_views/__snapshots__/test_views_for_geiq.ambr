@@ -1,0 +1,3186 @@
+# serializer version: 1
+# name: TestAssessmentComment.test_access_and_comment[comment assessment]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-form">
+                          <form class="js-prevent-multiple-submit" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_geiq_comment">Renseignez un commentaire</label><textarea class="form-control" cols="40" id="id_geiq_comment" name="geiq_comment" required="" rows="10"></textarea></div>
+                              
+                                  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Enregistrer et quitter</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              
+                          </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestAssessmentContractsSync.test_error[details page with error for contracts]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <h2>Mon dossier</h2>
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="summary-document-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Document de synthèse généré par le site label GEIQ</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="structure-financial-assessment-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de la structure</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de l’action</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment/upload?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              </div>
+          
+      </div>
+  </div>
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="contracts-box">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Détail et sélection des contrats</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+          <div class="c-box--summary__body">
+              <p class="fs-sm">
+                  <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>Les contrats n’ont pas pu être importés, merci de réessayer
+              </p>
+          </div>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="click" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Réessayer</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              
+          </div>
+      </div>
+  </div>
+  
+  
+      
+  
+  
+  
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Commentaire général</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/comment?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                      
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+          
+              <h4>Votre dossier n’est pas encore complet</h4>
+              <p class="mb-0">Actions restantes :</p>
+              <ul>
+                  
+                      <li>
+                          <strong>Récupérer le document de synthèse de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Récupérer le bilan financier de la structure de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Transmettre le bilan financier de l’action</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Détail et sélection des contrats à présenter</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Commentaire</strong>
+                      </li>
+                  
+                  <li>
+                      <strong>Envoi du bilan d’exécution</strong>
+                  </li>
+              </ul>
+              <button class="btn btn-primary btn-block" disabled="" type="button">
+                  <span>Envoyer le bilan d’exécution</span>
+              </button>
+          
+      </div>
+  
+  
+                      
+                      <div class="c-box mb-3 mb-md-4">
+                          <h4>Informations générales</h4>
+                          <h5>Structures concernées par la convention</h5>
+                          <ul>
+                              <li>Un Joli GEIQ</li><li>Une antenne</li>
+                          </ul>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <form id="label-sync-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+      </section>
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: contracts, summary document & structure financial assessment missing]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <h4>
+          Votre dossier n’est pas encore complet
+      </h4>
+      <p class="mb-0">
+          Actions restantes :
+      </p>
+      <ul>
+          <li>
+              <strong>
+                  Récupérer le document de synthèse de label
+              </strong>
+          </li>
+          <li>
+              <strong>
+                  Récupérer le bilan financier de la structure de label
+              </strong>
+          </li>
+          <li>
+              <strong>
+                  Détail et sélection des contrats à présenter
+              </strong>
+          </li>
+          <li>
+              <strong>
+                  Envoi du bilan d’exécution
+              </strong>
+          </li>
+      </ul>
+      <button class="btn btn-primary btn-block" disabled="" type="button">
+          <span>
+              Envoyer le bilan d’exécution
+          </span>
+      </button>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: ready for submission]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <h4>
+          Votre dossier est en attente d’envoi
+      </h4>
+      <form method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button class="btn btn-primary btn-block" type="submit">
+              <span>
+                  Envoyer le bilan d’exécution
+              </span>
+          </button>
+      </form>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: summary document & structure financial assessment missing]
+  '''
+  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+      <h4>
+          Votre dossier n’est pas encore complet
+      </h4>
+      <p class="mb-0">
+          Actions restantes :
+      </p>
+      <ul>
+          <li>
+              <strong>
+                  Récupérer le document de synthèse de label
+              </strong>
+          </li>
+          <li>
+              <strong>
+                  Récupérer le bilan financier de la structure de label
+              </strong>
+          </li>
+          <li>
+              <strong>
+                  Envoi du bilan d’exécution
+              </strong>
+          </li>
+      </ul>
+      <button class="btn btn-primary btn-block" disabled="" type="button">
+          <span>
+              Envoyer le bilan d’exécution
+          </span>
+      </button>
+  </div>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_details_for_geiq[SQL queries]
+  dict({
+    'num_queries': 14,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."user_id" = %s
+                 AND "companies_companymembership"."is_active")
+          ORDER BY "companies_companymembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND (NOT ("companies_company"."kind" IN (%s,
+                                                          %s,
+                                                          %s,
+                                                          %s,
+                                                          %s))
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessment_companies" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessment_companies"."assessment_id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE ("geiq_assessments_assessment_companies"."company_id" = %s
+                 AND "geiq_assessments_assessment"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessmentinstitutionlink"."id",
+                 "geiq_assessments_assessmentinstitutionlink"."assessment_id",
+                 "geiq_assessments_assessmentinstitutionlink"."institution_id",
+                 "geiq_assessments_assessmentinstitutionlink"."with_convention",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "geiq_assessments_assessmentinstitutionlink"
+          INNER JOIN "institutions_institution" ON ("geiq_assessments_assessmentinstitutionlink"."institution_id" = "institutions_institution"."id")
+          WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s)
+          ORDER BY "institutions_institution"."kind" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'IfNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
+          WHERE "institutions_institutionmembership"."id" IN
+              (SELECT U0."id"
+               FROM "institutions_institutionmembership" U0
+               INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+               WHERE (U0."institution_id" = %s
+                      AND U2."is_active"
+                      AND U0."is_active"))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'IfNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'ForNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
+          WHERE "institutions_institutionmembership"."id" IN
+              (SELECT U0."id"
+               FROM "institutions_institutionmembership" U0
+               INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+               WHERE (U0."institution_id" = %s
+                      AND U2."is_active"
+                      AND U0."is_active"))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_details_for_geiq[assessment details section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <h2>Mon dossier</h2>
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="summary-document-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Document de synthèse généré par le site label GEIQ</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="structure-financial-assessment-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de la structure</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de l’action</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment/upload?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              </div>
+          
+      </div>
+  </div>
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="contracts-box">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Détail et sélection des contrats</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text"></span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Commentaire général</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/comment?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                      
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+          
+              <h4>Votre dossier n’est pas encore complet</h4>
+              <p class="mb-0">Actions restantes :</p>
+              <ul>
+                  
+                      <li>
+                          <strong>Récupérer le document de synthèse de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Récupérer le bilan financier de la structure de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Transmettre le bilan financier de l’action</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Détail et sélection des contrats à présenter</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Commentaire</strong>
+                      </li>
+                  
+                  <li>
+                      <strong>Envoi du bilan d’exécution</strong>
+                  </li>
+              </ul>
+              <button class="btn btn-primary btn-block" disabled="" type="button">
+                  <span>Envoyer le bilan d’exécution</span>
+              </button>
+          
+      </div>
+  
+  
+                      
+                      <div class="c-box mb-3 mb-md-4">
+                          <h4>Informations générales</h4>
+                          <h5>Structures concernées par la convention</h5>
+                          <ul>
+                              <li>Un Joli GEIQ</li><li>Une antenne</li>
+                          </ul>
+                          
+                              
+                                  
+                                      <h5>Contact(s) DDETS</h5>
+                                  
+                                  <ul>
+                                      
+                                          <li>paul@dd.ets</li>
+                                      
+                                  </ul>
+                              
+                          
+                              
+                                  
+                                      <h5>Contact(s) DREETS</h5>
+                                  
+                                  <ul>
+                                      
+                                          <li>paul@dre.ets</li>
+                                      
+                                  </ul>
+                              
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <form id="label-sync-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+      </section>
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_details_for_geiq[assessment details title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Bilan d’exécution - DDETS 29 / DREETS BRET <span class="badge rounded-pill text-nowrap badge-base bg-info">À compléter</span></h1>
+          </div>
+      
+          <div class="c-title__cta">
+              <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                  <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+              </button>
+          </div>
+      
+      
+  </div>
+  
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+          <li class="nav-item">
+              <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
+          </li>
+          <li class="nav-item" id="kpi-tab">
+      <a aria-disabled="true" class="nav-link disabled" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/kpi" tabindex="-1">Indicateurs clés</a>
+  </li>
+  
+  
+          
+      </ul>
+  
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_submission[submitted assessment details section]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2>
+                      Mon dossier
+                  </h2>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="summary-document-section">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Document de synthèse généré par le site label GEIQ
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Complété
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <p class="fs-sm">
+                              Ce document a été transmis automatiquement par le site label GEIQ, il présente les données consolidées du GEIQ siège ainsi que de l’ensemble de ses antennes.
+                          </p>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <a class="btn-link btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document" rel="noopener" target="_blank">
+                              <span>
+                                  Synthèse 2023.pdf
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="structure-financial-assessment-section">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Bilan financier de la structure
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Complété
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <p class="fs-sm">
+                              Ce document a été transmis automatiquement par le site label GEIQ, il présente les données consolidées du GEIQ siège ainsi que de l’ensemble de ses antennes.
+                          </p>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <a class="btn-link btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment" rel="noopener" target="_blank">
+                              <span>
+                                  Bilan financier structure 2023.pdf
+                              </span>
+                          </a>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Bilan financier de l’action
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Complété
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                              <a class="btn-link mb-3 mb-md-0" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment" rel="noopener" target="_blank">
+                                  <span>
+                                      Bilan financier action 2023.pdf
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="contracts-box">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Détail et sélection des contrats
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Complété
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter ma sélection
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                              <div class="flex-grow-1">
+                                  <h3 class="m-0">
+                                      Commentaire général
+                                  </h3>
+                              </div>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      Complété
+                                  </span>
+                              </div>
+                          </div>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <blockquote class="blockquote mb-0">
+                              Un commentaire important qui se trouve dans le snapshot
+                          </blockquote>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+                      <h4>
+                          Votre dossier a été transmis le 27/05/2025
+                      </h4>
+                      <p class="mb-0">
+                          Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter la DDETS 29.
+                          <br/>
+                          Vous serez notifié par mail de la décision suite à l’examen de votre bilan.
+                      </p>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <ul class="list-data mb-3">
+                          <li>
+                              <small>
+                                  Nombre d’aide à 814 €
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                          <li>
+                              <small>
+                                  Nombre d’aide à 1 400 €
+                              </small>
+                              <strong>
+                                  0
+                              </strong>
+                          </li>
+                          <div class="d-flex flex-column">
+                              <small>
+                                  Montant total potentiel
+                              </small>
+                              <strong>
+                                  0 €
+                              </strong>
+                          </div>
+                      </ul>
+                      <div class="c-info">
+                          <span class="c-info__summary">
+                              Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+                          </span>
+                      </div>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Informations générales
+                      </h4>
+                      <h5>
+                          Structures concernées par la convention
+                      </h5>
+                      <ul>
+                          <li>
+                              Une antenne
+                          </li>
+                          <li>
+                              Une autre antenne
+                          </li>
+                      </ul>
+                      <h5>
+                          Contact(s) DDETS
+                      </h5>
+                      <ul>
+                          <li>
+                              paul@dd.ets
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <form id="label-sync-form">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      </form>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentDetailsForGEIQView.test_submission[submitted assessment details title]
+  '''
+  <section class="s-title-02">
+      <div class="s-title-02__container container">
+          <div class="s-title-02__row row">
+              <div class="s-title-02__col col-12">
+                  <div class="c-prevstep">
+                      <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/list">
+                          <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                          </i>
+                          <span>
+                              Retour
+                  à la liste
+                          </span>
+                      </a>
+                  </div>
+                  <div class="c-title">
+                      <div class="c-title__main">
+                          <h1>
+                              Bilan d’exécution - DDETS 29
+                              <span class="badge rounded-pill text-nowrap badge-base text-info bg-info-lightest">
+                                  Envoyé
+                              </span>
+                          </h1>
+                      </div>
+                      <div class="c-title__cta">
+                          <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                              <i aria-hidden="true" class="ri-printer-line font-weight-normal">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+                  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+                      <li class="nav-item">
+                          <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
+                              Mon dossier
+                          </a>
+                      </li>
+                      <li class="nav-item" id="kpi-tab">
+                          <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/kpi">
+                              Indicateurs clés
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestAssessmentKPI.test_access[assessment details section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <h2>Indicateurs clés</h2>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__body">
+                              <div class="c-info mb-3">
+                                  <span class="c-info__summary">Les taux présentés ci-dessous sont générés automatiquement par le site label GEIQ. Ils concernent le GEIQ principal et ses antennes.</span>
+                              </div>
+  
+                              <div class="c-box--summary__list-data">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de rupture en période d’essai</span>
+                                          <strong>25 %</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de rupture hors période d’essai</span>
+                                          <strong>-</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de sortie emploi durable</span>
+                                          <strong>50 %</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de sortie emploi</span>
+                                          <strong>50 %</strong>
+                                      </li>
+                                      <li class="d-flex gap-2 mb-4">
+                                          <span class="flex-grow-1">Taux d’obtention de qualification</span>
+                                          <strong>75 %</strong>
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Nombre de salariés sur l’année N-1</span>
+                                          <strong>0</strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestAssessmentKPI.test_access[assessment details title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Bilan d’exécution - DDETS 29 <span class="badge rounded-pill text-nowrap badge-base bg-info">À compléter</span></h1>
+          </div>
+      
+          <div class="c-title__cta">
+              <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                  <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+              </button>
+          </div>
+      
+      
+  </div>
+  
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+          <li class="nav-item">
+              <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
+          </li>
+          <li class="nav-item" id="kpi-tab">
+      <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/kpi">Indicateurs clés</a>
+  </li>
+  
+  
+          
+      </ul>
+  
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: TestAssessmentResult.test_access[assessment details negative balance]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <h2>Résultat</h2>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Décision</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant total accordé</span>
+                                          <strong>20 000 €</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de réalisation</span>
+                                          
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">20 %</span>
+                                          
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Premier versement déjà réalisé</span>
+                                          <strong>80 000 €</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          
+                                              <span class="flex-grow-1">Remboursement attendu</span>
+                                              <strong>60 000 €</strong>
+                                          
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex flex-column gap-2">
+                                          <span class="flex-grow-1">Commentaire</span>
+                                          <blockquote class="blockquote mb-0">
+                                              Bravo !
+                                          </blockquote>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Conventionnement</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
+                                          <strong>100 000 €</strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Récapitulatif</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data mb-3">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Nombre d’aides à 814 € accordées</span>
+                                          <div>
+                                              <strong>0</strong> / 0
+                                          </div>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Nombre d’aides à 1 400 € accordées</span>
+                                          <div>
+                                              <strong>0</strong> / 0
+                                          </div>
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant potentiel de l’aide à l’accompagnement</span>
+                                          <strong>-</strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="c-info mb-3">
+                                  <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestAssessmentResult.test_access[assessment details positive balance]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <h2>Résultat</h2>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Décision</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant total accordé</span>
+                                          <strong>80 000 €</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Taux de réalisation</span>
+                                          
+                                              <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">80 %</span>
+                                          
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Premier versement déjà réalisé</span>
+                                          <strong>20 000 €</strong>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          
+                                              <span class="flex-grow-1">Deuxième versement accordé</span>
+                                              <strong>60 000 €</strong>
+                                          
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex flex-column gap-2">
+                                          <span class="flex-grow-1">Commentaire</span>
+                                          <blockquote class="blockquote mb-0">
+                                              Bravo !
+                                          </blockquote>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Conventionnement</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
+                                          <strong>100 000 €</strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--summary mb-3 mb-md-4">
+                          <div class="c-box--summary__header">
+                              <h3 class="m-0">Récapitulatif</h3>
+                          </div>
+                          <hr class="m-0"/>
+                          <div class="c-box--summary__body">
+                              <div class="c-box--summary__list-data mb-3">
+                                  <ul class="list-unstyled">
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Nombre d’aides à 814 € accordées</span>
+                                          <div>
+                                              <strong>0</strong> / 0
+                                          </div>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Nombre d’aides à 1 400 € accordées</span>
+                                          <div>
+                                              <strong>0</strong> / 0
+                                          </div>
+                                      </li>
+                                      <li aria-hidden="true">
+                                          <hr class="my-2"/>
+                                      </li>
+                                      <li class="d-flex gap-2">
+                                          <span class="flex-grow-1">Montant potentiel de l’aide à l’accompagnement</span>
+                                          <strong>-</strong>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="c-info mb-3">
+                                  <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestAssessmentResult.test_access[assessment details title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/geiq-assessments/list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <span>
+                  Retour
+                  à la liste
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      
+  <div class="c-title">
+      <div class="c-title__main">
+              <h1>Bilan d’exécution - DDETS 29 <span class="badge rounded-pill text-nowrap badge-base text-success bg-success-lightest">Traité</span></h1>
+          </div>
+      
+          <div class="c-title__cta">
+              <button aria-label="Imprimer la page" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" type="button">
+                  <i aria-hidden="true" class="ri-printer-line font-weight-normal"></i>
+              </button>
+          </div>
+      
+      
+  </div>
+  
+  
+                              
+                                  
+  
+  
+  
+                              
+                              
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+          <li class="nav-item">
+              <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
+          </li>
+          <li class="nav-item" id="kpi-tab">
+      <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/kpi">Indicateurs clés</a>
+  </li>
+  
+  
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/result">Résultat</a>
+              </li>
+          
+      </ul>
+  
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: TestAssessmentSyncFile.test_error[details page with error for structure financial assessment]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <h2>Mon dossier</h2>
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="summary-document-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Document de synthèse généré par le site label GEIQ</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="structure-financial-assessment-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de la structure</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+          <div class="c-box--summary__body">
+              
+                  <p class="fs-sm">
+                      <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>Le document n’a pas été importé, merci de réessayer
+                  </p>
+              
+          </div>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="click" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Réessayer</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+      
+      
+  
+  
+  
+  
+  
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de l’action</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment/upload?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              </div>
+          
+      </div>
+  </div>
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="contracts-box">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Détail et sélection des contrats</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text"></span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Commentaire général</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/comment?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                      
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+          
+              <h4>Votre dossier n’est pas encore complet</h4>
+              <p class="mb-0">Actions restantes :</p>
+              <ul>
+                  
+                      <li>
+                          <strong>Récupérer le document de synthèse de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Récupérer le bilan financier de la structure de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Transmettre le bilan financier de l’action</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Détail et sélection des contrats à présenter</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Commentaire</strong>
+                      </li>
+                  
+                  <li>
+                      <strong>Envoi du bilan d’exécution</strong>
+                  </li>
+              </ul>
+              <button class="btn btn-primary btn-block" disabled="" type="button">
+                  <span>Envoyer le bilan d’exécution</span>
+              </button>
+          
+      </div>
+  
+  
+                      
+                      <div class="c-box mb-3 mb-md-4">
+                          <h4>Informations générales</h4>
+                          <h5>Structures concernées par la convention</h5>
+                          <ul>
+                              <li>Un Joli GEIQ</li><li>Une antenne</li>
+                          </ul>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <form id="label-sync-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+      </section>
+  '''
+# ---
+# name: TestAssessmentSyncFile.test_error[details page with error for summary document]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <h2>Mon dossier</h2>
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="summary-document-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Document de synthèse généré par le site label GEIQ</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+          <div class="c-box--summary__body">
+              
+                  <p class="fs-sm">
+                      <i aria-hidden="true" class="ri-xl ri-alert-line text-danger"></i>Le document n’a pas été importé, merci de réessayer
+                  </p>
+              
+          </div>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/summary-document/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#summary-document-section" hx-trigger="click" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Réessayer</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+      
+      
+  
+  
+  
+  
+  
+  
+  
+  
+                      
+  
+  <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="structure-financial-assessment-section">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de la structure</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+  
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/structure-financial-asssessment/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#structure-financial-assessment-section" hx-trigger="load" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text">Récupération de Label</span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              </div>
+          
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Bilan financier de l’action</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--summary__footer">
+          
+              <div class="d-flex justify-content-end">
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/action-financial-asssessment/upload?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              </div>
+          
+      </div>
+  </div>
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4" id="contracts-box">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Détail et sélection des contrats</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                      <i aria-hidden="true" class="ri-refresh-line"></i>
+                      <span class="stable-text"></span>
+                      <span class="loading-text">Récupération en cours</span>
+                  </button>
+              
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                      <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+      <div class="c-box--summary__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="flex-grow-1">
+                  <h3 class="m-0">Commentaire général</h3>
+              </div>
+              <div>
+                  
+                      <span class="badge badge-sm rounded-pill bg-info">À compléter</span>
+  
+                  
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      
+      <div class="c-box--summary__footer">
+          <div class="d-flex justify-content-end">
+              
+                  <a class="btn btn-primary btn-block w-100 w-md-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444/comment?back_url=/geiq-assessments/00000000-1111-2222-3333-444444444444">Compléter</a>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                      
+      <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
+          
+              <h4>Votre dossier n’est pas encore complet</h4>
+              <p class="mb-0">Actions restantes :</p>
+              <ul>
+                  
+                      <li>
+                          <strong>Récupérer le document de synthèse de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Récupérer le bilan financier de la structure de label</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Transmettre le bilan financier de l’action</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Détail et sélection des contrats à présenter</strong>
+                      </li>
+                  
+                      <li>
+                          <strong>Commentaire</strong>
+                      </li>
+                  
+                  <li>
+                      <strong>Envoi du bilan d’exécution</strong>
+                  </li>
+              </ul>
+              <button class="btn btn-primary btn-block" disabled="" type="button">
+                  <span>Envoyer le bilan d’exécution</span>
+              </button>
+          
+      </div>
+  
+  
+                      
+                      <div class="c-box mb-3 mb-md-4">
+                          <h4>Informations générales</h4>
+                          <h5>Structures concernées par la convention</h5>
+                          <ul>
+                              <li>Un Joli GEIQ</li><li>Une antenne</li>
+                          </ul>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <form id="label-sync-form">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          </form>
+      </section>
+  '''
+# ---
+# name: TestAssessmentUploadActionFinancialAssessment.test_access_and_upload[upload action financial assessment]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-lg-8 order-2 order-lg-1">
+                  <h2 class="h4">
+                      1. Téléchargez le modèle du document
+                  </h2>
+                  <a class="btn btn-ico btn-outline-primary mb-3" href="/static/pdf/cerfa_15059-02.pdf" rel="noopener" target="_blank">
+                      <span>
+                          Modèle bilan financier de l’action
+                      </span>
+                      <i aria-hidden="true" class="ri-download-line fw-medium">
+                      </i>
+                  </a>
+                  <h2 class="h4">
+                      2. Déposez ici le document rempli
+                  </h2>
+                  <div class="c-form">
+                      <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <div class="form-group form-group-required">
+                              <label class="visually-hidden" for="id_assessment_file">
+                                  Bilan
+                              </label>
+                              <div class="c-dropzone position-relative file-dropzone">
+                                  <input accept="application/pdf" aria-describedby="id_assessment_file_helptext" class="form-control" id="id_assessment_file" name="assessment_file" required="" type="file"/>
+                                  <div class="file-dropzone-selector">
+                                      <p aria-hidden="true" class="mb-1 text-nuance-06">
+                                          <i aria-hidden="true" class="ri-upload-cloud-2-line ri-2x">
+                                          </i>
+                                      </p>
+                                      <p class="mb-2">
+                                          Glissez votre fichier ici ou
+                                          <strong>
+                                              rechercher
+                                          </strong>
+                                          dans vos fichiers
+                                      </p>
+                                      <label class="btn btn-link btn-sm btn-ico mb-2 stretched-link" for="id_assessment_file">
+                                          <i aria-hidden="true" class="ri-folder-line ri-xl">
+                                          </i>
+                                          <span>
+                                              Rechercher dans vos fichiers
+                                          </span>
+                                      </label>
+                                      <p class="small text-nuance-06 mb-0">
+                                          Taille maximale : 5 Mo
+                                          <br/>
+                                          Type de fichier : PDF
+                                      </p>
+                                  </div>
+                                  <div class="file-dropzone-preview d-none p-5">
+                                      <p>
+                                          Fichier sélectionné :
+                                      </p>
+                                      <div class="fs-sm mb-3">
+                                          <strong class="file-dropzone-filename">
+                                          </strong>
+                                      </div>
+                                      <button class="btn btn-sm btn-ico btn-secondary file-dropzone-clear" type="button">
+                                          <i aria-hidden="true" class="ri-delete-bin-line ri-xl">
+                                          </i>
+                                          <span>
+                                              Supprimer
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                              <div class="form-text" id="id_assessment_file_helptext">
+                                  <p>
+                                      <i class="ri-question-line mr-1">
+                                      </i>
+                                      Ce fichier n'est pas un PDF ?
+                                      <a aria-label="Découvrez comment le convertir (ouverture dans un nouvel onglet)" class="matomo-event has-external-link" data-matomo-action="clic" data-matomo-category="ajout-fichier-candidature" data-matomo-event="true" data-matomo-option="clic-sur-lien-aide-pdf" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16875396981777--Convertir-votre-document-en-format-PDF" rel="noopener" target="_blank">
+                                          Découvrez comment le convertir.
+                                      </a>
+                                  </p>
+                              </div>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Enregistrer et quitter
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
+# name: TestCreateAssessmentView.test_create_assessment_multiple_antennas[Assessment already exists for main & 1 antenna]
+  '''
+  <div class="alert alert-danger alert-dismissible fade show" role="status">
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-2">
+                          <strong>
+                              
+                                  Ces structures ont déjà été ajoutées à un bilan d’exécution, nous ne pouvez pas les sélectionner pour créer ce bilan.
+                              
+                          </strong>
+                      </p>
+                      <ul class="mb-0">
+                          <li>Un Joli GEIQ</li><li>Une autre antenne</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_create_assessment_multiple_antennas[Create form with disabled choices]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          <div class="c-form">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  
+                                  <fieldset>
+                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
+                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+    <option selected="" value="">---------</option>
+  
+    <option value="1">DDETS 29</option>
+  
+  </select></div>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
+                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+    <option selected="" value="">---------</option>
+  
+    <option value="2">DREETS BRET</option>
+  
+  </select></div>
+                                  </fieldset>
+                                  <hr/>
+                                  <fieldset>
+                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <h5>GEIQ principal:</h5>
+  
+                                      
+                                          <div class="form-group">
+                                              <div class="form-check">
+                                                  <input class="form-check-input" disabled="" id="id_main_geiq" name="main_geiq" type="checkbox"/>
+                                                  <label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label>
+                                                  <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
+                                              </div>
+                                          </div>
+                                      
+                                      <h5>Antennes:</h5>
+                                      
+                                          
+                                              <div class="form-group">
+                                                  <div class="form-check">
+                                                      <input class="form-check-input" disabled="" id="id_antenna_2345" name="antenna_2345" type="checkbox"/>
+                                                      <label class="form-check-label" for="id_antenna_2345">Une antenne</label>
+                                                      <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
+                                                  </div>
+                                              </div>
+                                          
+                                      
+                                          
+                                              <div class="form-group">
+                                                  <div class="form-check">
+                                                      <input class="form-check-input" disabled="" id="id_antenna_3456" name="antenna_3456" type="checkbox"/>
+                                                      <label class="form-check-label" for="id_antenna_3456">Une autre antenne</label>
+                                                      <i aria-label="Cette structure est déjà présente dans un autre bilan d’exécution." class="ri-error-warning-line text-info" data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution." data-bs-toggle="tooltip"></i>
+                                                  </div>
+                                              </div>
+                                          
+                                      
+                                          
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne</label></div></div>
+                                          
+                                      
+                                  </fieldset>
+                                  <div class="c-info mt-3 mb-3">
+                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
+                                  </div>
+                                  
+                                  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/list">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Créer le bilan</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              </form>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_create_assessment_multiple_antennas[Multiple antennas]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          <div class="c-form">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  
+                                  <fieldset>
+                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
+                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+    <option selected="" value="">---------</option>
+  
+    <option value="1">DDETS 29</option>
+  
+  </select></div>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
+                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+    <option selected="" value="">---------</option>
+  
+    <option value="2">DREETS BRET</option>
+  
+  </select></div>
+                                  </fieldset>
+                                  <hr/>
+                                  <fieldset>
+                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <h5>GEIQ principal:</h5>
+  
+                                      
+                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
+                                      
+                                      <h5>Antennes:</h5>
+                                      
+                                          
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_2345" name="antenna_2345" type="checkbox"/><label class="form-check-label" for="id_antenna_2345">Une antenne</label></div></div>
+                                          
+                                      
+                                          
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_3456" name="antenna_3456" type="checkbox"/><label class="form-check-label" for="id_antenna_3456">Une autre antenne</label></div></div>
+                                          
+                                      
+                                          
+                                              <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_antenna_4567" name="antenna_4567" type="checkbox"/><label class="form-check-label" for="id_antenna_4567">Une dernière antenne</label></div></div>
+                                          
+                                      
+                                  </fieldset>
+                                  <div class="c-info mt-3 mb-3">
+                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
+                                  </div>
+                                  
+                                  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/list">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Créer le bilan</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              </form>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_create_assessment_no_antenna[Assessment already exists]
+  '''
+  <div class="alert alert-danger alert-dismissible fade show" role="status">
+              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-2">
+                          <strong>
+                              
+                                  Cette structure a déjà été ajoutée à un bilan d’exécution, vous ne pouvez pas la sélectionner pour créer ce bilan.
+                              
+                          </strong>
+                      </p>
+                      <ul class="mb-0">
+                          <li>Un Joli GEIQ</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_create_assessment_no_antenna[No antenna]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          <div class="c-form">
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  
+                                  <fieldset>
+                                      <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
+                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+    <option selected="" value="">---------</option>
+  
+    <option value="1">DDETS 29</option>
+  
+  </select></div>
+                                      <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
+                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+    <option selected="" value="">---------</option>
+  
+    <option value="2">DREETS BRET</option>
+  
+  </select></div>
+                                  </fieldset>
+                                  <hr/>
+                                  <fieldset>
+                                      <legend class="h4">Quelles sont les structures concernées par cette convention ?</legend>
+                                      <h5>GEIQ principal:</h5>
+  
+                                      
+                                          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_main_geiq" name="main_geiq" type="checkbox"/><label class="form-check-label" for="id_main_geiq">Un Joli GEIQ</label></div></div>
+                                      
+                                      <h5>Antennes:</h5>
+                                      
+                                          Aucune
+                                      
+                                  </fieldset>
+                                  <div class="c-info mt-3 mb-3">
+                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
+                                  </div>
+                                  
+                                  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/geiq-assessments/list">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Créer le bilan</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                              </form>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_info_missing_for_creation[no campaign or data]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestCreateAssessmentView.test_info_missing_for_creation[unknown SIRET]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      
+                          Le SIRET (12345678901234) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestListAssessmentsView.test_complex_list[SQL queries]
+  dict({
+    'num_queries': 12,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."user_id" = %s
+                 AND "companies_companymembership"."is_active")
+          ORDER BY "companies_companymembership"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND (NOT ("companies_company"."kind" IN (%s,
+                                                          %s,
+                                                          %s,
+                                                          %s,
+                                                          %s))
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
+          'list_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[geiq_assessments_views/list_for_geiq.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
+          'list_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id",
+                 "geiq_assessments_assessment"."created_at",
+                 "geiq_assessments_assessment"."created_by_id",
+                 "geiq_assessments_assessment"."campaign_id",
+                 "geiq_assessments_assessment"."label_geiq_id",
+                 "geiq_assessments_assessment"."label_geiq_name",
+                 "geiq_assessments_assessment"."with_main_geiq",
+                 "geiq_assessments_assessment"."label_antennas",
+                 "geiq_assessments_assessment"."summary_document_file_id",
+                 "geiq_assessments_assessment"."structure_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."action_financial_assessment_file_id",
+                 "geiq_assessments_assessment"."label_rates",
+                 "geiq_assessments_assessment"."employee_nb",
+                 "geiq_assessments_assessment"."contracts_synced_at",
+                 "geiq_assessments_assessment"."contracts_selection_validated_at",
+                 "geiq_assessments_assessment"."geiq_comment",
+                 "geiq_assessments_assessment"."submitted_at",
+                 "geiq_assessments_assessment"."submitted_by_id",
+                 "geiq_assessments_assessment"."review_comment",
+                 "geiq_assessments_assessment"."convention_amount",
+                 "geiq_assessments_assessment"."granted_amount",
+                 "geiq_assessments_assessment"."advance_amount",
+                 "geiq_assessments_assessment"."decision_validated_at",
+                 "geiq_assessments_assessment"."grants_selection_validated_at",
+                 "geiq_assessments_assessment"."reviewed_at",
+                 "geiq_assessments_assessment"."reviewed_by_id",
+                 "geiq_assessments_assessment"."reviewed_by_institution_id",
+                 "geiq_assessments_assessment"."final_reviewed_at",
+                 "geiq_assessments_assessment"."final_reviewed_by_id",
+                 "geiq_assessments_assessment"."final_reviewed_by_institution_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "geiq_assessments_assessmentcampaign"."id",
+                 "geiq_assessments_assessmentcampaign"."year",
+                 "geiq_assessments_assessmentcampaign"."submission_deadline",
+                 "geiq_assessments_assessmentcampaign"."review_deadline"
+          FROM "geiq_assessments_assessment"
+          INNER JOIN "geiq_assessments_assessment_companies" ON ("geiq_assessments_assessment"."id" = "geiq_assessments_assessment_companies"."assessment_id")
+          INNER JOIN "users_user" ON ("geiq_assessments_assessment"."created_by_id" = "users_user"."id")
+          INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
+          WHERE "geiq_assessments_assessment_companies"."company_id" = %s
+          ORDER BY "geiq_assessments_assessment"."created_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[geiq_assessments_views/list_for_geiq.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
+          'list_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessmentinstitutionlink"."id",
+                 "geiq_assessments_assessmentinstitutionlink"."assessment_id",
+                 "geiq_assessments_assessmentinstitutionlink"."institution_id",
+                 "geiq_assessments_assessmentinstitutionlink"."with_convention",
+                 "institutions_institution"."id",
+                 "institutions_institution"."address_line_1",
+                 "institutions_institution"."address_line_2",
+                 "institutions_institution"."post_code",
+                 "institutions_institution"."city",
+                 "institutions_institution"."department",
+                 "institutions_institution"."coords",
+                 "institutions_institution"."geocoding_score",
+                 "institutions_institution"."geocoding_updated_at",
+                 "institutions_institution"."ban_api_resolved_address",
+                 "institutions_institution"."insee_city_id",
+                 "institutions_institution"."name",
+                 "institutions_institution"."created_at",
+                 "institutions_institution"."updated_at",
+                 "institutions_institution"."uid",
+                 "institutions_institution"."active_members_email_reminder_last_sent_at",
+                 "institutions_institution"."automatic_geocoding_update",
+                 "institutions_institution"."kind"
+          FROM "geiq_assessments_assessmentinstitutionlink"
+          INNER JOIN "institutions_institution" ON ("geiq_assessments_assessmentinstitutionlink"."institution_id" = "institutions_institution"."id")
+          WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s,
+                                                                                 %s,
+                                                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestListAssessmentsView.test_complex_list[assessments complex list]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                          <h2 class="mb-0">Mes bilans</h2>
+                          <div aria-label="Actions sur les bilans d’exécution" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
+                              <a class="btn btn-primary" href="/geiq-assessments/create">Créer un bilan d’exécution</a>
+                          </div>
+                      </div>
+                      
+                          <p>3 résultats</p>
+                          <div class="table-responsive mt-3 mt-md-4">
+                              <table class="table table-hover">
+                                  <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                                  <thead>
+                                      <tr>
+                                          <th scope="col">Institution</th>
+                                          <th scope="col">Structures</th>
+                                          <th scope="col">Créé par</th>
+                                          <th scope="col">Date d’envoi</th>
+                                          <th scope="col">Statut</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/00000000-0d2c-4f29-ba5b-a27ffb8ecc84"></a>
+                                              </td>
+                                              <td>
+                                                  <ul class="mb-0">
+                                                      <li>Siège</li><li>Une antenne</li>
+                                                  </ul>
+                                              </td>
+                                              <td>Jean DUPONT</td>
+                                              <td>-</td>
+                                              <td><span class="badge rounded-pill text-nowrap badge-sm bg-info">À compléter</span></td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/11111111-0d2c-4f29-ba5b-a27ffb8ecc84"></a>
+                                              </td>
+                                              <td>
+                                                  <ul class="mb-0">
+                                                      <li>Siège</li>
+                                                  </ul>
+                                              </td>
+                                              <td>Marie CURIE</td>
+                                              <td>21/05/2025</td>
+                                              <td><span class="badge rounded-pill text-nowrap badge-sm text-info bg-info-lightest">Envoyé</span></td>
+                                          </tr>
+                                      
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/22222222-0d2c-4f29-ba5b-a27ffb8ecc84"></a>
+                                              </td>
+                                              <td>
+                                                  <ul class="mb-0">
+                                                      <li>Un Superbe GEIQ</li>
+                                                  </ul>
+                                              </td>
+                                              <td>Marie CURIE</td>
+                                              <td>21/05/2025</td>
+                                              <td><span class="badge rounded-pill text-nowrap badge-sm text-success bg-success-lightest">Traité</span></td>
+                                          </tr>
+                                      
+                                  </tbody>
+                              </table>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: TestListAssessmentsView.test_empty_list[assessments empty list]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                          <h2 class="mb-0">Mes bilans</h2>
+                          <div aria-label="Actions sur les bilans d’exécution" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
+                              <a class="btn btn-primary" href="/geiq-assessments/create">Créer un bilan d’exécution</a>
+                          </div>
+                      </div>
+                      
+                          <p>
+                              Cet espace vous permet de créer et de suivre vos bilans d’exécution.
+                              <br/>
+                              Vous devez créer un bilan par convention.
+                          </p>
+                      
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
