@@ -134,8 +134,28 @@
                        aria-label="Réactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Réactiver</a>
                 {% endif %}
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?back_url={{ current_url|urlencode }}"
-                   class="btn {% if employee_record.status == "NEW" or employee_record.status == "REJECTED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
+                   class="btn {% if employee_record.status == "NEW" or employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
                    aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Voir la fiche salarié</a>
+                {% if employee_record.status == "PROCESSED" %}
+                    <div class="dropdown w-md-auto">
+                        <button type="button" class="btn btn-primary w-100 w-md-auto dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="sendBackRecordDropdown" aria-expanded="false">
+                            Renvoyer cette fiche salarié
+                        </button>
+                        <div class="dropdown-menu" id="sendBackRecordDropdown">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.pk %}" class="js-prevent-multiple-submit">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url "employee_record_views:create" employee_record.job_application.pk %}">Modifier et renvoyer</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
                 {% if employee_record.status == "NEW" %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
