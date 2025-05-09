@@ -91,9 +91,9 @@ def test_reason_status_filter(admin_client):
     membership_admin_url = reverse("admin:gps_followupgroupmembership_changelist")
 
     response = admin_client.get(membership_admin_url + "?has_reason=yes")
-    assertContains(response, str(membership_with_reason.member.email))
-    assertNotContains(response, str(membership_without_reason.member.email))
+    assertContains(response, membership_with_reason.member.email)
+    assertNotContains(response, membership_without_reason.member.email)
 
     response = admin_client.get(membership_admin_url + "?has_reason=no")
-    assertContains(response, str(membership_without_reason.member.email))
-    assertNotContains(response, str(membership_with_reason.member.email))
+    assertContains(response, membership_without_reason.member.email)
+    assertNotContains(response, membership_with_reason.member.email)
