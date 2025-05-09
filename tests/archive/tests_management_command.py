@@ -1,5 +1,6 @@
 import datetime
 
+import httpx
 import pytest
 from django.core.management import call_command
 from django.utils import timezone
@@ -8,6 +9,7 @@ from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PER
 from itou.archive.models import ArchivedJobSeeker
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.models import User
+from itou.utils.constants import BREVO_API_URL
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -25,6 +27,11 @@ from tests.users.factories import (
 
 
 DAYS_OF_INACTIVITY = 730 - 30
+
+
+@pytest.fixture(name="brevo_api_key")
+def brevo_api_key_fixture(settings):
+    settings.BREVO_API_KEY = "BREVO_API_KEY"
 
 
 class TestNotifyArchiveJobSeekersManagementCommand:
@@ -494,3 +501,18 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
         assert ArchivedJobSeeker.objects.exists()
+
+    def test_async_delete_contact_is_called_when_archiving_user(
+        self, django_capture_on_commit_callbacks, respx_mock, caplog, brevo_api_key
+    ):
+        jobseekers = JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        for jobseeker in jobseekers:
+            respx_mock.delete(f"{BREVO_API_URL}/contacts/{jobseeker.email}?identifierType=email_id").mock(
+                return_value=httpx.Response(status_code=204)
+            )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_jobseekers", wet_run=True)
+
+        assert respx_mock.calls.called
+        assert respx_mock.calls.call_count == len(jobseekers)
