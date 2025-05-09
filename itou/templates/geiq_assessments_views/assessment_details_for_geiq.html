@@ -1,0 +1,70 @@
+{% extends "geiq_assessments_views/_assessment_base_for_geiq.html" %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <h2>Mon dossier</h2>
+                    {% include "geiq_assessments_views/includes/summary_document_box.html" with assessment=assessment only %}
+                    {% include "geiq_assessments_views/includes/structure_financial_assessment_box.html" with assessment=assessment only %}
+                    {% include "geiq_assessments_views/includes/action_financial_assessment_box.html" with assessment=assessment request=request only %}
+                    {% include "geiq_assessments_views/includes/contracts_box.html" with assessment=assessment request=request only %}
+                    {% include "geiq_assessments_views/includes/geiq_comment_box.html" with assessment=assessment request=request only %}
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                    {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment csrf_token=csrf_token request=request only %}
+                    {% if assessment.contracts_selection_validated_at %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data mb-3">
+                                <li>
+                                    <small>Nombre d’aide à 814 €</small>
+                                    <strong>{{ stats.allowance_of_814_selected_nb }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre d’aide à 1 400 €</small>
+                                    <strong>{{ stats.allowance_of_1400_selected_nb }}</strong>
+                                </li>
+                                <div class="d-flex flex-column">
+                                    <small>Montant total potentiel</small>
+                                    <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                </div>
+                            </ul>
+                            <div class="c-info">
+                                <span class="c-info__summary">Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h4>Informations générales</h4>
+                        <h5>Structures concernées par la convention</h5>
+                        <ul>
+                            {% for antenna in assessment.label_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
+                        </ul>
+                        {% for institution_link in assessment.institution_links.all %}
+                            {% if institution_link.with_convention %}
+                                {% if institution_link.institution.kind == InstitutionKind.DDETS_GEIQ %}
+                                    <h5>Contacts DDETS</h5>
+                                {% elif institution_link.institution.kind == InstitutionKind.DREETS_GEIQ %}
+                                    <h5>Contacts DREETS</h5>
+                                {% else %}
+                                    <h5>Contacts {{ institution_link.institution.kind }}</h5>
+                                {% endif %}
+                                <ul>
+                                    {% for member in institution_link.institution.active_members.all %}
+                                        {% if member.email != PILOTAGE_INSTITUTION_EMAIL_CONTACT %}<li>{{ member.email }}</li>{% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="label-sync-form">
+            {% csrf_token %}
+        </form>
+    </section>
+{% endblock %}

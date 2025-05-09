@@ -1,0 +1,3 @@
+{% url "geiq_assessments_views:structure_financial_assessment" pk=assessment.pk as download_url %}
+{% url "geiq_assessments_views:sync_structure_financial_assessment" pk=assessment.pk as sync_url %}
+{% include "geiq_assessments_views/includes/_document_with_sync_box.html" with assessment=assessment document_filename=assessment.structure_financial_assessment_filename document_present=assessment.structure_financial_assessment_file_id download_url=download_url error=error|default:False request=request section_id="structure-financial-assessment-section" sync_url=sync_url title="Bilan financier de la structure" only %}

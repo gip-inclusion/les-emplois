@@ -1,0 +1,35 @@
+<div class="c-box c-box--summary has-links-inside">
+    <div class="c-box--summary__header">
+        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="flex-grow-1">
+                <h3 class="m-0">Commentaire général</h3>
+            </div>
+            <div>
+                {% if assessment.geiq_comment %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <hr class="m-0">
+    {% if assessment.geiq_comment %}
+        <div class="c-box--summary__body">
+            <blockquote class="blockquote mb-0">
+                {{ assessment.geiq_comment|linebreaksbr }}
+            </blockquote>
+        </div>
+    {% endif %}
+    <div class="c-box--summary__footer">
+        <div class="d-flex justify-content-end">
+            {% if assessment.geiq_comment %}
+                {% if not assessment.submitted_at %}
+                    <a href="{% url "geiq_assessments_views:assessment_comment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto"><i class="ri-pencil-line fw-medium" aria-hidden="true"></i><span>Modifier</span></a>
+                {% endif %}
+            {% else %}
+                <a href="{% url "geiq_assessments_views:assessment_comment" pk=assessment.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-primary btn-block w-100 w-md-auto">Compléter</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

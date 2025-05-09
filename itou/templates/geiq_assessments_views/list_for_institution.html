@@ -1,0 +1,113 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load geiq_assessments_badges %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}Bilans d’exécution GEIQ {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Bilans d’exécution GEIQ</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if assessments %}
+                        <p>{{ assessments|length }} résultat{{ assessments|pluralizefr }}</p>
+                        <div class="table-responsive mt-3 mt-md-4">
+                            <table class="table table-hover">
+                                <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">Campagne</th>
+                                        <th scope="col">Référent</th>
+                                        <th scope="col">Statut du bilan</th>
+                                        <th scope="col">Nombre de contrats</th>
+                                        <th scope="col">Montant accordé</th>
+                                        <th scope="col">Montant conventionné</th>
+                                        <th scope="col">Taux de réalisation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for assessment in assessments %}
+                                        <tr>
+                                            <td>
+                                                <a class="btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
+                                                    {{ assessment.name_for_institution }}
+
+                                                </a>
+                                                <ul class="mb-0">
+                                                    {% for antenna in assessment.label_antennas %}
+                                                        <li>
+                                                            {% if antenna.id %}
+                                                                {{ antenna.name }}
+                                                            {% else %}
+                                                                Siège
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>{{ assessment.campaign.year }}</td>
+                                            <td>
+                                                {% for institution in assessment.conventionned_institutions %}
+                                                    {{ institution.name }}
+                                                    {% if not forloop.last %}<br>{% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>{% state_for_institution assessment %}</td>
+                                            <td>
+                                                {% if assessment.submitted_at %}
+                                                    {{ assessment.contracts_nb }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.granted_amount|format_int_euros }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.convention_amount|format_int_euros }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if assessment.decision_validated_at and assessment.convention_amount %}
+                                                    {% grant_percentage_badge assessment %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center my-3 my-md-4">
+                            <p class="mb-1 mt-3">
+                                <strong>Aucun bilan pour le moment</strong>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
