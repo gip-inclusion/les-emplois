@@ -78,6 +78,11 @@ class CreateForm(forms.Form):
     def get_antenna_field(self, antenna_id):
         return f"{self.ANTENNA_PREFIX}_{antenna_id}"
 
+    def iter_antenna_field(self):
+        for field in self:
+            if self.ANTENNA_PREFIX in field.name:
+                yield field
+
     def clean(self):
         cleaned_data = super().clean()
         if not cleaned_data.get("convention_with_ddets") and not cleaned_data.get("convention_with_dreets"):

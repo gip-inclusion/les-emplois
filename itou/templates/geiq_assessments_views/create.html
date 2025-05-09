@@ -91,23 +91,23 @@
                                                 {% bootstrap_field form.main_geiq %}
                                             {% endif %}
                                             <h5>Antennes:</h5>
-                                            {% for field in form %}
-                                                {% if form.ANTENNA_PREFIX in field.name %}
-                                                    {% if field.field.disabled %}
-                                                        <div class="form-group">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" name="{{ field.name }}" class="form-check-input" disabled="" id="{{ field.auto_id }}">
-                                                                <label class="form-check-label" for="{{ field.auto_id }}">{{ field.field.label }}</label>
-                                                                <i class="ri-error-warning-line text-info"
-                                                                   aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
-                                                                   data-bs-toggle="tooltip"
-                                                                   data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution."></i>
-                                                            </div>
+                                            {% for field in form.iter_antenna_field %}
+                                                {% if field.field.disabled %}
+                                                    <div class="form-group">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" name="{{ field.name }}" class="form-check-input" disabled="" id="{{ field.auto_id }}">
+                                                            <label class="form-check-label" for="{{ field.auto_id }}">{{ field.field.label }}</label>
+                                                            <i class="ri-error-warning-line text-info"
+                                                               aria-label="Cette structure est déjà présente dans un autre bilan d’exécution."
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-title="Cette structure est déjà présente dans un autre bilan d’exécution."></i>
                                                         </div>
-                                                    {% else %}
-                                                        {% bootstrap_field field %}
-                                                    {% endif %}
+                                                    </div>
+                                                {% else %}
+                                                    {% bootstrap_field field %}
                                                 {% endif %}
+                                            {% empty %}
+                                                Aucune
                                             {% endfor %}
                                         </div>
                                     </div>
