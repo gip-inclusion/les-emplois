@@ -1037,13 +1037,13 @@
 # name: TestJobDescriptionListView.test_toggle_spontaneous_applications
   '''
   <form class="js-prevent-multiple-submit" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_spontaneous_applications" method="post">
-                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                                      <input name="action" type="hidden" value="toggle_spontaneous_applications"/>
-                                                      <div class="form-check form-switch has-state-label">
-                                                          <input checked="" class="form-check-input" id="spontaneous_applications_is_active" name="spontaneous_applications_is_active" type="checkbox"/>
-                                                          <label class="form-check-label" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert" for="spontaneous_applications_is_active">
-                                                          </label>
-                                                      </div>
-                                                  </form>
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <input name="action" type="hidden" value="toggle_spontaneous_applications"/>
+      <div class="form-check form-switch has-state-label">
+          <input checked="" class="form-check-input" id="spontaneous_applications_is_active" name="spontaneous_applications_is_active" type="checkbox"/>
+          <label class="form-check-label" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert" for="spontaneous_applications_is_active">
+          </label>
+      </div>
+  </form>
   '''
 # ---

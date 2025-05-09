@@ -14,6 +14,22 @@ urlpatterns = [
         views.JobDescriptionCardView.as_view(),
         name="job_description_card",
     ),
+    path(
+        "job_description/spontaneous_applications/refresh",
+        views.refresh_spontaneous_applications,
+        name="spontaneous_applications_refresh",
+    ),
+    path(
+        "job_description/<int:job_description_id>/refresh",
+        views.refresh_job_description,
+        name="job_description_refresh",
+    ),
+    path(
+        "job_description/<int:job_description_id>/refresh-for-detail",
+        views.refresh_job_description,
+        {"for_detail": True},
+        name="job_description_refresh_for_detail",
+    ),
     path("job_description_list", views.job_description_list, name="job_description_list"),
     path("edit_job_description", views.edit_job_description, name="edit_job_description"),
     path("edit_job_description/<uuid:edit_session_id>", views.edit_job_description, name="edit_job_description"),
