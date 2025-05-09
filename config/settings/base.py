@@ -104,6 +104,7 @@ INSTALLED_APPS = [
     "itou.www.dashboard",
     "itou.www.eligibility_views",
     "itou.www.employees_views",
+    "itou.www.geiq_assessments_views",
     "itou.www.home",
     "itou.www.prescribers_views",
     "itou.www.search",
@@ -380,6 +381,9 @@ ITOU_ENVIRONMENT = ItouEnvironment(os.getenv("ITOU_ENVIRONMENT", ItouEnvironment
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.gouv.fr")
+PILOTAGE_INSTITUTION_EMAIL_CONTACT = os.getenv(
+    "PILOTAGE_INSTITUTION_EMAIL_CONTACT", "pilotage+institution@inclusion.gouv.fr"
+)
 API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api.emplois@inclusion.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
