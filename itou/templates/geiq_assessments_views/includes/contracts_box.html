@@ -1,0 +1,54 @@
+<div id="contracts-box" class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+    <div class="c-box--summary__header">
+        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="flex-grow-1">
+                <h3 class="m-0">Détail et sélection des contrats</h3>
+            </div>
+            <div>
+                {% if assessment.contracts_selection_validated_at %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <hr class="m-0">
+    {% if error %}
+        <div class="c-box--summary__body">
+            <p class="fs-sm">
+                <i class="ri-xl ri-alert-line text-danger" aria-hidden="true"></i>Les contrats n’ont pas pu être importés, merci de réessayer
+            </p>
+        </div>
+    {% endif %}
+    <div class="c-box--summary__footer">
+        <div class="d-flex justify-content-end">
+            {% if assessment.contracts_selection_validated_at %}
+                <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto">
+                    <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                    <span>Consulter ma sélection</span>
+                </a>
+            {% elif assessment.contracts_synced_at %}
+                <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary btn-block w-100 w-md-auto">
+                    <span>Compléter</span>
+                </a>
+            {% else %}
+                <button type="button"
+                        class="btn btn-ico btn-primary btn-block w-100 w-md-auto"
+                        hx-post="{% url "geiq_assessments_views:assessment_contracts_sync" pk=assessment.pk %}"
+                        hx-swap="outerHTML"
+                        hx-trigger="{{ error|yesno:"click,load" }}"
+                        hx-include="#label-sync-form"
+                        hx-target="#contracts-box">
+                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                    <span class="stable-text">{{ error|yesno:"Réessayer,Récupérer de Label" }}</span>
+                    <span class="loading-text">Récupération en cours</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if request.htmx %}
+    {% include "geiq_assessments_views/includes/assessment_kpi_tab.html" with active_tab=active_tab assessment=assessment request_htmx=True only %}
+{% endif %}

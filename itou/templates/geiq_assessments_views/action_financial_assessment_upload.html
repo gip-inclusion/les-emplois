@@ -1,0 +1,50 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}Bilan financier de l’action - {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Bilan financier de l’action
+                {% if assessment.action_financial_assessment_file %}
+                    {% include "geiq_assessments_views/includes/badge_completed.html" only %}
+                {% else %}
+                    {% include "geiq_assessments_views/includes/badge_to_complete.html" only %}
+                {% endif %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <h4>1. Téléchargez le modèle du document</h4>
+                    <a href="{% static 'pdf/cerfa_15059-02.pdf' %}" class="btn btn-ico btn-outline-primary mb-3" rel="noopener" target="_blank">
+                        <span>Modèle bilan financier de l’action</span>
+                        <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                    </a>
+                    <h4>2. Déposez ici le document rempli</h4>
+
+                    <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                        {% csrf_token %}
+                        {% bootstrap_form_errors form alert_error_type="all" %}
+                        {% bootstrap_field form.assessment_file show_label=False %}
+                        {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=back_url %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

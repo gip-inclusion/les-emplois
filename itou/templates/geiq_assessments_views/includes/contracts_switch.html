@@ -1,0 +1,27 @@
+{% if value %}
+    {% url "geiq_assessments_views:assessment_contracts_exclude" contract_pk=contract.pk as post_url %}
+{% else %}
+    {% url "geiq_assessments_views:assessment_contracts_include" contract_pk=contract.pk as post_url %}
+{% endif %}
+
+<form hx-post="{{ post_url }}{% if from_list %}?from_list=1{% endif %}"
+      hx-trigger="change"
+      id="toggle_allowance_for_contract_{{ contract.pk }}"
+      hx-target="this"
+      hx-swap="outerHTML"
+      class="js-prevent-multiple-submit">
+    {% csrf_token %}
+    <div class="form-check form-switch{% if not from_list %} form-switch-lg{% endif %}">
+        <input type="checkbox" class="form-check-input" name="allowance" id="allowance_for_contract_{{ contract.pk }}" {% if value %}checked{% endif %} {% if not editable %}disabled{% endif %} />
+        <label class="form-check-label{% if from_list %} visually-hidden{% endif %}" for="allowance_for_contract_{{ contract.pk }}">
+            {% if request.user.is_employer %}
+                Obtenir l’aide
+            {% elif request.user.is_labor_inspector %}
+                Accorder l’aide
+            {% endif %}
+        </label>
+    </div>
+</form>
+{% if from_list and request.htmx %}
+    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
+{% endif %}
