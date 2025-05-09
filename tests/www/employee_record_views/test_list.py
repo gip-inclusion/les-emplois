@@ -221,6 +221,80 @@ class TestListEmployeeRecords:
             == snapshot()
         )
 
+    def test_processed_employee_record_can_be_sent_back(self, client, snapshot):
+        client.force_login(self.user)
+
+        self.employee_record.status = Status.PROCESSED
+        self.employee_record.save()
+
+        response = client.get(self.URL, data={"status": Status.PROCESSED})
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    selector=".employee-records-list .c-box--results__footer",
+                    replace_in_attr=[
+                        (
+                            "href",
+                            f"/employee_record/disable/{self.employee_record.pk}",
+                            "/employee_record/disable/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/summary/{self.employee_record.pk}",
+                            "/employee_record/summary/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/create/{self.job_application.pk}",
+                            "/employee_record/create/[PK of JobApplication]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/create/{self.job_application.pk}",
+                            "/employee_record/create/[PK of JobApplication]",
+                        ),
+                        (
+                            "action",
+                            f"/employee_record/create_step_5/{self.job_application.pk}",
+                            "/employee_record/create_step_5/[PK of JobApplication]",
+                        ),
+                    ],
+                )
+            )
+            == snapshot
+        )
+
+    @pytest.mark.parametrize(
+        "status,has_siret_changed,assertion",
+        [
+            (Status.NEW, False, assertNotContains),
+            (Status.READY, False, assertNotContains),
+            (Status.SENT, False, assertNotContains),
+            (Status.REJECTED, False, assertNotContains),
+            (Status.DISABLED, False, assertNotContains),
+            (Status.PROCESSED, False, assertNotContains),
+            (Status.READY, True, assertNotContains),
+            (Status.PROCESSED, True, assertContains),
+        ],
+    )
+    def test_display_alerts_when_siret_has_changed(self, client, status, has_siret_changed, assertion):
+        client.force_login(self.user)
+
+        self.employee_record.status = status
+        if has_siret_changed:
+            self.company.siret = "10000000000001"
+            self.employee_record.siret = "10000000000002"
+            self.company.save()
+        self.employee_record.save()
+
+        response = client.get(self.URL, data={"status": status})
+
+        header_warning_title = "Incohérence de numéro SIRET détectée"
+        item_warning_title = "Actualisation du numéro SIRET"
+        assertion(response, header_warning_title)
+        assertion(response, item_warning_title)
+
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self, client, snapshot):
         client.force_login(self.user)

@@ -66,7 +66,6 @@ class TestEmployeeRecord:
         [
             employee_record_enums.Status.READY,
             employee_record_enums.Status.SENT,
-            employee_record_enums.Status.PROCESSED,
             employee_record_enums.Status.ARCHIVED,
         ],
     )

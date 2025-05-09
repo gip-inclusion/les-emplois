@@ -17,7 +17,7 @@
                 </div>
                 <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
                     <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
-                        <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                        <i class="ri-file-add-line ri-lg" aria-hidden="true"></i>
                         <span>Créer une fiche salarié</span>
                     </a>
                 </div>
@@ -28,9 +28,34 @@
             <h2 class="mb-0">Fiches salarié ASP</h2>
             <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
                 <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}?reset_url={{ request.get_full_path|urlencode }}">
-                    <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                    <i class="ri-file-add-line ri-lg" aria-hidden="true"></i>
                     <span>Créer une fiche salarié</span>
                 </a>
+            </div>
+        </div>
+    {% endif %}
+    {% if one_siret_different_from_company %}
+        <div id="changed-siret-warning" class="alert alert-warning alert-dismissible-once d-none" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Incohérence de numéro SIRET détectée</strong>
+                    </p>
+                    <p class="mb-0">
+                        Le numéro SIRET associé à certaines fiches salarié déjà intégrées est différent de votre numéro SIRET actuel.
+                        Cela peut empêcher l'affichage de ces fiches dans votre espace Extranet IAE 2.0 de l'ASP.
+                        Si vous avez besoin de les récupérer, cliquez sur "<b>Renvoyer cette fiche salarié</b>".
+                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/15266700470289--Mettre-%C3%A0-jour-une-fiche-salari%C3%A9"
+                           rel="noopener"
+                           target="_blank"
+                           aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)"
+                           class="has-external-link">Consulter le mode d'emploi</a>
+                    </p>
+                </div>
             </div>
         </div>
     {% endif %}
