@@ -87,9 +87,11 @@ def test_get_fields_to_transfer_for_job_seekers():
         "auth_token",  # rest_framework.authtoken.models.Token.user
         "authorization_status_set",  # PrescriberOrganization.authorization_updated_by
         "company",  # Company.members
+        "created_assessments",  # Assessment.created_by
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
         "created_follow_up_groups",  # gps.FollowUpGroupMembership.creator: creator of a follow up group of GPS
+        "final_reviewed_assessments",  # Assessment.final_reviewed_by
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
@@ -121,7 +123,9 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_updated",  # Prolongation.updated_by
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
+        "reviewed_assessments",  # Assessment.reviewed_by
         "reviewed_geiq_assessment_set",  # ImplementationAssessment.reviewed_by
+        "submitted_assessments",  # Assessment.submitted_by
         "company_invitations",  # EmployerInvitation.sender
         "companymembership",  # CompanyMembership.user
         "submitted_geiq_assessment_set",  # ImplementationAssessment.submitted_by
