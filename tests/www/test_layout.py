@@ -42,7 +42,16 @@ def test_navigation_not_authenticated(snapshot, client):
                 membership__organization__name="ACME Inc.",
                 membership__organization__not_in_territorial_experimentation=True,
             ),
-            id="PrescriberWithOrganization",
+            id="PrescriberWithUnauthorizedOrganization",
+        ),
+        pytest.param(
+            partial(
+                PrescriberFactory,
+                membership__organization__authorized=True,
+                membership__organization__name="ACME Inc.",
+                membership__organization__not_in_territorial_experimentation=True,
+            ),
+            id="PrescriberWithAuthorizedOrganization",
         ),
         pytest.param(
             lambda for_snapshot, first_name, last_name, email: PrescriberFactory(

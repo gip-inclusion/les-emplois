@@ -260,14 +260,16 @@ def nav(request):
                 jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             if request.current_organization:
+                organization_items = [
+                    NAV_ENTRIES["prescriber-members"],
+                ]
+                if request.current_organization.is_authorized:
+                    organization_items.insert(0, NAV_ENTRIES["prescriber-overview"])
                 menu_items.append(
                     NavGroup(
                         label="Organisation",
                         icon="ri-team-line",
-                        items=[
-                            NAV_ENTRIES["prescriber-overview"],
-                            NAV_ENTRIES["prescriber-members"],
-                        ],
+                        items=organization_items,
                     )
                 )
         elif request.user.is_employer and request.current_organization:

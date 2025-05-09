@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -72,6 +74,23 @@ class TestMembers:
         url = reverse("prescribers_views:members")
         response = client.get(url)
         assertContains(response, self.MORE_ADMIN_MSG)
+
+    @pytest.mark.parametrize(
+        "factory,assertion",
+        [
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+        ],
+    )
+    def test_tab_bar(self, client, factory, assertion):
+        TAB_MARKUP = f"""<a class="nav-link" href="{reverse("prescribers_views:overview")}" data-matomo-event="true"
+                        data-matomo-category="prescribers" data-matomo-action="clic"
+                        data-matomo-option="organisation-presentation">
+                        Présentation</a>"""
+        organization = factory()
+        client.force_login(organization.members.first())
+        response = client.get(reverse("prescribers_views:members"))
+        assertion(response, TAB_MARKUP, html=True)
 
 
 class TestUserMembershipDeactivation:

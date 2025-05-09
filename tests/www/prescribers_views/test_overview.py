@@ -5,7 +5,7 @@ from django.urls import reverse
 from factory.fuzzy import FuzzyChoice
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 
@@ -18,12 +18,27 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspec
         pytest.param(partial(LaborInspectorFactory, membership=True), 403, id="LaborInspector"),
         pytest.param(PrescriberFactory, 404, id="PrescriberWithoutOrganization"),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__name="Orga courante", membership__is_admin=False),
+            partial(PrescriberFactory, membership__organization__authorized=False),
+            404,
+            id="PrescriberWithUnauthorizedOrganization",
+        ),
+        pytest.param(
+            partial(
+                PrescriberFactory,
+                membership__organization__name="Orga courante",
+                membership__organization__authorized=True,
+                membership__is_admin=False,
+            ),
             200,
             id="PrescriberWithOrganization",
         ),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__name="Orga courante", membership__is_admin=True),
+            partial(
+                PrescriberFactory,
+                membership__organization__name="Orga courante",
+                membership__organization__authorized=True,
+                membership__is_admin=True,
+            ),
             200,
             id="PrescriberIsAdminOfOrganization",
         ),
@@ -39,8 +54,10 @@ def test_overview_access(client, user_factory, status_code):
 
 def test_overview_access_prescriber_with_multiple_organizations(client):
     user = PrescriberFactory()
-    current_org = PrescriberOrganizationWithMembershipFactory(name="Orga courante", membership__user=user)
-    PrescriberOrganizationWithMembershipFactory(name="Une autre orga", membership__user=user)
+    current_org = PrescriberOrganizationWithMembershipFactory(
+        name="Orga courante", membership__user=user, authorized=True
+    )
+    PrescriberOrganizationWithMembershipFactory(name="Une autre orga", membership__user=user, authorized=True)
     client.force_login(user)
     client.post(reverse("dashboard:switch_organization"), data={"organization_id": current_org.pk})
     response = client.get(reverse("prescribers_views:overview"))
@@ -68,7 +85,9 @@ def test_overview_content_ft(client, description, assertion):
 def test_overview_content(client, description):
     organization = PrescriberOrganizationWithMembershipFactory(
         description=description,
-        kind=FuzzyChoice(set(PrescriberOrganizationKind) - set(PrescriberOrganizationKind.FT)),
+        kind=FuzzyChoice(
+            set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.OTHER}
+        ),
         authorized=True,
     )
     url = reverse("prescribers_views:overview")
@@ -80,18 +99,10 @@ def test_overview_content(client, description):
     assertion[1](response, "<strong>Oups ! Aucune information en vue !</strong>", html=True)
     assertContains(response, "<span>Voir la fiche publique</span>", html=True)
 
-    # Non authorized organizations: no description block
-    organization.authorization_status = PrescriberAuthorizationStatus.NOT_SET
-    organization.save(update_fields=["authorization_status", "updated_at"])
-    response = client.get(url)
-    assertNotContains(response, "<h3>Son activité</h3><p>Mon activité</p>", html=True)
-    assertNotContains(response, "<strong>Oups ! Aucune information en vue !</strong>", html=True)
-    assertNotContains(response, "<span>Voir la fiche publique</span>", html=True)
-
 
 @pytest.mark.parametrize("is_admin,assertion", [(False, assertNotContains), (True, assertContains)])
 def test_edit_button(client, is_admin, assertion):
-    organization = PrescriberOrganizationWithMembershipFactory(membership__is_admin=is_admin)
+    organization = PrescriberOrganizationWithMembershipFactory(membership__is_admin=is_admin, authorized=True)
     client.force_login(organization.members.first())
     response = client.get(reverse("prescribers_views:overview"))
     assertion(response, "<span>Modifier</span>", html=True)
