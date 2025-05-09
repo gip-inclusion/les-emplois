@@ -1,9 +1,10 @@
+from functools import partial
 from unittest import mock
 
 import pytest
 from django.urls import reverse
 from factory.fuzzy import FuzzyChoice
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -233,6 +234,19 @@ class TestEditOrganization:
         organization_refreshed = PrescriberOrganization.objects.get(pk=organization.pk)
         for field in [f for f in PrescriberOrganization._meta.get_fields() if not f.is_relation]:
             assert getattr(organization, field.name) == getattr(organization_refreshed, field.name)
+
+    @pytest.mark.parametrize(
+        "factory,assertion",
+        [
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+        ],
+    )
+    def test_mask_description(self, client, factory, assertion):
+        organization = factory()
+        client.force_login(organization.members.first())
+        response = client.get(reverse("prescribers_views:edit_organization"))
+        assertion(response, '<label class="form-label" for="id_description">Description</label>', html=True)
 
     @pytest.mark.parametrize(
         "back_url,expected_redirect",
