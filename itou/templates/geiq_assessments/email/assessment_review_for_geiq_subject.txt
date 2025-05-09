@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Résultat du contrôle effectué sur votre bilan d’exécution {{ assessment.name_for_institution }}
+{% endblock subject %}
