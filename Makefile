@@ -10,6 +10,7 @@ LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
 PIP_COMPILE_OPTIONS :=
+NETWORK_MODE := online
 
 ifdef $(XDG_CACHE_HOME)
 	CACHEDIR := $(XDG_CACHE_HOME)
@@ -28,9 +29,13 @@ runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
+ifeq "$(NETWORK_MODE)" "online"
 	uv venv
 	uv pip sync --require-hashes $^
 	touch $@
+else
+	@echo "Skipping virtualenv dependencies sync due to NETWORK_MODE=$(NETWORK_MODE)."
+endif
 
 venv: $(VIRTUAL_ENV)
 
