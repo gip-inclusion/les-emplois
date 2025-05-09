@@ -241,8 +241,10 @@
                               <div class="form-group form-group-input-w-lg-66"><label class="form-label" for="id_email">E-mail</label><input class="form-control" disabled="" id="id_email" maxlength="254" name="email" type="email" value="pe@mailinator.com"/></div>
                               <div class="form-group"><label class="form-label" for="id_website">Site web</label><input aria-describedby="id_website_helptext" class="form-control" disabled="" id="id_website" maxlength="200" name="website" type="url"/><div class="form-text" id="id_website_helptext">Votre site web doit commencer par http:// ou https://</div>
   </div>
-                              <div class="form-group"><label class="form-label" for="id_description">Description</label><textarea aria-describedby="id_description_helptext" class="form-control" cols="40" disabled="" id="id_description" name="description" rows="10"></textarea><div class="form-text" id="id_description_helptext">Texte de présentation de votre structure.</div>
+                              
+                                  <div class="form-group"><label class="form-label" for="id_description">Description</label><textarea aria-describedby="id_description_helptext" class="form-control" cols="40" disabled="" id="id_description" name="description" rows="10"></textarea><div class="form-text" id="id_description_helptext">Texte de présentation de votre structure.</div>
   </div>
+                              
   
                               
                           </form>
