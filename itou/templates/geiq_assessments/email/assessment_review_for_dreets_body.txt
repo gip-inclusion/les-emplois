@@ -1,0 +1,22 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load str_filters %}
+{% block body %}
+Bonjour,
+
+Le contrôle du bilan d’exécution de la structure `{{ assessment.label_geiq_name }}` a été réalisé par {{ assessment.reviewed_by.get_full_name }} de la {{ assessment.reviewed_by_institution.name }}.
+
+Références du dossier :
+
+{{ assessment.label_antenna_names|pluralizefr:"Structure concernée,Structures concernées" }} par la convention :
+{% for antenna_name in assessment.label_antenna_names %}{{ antenna_name }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% with conventionned_institutions=assessment.conventionned_institutions %}
+{{ conventionned_institutions|pluralizefr:"Institution référente sélectionnée,Institutions référentes sélectionnées" }} par le GEIQ :
+{% for conventionned_institution in conventionned_institutions %}{{ conventionned_institution }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% endwith %}
+
+En tant que DREETS, il vous revient de vérifier et valider ce contrôle afin de finaliser le traitement de ce bilan d’exécution. Pour cela, connectez-vous à votre espace “Institution partenaire” sur le site : {{ base_url }}.
+
+Si des modifications sont nécessaires, le bouton "Corriger le dossier" vous permettra de revenir à l’étape précédente, afin que la {{ assessment.reviewed_by_institution.name }} ou vous-même puissiez effectuer les ajustements requis.
+
+Cordialement,
+{% endblock body %}

@@ -30,8 +30,13 @@ from itou.geiq_assessments.models import (
     EmployeeContract,
     LabelInfos,
 )
+from itou.geiq_assessments.notifications import (
+    AssessmentReviewedForDREETSLaborInspectorNotification,
+    AssessmentReviewedForGeiqNotification,
+    AssessmentSubmittedForLaborInspectorNotification,
+)
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.models import Institution
+from itou.institutions.models import Institution, InstitutionMembership
 from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
@@ -275,6 +280,16 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
             EmployeeContract.objects.filter(employee__assessment=assessment).update(
                 allowance_granted=F("allowance_requested")
             )
+            institution_members = {
+                membership.user
+                for membership in InstitutionMembership.objects.active()
+                .filter(
+                    institution__in=[link.institution_id for link in assessment.institution_links.all()],
+                )
+                .select_related("user")
+            }
+            for member in institution_members:
+                AssessmentSubmittedForLaborInspectorNotification(member, assessment=assessment).send()
             return HttpResponseRedirect(
                 reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
             )
@@ -790,9 +805,23 @@ def assessment_details_for_institution(
                         assessment.pk,
                         extra={"geiq_assessment": assessment.pk},
                     )
+                    AssessmentReviewedForGeiqNotification(assessment.submitted_by, assessment=assessment).send()
                 else:
                     # DREETS trying to review an already final_reviewed assessment
                     raise PermissionDenied
+            else:
+                # Reviewed by a DDETS
+                dreets_members = {
+                    membership.user
+                    for membership in InstitutionMembership.objects.active()
+                    .filter(
+                        institution__kind=InstitutionKind.DREETS_GEIQ,
+                        institution__assessment_links__assessment=assessment,
+                    )
+                    .select_related("user")
+                }
+                for member in dreets_members:
+                    AssessmentReviewedForDREETSLaborInspectorNotification(member, assessment=assessment).send()
 
         elif action is InstitutionAction.FIX:
             if assessment.final_reviewed_at:

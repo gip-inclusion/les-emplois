@@ -1,0 +1,20 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load str_filters %}
+{% block body %}
+Bonjour,
+
+La structure `{{ assessment.label_geiq_name }}` a transmis son bilan d’exécution sur le site des Emplois de l’inclusion.
+
+Références du dossier :
+
+{{ assessment.label_antenna_names|pluralizefr:"Structure concernée,Structures concernées" }} par la convention :
+{% for antenna_name in assessment.label_antenna_names %}{{ antenna_name }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% with conventionned_institutions=assessment.conventionned_institutions %}
+{{ conventionned_institutions|pluralizefr:"Institution référente sélectionnée,Institutions référentes sélectionnées" }} par le GEIQ :
+{% for conventionned_institution in conventionned_institutions %}{{ conventionned_institution }}{% if not forloop.last %}; {% endif %}{% endfor %}
+{% endwith %}
+
+Pour consulter et traiter ce bilan, veuillez vous connecter à votre espace “Institution partenaire” sur le site {{ base_url }}.
+
+Cordialement,
+{% endblock body %}

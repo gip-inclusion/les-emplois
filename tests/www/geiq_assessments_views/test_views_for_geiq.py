@@ -558,8 +558,13 @@ class TestAssessmentDetailsForGEIQView:
         assert pretty_indented(status_box) == snapshot(name="assessment status: ready for submission")
 
     @freeze_time("2025-05-27 12:00", tick=True)
-    def test_submission(self, client, settings, snapshot):
+    def test_submission(self, client, mailoutbox, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        ddets_membership = InstitutionMembershipFactory(
+            institution__name="DDETS 29",
+            institution__kind=InstitutionKind.DDETS_GEIQ,
+            user__email="paul@dd.ets",
+        )
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
         assessment = AssessmentFactory(
@@ -592,11 +597,7 @@ class TestAssessmentDetailsForGEIQView:
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
-            institution=InstitutionMembershipFactory(
-                institution__name="DDETS 29",
-                institution__kind=InstitutionKind.DDETS_GEIQ,
-                user__email="paul@dd.ets",
-            ).institution,
+            institution=ddets_membership.institution,
             with_convention=True,
         )
         details_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
@@ -610,6 +611,14 @@ class TestAssessmentDetailsForGEIQView:
         # Requested allowance are automatically granted by default
         assert requested_contract.allowance_granted is True
         assert not_requested_contract.allowance_granted is False
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+        assert (
+            f"[DEV] Transmission du bilan d’exécution par la structure {assessment.label_geiq_name}" == email.subject
+        )
+        assert email.to[0] == ddets_membership.user.email
+        assert email.body == snapshot(name="body of mail sent to institution members")
 
         response = client.get(details_url)
         assert pretty_indented(parse_response_to_soup(response, ".s-title-02")) == snapshot(

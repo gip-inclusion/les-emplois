@@ -1,4 +1,61 @@
 # serializer version: 1
+# name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to DREETS members]
+  '''
+  Bonjour,
+  
+  Le contrôle du bilan d’exécution de la structure `Un Joli GEIQ` a été réalisé par Julia MARTIN de la DDETS 29.
+  
+  Références du dossier :
+  
+  Structure concernée par la convention :
+  Une antenne
+  
+  Institution référente sélectionnée par le GEIQ :
+  DDETS 29
+  
+  En tant que DREETS, il vous revient de vérifier et valider ce contrôle afin de finaliser le traitement de ce bilan d’exécution. Pour cela, connectez-vous à votre espace “Institution partenaire” sur le site : http://localhost:8000/.
+  
+  Si des modifications sont nécessaires, le bouton "Corriger le dossier" vous permettra de revenir à l’étape précédente, afin que la DDETS 29 ou vous-même puissiez effectuer les ajustements requis.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to GEIQ members]
+  '''
+  Bonjour,
+  
+  Votre bilan d’exécution a été contrôlé par les services de l’État.
+  
+  Références du dossier :
+  
+  Structure concernée par la convention :
+  Une antenne
+  
+  Institution référente sélectionnée par le GEIQ :
+  DDETS 29
+  
+  Récapitulatif de la décision enregistrée par la DDETS 29 :
+  
+  Montant total accordé : 80 000 €
+  Montant du premier versement déjà réalisé : 50 000 €
+  Montant du deuxième versement prévu : 30 000 €
+  
+  Commentaire:
+  Bravo !
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
 # name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after submission]
   '''
   <section class="s-section">
