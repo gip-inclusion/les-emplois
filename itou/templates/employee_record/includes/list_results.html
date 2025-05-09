@@ -4,7 +4,7 @@
 <div id="employee-records-container">
     <div class="employee-records-list">
         {% for employee_record in navigation_pages %}
-            {% include "employee_record/includes/list_item.html" with employee_record=employee_record current_url=request.get_full_path only %}
+            {% include "employee_record/includes/list_item.html" with employee_record=employee_record current_url=request.get_full_path csrf_token=csrf_token only %}
         {% empty %}
             <div class="c-box c-box--results my-3 my-md-4">
                 <div class="c-box--results__body">
