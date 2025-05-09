@@ -1,0 +1,46 @@
+{% if not assessment.submitted_at %}
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+        {% if assessment.missing_actions_to_submit %}
+            <h4>Votre dossier n’est pas encore complet</h4>
+            <p class="mb-0">Actions restantes :</p>
+            <ul>
+                {% for action in assessment.missing_actions_to_submit %}
+                    <li>
+                        <strong>{{ action }}</strong>
+                    </li>
+                {% endfor %}
+                <li>
+                    <strong>Envoi du bilan d’exécution</strong>
+                </li>
+            </ul>
+            <button type="button" class="btn btn-primary btn-block" disabled>
+                <span>Envoyer le bilan d’exécution</span>
+            </button>
+        {% else %}
+            <h4>Votre dossier est en attente d’envoi</h4>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Envoyer le bilan d’exécution</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+{% elif not assessment.dreets_reviewed_at %}
+    <div id="assessment-status-box" {% if request.htmx %}hx-swap-oob="true"{% endif %} class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+        <h4>Votre dossier a été transmis le {{ assessment.submitted_at|date:"d/m/Y" }}</h4>
+        <p class="mb-0">
+            Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter {{ assessment.institutions_to_contact }}.
+            <br>
+            Vous serez notifié par mail de la décision suite à l’examen de votre bilan.
+        </p>
+    </div>
+{% else %}
+    <div id="assessment-status-box" class="c-box mb-3 mb-md-4 bg-success-lightest border-success">
+        <h4>Votre dossier a été traité le {{ assessment.dreets_reviewed_at|date:"d/m/Y" }}</h4>
+        <p>Retrouvez le détail de la décision en cliquant ici.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_result' pk=assessment.pk %}">
+            <span>Voir le résultat</span>
+        </a>
+    </div>
+{% endif %}
