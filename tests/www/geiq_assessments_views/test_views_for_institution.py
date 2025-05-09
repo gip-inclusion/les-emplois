@@ -275,8 +275,13 @@ class TestAssessmentDetailsForInstitutionView:
             name="assessment details section with final review"
         )
 
-    def test_ddets_review_and_dreets_final_review(self, client):
-        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+    def test_ddets_review_and_dreets_final_review(self, client, mailoutbox, snapshot):
+        ddets_membership = InstitutionMembershipFactory(
+            institution__name="DDETS 29",
+            institution__kind=InstitutionKind.DDETS_GEIQ,
+            user__first_name="Julia",
+            user__last_name="Martin",
+        )
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -327,6 +332,15 @@ class TestAssessmentDetailsForInstitutionView:
             assert assessment.reviewed_by == ddets_membership.user
             assert assessment.reviewed_by_institution == ddets_membership.institution
 
+            assert len(mailoutbox) == 1
+            email = mailoutbox[0]
+            assert (
+                f"[DEV] Validation du bilan d’exécution de la structure {assessment.label_geiq_name}" == email.subject
+            )
+            assert email.to[0] == dreets_membership.user.email
+            assert email.body == snapshot(name="body of mail sent to DREETS members")
+            mailoutbox.clear()
+
         with freeze_time(timezone.now() + datetime.timedelta(hours=7)):
             client.force_login(dreets_membership.user)
             response = client.post(
@@ -340,6 +354,14 @@ class TestAssessmentDetailsForInstitutionView:
             assert assessment.final_reviewed_at == timezone.now()
             assert assessment.final_reviewed_by == dreets_membership.user
             assert assessment.final_reviewed_by_institution == dreets_membership.institution
+            assert len(mailoutbox) == 1
+            email = mailoutbox[0]
+            assert (
+                f"[DEV] Résultat du contrôle effectué sur votre bilan d’exécution {assessment.label_geiq_name}"
+                == email.subject
+            )
+            assert email.to[0] == geiq_membership.user.email
+            assert email.body == snapshot(name="body of mail sent to GEIQ members")
 
     def test_ddets_review_dreets_fix_and_dreets_review(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)

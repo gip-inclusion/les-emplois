@@ -1120,6 +1120,30 @@
               </section>
   '''
 # ---
+# name: TestAssessmentDetailsForGEIQView.test_submission[body of mail sent to institution members]
+  '''
+  Bonjour,
+  
+  La structure `Un Joli GEIQ` a transmis son bilan d’exécution sur le site des Emplois de l’inclusion.
+  
+  Références du dossier :
+  
+  Structures concernées par la convention :
+  Une antenne; Une autre antenne
+  
+  Institution référente sélectionnée par le GEIQ :
+  DDETS 29
+  
+  Pour consulter et traiter ce bilan, veuillez vous connecter à votre espace “Institution partenaire” sur le site http://localhost:8000/.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
 # name: TestAssessmentDetailsForGEIQView.test_submission[submitted assessment details section]
   '''
   <section class="s-section">

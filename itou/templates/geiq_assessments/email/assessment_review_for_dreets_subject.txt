@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Validation du bilan d’exécution de la structure {{ assessment.label_geiq_name }}
+{% endblock subject %}
