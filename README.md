@@ -144,6 +144,18 @@ Vous pouvez y accéder à l'adresse http://100.1.2.3:8000/ depuis n'importe quel
 $ make resetdb
 ```
 
+## Utiliser les commandes `make` sans connexion à internet
+
+Si vous développez hors ligne et que le fichier de dépendances
+(`requirements/dev.txt`) a changé, les commandes `make` vont planter, puisque
+lorsque ce fichier change, `uv` va être lancé pour mettre à jour les dépendances
+dans le `.venv`.
+
+Pour passer outre, vous pouvez utiliser `make` avec la variable `NETWORK_MODE` :
+```sh
+$ make NETWORK_MODE=offline resetdb
+```
+
 ## Charger une base de données de production
 
 Inspirez-vous de la suite de commandes suivante :
