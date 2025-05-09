@@ -221,6 +221,55 @@ class TestListEmployeeRecords:
             == snapshot()
         )
 
+    def test_processed_employee_record_can_be_sent_back(self, client, snapshot):
+        client.force_login(self.user)
+
+        self.employee_record.status = Status.PROCESSED
+        self.employee_record.save()
+
+        response = client.get(self.URL, data={"status": Status.PROCESSED})
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    selector=".employee-records-list .c-box--results__footer",
+                    replace_in_attr=[
+                        (
+                            "href",
+                            f"/employee_record/disable/{self.employee_record.pk}",
+                            "/employee_record/disable/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/summary/{self.employee_record.pk}",
+                            "/employee_record/summary/[PK of EmployeeRecord]",
+                        ),
+                        (
+                            "href",
+                            f"/employee_record/create/{self.job_application.pk}",
+                            "/employee_record/create/[PK of JobApplication]",
+                        ),
+                        (
+                            "action",
+                            f"/employee_record/create_step_5/{self.job_application.pk}",
+                            "/employee_record/create_step_5/[PK of JobApplication]",
+                        ),
+                        (
+                            "id",
+                            f"sendBackRecordDropDown-{self.employee_record.pk}",
+                            "sendBackRecordDropDown-[Pk of EmployeeRecord]",
+                        ),
+                        (
+                            "aria-controls",
+                            f"sendBackRecordDropDown-{self.employee_record.pk}",
+                            "sendBackRecordDropDown-[Pk of EmployeeRecord]",
+                        ),
+                    ],
+                )
+            )
+            == snapshot
+        )
+
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self, client, snapshot):
         client.force_login(self.user)
