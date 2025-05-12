@@ -316,7 +316,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     def _fill_denormalized_fields(self):
         # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
-        self.siret = self.siret_from_asp_source(self.job_application.to_company)
+        self.siret = self.job_application.to_company.siret_from_asp_source()
         self.asp_id = self.job_application.to_company.convention.asp_id
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
@@ -474,15 +474,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
-
-    @staticmethod
-    def siret_from_asp_source(siae):
-        """
-        Fetch SIRET number of authoritative SIAE from ASP source
-        """
-        if siae.canonical_company.source == Company.SOURCE_ASP:
-            return siae.canonical_company.siret
-        raise ValidationError("Could not find authoritative SIAE from ASP source")
 
     @classmethod
     def from_job_application(cls, job_application, clean=True):

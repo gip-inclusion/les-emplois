@@ -24,7 +24,7 @@ class Command(BaseCommand):
             self.stdout.write(f"{siae} can't uses employee records")
             return
 
-        asp_siret = EmployeeRecord.siret_from_asp_source(siae)
+        asp_siret = EmployeeRecord.job_application.to_company.siret_from_asp_source()
 
         to_resend = (
             EmployeeRecord.objects.filter(
