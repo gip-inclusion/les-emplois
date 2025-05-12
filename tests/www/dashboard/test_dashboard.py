@@ -15,7 +15,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
-from itou.companies.perms import can_create_antenna
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -330,16 +329,6 @@ class TestDashboardView:
             response,
             "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori",
         )
-
-    @pytest.mark.parametrize("kind", CompanyKind)
-    def test_dashboard_can_create_antenna(self, client, kind):
-        company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
-        user = company.members.get()
-
-        client.force_login(user)
-        response = client.get(reverse("dashboard:index"))
-        assertion = assertContains if can_create_antenna(response.wsgi_request) else assertNotContains
-        assertion(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_evaluations_institution_access(self, client):
         IN_PROGRESS_LINK = "Campagne en cours"

@@ -86,5 +86,18 @@ def test_navigation_authenticated(snapshot, client, user_factory):
         )
     )
     response = client.get(reverse("home:hp"), follow=True)
-    assert pretty_indented(parse_response_to_soup(response, "#nav-primary")) == snapshot(name="user menu")
-    assert pretty_indented(parse_response_to_soup(response, "#offcanvasNav")) == snapshot(name="navigation")
+    soup = parse_response_to_soup(response)
+
+    def set_org_id_for_snapshot(soup):
+        structure_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_id"})
+        if structure_switcher_buttons:
+            [structure_switcher_button] = structure_switcher_buttons
+            structure_switcher_button["value"] = "ORGANIZATION_ID"
+
+    [nav_primary] = soup.select("#nav-primary")
+    set_org_id_for_snapshot(nav_primary)
+    assert pretty_indented(nav_primary) == snapshot(name="user menu")
+
+    [offcanvasNav] = soup.select("#offcanvasNav")
+    set_org_id_for_snapshot(offcanvasNav)
+    assert pretty_indented(offcanvasNav) == snapshot(name="navigation")
