@@ -1,6 +1,7 @@
 from django import template
 from django.template.loader import get_template
 
+from itou.companies.perms import can_create_antenna
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import UserKind
 from itou.utils.errors import silently_report_exception
@@ -15,10 +16,13 @@ def structure_switcher(context, mobile):
         request = context["request"]
         current_organization = getattr(request, "current_organization", None)
         organizations = getattr(request, "organizations", [])
+        create_antenna_perm = can_create_antenna(request)
         template_context = {
+            "can_create_antenna": create_antenna_perm,
             "csrf_token": context["csrf_token"],
             "current_organization": current_organization,
             "organizations": organizations,
+            "show_company_switcher_menu": len(organizations) >= 2 or create_antenna_perm,
             "user": request.user,
         }
         userkind_context = {

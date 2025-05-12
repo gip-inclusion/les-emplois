@@ -298,7 +298,7 @@
   <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
       <div class="offcanvas-header offcanvas-header--structure">
           <div class="dropdown dropdown-structure flex-grow-1 py-4">
-              <div class="dropdown-toggle dropdown-toggle__summary">
+              <button aria-controls="switchStructureDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
                   <span>
@@ -307,6 +307,35 @@
                   <strong>
                       Acme inc.
                   </strong>
+              </button>
+              <div class="dropdown-menu" id="switchStructureDropdownMobile">
+                  <form action="/dashboard/switch-organization" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <ul class="list-unstyled">
+                          <li>
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="ORGANIZATION_ID">
+                                  <i aria-hidden="true" class="ri-community-line">
+                                  </i>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <strong>
+                                      Acme inc.
+                                  </strong>
+                              </button>
+                          </li>
+                      </ul>
+                  </form>
+                  <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+                      <i aria-hidden="true" class="ri-add-line">
+                      </i>
+                      <span>
+                          Créer ou rejoindre
+                      </span>
+                      <strong>
+                          une nouvelle structure
+                      </strong>
+                  </a>
               </div>
           </div>
           <div class="border-start border-nuance-08 d-xl-none">
@@ -618,6 +647,44 @@
                           </form>
                       </li>
                   </ul>
+              </div>
+          </li>
+          <li class="d-none d-lg-inline-block dropdown dropdown-structure">
+              <button aria-controls="switchStructureDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                  <i aria-hidden="true" class="ri-community-line">
+                  </i>
+                  <span>
+                      EI - Acme inc.
+                  </span>
+              </button>
+              <div class="dropdown-menu w-100" id="switchStructureDropdown">
+                  <form action="/dashboard/switch-organization" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <ul class="list-unstyled">
+                          <li>
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="ORGANIZATION_ID">
+                                  <i aria-hidden="true" class="ri-community-line">
+                                  </i>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <strong>
+                                      Acme inc.
+                                  </strong>
+                              </button>
+                          </li>
+                      </ul>
+                  </form>
+                  <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+                      <i aria-hidden="true" class="ri-add-line">
+                      </i>
+                      <span>
+                          Créer ou rejoindre
+                      </span>
+                      <strong>
+                          une nouvelle structure
+                      </strong>
+                  </a>
               </div>
           </li>
       </ul>
