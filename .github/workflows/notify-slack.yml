@@ -17,7 +17,7 @@ jobs:
         # Can't use `!contains(...)` because it give us a "tag suffix cannot contain flow indicator characters" error.
         # Oddly enough, using `if: > !contains(...)` works...
         if: contains(github.event.pull_request.labels.*.name, 'no-changelog') == false
-        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
         with:
           webhook: ${{ secrets.SLACK_MEP_C1_WEBHOOK_URL }}
           webhook-type: incoming-webhook
@@ -26,7 +26,7 @@ jobs:
               ${{ format('<{0}|{1}>', github.event.pull_request.html_url, github.event.pull_request.title) }}
       - name: "📢 Notify the #mep-c2 channel"
         if: contains(github.event.pull_request.labels.*.name, 'pilotage')
-        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
         with:
           webhook: ${{ secrets.SLACK_MEP_C2_WEBHOOK_URL }}
           webhook-type: incoming-webhook
