@@ -12,6 +12,8 @@
     '> successfully created count=3 new communes',
     '> REALIGN birth_place for code=41016 name=BILLY at=1990-01-01 found with new_name=BILLY and start_date=1942-01-01',
     '> REALIGN hexa_commune for code=41016 name=BILLY found with new_name=BILLY and start_date=1942-01-01',
+    '> REALIGN birth_place for code=41016 name=BILLY at=1990-01-01 found with new_name=BILLY and start_date=1942-01-01',
+    '> REALIGN hexa_commune for code=41016 name=BILLY found with new_name=BILLY and start_date=1942-01-01',
     '> realigned count=1 JobSeeker profiles with updated communes.',
   ])
 # ---

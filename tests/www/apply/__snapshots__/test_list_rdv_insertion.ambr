@@ -1,13 +1,4 @@
 # serializer version: 1
-# name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_no_pending_request
-  '''
-  <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
-          </span>
-  '''
-# ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[invitation_request_created]
   '''
   <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">

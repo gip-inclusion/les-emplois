@@ -168,23 +168,6 @@
     out='',
   )
 # ---
-# name: test_fetch_stalled_job_seekers[False][logs]
-  list([
-    'Number of stalled job seekers: 2',
-    'Number of stalled job seekers in database: 2',
-    'Number of job seekers exiting stalled status: 1',
-    'Number of job seekers entering stalled status: 1',
-  ])
-# ---
-# name: test_fetch_stalled_job_seekers[True][logs]
-  list([
-    'Number of stalled job seekers: 2',
-    'Number of stalled job seekers in database: 2',
-    'Number of job seekers exiting stalled status: 1',
-    'Number of job seekers entering stalled status: 1',
-    'Number of job seekers updated: exiting=1 entering=1',
-  ])
-# ---
 # name: test_show[stdout and stderr]
   CaptureResult(
     err='',

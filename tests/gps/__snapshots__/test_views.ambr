@@ -3692,86 +3692,6 @@
           </main>
   '''
 # ---
-# name: TestJoinGroupFromNir.test_unknown_nir_known_email_with_another_nir
-  '''
-  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                          </div>
-                          <div class="modal-body">
-                              
-                              <p>
-                                  L'adresse jane.doe@test.local est associée au compte de <b>Jane DOE</b>.
-                              </p>
-                              
-                              <p>
-                                  
-                                      L'identité du candidat est une information clé pour la structure.
-                                      Si vous ne souhaitez pas suivre <b>Jane DOE</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
-                                  
-                              </p>
-                              
-                          </div>
-                          <div class="modal-footer">
-  
-                              
-                                  
-                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Suivre un autre bénéficiaire</button>
-                                  
-                                  
-                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
-                              
-                          </div>
-                      </div>
-                  </div>
-              </div>
-  '''
-# ---
-# name: TestJoinGroupFromNir.test_unknown_nir_known_email_with_no_nir
-  '''
-  <div aria-labelledby="email-confirmation-label" aria-modal="true" class="modal" id="email-confirmation-modal" role="dialog" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                          </div>
-                          <div class="modal-body">
-                              
-                              <p>
-                                  L'adresse jane.doe@test.local est associée au compte de <b>Jane DOE</b>.
-                              </p>
-                              
-                              <p>
-                                  
-                                      L'identité du candidat est une information clé pour la structure.
-                                      Si vous ne souhaitez pas suivre <b>Jane DOE</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
-                                  
-                              </p>
-                              
-                                  <p>
-                                      En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale <span>2</span><span class="ms-1">76</span><span class="ms-1">02</span><span class="ms-1">47</span><span class="ms-1">197</span><span class="ms-1">113</span><span class="ms-1">71</span> soit associé à ce bénéficiaire.</b>
-                                  </p>
-                              
-                          </div>
-                          <div class="modal-footer">
-  
-                              
-                                  
-                                      <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Suivre un autre bénéficiaire</button>
-                                  
-                                  
-                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Continuer</button>
-                              
-                          </div>
-                      </div>
-                  </div>
-              </div>
-  '''
-# ---
 # name: TestJoinGroupFromNir.test_view[get]
   '''
   <main class="s-main" id="main" role="main">
@@ -3856,30 +3776,5 @@
       </section>
   
           </main>
-  '''
-# ---
-# name: TestJoinGroupFromNir.test_view[modal]
-  '''
-  <div aria-labelledby="nir-confirmation-label" aria-modal="true" class="modal" id="nir-confirmation-modal" role="dialog" tabindex="-1">
-                                      <div class="modal-dialog modal-dialog-centered">
-                                          <div class="modal-content">
-                                              <div class="modal-header">
-                                                  <h3 class="modal-title" id="nir-confirmation-label">Un bénéficiaire avec ce numéro a été trouvé</h3>
-                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                                              </div>
-                                              <div class="modal-body">
-                                                  <p>
-                                                      Ce numéro de sécurité sociale est associé au compte de <b>Jane DOE</b>.
-                                                  </p>
-                                              </div>
-                                              <div class="modal-footer">
-                                                  
-                                                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">Ce n'est pas le bénéficiaire que je cherche</button>
-                                                  
-                                                  <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">Ajouter le bénéficiaire</button>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
   '''
 # ---

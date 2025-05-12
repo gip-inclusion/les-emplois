@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
-from itou.users.models import User
+from itou.users.models import JobSeeker, User
 from itou.utils.command import BaseCommand
 from itou.utils.management_commands import DeprecatedLoggerMixin, XlsxExportMixin
 from itou.utils.urls import get_absolute_url
@@ -176,7 +176,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
 
         self.stdout.write("Starting. Good luck…")
 
-        duplicates_dict = User.objects.get_duplicates_by_pole_emploi_id(
+        duplicates_dict = JobSeeker.objects.get_duplicates_by_pole_emploi_id(
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
         )
 

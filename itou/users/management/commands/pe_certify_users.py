@@ -13,7 +13,7 @@ from django.utils import timezone
 from httpx import RequestError
 
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeeker, JobSeekerProfile, User
 from itou.utils.apis import pole_emploi_api_client
 from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
@@ -52,8 +52,7 @@ class Command(BaseCommand):
             )
 
         active_job_seekers = (
-            User.objects.filter(
-                kind=UserKind.JOB_SEEKER,
+            JobSeeker.objects.filter(
                 is_active=True,
                 pe_obfuscated_nir=None,
             )

@@ -524,57 +524,7 @@
   </div>
   '''
 # ---
-# name: TestDashboardView.test_gps_card[prescriber]
-  '''
-  <div class="col mb-3 mb-md-5" id="gps-card">
-      <div class="c-box p-0 h-100">
-          <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <ul class="list-unstyled">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
-                      </a>
-                  </li>
-              </ul>
-              <hr class="mb-3"/>
-              <p class="fs-sm mb-lg-5">
-                  Retrouvez les coordonnées des professionnels qui interviennent auprès de vos bénéficiaires.
-              </p>
-          </div>
-      </div>
-  </div>
-  '''
-# ---
 # name: TestDashboardView.test_gps_card[prescriber_no_org]
-  '''
-  <div class="col mb-3 mb-md-5" id="gps-card">
-      <div class="c-box p-0 h-100">
-          <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <ul class="list-unstyled">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
-                      </a>
-                  </li>
-              </ul>
-              <hr class="mb-3"/>
-              <p class="fs-sm mb-lg-5">
-                  Retrouvez les coordonnées des professionnels qui interviennent auprès de vos bénéficiaires.
-              </p>
-          </div>
-      </div>
-  </div>
-  '''
-# ---
-# name: TestDashboardView.test_gps_card[prescriber_non_authorized_org]
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
