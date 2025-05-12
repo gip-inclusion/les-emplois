@@ -51,7 +51,4 @@ def test_criteria_for_display(factory, method):
     assert_considered_certified(diagnosis, hiring_start_at=start)
     assert_considered_certified(diagnosis, hiring_start_at=today)
     assert_considered_certified(diagnosis, hiring_start_at=end)
-    assert_considered_certified(diagnosis, hiring_start_at=end + datetime.timedelta(days=1))
-    end_limit = end + datetime.timedelta(days=selected_criterion.CERTIFICATION_GRACE_PERIOD_DAYS)
-    assert_considered_certified(diagnosis, hiring_start_at=end_limit)
-    assert_not_considered_certified(diagnosis, hiring_start_at=end_limit + datetime.timedelta(days=1))
+    assert_not_considered_certified(diagnosis, hiring_start_at=end + datetime.timedelta(days=1))

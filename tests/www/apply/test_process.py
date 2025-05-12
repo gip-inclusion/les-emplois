@@ -334,8 +334,13 @@ class TestProcessViews:
         response = client.get(url)
         assertNotContains(response, CERTIFIED_BADGE_HTML, html=True)
 
-        eligibility_diagnosis.expires_at = today + datetime.timedelta(days=1)
+        tomorrow = today + datetime.timedelta(days=1)
+        eligibility_diagnosis.expires_at = tomorrow
         eligibility_diagnosis.save()
+        selected_criteria.certification_period = InclusiveDateRange(
+            selected_criteria.certification_period.lower, tomorrow
+        )
+        selected_criteria.save()
         response = client.get(url)
         assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 

@@ -1,4 +1,3 @@
-import datetime
 from collections import Counter
 
 from itou.eligibility.enums import (
@@ -6,7 +5,6 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaAnnex,
     AdministrativeCriteriaLevel,
 )
-from itou.utils.types import InclusiveDateRange
 
 
 def iae_has_required_criteria(criteria, company_kind):
@@ -18,19 +16,11 @@ def iae_has_required_criteria(criteria, company_kind):
     return level_2_count >= ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[company_kind]
 
 
-def _inclusive_overlap(date_range1: InclusiveDateRange, date_range2: InclusiveDateRange):
-    return date_range1.lower <= date_range2.upper and date_range2.lower <= date_range1.upper
-
-
 def _criteria_for_display(selected_criteria, hiring_start_at):
     for criterion in selected_criteria:
         criterion.is_considered_certified = False
         if hiring_start_at and criterion.certified:
-            validity_period = InclusiveDateRange(
-                hiring_start_at - datetime.timedelta(days=criterion.CERTIFICATION_GRACE_PERIOD_DAYS),
-                hiring_start_at,
-            )
-            criterion.is_considered_certified = _inclusive_overlap(validity_period, criterion.certification_period)
+            criterion.is_considered_certified = hiring_start_at in criterion.certification_period
     return selected_criteria
 
 
