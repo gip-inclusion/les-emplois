@@ -921,9 +921,7 @@ def hire_confirmation(
         request,
         company,
         job_seeker,
-        error_url=reverse(
-            "apply:hire_confirmation", kwargs={"company_pk": company_pk, "job_seeker_public_id": job_seeker_public_id}
-        ),
+        error_url=request.get_full_path(),
         # FIXME(alaurent) I doubt we should go back there...
         back_url=reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
