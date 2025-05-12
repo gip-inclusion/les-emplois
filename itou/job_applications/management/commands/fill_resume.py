@@ -53,8 +53,9 @@ class Command(BaseCommand):
                 new_file = files[key].copy()
                 job_app.resume = new_file
                 job_app.resume_link = public_storage.url(new_file.key)
-            else:
+            elif key in files:
                 job_app.resume = files[key]
+            previous_key = key
 
         JobApplication.objects.bulk_update(job_apps, ["resume_link", "resume"])
 
