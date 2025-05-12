@@ -296,9 +296,9 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
             # Searching by NIR is much more expensive than by number
             # so only do so for long numbers
             if len(search_term) == 15:  # Complete NIR
-                search_fields.append("user__jobseeker_profile__nir__exact")
+                search_fields.append("user__nir__exact")
             else:
-                search_fields.append("user__jobseeker_profile__nir__contains")
+                search_fields.append("user__nir__contains")
 
         if not search_fields:
             search_fields.append("user__email")

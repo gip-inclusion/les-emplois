@@ -517,7 +517,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             except ValueError:
                 pass
             else:
-                search_fields.append("jobseeker_profile__asp_uid__exact")
+                search_fields.append("asp_uid__exact")
         try:
             uuid.UUID(search_term)
             search_fields.append("public_id__exact")
@@ -525,7 +525,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             pass
         if search_term.isdecimal():
             search_fields.append("pk__exact")
-            search_fields.append("jobseeker_profile__nir__exact")
+            search_fields.append("nir__exact")
         else:
             search_fields.append("email")
             if "@" not in search_term:

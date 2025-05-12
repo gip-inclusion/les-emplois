@@ -69,7 +69,7 @@ class TestEditUserInfoView:
     @override_settings(TALLY_URL="https://tally.so")
     @freeze_time("2023-03-10")
     def test_edit_with_nir(self, client, mocker, snapshot):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(nir="178122978200508")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         with assertSnapshotQueries(snapshot):
@@ -143,9 +143,9 @@ class TestEditUserInfoView:
     def test_inconsistent_nir_title_birthdate(self, client):
         birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
-            jobseeker_profile__nir="178122978200508",
+            nir="178122978200508",
             title="M",
-            jobseeker_profile__birthdate=birthdate,
+            birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -196,9 +196,9 @@ class TestEditUserInfoView:
     def test_validate_nir_unknown_birth_month(self, client):
         birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
-            jobseeker_profile__nir="178332978200553",
+            nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=birthdate,
+            birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -225,9 +225,9 @@ class TestEditUserInfoView:
     def test_validate_nir_unknown_birth_month_bad_year(self, client):
         birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
-            jobseeker_profile__nir="178332978200553",
+            nir="178332978200553",
             title="M",
-            jobseeker_profile__birthdate=birthdate,
+            birthdate=birthdate,
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -271,7 +271,7 @@ class TestEditUserInfoView:
     @freeze_time("2023-03-10")
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     def test_update_address(self, client, snapshot):
-        user = JobSeekerFactory(with_address=True, jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(with_address=True, nir="178122978200508")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
@@ -328,7 +328,7 @@ class TestEditUserInfoView:
         assert str(results_section) == snapshot(name="user address input")
 
     def test_update_address_unavailable_api(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(nir="178122978200508")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
@@ -360,7 +360,7 @@ class TestEditUserInfoView:
     @freeze_time("2023-03-10")
     def test_edit_with_lack_of_nir_reason(self, client):
         user = JobSeekerFactory(
-            jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+            nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -398,7 +398,7 @@ class TestEditUserInfoView:
 
     @freeze_time("2023-03-10")
     def test_edit_without_nir_information(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
+        user = JobSeekerFactory(nir="", lack_of_nir_reason="")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
@@ -431,7 +431,7 @@ class TestEditUserInfoView:
     def test_edit_existing_nir(self, client):
         other_jobseeker = JobSeekerFactory()
 
-        user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
+        user = JobSeekerFactory(nir="", lack_of_nir_reason="")
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
@@ -465,7 +465,7 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.nir == ""
 
     def test_only_birth_country(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508", born_outside_france=True)
+        user = JobSeekerFactory(nir="178122978200508", born_outside_france=True)
         birth_country = user.jobseeker_profile.birth_country
         client.force_login(user)
         birthdate = date(1978, 12, 20)
@@ -491,7 +491,7 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.birth_country_id == birth_country.pk
 
     def test_born_in_france_no_birthplace(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(nir="178122978200508")
         client.force_login(user)
         birthdate = date(1978, 12, 20)
         birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
@@ -530,7 +530,7 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.birth_country_id is None
 
     def test_accept_born_outside_of_france_specifies_birth_place(self, client):
-        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
+        user = JobSeekerFactory(nir="178122978200508")
         client.force_login(user)
         birthdate = date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
@@ -573,8 +573,8 @@ class TestEditUserInfoView:
         job_seeker = JobSeekerFactory(
             title=Title.M,
             born_in_france=True,
-            jobseeker_profile__birthdate=date(1978, 12, 20),
-            jobseeker_profile__nir="178122978200508",
+            birthdate=date(1978, 12, 20),
+            nir="178122978200508",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -617,7 +617,7 @@ class TestEditUserInfoView:
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             first_name="Not Bob",
             last_name="Not Saint Clar",
-            jobseeker_profile__birthdate=date(1970, 1, 1),
+            birthdate=date(1970, 1, 1),
             title="M",
         )
         client.force_login(user)

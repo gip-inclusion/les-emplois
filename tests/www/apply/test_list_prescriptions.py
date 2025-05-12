@@ -509,7 +509,7 @@ def test_exports_download(client, snapshot):
         job_seeker__last_name="Undisclosed",
         job_seeker__email="undisclosed@secr.et",
         job_seeker__phone="3949",
-        job_seeker__jobseeker_profile__birthdate=datetime.date(2000, 1, 2),
+        job_seeker__birthdate=datetime.date(2000, 1, 2),
         to_company__name="Le fameux garage",
         sender=job_application.sender,
     )

@@ -130,7 +130,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"].replace(" ", "")
-        if User.objects.filter(jobseeker_profile__nir=nir).exists():
+        if User.objects.filter(nir=nir).exists():
             self._nir_submitted = nir
             raise ValidationError("Un compte avec ce numéro existe déjà.")
         return nir

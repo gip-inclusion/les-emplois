@@ -46,7 +46,7 @@ def forwards(apps, editor):
     # Handle identity certifications removed while the table was being populated.
     IdentityCertification.objects.filter(
         certifier=API_RECHERCHE_INDIVIDU_CERTIFIE,
-        jobseeker_profile__pe_obfuscated_nir=None,
+        pe_obfuscated_nir=None,
     ).delete()
 
     profile_identity_certifications = {}

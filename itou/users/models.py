@@ -142,17 +142,17 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         Implemented as a manager method to make unit testing easier.
         """
         return (
-            self.values("jobseeker_profile__pole_emploi_id")
+            self.values("pole_emploi_id")
             .filter(kind=UserKind.JOB_SEEKER)
             # Skip empty `pole_emploi_id`.
-            .exclude(jobseeker_profile__pole_emploi_id="")
+            .exclude(pole_emploi_id="")
             # Skip 31 cases where `00000000` was used as the `pole_emploi_id`.
-            .exclude(jobseeker_profile__pole_emploi_id="00000000")
+            .exclude(pole_emploi_id="00000000")
             # Group by.
-            .values("jobseeker_profile__pole_emploi_id")
-            .annotate(num_of_duplications=Count("jobseeker_profile__pole_emploi_id"))
+            .values("pole_emploi_id")
+            .annotate(num_of_duplications=Count("pole_emploi_id"))
             .filter(num_of_duplications__gt=1)
-            .values_list("jobseeker_profile__pole_emploi_id", flat=True)
+            .values_list("pole_emploi_id", flat=True)
         )
 
     def get_duplicates_by_pole_emploi_id(self, prefetch_related_lookups=None):
@@ -170,7 +170,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         Implemented as a manager method to make unit testing easier.
         """
         users = self.select_related("jobseeker_profile").filter(
-            jobseeker_profile__pole_emploi_id__in=self.get_duplicated_pole_emploi_ids()
+            pole_emploi_id__in=self.get_duplicated_pole_emploi_ids()
         )
         if prefetch_related_lookups:
             users = users.prefetch_related(*prefetch_related_lookups)
@@ -237,7 +237,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         # First the links for the user as a member of no organisation
         job_seeker_filters = [
-            Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=None),
+            Q(created_by=user, created_by_prescriber_organization=None),
         ]
         job_applications_filter = [Q(sender=user, sender_prescriber_organization=None)]
         eligibility_diagnosis_filters = [Q(author=user, author_prescriber_organization=None)]
@@ -245,12 +245,12 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         # then the links for the organization either only for the user, or for all members
         if organization:
             if from_all_coworkers:
-                job_seeker_filters.append(Q(jobseeker_profile__created_by_prescriber_organization=organization))
+                job_seeker_filters.append(Q(created_by_prescriber_organization=organization))
                 job_applications_filter.append(Q(sender_prescriber_organization=organization))
                 eligibility_diagnosis_filters.append(Q(author_prescriber_organization=organization))
             else:
                 job_seeker_filters.append(
-                    Q(created_by=user, jobseeker_profile__created_by_prescriber_organization=organization)
+                    Q(created_by=user, created_by_prescriber_organization=organization)
                 )
                 job_applications_filter.append(Q(sender=user, sender_prescriber_organization=organization))
                 eligibility_diagnosis_filters.append(Q(author=user, author_prescriber_organization=organization))
@@ -262,7 +262,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         )
 
         if stalled is not None:
-            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_stalled=stalled)
+            created_job_seekers = created_job_seekers.filter(is_stalled=stalled)
             job_seekers_applications = job_seekers_applications.filter(
                 job_seeker__jobseeker_profile__is_stalled=stalled
             )

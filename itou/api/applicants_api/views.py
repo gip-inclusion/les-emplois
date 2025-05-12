@@ -65,7 +65,7 @@ class ApplicantsView(LoginNotRequiredMixin, generics.ListAPIView):
                     ordering="job_applications__to_company_id__uid",
                 )
             )
-            .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
+            .select_related("birth_place", "birth_country")
             .order_by("-pk")
         )
 

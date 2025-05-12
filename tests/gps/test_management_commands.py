@@ -434,12 +434,12 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
 
     job_seeker_1 = JobSeekerFactory(
         post_code="30000",
-        jobseeker_profile__birthdate=datetime.date(2000, 12, 31),
-        jobseeker_profile__nir="",
+        birthdate=datetime.date(2000, 12, 31),
+        nir="",
     )
     job_seeker_2 = JobSeekerFactory(
         post_code="30000",
-        jobseeker_profile__birthdate=None,
+        birthdate=None,
     )
 
     management.call_command("export_beneficiaries_for_advisor", "30")

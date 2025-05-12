@@ -63,9 +63,9 @@ def test_show(capsys, snapshot, command):
 def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     settings.METABASE_API_KEY = "metabase-api-key"
 
-    entering_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=False)
-    exiting_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
-    noop_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
+    entering_job_seeker = JobSeekerFactory(is_stalled=False)
+    exiting_job_seeker = JobSeekerFactory(is_stalled=True)
+    noop_job_seeker = JobSeekerFactory(is_stalled=True)
     mocker.patch(
         "itou.utils.apis.metabase.Client.fetch_card_results",
         return_value=[
@@ -77,21 +77,21 @@ def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     management.call_command("metabase_data", "stalled-job-seekers", wet_run=wet_run)
     if wet_run:
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=True),
+            User.objects.filter(is_stalled=True),
             {entering_job_seeker, noop_job_seeker},
             ordered=False,
         )
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=False), {exiting_job_seeker}, ordered=False
+            User.objects.filter(is_stalled=False), {exiting_job_seeker}, ordered=False
         )
     else:
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=True),
+            User.objects.filter(is_stalled=True),
             {exiting_job_seeker, noop_job_seeker},
             ordered=False,
         )
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=False), {entering_job_seeker}, ordered=False
+            User.objects.filter(is_stalled=False), {entering_job_seeker}, ordered=False
         )
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.metabase_data succeeded in "

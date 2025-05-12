@@ -164,7 +164,7 @@ class TestJobSeekerExternalData:
         _mock_status_ok()
 
         # Check override of birthdate / of a field
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
+        user = JobSeekerFactory(birthdate=None)
 
         result = import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()

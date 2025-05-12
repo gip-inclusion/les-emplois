@@ -131,7 +131,7 @@ class TestGetOrCreateForJobSeeker:
 
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(birthdate=None, nir="")
         reset_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
 
@@ -161,7 +161,7 @@ class TestGetOrCreateForJobSeeker:
     def test_cannot_check_nir_if_already_set(self, client):
         company = CompanyFactory(with_membership=True)
         user = JobSeekerFactory(
-            jobseeker_profile__birthdate=datetime.date(1994, 2, 22), jobseeker_profile__nir="194022734304328"
+            birthdate=datetime.date(1994, 2, 22), nir="194022734304328"
         )
         client.force_login(user)
 
@@ -617,11 +617,11 @@ class TestStandaloneCreateAsPrescriber:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="178122978200508",
+            birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
 
@@ -880,7 +880,7 @@ class TestUpdateAsOther:
 
 class TestUpdateForJobSeeker:
     def test_start_update_job_seeker_forbidden(self, client):
-        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        job_seeker = JobSeekerFactory(birthdate=None, nir="")
         company = CompanyFactory(with_membership=True)
         client.force_login(job_seeker)
 
@@ -1001,7 +1001,7 @@ class TestUpdateForSender:
     def test_update_step_1(self, born_in_france, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1048,7 +1048,7 @@ class TestUpdateForSender:
     def test_birth_country_not_france_and_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1096,7 +1096,7 @@ class TestUpdateForSender:
     def test_birth_country_france_and_no_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1147,8 +1147,8 @@ class TestUpdateForSender:
             created_by=user,
             title=Title.M,
             born_in_france=True,
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
-            jobseeker_profile__nir="178122978200508",
+            birthdate=datetime.date(1978, 12, 20),
+            nir="178122978200508",
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,

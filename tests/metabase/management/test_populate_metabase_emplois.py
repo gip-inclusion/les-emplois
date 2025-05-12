@@ -149,10 +149,10 @@ def test_populate_job_seekers():
     user_1 = JobSeekerFactory(
         created_by=PrescriberFactory(),
         identity_provider=IdentityProvider.PE_CONNECT,
-        jobseeker_profile__pole_emploi_id="",
+        pole_emploi_id="",
         last_login=timezone.now(),
         first_login=timezone.now(),
-        jobseeker_profile__nir="179038704133768",
+        nir="179038704133768",
         post_code="33360",
         geocoding_score=1,
         coords=coords_to_geometry("48.85592", "2.41299"),
@@ -164,7 +164,7 @@ def test_populate_job_seekers():
     #  - expired eligibility diagnosis
     user_2 = JobSeekerFactory(
         created_by=EmployerFactory(),
-        jobseeker_profile__nir="271049232724647",
+        nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
         with_pole_emploi_id=True,
@@ -185,7 +185,7 @@ def test_populate_job_seekers():
     #  - not an AI
     #  - outside QPV but missing geocoding score
     user_3 = JobSeekerFactory(
-        jobseeker_profile__nir="297016314515713",
+        nir="297016314515713",
         with_pole_emploi_id=True,
         geocoding_score=None,
         coords=Point(0, 0),  # QPV utils is mocked

@@ -311,7 +311,7 @@ class JobSeekerFactory(UserFactory):
             ZRRFactory(insee_code="97405")
             create_city_partially_in_zrr()
 
-        kwargs = {k.replace("jobseeker_profile__", ""): v for k, v in kwargs.items()}
+        kwargs = {k.replace("", ""): v for k, v in kwargs.items()}
         # print("_ADJUST_KWARGS", kwargs)
 
         return kwargs

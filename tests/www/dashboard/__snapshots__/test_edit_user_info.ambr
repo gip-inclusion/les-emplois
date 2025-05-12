@@ -77,8 +77,7 @@
           'edit_user_info[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
+          SELECT "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
                  "users_jobseekerprofile"."nir",
@@ -115,7 +114,8 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
           LIMIT 21

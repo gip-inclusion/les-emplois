@@ -97,7 +97,7 @@ class TestEmployeeRecordAddressSerializer:
 
     def test_with_empty_fields(self):
         commune = Commune.objects.order_by("?").first()
-        serializer = _AddressSerializer(JobSeekerFactory(jobseeker_profile__hexa_commune=commune))
+        serializer = _AddressSerializer(JobSeekerFactory(hexa_commune=commune))
 
         assert serializer.data == {
             "adrTelephone": None,
@@ -190,7 +190,7 @@ class TestEmployeeRecordUpdateNotificationSerializer:
 def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
     notification = EmployeeRecordUpdateNotificationFactory(
         employee_record__job_application__for_snapshot=True,
-        **{f"employee_record__job_application__job_seeker__jobseeker_profile__{field}": value},
+        **{f"employee_record__job_application__job_seeker__{field}": value},
     )
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
@@ -200,8 +200,8 @@ def test_update_notification_use_static_serializers_on_missing_fields(snapshot, 
 def test_update_notification_use_static_serializers_on_missing_pole_emploi_since_fields(snapshot):
     notification = EmployeeRecordUpdateNotificationFactory(
         employee_record__job_application__for_snapshot=True,
-        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_id="1234567U",
-        employee_record__job_application__job_seeker__jobseeker_profile__pole_emploi_since="",
+        employee_record__job_application__job_seeker__pole_emploi_id="1234567U",
+        employee_record__job_application__job_seeker__pole_emploi_since="",
     )
 
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
@@ -237,7 +237,7 @@ def test_situation_salarie_serializer_with_empty_fields(snapshot, kind):
     employee_record = EmployeeRecordWithProfileFactory(
         status=Status.PROCESSED,
         job_application__to_company__kind=kind,
-        job_application__job_seeker__jobseeker_profile__education_level="",
+        job_application__job_seeker__education_level="",
     )
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
@@ -256,16 +256,16 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
         status=Status.PROCESSED,
         job_application__to_company__kind=kind,
         # EITI fields
-        job_application__job_seeker__jobseeker_profile__oeth_employee=True,
-        job_application__job_seeker__jobseeker_profile__are_allocation_since=AllocationDuration.LESS_THAN_6_MONTHS,
-        job_application__job_seeker__jobseeker_profile__activity_bonus_since=AllocationDuration.FROM_6_TO_11_MONTHS,
-        job_application__job_seeker__jobseeker_profile__cape_freelance=True,
-        job_application__job_seeker__jobseeker_profile__cesa_freelance=True,
-        job_application__job_seeker__jobseeker_profile__actor_met_for_business_creation="Actor Étude",
-        job_application__job_seeker__jobseeker_profile__mean_monthly_income_before_process=12345.67,
-        job_application__job_seeker__jobseeker_profile__eiti_contributions=EITIContributions.OTHER_SERVICES,
+        job_application__job_seeker__oeth_employee=True,
+        job_application__job_seeker__are_allocation_since=AllocationDuration.LESS_THAN_6_MONTHS,
+        job_application__job_seeker__activity_bonus_since=AllocationDuration.FROM_6_TO_11_MONTHS,
+        job_application__job_seeker__cape_freelance=True,
+        job_application__job_seeker__cesa_freelance=True,
+        job_application__job_seeker__actor_met_for_business_creation="Actor Étude",
+        job_application__job_seeker__mean_monthly_income_before_process=12345.67,
+        job_application__job_seeker__eiti_contributions=EITIContributions.OTHER_SERVICES,
         # Force some fields for snapshots
-        job_application__job_seeker__jobseeker_profile__education_level=EducationLevel.NO_SCHOOLING,
+        job_application__job_seeker__education_level=EducationLevel.NO_SCHOOLING,
     )
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 

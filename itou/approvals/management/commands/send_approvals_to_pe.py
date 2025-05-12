@@ -32,7 +32,7 @@ class Command(BaseCommand):
         approvals_models.Approval.objects.filter(
             pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
             pe_notification_endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
-            user__jobseeker_profile__pe_obfuscated_nir__isnull=False,
+            user__pe_obfuscated_nir__isnull=False,
         ).update(pe_notification_status=api_enums.PEApiNotificationStatus.PENDING)
 
         # Check if pending approvals are now READY to be sent
@@ -43,8 +43,8 @@ class Command(BaseCommand):
             # also removes the approvals without any job application yet.
             jobapplication__state=JobApplicationState.ACCEPTED,
         ).exclude(
-            Q(user__jobseeker_profile__nir="")
-            | Q(user__jobseeker_profile__birthdate=None)
+            Q(user__nir="")
+            | Q(user__birthdate=None)
             | Q(user__first_name="")
             | Q(user__last_name="")
         ).update(pe_notification_status=api_enums.PEApiNotificationStatus.READY)

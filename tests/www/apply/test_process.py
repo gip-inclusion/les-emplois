@@ -504,7 +504,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
-            job_seeker__jobseeker_profile__nir="11111111111111",
+            job_seeker__nir="11111111111111",
             job_seeker__post_code="59140",
             job_seeker__with_mocked_address=True,
             sender=prescriber,
@@ -2680,7 +2680,7 @@ class TestProcessAcceptViews:
         )
         job_application = self.create_job_application(
             eligibility_diagnosis=diagnosis,
-            job_seeker__jobseeker_profile__birthdate=birthdate,
+            job_seeker__birthdate=birthdate,
         )
         to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
             administrative_criteria__kind__in=criteria_kind
@@ -2767,7 +2767,7 @@ class TestProcessAcceptViews:
         )
         job_application = self.create_job_application(
             geiq_eligibility_diagnosis=diagnosis,
-            job_seeker__jobseeker_profile__birthdate=birthdate,
+            job_seeker__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
             administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
@@ -2938,7 +2938,7 @@ class TestProcessAcceptViews:
         )
         job_application = self.create_job_application(
             eligibility_diagnosis=diagnosis,
-            job_seeker__jobseeker_profile__birthdate=birthdate,
+            job_seeker__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
         post_data = self._accept_view_post_data(job_application=job_application)
@@ -2975,7 +2975,7 @@ class TestProcessAcceptViews:
         )
         job_application = self.create_job_application(
             eligibility_diagnosis=diagnosis,
-            job_seeker__jobseeker_profile__birthdate=birthdate,
+            job_seeker__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
         post_data = self._accept_view_post_data(job_application=job_application)

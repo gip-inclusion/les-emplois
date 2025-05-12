@@ -116,7 +116,7 @@ class FilterForm(forms.Form):
             filters.append(pass_status_filter)
 
         if self.cleaned_data.get("is_stalled"):
-            queryset = queryset.filter(jobseeker_profile__is_stalled=True)
+            queryset = queryset.filter(is_stalled=True)
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):
@@ -155,7 +155,7 @@ class CheckJobSeekerNirForm(forms.Form):
     def clean_nir(self):
         nir = self.cleaned_data["nir"].upper()
         nir = nir.replace(" ", "")
-        existing_account = User.objects.filter(jobseeker_profile__nir=nir).first()
+        existing_account = User.objects.filter(nir=nir).first()
 
         # Job application sent by autonomous job seeker.
         if self.job_seeker:

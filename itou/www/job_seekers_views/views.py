@@ -654,7 +654,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         if self.form.is_valid():
             existing_job_seeker = User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
-                jobseeker_profile__birthdate=self.form.cleaned_data["birthdate"],
+                birthdate=self.form.cleaned_data["birthdate"],
                 first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
                 last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
             ).first()

@@ -55,15 +55,15 @@ class Command(BaseCommand):
             User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
                 is_active=True,
-                jobseeker_profile__pe_obfuscated_nir=None,
+                pe_obfuscated_nir=None,
             )
-            .exclude(jobseeker_profile__pe_last_certification_attempt_at__gt=timezone.now() - RETRY_DELAY)
+            .exclude(pe_last_certification_attempt_at__gt=timezone.now() - RETRY_DELAY)
             .select_related("jobseeker_profile")
         )
         self.logger.info("about to resolve first_name and last_name for count=%d users", active_job_seekers.count())
 
         eligible_users = active_job_seekers.exclude(
-            Q(jobseeker_profile__nir="") | Q(jobseeker_profile__birthdate=None) | Q(first_name="") | Q(last_name="")
+            Q(nir="") | Q(birthdate=None) | Q(first_name="") | Q(last_name="")
         )
         self.logger.info("only count=%d users have the necessary data to be resolved", eligible_users.count())
 
@@ -85,7 +85,7 @@ class Command(BaseCommand):
             self.logger.info("certified user pk=%d", user.pk)
 
         for user in eligible_users.order_by(
-            F("jobseeker_profile__pe_last_certification_attempt_at").asc(nulls_first=True)
+            F("pe_last_certification_attempt_at").asc(nulls_first=True)
         )[:chunk_size]:
             user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
             examined_profiles.append(user.jobseeker_profile)

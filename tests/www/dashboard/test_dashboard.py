@@ -894,7 +894,7 @@ def test_stalled_job_seekers_box(client):
     client.force_login(prescriber)
     JobApplicationFactory(
         sender=prescriber,
-        job_seeker__jobseeker_profile__is_stalled=True,
+        job_seeker__is_stalled=True,
     )
     JobApplicationFactory(sender=prescriber)
 

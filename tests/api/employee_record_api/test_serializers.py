@@ -90,7 +90,7 @@ def test_address_serializer_with_empty_fields():
 
 def test_person_serializer_with_empty_birth_country():
     serializer = _API_PersonSerializer(
-        EmployeeRecordFactory(job_application__job_seeker__jobseeker_profile__birth_country=None)
+        EmployeeRecordFactory(job_application__job_seeker__birth_country=None)
     )
 
     assert serializer.data["codeInseePays"] is None

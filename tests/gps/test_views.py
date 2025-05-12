@@ -970,7 +970,7 @@ class TestBeneficiariesAutocomplete:
             first_name="gps beneficiary Bob",
             last_name="Le Brico",
             created_by=prescriber,
-            jobseeker_profile__birthdate=date(1980, 1, 1),
+            birthdate=date(1980, 1, 1),
             title=Title.M,
         )
         FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=1, memberships__member=prescriber)
@@ -979,7 +979,7 @@ class TestBeneficiariesAutocomplete:
         second_beneficiary = JobSeekerFactory(
             first_name="gps second beneficiary Martin",
             last_name="Pêcheur",
-            jobseeker_profile__birthdate=date(1990, 1, 1),
+            birthdate=date(1990, 1, 1),
             title=Title.MME,
         )
         FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=1, memberships__member=prescriber)
@@ -988,7 +988,7 @@ class TestBeneficiariesAutocomplete:
         third_beneficiary = JobSeekerFactory(
             first_name="gps third beneficiary Jeanne",
             last_name="Bonneau",
-            jobseeker_profile__birthdate=date(2000, 1, 1),
+            birthdate=date(2000, 1, 1),
             title=Title.MME,
         )
         FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=1, memberships__member=coworker_1)
@@ -1230,7 +1230,7 @@ class TestJoinGroupFromNir:
 
     def test_unknown_nir_known_email_with_no_nir(self, client, snapshot):
         user = EmployerFactory(with_company=True)
-        existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+        existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, nir="")
         nir = "276024719711371"
 
         client.force_login(user)
@@ -1345,8 +1345,8 @@ class TestJoinGroupFromNir:
     def test_unknown_nir_and_unknown_email(self, client, settings, mocker):
         user = EmployerFactory(with_company=True)
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
         )
 
@@ -1539,8 +1539,8 @@ class TestJoinGroupFromNameAndEmail:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
         )
 

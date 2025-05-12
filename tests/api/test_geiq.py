@@ -104,7 +104,7 @@ def test_candidatures_geiq_nominal(snapshot):
     assert response.status_code == 200
     assert response.json() == snapshot(name="empty")
 
-    job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__education_level="51")
+    job_seeker = JobSeekerFactory(for_snapshot=True, education_level="51")
 
     job_application = JobApplicationFactory(
         pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9504"),
@@ -174,7 +174,7 @@ def test_candidatures_geiq_nominal(snapshot):
 def test_serializer_method_defaults():
     ja = JobApplicationFactory(
         with_geiq_eligibility_diagnosis=False,
-        job_seeker__jobseeker_profile__education_level="",
+        job_seeker__education_level="",
     )
     serializer = serializers.GeiqJobApplicationSerializer()
     assert serializer.get_criteres_eligibilite(ja) == []

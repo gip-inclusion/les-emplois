@@ -602,7 +602,7 @@ class TestJobSeekerSignup:
             assert response.context["form"].errors["email"] == [
                 "Un autre utilisateur utilise déjà cette adresse e-mail."
             ]
-        if "jobseeker_profile__nir" in erroneous_fields:
+        if "nir" in erroneous_fields:
             assert response.context["form"].errors["nir"] == ["Un compte avec ce numéro existe déjà."]
 
     def test_job_seeker_signup_with_conflicting_email_not_verified(self, client, snapshot):
@@ -648,7 +648,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_temporary_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
+        existing_user = JobSeekerFactory(for_snapshot=True, nir="", born_in_france=True)
 
         post_data = {
             "nir": "1234567895GHTUI",
@@ -673,7 +673,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_redefine_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
+        existing_user = JobSeekerFactory(for_snapshot=True, nir="", born_in_france=True)
 
         post_data = {
             "nir": "141068078200557",
@@ -727,7 +727,7 @@ class TestJobSeekerSignup:
         The NIR is normally a more reliable source of unicity than email
         When the NIR is undefined (e.g. temporary), then a matching email is more important
         """
-        existing_user = JobSeekerFactory(jobseeker_profile__nir="")
+        existing_user = JobSeekerFactory(nir="")
 
         post_data = {
             "nir": "",

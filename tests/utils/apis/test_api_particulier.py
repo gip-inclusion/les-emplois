@@ -25,7 +25,7 @@ def test_build_params_from(snapshot):
     assert api_particulier._build_params_from(job_seeker) == snapshot(name="api_particulier_build_params")
     assert api_particulier.has_required_info(job_seeker) is True
 
-    job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None)
+    job_seeker = JobSeekerFactory(birthdate=None)
     assert api_particulier.has_required_info(job_seeker) is False
 
     job_seeker = JobSeekerFactory(born_outside_france=True)

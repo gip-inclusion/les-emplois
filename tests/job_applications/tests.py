@@ -1082,9 +1082,9 @@ class TestJobApplicationNotifications:
     def test_manually_deliver_approval(self, django_capture_on_commit_callbacks, mailoutbox):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
-            jobseeker_profile__pole_emploi_id="",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            nir="",
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
@@ -1107,9 +1107,9 @@ class TestJobApplicationNotifications:
     def test_manually_refuse_approval(self, django_capture_on_commit_callbacks, mailoutbox):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
-            jobseeker_profile__pole_emploi_id="",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            nir="",
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1308,7 +1308,7 @@ class TestJobApplicationWorkflow:
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
-        job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
+        job_seeker = JobSeekerFactory(pole_emploi_id="", birthdate=None)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1333,9 +1333,9 @@ class TestJobApplicationWorkflow:
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
-            jobseeker_profile__pole_emploi_id="",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            nir="",
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1355,7 +1355,7 @@ class TestJobApplicationWorkflow:
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="",
+            pole_emploi_id="",
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1380,7 +1380,7 @@ class TestJobApplicationWorkflow:
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
+            nir="",
             with_pole_emploi_id=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1402,9 +1402,9 @@ class TestJobApplicationWorkflow:
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
-            jobseeker_profile__pole_emploi_id="",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            nir="",
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

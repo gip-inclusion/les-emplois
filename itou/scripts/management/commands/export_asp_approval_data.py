@@ -27,27 +27,27 @@ class Command(BaseCommand):
             "number",
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate",
-            "user__jobseeker_profile__birth_place__code",
+            "user__birthdate",
+            "user__birth_place__code",
         },
         {
             "number",
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate__year",
-            "user__jobseeker_profile__birth_place__code",
+            "user__birthdate__year",
+            "user__birth_place__code",
         },
         {
             "number",
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate",
+            "user__birthdate",
         },
         {
             "number",
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate__year",
+            "user__birthdate__year",
         },
         {
             "number",
@@ -57,35 +57,35 @@ class Command(BaseCommand):
         {
             "number",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate",
+            "user__birthdate",
         },
         {
             "number",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate__year",
-            "user__jobseeker_profile__birth_place__code",
+            "user__birthdate__year",
+            "user__birth_place__code",
         },
         {
             "number",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate__year",
+            "user__birthdate__year",
         },
         {
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate",
-            "user__jobseeker_profile__birth_place__code",
+            "user__birthdate",
+            "user__birth_place__code",
         },
         {
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate__year",
-            "user__jobseeker_profile__birth_place__code",
+            "user__birthdate__year",
+            "user__birth_place__code",
         },
         {
             "user__first_name__icontains",
             "user__last_name__icontains",
-            "user__jobseeker_profile__birthdate",
+            "user__birthdate",
         },
     ]
 
@@ -105,14 +105,14 @@ class Command(BaseCommand):
             data = {
                 "user__first_name__icontains": row["pph_prenom"],
                 "user__last_name__icontains": row["pph_nom_usage"],
-                "user__jobseeker_profile__birthdate": birthdate.isoformat(),
-                "user__jobseeker_profile__birthdate__year": birthdate.year,
-                "user__jobseeker_profile__birth_place__code": row["code_com_insee"],
+                "user__birthdate": birthdate.isoformat(),
+                "user__birthdate__year": birthdate.year,
+                "user__birth_place__code": row["code_com_insee"],
             }
             if row["agr_numero_agrement"] != "0":
                 data["number"] = row["agr_numero_agrement"]
             if row["code_com_insee"] != "[NULL]":
-                data["user__jobseeker_profile__birth_place__code"] = row["code_com_insee"]
+                data["user__birth_place__code"] = row["code_com_insee"]
 
             step, approvals = search(data, self.QUERIES)
             if not approvals:

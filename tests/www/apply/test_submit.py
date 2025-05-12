@@ -526,9 +526,9 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
     user = JobSeekerFactory(
-        jobseeker_profile__birthdate=None,
-        jobseeker_profile__nir="",
-        jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+        birthdate=None,
+        nir="",
+        lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
     )
     client.force_login(user)
 
@@ -568,7 +568,7 @@ class TestApplyAsJobSeeker:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(birthdate=None, nir="")
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
@@ -589,7 +589,7 @@ class TestApplyAsJobSeeker:
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(birthdate=None, nir="")
         client.force_login(user)
 
         # Entry point.
@@ -733,7 +733,7 @@ class TestApplyAsJobSeeker:
         """
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        user = JobSeekerFactory(nir="", with_pole_emploi_id=True)
         client.force_login(user)
 
         # Entry point.
@@ -783,9 +783,9 @@ class TestApplyAsJobSeeker:
         )
 
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="141068078200557",
+            nir="141068078200557",
             with_pole_emploi_id=True,
-            jobseeker_profile__birthdate=datetime.date(1941, 6, 12),
+            birthdate=datetime.date(1941, 6, 12),
         )
         client.force_login(job_seeker)
 
@@ -1000,8 +1000,8 @@ class TestApplyAsAuthorizedPrescriber:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
         )
         existing_job_seeker = JobSeekerFactory()
@@ -1297,8 +1297,8 @@ class TestApplyAsAuthorizedPrescriber:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
             first_name="John",
             last_name="DOE",
@@ -1360,7 +1360,7 @@ class TestApplyAsAuthorizedPrescriber:
         # Step get job seeker e-mail. Second try: email is found, attached to a
         # user without NIR
         # ----------------------------------------------------------------------
-        existing_job_seeker_without_nir = JobSeekerFactory(jobseeker_profile__nir="")
+        existing_job_seeker_without_nir = JobSeekerFactory(nir="")
 
         response = client.post(
             next_url,
@@ -1788,11 +1788,11 @@ class TestApplyAsPrescriber:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="178122978200508",
+            birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
         existing_job_seeker = JobSeekerFactory()
@@ -2011,7 +2011,7 @@ class TestApplyAsPrescriber:
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=dummy_job_seeker.jobseeker_profile.nir)
+        other_job_seeker = JobSeekerFactory(nir=dummy_job_seeker.jobseeker_profile.nir)
 
         response = client.post(next_url)
         assertMessages(
@@ -2122,11 +2122,11 @@ class TestApplyAsPrescriber:
         fake_session_initialization(client, company, {})
 
         dummy_job_seeker = JobSeekerFactory(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=None,
+            nir="178122978200508",
+            birthdate=None,
             title="M",
         )
 
@@ -2179,7 +2179,7 @@ class TestApplyAsPrescriberNirExceptions:
         This NIR account is empty.
         An update is expected.
         """
-        job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        job_seeker = JobSeekerFactory(nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(
             birthdate=job_seeker.jobseeker_profile.birthdate,
@@ -2230,7 +2230,7 @@ class TestApplyAsPrescriberNirExceptions:
 
         # Create a job seeker with this NIR right after the check. Sorry.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
+        other_job_seeker = JobSeekerFactory(nir=nir)
 
         # Enter an existing email.
         # ----------------------------------------------------------------------
@@ -2267,8 +2267,8 @@ class TestApplyAsPrescriberNirExceptions:
 
     def test_one_account_lack_of_nir_reason(self, client):
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
@@ -2700,11 +2700,11 @@ class TestApplyAsCompany:
         client.force_login(employer)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="278122978200555",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="278122978200555",
+            birthdate=datetime.date(1978, 12, 20),
             title="MME",
         )
         self._test_apply_as_company(client, employer, company, dummy_job_seeker, pdf_file)
@@ -2716,11 +2716,11 @@ class TestApplyAsCompany:
         client.force_login(employer)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="278122978200555",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="278122978200555",
+            birthdate=datetime.date(1978, 12, 20),
             title="MME",
         )
         self._test_apply_as_company(client, employer, company, dummy_job_seeker, pdf_file)
@@ -2732,11 +2732,11 @@ class TestApplyAsCompany:
         fake_session_initialization(client, company, {})
 
         dummy_job_seeker = JobSeekerFactory(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="278122978200555",
-            jobseeker_profile__birthdate=None,
+            nir="278122978200555",
+            birthdate=None,
             title="MME",
         )
 
@@ -2854,11 +2854,11 @@ class TestDirectHireFullProcess:
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            with_hexa_address=True,
+            with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="178122978200508",
+            birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
         existing_job_seeker = JobSeekerFactory()
@@ -3776,8 +3776,8 @@ class UpdateJobSeekerTestMixin:
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         self.job_seeker = JobSeekerFactory(
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="178122978200508",
-            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            nir="178122978200508",
+            birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
         from_url = reverse(
@@ -4387,7 +4387,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
 class TestUpdateJobSeekerStep3View:
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
+        job_seeker = JobSeekerFactory(ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
 
         client.force_login(company.members.first())
         apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
@@ -4433,8 +4433,8 @@ def test_detect_existing_job_seeker(client):
     client.force_login(user)
 
     job_seeker = JobSeekerFactory(
-        jobseeker_profile__nir="",
-        jobseeker_profile__birthdate=datetime.date(1997, 1, 1),
+        nir="",
+        birthdate=datetime.date(1997, 1, 1),
         title="M",
         first_name="Jérémy",
         email="jeremy@example.com",
@@ -5136,7 +5136,7 @@ class TestFindJobSeekerForHireView:
 
         dummy_job_seeker = JobSeekerFactory.build(
             with_address=True,
-            jobseeker_profile__with_hexa_address=True,
+            with_hexa_address=True,
         )
 
         check_nir_url = self.get_check_nir_url(client)
@@ -5188,8 +5188,8 @@ class TestCheckJobSeekerInformationsForHire:
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
-            jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {})
@@ -5229,8 +5229,8 @@ class TestCheckJobSeekerInformationsForHire:
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
-            jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {})
@@ -5675,7 +5675,7 @@ class TestNewHireProcessInfo:
     def setup_method(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         self.geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        self.job_seeker = JobSeekerFactory(jobseeker_profile__nir="")
+        self.job_seeker = JobSeekerFactory(nir="")
 
     def test_as_job_seeker(self, client):
         client.force_login(self.job_seeker)

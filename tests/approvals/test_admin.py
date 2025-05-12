@@ -235,7 +235,7 @@ def test_search_fields(admin_client):
         user__first_name="Jean Michel",
         user__last_name="Dupont",
         user__email="jean.michel@example.com",
-        user__jobseeker_profile__nir="190031398700953",
+        user__nir="190031398700953",
         origin_pe_approval=True,
         number="123456789012",
     )
@@ -244,7 +244,7 @@ def test_search_fields(admin_client):
         user__first_name="Pierre François",
         user__last_name="Martin",
         user__email="pierre.francois@example.com",
-        user__jobseeker_profile__nir="",
+        user__nir="",
     )
     url_2 = reverse("admin:approvals_approval_change", kwargs={"object_id": approval2.pk})
 

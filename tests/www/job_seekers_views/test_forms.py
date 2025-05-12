@@ -18,7 +18,7 @@ class TestCheckJobSeekerNirForm:
     def test_form_job_seeker_found(self):
         # A job seeker with this NIR already exists.
         nir = "141062A78200555"
-        job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
+        job_seeker = JobSeekerFactory(nir=nir)
         form_data = {"nir": job_seeker.jobseeker_profile.nir}
         form = job_seekers_forms.CheckJobSeekerNirForm(data=form_data)
         # A job seeker has been found.

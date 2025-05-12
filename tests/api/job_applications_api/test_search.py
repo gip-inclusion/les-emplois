@@ -40,16 +40,16 @@ class TestJobApplicationSearchApi:
         settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] |= {"job-applications-search": "10/minute"}
 
         self.job_seeker_1 = JobSeekerFactory(
-            jobseeker_profile__nir="269054958815780",
-            jobseeker_profile__birthdate=date(1969, 5, 12),
+            nir="269054958815780",
+            birthdate=date(1969, 5, 12),
             last_name="Durand",
             first_name="Nathalie",
             born_in_france=True,
             with_address=True,
         )
         self.job_seeker_2 = JobSeekerFactory(
-            jobseeker_profile__nir="199127524528683",
-            jobseeker_profile__birthdate=date(1999, 12, 3),
+            nir="199127524528683",
+            birthdate=date(1999, 12, 3),
             last_name="Dupont-Maréchal",
             first_name="Léopold",
             born_outside_france=True,

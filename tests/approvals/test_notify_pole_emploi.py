@@ -49,7 +49,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
          - We do not even call the APIs
          - no entry should be added to the notification log database
         """
-        approval = ApprovalFactory(user__jobseeker_profile__nir="", with_jobapplication=True)
+        approval = ApprovalFactory(user__nir="", with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
         assert return_status == api_enums.PEApiNotificationStatus.PENDING
@@ -594,8 +594,8 @@ class TestApprovalsSendToPeManagement:
         # create ignored Approvals, will not even be counted in the batch. the cron will wait for
         # the database to have the necessary job application, nir, or start date to fetch them.
         no_jobapp = ApprovalFactory(with_jobapplication=False)
-        missing_user_data1 = ApprovalFactory(user__jobseeker_profile__nir="")
-        missing_user_data2 = ApprovalFactory(user__jobseeker_profile__birthdate=None)
+        missing_user_data1 = ApprovalFactory(user__nir="")
+        missing_user_data2 = ApprovalFactory(user__birthdate=None)
         future = ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
 
         # Create CancelledApproval
@@ -619,7 +619,7 @@ class TestApprovalsSendToPeManagement:
             with_jobapplication=True,
             pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
             pe_notification_endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
-            user__jobseeker_profile__pe_obfuscated_nir="something",
+            user__pe_obfuscated_nir="something",
         )
         retry_approval = ApprovalFactory(
             start_at=datetime.datetime.today().date() - datetime.timedelta(days=1),

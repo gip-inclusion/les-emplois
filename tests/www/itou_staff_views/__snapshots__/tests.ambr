@@ -435,7 +435,6 @@
                  "cities_city"."code_insee",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
-                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -474,6 +473,7 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -1070,7 +1070,6 @@
                  "cities_city"."code_insee",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
-                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1109,6 +1108,7 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -1705,7 +1705,6 @@
                  "cities_city"."code_insee",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
-                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -1744,6 +1743,7 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
                  "eligibility_eligibilitydiagnosis"."author_kind",
@@ -2455,7 +2455,6 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
-                 "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
                  "users_jobseekerprofile"."birth_country_id",
@@ -2493,7 +2492,8 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."fields_history"
+                 "users_jobseekerprofile"."fields_history",
+                 "users_jobseekerprofile"."user_id"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")

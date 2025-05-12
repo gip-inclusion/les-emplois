@@ -81,8 +81,8 @@ class TestExportJobApplications:
         with freeze_time("2024-05-10T11:11:11+02:00"):
             job_seeker = JobSeekerFactory(
                 for_snapshot=True,
-                jobseeker_profile__pe_last_certification_attempt_at=timezone.now(),
-                jobseeker_profile__hexa_post_code="35000",
+                pe_last_certification_attempt_at=timezone.now(),
+                hexa_post_code="35000",
             )
             eligibility_diag = IAEEligibilityDiagnosisFactory(
                 from_prescriber=True,
@@ -177,7 +177,7 @@ class TestExportPEApiRejections:
             pe_notification_time=datetime.datetime(2022, 8, 31, tzinfo=datetime.UTC),
             pe_notification_exit_code="FOOBAR",
             user__for_snapshot=True,
-            user__jobseeker_profile__pole_emploi_id="PE777",
+            user__pole_emploi_id="PE777",
             origin_siae_kind="EI",
             origin_siae_siret="12345678900000",
             number="XXXXX1234567",
