@@ -5271,49 +5271,66 @@ class TestCheckPreviousApplicationsForHireView:
             view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
         )
 
-    def test_no_previous_as_employer(self, client):
+    def test_iae_employer(self, client):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         client.force_login(self.company.members.first())
         fake_session_initialization(client, self.company, {})
 
-        response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
-        assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
+        url = self._reverse("apply:check_prev_applications_for_hire")
+        next_url = self._reverse("apply:eligibility_for_hire")
+        response = client.get(url)
+        assertRedirects(response, next_url)
 
-    def test_with_previous_as_employer(self, client):
-        self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
-        client.force_login(self.company.members.first())
-        fake_session_initialization(client, self.company, {})
-
-        response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        response = client.get(url)
         assertTemplateNotUsed(response, "approvals/includes/box.html")
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
         )
-        assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
+        assertRedirects(response, next_url)
 
-    def test_no_previous_as_geiq_staff(self, client):
+    def test_geiq_employer(self, client):
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         client.force_login(self.company.members.first())
         fake_session_initialization(client, self.company, {})
 
-        response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
-        assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
+        url = self._reverse("apply:check_prev_applications_for_hire")
+        next_url = self._reverse("apply:geiq_eligibility_for_hire")
+        response = client.get(url)
+        assertRedirects(response, next_url)
 
-    def test_with_previous_as_geiq_staff(self, client):
-        self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+        # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
-        client.force_login(self.company.members.first())
-        fake_session_initialization(client, self.company, {})
-
-        response = client.get(self._reverse("apply:check_prev_applications_for_hire"))
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = client.get(url)
         assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
         )
-        assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
+        assertRedirects(response, next_url)
+
+    def test_other_employer(self, client):
+        # not IAE or GEIQ
+        self.company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)
+        client.force_login(self.company.members.first())
+        fake_session_initialization(client, self.company, {})
+
+        url = self._reverse("apply:check_prev_applications_for_hire")
+        next_url = self._reverse("apply:hire_confirmation")
+        response = client.get(url)
+        assertRedirects(response, next_url)
+
+        # with previous job application
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
+        response = client.get(url)
+        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = client.post(
+            self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
+        )
+        assertRedirects(response, next_url)
 
 
 @pytest.mark.ignore_unknown_variable_template_error("is_subject_to_eligibility_rules")
@@ -5328,7 +5345,7 @@ class TestEligibilityForHire:
         )
 
     def test_not_subject_to_eligibility(self, client):
-        self.company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
+        self.company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)  # We don't want a GEIQ here
         client.force_login(self.company.members.first())
         fake_session_initialization(client, self.company, {"selected_jobs": []})
         response = client.get(self._reverse("apply:eligibility_for_hire"))
