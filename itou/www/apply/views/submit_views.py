@@ -337,6 +337,29 @@ class ApplicationBaseView(ApplyStepBaseView):
                 )
         return None
 
+    def get_eligibility_for_hire_step_url(self):
+        if self.company.kind == CompanyKind.GEIQ:
+            if not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists():
+                return reverse(
+                    "apply:geiq_eligibility_for_hire",
+                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+                )
+        else:
+            bypass_eligibility_conditions = [
+                # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
+                not self.company.is_subject_to_eligibility_rules,
+                # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+                self.job_seeker.has_valid_approval,
+                # Job seeker must not have a diagnosis
+                self.job_seeker.has_valid_diagnosis(for_siae=self.company),
+            ]
+            if not any(bypass_eligibility_conditions):
+                return reverse(
+                    "apply:eligibility_for_hire",
+                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+                )
+        return None
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
@@ -407,10 +430,9 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def get_next_url(self):
         if self.hire_process:
-            view_name = (
-                "apply:geiq_eligibility_for_hire"
-                if self.company.kind == CompanyKind.GEIQ
-                else "apply:eligibility_for_hire"
+            return self.get_eligibility_for_hire_step_url() or reverse(
+                "apply:hire_confirmation",
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
             )
         else:
             view_name = "apply:application_jobs"
@@ -798,13 +820,7 @@ class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibi
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-            not self.company.is_subject_to_eligibility_rules,
-            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
-            self.job_seeker.has_valid_approval,
-        ]
-        if any(bypass_eligibility_conditions) or self.job_seeker.has_valid_diagnosis(for_siae=self.company):
+        if self.get_eligibility_for_hire_step_url() is None:
             return HttpResponseRedirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)
 
@@ -838,7 +854,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         )
 
     def dispatch(self, request, *args, **kwargs):
-        if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists():
+        if self.get_eligibility_for_hire_step_url() is None:
             return HttpResponseRedirect(self.get_next_url())
         return super().dispatch(request, *args, **kwargs)
 
@@ -908,6 +924,7 @@ def hire_confirmation(
         error_url=reverse(
             "apply:hire_confirmation", kwargs={"company_pk": company_pk, "job_seeker_public_id": job_seeker_public_id}
         ),
+        # FIXME(alaurent) I doubt we should go back there...
         back_url=reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
