@@ -9,6 +9,7 @@
 LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
+PIP_COMPILE_OPTIONS :=
 
 ifdef $(XDG_CACHE_HOME)
 	CACHEDIR := $(XDG_CACHE_HOME)
