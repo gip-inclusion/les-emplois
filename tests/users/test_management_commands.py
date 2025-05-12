@@ -59,12 +59,12 @@ class TestDeduplicateJobSeekersManagementCommands:
         # Attributes shared by all users.
         # Deduplication is based on these values.
         kwargs = {
-            "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         assert user1.jobseeker_profile.nir == ""
@@ -73,7 +73,7 @@ class TestDeduplicateJobSeekersManagementCommands:
         assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
-        job_app2 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app2 = JobApplicationFactory(job_seeker__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert user2.jobseeker_profile.nir == ""
@@ -121,26 +121,26 @@ class TestDeduplicateJobSeekersManagementCommands:
         # Attributes shared by all users.
         # Deduplication is based on these values.
         kwargs = {
-            "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         assert 1 == user1.job_applications.count()
         assert job_app1.sender == user1
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert 1 == user2.job_applications.count()
         assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app3 = JobApplicationFactory(job_seeker__nir="", **kwargs)
         user3 = job_app3.job_seeker
         assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
@@ -161,8 +161,8 @@ class TestDeduplicateJobSeekersManagementCommands:
         job_app2.refresh_from_db()
         job_app3.refresh_from_db()
 
-        assert job_app1.sender == user1
-        assert job_app2.sender == user1  # The sender must now be user1.
+        assert job_app1.sender == user1.user_ptr
+        assert job_app2.sender == user1.user_ptr  # The sender must now be user1.
         assert job_app3.sender == job_app3_sender  # The sender must still be a prescriber.
 
         assert 0 == User.objects.filter(email=user2.email).count()
@@ -182,17 +182,17 @@ class TestDeduplicateJobSeekersManagementCommands:
         # Attributes shared by all users.
         # Deduplication is based on these values.
         kwargs = {
-            "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         # Create `user2` through a job application sent by him.
         job_app2 = JobApplicationSentByJobSeekerFactory(
-            with_approval=True, job_seeker__jobseeker_profile__nir="", with_iae_eligibility_diagnosis=True, **kwargs
+            with_approval=True, job_seeker__nir="", with_iae_eligibility_diagnosis=True, **kwargs
         )
         user2 = job_app2.job_seeker
 
@@ -1002,8 +1002,8 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
         pk=424242,
         first_name="Yoder",
         last_name="Olson",
-        jobseeker_profile__birthdate=datetime.date(1994, 2, 22),
-        jobseeker_profile__nir="194022734304328",
+        birthdate=datetime.date(1994, 2, 22),
+        nir="194022734304328",
     )
     settings.API_ESD = {
         "BASE_URL": "https://pe.fake",
@@ -1064,8 +1064,8 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
         pk=424243,
         first_name="Balthazar",
         last_name="Durand",
-        jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
-        jobseeker_profile__nir="187062112345678",
+        birthdate=datetime.date(1987, 6, 21),
+        nir="187062112345678",
     )
     settings.API_ESD = {
         "BASE_URL": "https://pe.fake",
@@ -1116,15 +1116,15 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
 
 
 def test_pe_certify_users_retry(caplog, snapshot):
-    new_user = JobSeekerFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
+    new_user = JobSeekerFactory(pe_last_certification_attempt_at=None)
     old_failure = JobSeekerFactory(
-        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
+        pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
     )
     really_old_failure = JobSeekerFactory(
-        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=900),
+        pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=900),
     )
     JobSeekerFactory(
-        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(seconds=90),
+        pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(seconds=90),
     )  # recent failure that should not be called
     with mock.patch(
         "itou.utils.apis.PoleEmploiApiClient.recherche_individu_certifie", side_effect=PoleEmploiAPIBadResponse("R010")

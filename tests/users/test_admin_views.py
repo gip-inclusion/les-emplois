@@ -17,7 +17,6 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerProfileFactory,
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
@@ -154,7 +153,7 @@ class TestTransferUserData:
         approval = job_application.approval
 
         from_user = job_application.job_seeker
-        to_user = JobSeekerFactory()
+        to_user = JobSeekerFactory().user_ptr
 
         transfer_url_1 = reverse("admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk})
         transfer_url_2 = reverse(
@@ -403,14 +402,14 @@ def test_search_fields(admin_client):
         first_name="Jean Michel",
         last_name="Dupont",
         email="jean.michel@example.com",
-        jobseeker_profile__nir="190031398700953",
+        nir="190031398700953",
     )
     url_1 = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker1.jobseeker_profile.pk})
     job_seeker2 = JobSeekerFactory(
         first_name="Pierre François",
         last_name="Martin",
         email="pierre.francois@example.com",
-        jobseeker_profile__nir="",
+        nir="",
     )
     url_2 = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker2.jobseeker_profile.pk})
 
@@ -451,7 +450,7 @@ def test_search_fields(admin_client):
 
 
 def test_profile_check_inconsistency_check(admin_client):
-    profile = JobSeekerProfileFactory()
+    profile = JobSeekerFactory()
 
     response = admin_client.post(
         reverse("admin:users_jobseekerprofile_changelist"),
@@ -463,8 +462,7 @@ def test_profile_check_inconsistency_check(admin_client):
     )
     assertContains(response, "Aucune incohérence trouvée")
 
-    prescriber = PrescriberFactory()
-    inconsistent_profile = JobSeekerProfileFactory(user=prescriber)
+    inconsistent_profile = JobSeekerFactory(kind=UserKind.PRESCRIBER)
 
     response = admin_client.post(
         reverse("admin:users_jobseekerprofile_changelist"),

@@ -468,7 +468,7 @@ class User(AbstractUser, AddressMixin):
         # Capture Django update_last_login signal
         if self.first_login is None and self.last_login is not None:
             self.first_login = self.last_login
-            if "update_fields" in kwargs and "last_login" in kwargs["update_fields"]:
+            if kwargs.get("update_fields") and "last_login" in kwargs["update_fields"]:
                 kwargs["update_fields"].append("first_login")
 
         super().save(*args, **kwargs)
@@ -837,12 +837,12 @@ def get_allauth_account_user_display(user):
     return user.email
 
 
-class JobSeekerProfileManager(models.Manager):
+class JobSeekerProfileManager(ItouUserManager):
     def get_queryset(self):
         return super().get_queryset().defer("fields_history")
 
 
-class JobSeekerProfile(models.Model):
+class JobSeekerMixin(models.Model):
     """
     Specific information about the job seeker
 
@@ -903,14 +903,6 @@ class JobSeekerProfile(models.Model):
         " La date de naissance renseignée ne correspond pas au numéro de sécurité sociale%s enregistré."
     )
 
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        verbose_name="demandeur d'emploi",
-        related_name="jobseeker_profile",
-    )
-
     birthdate = models.DateField(
         verbose_name="date de naissance",
         null=True,
@@ -921,7 +913,7 @@ class JobSeekerProfile(models.Model):
     birth_place = models.ForeignKey(
         "asp.Commune",
         verbose_name="commune de naissance",
-        related_name="jobseeker_profiles_born_here",
+        related_name="+",
         null=True,
         blank=True,
         on_delete=models.RESTRICT,
@@ -929,7 +921,7 @@ class JobSeekerProfile(models.Model):
     birth_country = models.ForeignKey(
         "asp.Country",
         verbose_name="pays de naissance",
-        related_name="jobseeker_profiles_born_here",
+        related_name="+",
         null=True,
         blank=True,
         on_delete=models.RESTRICT,
@@ -1189,34 +1181,7 @@ class JobSeekerProfile(models.Model):
     objects = JobSeekerProfileManager()
 
     class Meta:
-        verbose_name = "profil demandeur d'emploi"
-        verbose_name_plural = "profils demandeur d'emploi"
-
-        constraints = [
-            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
-            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
-            models.CheckConstraint(
-                condition=Q(lack_of_nir_reason="") | Q(nir=""),
-                name="jobseekerprofile_lack_of_nir_reason_or_nir",
-                violation_error_message=(
-                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
-                ),
-            ),
-            models.UniqueConstraint(
-                "nir",
-                name="jobseekerprofile_unique_nir_if_not_empty",
-                condition=~Q(nir=""),
-                violation_error_code="unique_nir_if_not_empty",
-                violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
-            ),
-        ]
-        indexes = [
-            models.Index(fields=["is_stalled"], name="users_jobseeker_stalled_idx", condition=Q(is_stalled=True)),
-        ]
-        triggers = [FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid"])]
-
-    def __str__(self):
-        return str(self.user)
+        abstract = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1231,9 +1196,6 @@ class JobSeekerProfile(models.Model):
                 if getattr(self, field) != self._old_values[field]:
                     return True
         return False
-
-    def _default_asp_uid(self):
-        return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.validate_constraints()
@@ -1472,6 +1434,74 @@ class JobSeekerProfile(models.Model):
                     blocked_fields.update(api_particulier.USER_REQUIRED_FIELDS)
                     blocked_fields.update(api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS)
         return blocked_fields
+
+
+class JobSeeker(JobSeekerMixin, User):
+    class Meta:
+        managed = False
+        verbose_name = "candidat"
+        verbose_name_plural = "candidats"
+        constraints = [
+            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
+            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
+            models.CheckConstraint(
+                condition=Q(lack_of_nir_reason="") | Q(nir=""),
+                name="jobseekerprofile_lack_of_nir_reason_or_nir",
+                violation_error_message=(
+                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
+                ),
+            ),
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._auto_create_job_seeker_profile = False
+
+    def _default_asp_uid(self):
+        return uuid.uuid4().hex[:30]
+
+
+class JobSeekerProfile(JobSeekerMixin, models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        verbose_name="demandeur d'emploi",
+        related_name="jobseeker_profile",
+    )
+
+    class Meta:
+        verbose_name = "profil demandeur d'emploi"
+        verbose_name_plural = "profils demandeur d'emploi"
+
+        constraints = [
+            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
+            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
+            models.CheckConstraint(
+                condition=Q(lack_of_nir_reason="") | Q(nir=""),
+                name="jobseekerprofile_lack_of_nir_reason_or_nir",
+                violation_error_message=(
+                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
+                ),
+            ),
+            models.UniqueConstraint(
+                "nir",
+                name="jobseekerprofile_unique_nir_if_not_empty",
+                condition=~Q(nir=""),
+                violation_error_code="unique_nir_if_not_empty",
+                violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["is_stalled"], name="users_jobseeker_stalled_idx", condition=Q(is_stalled=True)),
+        ]
+        triggers = [FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid"])]
+
+    def __str__(self):
+        return str(self.user)
+
+    def _default_asp_uid(self):
+        return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
 
 
 class IdentityCertificationManager(models.Manager):

@@ -106,6 +106,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "job_applications_sent",  # JobApplication.sender
         "jobapplication",  # JobApplication.transferred_by
         "jobapplicationtransitionlog",  # JobApplicationTransitionLog.user
+        "jobseeker",  # JobSeeker.user_ptr: the target already has one
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
         "jobseekerexternaldata",  # JobSeekerExternalData.user: this seems largely unused
         "logentry",  # django.contrib.admin.models.LogEntry.user

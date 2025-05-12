@@ -30,7 +30,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeeker, JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -47,7 +47,6 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerProfileFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
@@ -57,16 +56,16 @@ from tests.users.factories import (
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
         # Unique user.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
+        JobSeekerFactory(pole_emploi_id="5555555A")
 
         # 2 users using the same `pole_emploi_id`.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
+        JobSeekerFactory(pole_emploi_id="6666666B")
+        JobSeekerFactory(pole_emploi_id="6666666B")
 
         # 3 users using the same `pole_emploi_id`.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(pole_emploi_id="7777777C")
 
         duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
 
@@ -75,37 +74,21 @@ class TestManager:
 
     def test_get_duplicates_by_pole_emploi_id(self):
         # 2 users using the same `pole_emploi_id` and different birthdates.
-        JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
-        )
-        JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(2001, 12, 12)
-        )
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
 
         # 2 users using the same `pole_emploi_id` and the same birthdates.
-        user1 = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
-        )
-        user2 = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
-        )
+        user1 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
 
         # 3 users using the same `pole_emploi_id` and the same birthdates.
-        user3 = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
-        )
-        user4 = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
-        )
-        user5 = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
-        )
+        user3 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user4 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
-        JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(1978, 12, 20)
-        )
+        JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
 
-        duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
+        duplicated_users = JobSeeker.objects.get_duplicates_by_pole_emploi_id()
         # sort sub lists in result
         for key in duplicated_users.keys():
             duplicated_users[key] = sorted(duplicated_users[key], key=attrgetter("pk"))
@@ -120,8 +103,8 @@ class TestManager:
         user_1 = JobSeekerFactory(first_name="Jean-Paul", last_name="II")
         JobSeekerFactory(first_name="Jean-Michel", last_name="Relou")
 
-        assert User.objects.search_by_full_name("Jean").count() == 2
-        assert User.objects.search_by_full_name("Jean II").get() == user_1
+        assert JobSeeker.objects.search_by_full_name("Jean").count() == 2
+        assert JobSeeker.objects.search_by_full_name("Jean II").get() == user_1
 
     def test_linked_job_seeker_ids(self):
         organization = PrescriberOrganizationFactory()
@@ -138,7 +121,7 @@ class TestManager:
         # From the prescriber as a member of the organization
         job_seeker_created_by_user_in_organization = JobSeekerFactory(
             created_by=prescriber,
-            jobseeker_profile__created_by_prescriber_organization=organization,
+            created_by_prescriber_organization=organization,
         )
         job_seeker_with_sent_job_app_in_organization = JobApplicationFactory(
             sender=prescriber,
@@ -154,7 +137,7 @@ class TestManager:
         # From the prescriber as a member of another organization. We won't display those
         JobSeekerFactory(
             created_by=prescriber,
-            jobseeker_profile__created_by_prescriber_organization=other_organization,
+            created_by_prescriber_organization=other_organization,
         )
         JobApplicationFactory(
             sender=prescriber,
@@ -167,9 +150,7 @@ class TestManager:
             from_prescriber=True,
         )
 
-        job_seeker_created_by_organization_coworker = JobSeekerFactory(
-            jobseeker_profile__created_by_prescriber_organization=organization
-        )
+        job_seeker_created_by_organization_coworker = JobSeekerFactory(created_by_prescriber_organization=organization)
         job_seeker_with_job_app_sent_by_organization_coworker = JobApplicationFactory(
             sender_prescriber_organization=organization,
             eligibility_diagnosis=None,
@@ -300,9 +281,7 @@ class TestModel:
 
     def test_clean_pole_emploi_fields(self):
         # Both fields cannot be empty.
-        job_seeker = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="", jobseeker_profile__lack_of_pole_emploi_id_reason=""
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
         cleaned_data = {
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
@@ -312,8 +291,8 @@ class TestModel:
 
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="69970749",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            pole_emploi_id="69970749",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         cleaned_data = {
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
@@ -325,9 +304,7 @@ class TestModel:
 
         # No exception should be raised for the following cases.
 
-        job_seeker = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="62723349", jobseeker_profile__lack_of_pole_emploi_id_reason=""
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="62723349", lack_of_pole_emploi_id_reason="")
         cleaned_data = {
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
@@ -335,8 +312,8 @@ class TestModel:
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         job_seeker = JobSeekerFactory(
-            jobseeker_profile__pole_emploi_id="",
-            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         cleaned_data = {
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
@@ -541,12 +518,14 @@ class TestModel:
     def test_can_edit_email(self):
         user = PrescriberFactory()
         job_seeker = JobSeekerFactory()
+        print("FIRST", job_seeker.asp_uid)
 
         # Same user.
         assert not user.can_edit_email(user)
 
         # All conditions are met.
         job_seeker = JobSeekerFactory(created_by=user)
+        print("SECOND", job_seeker.asp_uid)
         assert user.can_edit_email(job_seeker)
 
         # Job seeker logged in, he is not longer handled by a proxy.
@@ -639,13 +618,13 @@ class TestModel:
         assert "inspecteur du travail" == labor_inspector.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
-        no_nir_profile = JobSeekerProfileFactory(nir="")
+        no_nir_profile = JobSeekerFactory(nir="")
         # This works
         assert no_nir_profile.nir == ""
         no_nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         no_nir_profile.save()
 
-        nir_profile = JobSeekerProfileFactory()
+        nir_profile = JobSeekerFactory()
         # This doesn't
         assert nir_profile.nir
         nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
@@ -739,8 +718,8 @@ class TestJobSeekerProfileModel:
         self.user = JobSeekerFactory(
             with_address=True,
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
-            jobseeker_profile__education_level=random.choice(EducationLevel.values),
-            jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
+            education_level=random.choice(EducationLevel.values),
+            pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
         self.profile = self.user.jobseeker_profile
 
@@ -1050,6 +1029,9 @@ class TestLatestApproval:
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory(with_pole_emploi_id=True)
+        print("USER", user, type(user))
+        print("PROFILE", user.jobseeker_profile, type(user.jobseeker_profile))
+        print(user.birthdate, user.jobseeker_profile.birthdate)
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
@@ -1195,12 +1177,12 @@ class TestLatestApproval:
 @pytest.mark.parametrize("initial_asp_uid", ("000000000000000000000000000000", ""))
 @override_settings(SECRET_KEY="test")
 def test_job_seeker_profile_asp_uid(initial_asp_uid):
-    profile = JobSeekerProfileFactory(user__pk=42, asp_uid=initial_asp_uid)
+    profile = JobSeekerFactory(pk=42, asp_uid=initial_asp_uid)
     assert profile.asp_uid == initial_asp_uid or "08b4e9f755a688b554a6487d96d2a0"
 
 
 def test_job_seeker_profile_asp_uid_field_history():
-    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
+    profile = JobSeekerFactory(asp_uid="000000000000000000000000000000")
     assert profile.fields_history == []
 
     profile.asp_uid = "000000000000000000000000000001"
@@ -1375,7 +1357,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
 
 @pytest.mark.parametrize("initial", [None, ""])
 def test_save_erases_pe_obfuscated_nir_when_the_nir_changes_after_a_failed_attempt(faker, initial):
-    profile = JobSeekerProfileFactory(
+    profile = JobSeekerFactory(
         pe_obfuscated_nir=initial,
         pe_last_certification_attempt_at=faker.date_time(tzinfo=datetime.UTC),
     )
@@ -1477,3 +1459,23 @@ def test_jobseeker_with_last_activity(factory, related_object_factory, expected_
         assert user_from_qs.last_activity == expected_last_activity(user)
     else:
         assert User.objects.job_seekers_with_last_activity().exists() is False
+
+
+def test_jobseeker():
+    j = JobSeeker(
+        kind=UserKind.JOB_SEEKER,
+        email="test@example.com",
+        asp_uid=uuid.uuid4(),
+        username=uuid.uuid4(),
+    )
+    j.save()
+    print("JOBSEEKER", j)
+
+    jf = JobSeekerFactory()
+    print("JOBSEEKER FACTORY", jf)
+
+    print("JOBSEEKER LIST", list(JobSeeker.objects.all()))
+    print("JOBSEEKERPROFILE LIST", list(JobSeekerProfile.objects.all()))
+    print("USERS LIST", list(User.objects.all()))
+
+    # assert False
