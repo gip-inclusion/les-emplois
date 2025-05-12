@@ -1,5 +1,4 @@
 import datetime
-from functools import partial
 
 import pytest
 from django.contrib import messages
@@ -15,11 +14,12 @@ from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation
-from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
+from itou.utils.session import SessionNamespace
+from itou.www.companies_views.views import JOB_DESCRIPTION_EDIT_SESSION_KIND
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -80,8 +80,6 @@ class JobDescriptionAbstract:
 
         self.list_url = reverse("companies_views:job_description_list")
         self.edit_url = reverse("companies_views:edit_job_description")
-        self.edit_details_url = reverse("companies_views:edit_job_description_details")
-        self.edit_preview_url = reverse("companies_views:edit_job_description_preview")
 
 
 class TestJobDescriptionListView(JobDescriptionAbstract):
@@ -104,7 +102,6 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
             html=True,
             count=1,
         )
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
         for job in self.company.job_description_through.all():
             with subtests.test(job.pk):
@@ -414,85 +411,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
         # Hence its last activation date should be automatically defined
         assert self.company.job_description_through.order_by("-pk").first().last_employer_update_at == timezone.now()
 
-    def test_edit_job_description_company_url_fallback(self, client):
-        # TODO(François): Drop this test next week.
-        client.force_login(self.user)
-        session = client.session
-        session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
-            "appellation": "11076",  # Must be a non existing one for the company
-            "custom_name": "",
-            "location": self.paris_city.pk,
-            "hours_per_week": 35,
-            "contract_type": ContractType.OTHER.value,
-            "other_contract_type": "other_contract_type",
-            "open_positions": 5,
-        }
-        session.save()
-        response = client.get(self.edit_url)
-        assert response.context["form"].initial == session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
-
-        response = client.post(self.edit_url, session[ITOU_SESSION_JOB_DESCRIPTION_KEY])
-        resolver_match = resolve(response.url)
-        assert resolver_match.view_name == "companies_views:edit_job_description_details"
-        session_key = str(resolver_match.kwargs["edit_session_id"])  # It’s a UUID.
-        assertRedirects(
-            response,
-            reverse("companies_views:edit_job_description_details", kwargs={"edit_session_id": session_key}),
-        )
-        assert client.session[session_key] == session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-    def test_edit_job_description_company_edit_url_details_fallback(self, client):
-        # TODO(François): Drop this test next week.
-        client.force_login(self.user)
-        session = client.session
-        session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
-            "appellation": "11076",  # Must be a non existing one for the company
-            "custom_name": "",
-            "location": self.paris_city.pk,
-            "hours_per_week": 35,
-            "contract_type": ContractType.OTHER.value,
-            "other_contract_type": "other_contract_type",
-            "open_positions": 5,
-        }
-        session.save()
-        step2_post_data = {
-            "description": "description",
-            "profile_description": "profile_description",
-            "is_resume_mandatory": True,
-        }
-        response = client.post(self.edit_details_url, data=step2_post_data)
-        resolver_match = resolve(response.url)
-        assert resolver_match.view_name == "companies_views:edit_job_description_preview"
-        session_key = str(resolver_match.kwargs["edit_session_id"])  # It’s a UUID.
-        expected_session_data = session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
-        expected_session_data.update(step2_post_data)
-        assert client.session[session_key] == expected_session_data
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-    def test_edit_job_description_company_edit_url_preview_fallback(self, client):
-        # TODO(François): Drop this test next week.
-        client.force_login(self.user)
-        session = client.session
-        session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
-            "appellation": "11076",  # Must be a non existing one for the company
-            "custom_name": "",
-            "location": self.paris_city.pk,
-            "hours_per_week": 35,
-            "contract_type": ContractType.OTHER.value,
-            "other_contract_type": "other_contract_type",
-            "open_positions": 5,
-            "description": "description",
-            "profile_description": "profile_description",
-            "is_resume_mandatory": True,
-            "is_qpv_mandatory": False,
-        }
-        session.save()
-        response = client.post(self.edit_preview_url)
-        assertRedirects(response, self.list_url)
-        assert self.company.job_description_through.count() == 5
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
     @freeze_time("2025-04-09 15:16:17.18")
     def test_edit_job_description_opcs(self, client):
         opcs = CompanyFactory(
@@ -694,27 +612,36 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
                 last_employer_update_at=frozen_time().replace(tzinfo=datetime.UTC),
             )
             initial_last_employer_update_at = job_description.last_employer_update_at
-            session_data = client.session
-            session_data[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {
-                "pk": job_description.pk,
-                "appellation": job_description.appellation.code,
-                "custom_name": job_description.custom_name,
-                "location": job_description.location,
-                "hours_per_week": job_description.hours_per_week,
-                "contract_type": job_description.contract_type,
-                "other_contract_type": job_description.other_contract_type,
-                "open_positions": job_description.open_positions,
-                "description": job_description.description,
-                "profile_description": job_description.profile_description,
-                "is_resume_mandatory": job_description.is_resume_mandatory,
-            }
-            session_data.save()
+            session_namespace = SessionNamespace.create_uuid_namespace(
+                client.session,
+                JOB_DESCRIPTION_EDIT_SESSION_KIND,
+                {
+                    "appellation": job_description.appellation.code,
+                    "custom_name": job_description.custom_name,
+                    "location": job_description.location,
+                    "hours_per_week": job_description.hours_per_week,
+                    "contract_type": job_description.contract_type,
+                    "other_contract_type": job_description.other_contract_type,
+                    "open_positions": job_description.open_positions,
+                    "description": job_description.description,
+                    "profile_description": job_description.profile_description,
+                    "is_resume_mandatory": job_description.is_resume_mandatory,
+                },
+            )
+            session_namespace.save()
 
             frozen_time.tick()
 
-            response = client.post(self.edit_preview_url)
+            response = client.post(
+                reverse(
+                    "companies_views:edit_job_description_preview",
+                    kwargs={
+                        "edit_session_id": str(session_namespace.name),
+                        "job_description_id": job_description.pk,
+                    },
+                )
+            )
             assertRedirects(response, self.list_url)
-            assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
             job_description.refresh_from_db()
             assert job_description.is_active == is_active
@@ -722,84 +649,6 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
             assert job_description.last_employer_update_at == (
                 initial_last_employer_update_at + datetime.timedelta(seconds=int(is_active))
             )
-
-
-# TODO(François): Drop next week.
-class TestUpdateJobDescriptionView(JobDescriptionAbstract):
-    @pytest.fixture(autouse=True)
-    def setup_method(self):
-        self.job_description = self.company.job_description_through.filter(location__isnull=False).first()
-        self.update_url = reverse(
-            "companies_views:update_job_description",
-            kwargs={
-                "job_description_id": self.job_description.pk,
-            },
-        )
-        # Start from here as update is a redirect
-        self.url = self.list_url
-
-    def test_update_job_description(self, client):
-        client.force_login(self.user)
-        response = client.get(self.url)
-
-        assert response.status_code == 200
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-        response = client.get(self.update_url, follow=True)
-
-        assertRedirects(
-            response,
-            reverse(
-                "companies_views:edit_job_description",
-                kwargs={"job_description_id": self.job_description.pk},
-            ),
-        )
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY in client.session
-
-        session_data = client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-
-        assert session_data.get("pk") == self.job_description.pk
-        assertContains(response, self.job_description.appellation.name)
-
-        # At this point, we're redirected to 'edit_job_description'
-
-    def test_update_other_company_job_description(self, client):
-        job_description = JobDescriptionFactory()
-        client.force_login(self.user)
-        response = client.get(
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": job_description.pk},
-            )
-        )
-        assert response.status_code == 403
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-    def test_update_nonexistent_job_description(self, client):
-        client.force_login(self.user)
-        response = client.get(
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": 0},
-            )
-        )
-        assert response.status_code == 403
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
-
-    @pytest.mark.parametrize(
-        "UserFactory", [partial(EmployerFactory, with_company=True), PrescriberFactory, JobSeekerFactory]
-    )
-    def test_update_job_description_as_other_user(self, client, UserFactory):
-        job_description = JobDescriptionFactory()
-        client.force_login(UserFactory())
-        response = client.get(
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": job_description.pk},
-            )
-        )
-        assert response.status_code == 403
-        assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
 
 class TestJobDescriptionCard(JobDescriptionAbstract):
