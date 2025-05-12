@@ -1,5 +1,6 @@
 import datetime
 import logging
+from functools import partial
 
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef
@@ -13,6 +14,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
+from itou.utils.brevo import async_delete_contact
 from itou.utils.command import BaseCommand
 
 
@@ -132,22 +134,25 @@ class Command(BaseCommand):
                 : self.batch_size
             ]
         )
-        archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
 
         if self.wet_run:
             for user in users_to_archive:
                 ArchiveJobSeeker(
                     user,
                 ).send()
+            self.archive_with_related_objects(users_to_archive)
+            self.delete_with_related_objects(users_to_archive)
 
-            ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
-            self._delete_with_related_objects(users_to_archive)
+        self.logger.info("Archived jobseekers after grace period, count: %d", len(users_to_archive))
 
-        self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
+    def archive_with_related_objects(self, users):
+        ArchivedJobSeeker.objects.bulk_create([anonymized_jobseeker(user) for user in users])
 
-    def _delete_with_related_objects(self, users):
+    def delete_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
+        for user in users:
+            transaction.on_commit(partial(async_delete_contact, user.email))
 
     @monitor(
         monitor_slug="notify_archive_jobseekers",
