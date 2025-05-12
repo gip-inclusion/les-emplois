@@ -1,0 +1,118 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load markdownify %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+{% load url_add_query %}
+
+{% block title %}Présentation {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Organisation</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'prescribers_views:overview' %}" {% matomo_event "prescribers" "clic" "organisation-presentation" %}>Présentation</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'prescribers_views:members' %}" {% matomo_event "prescribers" "clic" "gerer-collaborateurs" %}>Collaborateurs</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3 mb-lg-4">
+                            <h2 class="mb-0">Présentation</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur l'organisation">
+                                <a class="btn {% if can_edit %}btn-outline-primary{% else %}btn-primary{% endif %} btn-ico"
+                                   href="{{ organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                   {% matomo_event "prescribers" "clic" "voir-infos-organisation" %}>
+                                    <i class="ri-eye-line ri-lg" aria-hidden="true"></i>
+                                    <span>Voir la fiche publique</span>
+                                </a>
+                                {% if can_edit %}
+                                    <a class="btn btn-primary btn-ico"
+                                       href="{% url 'prescribers_views:edit_organization' %}?back_url={{ request.get_full_path|urlencode }}"
+                                       {% matomo_event "prescribers" "clic" "modifier-infos-organisation" %}>
+                                        <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                                        <span>Modifier</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-8 order-2 order-lg-1">
+                                <div class="c-box h-100 {% if not organization.description %}d-flex align-items-center justify-content-center{% endif %}">
+                                    {% if organization.description %}
+                                        <article class="mb-3 mb-lg-5">
+                                            <h3>Son activité</h3>
+                                            {{ organization.description|markdownify }}
+                                        </article>
+                                    {% else %}
+                                        <div class="text-center">
+                                            <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.png' %}" alt="" loading="lazy">
+                                            <p class="mb-0 mt-3">
+                                                <strong>Oups ! Aucune information en vue !</strong>
+                                            </p>
+                                            {% if organization.kind != PrescriberOrganizationKind.FT %}
+                                                {% if can_edit %}
+                                                    <p>
+                                                        <i>Vous n’avez pas encore renseigné d’informations
+                                                            <br class="d-none d-lg-inline">
+                                                            à propos de votre organisation.
+                                                        </i>
+                                                    </p>
+                                                    <a class="btn btn-sm btn-primary btn-ico" href="{% url 'prescribers_views:edit_organization' %}?back_url={{ request.get_full_path|urlencode }}">
+                                                        <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                                                        <span>Modifier</span>
+                                                    </a>
+                                                {% else %}
+                                                    <p>
+                                                        <i>L'administrateur n’a pas encore renseigné l’activité de l’organisation.</i>
+                                                    </p>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="c-info mt-3 mt-lg-4">
+                                    <span class="c-info__summary">{{ organization.display_name }} est une organisation habilitée.</span>
+                                    <div class="c-info__detail">
+                                        <p>
+                                            Vous pouvez réaliser le <a href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
+    target="_blank"
+    class="has-external-link"
+    aria-label="diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-4 order-1 order-lg-2">
+                                {% include "companies/includes/_company_info.html" with company=organization show=True show_cta=False extra_box_class="mb-3 mb-lg-5" %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}

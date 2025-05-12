@@ -7,6 +7,7 @@ from itou.www.prescribers_views import views
 app_name = "prescribers_views"
 
 urlpatterns = [
+    path("overview", views.overview, name="overview"),
     path("edit_organization", views.edit_organization, name="edit_organization"),
     path("colleagues", views.member_list, name="members"),
     path("<int:org_id>/card", views.card, name="card"),
