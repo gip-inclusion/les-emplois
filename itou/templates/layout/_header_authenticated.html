@@ -44,7 +44,7 @@
                                         <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name }}</span>
                                     </button>
                                     <div class="dropdown-menu w-100" id="switchUserDropdown">
-                                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
+                                        {% include "layout/_header_organization_dropdown_menu.html" with request=request user=user csrf_token=csrf_token only %}
                                     </div>
                                 </li>
                             {% endif %}
@@ -129,7 +129,7 @@
                         <strong>{{ request.current_organization.display_name }}</strong>
                     </button>
                     <div class="dropdown-menu" id="switchUserDropdownMobile">
-                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
+                        {% include "layout/_header_organization_dropdown_menu.html" with request=request user=user csrf_token=csrf_token only %}
                     </div>
                 {% endif %}
             </div>
