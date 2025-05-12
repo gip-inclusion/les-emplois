@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *, wet_run, **options):
-        qs = Email.objects.filter(created_at__lt=timezone.now() - timedelta(days=365))
+        qs = Email.objects.filter(created_at__lt=timezone.now() - timedelta(days=182))
         if wet_run:
             prefix = "Deleted"
             count, _details = qs.delete()
