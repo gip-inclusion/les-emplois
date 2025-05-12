@@ -1,5 +1,15 @@
 # Journal des modifications
 
+## 2025-05-05
+
+### Modifié
+
+- [Admin : Autoriser l’ajout de calendriers de campagnes de contrôle à posteriori aux members du groupe itou-admin](https://github.com/gip-inclusion/les-emplois/pull/6066) 🖼
+- [Demandeur d’emploi : Empêcher l’édition de l’identité pivot pour les candidats identifiés par l’API Particulier](https://github.com/gip-inclusion/les-emplois/pull/5749) 🖼
+- [Interface : Harmonisation de la formulation en "numéro SIRET"](https://github.com/gip-inclusion/les-emplois/pull/6072)
+- [Interface: Inversion des blocs structure et orientation sur le dashboard](https://github.com/gip-inclusion/les-emplois/pull/6063)
+- [Éligibilité : Mieux indiquer le lien externe dans le bloc d’information sur la certification des critères](https://github.com/gip-inclusion/les-emplois/pull/6057) 🖼
+
 ## 2025-04-28
 
 ### Ajouté
