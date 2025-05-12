@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 25,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -955,32 +955,6 @@
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[employees/detail.html]',
-          'IfNode[employees/detail.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[employees/detail.html]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
-                 "eligibility_selectedadministrativecriteria"."certified_at",
-                 "eligibility_selectedadministrativecriteria"."certification_period",
-                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
-                 "eligibility_selectedadministrativecriteria"."created_at",
-                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 ("eligibility_selectedadministrativecriteria"."certification_period" && %s
-                  AND "eligibility_selectedadministrativecriteria"."certified") AS "is_considered_certified"
-          FROM "eligibility_selectedadministrativecriteria"
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
