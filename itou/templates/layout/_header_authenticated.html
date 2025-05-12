@@ -1,11 +1,15 @@
+{% load can_create_antenna %}
 {% load matomo %}
 {% load nav %}
 {% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
 
+{% can_create_antenna request as can_create_company %}
+
 <header role="banner" id="header">
     {% include "layout/_header_print.html" %}
+
     <section class="s-header-authenticated">
         <div class="s-header-authenticated__container container">
             <div class="s-header-authenticated__row row">
@@ -26,7 +30,7 @@
                                     {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=False csrf_token=csrf_token only %}
                                 </div>
                             </li>
-                            {% if request.organizations|length > 1 %}
+                            {% if request.organizations|length == 1 and can_create_company or request.organizations|length > 1 %}
                                 {# If the name of the organisation.display_name is longer than the .dropdown-structure width, it will be automatically truncated in css and it will be displayed in full in a tooltip. #}
                                 <li class="d-none d-lg-inline-block dropdown dropdown-structure">
                                     <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
@@ -45,6 +49,10 @@
                                     </button>
                                     <div class="dropdown-menu w-100" id="switchUserDropdown">
                                         {% include "layout/_header_organization_dropdown_menu.html" with request=request user=user csrf_token=csrf_token only %}
+                                        {% comment %} @françois Ici c'est pour verifier que les organizations|length > 1 peuvent bien can_create_company {% endcomment %}
+                                        {% if can_create_company %}
+                                            {% include "layout/_header_organization_dropdown_menu_can_create_company.html" %}
+                                        {% endif %}
                                     </div>
                                 </li>
                             {% endif %}
@@ -96,7 +104,7 @@
                             <strong>{{ user.get_full_name }}</strong>
                         </div>
                     {% endif %}
-                {% elif request.organizations|length == 1 %}
+                {% elif request.organizations|length == 1 and not can_create_company %}
                     <div class="dropdown-toggle dropdown-toggle__summary">
                         {% if user.is_employer %}
                             <i class="ri-community-line" aria-hidden="true"></i>
@@ -112,7 +120,7 @@
                         <span>{{ request.current_organization.kind }}</span>
                         <strong>{{ request.current_organization.display_name }}</strong>
                     </div>
-                {% else %}
+                {% elif request.organizations|length == 1 and can_create_company or request.organizations|length > 1 %}
                     <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
                         {% if user.is_employer %}
                             <i class="ri-community-line" aria-hidden="true"></i>
@@ -130,6 +138,9 @@
                     </button>
                     <div class="dropdown-menu" id="switchUserDropdownMobile">
                         {% include "layout/_header_organization_dropdown_menu.html" with request=request user=user csrf_token=csrf_token only %}
+                        {% if can_create_company %}
+                            {% include "layout/_header_organization_dropdown_menu_can_create_company.html" %}
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>

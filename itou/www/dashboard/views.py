@@ -95,7 +95,6 @@ def _employer_dashboard_context(request):
                 "evaluated_job_applications__evaluated_administrative_criteria",
             )
         ),
-        "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_employee_records": current_org.can_use_employee_record,
         "can_show_financial_annexes": current_org.convention_can_be_accessed_by(request.user),
         "evaluated_siae_notifications": (
@@ -124,7 +123,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "active_campaigns": [],
         "closed_campaigns": [],
         "job_applications_categories": [],
-        "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
         "can_view_gps_card": is_allowed_to_use_gps(request) and not show_gps_as_a_nav_entry(request),

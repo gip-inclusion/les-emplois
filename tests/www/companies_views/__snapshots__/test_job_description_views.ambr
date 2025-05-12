@@ -640,7 +640,7 @@
 # ---
 # name: TestJobDescriptionListView.test_response_content[job descriptions list]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -826,6 +826,34 @@
         'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
+          'job_description_list[www/companies_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[companies/job_description_list.html]',
           'job_description_list[www/companies_views/views.py]',
         ]),
         'sql': '''

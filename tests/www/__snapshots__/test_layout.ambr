@@ -279,12 +279,41 @@
           <div class="offcanvas-header offcanvas-header--structure">
               <div class="dropdown dropdown-structure flex-grow-1 py-4">
                   
-                      <div class="dropdown-toggle dropdown-toggle__summary">
+                      <button aria-controls="switchUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" type="button">
                           
                               <i aria-hidden="true" class="ri-community-line"></i>
                           
                           <span>EI</span>
                           <strong>Acme inc.</strong>
+                      </button>
+                      <div class="dropdown-menu" id="switchUserDropdownMobile">
+                          <form action="/dashboard/switch-organization" method="post">
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <ul class="list-unstyled">
+          
+              <li>
+                  <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="3611">
+                      
+                          <i aria-hidden="true" class="ri-community-line"></i>
+                      
+                      <span>EI</span>
+                      
+                          <strong>Acme inc.</strong>
+                      
+                  </button>
+              </li>
+          
+      </ul>
+  </form>
+  
+                          
+                              <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+      <i aria-hidden="true" class="ri-add-line"></i>
+      <span>Créer ou rejoindre</span>
+      <strong>une nouvelle structure</strong>
+  </a>
+  
+                          
                       </div>
                   
               </div>
@@ -578,6 +607,46 @@
   
                                   </div>
                               </li>
+                              
+                                  
+                                  <li class="d-none d-lg-inline-block dropdown dropdown-structure">
+                                      <button aria-controls="switchUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                                          
+                                              <i aria-hidden="true" class="ri-community-line"></i>
+                                          
+                                          <span>EI - Acme inc.</span>
+                                      </button>
+                                      <div class="dropdown-menu w-100" id="switchUserDropdown">
+                                          <form action="/dashboard/switch-organization" method="post">
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <ul class="list-unstyled">
+          
+              <li>
+                  <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="3611">
+                      
+                          <i aria-hidden="true" class="ri-community-line"></i>
+                      
+                      <span>EI</span>
+                      
+                          <strong>Acme inc.</strong>
+                      
+                  </button>
+              </li>
+          
+      </ul>
+  </form>
+  
+                                          
+                                          
+                                              <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+      <i aria-hidden="true" class="ri-add-line"></i>
+      <span>Créer ou rejoindre</span>
+      <strong>une nouvelle structure</strong>
+  </a>
+  
+                                          
+                                      </div>
+                                  </li>
                               
                           </ul>
                       </nav>

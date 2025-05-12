@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalSuspendActionChoiceView.test_context[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -359,6 +359,34 @@
       dict({
         'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_action_choice.html]',
+          'suspension_action_choice[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -421,7 +449,7 @@
 # ---
 # name: TestApprovalSuspendUpdateEndDateView.test_context[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -773,6 +801,34 @@
                                                     %s))
           ORDER BY 48 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_update_enddate.html]',
+          'suspension_update_enddate[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),
@@ -928,7 +984,7 @@
 # ---
 # name: TestApprovalSuspendView.test_delete_suspension[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1286,6 +1342,34 @@
       dict({
         'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_delete.html]',
+          'suspension_delete[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -1348,7 +1432,7 @@
 # ---
 # name: TestApprovalSuspendView.test_update_suspension[view queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -1815,6 +1899,34 @@
                  AND "approvals_suspension"."end_at" < %s
                  AND NOT ("approvals_suspension"."id" = %s))
           ORDER BY "approvals_suspension"."start_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/suspension_update.html]',
+          'suspension_update[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),

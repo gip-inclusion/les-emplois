@@ -320,16 +320,6 @@ class TestDashboardView:
             "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori",
         )
 
-    @pytest.mark.parametrize("kind", CompanyKind)
-    def test_dashboard_can_create_siae_antenna(self, client, kind):
-        company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
-        user = company.members.get()
-
-        client.force_login(user)
-        response = client.get(reverse("dashboard:index"))
-        assertion = assertContains if user.can_create_siae_antenna(company) else assertNotContains
-        assertion(response, "Créer/rejoindre une autre structure")
-
     def test_dashboard_siae_evaluations_institution_access(self, client):
         IN_PROGRESS_LINK = "Campagne en cours"
         membershipfactory = InstitutionMembershipFactory()

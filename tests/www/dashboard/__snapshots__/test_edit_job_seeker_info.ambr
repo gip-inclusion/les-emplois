@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -288,6 +288,34 @@
           WHERE ("account_emailaddress"."user_id" = %s
                  AND "account_emailaddress"."email" = %s
                  AND "account_emailaddress"."verified")
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_job_seeker_info.html]',
+          'edit_job_seeker_info[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),
