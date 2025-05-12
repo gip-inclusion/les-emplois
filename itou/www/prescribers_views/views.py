@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 
@@ -49,6 +49,19 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
 
     context = {"form": form, "organization": organization, "back_url": reverse("dashboard:index")}
+    return render(request, template_name, context)
+
+
+@check_user(lambda user: user.is_prescriber)
+def overview(request, template_name="prescribers/overview.html"):
+    organization = get_current_org_or_404(request)
+    if not organization.is_authorized:
+        raise Http404
+
+    context = {
+        "organization": organization,
+        "can_edit": organization.has_admin(request.user),
+    }
     return render(request, template_name, context)
 
 

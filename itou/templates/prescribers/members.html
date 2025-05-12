@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load matomo %}
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
@@ -9,6 +10,23 @@
             <h1>Organisation</h1>
         {% endfragment %}
     {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    {% if organization.is_authorized %}
+        <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'prescribers_views:overview' %}" {% matomo_event "prescribers" "clic" "organisation-presentation" %}>
+                    Présentation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'prescribers_views:members' %}" {% matomo_event "prescribers" "clic" "gerer-collaborateurs" %}>
+                    Collaborateurs
+                </a>
+            </li>
+        </ul>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
