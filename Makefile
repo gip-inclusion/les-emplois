@@ -21,7 +21,7 @@ DBDUMP ?= $(CACHEDIR)/development_db.dump
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
-.PHONY: runserver venv buckets clean quality fix compile-deps
+.PHONY: runserver venv buckets quality fix compile-deps
 
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
@@ -41,9 +41,6 @@ compile-deps: $(VIRTUAL_ENV)
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
-
-clean:
-	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 quality: $(VIRTUAL_ENV)
 	ruff format --check $(LINTER_CHECKED_DIRS)
