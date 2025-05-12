@@ -15,9 +15,6 @@ from itou.eligibility.enums import (
     AuthorKind,
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.eligibility.models.common import (
-    AbstractSelectedAdministrativeCriteria,
-)
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import IdentityCertificationAuthorities
@@ -702,69 +699,6 @@ def test_selected_administrative_criteria_certified(
         identity_certifiers,
         transform=lambda certification: certification.certifier,
     )
-
-
-def test_with_is_considered_certified():
-    def assert_considered_valid_count(hiring_start_at, expected):
-        assert (
-            diagnosis.selected_administrative_criteria.with_is_considered_certified(hiring_start_at)
-            .filter(is_considered_certified=True)
-            .count()
-            == expected
-        )
-
-    diagnosis = IAEEligibilityDiagnosisFactory(
-        certifiable=True,
-        criteria_kinds=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
-    )
-    for selected_criterion in diagnosis.selected_administrative_criteria.all():
-        selected_criterion.certified = True
-        certification_period_start = timezone.now() - datetime.timedelta(days=10)
-        certification_period_end = timezone.now() + datetime.timedelta(days=20)
-        selected_criterion.certification_period = InclusiveDateRange(
-            certification_period_start, certification_period_end
-        )
-        selected_criterion.save()
-    assert (
-        diagnosis.selected_administrative_criteria.with_is_considered_certified().count()
-        == diagnosis.selected_administrative_criteria.count()
-    )
-
-    criterion_to_keep = diagnosis.selected_administrative_criteria.all()[:1]
-    diagnosis.selected_administrative_criteria.exclude(pk__in=criterion_to_keep).delete()
-    assert diagnosis.selected_administrative_criteria.count() == 1
-
-    # no hiring_start_at: none is certified.
-    assert_considered_valid_count(hiring_start_at=None, expected=0)
-
-    # hiring_start_at within certification period.
-    assert_considered_valid_count(hiring_start_at=timezone.now(), expected=1)
-
-    # hiring_start_at before certification period beginning.
-    hiring_start_at = certification_period_start - datetime.timedelta(days=1)
-    assert_considered_valid_count(hiring_start_at=hiring_start_at, expected=0)
-
-    # hiring_start_at on certification period beginning.
-    assert_considered_valid_count(hiring_start_at=certification_period_start, expected=1)
-
-    # hiring_start_at on certification period ending.
-    assert_considered_valid_count(hiring_start_at=certification_period_end, expected=1)
-
-    # hiring start_at after certification period ending.
-    hiring_start_at = certification_period_end + datetime.timedelta(days=1)
-    assert_considered_valid_count(hiring_start_at=hiring_start_at, expected=1)
-
-    # hiring start_at after certification period ending + grace period almost finished.
-    hiring_start_at = certification_period_end + datetime.timedelta(
-        days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS
-    )
-    assert_considered_valid_count(hiring_start_at=hiring_start_at, expected=1)
-
-    # hiring start_at after certification period ending + grace period.
-    hiring_start_at = certification_period_end + datetime.timedelta(
-        days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS + 1
-    )
-    assert_considered_valid_count(hiring_start_at=hiring_start_at, expected=0)
 
 
 def test_is_from_employer():

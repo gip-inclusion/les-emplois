@@ -14,7 +14,6 @@ from itou.eligibility.enums import (
 from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.job_applications.enums import SenderKind
 from itou.utils.models import InclusiveDateRangeField
-from itou.utils.types import InclusiveDateRange
 
 
 logger = logging.getLogger(__name__)
@@ -104,9 +103,6 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             logger.info("Could not certify criteria synchronously.", exc_info=True)
             async_certify_criteria(self._meta.model_name, self.pk)
 
-    def get_criteria_display_qs(self, hiring_start_at=None):
-        return self.selected_administrative_criteria.with_is_considered_certified(hiring_start_at=hiring_start_at)
-
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
     def level1(self):
@@ -170,22 +166,6 @@ class AbstractAdministrativeCriteria(models.Model):
         return self.kind in CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
 
 
-class SelectedAdministrativeCriteriaQuerySet(models.QuerySet):
-    def with_is_considered_certified(self, hiring_start_at=None):
-        if not hiring_start_at:
-            # could be:
-            # is_certified = models.Q(certification_period__contains=timezone.now())
-            # but not validated by UX for the moment.
-            is_certified = models.Value(False)
-        else:
-            validity_period = InclusiveDateRange(
-                hiring_start_at - datetime.timedelta(days=self.model.CERTIFICATION_GRACE_PERIOD_DAYS),
-                hiring_start_at,
-            )
-            is_certified = models.Q(certification_period__overlap=validity_period, certified=True)
-        return self.annotate(is_considered_certified=is_certified)
-
-
 class AbstractSelectedAdministrativeCriteria(models.Model):
     CERTIFICATION_GRACE_PERIOD_DAYS = 92
 
@@ -199,5 +179,3 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     class Meta:
         abstract = True
-
-    objects = SelectedAdministrativeCriteriaQuerySet.as_manager()

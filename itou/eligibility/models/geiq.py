@@ -162,13 +162,6 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     def author_structure(self):
         return self.author_geiq or self.author_prescriber_organization
 
-    def get_criteria_display_qs(self, hiring_start_at=None):
-        return (
-            super()
-            .get_criteria_display_qs(hiring_start_at)
-            .exclude(administrative_criteria__annex=AdministrativeCriteriaAnnex.NO_ANNEX)
-        )
-
     @classmethod
     def _expiration_date(cls, author=None):
         return timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)

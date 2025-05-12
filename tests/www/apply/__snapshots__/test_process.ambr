@@ -1018,7 +1018,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -1916,37 +1916,6 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
-                 "eligibility_selectedadministrativecriteria"."certified_at",
-                 "eligibility_selectedadministrativecriteria"."certification_period",
-                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
-                 "eligibility_selectedadministrativecriteria"."created_at",
-                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 ("eligibility_selectedadministrativecriteria"."certification_period" && %s
-                  AND "eligibility_selectedadministrativecriteria"."certified") AS "is_considered_certified"
-          FROM "eligibility_selectedadministrativecriteria"
-          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
@@ -2208,7 +2177,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -3106,37 +3075,6 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
-                 "eligibility_selectedadministrativecriteria"."certified_at",
-                 "eligibility_selectedadministrativecriteria"."certification_period",
-                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
-                 "eligibility_selectedadministrativecriteria"."created_at",
-                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 ("eligibility_selectedadministrativecriteria"."certification_period" && %s
-                  AND "eligibility_selectedadministrativecriteria"."certified") AS "is_considered_certified"
-          FROM "eligibility_selectedadministrativecriteria"
-          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
@@ -3454,7 +3392,7 @@
 # ---
 # name: TestProcessViews.test_details_for_job_seeker
   dict({
-    'num_queries': 16,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -4197,36 +4135,6 @@
           WHERE ("rdv_insertion_participation"."job_seeker_id" = %s
                  AND "rdv_insertion_appointment"."company_id" = %s)
           ORDER BY "rdv_insertion_appointment"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/process_details.html]',
-          'IfNode[apply/process_details.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details.html]',
-          'details_for_jobseeker[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
-                 "eligibility_selectedadministrativecriteria"."certified_at",
-                 "eligibility_selectedadministrativecriteria"."certification_period",
-                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
-                 "eligibility_selectedadministrativecriteria"."created_at",
-                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 ("eligibility_selectedadministrativecriteria"."certification_period" && %s
-                  AND "eligibility_selectedadministrativecriteria"."certified") AS "is_considered_certified"
-          FROM "eligibility_selectedadministrativecriteria"
-          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY "eligibility_administrativecriteria"."level" ASC,
-                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
