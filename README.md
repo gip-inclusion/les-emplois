@@ -196,10 +196,10 @@ pytest tests/utils/tests.py::TestJSON::test_encoder
 La liste des dépendances est consignée dans les fichiers `requirements/*.in`.
 Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
 [pip-tools](https://pypi.org/project/pip-tools/). La commande suivante permet
-de mettre à jour une dépendance, par exemple `flake8` :
+de mettre à jour une dépendance, par exemple `django` :
 
 ```sh
-$ PIP_COMPILE_OPTIONS="-P flake8" make compile-deps
+$ PIP_COMPILE_OPTIONS="-P django" make compile-deps
 ```
 
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
