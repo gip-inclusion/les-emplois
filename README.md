@@ -199,7 +199,7 @@ Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
 de mettre à jour une dépendance, par exemple `django` :
 
 ```sh
-$ PIP_COMPILE_OPTIONS="-P django" make compile-deps
+$ make compile-deps PIP_COMPILE_OPTIONS="-P django"
 ```
 
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
