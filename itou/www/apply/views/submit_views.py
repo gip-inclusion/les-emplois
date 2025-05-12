@@ -17,6 +17,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
@@ -839,13 +840,13 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
         context = super().get_context_data(**kwargs)
 
         if self.geiq_eligibility_diagnosis:
-            self.geiq_eligibility_diagnosis.criteria_display = (
-                self.geiq_eligibility_diagnosis.get_criteria_display_qs()
+            self.geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(
+                self.geiq_eligibility_diagnosis
             )
         if self.eligibility_diagnosis:
             # The job_seeker object already contains a lot of information: no need to re-retrieve it
             self.eligibility_diagnosis.job_seeker = self.job_seeker
-            self.eligibility_diagnosis.criteria_display = self.eligibility_diagnosis.get_criteria_display_qs()
+            self.eligibility_diagnosis.criteria_display = iae_criteria_for_display(self.eligibility_diagnosis)
 
         context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.job_seeker)
         context["is_subject_to_eligibility_rules"] = self.company.is_subject_to_eligibility_rules
