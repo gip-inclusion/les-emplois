@@ -263,9 +263,12 @@ class TestSiaeJobApplicationListView:
                 "XXXXX2412345",
                 '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
                 """
-                <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
-                <br>
-                <strong class="fs-sm">Bénéficiaire du RSA</strong>
+                <p class="mb-1">
+                    <strong class="text-success">
+                        <i class="ri-check-line" aria-hidden="true"></i> Validé
+                    </strong>
+                </p>
+                <p class="mb-1"><strong>Bénéficiaire du RSA</strong></p>
                 """,
             ),
             (
@@ -273,9 +276,12 @@ class TestSiaeJobApplicationListView:
                 "XXXXX2423456",
                 SIAE_JOB_APPLICATION_LIST_REFUSED_HTML,
                 """
-                <strong class="text-danger"><i class="ri-close-line" aria-hidden="true"></i> Refusé</strong>
-                <br>
-                <strong class="fs-sm">Bénéficiaire du RSA</strong>
+                <p class="mb-1">
+                    <strong class="text-danger">
+                        <i class="ri-close-line" aria-hidden="true"></i> Refusé
+                    </strong>
+                </p>
+                <p class="mb-1"><strong>Bénéficiaire du RSA</strong></p>
                 """,
             ),
         ],
