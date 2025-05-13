@@ -3,7 +3,11 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
+from itou.eligibility.enums import (
+    ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND,
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+)
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 from tests.companies.factories import CompanyFactory
@@ -218,8 +222,4 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
         form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
-
-        if kind in [CompanyKind.ETTI, CompanyKind.AI]:
-            assert 2 == form.num_level2_admin_criteria
-        else:
-            assert 3 == form.num_level2_admin_criteria
+        assert ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[kind] == form.num_level2_admin_criteria
