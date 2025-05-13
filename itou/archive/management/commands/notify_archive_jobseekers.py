@@ -49,23 +49,21 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
 
 
 def anonymized_jobseeker(user):
-    kwargs = {
-        "date_joined": timezone.localdate(user.date_joined).replace(day=1),
-        "first_login": timezone.localdate(user.first_login).replace(day=1) if user.first_login else None,
-        "last_login": timezone.localdate(user.last_login).replace(day=1) if user.last_login else None,
-        "user_signup_kind": getattr(user.created_by, "kind", None),
-        "department": user.department,
-        "title": user.title,
-        "identity_provider": user.identity_provider,
-        "had_pole_emploi_id": bool(user.jobseeker_profile.pole_emploi_id),
-        "had_nir": bool(user.jobseeker_profile.nir),
-        "lack_of_nir_reason": user.jobseeker_profile.lack_of_nir_reason,
-        "nir_sex": user.jobseeker_profile.nir[0] if user.jobseeker_profile.nir else None,
-        "nir_year": user.jobseeker_profile.nir[1:3] if user.jobseeker_profile.nir else None,
-        "birth_year": user.jobseeker_profile.birthdate.year if user.jobseeker_profile.birthdate else None,
-    }
-
-    return ArchivedJobSeeker(**kwargs)
+    return ArchivedJobSeeker(
+        date_joined=timezone.localdate(user.date_joined).replace(day=1),
+        first_login=timezone.localdate(user.first_login).replace(day=1) if user.first_login else None,
+        last_login=timezone.localdate(user.last_login).replace(day=1) if user.last_login else None,
+        user_signup_kind=getattr(user.created_by, "kind", None),
+        department=user.department,
+        title=user.title,
+        identity_provider=user.identity_provider,
+        had_pole_emploi_id=bool(user.jobseeker_profile.pole_emploi_id),
+        had_nir=bool(user.jobseeker_profile.nir),
+        lack_of_nir_reason=user.jobseeker_profile.lack_of_nir_reason,
+        nir_sex=user.jobseeker_profile.nir[0] if user.jobseeker_profile.nir else None,
+        nir_year=user.jobseeker_profile.nir[1:3] if user.jobseeker_profile.nir else None,
+        birth_year=user.jobseeker_profile.birthdate.year if user.jobseeker_profile.birthdate else None,
+    )
 
 
 class Command(BaseCommand):
