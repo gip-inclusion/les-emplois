@@ -1,22 +1,27 @@
-{% if review_state == "ACCEPTED" %}
-    <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
-    <br>
-{% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
-    <strong class="text-danger"><i class="ri-close-line" aria-hidden="true"></i> Refusé</strong>
-    <br>
-{% endif %}
-<strong class="fs-sm">{{ criteria.name }}</strong>
-<br>
-<ul class="fs-sm">
-    {% if criteria.written_proof %}<li class="m-0">Pièce justificative : {{ criteria.written_proof }}</li>{% endif %}
-    {% if criteria.written_proof_validity %}
-        <li class="m-0">Durée de validité du justificatif : {{ criteria.written_proof_validity }}</li>
+<div class="fs-sm">
+    {% if review_state == "ACCEPTED" %}
+        <p class="mb-1">
+            <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
+        </p>
+    {% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
+        <p class="mb-1">
+            <strong class="text-danger"><i class="ri-close-line" aria-hidden="true"></i> Refusé</strong>
+        </p>
     {% endif %}
-    {% if criteria.written_proof_url %}
-        <li class="m-0">
-            <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" class="has-external-link" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
-                {{ criteria.written_proof_url }}
-            </a>
-        </li>
-    {% endif %}
-</ul>
+    <p class="mb-1">
+        <strong>{{ criteria.name }}</strong>
+    </p>
+    <ul>
+        {% if criteria.written_proof %}<li class="m-0">Pièce justificative : {{ criteria.written_proof }}</li>{% endif %}
+        {% if criteria.written_proof_validity %}
+            <li class="m-0">Durée de validité du justificatif : {{ criteria.written_proof_validity }}</li>
+        {% endif %}
+        {% if criteria.written_proof_url %}
+            <li class="m-0">
+                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" class="has-external-link" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                    {{ criteria.written_proof_url }}
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
