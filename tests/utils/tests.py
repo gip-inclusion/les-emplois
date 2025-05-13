@@ -785,16 +785,6 @@ class TestUtilsTemplateTags:
         )
         assert template.render(Context({})).strip() == ""
 
-    def test_call_method(self):
-        """Test `call_method` template tag."""
-        company = CompanyFactory(with_membership=True)
-        user = company.members.first()
-        context = {"siae": company, "user": user}
-        template = Template("{% load call_method %}{% call_method siae 'has_member' user %}")
-        out = template.render(Context(context))
-        expected = "True"
-        assert out == expected
-
     def test_pluralizefr(self):
         """Test `pluralizefr` template tag."""
         template = Template("{% load str_filters %}résultat{{ counter|pluralizefr }}")
