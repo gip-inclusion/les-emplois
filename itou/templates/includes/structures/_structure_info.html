@@ -25,7 +25,7 @@
                 {% include 'includes/copy_to_clipboard.html' with content=company.address_on_one_line css_classes="btn-link fw-medium ms-1" only_icon=True %}
             </li>
             {% if company.email or company.phone or company.website %}
-                {% include "companies/includes/_company_details.html" with company=company only %}
+                {% include "includes/structures/_structure_details.html" with company=company only %}
             {% endif %}
         </ul>
         {% if show_cta %}
