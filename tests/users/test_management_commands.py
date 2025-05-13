@@ -16,7 +16,6 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
@@ -677,91 +676,9 @@ class TestCommandSendUsersToBrevo:
             # Needed to fill the department field.
             with_ban_geoloc_address=True,
             with_verified_email=True,
+            jobseeker_profile__is_stalled=True,
         )
-        JobApplicationFactory(
-            job_seeker=billy,
-            sender=billy,
-            # More than six months ago, excluded by <6 months, matches >1 month.
-            created_at=timezone.now() - datetime.timedelta(days=183),
-            eligibility_diagnosis=None,
-        )
-        JobApplicationFactory(
-            job_seeker=billy,
-            sender=billy,
-            # Less than 6 months ago.
-            created_at=timezone.now() - datetime.timedelta(days=181),
-            eligibility_diagnosis=None,
-        )
-        valery = JobSeekerFactory(
-            first_name="Valery",
-            last_name="Vanda",
-            email="valery.vanda@mailinator.com",
-            # Needed to fill the department field.
-            with_ban_geoloc_address=True,
-            with_verified_email=True,
-        )
-        valid_stalled_created_at = timezone.now() - datetime.timedelta(days=90)
-        JobApplicationFactory(
-            job_seeker=valery,
-            sender=valery,
-            # More than six months ago, excluded by <6 months, matches >1 month.
-            created_at=valid_stalled_created_at,
-            eligibility_diagnosis=None,
-        )
-
-        # The following job seekers are not sent.
-        # Too recent.
-        too_recent_job_seeker = JobSeekerFactory(first_name="recent", last_name="recent", with_verified_email=True)
-        JobApplicationFactory(
-            job_seeker=too_recent_job_seeker,
-            sender=too_recent_job_seeker,
-            eligibility_diagnosis=None,
-        )
-        # Too old.
-        too_old_job_seeker = JobSeekerFactory(first_name="old", last_name="old", with_verified_email=True)
-        JobApplicationFactory(
-            created_at=timezone.now() - datetime.timedelta(days=185),
-            job_seeker=too_old_job_seeker,
-            sender=too_old_job_seeker,
-            eligibility_diagnosis=None,
-        )
-        # Accepted
-        accepted_job_seeker = JobSeekerFactory(first_name="accepted", last_name="accepted", with_verified_email=True)
-        JobApplicationFactory(
-            created_at=valid_stalled_created_at,
-            state=JobApplicationState.ACCEPTED,
-            job_seeker=accepted_job_seeker,
-            sender=accepted_job_seeker,
-            eligibility_diagnosis=None,
-        )
-        JobApplicationFactory(
-            job_seeker=accepted_job_seeker,
-            sender=accepted_job_seeker,
-            eligibility_diagnosis=None,
-        )
-        # Has diagnosis.
-        iae_job_seeker = JobSeekerFactory(first_name="iae_diag", last_name="iae_diag", with_verified_email=True)
-        JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker)
-        JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker, created_at=valid_stalled_created_at)
-        geiq_job_seeker = JobSeekerFactory(first_name="geiq_diag", last_name="geiq_diag", with_verified_email=True)
-        JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker)
-        JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker, created_at=valid_stalled_created_at)
-        # Has approval.
-        approval_job_seeker = JobSeekerFactory(first_name="approval", last_name="approval", with_verified_email=True)
-        approval = ApprovalFactory(user=approval_job_seeker)
-        JobApplicationFactory(
-            job_seeker=approval_job_seeker,
-            sender=approval_job_seeker,
-            approval=approval,
-            eligibility_diagnosis=None,
-        )
-        JobApplicationFactory(
-            job_seeker=approval_job_seeker,
-            sender=approval_job_seeker,
-            approval=approval,
-            created_at=valid_stalled_created_at,
-            eligibility_diagnosis=None,
-        )
+        JobSeekerFactory(with_verified_email=True)
         import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
@@ -769,8 +686,8 @@ class TestCommandSendUsersToBrevo:
         call_command("send_users_to_brevo", wet_run=True)
 
         # Employers and prescribers are created by the factories, ignore them.
-        assert "Job seekers count: 8" in caplog.messages
-        assert "Stalled autonomous job seekers count: 2" in caplog.messages
+        assert "Job seekers count: 2" in caplog.messages
+        assert "Stalled autonomous job seekers count: 1" in caplog.messages
         autonomous_job_seeker_mock_call = import_mock.calls[-1]
         assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
             "listIds": [BREVO_CANDIDATS_AUTONOMES_BLOQUES_LIST_ID],
@@ -787,16 +704,6 @@ class TestCommandSendUsersToBrevo:
                         "date_inscription": "2025-02-25",
                         "departement": "67",
                         "id": billy.pk,
-                    },
-                },
-                {
-                    "email": "valery.vanda@mailinator.com",
-                    "attributes": {
-                        "prenom": "Valery",
-                        "nom": "VANDA",
-                        "date_inscription": "2025-02-25",
-                        "departement": "67",
-                        "id": valery.pk,
                     },
                 },
             ],
