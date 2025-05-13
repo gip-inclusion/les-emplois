@@ -9,12 +9,8 @@ from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
-from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
-from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
-from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
@@ -218,18 +214,7 @@ class Command(BaseCommand):
         if wet_run:
             client.import_users(recently_joined, BREVO_CANDIDATS_LIST_ID, job_seeker_serializer)
 
-        six_months_ago = midnight_today - datetime.timedelta(days=182)
-        job_apps_subquery = JobApplication.objects.filter(job_seeker=OuterRef("pk"))
-        stalled_autonomous_job_seekers = (
-            job_seekers.filter(
-                Exists(job_apps_subquery.filter(sender=OuterRef("pk"), created_at__lte=a_month_ago)),
-                Exists(job_apps_subquery.filter(sender=OuterRef("pk"), created_at__gte=six_months_ago)),
-            )
-            .exclude(Exists(Approval.objects.filter(user=OuterRef("pk"))))
-            .exclude(Exists(EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))))
-            .exclude(Exists(GEIQEligibilityDiagnosis.objects.filter(job_seeker=OuterRef("pk"))))
-            .exclude(Exists(job_apps_subquery.filter(state=JobApplicationState.ACCEPTED)))
-        )
+        stalled_autonomous_job_seekers = job_seekers.filter(jobseeker_profile__is_stalled=True)
         logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
         if wet_run:
             client.import_users(
