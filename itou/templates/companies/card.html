@@ -139,13 +139,13 @@
                         <hr class="my-3">
                         <ul class="fs-sm list-unstyled mb-0">
                             {% if siae.email %}
-                                {% include "includes/email_li.html" with email=siae.email only %}
+                                {% include "includes/structures/email_li.html" with email=siae.email only %}
                             {% endif %}
                             {% if siae.phone %}
-                                {% include "includes/phone_li.html" with phonenumber=siae.phone only %}
+                                {% include "includes/structures/phone_li.html" with phonenumber=siae.phone only %}
                             {% endif %}
                             {% if siae.website %}
-                                {% include "includes/website_li.html" with website=siae.website only %}
+                                {% include "includes/structures/website_li.html" with website=siae.website only %}
                             {% endif %}
                         </ul>
                     </div>
