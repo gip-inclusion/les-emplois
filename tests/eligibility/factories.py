@@ -1,13 +1,20 @@
 import datetime
 
 import factory
+import factory.fuzzy
 from dateutil.relativedelta import relativedelta
+from django.db.models import Max
 from django.utils import timezone
 from faker import Faker
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import (
+    AdministrativeCriteriaAnnex,
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+    AuthorKind,
+)
 from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.models.iae import AdministrativeCriteria
@@ -15,7 +22,7 @@ from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 
 
 faker = Faker()
@@ -111,3 +118,36 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
                 certifier=IdentityCertificationAuthorities.API_PARTICULIER,
                 jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
             )
+
+
+class AbstractAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        abstract = True
+
+    kind = factory.fuzzy.FuzzyChoice(AdministrativeCriteriaKind)
+    level = factory.fuzzy.FuzzyChoice(AdministrativeCriteriaLevel)
+    name = factory.Faker("word")
+    desc = factory.Faker("sentence")
+    created_at = factory.LazyFunction(timezone.now)
+    created_by = factory.SubFactory(EmployerFactory)
+
+    # IAE/GEIQ-AdministrativeCriteria tables are autopopulated, so we need to set the sequence to start
+    # at the next available ID.
+    @classmethod
+    def _setup_next_sequence(cls):
+        max_id = cls._meta.model.objects.aggregate(max_id=Max("id"))["max_id"]
+        return (max_id or 0) + 1
+
+    id = factory.Sequence(lambda n: n)
+
+
+class IAEAdministrativeCriteriaFactory(AbstractAdministrativeCriteriaFactory):
+    class Meta:
+        model = models.AdministrativeCriteria
+
+
+class GEIQAdministrativeCriteriaFactory(AbstractAdministrativeCriteriaFactory):
+    class Meta:
+        model = models.GEIQAdministrativeCriteria
+
+    annex = factory.fuzzy.FuzzyChoice([AdministrativeCriteriaAnnex.ANNEX_2, AdministrativeCriteriaAnnex.BOTH_ANNEXES])
