@@ -891,8 +891,7 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
         self.apply_session.delete()
 
     def get_back_url(self):
-        # FIXME(alaurent) I doubt we should go back there...
-        return reverse(
+        return self.get_eligibility_for_hire_step_url() or reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
             kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
         )
