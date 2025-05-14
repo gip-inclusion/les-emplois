@@ -15,6 +15,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import parse_response_to_soup
+from tests.www.apply.test_submit import fake_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 
 
@@ -317,15 +318,11 @@ def test_step_2(client, snapshot):
     transfer_step_1_url = reverse(
         "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
     )
+    fake_session_initialization(client, other_company, {"reset_url": transfer_step_1_url})
     transfer_step_2_base_url = reverse(
         "apply:job_application_external_transfer_step_2",
         kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
     )
-
-    session = client.session
-    session[f"job_application-{other_company.pk}"] = {"reset_url": transfer_step_1_url}
-    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
-    session.save()
 
     # No selected job
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
@@ -396,10 +393,7 @@ def test_step_3(client, snapshot, pdf_file):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
-    session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
-    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
-    session.save()
+    fake_session_initialization(client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"})
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -443,10 +437,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
-    session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
-    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
-    session.save()
+    fake_session_initialization(client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"})
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -486,10 +477,7 @@ def test_step_3_remove_previous_CV(client):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
-    session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
-    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
-    session.save()
+    fake_session_initialization(client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"})
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -528,10 +516,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
-    session = client.session
-    session[f"job_application-{other_company.pk}"] = {"selected_jobs": [], "reset_url": "/dashboard"}
-    session[f"job_application-{other_company.pk}_session_kind"] = "apply_session"
-    session.save()
+    fake_session_initialization(client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"})
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",

@@ -37,7 +37,6 @@ from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
-from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import add_url_params
@@ -3658,9 +3657,7 @@ class TestLastCheckedAtView:
 
     def _check_last_checked_at(self, client, user, sees_warning, sees_verify_link):
         client.force_login(user)
-        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{self.company.pk}")
-        apply_session.init("apply_session", {"selected_jobs": []})
-        apply_session.save()
+        fake_session_initialization(client, self.company, {"selected_jobs": []})
 
         url = reverse(
             "apply:application_jobs",
@@ -4325,9 +4322,7 @@ class TestUpdateJobSeekerStep3View:
         job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
 
         client.force_login(company.members.first())
-        apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
-        apply_session.init("apply_session", {"selected_jobs": []})
-        apply_session.save()
+        fake_session_initialization(client, company, {"selected_jobs": []})
 
         # START to setup jobseeker session
         params = {
