@@ -1,3 +1,4 @@
+import random
 import uuid
 from datetime import UTC, datetime
 
@@ -16,6 +17,7 @@ from itou.job_applications.enums import (
     ProfessionalSituationExperience,
     SenderKind,
 )
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
@@ -251,3 +253,18 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         born_in_france=True,
     )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
+
+
+class JobApplicationTransitionLogFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobApplicationTransitionLog
+
+    @factory.lazy_attribute
+    def transition(self):
+        return random.choice(list(JobApplicationWorkflow.transitions))
+
+    job_application = factory.SubFactory(JobApplicationFactory)
+    from_state = factory.LazyAttribute(lambda obj: random.choice(obj.transition.source))
+    to_state = factory.LazyAttribute(lambda obj: obj.transition.target)
+    user = factory.LazyAttribute(lambda obj: obj.job_application.to_company.members.first())
+    target_company = factory.SelfAttribute("job_application.to_company")
