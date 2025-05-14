@@ -337,26 +337,26 @@ class ApplicationBaseView(ApplyStepBaseView):
         return None
 
     def get_eligibility_for_hire_step_url(self):
-        if self.company.kind == CompanyKind.GEIQ:
-            if not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists():
-                return reverse(
-                    "apply:geiq_eligibility_for_hire",
-                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-                )
-        else:
-            bypass_eligibility_conditions = [
-                # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-                not self.company.is_subject_to_eligibility_rules,
-                # No need for eligibility diagnosis if the job seeker already has a PASS IAE
-                self.job_seeker.has_valid_approval,
-                # Job seeker must not have a diagnosis
-                self.job_seeker.has_valid_diagnosis(for_siae=self.company),
-            ]
-            if not any(bypass_eligibility_conditions):
-                return reverse(
-                    "apply:eligibility_for_hire",
-                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-                )
+        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
+            return reverse(
+                "apply:geiq_eligibility_for_hire",
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            )
+
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
+            not self.company.is_subject_to_eligibility_rules,
+            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+            self.job_seeker.has_valid_approval,
+            # Job seeker must not have a diagnosis
+            self.eligibility_diagnosis,
+        ]
+        if not any(bypass_eligibility_conditions):
+            return reverse(
+                "apply:eligibility_for_hire",
+                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            )
+
         return None
 
     def get_context_data(self, **kwargs):
