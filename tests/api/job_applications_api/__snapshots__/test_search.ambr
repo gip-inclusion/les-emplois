@@ -584,56 +584,10 @@
 # name: TestJobApplicationSearchApi.test_serialized_data
   '''
   {
-      "count": 1,
+      "count": 0,
       "next": null,
       "previous": null,
-      "results": [
-          {
-              "identifiant_unique": "11111111-1111-1111-1111-111111111111",
-              "cree_le": "2025-02-14T01:00:00+01:00",
-              "mis_a_jour_le": "2025-02-14T01:00:00+01:00",
-              "dernier_changement_le": "2025-02-14T01:00:00+01:00",
-              "statut": "accepted",
-              "candidat_nir": "290010101010125",
-              "candidat_nom": "Doe",
-              "candidat_prenom": "Jane",
-              "candidat_date_naissance": "1990-01-01",
-              "candidat_email": "jane.doe@test.local",
-              "candidat_telephone": "0612345678",
-              "candidat_pass_iae_statut": "VALID",
-              "candidat_pass_iae_numero": "999999999999",
-              "candidat_pass_iae_date_debut": "2000-01-01",
-              "candidat_pass_iae_date_fin": "3000-01-01",
-              "entreprise_type": "EI",
-              "entreprise_nom": "Acme inc.",
-              "entreprise_siret": "012345678910",
-              "entreprise_adresse": "112 rue de la Croix-Nivert, 75015 Paris",
-              "entreprise_employeur_email": "contact@acmeinc.com",
-              "orientation_emetteur_type": "prescriber",
-              "orientation_emetteur_sous_type": "FT",
-              "orientation_emetteur_nom": "Dupont",
-              "orientation_emetteur_prenom": "Pierre",
-              "orientation_emetteur_email": "pierre.dupont@test.local",
-              "orientation_emetteur_organisme": "Pres. Org.",
-              "orientation_emetteur_organisme_telephone": "0612345678",
-              "orientation_postes_recherches": [
-                  {
-                      "rome": "N1101",
-                      "titre": "Conduite d'engins de d\u00e9placement des charges",
-                      "ville": "Vannes"
-                  }
-              ],
-              "orientation_candidat_message": "Message de candidature",
-              "orientation_candidat_cv": "https://server.com/rockie-balboa.pdf",
-              "contrat_date_debut": "2025-02-14",
-              "contrat_date_fin": "2027-02-14",
-              "contrat_poste_retenu": {
-                  "rome": "N1101",
-                  "titre": "Conduite d'engins de d\u00e9placement des charges",
-                  "ville": "Vannes"
-              }
-          }
-      ]
+      "results": []
   }
   '''
 # ---

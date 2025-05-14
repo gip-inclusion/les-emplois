@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_employer_allowed[view queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -187,6 +187,34 @@
                  AND "communications_notificationsettings"."structure_pk" = %s
                  AND "communications_notificationsettings"."structure_type_id" = %s)
           ORDER BY "communications_notificationsettings"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'User.can_create_siae_antenna[users/models.py]',
+          'can_create_antenna[utils/templatetags/can_create_antenna.py]',
+          'SimpleNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[dashboard/edit_user_notifications.html]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
+                    WHERE (U0."company_id" = %s
+                           AND U2."is_active"
+                           AND U0."is_active"
+                           AND U0."is_admin"
+                           AND U2."is_active"))
+                 AND "users_user"."id" = %s)
           LIMIT 1
         ''',
       }),
