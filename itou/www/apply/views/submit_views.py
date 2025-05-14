@@ -79,10 +79,8 @@ def _get_job_seeker_to_apply_for(request):
     return job_seeker
 
 
-def initialize_apply_session(request, company, data):
-    apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, f"job_application-{company.pk}")
-    apply_session.init(APPLY_SESSION_KIND, data)
-    return apply_session
+def initialize_apply_session(request, data):
+    return SessionNamespace.create_uuid_namespace(request.session, APPLY_SESSION_KIND, data)
 
 
 class ApplicationPermissionMixin:
@@ -163,13 +161,16 @@ class StartView(ApplicationPermissionMixin, View):
                 "config": {
                     "from_url": self.get_reset_url(),
                 },
-                "apply": {"company_pk": self.company.pk},
+                "apply": {
+                    "session_uuid": self.apply_session.name,
+                    "company_pk": self.company.pk,
+                },
             },
         )
         return job_seeker_session
 
     def get(self, request, *args, **kwargs):
-        session_data = {"reset_url": self.reset_url}
+        session_data = {"reset_url": self.reset_url, "company_pk": self.company.pk}
         # Store away the selected job in the session to avoid passing it
         # along the many views before ApplicationJobsView.
         if job_description_id := request.GET.get("job_description_id"):
@@ -180,7 +181,7 @@ class StartView(ApplicationPermissionMixin, View):
             else:
                 session_data["selected_jobs"] = [job_description.pk]
 
-        self.apply_session = initialize_apply_session(request, self.company, session_data)
+        self.apply_session = initialize_apply_session(request, session_data)
 
         if request.user.is_job_seeker:
             tunnel = "job_seeker"
@@ -195,7 +196,7 @@ class StartView(ApplicationPermissionMixin, View):
                 add_url_params(
                     reverse(
                         "apply:application_jobs",
-                        kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
+                        kwargs={"session_uuid": self.apply_session.name, "job_seeker_public_id": job_seeker.public_id},
                     ),
                     {"job_description_id": job_description_id},
                 )
@@ -208,7 +209,7 @@ class StartView(ApplicationPermissionMixin, View):
             and request.current_organization.has_pending_authorization()
         ):
             return HttpResponseRedirect(
-                reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
+                reverse("apply:pending_authorization_for_sender", kwargs={"session_uuid": self.apply_session.name})
             )
 
         if tunnel == "job_seeker":
@@ -221,6 +222,7 @@ class StartView(ApplicationPermissionMixin, View):
 
         params = {
             "tunnel": tunnel,
+            "apply_session_uuid": self.apply_session.name,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
         }
@@ -233,11 +235,16 @@ class RequireApplySessionMixin:
     def __init__(self):
         self.apply_session = None
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, session_uuid=None, company_pk=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
+        # TODO(alaurent) Remove company_pk
+        if not (session_uuid or company_pk):
+            raise Http404
+
+        # TODO(alaurent) remove or clause
         self.apply_session = SessionNamespace(
-            request.session, APPLY_SESSION_KIND, f"job_application-{self.company.pk}"
+            request.session, APPLY_SESSION_KIND, session_uuid or f"job_application-{company_pk}"
         )
         if not self.apply_session.exists():
             raise Http404
@@ -251,7 +258,11 @@ class RequireApplySessionMixin:
         }
 
     def get_base_kwargs(self):
-        return {"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
+        try:
+            uuid.UUID(self.apply_session.name)
+            return {"session_uuid": self.apply_session.name, "job_seeker_public_id": self.job_seeker.public_id}
+        except ValueError:
+            return {"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
 
 
 class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
@@ -263,7 +274,13 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         self.auto_prescription_process = None
 
     def setup(self, request, *args, **kwargs):
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        super().setup(request, *args, **kwargs)
+
+        # FIXME(alaurent) remove "or ..." part
+        self.company = get_object_or_404(
+            Company.objects.with_has_active_members(),
+            pk=kwargs.get("company_pk") or self.apply_session.get("company_pk"),
+        )
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
             request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
@@ -271,8 +288,6 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         self.auto_prescription_process = (
             not self.hire_process and request.user.is_employer and self.company == request.current_organization
         )
-
-        super().setup(request, *args, **kwargs)
 
     def get_back_url(self):
         return None
@@ -390,6 +405,12 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
         }
+        # FIXME(alaurent) put apply_session_uuid in dict in a week
+        try:
+            uuid.UUID(self.apply_session.name)
+            params |= {"apply_session_uuid": self.apply_session.name}
+        except ValueError:
+            pass
 
         self.next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
 
