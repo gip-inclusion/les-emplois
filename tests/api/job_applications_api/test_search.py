@@ -169,20 +169,20 @@ class TestJobApplicationSearchApi:
         response = api_client.post(self.ENDPOINT_URL, VALID_SEARCH_DATA, format="json")
         assert response.status_code == 429
 
+    @freeze_time("2025-02-14")
     def test_serialized_data(self, api_client, snapshot):
         api_client.force_authenticate(ServiceAccount(), self.token)
-        with freeze_time("2025-02-14"):
-            job_application = JobApplicationFactory(
-                sent_by_authorized_prescriber_organisation=True,
-                with_approval=True,
-                was_hired=True,
-                for_snapshot=True,
-                sender_prescriber_organization__for_snapshot=True,
-                sender_prescriber_organization__membership__user__for_snapshot=True,
-                hired_job__for_snapshot=True,
-                resume_link="https://server.com/rockie-balboa.pdf",
-            )
-            job_application.selected_jobs.set({job_application.hired_job})
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            with_approval=True,
+            was_hired=True,
+            for_snapshot=True,
+            sender_prescriber_organization__for_snapshot=True,
+            sender_prescriber_organization__membership__user__for_snapshot=True,
+            hired_job__for_snapshot=True,
+            resume_link="https://server.com/rockie-balboa.pdf",
+        )
+        job_application.selected_jobs.set({job_application.hired_job})
 
         response = api_client.post(
             self.ENDPOINT_URL,
