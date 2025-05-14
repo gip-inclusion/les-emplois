@@ -31,6 +31,7 @@ from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
@@ -78,6 +79,7 @@ from tests.utils.test import (
     get_session_name,
     parse_response_to_soup,
 )
+from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML
 
 
 logger = logging.getLogger(__name__)
@@ -301,6 +303,43 @@ class TestProcessViews:
                 response = client.get(url)
                 # Check if approval is displayed
                 assertion(response, "Numéro de PASS IAE")
+
+    def test_details_for_company_certified_criteria_after_expiration(self, client):
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        now = timezone.now()
+        today = timezone.localdate(now)
+        job_seeker = JobSeekerFactory()
+        certification_grace_period = datetime.timedelta(
+            days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS
+        )
+        created_at = now - certification_grace_period - datetime.timedelta(days=1)
+        expires_at = today - datetime.timedelta(days=1)
+        certification_period = InclusiveDateRange(timezone.localdate(created_at), expires_at)
+        selected_criteria = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__author_siae=company,
+            eligibility_diagnosis__job_seeker=job_seeker,
+            eligibility_diagnosis__created_at=created_at,
+            eligibility_diagnosis__expires_at=expires_at,
+            certified=True,
+            certification_period=certification_period,
+        )
+        eligibility_diagnosis = selected_criteria.eligibility_diagnosis
+        job_application = JobApplicationFactory(
+            to_company=company,
+            job_seeker=job_seeker,
+            hiring_start_at=today,
+            eligibility_diagnosis=eligibility_diagnosis,
+        )
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        client.force_login(company.members.get())
+        response = client.get(url)
+        assertNotContains(response, CERTIFIED_BADGE_HTML, html=True)
+
+        eligibility_diagnosis.expires_at = today + datetime.timedelta(days=1)
+        eligibility_diagnosis.save()
+        response = client.get(url)
+        assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 
     def test_details_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)

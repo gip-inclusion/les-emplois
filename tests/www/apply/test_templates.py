@@ -31,6 +31,7 @@ from tests.job_applications.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import load_template
+from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
 
 
 def get_request(path="/"):
@@ -193,16 +194,6 @@ def test_known_criteria_template_with_partial_zrr_criterion():
     assert "est classée en ZRR" not in rendered
     assert "est partiellement classée en ZRR" in rendered
     assert escape(job_seeker.city) in rendered
-
-
-CERTIFIED_BADGE_HTML = """\
-<span class="badge badge-xs rounded-pill bg-info-lighter text-info ms-3">
-    <i class="ri-verified-badge-fill" aria-hidden="true"></i>
-    Certifié</span>"""
-NOT_CERTIFIED_BADGE_HTML = """\
-<span class="badge badge-xs rounded-pill bg-warning-lighter text-warning ms-3">
-    <i class="ri-error-warning-fill" aria-hidden="true"></i>
-    Non certifié</span>"""
 
 
 class TestCertifiedBadgeIae:
