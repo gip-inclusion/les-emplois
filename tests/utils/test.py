@@ -154,6 +154,26 @@ class ItouClient(Client):
             # Detect rendering issues in templates
             assert "{{" not in content
             assert "{%" not in content
+
+            if request.get("HTTP_HX_REQUEST") != "true":  # Do not check htmx requests that contain partial documents
+                # Check HTML consistency (use lxml parser for speed)
+                soup = BeautifulSoup(content, "lxml")
+
+                tag_with_ids = soup.find_all(id=True)
+                ids = {tag.attrs["id"] for tag in tag_with_ids}
+                # Check for for duplicate ids
+                assert len(ids) == len(tag_with_ids)
+
+                for tag in soup.find_all(attrs={"aria-labelledby": True}):
+                    assert tag.attrs["aria-labelledby"] in ids
+
+                for tag in soup.find_all(attrs={"aria-controls": True}):
+                    assert tag.attrs["aria-controls"] in ids
+
+                for tag in soup.find_all(attrs={"data-bs-target": True}):
+                    if tag.attrs["data-bs-target"][0] == "#":
+                        assert tag.attrs["data-bs-target"][1:] in ids
+
         return response
 
 
