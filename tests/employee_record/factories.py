@@ -1,11 +1,14 @@
 import datetime
 
 import factory
+import factory.fuzzy
 
 from itou.asp import models as asp_models
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import (
     EmployeeRecord,
+    EmployeeRecordTransition,
+    EmployeeRecordTransitionLog,
     EmployeeRecordUpdateNotification,
 )
 from tests.job_applications.factories import (
@@ -13,6 +16,7 @@ from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
+from tests.users.factories import EmployerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
@@ -87,3 +91,14 @@ class EmployeeRecordUpdateNotificationFactory(BareEmployeeRecordUpdateNotificati
 
     class Params:
         ready_for_transfer = factory.Trait(status=NotificationStatus.NEW)
+
+
+class EmployeeRecordTransitionLogFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EmployeeRecordTransitionLog
+
+    employee_record = factory.SubFactory(EmployeeRecordFactory)
+    user = factory.SubFactory(EmployerFactory)
+    transition = factory.fuzzy.FuzzyChoice(EmployeeRecordTransition)
+    from_state = factory.fuzzy.FuzzyChoice(Status)
+    to_state = factory.fuzzy.FuzzyChoice(Status)
