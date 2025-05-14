@@ -209,20 +209,25 @@ class GetOrCreateJobSeekerStartView(View):
         if not self.from_url:
             raise Http404
 
-        company = None
-        if self.tunnel == "sender" or self.tunnel == "hire":
-            try:
-                company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
-            except ValueError:
-                raise Http404("Aucune entreprise n'a été trouvée")
-
         data = {
             "config": {
                 "tunnel": self.tunnel,
                 "from_url": self.from_url,
             }
         }
-        data |= {"apply": {"company_pk": company.pk}} if company else {}
+
+        # apply data
+        if self.tunnel == "sender" or self.tunnel == "hire":
+            apply_data = {}
+            if apply_session_uuid := request.GET.get("apply_session_uuid"):
+                apply_data["session_uuid"] = apply_session_uuid
+            try:
+                company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
+                apply_data["company_pk"] = company.pk
+            except ValueError:  # In case the pk isn't a integer
+                raise Http404("Aucune entreprise n'a été trouvée")
+            data["apply"] = apply_data
+
         self.job_seeker_session = SessionNamespace.create_uuid_namespace(
             request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
         )
@@ -304,6 +309,9 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def get_apply_kwargs(self, job_seeker):
         apply_data = self.job_seeker_session.get("apply", {})
+        if session_uuid := apply_data.get("session_uuid"):
+            return {"session_uuid": session_uuid, "job_seeker_public_id": job_seeker.public_id}
+        # There's only the company_pk, it's the old session format
         return apply_data | {"job_seeker_public_id": job_seeker.public_id}
 
     def get_exit_url(self, job_seeker, created=False):

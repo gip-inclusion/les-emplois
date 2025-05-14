@@ -9,11 +9,12 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import get_session_name, parse_response_to_soup
 
 
 class TestApplyAsPrescriber:
@@ -111,10 +112,11 @@ class TestApplyAsPrescriber:
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
         next_url = reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -127,14 +129,15 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {
+        assert client.session[apply_session_name] == {
+            "company_pk": guerande_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
         }
 
         next_url = reverse(
             "apply:application_eligibility",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -146,8 +149,7 @@ class TestApplyAsPrescriber:
                 response,
                 "#main",
                 replace_in_attr=[
-                    ("href", f"apply%2F{guerande_company.pk}", "apply%2F[PK of Company]"),
-                    ("href", f"apply/{guerande_company.pk}", "apply/[PK of Company]"),
+                    ("href", apply_session_name, "[Session UUID]"),
                     ("href", f"/company/{guerande_company.pk}", "company/[PK of Company]"),
                 ],
             )
@@ -160,7 +162,7 @@ class TestApplyAsPrescriber:
 
         next_url = reverse(
             "apply:application_resume",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -186,7 +188,7 @@ class TestApplyAsPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
 
-        assert f"job_application-{guerande_company.pk}" not in client.session
+        assert apply_session_name not in client.session
 
         next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
@@ -283,10 +285,11 @@ class TestApplyAsPrescriber:
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
         next_url = reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -299,14 +302,15 @@ class TestApplyAsPrescriber:
         selected_job = guerande_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{guerande_company.pk}"] == {
+        assert client.session[apply_session_name] == {
+            "company_pk": guerande_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
         }
 
         next_url = reverse(
             "apply:application_resume",
-            kwargs={"company_pk": guerande_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -332,7 +336,7 @@ class TestApplyAsPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
 
-        assert f"job_application-{guerande_company.pk}" not in client.session
+        assert apply_session_name not in client.session
 
         next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
@@ -441,10 +445,11 @@ class TestApplyAsCompany:
             + f"?job_seeker_public_id={job_seeker.public_id}"
         )
         response = client.get(apply_company_url)
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
         next_url = reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -457,14 +462,15 @@ class TestApplyAsCompany:
         selected_job = other_company.job_description_through.first()
         response = client.post(next_url, data={"selected_jobs": [selected_job.pk]})
 
-        assert client.session[f"job_application-{other_company.pk}"] == {
+        assert client.session[apply_session_name] == {
+            "company_pk": other_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
         }
 
         next_url = reverse(
             "apply:application_resume",
-            kwargs={"company_pk": other_company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -489,7 +495,7 @@ class TestApplyAsCompany:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
 
-        assert f"job_application-{other_company.pk}" not in client.session
+        assert apply_session_name not in client.session
 
         next_url = reverse("apply:application_end", kwargs={"application_pk": job_application.pk})
         assertRedirects(response, next_url)
@@ -532,10 +538,12 @@ class TestApplyAsJobSeeker:
 
         client.force_login(job_seeker)
 
-        check_info_url = reverse(
-            "job_seekers_views:check_job_seeker_info",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
+        def _check_info_url(session_uuid):
+            return reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"session_uuid": session_uuid, "job_seeker_public_id": job_seeker.public_id},
+            )
+
         # Step apply to company
         # ----------------------------------------------------------------------
 
@@ -544,7 +552,8 @@ class TestApplyAsJobSeeker:
             + f"?job_seeker_public_id={other_job_seeker.public_id}"
         )
         response = client.get(apply_company_url_other_uuid, follow=True)
-        assert response.request["PATH_INFO"] == check_info_url
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        assert response.request["PATH_INFO"] == _check_info_url(apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker
 
@@ -557,6 +566,7 @@ class TestApplyAsJobSeeker:
         )
 
         response = client.get(apply_job_description_url_other_uuid, follow=True)
-        assert response.request["PATH_INFO"] == check_info_url
+        other_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[apply_session_name])
+        assert response.request["PATH_INFO"] == _check_info_url(other_apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker

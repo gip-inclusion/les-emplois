@@ -369,7 +369,10 @@ def test_job_seeker_created_for_prescription_is_shown(client):
             "tunnel": "sender",
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
         },
-        "apply": {"company_pk": company.pk},
+        "apply": {
+            "company_pk": company.pk,
+            "session_uuid": uuid.uuid4(),  # We don't need the apply_session to exist in this test
+        },
         "user": {
             "email": "jeandujardin@inclusion.gouv.fr",
             "title": "M",
