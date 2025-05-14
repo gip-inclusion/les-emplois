@@ -69,16 +69,19 @@ urlpatterns = [
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/eligibility",
         submit_views.IAEEligibilityForHireView.as_view(),
         name="eligibility_for_hire",
+        kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility",
         submit_views.GEIQEligibilityForHireView.as_view(),
         name="geiq_eligibility_for_hire",
+        kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility-criteria",
         submit_views.GEIQEligiblityCriteriaForHireView.as_view(),
         name="geiq_eligibility_criteria_for_hire",
+        kwargs={"hire_process": True},
     ),
     path(
         "<int:company_pk>/hire/<uuid:job_seeker_public_id>/confirm",
