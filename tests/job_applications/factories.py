@@ -252,3 +252,14 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         born_in_france=True,
     )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
+
+
+class JobApplicationTransitionLogFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobApplicationTransitionLog
+
+    job_application = factory.SubFactory(JobApplicationFactory)
+    from_state = factory.fuzzy.FuzzyChoice(JobApplicationState)
+    to_state = factory.fuzzy.FuzzyChoice(JobApplicationState)
+    user = factory.SelfAttribute("job_application.sender")
+    target_company = factory.SelfAttribute("job_application.to_company")
