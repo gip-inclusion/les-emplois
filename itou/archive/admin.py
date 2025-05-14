@@ -61,3 +61,19 @@ class ArchiveApplicationAdmin(ItouModelAdmin):
     )
 
     readonly_fields = fields
+
+
+@admin.register(models.ArchivedProfessional)
+class ArchiveProfessionalAdmin(ItouModelAdmin):
+    fields = (
+        "date_joined",
+        "first_login",
+        "last_login",
+        "archived_at",
+        "user_signup_kind",
+        "department",
+        "title",
+        "identity_provider",
+    )
+
+    readonly_fields = fields
