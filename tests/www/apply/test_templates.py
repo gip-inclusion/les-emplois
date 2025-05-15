@@ -14,6 +14,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.tasks import certify_criteria
+from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
@@ -222,7 +223,9 @@ class TestCertifiedBadgeIae:
             job_application.to_company = diagnosis.author_siae
             job_application.save()
         # This is the way it's set in views.
-        diagnosis.criteria_display = diagnosis.get_criteria_display_qs(hiring_start_at=job_application.hiring_start_at)
+        diagnosis.criteria_display = iae_criteria_for_display(
+            diagnosis, hiring_start_at=job_application.hiring_start_at
+        )
         return {
             "eligibility_diagnosis": diagnosis,
             "request": RequestFactory(),
@@ -377,7 +380,9 @@ class TestCertifiedBadgeGEIQ:
         return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
 
     def default_params_geiq(self, diagnosis, job_application):
-        diagnosis.criteria_display = diagnosis.get_criteria_display_qs(hiring_start_at=job_application.hiring_start_at)
+        diagnosis.criteria_display = geiq_criteria_for_display(
+            diagnosis, hiring_start_at=job_application.hiring_start_at
+        )
         return {
             "request": RequestFactory(),
             "diagnosis": diagnosis,

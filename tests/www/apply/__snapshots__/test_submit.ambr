@@ -486,7 +486,7 @@
 # ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
-    'num_queries': 25,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -1449,35 +1449,6 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[apply/submit/hire_confirmation.html]',
-          'BlockNode[apply/submit_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/hire_confirmation.html]',
-          '_accept[www/apply/views/common.py]',
-          'hire_confirmation[www/apply/views/submit_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
-                 "eligibility_selectedadministrativecriteria"."certified_at",
-                 "eligibility_selectedadministrativecriteria"."certification_period",
-                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
-                 "eligibility_selectedadministrativecriteria"."created_at",
-                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
-                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
-                 %s AS "is_considered_certified"
-          FROM "eligibility_selectedadministrativecriteria"
-          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

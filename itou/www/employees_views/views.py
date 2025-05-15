@@ -10,6 +10,7 @@ from itou.approvals.models import (
     Approval,
     ProlongationRequest,
 )
+from itou.eligibility.utils import iae_criteria_for_display
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
@@ -106,8 +107,9 @@ class EmployeeDetailView(DetailView):
         eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
         if eligibility_diagnosis:
             hiring_start_at = job_application.hiring_start_at if job_application else None
-            eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs(
-                hiring_start_at=hiring_start_at
+            eligibility_diagnosis.criteria_display = iae_criteria_for_display(
+                eligibility_diagnosis,
+                hiring_start_at=hiring_start_at,
             )
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info

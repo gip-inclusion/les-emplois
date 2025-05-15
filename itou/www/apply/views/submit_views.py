@@ -17,6 +17,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
@@ -907,7 +908,7 @@ def hire_confirmation(
             .first()
         )
         if geiq_eligibility_diagnosis:
-            geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs()
+            geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(geiq_eligibility_diagnosis)
         eligibility_diagnosis = None
 
     else:
@@ -919,7 +920,7 @@ def hire_confirmation(
         if eligibility_diagnosis is not None:
             # The job_seeker object already contains a lot of information: no need to re-retrieve it
             eligibility_diagnosis.job_seeker = job_seeker
-            eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs()
+            eligibility_diagnosis.criteria_display = iae_criteria_for_display(eligibility_diagnosis)
         geiq_eligibility_diagnosis = None
 
     return common_views._accept(
