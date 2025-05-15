@@ -199,7 +199,13 @@ class TestAdministrativeCriteriaEvaluationForm:
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
 
-        form = AdministrativeCriteriaEvaluationForm(user, company, job_application=job_application)
+        form = AdministrativeCriteriaEvaluationForm(
+            user,
+            company,
+            job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
+                "administrative_criteria"
+            ),
+        )
 
         assert 2 == len(form.fields)
         assert (
@@ -215,12 +221,5 @@ class TestAdministrativeCriteriaEvaluationForm:
     def test_num_level2_admin_criteria(self, kind):
         company = CompanyFactory(kind=kind, with_membership=True)
         user = company.members.first()
-
-        job_application = JobApplicationFactory(
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            hiring_start_at=timezone.localdate() - relativedelta(months=2),
-        )
-        form = AdministrativeCriteriaEvaluationForm(user, company, job_application=job_application)
+        form = AdministrativeCriteriaEvaluationForm(user, company, job_app_selected_administrative_criteria=[])
         assert ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[kind] == form.num_level2_admin_criteria
