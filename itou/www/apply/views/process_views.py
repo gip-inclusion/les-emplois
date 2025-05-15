@@ -691,6 +691,12 @@ class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, Applicat
             selected_jobs.append(job_id)
         return {"selected_jobs": selected_jobs}
 
+    # FIXME(alaurent) Remove in a week
+    def get_base_kwargs(self):
+        kwargs = super().get_base_kwargs()
+        kwargs.pop("job_seeker_public_id", None)
+        return kwargs
+
     def get_next_url(self):
         base_url = reverse(
             "apply:job_application_external_transfer_step_3",
