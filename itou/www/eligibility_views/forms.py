@@ -31,16 +31,16 @@ class AdministrativeCriteriaForm(forms.Form):
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
-    def get_administrative_criteria(self):
-        return AdministrativeCriteria.objects.all()
-
-    def __init__(self, is_authorized_prescriber, siae, **kwargs):
+    def __init__(self, is_authorized_prescriber, siae, administrative_criteria=None, **kwargs):
         self.is_authorized_prescriber = is_authorized_prescriber
         self.siae = siae
         super().__init__(**kwargs)
 
         initial_administrative_criteria = self.initial.get("administrative_criteria", [])
-        for criterion in self.get_administrative_criteria():
+
+        if administrative_criteria is None:
+            administrative_criteria = AdministrativeCriteria.objects.all()
+        for criterion in administrative_criteria:
             key = criterion.key
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.

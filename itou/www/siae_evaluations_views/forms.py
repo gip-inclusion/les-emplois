@@ -38,17 +38,9 @@ class SetChosenPercentForm(forms.ModelForm):
 
 
 class AdministrativeCriteriaEvaluationForm(AdministrativeCriteriaForm):
-    def get_administrative_criteria(self):
-        return [
-            e.administrative_criteria
-            for e in self.job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
-                "administrative_criteria"
-            )
-        ]
-
-    def __init__(self, user, siae, job_application, **kwargs):
-        self.job_application = job_application
-        super().__init__(user, siae, **kwargs)
+    def __init__(self, user, siae, job_app_selected_administrative_criteria, **kwargs):
+        administrative_criteria = [e.administrative_criteria for e in job_app_selected_administrative_criteria]
+        super().__init__(user, siae, administrative_criteria, **kwargs)
         self.num_level2_admin_criteria = ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[siae.kind]
 
 
