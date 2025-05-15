@@ -1393,8 +1393,10 @@
                  "eligibility_selectedadministrativecriteria"."administrative_criteria_id",
                  %s AS "is_considered_certified"
           FROM "eligibility_selectedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-          ORDER BY RANDOM() ASC
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({

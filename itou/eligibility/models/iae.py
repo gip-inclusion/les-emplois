@@ -284,6 +284,7 @@ class SelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
     )
 
     class Meta:
+        ordering = ["administrative_criteria"]
         verbose_name = "critère administratif IAE sélectionné"
         verbose_name_plural = "critères administratifs IAE sélectionnés"
         unique_together = ("eligibility_diagnosis", "administrative_criteria")
