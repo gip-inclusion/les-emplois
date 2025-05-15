@@ -27,7 +27,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siae_evaluations_views.forms import (
-    AdministrativeCriteriaOfJobApplicationForm,
+    AdministrativeCriteriaEvaluationForm,
     InstitutionEvaluatedSiaeNotifyStep1Form,
     InstitutionEvaluatedSiaeNotifyStep2Form,
     InstitutionEvaluatedSiaeNotifyStep3Form,
@@ -565,7 +565,7 @@ def siae_select_criteria(
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
     }
 
-    form_administrative_criteria = AdministrativeCriteriaOfJobApplicationForm(
+    form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
         request.user,
         siae=siae,
         job_application=evaluated_job_application.job_application,
@@ -595,12 +595,12 @@ def siae_select_criteria(
     level_1_fields = [
         field
         for field in form_administrative_criteria
-        if AdministrativeCriteriaOfJobApplicationForm.LEVEL_1_PREFIX in field.name
+        if AdministrativeCriteriaEvaluationForm.LEVEL_1_PREFIX in field.name
     ]
     level_2_fields = [
         field
         for field in form_administrative_criteria
-        if AdministrativeCriteriaOfJobApplicationForm.LEVEL_2_PREFIX in field.name
+        if AdministrativeCriteriaEvaluationForm.LEVEL_2_PREFIX in field.name
     ]
 
     back_url = get_safe_url(request, "back_url", fallback_url=url)

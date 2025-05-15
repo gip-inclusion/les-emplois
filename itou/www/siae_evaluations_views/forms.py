@@ -37,7 +37,7 @@ class SetChosenPercentForm(forms.ModelForm):
         }
 
 
-class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
+class AdministrativeCriteriaEvaluationForm(AdministrativeCriteriaForm):
     def get_administrative_criteria(self):
         return [
             e.administrative_criteria
