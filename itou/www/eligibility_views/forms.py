@@ -75,7 +75,12 @@ class AdministrativeCriteriaForm(forms.Form):
 
 class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
     def get_administrative_criteria(self):
-        return AdministrativeCriteria.objects.for_job_application(self.job_application)
+        return [
+            e.administrative_criteria
+            for e in self.job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
+                "administrative_criteria"
+            )
+        ]
 
     def __init__(self, user, siae, job_application, **kwargs):
         self.job_application = job_application
