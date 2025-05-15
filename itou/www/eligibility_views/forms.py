@@ -84,8 +84,6 @@ class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
 
     def __init__(self, user, siae, job_application, **kwargs):
         self.job_application = job_application
-
-        self.siae = siae
         self.num_level2_admin_criteria = eligibilty_enums.ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[
             siae.kind
         ]
