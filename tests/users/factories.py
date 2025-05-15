@@ -93,6 +93,13 @@ class UserFactory(factory.django.DjangoModelFactory):
             if create:
                 obj.save(update_fields=["upcoming_deletion_notified_at"])
 
+    @factory.post_generation
+    def last_login_days_ago(obj, create, extracted, **kwargs):
+        if extracted:
+            obj.last_login = timezone.now() - datetime.timedelta(days=extracted)
+            if create:
+                obj.save(update_fields=["last_login"])
+
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF

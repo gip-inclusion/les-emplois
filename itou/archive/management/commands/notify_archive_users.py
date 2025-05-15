@@ -15,14 +15,12 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
-from itou.users.notifications import ArchiveJobSeeker, InactiveJobSeeker
+from itou.users.notifications import ArchiveUser, InactiveUser
 from itou.utils.command import BaseCommand
+from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 logger = logging.getLogger(__name__)
-
-GRACE_PERIOD = datetime.timedelta(days=30)
-INACTIVITY_PERIOD = datetime.timedelta(days=365) * 2 - GRACE_PERIOD
 
 BATCH_SIZE = 100
 
@@ -128,7 +126,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--wet-run",
             action="store_true",
-            help="Perform the actual archiving of jobseekers",
+            help="Perform the actual archiving of users",
         )
 
         parser.add_argument(
@@ -136,7 +134,7 @@ class Command(BaseCommand):
             action="store",
             type=int,
             default=BATCH_SIZE,
-            help="Number of jobseekers to process in a batch",
+            help="Number of users to process in a batch",
         )
 
     @transaction.atomic
@@ -150,7 +148,7 @@ class Command(BaseCommand):
 
         if self.wet_run:
             for user in users:
-                InactiveJobSeeker(
+                InactiveUser(
                     user,
                     end_of_grace_period=now + GRACE_PERIOD,
                 ).send()
@@ -231,24 +229,24 @@ class Command(BaseCommand):
 
         if self.wet_run:
             for user in users_to_archive:
-                ArchiveJobSeeker(
+                ArchiveUser(
                     user,
                 ).send()
 
             ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
             ArchivedApplication.objects.bulk_create(archived_jobapplications)
-            self._delete_with_related_objects(users_to_archive)
+            self._delete_jobseekers_with_related_objects(users_to_archive)
 
         self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
         self.logger.info("Archived job applications after grace period, count: %d", len(archived_jobapplications))
 
-    def _delete_with_related_objects(self, users):
+    def _delete_jobseekers_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
     @monitor(
-        monitor_slug="notify_archive_jobseekers",
+        monitor_slug="notify_archive_users",
         monitor_config={
             "schedule": {"type": "crontab", "value": "*/5 7-20 * * MON-FRI"},
             "checkin_margin": 5,
@@ -261,7 +259,7 @@ class Command(BaseCommand):
     def handle(self, *args, wet_run, batch_size, **options):
         self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start notifying and archiving jobseekers in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
         self.notify_inactive_jobseekers()

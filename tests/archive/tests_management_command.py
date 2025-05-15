@@ -6,7 +6,6 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.archive.management.commands.notify_archive_jobseekers import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -15,6 +14,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.jobs.models import Appellation, Rome
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import JobDescriptionFactory
 from tests.eligibility.factories import (
@@ -32,67 +32,72 @@ from tests.users.factories import (
 )
 
 
-DAYS_OF_INACTIVITY = 730 - 30
-
-
-class TestNotifyArchiveJobSeekersManagementCommand:
-    @pytest.mark.parametrize("wet_run", [True, False])
+class TestNotifyArchiveUsersManagementCommand:
     @pytest.mark.parametrize(
-        "kwargs, model",
+        "factory,kwargs",
         [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY},
-                "user",
                 id="jobseeker_to_notify",
             ),
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": timezone.now()},
-                "user",
                 id="notified_jobseeker_to_reset",
             ),
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
-                "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
         ],
     )
-    def test_dry_run(self, kwargs, model, wet_run):
-        jobseeker = JobSeekerFactory(**kwargs)
-        call_command("notify_archive_jobseekers", wet_run=wet_run)
+    def test_dry_run(self, factory, kwargs, django_capture_on_commit_callbacks, mailoutbox):
+        user = factory(**kwargs)
 
-        if not wet_run or model == "user":
-            assert jobseeker == User.objects.get()
-            assert not ArchivedJobSeeker.objects.exists()
-        elif model == "archived_jobseeker":
-            assert ArchivedJobSeeker.objects.count() == 1
-            assert not User.objects.exists()
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_users")
+
+        unmodified_user = User.objects.get()
+        assert user == unmodified_user
+        assert not mailoutbox
+        assert not ArchivedJobSeeker.objects.exists()
+        assert not ArchivedApplication.objects.exists()
 
     @pytest.mark.parametrize(
-        "kwargs, model",
+        "factory,kwargs",
         [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY},
-                "user",
                 id="jobseeker_to_notify",
             ),
+        ],
+    )
+    def test_notify_batch_size(self, factory, kwargs):
+        factory.create_batch(3, **kwargs)
+        call_command("notify_archive_users", batch_size=2, wet_run=True)
+
+        assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
+        assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
+
+    @pytest.mark.parametrize(
+        "factory,kwargs",
+        [
             pytest.param(
+                JobSeekerFactory,
                 {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 30},
-                "archived_jobseeker",
                 id="jobseeker_to_archive",
             ),
         ],
     )
-    def test_batch_size(self, kwargs, model):
-        JobSeekerFactory.create_batch(3, **kwargs)
-        call_command("notify_archive_jobseekers", batch_size=2, wet_run=True)
+    def test_archive_batch_size(self, factory, kwargs):
+        factory.create_batch(3, **kwargs)
+        call_command("notify_archive_users", batch_size=2, wet_run=True)
 
-        if model == "user":
-            assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
-            assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
-        else:
-            assert ArchivedJobSeeker.objects.count() == 2
-            assert User.objects.count() == 1
+        assert ArchivedJobSeeker.objects.count() == 2
+        assert User.objects.count() == 1
 
     @pytest.mark.parametrize(
         "factory, related_object_factory, updated_notification_date",
@@ -208,7 +213,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             related_object_factory(user)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is not None) == updated_notification_date
@@ -337,7 +342,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         if related_object_factory:
             related_object_factory(user)
 
-        call_command("notify_archive_jobseekers", wet_run=True)
+        call_command("notify_archive_users", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
@@ -377,7 +382,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
     )
     def test_exclude_users_when_archiving(self, user_factory):
         user = user_factory()
-        call_command("notify_archive_jobseekers", wet_run=True)
+        call_command("notify_archive_users", wet_run=True)
 
         expected_user = User.objects.get()
         assert user == expected_user
@@ -491,7 +496,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             )
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
@@ -540,7 +545,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         assert FollowUpGroupMembership.objects.exists()
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not FollowUpGroup.objects.exists()
@@ -668,7 +673,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             job_application.selected_jobs.set(selected_jobs)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_archive_jobseekers", wet_run=True)
+            call_command("notify_archive_users", wet_run=True)
 
         archived_application = ArchivedApplication.objects.all().values(
             "job_seeker_birth_year",

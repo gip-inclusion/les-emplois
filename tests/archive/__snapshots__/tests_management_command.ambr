@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
   list([
     dict({
       'birth_year': 1964,
@@ -21,7 +21,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
   list([
     dict({
       'birth_year': 1990,
@@ -43,7 +43,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
   '''
   Bonjour Johan ANDERSON,
   Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
@@ -56,10 +56,10 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
   list([
     dict({
       'birth_year': 1985,
@@ -81,7 +81,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
   '''
   Bonjour Johanna ANDREWS,
   Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
@@ -94,10 +94,10 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
   list([
     dict({
       'birth_year': None,
@@ -119,7 +119,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
   '''
   Bonjour Martin JACOBSON,
   Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
@@ -132,10 +132,10 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
   list([
     dict({
       'applied_at': datetime.date(2025, 2, 1),
@@ -166,7 +166,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][archived_application]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][archived_application]
   list([
     dict({
       'applied_at': datetime.date(2025, 2, 1),
@@ -197,7 +197,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][archived_application]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][archived_application]
   list([
     dict({
       'applied_at': datetime.date(2025, 2, 1),
@@ -228,7 +228,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][archived_application]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][archived_application]
   list([
     dict({
       'applied_at': datetime.date(2025, 2, 1),
@@ -259,7 +259,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
+# name: TestNotifyArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
   list([
     dict({
       'applied_at': datetime.date(2025, 2, 1),
@@ -290,7 +290,7 @@
     }),
   ])
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
@@ -303,10 +303,10 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_subject]
   '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
@@ -319,10 +319,10 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_subject]
   '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
@@ -335,6 +335,6 @@
   http://localhost:8000
   '''
 # ---
-# name: TestNotifyArchiveJobSeekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_subject]
+# name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_subject]
   '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
