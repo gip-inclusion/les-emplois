@@ -115,9 +115,6 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
     def level2(self):
         return self.filter(level=AdministrativeCriteriaLevel.LEVEL_2)
 
-    def for_job_application(self, job_application):
-        return self.filter(eligibilitydiagnosis__jobapplication=job_application)
-
     @property
     def certifiable_lookup(self):
         return models.Q(kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
