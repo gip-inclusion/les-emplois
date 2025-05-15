@@ -11,7 +11,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.www.apply.test_submit import fake_session_initialization
+from tests.www.apply.test_submit import fake_old_session_initialization, fake_session_initialization
 
 
 @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
@@ -322,6 +322,22 @@ def test_get_geiq_eligibility_diagnosis(subtests):
 class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     """Check that QPV and ZRR details for job seeker are displayed in GEIQ eligibility diagnosis form"""
 
+    # FIXME(alaurent) remove in a week
+    def test_job_old_session(self, client):
+        job_seeker = JobSeekerFactory()
+        geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
+        client.force_login(prescriber)
+        fake_old_session_initialization(client, geiq, {"selected_jobs": []})
+        response = client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+        assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
+
     def test_job_seeker_not_resident_in_qpv_or_zrr(self, client):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
         job_seeker = JobSeekerFactory()
@@ -339,12 +355,9 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, job_seeker, {"selected_jobs": []})
         response = client.get(
-            reverse(
-                "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker.public_id},
-            )
+            reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         )
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
         assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
@@ -368,12 +381,9 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, job_seeker_in_qpv, {"selected_jobs": []})
         response = client.get(
-            reverse(
-                "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker_in_qpv.public_id},
-            )
+            reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         )
 
         assertTemplateUsed(response, "apply/includes/known_criteria.html")
@@ -398,12 +408,9 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, job_seeker_in_zrr, {"selected_jobs": []})
         response = client.get(
-            reverse(
-                "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker_in_zrr.public_id},
-            )
+            reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         )
 
         assertTemplateUsed(response, "apply/includes/known_criteria.html")

@@ -658,12 +658,16 @@ def job_application_external_transfer_start_view(request, job_application_id, co
         return HttpResponseRedirect(url)
 
     # It's an external transfer : initialize the apply_session
-    data = {"reset_url": get_safe_url(request, "back_url", reverse("dashboard:index"))}
-    initialize_apply_session(request, company, data)
+    data = {
+        "reset_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
+        "company_pk": company.pk,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
+    }
+    apply_session = initialize_apply_session(request, data)
 
     url = reverse(
         "apply:job_application_external_transfer_step_2",
-        kwargs={"job_application_id": job_application.pk, "company_pk": company.pk},
+        kwargs={"job_application_id": job_application.pk, "session_uuid": apply_session.name},
     )
     if params := request.GET.urlencode():
         url = f"{url}?{params}"
@@ -680,7 +684,7 @@ class ApplicationOverrideMixin:
             ),
             pk=kwargs["job_application_id"],
         )
-        kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id
+        kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id  # FIXME(alaurent) Remove in a week
         return super().setup(request, *args, **kwargs)
 
 
