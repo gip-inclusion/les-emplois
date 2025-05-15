@@ -4,7 +4,6 @@ from django.db import transaction
 from django.utils import timezone
 from huey.constants import EmptyData
 from huey.storage import BaseStorage
-from regex import E
 
 
 logger = logging.getLogger(__name__)
