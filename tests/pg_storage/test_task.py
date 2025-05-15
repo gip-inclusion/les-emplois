@@ -1,5 +1,6 @@
 import pickle
 
+from django.core.management import call_command
 from huey import Huey
 
 from itou.pg_storage.models import Task
@@ -23,6 +24,7 @@ def pg_task(a, b):
 
 def test_huey_task_postgres():
     result = pg_task(1, 2)
+
     stored_task = Task.objects.get()
     message = pickle.loads(stored_task.data)
     assert message.args == (1, 2)
@@ -30,4 +32,9 @@ def test_huey_task_postgres():
 
     executed_task = postgres_huey.execute(result.task)
     assert executed_task == 3
+
+
+def test_run_huey_task_postgres():
+    pg_task(1, 2)
+    call_command("run_huey")
     assert Task.objects.count() == 0
