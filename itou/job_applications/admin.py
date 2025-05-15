@@ -150,7 +150,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "job_seeker",
                     "to_company",
                     "message",
-                    "resume_link",
                     "refusal_reason",
                     "answer",
                     "answer_to_prescriber",

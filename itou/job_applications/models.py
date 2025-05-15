@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.storage import storages
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, Func, Max, OuterRef, Prefetch, Q, Subquery, When
@@ -493,8 +494,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     create_employee_record = models.BooleanField(default=True, verbose_name="création d'une fiche salarié")
 
     # The job seeker's resume used for this job application.
-    # TODO: Remove the patchy code block of the `test_bucket` fixture when this field become a ForeignKey()
-    resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
     resume = models.OneToOneField(File, null=True, blank=True, verbose_name="CV", on_delete=models.RESTRICT)
 
     # Who send the job application. It can be the same user as `job_seeker`
@@ -879,6 +878,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationState.ACCEPTED,
             JobApplicationState.POSTPONED,
         ]
+
+    @property
+    def resume_link(self):
+        if self.resume_id:
+            return storages["public"].url(self.resume_id)
+        return ""
 
     def get_sender_kind_display(self):
         # Override default getter since we want to separate Orienteur and Prescripteur

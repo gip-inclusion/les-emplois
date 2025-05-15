@@ -282,7 +282,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -351,7 +350,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 48 DESC,
+          ORDER BY 47 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -702,7 +701,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -771,7 +769,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 48 DESC,
+          ORDER BY 47 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -1209,7 +1207,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -1278,7 +1275,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 48 DESC,
+          ORDER BY 47 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -1629,7 +1626,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -1698,7 +1694,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 48 DESC,
+          ORDER BY 47 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -1717,7 +1713,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -1786,7 +1781,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 48 DESC,
+          ORDER BY 47 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',

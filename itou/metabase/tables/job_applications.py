@@ -296,7 +296,7 @@ TABLE.add_columns(
             "name": "présence_de_cv",
             "type": "boolean",
             "comment": "Présence d''un CV",
-            "fn": lambda o: bool(o.resume_link),
+            "fn": lambda o: bool(o.resume_id),
         },
     ]
 )

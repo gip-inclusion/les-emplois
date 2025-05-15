@@ -3,8 +3,6 @@ import uuid
 from urllib.parse import quote
 
 import pytest
-from django.conf import settings
-from django.core.files.storage import storages
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -432,7 +430,6 @@ def test_step_3(client, snapshot, pdf_file):
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
     assert new_job_application.state == JobApplicationState.NEW
-    assert new_job_application.resume_link == storages["public"].url(new_job_application.resume.key)
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_job_application.resume.key)
 
     transfer_log = job_application.logs.last()
@@ -442,7 +439,7 @@ def test_step_3(client, snapshot, pdf_file):
 
 
 def test_step_3_no_previous_CV(client, mocker, pdf_file):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume_link="")
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -479,17 +476,13 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
-    assert new_job_application.resume_link == (
-        f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-        "/resume/11111111-1111-1111-1111-111111111111.pdf"
-    )
     assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 
 def test_step_3_remove_previous_CV(client):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
-    assert job_application.resume_link
+    assert job_application.resume
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -525,14 +518,13 @@ def test_step_3_remove_previous_CV(client):
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
-    assert new_job_application.resume_link == ""
     assert new_job_application.resume is None
     assert new_job_application.state == JobApplicationState.NEW
 
 
 def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
-    assert job_application.resume_link
+    assert job_application.resume
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
@@ -571,16 +563,12 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
-    assert new_job_application.resume_link == (
-        f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-        "/resume/11111111-1111-1111-1111-111111111111.pdf"
-    )
     assert new_job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
     assert new_job_application.state == JobApplicationState.NEW
 
 
 def test_access_step_3_without_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume_link="")
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)

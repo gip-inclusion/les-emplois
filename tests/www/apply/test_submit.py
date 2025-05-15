@@ -5,9 +5,7 @@ from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.contrib import messages
-from django.core.files.storage import storages
 from django.template.defaultfilters import date, time
 from django.urls import resolve, reverse
 from django.utils import timezone
@@ -701,10 +699,6 @@ class TestApplyAsJobSeeker:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-            "/resume/11111111-1111-1111-1111-111111111111.pdf"
-        )
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
@@ -1257,10 +1251,6 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert (
-            job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
-            f"{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
-        )
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
@@ -1605,10 +1595,6 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-        assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-            "/resume/11111111-1111-1111-1111-111111111111.pdf"
-        )
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
@@ -2073,11 +2059,6 @@ class TestApplyAsPrescriber:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-
-        assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-            "/resume/11111111-1111-1111-1111-111111111111.pdf"
-        )
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
@@ -2643,11 +2624,6 @@ class TestApplyAsCompany:
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
-
-        assert job_application.resume_link == (
-            f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{storages['public'].location}"
-            "/resume/11111111-1111-1111-1111-111111111111.pdf"
-        )
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
 
         assert f"job_application-{company.pk}" not in client.session
@@ -3134,7 +3110,6 @@ class TestDirectHireFullProcess:
         assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume_link == ""
         assert job_application.resume is None
 
         # Get application detail
@@ -3292,7 +3267,6 @@ class TestDirectHireFullProcess:
         assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume_link == ""
         assert job_application.resume is None
         assert job_application.qualification_type == QualificationType.STATE_DIPLOMA
         assert job_application.qualification_level == QualificationLevel.LEVEL_4
@@ -5488,7 +5462,6 @@ class TestHireConfirmation:
         assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume_link == ""
         assert job_application.resume is None
 
         assert apply_session.name not in client.session
@@ -5580,7 +5553,6 @@ class TestHireConfirmation:
         assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume_link == ""
         assert job_application.resume is None
 
         assert apply_session.name not in client.session
@@ -5640,7 +5612,6 @@ class TestHireConfirmation:
         assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume_link == ""
         assert job_application.resume is None
 
         assert apply_session.name not in client.session

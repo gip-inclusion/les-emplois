@@ -41,7 +41,7 @@ Candidature chez {{ job_application.to_company.display_name }} envoyée avec suc
 - Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate %}
 - Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}{% endif %}
-{% if job_application.resume_link %}
+{% if job_application.resume_id %}
 - CV en ligne : {{ job_application.resume_link }}
 {% endif %}
 

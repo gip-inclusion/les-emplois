@@ -7,8 +7,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.storage import storages
-from django.core.management import call_command
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.test import RequestFactory
@@ -25,7 +23,6 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition, EmployeeRecordTransitionLog
-from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
@@ -2133,7 +2130,6 @@ class TestJobApplicationAdminForm:
             "eligibility_diagnosis",
             "geiq_eligibility_diagnosis",
             "create_employee_record",
-            "resume_link",
             "resume",
             "sender",
             "sender_kind",
@@ -2342,32 +2338,3 @@ class TestJobApplicationsEnums:
             assert len(reasons) > 0
             with subtests.test(choice.label):
                 assert choice.value not in reasons
-
-
-def test_fill_resume_command(pdf_file):
-    job_app_1 = JobApplicationFactory(with_file=pdf_file)
-    job_app_1.resume = None
-    job_app_1.save()
-    job_app_2 = JobApplicationFactory(resume_link=job_app_1.resume_link, resume=None)
-    existing_file = File.objects.get()
-    public_storage = storages["public"]
-
-    assert JobApplication.objects.filter(resume__isnull=True).count() == 2
-    assert File.objects.count() == 1
-
-    # Filling job_app_1
-    call_command("fill_resume", batch_size=1)
-    assert JobApplication.objects.filter(resume__isnull=True).count() == 1
-    assert File.objects.count() == 1
-    job_app_1.refresh_from_db()
-    assert job_app_1.resume == existing_file
-    assert job_app_1.resume_link == public_storage.url(existing_file.key)
-
-    # Filling job_app_2
-    call_command("fill_resume", batch_size=1)
-    assert JobApplication.objects.filter(resume__isnull=True).count() == 0
-    assert File.objects.count() == 2
-    new_file = File.objects.exclude(key=existing_file.key).get()
-    job_app_2.refresh_from_db()
-    assert job_app_2.resume == new_file
-    assert job_app_2.resume_link == public_storage.url(new_file.key)

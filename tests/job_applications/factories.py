@@ -116,7 +116,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
     resume = factory.SubFactory(FileFactory)
-    resume_link = factory.LazyAttribute(lambda o: storages["public"].url(o.resume.key) if o.resume else "")
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
     eligibility_diagnosis = factory.SubFactory(
