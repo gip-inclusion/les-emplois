@@ -118,12 +118,12 @@ class TransferJobApplicationForm(SubmitJobApplicationForm):
     def __init__(self, company, user, auto_prescription_process, *args, original_job_application, **kwargs):
         super().__init__(company, user, auto_prescription_process, *args, **kwargs)
         self.original_job_application = original_job_application
-        if self.original_job_application.resume_link:
+        if self.original_job_application.resume_id:
             self.fields["resume"].label = "Joindre un nouveau Curriculum Vitae (CV)"
 
     def clean_keep_original_resume(self):
         value = self.cleaned_data.get("keep_original_resume")
-        if self.original_job_application.resume_link and value is None:
+        if self.original_job_application.resume_id and value is None:
             raise forms.ValidationError("Ce champ est obligatoire.")
         return value
 

@@ -170,7 +170,7 @@ class TestJobApplicationSearchApi:
         assert response.status_code == 429
 
     @freeze_time("2025-02-14")
-    def test_serialized_data(self, api_client, snapshot):
+    def test_serialized_data(self, api_client, snapshot, mocker):
         api_client.force_authenticate(ServiceAccount(), self.token)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -180,10 +180,13 @@ class TestJobApplicationSearchApi:
             sender_prescriber_organization__for_snapshot=True,
             sender_prescriber_organization__membership__user__for_snapshot=True,
             hired_job__for_snapshot=True,
-            resume_link="https://server.com/rockie-balboa.pdf",
         )
         job_application.selected_jobs.set({job_application.hired_job})
 
+        mocker.patch(
+            "itou.job_applications.models.JobApplication.resume_link",
+            "https://server.com/rockie-balboa.pdf",
+        )
         response = api_client.post(
             self.ENDPOINT_URL,
             {

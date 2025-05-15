@@ -146,7 +146,7 @@ class TestProcessViews:
         """Display the details of a job application coming from the approval detail page."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, resume_link="", with_approval=True
+            sent_by_authorized_prescriber_organisation=True, resume=None, with_approval=True
         )
         company = job_application.to_company
         employer = company.members.first()
@@ -201,18 +201,17 @@ class TestProcessViews:
         assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
-        resume_link = "https://server.com/sylvester-stallone.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
+        job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
-        assertContains(response, resume_link)
+        assertContains(response, job_application.resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
     def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, resume_link="", with_approval=True
+            sent_by_authorized_prescriber_organisation=True, resume=None, with_approval=True
         )
         company = job_application.to_company
         employer = company.members.first()
@@ -265,11 +264,10 @@ class TestProcessViews:
         assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
-        resume_link = "https://server.com/sylvester-stallone.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
+        job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
-        assertContains(response, resume_link)
+        assertContains(response, job_application.resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
     def test_details_for_company_with_expired_approval(self, client, subtests):
@@ -420,7 +418,7 @@ class TestProcessViews:
         appelation = Appellation.objects.first()
         job_application = JobApplicationFactory(
             with_approval=True,
-            resume_link="",
+            resume=None,
             sent_by_authorized_prescriber_organisation=True,
             selected_jobs=[appelation],
         )
@@ -1601,7 +1599,7 @@ class TestProcessViews:
         assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez pas annuler cette embauche.")])
 
     def test_diagoriente_section_as_job_seeker(self, client):
-        job_application = JobApplicationFactory(with_approval=True, resume_link="")
+        job_application = JobApplicationFactory(with_approval=True, resume=None)
 
         client.force_login(job_application.job_seeker)
         response = client.get(
@@ -1617,7 +1615,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
-            resume_link="",
+            resume=None,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
         client.force_login(prescriber)
@@ -1659,7 +1657,6 @@ class TestProcessViews:
     def test_diagoriente_section_as_employee_for_prescriber(self, client):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            resume_link="https://myresume.com/me",
         )
         company = job_application.to_company
         employee = company.members.first()
@@ -1670,8 +1667,8 @@ class TestProcessViews:
         assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
         # Unset resume on job application, should now include Diagoriente section
-        job_application.resume_link = ""
-        job_application.save(update_fields=["resume_link", "updated_at"])
+        job_application.resume = None
+        job_application.save(update_fields=["resume", "updated_at"])
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
@@ -1683,7 +1680,6 @@ class TestProcessViews:
     def test_diagoriente_section_as_employee_for_job_seeker(self, client):
         job_application = JobApplicationFactory(
             with_approval=True,
-            resume_link="https://myresume.com/me",
             sender=factory.SelfAttribute(".job_seeker"),
         )
         company = job_application.to_company
@@ -1695,8 +1691,8 @@ class TestProcessViews:
         assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
         # Unset resume on job application, should now include Diagoriente section
-        job_application.resume_link = ""
-        job_application.save(update_fields=["resume_link", "updated_at"])
+        job_application.resume = None
+        job_application.save(update_fields=["resume", "updated_at"])
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
@@ -1706,7 +1702,7 @@ class TestProcessViews:
         assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
     def test_diagoriente_invite_as_job_seeker(self, client, mailoutbox):
-        job_application = JobApplicationFactory(with_approval=True, resume_link="")
+        job_application = JobApplicationFactory(with_approval=True, resume=None)
 
         client.force_login(job_application.job_seeker)
         response = client.post(
@@ -1719,7 +1715,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
-            resume_link="",
+            resume=None,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
@@ -1732,10 +1728,7 @@ class TestProcessViews:
 
     def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, client, mailoutbox):
         with freeze_time("2023-12-12 13:37:00") as frozen_time:
-            job_application = JobApplicationFactory(
-                sent_by_authorized_prescriber_organisation=True,
-                resume_link="https://myresume.com/me",
-            )
+            job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
             company = job_application.to_company
             employee = company.members.first()
             client.force_login(employee)
@@ -1757,8 +1750,8 @@ class TestProcessViews:
             assert len(mailoutbox) == 0
 
             # Unset resume, should now update the timestamp and send the mail
-            job_application.resume_link = ""
-            job_application.save(update_fields=["resume_link", "updated_at"])
+            job_application.resume = None
+            job_application.save(update_fields=["resume", "updated_at"])
             frozen_time.tick()
             initial_invite_time = frozen_time()
             response = client.post(
@@ -1812,7 +1805,7 @@ class TestProcessViews:
             assert len(mailoutbox) == 1
 
     def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self, client, mailoutbox):
-        job_application = JobApplicationFactory(resume_link="")
+        job_application = JobApplicationFactory(resume=None)
         company = job_application.to_company
         employee = company.members.first()
         client.force_login(employee)
@@ -1854,7 +1847,7 @@ class TestProcessViews:
     def test_diagoriente_invite_as_employee_for_job_seeker(self, client, mailoutbox):
         job_application = JobApplicationFactory(
             with_approval=True,
-            resume_link="",
+            resume=None,
             sender=factory.SelfAttribute(".job_seeker"),
         )
         company = job_application.to_company

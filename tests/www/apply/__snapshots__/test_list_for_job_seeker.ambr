@@ -267,7 +267,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -609,9 +608,9 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
-                   50,
+                   49,
+                   52,
                    53,
-                   54,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -853,7 +852,6 @@
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
                  "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
                  "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
                  "job_applications_jobapplication"."resume_id",
                  "job_applications_jobapplication"."sender_id",
                  "job_applications_jobapplication"."sender_kind",
@@ -1167,8 +1165,8 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   49,
                    50,
-                   51,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",

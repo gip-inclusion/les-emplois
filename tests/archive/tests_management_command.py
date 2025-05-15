@@ -579,7 +579,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                     "to_company__romes": ["N1102"],
                     "state": JobApplicationState.REFUSED,
                     "refusal_reason": "reason",
-                    "resume_link": "",
+                    "resume": None,
                 },
                 False,
                 1,

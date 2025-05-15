@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import storages
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
@@ -735,13 +734,8 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
         new_job_application = super().form_valid()
         self.job_application.external_transfer(target_company=self.company, user=self.request.user)
         if self.form.cleaned_data.get("keep_original_resume"):
-            if self.job_application.resume:
-                new_job_application.resume = self.job_application.resume.copy()
-                public_storage = storages["public"]
-                new_job_application.resume_link = public_storage.url(new_job_application.resume.key)
-            else:
-                new_job_application.resume_link = self.job_application.resume_link
-            new_job_application.save(update_fields={"resume_link", "resume", "updated_at"})
+            new_job_application.resume = self.job_application.resume.copy()
+            new_job_application.save(update_fields={"resume", "updated_at"})
         return new_job_application
 
     def get_next_url(self, job_application):
@@ -811,7 +805,7 @@ def send_diagoriente_invite(request, job_application_id):
     """
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset.select_for_update(), pk=job_application_id)
-    if not job_application.resume_link and not job_application.diagoriente_invite_sent_at:
+    if not job_application.resume_id and not job_application.diagoriente_invite_sent_at:
         if job_application.is_sent_by_proxy:
             job_application.email_diagoriente_invite_for_prescriber.send()
         else:
