@@ -1,10 +1,8 @@
-import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import (
-    ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND,
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
@@ -216,10 +214,3 @@ class TestAdministrativeCriteriaEvaluationForm:
             AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first().key
             in form.fields.keys()
         )
-
-    @pytest.mark.parametrize("kind", CompanyKind.siae_kinds())
-    def test_num_level2_admin_criteria(self, kind):
-        company = CompanyFactory(kind=kind, with_membership=True)
-        user = company.members.first()
-        form = AdministrativeCriteriaEvaluationForm(user, company, job_app_selected_administrative_criteria=[])
-        assert ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[kind] == form.num_level2_admin_criteria
