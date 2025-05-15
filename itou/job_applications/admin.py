@@ -112,6 +112,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "approval",
         "transferred_by",
         "transferred_from",
+        "resume",
     )
     list_filter = (
         ManualApprovalDeliveryRequiredFilter,
@@ -150,6 +151,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "job_seeker",
                     "to_company",
                     "message",
+                    "resume",
                     "refusal_reason",
                     "answer",
                     "answer_to_prescriber",
