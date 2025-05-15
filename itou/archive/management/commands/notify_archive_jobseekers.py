@@ -107,7 +107,7 @@ def anonymized_jobapplication(obj):
             if obj.last_transition_at
             else get_year_month_or_none(obj.created_at)
         ),
-        had_resume=obj.resume_link is not None,
+        had_resume=bool(obj.resume_id),
         origin=obj.origin,
         state=obj.state,
         refusal_reason=obj.refusal_reason,

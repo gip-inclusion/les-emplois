@@ -236,7 +236,7 @@
       'company_has_convention': True,
       'company_kind': 'OPCS',
       'company_naf': '4567A',
-      'had_resume': True,
+      'had_resume': False,
       'has_been_transferred': False,
       'has_diagoriente_invitation': False,
       'hiring_contract_nature': None,
