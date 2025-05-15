@@ -546,7 +546,7 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__created_by=factory.SelfAttribute("..author"),
             eligibility_diagnosis__job_seeker__title=Title.M,
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
-            eligibility_diagnosis__job_seeker__born_in_france=True,
+            eligibility_diagnosis__job_seeker__certifiable=True,
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
             certified=True,
         )
