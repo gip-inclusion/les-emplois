@@ -26,8 +26,8 @@ from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
+    AdministrativeCriteriaOfJobApplicationForm,
     InstitutionEvaluatedSiaeNotifyStep1Form,
     InstitutionEvaluatedSiaeNotifyStep2Form,
     InstitutionEvaluatedSiaeNotifyStep3Form,

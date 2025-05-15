@@ -9,7 +9,8 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.siae_evaluations_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory

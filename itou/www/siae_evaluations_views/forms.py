@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from itou.eligibility.enums import ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND
 from itou.files.forms import ItouFileField
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import (
@@ -15,6 +16,7 @@ from itou.utils.constants import MB
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 class SetChosenPercentForm(forms.ModelForm):
@@ -33,6 +35,21 @@ class SetChosenPercentForm(forms.ModelForm):
                 }
             )
         }
+
+
+class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
+    def get_administrative_criteria(self):
+        return [
+            e.administrative_criteria
+            for e in self.job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
+                "administrative_criteria"
+            )
+        ]
+
+    def __init__(self, user, siae, job_application, **kwargs):
+        self.job_application = job_application
+        super().__init__(user, siae, **kwargs)
+        self.num_level2_admin_criteria = ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[siae.kind]
 
 
 class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.Form):
