@@ -550,7 +550,10 @@ def siae_select_criteria(
 ):
     siae = get_current_company_or_404(request)
     evaluated_job_application = get_object_or_404(
-        EvaluatedJobApplication,
+        EvaluatedJobApplication.objects.select_related("job_application__eligibility_diagnosis").prefetch_related(
+            "job_application__eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "evaluated_administrative_criteria__administrative_criteria",
+        ),
         pk=evaluated_job_application_pk,
         evaluated_siae__siae=siae,
         evaluated_siae__evaluation_campaign__ended_at__isnull=True,
@@ -560,6 +563,8 @@ def siae_select_criteria(
         == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
     ):
         return HttpResponseForbidden()
+    eligibility_diagnosis = evaluated_job_application.job_application.eligibility_diagnosis
+    job_application_administrative_criteria = eligibility_diagnosis.selected_administrative_criteria.all()
     initial_data = {
         eval_criterion.administrative_criteria.key: True
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
@@ -568,7 +573,7 @@ def siae_select_criteria(
     form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
         request.user,
         siae=siae,
-        job_application=evaluated_job_application.job_application,
+        job_app_selected_administrative_criteria=job_application_administrative_criteria,
         data=request.POST or None,
         initial=initial_data,
     )
