@@ -391,17 +391,6 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
-    # TODO(ewen): to be removed in favor of job_seekers_views/views.py::JobSeekerForSenderBaseView
-    def redirect_to_check_infos(self, job_seeker_public_id):
-        view_name = (
-            "job_seekers_views:check_job_seeker_info_for_hire"
-            if self.hire_process
-            else "job_seekers_views:check_job_seeker_info"
-        )
-        return HttpResponseRedirect(
-            reverse(view_name, kwargs=self.get_base_kwargs() | {"job_seeker_public_id": job_seeker_public_id})
-        )
-
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
