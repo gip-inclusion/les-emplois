@@ -251,7 +251,7 @@ class RequireApplySessionMixin:
         }
 
     def get_base_kwargs(self):
-        return {"company_pk": self.company.pk}
+        return {"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
 
 
 class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
@@ -316,10 +316,7 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def get_eligibility_step_url(self):
         if self.company.kind == CompanyKind.GEIQ and self.request.from_authorized_prescriber:
-            return reverse(
-                "apply:application_geiq_eligibility",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            )
+            return reverse("apply:application_geiq_eligibility", kwargs=self.get_base_kwargs())
         if self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis if the SIAE doesn't need it
@@ -330,18 +327,12 @@ class ApplicationBaseView(ApplyStepBaseView):
                 self.job_seeker.has_valid_approval,
             ]
             if not any(bypass_eligibility_conditions):
-                return reverse(
-                    "apply:application_eligibility",
-                    kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-                )
+                return reverse("apply:application_eligibility", kwargs=self.get_base_kwargs())
         return None
 
     def get_eligibility_for_hire_step_url(self):
         if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
-            return reverse(
-                "apply:geiq_eligibility_for_hire",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            )
+            return reverse("apply:geiq_eligibility_for_hire", kwargs=self.get_base_kwargs())
 
         bypass_eligibility_conditions = [
             # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
@@ -352,10 +343,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             self.eligibility_diagnosis,
         ]
         if not any(bypass_eligibility_conditions):
-            return reverse(
-                "apply:eligibility_for_hire",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            )
+            return reverse("apply:eligibility_for_hire", kwargs=self.get_base_kwargs())
 
         return None
 
@@ -419,12 +407,11 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_confirmation",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+                "apply:hire_confirmation", kwargs=self.get_base_kwargs()
             )
         else:
             view_name = "apply:application_jobs"
-        return reverse(view_name, kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id})
+        return reverse(view_name, kwargs=self.get_base_kwargs())
 
     def get(self, request, *args, **kwargs):
         if not self.get_previous_applications_queryset().exists():
@@ -465,10 +452,7 @@ class ApplicationJobsView(ApplicationBaseView):
         )
 
     def get_next_url(self):
-        return self.get_eligibility_step_url() or reverse(
-            "apply:application_resume",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return self.get_eligibility_step_url() or reverse("apply:application_resume", kwargs=self.get_base_kwargs())
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
@@ -489,10 +473,7 @@ class ApplicationJobsView(ApplicationBaseView):
 
 class CheckApplySessionMixin:
     def get_redirect_url(self):
-        return reverse(
-            "apply:application_jobs",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:application_jobs", kwargs=self.get_base_kwargs())
 
     def dispatch(self, request, *args, **kwargs):
         # Application must not be blocked by the employer at time of access
@@ -541,10 +522,7 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
         )
 
     def get_next_url(self):
-        return reverse(
-            "apply:application_resume",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:application_resume", kwargs=self.get_base_kwargs())
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_eligibility_step_url() is None:
@@ -576,10 +554,7 @@ class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
         context["form"] = self.form
         context["progress"] = 50
         context["job_seeker"] = self.job_seeker
-        context["back_url"] = reverse(
-            "apply:application_jobs",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        context["back_url"] = reverse("apply:application_jobs", kwargs=self.get_base_kwargs())
         context["full_content_width"] = True
         if self.eligibility_diagnosis:
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
@@ -606,18 +581,12 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 if self.geiq_eligibility_diagnosis
                 else []
             ),
-            form_url=reverse(
-                "apply:application_geiq_eligibility",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            ),
+            form_url=reverse("apply:application_geiq_eligibility", kwargs=self.get_base_kwargs()),
             data=request.POST or None,
         )
 
     def get_next_url(self):
-        return reverse(
-            "apply:application_resume",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:application_resume", kwargs=self.get_base_kwargs())
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_eligibility_step_url() is None:
@@ -627,10 +596,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
     def get_context_data(self, **kwargs):
         geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
         return super().get_context_data(**kwargs) | {
-            "back_url": reverse(
-                "apply:application_jobs",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            ),
+            "back_url": reverse("apply:application_jobs", kwargs=self.get_base_kwargs()),
             "form": self.form,
             "full_content_width": True,
             "geo_criteria_detected": geo_criteria_detected,
@@ -743,10 +709,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_back_url(self):
-        return self.get_eligibility_step_url() or reverse(
-            "apply:application_jobs",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return self.get_eligibility_step_url() or reverse("apply:application_jobs", kwargs=self.get_base_kwargs())
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -811,16 +774,10 @@ class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibi
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse(
-            "apply:hire_confirmation",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:hire_confirmation", kwargs=self.get_base_kwargs())
 
     def get_cancel_url(self):
-        return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs=self.get_base_kwargs())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -835,8 +792,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         super().setup(request, *args, **kwargs)
 
         self.geiq_eligibility_criteria_url = reverse(
-            "apply:geiq_eligibility_criteria_for_hire",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            "apply:geiq_eligibility_criteria_for_hire", kwargs=self.get_base_kwargs()
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -845,16 +801,10 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse(
-            "apply:hire_confirmation",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:hire_confirmation", kwargs=self.get_base_kwargs())
 
     def get_back_url(self):
-        return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs=self.get_base_kwargs())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -879,8 +829,7 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
 
     def get_back_url(self):
         return self.get_eligibility_for_hire_step_url() or reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs=self.get_base_kwargs()
         )
 
     def get_error_url(self):

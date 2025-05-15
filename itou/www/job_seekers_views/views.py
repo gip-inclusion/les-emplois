@@ -302,8 +302,9 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
-    def get_apply_kwargs(self):
-        return self.job_seeker_session.get("apply", {})
+    def get_apply_kwargs(self, job_seeker):
+        apply_data = self.job_seeker_session.get("apply", {})
+        return apply_data | {"job_seeker_public_id": job_seeker.public_id}
 
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
@@ -317,7 +318,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-        kwargs = self.get_apply_kwargs() | {"job_seeker_public_id": job_seeker.public_id}
+        kwargs = self.get_apply_kwargs(job_seeker)
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -391,10 +392,10 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
         if self.job_seeker.jobseeker_profile.nir:
+            # get_apply_kwargs requires the job_seeker_session
             next_url = reverse(
-                "job_seekers_views:check_job_seeker_info",
-                kwargs=self.get_apply_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            )  # get_apply_kwargs requires the job_seeker_session
+                "job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker)
+            )
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
             self.job_seeker_session.delete()
@@ -403,10 +404,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        next_url = reverse(
-            "job_seekers_views:check_job_seeker_info",
-            kwargs=self.get_apply_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker))
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
@@ -1190,10 +1188,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
 
     def get_redirect_url(self):
-        return reverse(
-            "apply:step_check_prev_applications",
-            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-        )
+        return reverse("apply:step_check_prev_applications", kwargs=self.get_base_kwargs())
 
     def get(self, request, *args, **kwargs):
         # Check required info that will allow us to find a pre-existing approval.
@@ -1234,8 +1229,5 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
-            "next_url": reverse(
-                "apply:check_prev_applications_for_hire",
-                kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
-            ),
+            "next_url": reverse("apply:check_prev_applications_for_hire", kwargs=self.get_base_kwargs()),
         }
