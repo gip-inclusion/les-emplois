@@ -419,31 +419,46 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
-def accept(request, job_application_id, template_name="apply/process_accept.html"):
-    """
-    Trigger the `accept` transition.
-    """
-    queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
-        "job_seeker", "job_seeker__jobseeker_profile"
-    )
-    job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
-    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required():
-        messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
-        return HttpResponseRedirect(next_url)
+class AcceptView(common_views.BaseAcceptView):
+    template_name = "apply/process_accept.html"
 
-    return common_views._accept(
-        request,
-        job_application.to_company,
-        job_application.job_seeker,
-        error_url=next_url,
-        back_url=next_url,
-        template_name=template_name,
-        extra_context={},
-        job_application=job_application,
-    )
+    def setup(self, request, job_application_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
+            "job_seeker", "job_seeker__jobseeker_profile", "to_company"
+        )
+        self.job_application = get_object_or_404(queryset, id=job_application_id)
+        check_waiting_period(self.job_application)
+
+        self.company = self.job_application.to_company
+        self.job_seeker = self.job_application.job_seeker
+
+        self.next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})
+
+        if self.company.is_subject_to_eligibility_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                job_seeker=self.job_seeker, for_siae=self.company
+            )
+        elif self.company.kind == CompanyKind.GEIQ:
+            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                job_seeker=self.job_seeker, for_geiq=self.company
+            ).first()
+
+    def dispatch(self, request, *args, **kwargs):
+        if (
+            not self.job_application.hiring_without_approval
+            and self.job_application.eligibility_diagnosis_by_siae_required()
+        ):
+            messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
+            return HttpResponseRedirect(self.next_url)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_back_url(self):
+        return self.next_url
+
+    def get_error_url(self):
+        return self.next_url
 
 
 class AcceptHTMXFragmentView(UserPassesTestMixin, TemplateView):

@@ -22,7 +22,6 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.auth import check_user
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
@@ -881,68 +880,46 @@ class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGE
     pass
 
 
-@check_user(lambda user: user.is_employer)
-def hire_confirmation(
-    request,
-    company_pk,
-    job_seeker_public_id,
-    template_name="apply/submit/hire_confirmation.html",
-):
-    # RequireApplySessionMixin
-    apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, f"job_application-{company_pk}")
-    if not apply_session.exists():
-        raise Http404
+class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
+    template_name = "apply/submit/hire_confirmation.html"
 
-    company = get_object_or_404(
-        Company.objects.filter(pk__in={org.pk for org in request.organizations}), pk=company_pk
-    )
-    job_seeker = get_object_or_404(
-        User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
-        public_id=job_seeker_public_id,
-    )
-    if company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = (
-            GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company)
-            .prefetch_related("selected_administrative_criteria__administrative_criteria")
-            .first()
-        )
-        if geiq_eligibility_diagnosis:
-            geiq_eligibility_diagnosis.criteria_display = geiq_eligibility_diagnosis.get_criteria_display_qs()
-        eligibility_diagnosis = None
+    def setup(self, request, *args, **kwargs):
+        self.job_application = None
+        return super().setup(request, *args, **kwargs)
 
-    else:
-        _check_job_seeker_approval(request, job_seeker, company)
-        # General IAE eligibility case
-        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker, for_siae=company, prefetch=["selected_administrative_criteria__administrative_criteria"]
-        )
-        if eligibility_diagnosis is not None:
-            # The job_seeker object already contains a lot of information: no need to re-retrieve it
-            eligibility_diagnosis.job_seeker = job_seeker
-            eligibility_diagnosis.criteria_display = eligibility_diagnosis.get_criteria_display_qs()
-        geiq_eligibility_diagnosis = None
+    def clean_session(self):
+        self.apply_session.delete()
 
-    return common_views._accept(
-        request,
-        company,
-        job_seeker,
-        error_url=request.get_full_path(),
+    def get_back_url(self):
         # FIXME(alaurent) I doubt we should go back there...
-        back_url=reverse(
+        return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        ),
-        template_name=template_name,
-        extra_context={
-            "can_edit_personal_information": can_edit_personal_information(request, job_seeker),
-            "is_subject_to_eligibility_rules": company.is_subject_to_eligibility_rules,
-            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
-            "eligibility_diagnosis": eligibility_diagnosis,
-            "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
-            "is_subject_to_geiq_eligibility_rules": company.kind == CompanyKind.GEIQ,
-        },
-        session=apply_session,
-    )
+            kwargs=self.get_base_kwargs() | {"job_seeker_public_id": self.job_seeker.public_id},
+        )
+
+    def get_error_url(self):
+        return self.request.get_full_path()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.geiq_eligibility_diagnosis:
+            self.geiq_eligibility_diagnosis.criteria_display = (
+                self.geiq_eligibility_diagnosis.get_criteria_display_qs()
+            )
+        if self.eligibility_diagnosis:
+            # The job_seeker object already contains a lot of information: no need to re-retrieve it
+            self.eligibility_diagnosis.job_seeker = self.job_seeker
+            self.eligibility_diagnosis.criteria_display = self.eligibility_diagnosis.get_criteria_display_qs()
+
+        context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.job_seeker)
+        context["is_subject_to_eligibility_rules"] = self.company.is_subject_to_eligibility_rules
+        context["geiq_eligibility_diagnosis"] = self.geiq_eligibility_diagnosis
+        context["eligibility_diagnosis"] = self.eligibility_diagnosis
+        context["expired_eligibility_diagnosis"] = None  # XXX: should we search for an expired diagnosis here ?
+        context["is_subject_to_geiq_eligibility_rules"] = self.company.kind == CompanyKind.GEIQ
+
+        return context
 
 
 class ApplyForJobSeekerMixin:
