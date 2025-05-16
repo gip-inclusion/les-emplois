@@ -19,16 +19,18 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info" role="status">
-        <p class="mb-0">
-            {% if organization.kind == PrescriberOrganizationKind.FT %}
-                Affichage des informations en lecture seule. Si vous souhaitez modifier ces informations, merci de
-                <a href="{{ ITOU_HELP_CENTER_URL }}" class="has-external-link" target="_blank">contacter notre support technique</a>.
-            {% else %}
-                Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
-            {% endif %}
-        </p>
-    </div>
+    {% if organization.is_authorized %}
+        <div class="alert alert-info" role="status">
+            <p class="mb-0">
+                {% if organization.kind == PrescriberOrganizationKind.FT %}
+                    Affichage des informations en lecture seule. Si vous souhaitez modifier ces informations, merci de
+                    <a href="{{ ITOU_HELP_CENTER_URL }}" class="has-external-link" target="_blank">contacter notre support technique</a>.
+                {% else %}
+                    Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

@@ -249,6 +249,26 @@ class TestEditOrganization:
         assertion(response, '<label class="form-label" for="id_description">Description</label>', html=True)
 
     @pytest.mark.parametrize(
+        "factory,assertion",
+        [
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
+            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+        ],
+    )
+    def test_display_banner(self, client, factory, assertion):
+        organization = factory(
+            kind=FuzzyChoice(set(PrescriberOrganizationKind.values) - {PrescriberOrganizationKind.FT})
+        )
+        client.force_login(organization.members.first())
+        response = client.get(reverse("prescribers_views:edit_organization"))
+        assertion(
+            response,
+            """<p class="mb-0">Les coordonnées de contact de votre organisation sont visibles
+                par tous les utilisateurs connectés.</p>""",
+            html=True,
+        )
+
+    @pytest.mark.parametrize(
         "back_url,expected_redirect",
         [
             (reverse("dashboard:index"), reverse("dashboard:index")),
