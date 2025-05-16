@@ -55,6 +55,7 @@ class TestEmployeeRecord:
             employee_record_enums.Status.NEW,
             employee_record_enums.Status.REJECTED,
             employee_record_enums.Status.DISABLED,
+            employee_record_enums.Status.PROCESSED,
         ],
     )
     def test_tunnel_step_is_allowed_with_valid_status(self, status):
@@ -66,7 +67,6 @@ class TestEmployeeRecord:
         [
             employee_record_enums.Status.READY,
             employee_record_enums.Status.SENT,
-            employee_record_enums.Status.PROCESSED,
             employee_record_enums.Status.ARCHIVED,
         ],
     )

@@ -324,6 +324,15 @@ class TestCompanyModel:
         with pytest.raises(ValidationError):
             company.add_or_activate_membership(non_employer)
 
+    def test_siret_from_asp_source(self):
+        company = CompanyFactory(with_membership=True, source=Company.SOURCE_ASP)
+        antenna = CompanyFactory(
+            with_membership=True, convention=company.convention, source=Company.SOURCE_USER_CREATED
+        )
+
+        assert company.siret != antenna.siret
+        assert antenna.siret_from_asp_source() == company.siret
+
 
 class TestCompanyQuerySet:
     def test_with_count_recent_received_job_applications(self):

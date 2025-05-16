@@ -1,0 +1,10 @@
+<button class="btn {{ extra_class }} dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" aria-controls="sendBackRecordDropDown-{{ employee_record.pk }}">
+    Renvoyer cette fiche salarié
+</button>
+<div class="dropdown-menu" id="sendBackRecordDropDown-{{ employee_record.pk }}">
+    <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.pk %}" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
+    </form>
+    <a class="dropdown-item" href="{% url "employee_record_views:create" employee_record.job_application.pk %}">Modifier et renvoyer</a>
+</div>

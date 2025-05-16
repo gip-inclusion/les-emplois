@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.utils.html import format_html
 
-from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
 from itou.utils.perms.company import get_current_company_or_404
@@ -19,11 +18,7 @@ def tunnel_step_is_allowed(job_application):
     if not employee_record:
         return True
 
-    return employee_record.status in [
-        Status.NEW,
-        Status.REJECTED,
-        Status.DISABLED,
-    ]
+    return employee_record.ready.is_available()
 
 
 def siae_is_allowed(job_application, siae):

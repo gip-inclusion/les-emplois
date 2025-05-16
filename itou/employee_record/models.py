@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Exists, F, Max, OuterRef
+from django.db.models import Exists, F, Max, OuterRef, Subquery
 from django.db.models.functions import Greatest
 from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
@@ -119,7 +119,11 @@ class EmployeeRecordWorkflow(xwf_models.Workflow):
     CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
     CAN_BE_ARCHIVED_STATES = [Status.NEW, Status.READY, Status.REJECTED, Status.PROCESSED, Status.DISABLED]
     transitions = (
-        (EmployeeRecordTransition.READY, [Status.NEW, Status.REJECTED, Status.DISABLED], Status.READY),
+        (
+            EmployeeRecordTransition.READY,
+            [Status.NEW, Status.REJECTED, Status.DISABLED, Status.PROCESSED],
+            Status.READY,
+        ),
         (EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE, Status.READY, Status.SENT),
         (EmployeeRecordTransition.REJECT, Status.SENT, Status.REJECTED),
         (EmployeeRecordTransition.PROCESS, Status.SENT, Status.PROCESSED),
@@ -188,6 +192,15 @@ class EmployeeRecordQuerySet(models.QuerySet):
             ),
         ).filter(
             last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
+        )
+
+    def with_siret_from_asp_source(self):
+        return self.annotate(
+            siret_from_asp_source=Subquery(
+                Company.objects.filter(
+                    source=Company.SOURCE_ASP, convention=OuterRef("job_application__to_company__convention")
+                ).values("siret")
+            )
         )
 
 
@@ -307,7 +320,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     def _fill_denormalized_fields(self):
         # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
-        self.siret = self.siret_from_asp_source(self.job_application.to_company)
+        self.siret = self.job_application.to_company.siret_from_asp_source()
         self.asp_id = self.job_application.to_company.convention.asp_id
         self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
@@ -466,14 +479,13 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
 
-    @staticmethod
-    def siret_from_asp_source(siae):
-        """
-        Fetch SIRET number of authoritative SIAE from ASP source
-        """
-        if siae.canonical_company.source == Company.SOURCE_ASP:
-            return siae.canonical_company.siret
-        raise ValidationError("Could not find authoritative SIAE from ASP source")
+    def has_siret_different_from_asp_source(self):
+        siret_from_asp_source = (
+            self.siret_from_asp_source
+            if hasattr(self, "siret_from_asp_source")
+            else self.job_application.to_company.siret_from_asp_source()
+        )
+        return self.siret != siret_from_asp_source
 
     @classmethod
     def from_job_application(cls, job_application, clean=True):

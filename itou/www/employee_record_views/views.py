@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Count
+from django.db.models import Count, F
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -254,7 +254,15 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         EmployeeRecordOrder.HIRING_START_AT_ASC: ("job_application__hiring_start_at",),
         EmployeeRecordOrder.HIRING_START_AT_DESC: ("-job_application__hiring_start_at",),
     }[order_by]
-    data = EmployeeRecord.objects.full_fetch().for_company(siae).order_by(*employee_record_order_by)
+    data = (
+        EmployeeRecord.objects.full_fetch()
+        .for_company(siae)
+        .with_siret_from_asp_source()
+        .order_by(*employee_record_order_by)
+    )
+    show_siret_has_changed_warning = (
+        data.filter(status=Status.PROCESSED).exclude(siret=F("siret_from_asp_source")).exists()
+    )
     if statuses := form.cleaned_data.get("status"):
         data = data.filter(status__in=[Status(value) for value in statuses])
     if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
@@ -279,6 +287,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "back_url": reverse("dashboard:index"),
         "num_rejected_employee_records": employee_record_badges.get(Status.REJECTED, 0),
         "num_recently_missing_employee_records": num_recently_missing_employee_records,
+        "show_siret_has_changed_warning": show_siret_has_changed_warning,
     }
 
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)
@@ -480,11 +489,16 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = job_application.employee_record.full_fetch().latest("created_at")
 
     if request.method == "POST" and not job_application.hiring_starts_in_future:
-        back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
+        previous_status = employee_record.status
+        back_url = f"{reverse('employee_record_views:list')}?status={previous_status}"
         employee_record.ready(user=request.user)
-        toast_title, toast_message = (
-            "La création de cette fiche salarié est terminée",
-            "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
+        toast_title = (
+            "La fiche salarié a été renvoyée"
+            if previous_status == Status.PROCESSED
+            else "La création de cette fiche salarié est terminée"
+        )
+        toast_message = (
+            "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts."
         )
         messages.success(
             request,

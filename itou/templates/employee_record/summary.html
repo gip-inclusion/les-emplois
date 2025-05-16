@@ -19,7 +19,71 @@
             </h1>
         {% endfragment %}
     {% endcomponent_title %}
+
+    {% if employee_record.status == "PROCESSED" and employee_record.has_siret_different_from_asp_source %}
+        <div class="alert alert-warning alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Incohérence de numéro SIRET détectée</strong>
+                    </p>
+                    <p class="mb-0">
+                        Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
+                        Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
+                        Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
+
+{% block title_extra %}
+    {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
+        <div class="c-box c-box--action">
+            <div class="form-row align-items-center gx-3">
+                {% if employee_record.status == "PROCESSED" %}
+                    <div class="form-group col-12 col-lg-auto">
+                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_class="btn-lg btn-white btn-block w-lg-auto" only %}
+                    </div>
+                {% elif employee_record.status == "NEW" %}
+                    <div class="form-group col-12 col-lg-auto">
+                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-lg btn-white btn-block btn-ico">
+                            <i class="ri-file-edit-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Compléter</span>
+                        </a>
+                    </div>
+                {% elif employee_record.status == "REJECTED" %}
+                    <div class="form-group col-12 col-lg-auto">
+                        <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED" class="btn btn-lg btn-white btn-block btn-ico">
+                            <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Modifier</span>
+                        </a>
+                    </div>
+                {% elif employee_record.status == "DISABLED" %}
+                    <div class="form-group col-12 col-lg-auto">
+                        <a href="{% url "employee_record_views:reactivate" employee_record.pk %}" class="btn btn-lg btn-white btn-block btn-ico">
+                            <i class="ri-reset-right-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Réactiver</span>
+                        </a>
+                    </div>
+                {% endif %}
+                {% if employee_record.disable.is_available %}
+                    <div class="form-group col-12 col-lg-auto">
+                        <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                            <i class="ri-file-close-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Désactiver</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock title_extra %}
 
 {% block content %}
     <section class="s-section">
@@ -29,20 +93,6 @@
                     <div class="c-box">{% include "employee_record/includes/employee_record_summary.html" %}</div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
-                    {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
-                        <div class="c-box mb-4">
-                            {% if employee_record.status == "NEW" %}
-                                <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-block btn-primary my-2">Compléter la fiche salarié</a>
-                            {% elif employee_record.status == "REJECTED" %}
-                                <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED" class="btn btn-block btn-primary my-2">Modifier la fiche salarié</a>
-                            {% elif employee_record.status == "DISABLED" %}
-                                <a href="{% url "employee_record_views:reactivate" employee_record.pk %}" class="btn btn-block btn-outline-primary my-2">Réactiver la fiche salarié</a>
-                            {% endif %}
-                            {% if employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}
-                                <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-block btn-outline-primary my-2">Désactiver la fiche salarié</a>
-                            {% endif %}
-                        </div>
-                    {% endif %}
                     <div class="c-box">
                         <p>
                             <b>PASS IAE :</b>

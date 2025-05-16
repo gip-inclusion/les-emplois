@@ -551,6 +551,14 @@ class Company(AddressMixin, OrganizationAbstract):
             f"{active_suspension_dates.lower:%d/%m/%Y} et le sera jusqu'au {active_suspension_dates.upper:%d/%m/%Y}."
         )
 
+    def siret_from_asp_source(self):
+        """
+        Fetch SIRET number of authoritative SIAE from ASP source
+        """
+        if self.canonical_company.source == Company.SOURCE_ASP:
+            return self.canonical_company.siret
+        raise ValidationError("Could not find authoritative SIAE from ASP source")
+
 
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
