@@ -1,12 +1,11 @@
 from django import forms
-from django.core.validators import MinLengthValidator, RegexValidator
+from django.core.validators import RegexValidator
 from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.enums import Status
 from itou.users.models import JobSeekerProfile
-from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
 
@@ -168,11 +167,6 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     """
 
     pole_emploi = forms.BooleanField(required=False, label="Inscrit à France Travail")
-    pole_emploi_id = forms.CharField(
-        label="Identifiant France Travail",
-        required=False,
-        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
-    )
 
     # A set of transient checkboxes used to collapse optional blocks
     rsa_allocation = forms.BooleanField(
@@ -207,6 +201,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         fields = [
             "education_level",
             "resourceless",
+            "pole_emploi_id",
             "pole_emploi_since",
             "unemployed_since",
             "rqth_employee",
@@ -233,7 +228,6 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
 
         # Pôle emploi (collapsible section)
         pole_emploi_id = self.instance.user.jobseeker_profile.pole_emploi_id
-
         if pole_emploi_id:
             self.initial["pole_emploi_id"] = pole_emploi_id
             self.initial["pole_emploi"] = True
@@ -249,16 +243,13 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         super().clean()
 
         # Pôle emploi
-        if self.instance.user.jobseeker_profile.pole_emploi_id:
+        if self.cleaned_data["pole_emploi"] or self.instance.user.jobseeker_profile.pole_emploi_id:
             if not self.cleaned_data["pole_emploi_since"]:
                 raise forms.ValidationError("La durée d'inscription à France Travail est obligatoire")
 
             if not self.cleaned_data.get("pole_emploi_id"):
                 # This field is validated and may not exist in `cleaned_data`
                 raise forms.ValidationError("L'identifiant France Travail est obligatoire")
-
-            self.instance.user.jobseeker_profile.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
-            self.instance.user.save()
         else:
             # Reset "inner" fields
             self.cleaned_data["pole_emploi_since"] = self.cleaned_data["pole_emploi_id"] = ""
