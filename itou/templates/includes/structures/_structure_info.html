@@ -10,10 +10,10 @@
          tabindex="0">
         <i class="ri-community-line" aria-hidden="true"></i>
         <div>
-            <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ company.get_kind_display }}">
-                {{ company.kind }}
+            <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ structure.get_kind_display }}">
+                {{ structure.kind }}
             </button>
-            <h3>{{ company.display_name }}</h3>
+            <h3>{{ structure.display_name }}</h3>
         </div>
     </div>
     <div class="c-box--structure__detail collapse{% if show|default:False %} show{% endif %}" id="collapseBoxStructure">
@@ -21,19 +21,19 @@
         <ul class="c-box--structure__list-contact">
             <li>
                 <i class="ri-map-pin-2-line fw-normal me-2" aria-hidden="true"></i>
-                <address class="m-0">{{ company.address_on_one_line }}</address>
-                {% include 'includes/copy_to_clipboard.html' with content=company.address_on_one_line css_classes="btn-link fw-medium ms-1" only_icon=True %}
+                <address class="m-0">{{ structure.address_on_one_line }}</address>
+                {% include 'includes/copy_to_clipboard.html' with content=structure.address_on_one_line css_classes="btn-link fw-medium ms-1" only_icon=True %}
             </li>
-            {% if company.email or company.phone or company.website %}
-                {% include "includes/structures/_structure_details.html" with company=company only %}
+            {% if structure.email or structure.phone or structure.website %}
+                {% include "includes/structures/_structure_details.html" with structure=structure only %}
             {% endif %}
         </ul>
         {% if show_cta %}
             {% if job_app_to_transfer|default:False %}
-                <a href="{% url 'apply:job_application_external_transfer_step_1_company_card' job_application_id=job_app_to_transfer company_pk=company.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}"
+                <a href="{% url 'apply:job_application_external_transfer_step_1_company_card' job_application_id=job_app_to_transfer company_pk=structure.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}"
                    class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
             {% else %}
-                {% url 'companies_views:card' siae_id=company.pk as company_url %}
+                {% url 'companies_views:card' siae_id=structure.pk as company_url %}
                 {% if back_url|default:'' and not open_in_tab|default:False %}
                     {% url_add_query company_url job_seeker_public_id=job_seeker.public_id|default:'' back_url=back_url as company_url_params %}
                 {% else %}
