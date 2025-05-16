@@ -13,7 +13,7 @@ from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector, SearchVectorField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.validators import MaxLengthValidator, MinLengthValidator, RegexValidator
+from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
 from django.db.models.functions import Greatest, Upper
@@ -961,9 +961,12 @@ class JobSeekerProfile(models.Model):
     # by user and by region…
     pole_emploi_id = models.CharField(
         verbose_name="identifiant France Travail",
-        help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
-        max_length=8,
-        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
+        help_text=(
+            "L’identifiant doit respecter l’un des deux formats autorisés :  "
+            "8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres."
+        ),
+        max_length=11,
+        validators=[validate_pole_emploi_id],
         blank=True,
     )
     lack_of_pole_emploi_id_reason = models.CharField(
