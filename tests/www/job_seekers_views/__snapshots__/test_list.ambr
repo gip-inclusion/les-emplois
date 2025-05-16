@@ -646,7 +646,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -784,6 +785,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -859,8 +861,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -943,6 +945,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1018,8 +1021,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -1100,7 +1103,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           WHERE ("prescribers_prescribermembership"."organization_id" = %s
@@ -1195,6 +1199,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1270,10 +1275,10 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 35 ASC,
+          ORDER BY 36 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
@@ -1672,7 +1677,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1818,6 +1824,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -1892,8 +1899,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -1975,6 +1982,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2049,8 +2057,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -2130,7 +2138,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           INNER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           WHERE ("prescribers_prescribermembership"."organization_id" = %s
@@ -2226,6 +2235,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "full_name",
                  COALESCE(
                             (SELECT COUNT(U0."id") AS "count"
@@ -2300,10 +2310,10 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   35,
                    36,
+                   37,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 35 ASC,
+          ORDER BY 36 ASC,
                    "users_user"."id" ASC
           LIMIT 3
         ''',

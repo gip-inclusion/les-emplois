@@ -386,6 +386,12 @@ class User(AbstractUser, AddressMixin):
         verbose_name="date de notification de l'archivage à venir", null=True, blank=True
     )
 
+    allow_next_sso_sub_update = models.BooleanField(
+        verbose_name="mise à jour SSO",
+        help_text="Autoriser la mise à jour du sub à la prochaine connexion",
+        db_default=False,
+    )
+
     objects = ItouUserManager()
 
     class Meta(AbstractUser.Meta):

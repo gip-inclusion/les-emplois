@@ -55,7 +55,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -206,7 +207,8 @@
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
                              "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at"
+                             "users_user"."upcoming_deletion_notified_at",
+                             "users_user"."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
@@ -301,7 +303,8 @@
                              T3."public_id",
                              T3."address_filled_at",
                              T3."first_login",
-                             T3."upcoming_deletion_notified_at"
+                             T3."upcoming_deletion_notified_at",
+                             T3."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T3 ON ("job_applications_jobapplication"."job_seeker_id" = T3."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
@@ -739,6 +742,7 @@
                  T5."address_filled_at",
                  T5."first_login",
                  T5."upcoming_deletion_notified_at",
+                 T5."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -812,6 +816,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",
@@ -1195,7 +1200,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1368,6 +1374,7 @@
                  T5."address_filled_at",
                  T5."first_login",
                  T5."upcoming_deletion_notified_at",
+                 T5."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -1441,6 +1448,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T8."id",
                  T8."address_line_1",
                  T8."address_line_2",
@@ -1769,6 +1777,7 @@
                  T3."address_filled_at",
                  T3."first_login",
                  T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1948,6 +1957,7 @@
                  T3."address_filled_at",
                  T3."first_login",
                  T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -3050,7 +3060,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3201,7 +3212,8 @@
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
                              "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at"
+                             "users_user"."upcoming_deletion_notified_at",
+                             "users_user"."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -3298,7 +3310,8 @@
                              T4."public_id",
                              T4."address_filled_at",
                              T4."first_login",
-                             T4."upcoming_deletion_notified_at"
+                             T4."upcoming_deletion_notified_at",
+                             T4."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -3744,6 +3757,7 @@
                  T6."address_filled_at",
                  T6."first_login",
                  T6."upcoming_deletion_notified_at",
+                 T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3817,6 +3831,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -4196,7 +4211,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4347,7 +4363,8 @@
                              "users_user"."public_id",
                              "users_user"."address_filled_at",
                              "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at"
+                             "users_user"."upcoming_deletion_notified_at",
+                             "users_user"."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -4444,7 +4461,8 @@
                              T4."public_id",
                              T4."address_filled_at",
                              T4."first_login",
-                             T4."upcoming_deletion_notified_at"
+                             T4."upcoming_deletion_notified_at",
+                             T4."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
           WHERE (("job_applications_jobapplication"."sender_id" = %s
@@ -4833,6 +4851,7 @@
                  T6."address_filled_at",
                  T6."first_login",
                  T6."upcoming_deletion_notified_at",
+                 T6."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -4906,6 +4925,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
