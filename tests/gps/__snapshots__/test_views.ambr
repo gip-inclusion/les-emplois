@@ -1652,7 +1652,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1777,7 +1778,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s,
                                       %s,
@@ -1868,6 +1870,7 @@
                  T6."address_filled_at",
                  T6."first_login",
                  T6."upcoming_deletion_notified_at",
+                 T6."allow_next_sso_sub_update",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1901,7 +1904,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "gps_followupgroupmembership"
           INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
@@ -1973,7 +1977,8 @@
                  "col47",
                  "col48",
                  "col49",
-                 "col50"
+                 "col50",
+                 "col51"
           FROM
             (SELECT *
              FROM
@@ -2029,7 +2034,8 @@
                        "users_user"."public_id" AS "col47",
                        "users_user"."address_filled_at" AS "col48",
                        "users_user"."first_login" AS "col49",
-                       "users_user"."upcoming_deletion_notified_at" AS "col50"
+                       "users_user"."upcoming_deletion_notified_at" AS "col50",
+                       "users_user"."allow_next_sso_sub_update" AS "col51"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
@@ -2325,7 +2331,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2450,7 +2457,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s)
           ORDER BY "users_user"."first_name" ASC,
@@ -2539,6 +2547,7 @@
                  T6."address_filled_at",
                  T6."first_login",
                  T6."upcoming_deletion_notified_at",
+                 T6."allow_next_sso_sub_update",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -2572,7 +2581,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "gps_followupgroupmembership"
           INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
@@ -2644,7 +2654,8 @@
                  "col47",
                  "col48",
                  "col49",
-                 "col50"
+                 "col50",
+                 "col51"
           FROM
             (SELECT *
              FROM
@@ -2700,7 +2711,8 @@
                        "users_user"."public_id" AS "col47",
                        "users_user"."address_filled_at" AS "col48",
                        "users_user"."first_login" AS "col49",
-                       "users_user"."upcoming_deletion_notified_at" AS "col50"
+                       "users_user"."upcoming_deletion_notified_at" AS "col50",
+                       "users_user"."allow_next_sso_sub_update" AS "col51"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
                 WHERE ("gps_followupgroupmembership"."is_referent"
