@@ -14,6 +14,7 @@ from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
     _PersonSerializer,
+    _SituationSerializer,
 )
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
@@ -276,3 +277,17 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
     data = EmployeeRecordUpdateNotificationSerializer(notification).data
     assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
     assert data["situationSalarie"] == snapshot(name="employee record update notification")
+
+
+@pytest.mark.parametrize("pole_emploi_id", ["1234567A", "12345678900", ""])
+def test_situation_salarie_serializer_pole_emploi_id(snapshot, pole_emploi_id):
+    pole_emploi_since = AllocationDuration.FROM_6_TO_11_MONTHS if pole_emploi_id else ""
+    employee_record = EmployeeRecordWithProfileFactory(
+        status=Status.PROCESSED,
+        job_application__job_seeker__for_snapshot=True,
+        job_application__job_seeker__jobseeker_profile__pole_emploi_id=pole_emploi_id,
+        job_application__job_seeker__jobseeker_profile__pole_emploi_since=pole_emploi_since,
+    )
+
+    data = _SituationSerializer(employee_record).data
+    assert data == snapshot
