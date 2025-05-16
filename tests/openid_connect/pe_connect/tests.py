@@ -326,13 +326,30 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
+        user = JobSeekerFactory(
             username="another_sub", email=peamu_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
         )
 
         # Test redirection and modal content
         response = mock_oauth_dance(client, expected_route="login:job_seeker")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
+        # If we allow the update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
+        assert user.username == peamu_user_data.username
+
+        # If we allow the update again, but the sub does change, we still disable allow_next_sso_sub_update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
 
     def test_logout_no_id_token(self, client):
         url = reverse("pe_connect:logout")

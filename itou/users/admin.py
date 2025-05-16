@@ -480,6 +480,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                         "kind",
                         "created_by",
                         "identity_provider",
+                        "allow_next_sso_sub_update",
                         "jobseeker_profile_link",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
