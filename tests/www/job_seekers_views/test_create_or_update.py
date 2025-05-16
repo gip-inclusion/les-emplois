@@ -137,13 +137,15 @@ class TestGetOrCreateForJobSeeker:
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url, {"back_url": reset_url})
+        response = client.get(start_url, {"back_url": reset_url})
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
+        response = client.get(next_url)
         assertContains(response, company.display_name)
         assertContains(
             response,
@@ -165,12 +167,15 @@ class TestGetOrCreateForJobSeeker:
 
         # Init session
         start_url = reverse("apply:start", kwargs={"company_pk": company.pk})
-        client.get(start_url)
+        response = client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER)
 
-        response = client.get(
-            reverse("job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name})
+        next_url = reverse(
+            "job_seekers_views:check_nir_for_job_seeker", kwargs={"session_uuid": job_seeker_session_name}
         )
+        assertRedirects(response, next_url, fetch_redirect_response=False)
+
+        response = client.get(next_url)
         assertRedirects(
             response,
             reverse(
