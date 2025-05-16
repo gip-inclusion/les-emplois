@@ -721,12 +721,9 @@ class User(AbstractUser, AddressMixin):
         """
         return (
             self.is_employer
-            and parent_siae.is_active
             and parent_siae.has_admin(self)
-            and (
-                parent_siae.kind == CompanyKind.GEIQ
-                or (parent_siae.should_have_convention and parent_siae.convention is not None)
-            )
+            and parent_siae.kind in [CompanyKind.GEIQ, *CompanyKind.siae_kinds()]
+            and parent_siae.is_active
         )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:
