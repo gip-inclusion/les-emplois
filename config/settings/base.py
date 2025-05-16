@@ -13,6 +13,7 @@ from botocore.config import Config
 from dotenv import load_dotenv
 
 from config.sentry import sentry_init
+from itou.pg_storage.storage import PostgresStorage
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
 
@@ -122,6 +123,7 @@ INSTALLED_APPS = [
     "itou.gps",
     "itou.rdv_insertion",
     "itou.archive",
+    "itou.pg_storage",
 ]
 
 # TODO: Remove with Django 6.0
@@ -506,7 +508,18 @@ HUEY = {
     "name": os.getenv("HUEY_QUEUE_NAME", DATABASES["default"]["NAME"]),
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{redis_url}/?db={redis_db}",
+    # "url": f"{redis_url}/?db={redis_db}",
+    "storage_class": PostgresStorage,
+    # "connection": {
+    #    "host": DATABASES["default"]["HOST"],
+    #    "port": DATABASES["default"]["PORT"],
+    #    "user": DATABASES["default"]["USER"],
+    #    "password": DATABASES["default"]["PASSWORD"],
+    #    "dbname": DATABASES["default"]["NAME"],
+    # },
+    "utc": True,  # use UTC timestamps
+    "blocking": True,  # use blocking dequeue until ready
+    "priority": True,  # use priority queue
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
