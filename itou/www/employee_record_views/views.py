@@ -380,6 +380,9 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     profile = job_seeker.jobseeker_profile
+    # We need to know if the user was registred, but the form will change the value of this instance
+    # even if it's not valid.
+    is_registered_to_pole_emploi = bool(profile.pole_emploi_id)
 
     if not profile.hexa_address_filled:
         raise PermissionDenied
@@ -418,7 +421,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     context = {
         "job_application": job_application,
         "form": form,
-        "is_registered_to_pole_emploi": bool(job_application.job_seeker.jobseeker_profile.pole_emploi_id),
+        "is_registered_to_pole_emploi": is_registered_to_pole_emploi,
         "steps": STEPS,
         "step": 3,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 3",
