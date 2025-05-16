@@ -110,6 +110,16 @@ class TestSummaryEmployeeRecords:
                     f"/employee_record/disable/{self.employee_record.pk}",
                     "/employee_record/disable/[Pk of EmployeeRecord]",
                 ),
+                (
+                    "id",
+                    f"sendBackRecordDropDown-{self.employee_record.pk}",
+                    "sendBackRecordDropDown-[Pk of EmployeeRecord]",
+                ),
+                (
+                    "aria-controls",
+                    f"sendBackRecordDropDown-{self.employee_record.pk}",
+                    "sendBackRecordDropDown-[Pk of EmployeeRecord]",
+                ),
             ],
         )
 

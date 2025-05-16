@@ -27,16 +27,7 @@
             <div class="form-row align-items-center gx-3">
                 {% if employee_record.status == "PROCESSED" %}
                     <div class="form-group col-12 col-lg-auto">
-                        <button id="send_back_button" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
-                            Renvoyer cette fiche salarié
-                        </button>
-                        <div class="dropdown-menu">
-                            <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.pk %}" class="js-prevent-multiple-submit">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
-                            </form>
-                            <a class="dropdown-item" href="{% url "employee_record_views:create" employee_record.job_application.pk %}">Modifier et renvoyer</a>
-                        </div>
+                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_class="btn-lg btn-white btn-block w-lg-auto" only %}
                     </div>
                 {% elif employee_record.status == "NEW" %}
                     <div class="form-group col-12 col-lg-auto">
