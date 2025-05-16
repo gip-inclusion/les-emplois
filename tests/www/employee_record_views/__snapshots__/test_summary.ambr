@@ -232,16 +232,17 @@
               <div class="form-row align-items-center gx-3">
                   
                       <div class="form-group col-12 col-lg-auto">
-                          <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="send_back_button" type="button">
-                              Renvoyer cette fiche salarié
-                          </button>
-                          <div class="dropdown-menu">
-                              <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
-                              </form>
-                              <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
-                          </div>
+                          <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" type="button">
+      Renvoyer cette fiche salarié
+  </button>
+  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
+          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
+      </form>
+      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
+  </div>
+  
                       </div>
                   
                   
