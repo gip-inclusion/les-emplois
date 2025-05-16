@@ -312,6 +312,7 @@ class GEIQSelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria)
     )
 
     class Meta:
+        ordering = ["administrative_criteria"]
         verbose_name = "critère administratif GEIQ sélectionné"
         verbose_name_plural = "critères administratifs GEIQ sélectionnés"
         unique_together = ("eligibility_diagnosis", "administrative_criteria")

@@ -1,15 +1,14 @@
-import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import (
-    ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND,
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.siae_evaluations_views.forms import AdministrativeCriteriaEvaluationForm
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
@@ -173,7 +172,7 @@ class TestAdministrativeCriteriaForm:
         assert AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data={}).is_valid()
 
 
-class TestAdministrativeCriteriaOfJobApplicationForm:
+class TestAdministrativeCriteriaEvaluationForm:
     def test_job_application(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -198,7 +197,13 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
 
-        form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
+        form = AdministrativeCriteriaEvaluationForm(
+            user,
+            company,
+            job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
+                "administrative_criteria"
+            ),
+        )
 
         assert 2 == len(form.fields)
         assert (
@@ -209,17 +214,3 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
             AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first().key
             in form.fields.keys()
         )
-
-    @pytest.mark.parametrize("kind", CompanyKind.siae_kinds())
-    def test_num_level2_admin_criteria(self, kind):
-        company = CompanyFactory(kind=kind, with_membership=True)
-        user = company.members.first()
-
-        job_application = JobApplicationFactory(
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            hiring_start_at=timezone.localdate() - relativedelta(months=2),
-        )
-        form = AdministrativeCriteriaOfJobApplicationForm(user, company, job_application=job_application)
-        assert ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[kind] == form.num_level2_admin_criteria

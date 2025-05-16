@@ -26,8 +26,8 @@ from itou.utils.emails import send_email_messages
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
+    AdministrativeCriteriaEvaluationForm,
     InstitutionEvaluatedSiaeNotifyStep1Form,
     InstitutionEvaluatedSiaeNotifyStep2Form,
     InstitutionEvaluatedSiaeNotifyStep3Form,
@@ -550,7 +550,10 @@ def siae_select_criteria(
 ):
     siae = get_current_company_or_404(request)
     evaluated_job_application = get_object_or_404(
-        EvaluatedJobApplication,
+        EvaluatedJobApplication.objects.select_related("job_application__eligibility_diagnosis").prefetch_related(
+            "job_application__eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "evaluated_administrative_criteria__administrative_criteria",
+        ),
         pk=evaluated_job_application_pk,
         evaluated_siae__siae=siae,
         evaluated_siae__evaluation_campaign__ended_at__isnull=True,
@@ -560,15 +563,17 @@ def siae_select_criteria(
         == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
     ):
         return HttpResponseForbidden()
+    eligibility_diagnosis = evaluated_job_application.job_application.eligibility_diagnosis
+    job_application_administrative_criteria = eligibility_diagnosis.selected_administrative_criteria.all()
     initial_data = {
         eval_criterion.administrative_criteria.key: True
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
     }
 
-    form_administrative_criteria = AdministrativeCriteriaOfJobApplicationForm(
+    form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
         request.user,
         siae=siae,
-        job_application=evaluated_job_application.job_application,
+        job_app_selected_administrative_criteria=job_application_administrative_criteria,
         data=request.POST or None,
         initial=initial_data,
     )
@@ -595,12 +600,12 @@ def siae_select_criteria(
     level_1_fields = [
         field
         for field in form_administrative_criteria
-        if AdministrativeCriteriaOfJobApplicationForm.LEVEL_1_PREFIX in field.name
+        if AdministrativeCriteriaEvaluationForm.LEVEL_1_PREFIX in field.name
     ]
     level_2_fields = [
         field
         for field in form_administrative_criteria
-        if AdministrativeCriteriaOfJobApplicationForm.LEVEL_2_PREFIX in field.name
+        if AdministrativeCriteriaEvaluationForm.LEVEL_2_PREFIX in field.name
     ]
 
     back_url = get_safe_url(request, "back_url", fallback_url=url)

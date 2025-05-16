@@ -31,16 +31,16 @@ class AdministrativeCriteriaForm(forms.Form):
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
-    def get_administrative_criteria(self):
-        return AdministrativeCriteria.objects.all()
-
-    def __init__(self, is_authorized_prescriber, siae, **kwargs):
+    def __init__(self, is_authorized_prescriber, siae, administrative_criteria=None, **kwargs):
         self.is_authorized_prescriber = is_authorized_prescriber
         self.siae = siae
         super().__init__(**kwargs)
 
         initial_administrative_criteria = self.initial.get("administrative_criteria", [])
-        for criterion in self.get_administrative_criteria():
+
+        if administrative_criteria is None:
+            administrative_criteria = AdministrativeCriteria.objects.all()
+        for criterion in administrative_criteria:
             key = criterion.key
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
@@ -71,17 +71,3 @@ class AdministrativeCriteriaForm(forms.Form):
             raise forms.ValidationError(message)
 
         return selected_objects
-
-
-class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
-    def get_administrative_criteria(self):
-        return AdministrativeCriteria.objects.for_job_application(self.job_application)
-
-    def __init__(self, user, siae, job_application, **kwargs):
-        self.job_application = job_application
-
-        self.siae = siae
-        self.num_level2_admin_criteria = eligibilty_enums.ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[
-            siae.kind
-        ]
-        super().__init__(user, siae, **kwargs)

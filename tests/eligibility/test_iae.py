@@ -17,7 +17,6 @@ from itou.eligibility.enums import (
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import (
     AbstractSelectedAdministrativeCriteria,
-    AdministrativeCriteriaQuerySet,
 )
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -34,7 +33,6 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
-from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -495,42 +493,6 @@ class TestAdministrativeCriteriaModel:
         qs = AdministrativeCriteria.objects.level2()
         assert level2_criterion in qs
         assert level1_criterion not in qs
-
-    def test_for_job_application(self):
-        company = CompanyFactory(department="14", with_membership=True)
-
-        job_seeker = JobSeekerFactory()
-        user = company.members.first()
-
-        criteria1 = AdministrativeCriteria.objects.get(
-            level=AdministrativeCriteriaLevel.LEVEL_1, kind=AdministrativeCriteriaKind.RSA
-        )
-        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
-        )
-
-        job_application1 = JobApplicationFactory(
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            eligibility_diagnosis=eligibility_diagnosis,
-            hiring_start_at=timezone.localdate() - relativedelta(months=2),
-        )
-
-        job_application2 = JobApplicationFactory(
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            hiring_start_at=timezone.localdate() - relativedelta(months=2),
-        )
-
-        assert isinstance(
-            AdministrativeCriteria.objects.for_job_application(job_application1), AdministrativeCriteriaQuerySet
-        )
-
-        assert 1 == AdministrativeCriteria.objects.for_job_application(job_application1).count()
-        assert criteria1 == AdministrativeCriteria.objects.for_job_application(job_application1).first()
-        assert 0 == AdministrativeCriteria.objects.for_job_application(job_application2).count()
 
     def test_key_property(self):
         criterion_level_1 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
