@@ -699,7 +699,7 @@ class TestEditUserInfoView:
             "birthdate": birthdate.isoformat(),
             "birth_place": birth_place.pk,
             "phone": user.phone,
-            "pole_emploi_id": "trop long",
+            "pole_emploi_id": "1234567890A",  # 11 chars with a letter : wrong format
             "lack_of_pole_emploi_id_reason": "",
             "address_line_1": "10 rue du Gué",
             "address_line_2": "Sous l'escalier",
@@ -711,25 +711,7 @@ class TestEditUserInfoView:
         response = client.post(url, data=post_data)
         assert response.status_code == 200
         assertFormError(
-            response.context["form"],
-            "pole_emploi_id",
-            "Assurez-vous que cette valeur comporte au plus 8 caractères (actuellement 9).",
-        )
-        assertFormError(
-            response.context["form"],
-            None,
-            "Renseignez soit un identifiant France Travail, soit la raison de son absence.",
-        )
-        post_data["pole_emploi_id"] = "invalide"  # No length issue but validate_pole_emploi_id shouldn't be happy
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assertFormError(
-            response.context["form"],
-            "pole_emploi_id",
-            (
-                "L'identifiant France Travail doit être composé de 8 caractères : "
-                "7 chiffres suivis d'une 1 lettre ou d'un chiffre."
-            ),
+            response.context["form"], "pole_emploi_id", "Le format de l’identifiant France Travail est invalide."
         )
 
     def test_edit_as_prescriber_PC(self, client):
