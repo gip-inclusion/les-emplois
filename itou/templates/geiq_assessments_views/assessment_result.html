@@ -1,0 +1,115 @@
+{% extends "geiq_assessments_views/_assessment_base_for_geiq.html" %}
+{% load format_filters %}
+{% load geiq_assessments_badges %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <h2>Résultat</h2>
+                    <div class="c-box c-box--summary mb-3">
+                        <div class="c-box--summary__header">
+                            <h3 class="m-0">Décision</h3>
+                        </div>
+                        <hr class="m-0">
+                        <div class="c-box--summary__body">
+                            <div class="c-box--summary__list-data">
+                                <ul class="list-unstyled">
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Montant total accordé</span>
+                                        <strong>{{ assessment.granted_amount|format_int_euros }}</strong>
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Taux de réalisation</span>
+                                        {# TODO: use a template tag assessment_grant_percentage_badge #}
+                                        {% if assessment.decision_validated_at and assessment.convention_amount %}
+                                            {% grant_percentage_badge assessment %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </li>
+                                    <li aria-hidden="true">
+                                        <hr class="my-2">
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Premier versement déjà réalisé</span>
+                                        <strong>{{ assessment.advance_amount|format_int_euros }}</strong>
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        {% if assessment.granted_amount >= assessment.advance_amount %}
+                                            <span class="flex-grow-1">Deuxième versement accordé</span>
+                                            <strong>{{ abs_balance_amount|format_int_euros }}</strong>
+                                        {% else %}
+                                            <span class="flex-grow-1">Remboursement attendu</span>
+                                            <strong>{{ abs_balance_amount|format_int_euros }}</strong>
+                                        {% endif %}
+                                    </li>
+                                    <li aria-hidden="true">
+                                        <hr class="my-2">
+                                    </li>
+                                    <li class="d-flex flex-column gap-2">
+                                        <span class="flex-grow-1">Commentaire</span>
+                                        <blockquote class="blockquote mb-0">
+                                            {{ assessment.review_comment|linebreaksbr }}
+                                        </blockquote>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-box c-box--summary mb-3">
+                        <div class="c-box--summary__header">
+                            <h3 class="m-0">Conventionnement</h3>
+                        </div>
+                        <hr class="m-0">
+                        <div class="c-box--summary__body">
+                            <div class="c-box--summary__list-data">
+                                <ul class="list-unstyled">
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Montant conventionné (convention initiale + avenants)</span>
+                                        <strong>{{ assessment.convention_amount|format_int_euros }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="c-box c-box--summary">
+                        <div class="c-box--summary__header">
+                            <h3 class="m-0">Récapitulatif</h3>
+                        </div>
+                        <hr class="m-0">
+                        <div class="c-box--summary__body">
+                            <div class="c-box--summary__list-data mb-3">
+                                <ul class="list-unstyled">
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Nombre d’aides à 814 € accordées</span>
+                                        <div>
+                                            <strong>{{ stats.allowance_of_814_nb }}</strong> / {{ stats.allowance_of_814_submitted_nb }}
+                                        </div>
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Nombre d’aides à 1 400 € accordées</span>
+                                        <div>
+                                            <strong>{{ stats.allowance_of_1400_nb }}</strong> / {{ stats.allowance_of_1400_submitted_nb }}
+                                        </div>
+                                    </li>
+                                    <li aria-hidden="true">
+                                        <hr class="my-2">
+                                    </li>
+                                    <li class="d-flex gap-2">
+                                        <span class="flex-grow-1">Montant potentiel de l’aide à l’accompagnement</span>
+                                        <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load geiq_assessments_badges %}
+
+{% block title %}Bilan d’exécution - {{ assessment.name_for_institution }} {{ block.super }}{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
+        {% fragment as c_title__main %}
+            <h1>
+                Bilan d’exécution - {{ assessment.name_for_institution }} {% state_for_institution assessment extra_class="badge-base" %}
+            </h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">
+                <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+            </button>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
+                    <h2>Dossier transmis par le GEIQ</h2>
+                    {% if not assessment.submitted_at %}
+                        <div class="c-box">
+                            <p class="mb-0">Le dossier n’a pas encore été transmis par le GEIQ.</p>
+                        </div>
+                    {% else %}
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                            <div class="c-box--summary__header">
+                                <h3 class="m-0">Documents</h3>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Synthèse du dossier de demande d’appellation GEIQ</span>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:summary_document" pk=assessment.pk %}" data-bs-toggle="tooltip" data-bs-title="Télécharger ({{ assessment.summary_document_filename }})">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.summary_document_filename }}"></i>
+                                            </a>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Bilan financier de l’action</span>
+                                            <a class="btn-link"
+                                               href="{% url "geiq_assessments_views:action_financial_assessment" pk=assessment.pk %}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="Télécharger ({{ assessment.action_financial_assessment_filename }})">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.action_financial_assessment_filename }}"></i>
+                                            </a>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Bilan financier de la structure</span>
+                                            <a class="btn-link"
+                                               href="{% url "geiq_assessments_views:structure_financial_assessment" pk=assessment.pk %}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-title="Télécharger ({{ assessment.structure_financial_assessment_filename }})">
+                                                <i class="ri-download-line fw-medium" aria-label="Télécharger le fichier {{ assessment.structure_financial_assessment_filename }}"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                            <div class="c-box--summary__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="flex-grow-1">
+                                        <h3 class="m-0">Détail et sélection des contrats</h3>
+                                    </div>
+                                    <div>
+                                        {% if not assessment.grants_selection_validated_at %}
+                                            {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
+                                        {% else %}
+                                            {% include "geiq_assessments_views/includes/badge_checked.html" only %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Nombre de contrats</span>
+                                            <strong>{{ stats.contracts_selected_nb }} / {{ stats.contracts_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Dont potentiellement éligible à l’aide de 814 €</span>
+                                            <strong>{{ stats.allowance_of_814_selected_nb }} / {{ stats.allowance_of_814_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Dont potentiellement éligible à l’aide de 1 400 €</span>
+                                            <strong>{{ stats.allowance_of_1400_selected_nb }} / {{ stats.allowance_of_1400_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Nombre de contrats avec un accompagnement > 3 mois sur l’année</span>
+                                            <strong>{{ stats.contracts_with_3_months_in_assessment_year_selected_nb }} / {{ stats.contracts_with_3_months_in_assessment_year_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Contrats de professionalisation</span>
+                                            <strong>{{ stats.professionalization_contracts_selected_nb }} / {{ stats.professionalization_contracts_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Contrats d’apprentissage</span>
+                                            <strong>{{ stats.apprenticeship_contracts_selected_nb }} / {{ stats.apprenticeship_contracts_nb }}</strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant de l’aide potentielle</span>
+                                            <strong>{{ stats.potential_allowance_amount|format_int_euros }}</strong>
+                                        </li>
+                                    </ul>
+                                    <div class="c-info mb-3 mt-3 mt-lg-4">
+                                        <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="c-box--summary__footer">
+                                <div class="d-flex justify-content-end">
+                                    {% if not assessment.reviewed_at and not assessment.grants_selection_validated_at %}
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}">
+                                            Contrôler la sélection
+                                        </a>
+                                    {% else %}
+                                        <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}">
+                                            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                                            <span>Consulter ma sélection</span>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="c-box c-box--summary mb-3 mb-md-4">
+                            <div class="c-box--summary__header">
+                                <h3 class="m-0">Commentaire général du GEIQ</h3>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <blockquote class="blockquote mb-0">
+                                    {{ assessment.geiq_comment|linebreaksbr }}
+                                </blockquote>
+                            </div>
+                        </div>
+                        <div class="c-box c-box--summary has-links-inside mb-3 mb-md-4">
+                            <div class="c-box--summary__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="flex-grow-1">
+                                        <h3 class="m-0">Décision</h3>
+                                    </div>
+                                    <div>
+                                        {% if not assessment.decision_validated_at %}
+                                            {% include "geiq_assessments_views/includes/badge_to_check.html" only %}
+                                        {% else %}
+                                            {% include "geiq_assessments_views/includes/badge_checked.html" only %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--summary__body">
+                                <div class="c-box--summary__list-data">
+                                    <ul class="list-unstyled">
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant conventionné (convention initiale + avenant)</span>
+                                            <strong>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.convention_amount|format_int_euros }}
+                                                {% else %}
+                                                    - €
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                        <li class="d-flex gap-2">
+                                            <span class="flex-grow-1">Montant total accordé</span>
+                                            <strong>
+                                                {% if assessment.decision_validated_at %}
+                                                    {{ assessment.granted_amount|format_int_euros }}
+                                                {% else %}
+                                                    - €
+                                                {% endif %}
+                                            </strong>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            {% if not assessment.reviewed_at %}
+                                <div class="c-box--summary__footer">
+                                    <div class="d-flex justify-content-end">
+                                        {% if assessment.grants_selection_validated_at %}
+                                            {% if assessment.decision_validated_at %}
+                                                <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                                    <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                                                    <span>Consulter ma décision</span>
+                                                </a>
+                                            {% else %}
+                                                <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                                    Saisir la décision
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <span>Vous devez d’abord contrôler la sélection</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                    {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token request=request InstitutionKind=InstitutionKind only %}
+                    {% if assessment.submitted_at %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data mb-3">
+                                <li>
+                                    <small>Taux de rupture en période d’essai</small>
+                                    <strong>{{ assessment.label_rates.taux_rupture_periode_essai|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de rupture hors période d’essai</small>
+                                    <strong>{{ assessment.label_rates.taux_rupture_hors_periode_essai|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de sortie emploi durable</small>
+                                    <strong>{{ assessment.label_rates.taux_sortie_emploi_durable|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux de sortie emploi</small>
+                                    <strong>{{ assessment.label_rates.taux_sortie_emploi|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Taux d’obtention de qualification</small>
+                                    <strong>{{ assessment.label_rates.taux_obtention_qualification|formatfloat_with_unit:"%" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre de salariés sur l’année N-1</small>
+                                    <strong>{{ assessment.employee_nb }}</strong>
+                                </li>
+                            </ul>
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Les taux présentés ci-dessus sont générés automatiquement par le label. Ils concernent le GEIQ principal et ses antennes.</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h4>Informations générales</h4>
+                        <h5>Structures concernées par la convention</h5>
+                        <ul>
+                            {% for antenna in assessment.label_antennas %}<li>{{ antenna.name }}</li>{% endfor %}
+                        </ul>
+                        <h5>Contacts GEIQ</h5>
+                        <ul>
+                            <li>{{ assessment.created_by.get_full_name }} - {{ assessment.created_by.email }}</li>
+                            {% if assessment.submitted_by and assessment.submitted_by != assessment.created_by %}
+                                <li>{{ assessment.submitted_by.get_full_name }} - {{ assessment.submitted_by.email }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="label-sync-form">
+            {% csrf_token %}
+        </form>
+    </section>
+{% endblock %}
+
+
+{% block modals %}
+    {{ block.super }}
+    {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and not assessment.dreets_reviewed_at %}
+        <div id="dreets_review_modal" class="modal" tabindex="-1" aria-labelledby="dreets_review_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="dreets_review_modal_title">Confirmer la validation du bilan d’exécution</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        La validation entraînera l’envoi d'un email au GEIQ indiquant le montant accordé : {{ assessment.granted_amount|format_int_euros }}.
+                        <br>
+                        {% if assessment.granted_amount > assessment.advance_amount %}
+                            Cette décision implique la mise en place d’un prochain versement de {{ abs_balance_amount|format_int_euros }} au GEIQ, conformément aux modalités habituelles.
+                        {% else %}
+                            Cette décision implique la mise en place d’une demande de remboursement de {{ abs_balance_amount|format_int_euros }} adressée au GEIQ, conformément aux modalités habituelles.
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-primary" name="action" value="{{ InstitutionAction.REVIEW }}">Confirmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
