@@ -56,13 +56,13 @@
                         <hr class="my-3">
                         <ul class="fs-sm list-unstyled mb-0">
                             {% if user.is_authenticated and prescriber_org.email %}
-                                {% include "includes/email_li.html" with email=prescriber_org.email only %}
+                                {% include "includes/structures/email_li.html" with email=prescriber_org.email only %}
                             {% endif %}
                             {% if user.is_authenticated and prescriber_org.phone %}
-                                {% include "includes/phone_li.html" with phonenumber=prescriber_org.phone only %}
+                                {% include "includes/structures/phone_li.html" with phonenumber=prescriber_org.phone only %}
                             {% endif %}
                             {% if prescriber_org.website %}
-                                {% include "includes/website_li.html" with website=prescriber_org.website only %}
+                                {% include "includes/structures/website_li.html" with website=prescriber_org.website only %}
                             {% endif %}
                         </ul>
                     </div>
