@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.forms import widgets
+from django.utils.safestring import mark_safe
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
@@ -106,3 +107,23 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
                     accessor = modelfield.attname
                     value = getattr(self.instance.jobseeker_profile, accessor)
                     field.queryset = field.queryset.filter(pk=value)
+
+    def clean(self):
+        super().clean()
+        if "pole_emploi_id" in self.fields and "lack_of_pole_emploi_id_reason" in self.fields:
+            JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+
+    def pole_emploi_id_error(self):
+        if self.has_error("pole_emploi_id"):
+            return mark_safe("""
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p>
+                        <strong>L’identifiant France Travail n’est pas valide</strong>
+                    </p>
+                    <p class="mb-0">
+                        Pour continuer, veuillez renseigner un identifiant qui respecte l’un des deux formats
+                        autorisés : 8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.
+                    </p>
+                </div>
+            """)
+        return None

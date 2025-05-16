@@ -22,7 +22,7 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
 from itou.users.forms import JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
@@ -656,10 +656,6 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
 
     class Meta(JobSeekerProfileModelForm.Meta):
         fields = []
-
-    def clean(self):
-        super().clean()
-        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class FilterJobApplicationsForm(forms.Form):

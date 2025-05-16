@@ -17,6 +17,7 @@
 
         {% if form_personal_data %}
             {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
+            {% if form_personal_data.pole_emploi_id_error %}{{ form_personal_data.pole_emploi_id_error }}{% endif %}
 
             {% include "includes/job_seekers/readonly_form.html" with form=form_personal_data ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
             {% bootstrap_form_errors form_personal_data type='non_fields' %}

@@ -89,7 +89,6 @@ class EditJobSeekerInfoForm(
 
     def clean(self):
         super().clean()
-        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
         JobSeekerProfile.clean_nir_title_birthdate_fields(self.cleaned_data)
 
     def save(self, commit=True):

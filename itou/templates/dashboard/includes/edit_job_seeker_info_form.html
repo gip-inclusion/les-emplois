@@ -12,6 +12,7 @@
     {% csrf_token %}
 
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
+    {% if form.pole_emploi_id_error %}{{ form.pole_emploi_id_error }}{% endif %}
 
     {% include "includes/job_seekers/readonly_form.html" with form=form ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
     {% bootstrap_form_errors form type='non_fields' %}
