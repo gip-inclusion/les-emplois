@@ -4,10 +4,17 @@ from rest_framework import serializers
 
 
 class NullIfEmptyCharField(serializers.CharField):
+    def __init__(self, truncate=None, **kwargs):
+        self.truncate = truncate
+        super().__init__(**kwargs)
+
     def to_representation(self, value):
         if value == "":
             return None
-        return super().to_representation(value)
+        representation = super().to_representation(value)
+        if self.truncate:
+            representation = representation[: self.truncate]
+        return representation
 
 
 class NullIfEmptyChoiceField(serializers.ChoiceField):
