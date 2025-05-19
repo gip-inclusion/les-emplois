@@ -130,6 +130,11 @@ class OIDConnectUserData:
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
     allow_sub_update: ClassVar[bool] = False
 
+    def is_sub_update_allowed(self, user):
+        if user.is_staff:  # security check
+            return False
+        return user.allow_next_sso_sub_update or self.allow_sub_update
+
     @property
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
@@ -170,7 +175,7 @@ class OIDConnectUserData:
                 # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
                 if user.identity_provider == self.identity_provider:
-                    if not self.allow_sub_update:
+                    if not self.is_sub_update_allowed(user):
                         raise MultipleSubSameEmailException(user)
                 elif user.identity_provider not in self.allowed_identity_provider_migration:
                     self.check_valid_kind(user, user_data_dict, is_login)
@@ -224,6 +229,8 @@ class OIDConnectUserData:
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)
+
+        user.allow_next_sso_sub_update = False  # Always disable this at login, even if the sub wasn't changed
         user.save()
 
         return user, created

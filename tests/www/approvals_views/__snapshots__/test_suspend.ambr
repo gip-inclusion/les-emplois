@@ -55,7 +55,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -239,7 +240,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -474,7 +476,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -658,7 +661,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -980,7 +984,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1164,7 +1169,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -1399,7 +1405,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1583,7 +1590,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "approvals_suspension"
           INNER JOIN "approvals_approval" ON ("approvals_suspension"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")

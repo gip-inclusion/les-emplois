@@ -137,7 +137,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE "companies_companymembership"."id" IN
@@ -198,7 +199,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"

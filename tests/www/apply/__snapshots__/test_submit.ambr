@@ -540,7 +540,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -750,7 +751,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -852,6 +854,7 @@
                  T3."address_filled_at",
                  T3."first_login",
                  T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1087,6 +1090,7 @@
                  T4."address_filled_at",
                  T4."first_login",
                  T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
                  "prescribers_prescriberorganization"."id",
                  "prescribers_prescriberorganization"."address_line_1",
                  "prescribers_prescriberorganization"."address_line_2",
@@ -1535,7 +1539,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1636,7 +1641,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -1748,7 +1754,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -1851,6 +1858,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2054,7 +2062,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2156,7 +2165,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -2257,7 +2267,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2360,6 +2371,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -2486,7 +2498,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2640,7 +2653,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -2752,7 +2766,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -2908,6 +2923,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3124,7 +3140,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3279,7 +3296,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -3393,7 +3411,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3549,6 +3568,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -3688,7 +3708,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -3789,7 +3810,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -3901,7 +3923,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4004,6 +4027,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -4207,7 +4231,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4309,7 +4334,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -4410,7 +4436,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4513,6 +4540,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -4639,7 +4667,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -4793,7 +4822,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -4905,7 +4935,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -5061,6 +5092,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -5277,7 +5309,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -5432,7 +5465,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -5546,7 +5580,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -5702,6 +5737,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -5841,7 +5877,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -5942,7 +5979,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -6054,7 +6092,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -6157,6 +6196,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -6360,7 +6400,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -6462,7 +6503,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -6563,7 +6605,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -6666,6 +6709,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -6792,7 +6836,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -6946,7 +6991,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -7058,7 +7104,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -7214,6 +7261,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -7430,7 +7478,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -7585,7 +7634,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -7699,7 +7749,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -7855,6 +7906,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -7994,7 +8046,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -8095,7 +8148,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -8207,7 +8261,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -8310,6 +8365,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -8513,7 +8569,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -8615,7 +8672,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -8716,7 +8774,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -8819,6 +8878,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -8945,7 +9005,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -9099,7 +9160,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
@@ -9211,7 +9273,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -9367,6 +9430,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",
@@ -9583,7 +9647,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -9738,7 +9803,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."id" = %s)
@@ -9852,7 +9918,8 @@
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at"
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" = %s
           LIMIT 21
@@ -10008,6 +10075,7 @@
                  "users_user"."address_filled_at",
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
                  "users_jobseekerprofile"."user_id",
                  "users_jobseekerprofile"."birthdate",
                  "users_jobseekerprofile"."birth_place_id",

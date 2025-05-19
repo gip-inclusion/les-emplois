@@ -303,13 +303,30 @@ class TestFranceConnect:
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(
+        user = JobSeekerFactory(
             username="another_sub", email=fc_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT
         )
 
         # Test redirection and modal content
         response = mock_oauth_dance(client, expected_route="login:job_seeker")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
+        # If we force the update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        response = mock_oauth_dance(client)
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
+        assert user.username == fc_user_data.username
+
+        # If we allow the update again, but the sub does change, we still disable allow_next_sso_sub_update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        response = mock_oauth_dance(client)
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
 
     def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")

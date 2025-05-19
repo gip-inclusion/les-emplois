@@ -467,7 +467,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             (
                 "Informations",
                 {
-                    "fields": (
+                    "fields": [
                         "pk",
                         "title",
                         "phone",
@@ -483,7 +483,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                         "jobseeker_profile_link",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
-                    )
+                    ]
                 },
             ),
         )
@@ -505,6 +505,12 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 fieldsets[2] = ("Permissions", {"fields": ["is_active", "is_staff", "is_superuser"]})
         else:
             fieldsets[2] = ("Permissions", {"fields": ["is_active"]})
+
+        if obj and obj.identity_provider != IdentityProvider.DJANGO:
+            # Add allow_next_sso_sub_update just after identity_provider
+            assert fieldsets[-1][0] == "Informations"
+            identity_provider_index = fieldsets[-1][1]["fields"].index("identity_provider")
+            fieldsets[-1][1]["fields"].insert(identity_provider_index + 1, "allow_next_sso_sub_update")
 
         return fieldsets
 
