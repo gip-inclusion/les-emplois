@@ -26,6 +26,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries
 
 
+DDETS_refusal_comment_txt = "Commentaire de la DDETS"
+
+
 # fixme vincentporte : convert this method into factory
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
     job_seeker = JobSeekerFactory()
@@ -1146,8 +1149,6 @@ class TestSiaeEvaluatedSiaeDetailView:
 
 
 class TestSiaeEvaluatedJobApplicationView:
-    refusal_comment_txt = "Commentaire de la DDETS"
-
     def test_access(self, client):
         membership = CompanyMembershipFactory()
         user = membership.user
@@ -1169,7 +1170,7 @@ class TestSiaeEvaluatedJobApplicationView:
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
         response = client.get(url)
-        assertNotContains(response, self.refusal_comment_txt)
+        assertNotContains(response, DDETS_refusal_comment_txt)
 
         # Refusal comment is only displayed when state is refused
         EvaluatedAdministrativeCriteriaFactory(
@@ -1180,4 +1181,4 @@ class TestSiaeEvaluatedJobApplicationView:
         evaluated_siae.reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at"])
         response = client.get(url)
-        assertContains(response, self.refusal_comment_txt)
+        assertContains(response, DDETS_refusal_comment_txt)
