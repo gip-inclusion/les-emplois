@@ -6,11 +6,10 @@
             {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validés" }}
             le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
             <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
-            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
             {% if eligibility_diagnosis.author_prescriber_organization %}
-                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
             {% endif %}
-            .
         </p>
         <p class="fs-sm">
             <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
