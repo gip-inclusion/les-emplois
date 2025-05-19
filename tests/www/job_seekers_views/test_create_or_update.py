@@ -41,12 +41,13 @@ class TestGetOrCreateAsOther:
         institution_member = InstitutionMembershipFactory().user
 
         client.force_login(institution_member)
+        apply_session = fake_session_initialization(client, company, {})
 
         for tunnel in self.TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": str(uuid.uuid4()),
+                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
@@ -58,12 +59,13 @@ class TestGetOrCreateAsOther:
         user = ItouStaffFactory()
 
         client.force_login(user)
+        apply_session = fake_session_initialization(client, company, {})
 
         for tunnel in self.TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": str(uuid.uuid4()),
+                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
@@ -91,12 +93,13 @@ class TestGetOrCreateForJobSeeker:
         job_seeker = JobSeekerFactory()
 
         client.force_login(job_seeker)
+        apply_session = fake_session_initialization(client, company, {})
 
         for tunnel in TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": str(uuid.uuid4()),
+                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
