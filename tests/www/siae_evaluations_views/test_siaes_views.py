@@ -595,7 +595,6 @@ class TestSiaeSelectCriteriaView:
 
         assert response.status_code == 404
 
-    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_access(self, client):
         client.force_login(self.user)
 
@@ -621,7 +620,6 @@ class TestSiaeSelectCriteriaView:
         )
         assert evaluated_siae.siae.kind == response.context["kind"]
 
-    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     @pytest.mark.parametrize("level_1,level_2", [(True, False), (False, True), (True, True), (False, False)])
     def test_context_fields_list(self, client, level_1, level_2):
         institution = InstitutionFactory(name="DDETS 01", department="01")
@@ -650,7 +648,6 @@ class TestSiaeSelectCriteriaView:
         assert level_1 is bool(response.context["level_1_fields"])
         assert level_2 is bool(response.context["level_2_fields"])
 
-    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_post(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -696,7 +693,6 @@ class TestSiaeSelectCriteriaView:
         assert response.status_code == 403
         assert evaluated_job_application.evaluated_administrative_criteria.count() == 0
 
-    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_initial_data_form(self, client):
         # no preselected criteria
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
