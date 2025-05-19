@@ -35,7 +35,7 @@ from tests.siae_evaluations.factories import (
 )
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
-from tests.www.siae_evaluations_views.test_siaes_views import TestSiaeEvaluatedJobApplicationView
+from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
 
 # fixme vincentporte : convert this method into factory
@@ -3424,7 +3424,7 @@ class TestInstitutionEvaluatedJobApplicationView:
             + f"#{evaluated_job_application.pk}"
         )
         assertContains(response, self.save_text, count=1)
-        assertNotContains(response, TestSiaeEvaluatedJobApplicationView.refusal_comment_txt)
+        assertNotContains(response, DDETS_refusal_comment_txt)
 
     def test_get_before_new_criteria_submitted(self, client):
         now = timezone.now()
