@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## 2025-05-12
+
+### Ajouté
+
+- [[Prescripteur] Ajout d'un message pour les admins des CD](https://github.com/gip-inclusion/les-emplois/pull/6073) 🖼
+- [Candidature : Indiquer à l’employeur qui met en attente une candidature que son commentaire sera envoyé par mail au candidat et prescripteur.](https://github.com/gip-inclusion/les-emplois/pull/6085) 🖼
+- [Eligibilité : Ajouter un badge pour indiquer les critères non certifiés](https://github.com/gip-inclusion/les-emplois/pull/6058) 🖼
+- [Pilotage : Ajouter l’absence/présence de CV dans la table candidatures de Metabase](https://github.com/gip-inclusion/les-emplois/pull/6103)
+- [RDV Insertion : Création d’un groupe pour un accès restreint à l’interface administateur](https://github.com/gip-inclusion/les-emplois/pull/6092) 🖼
+
+### Modifié
+
+- [[ASP] Fix wrong department code](https://github.com/gip-inclusion/les-emplois/pull/6091)
+- [Admin : Rendre les champs utilisateurs éditables même lorsque son identité est certifiée](https://github.com/gip-inclusion/les-emplois/pull/6100) 🖼
+- [Admin: Amélioration d'une description de champ](https://github.com/gip-inclusion/les-emplois/pull/6075)
+- [Candidature: Protection contre les candidatures multiples (<24h)](https://github.com/gip-inclusion/les-emplois/pull/6077)
+- [Candidature: Vérifier l'identité de l'utilisateur pour accéder à la page de fin de candidature](https://github.com/gip-inclusion/les-emplois/pull/6088)
+- [Employeur : Correctif de la logique Convergence ACI (PHC CVG) pour les antennes](https://github.com/gip-inclusion/les-emplois/pull/6025)
+- [Fiche de poste: Mise à jour de l'ordonnancement des fiches](https://github.com/gip-inclusion/les-emplois/pull/6069)
+- [GPS: Ajout d'un filtre dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/6105)
+- [Inscription: Sécuriser l’inscription des OPCS pour éviter les offres frauduleuses](https://github.com/gip-inclusion/les-emplois/pull/6076)
+- [Interface: ajout de la classe .stretched-link manquante sur les cartes de job_description](https://github.com/gip-inclusion/les-emplois/pull/6068)
+- [Stabilité: traitement des logs de Import EA EATT](https://github.com/gip-inclusion/les-emplois/pull/5979)
+- [Utiliser le SessionNamespace pour sécuriser l’édition des fiches de poste](https://github.com/gip-inclusion/les-emplois/pull/6044)
+
 ## 2025-05-05
 
 ### Modifié
