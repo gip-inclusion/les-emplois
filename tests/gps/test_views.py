@@ -34,6 +34,11 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
 
 
+def logs(caplog):
+    clean_messages = [message for message in caplog.messages if not message.startswith("HTTP ")]
+    return clean_messages
+
+
 def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
     name = mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_info)
     assertMessages(
@@ -99,7 +104,7 @@ class TestGroupLists:
             assert response.status_code == status_code
 
     @freezegun.freeze_time("2024-06-21", tick=True)
-    def test_group_list(self, snapshot, client):
+    def test_group_list(self, snapshot, client, caplog):
         user = PrescriberFactory(
             membership__organization__authorized=True, membership__organization__for_snapshot=True
         )
@@ -161,6 +166,8 @@ class TestGroupLists:
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
+        assert logs(caplog) == []
+
         # Test `is_referent` display.
         group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
         FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
@@ -168,7 +175,7 @@ class TestGroupLists:
         assertContains(response, "vous êtes référent")
 
     @freezegun.freeze_time("2024-06-21", tick=True)
-    def test_old_group_list(self, snapshot, client):
+    def test_old_group_list(self, snapshot, client, caplog):
         user = PrescriberFactory(
             membership__organization__authorized=True, membership__organization__for_snapshot=True
         )
@@ -202,6 +209,7 @@ class TestGroupLists:
         assert str(groups) == snapshot(name="test_my_groups__group_card")
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
+        assert logs(caplog) == []
 
     def test_groups_pagination_and_name_filter(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=True)
@@ -333,7 +341,7 @@ class TestGroupDetailsMembershipTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(
             membership=True,
             for_snapshot=True,
@@ -392,6 +400,7 @@ class TestGroupDetailsMembershipTab:
             ],
         )
         assert str(html_details) == snapshot
+        assert logs(caplog) == []
 
         display_phone_txt = "<span>Afficher le téléphone</span>"
         display_email_txt = "<span>Afficher l'email</span>"
@@ -432,7 +441,7 @@ class TestGroupDetailsMembershipTab:
         ]
 
     @freezegun.freeze_time("2025-01-20")
-    def test_display_participant_contact_info(self, client, mocker, snapshot):
+    def test_display_participant_contact_info(self, client, mocker, snapshot, caplog):
         prescriber = PrescriberFactory(
             membership=True,
             for_snapshot=True,
@@ -480,8 +489,9 @@ class TestGroupDetailsMembershipTab:
             ((prescriber, group, target_participant, "phone"),),
             ((prescriber, group, target_participant, "email"),),
         ]
+        assert logs(caplog) == []
 
-    def test_ask_access(self, client, mocker, snapshot):
+    def test_ask_access(self, client, mocker, snapshot, caplog):
         user = PrescriberFactory()
         job_seeker = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=job_seeker, memberships=1, memberships__member=user)
@@ -519,8 +529,9 @@ class TestGroupDetailsMembershipTab:
             )
         ]
         assert slack_mock.mock_calls == expected_calls
-        slack_mock.reset_mock()
+        assert logs(caplog) == []
 
+        slack_mock.reset_mock()
         membership.can_view_personal_information = True
         membership.save()
         client.post(ask_access_url)
@@ -557,7 +568,7 @@ class TestGroupDetailsBeneficiaryTab:
         else:
             assert response.status_code == 403
 
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True, for_snapshot=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
@@ -576,6 +587,7 @@ class TestGroupDetailsBeneficiaryTab:
             ],
         )
         assert str(html_details) == snapshot(name="masked_info")
+        assert logs(caplog) == []
 
         # When he can but is not from an authorized organization
         beneficiary.created_by = prescriber
@@ -668,7 +680,7 @@ class TestGroupDetailsContributionTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
@@ -685,6 +697,7 @@ class TestGroupDetailsContributionTab:
             ],
         )
         assert str(html_details) == snapshot(name="ongoing_membership_no_reason")
+        assert logs(caplog) == []
 
         membership = group.memberships.get()
         membership.ended_at = timezone.localdate()
@@ -733,7 +746,7 @@ class TestGroupDetailsEditionTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary)
@@ -761,6 +774,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -777,6 +791,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -793,6 +808,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -811,6 +827,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -828,6 +845,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -845,6 +863,7 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert logs(caplog) == []
 
         membership.refresh_from_db()
         assert membership.reason == "iae"
@@ -899,16 +918,18 @@ class TestJoinGroup:
             "prescriber_with_org",
         ],
     )
-    def test_view_with_org(self, client, snapshot, user_factory):
+    def test_view_with_org(self, client, snapshot, user_factory, caplog):
         url = reverse("gps:join_group")
         user = user_factory()
         client.force_login(user)
         response = client.get(url)
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert logs(caplog) == []
 
         # All redirection work : the join_group_from_* view will check if the user is allowed
         response = client.post(url, data={"channel": "from_coworker"})
         assertRedirects(response, reverse("gps:join_group_from_coworker"), fetch_redirect_response=False)
+        assert logs(caplog) == []
 
         response = client.post(url, data={"channel": "from_nir"})
         assertRedirects(response, reverse("gps:join_group_from_nir"), fetch_redirect_response=False)
@@ -916,12 +937,13 @@ class TestJoinGroup:
         response = client.post(url, data={"channel": "from_name_email"})
         assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
 
-    def test_view_without_org(self, client):
+    def test_view_without_org(self, client, caplog):
         url = reverse("gps:join_group")
         user = PrescriberFactory()
         client.force_login(user)
         response = client.get(url)
         assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
+        assert logs(caplog) == []
 
 
 class TestBeneficiariesAutocomplete:
@@ -1107,7 +1129,7 @@ class TestJoinGroupFromCoworker:
         else:
             assert response.status_code == 403
 
-    def test_view(self, client, snapshot):
+    def test_view(self, client, snapshot, caplog):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         coworker = CompanyMembershipFactory(company=company).user
@@ -1115,12 +1137,14 @@ class TestJoinGroupFromCoworker:
         client.force_login(user)
         response = client.get(self.URL)
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert logs(caplog) == []
 
         followed_job_seeker = JobSeekerFactory()
         FollowUpGroupFactory(beneficiary=followed_job_seeker, memberships=1, memberships__member=user)
         response = client.post(self.URL, data={"user": followed_job_seeker.pk})
         assertRedirects(response, reverse("gps:group_list"))
         assert_already_followed_beneficiary_toast(response, followed_job_seeker)
+        assert logs(caplog) == []
 
         coworker_job_seeker = JobSeekerFactory()
         group = FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
@@ -1181,12 +1205,13 @@ class TestJoinGroupFromNir:
         else:
             assert response.status_code == 403
 
-    def test_view(self, client, snapshot):
+    def test_view(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
 
         client.force_login(user)
         response = client.get(self.URL)
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
+        assert logs(caplog) == []
 
         # unknown NIR :
         dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
@@ -1207,29 +1232,34 @@ class TestJoinGroupFromNir:
         }
         assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
+        assert logs(caplog) == []
 
-        # existing nit
+        # existing nir
         job_seeker = JobSeekerFactory(for_snapshot=True)
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "preview": "1"})
         assert str(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(name="modal")
+        assert logs(caplog) == []
 
         # if we cancel: back to start with the nir we didn't find in the input
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
         html_detail = parse_response_to_soup(response, selector="#main")
         del html_detail.find(id="id_nir").attrs["value"]
         assert str(html_detail) == snapshot(name="get")
+        assert logs(caplog) == []
 
         # But if we accept:
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
+        assert logs(caplog) == []
 
         # If we were already following the user
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
         assertRedirects(response, reverse("gps:group_list"))
         assert_already_followed_beneficiary_toast(response, job_seeker)
+        assert logs(caplog) == []
 
-    def test_unknown_nir_known_email_with_no_nir(self, client, snapshot):
+    def test_unknown_nir_known_email_with_no_nir(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
         existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
         nir = "276024719711371"
@@ -1286,8 +1316,9 @@ class TestJoinGroupFromNir:
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=existing_job_seeker_without_nir, member=user
         ).exists()
+        assert logs(caplog) == []
 
-    def test_unknown_nir_known_email_with_another_nir(self, client, snapshot):
+    def test_unknown_nir_known_email_with_another_nir(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
         existing_job_seeker_with_nir = JobSeekerFactory(for_snapshot=True)
         job_seeker_nir = existing_job_seeker_with_nir.jobseeker_profile.nir
@@ -1342,8 +1373,9 @@ class TestJoinGroupFromNir:
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=existing_job_seeker_with_nir, member=user
         ).exists()
+        assert logs(caplog) == []
 
-    def test_unknown_nir_and_unknown_email(self, client, settings, mocker):
+    def test_unknown_nir_and_unknown_email(self, client, settings, mocker, caplog):
         user = EmployerFactory(with_company=True)
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
@@ -1498,6 +1530,13 @@ class TestJoinGroupFromNir:
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
+        assert logs(caplog) == [
+            f"user={user.pk} created job_seeker={new_job_seeker.pk}",
+            "Error while requesting `http://ban-api/search/?q=37+B+Rue+du+G%C3%A9n%C3%A9ral+De+Gaulle%2C+67118"
+            "+Geispolsheim&limit=1&postcode=67118`: [Errno -3] Temporary failure in name resolution",
+            "No geocoding data could be found for the address of "
+            f"<<class 'itou.users.models.User'> - pk={new_job_seeker.pk}>",
+        ]
 
 
 class TestJoinGroupFromNameAndEmail:
@@ -1532,7 +1571,7 @@ class TestJoinGroupFromNameAndEmail:
             assert response.status_code == 403
 
     @pytest.mark.parametrize("known_name", [True, False])
-    def test_unknown_email(self, client, settings, mocker, known_name):
+    def test_unknown_email(self, client, settings, mocker, known_name, caplog):
         # This process is the same with or without gps advanced features
         user = PrescriberFactory()
         slack_mock = mocker.patch("itou.www.gps.utils.send_slack_message_for_gps")  # mock the imported link
@@ -1706,7 +1745,15 @@ class TestJoinGroupFromNameAndEmail:
             ]
         assert slack_mock.mock_calls == expected_mock_calls
 
-    def test_full_match_with_advanced_features(self, client, snapshot):
+        assert logs(caplog) == [
+            f"user={user.pk} created job_seeker={new_job_seeker.pk}",
+            "Error while requesting `http://ban-api/search/?q=37+B+Rue+du+G%C3%A9n%C3%A9ral+De+Gaulle%2C+67118"
+            "+Geispolsheim&limit=1&postcode=67118`: [Errno -3] Temporary failure in name resolution",
+            "No geocoding data could be found for the address of "
+            f"<<class 'itou.users.models.User'> - pk={new_job_seeker.pk}>",
+        ]
+
+    def test_full_match_with_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=True)
         client.force_login(user)
 
@@ -1730,8 +1777,9 @@ class TestJoinGroupFromNameAndEmail:
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
         assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+        assert logs(caplog) == []
 
-    def test_full_match_without_advanced_features(self, client, snapshot, mocker):
+    def test_full_match_without_advanced_features(self, client, snapshot, mocker, caplog):
         user = PrescriberFactory(membership__organization__authorized=False)
         slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
         client.force_login(user)
@@ -1785,8 +1833,9 @@ class TestJoinGroupFromNameAndEmail:
                 ),
             )
         ]
+        assert logs(caplog) == []
 
-    def test_partial_match_with_advanced_features(self, client, snapshot):
+    def test_partial_match_with_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=True)
         client.force_login(user)
 
@@ -1812,8 +1861,9 @@ class TestJoinGroupFromNameAndEmail:
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
         assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+        assert logs(caplog) == []
 
-    def test_partial_match_without_advanced_features(self, client, snapshot):
+    def test_partial_match_without_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=False)
         client.force_login(user)
 
@@ -1841,3 +1891,4 @@ class TestJoinGroupFromNameAndEmail:
         assert not FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
+        assert logs(caplog) == []
