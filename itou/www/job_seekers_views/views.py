@@ -313,7 +313,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def get_apply_kwargs(self, job_seeker):
         apply_data = self.job_seeker_session.get("apply", {})
         if session_uuid := apply_data.get("session_uuid"):
-            return {"session_uuid": session_uuid, "job_seeker_public_id": job_seeker.public_id}
+            return {"session_uuid": session_uuid}
         # There's only the company_pk, it's the old session format
         return apply_data | {"job_seeker_public_id": job_seeker.public_id}
 
@@ -345,7 +345,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         else:
             # We found a job seeker to apply for, so we check their info
             view_name = "job_seekers_views:check_job_seeker_info"
-        return reverse(view_name, kwargs=kwargs)
+        return add_url_params(reverse(view_name, kwargs=kwargs), {"job_seeker_public_id": job_seeker.public_id})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -404,8 +404,9 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         # The NIR already exists, go to next step
         if self.job_seeker.jobseeker_profile.nir:
             # get_apply_kwargs requires the job_seeker_session
-            next_url = reverse(
-                "job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker)
+            next_url = add_url_params(
+                reverse("job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker)),
+                {"job_seeker_public_id": self.job_seeker.public_id},
             )
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
@@ -415,7 +416,10 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker))
+        next_url = add_url_params(
+            reverse("job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker)),
+            {"job_seeker_public_id": self.job_seeker.public_id},
+        )
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""

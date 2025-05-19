@@ -25,27 +25,27 @@ urlpatterns = [
     ),
     # Submit - common.
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/check_prev_applications",
+        "<uuid:session_uuid>/create/check_prev_applications",
         submit_views.CheckPreviousApplications.as_view(),
         name="step_check_prev_applications",
     ),
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/select_jobs",
+        "<uuid:session_uuid>/create/select_jobs",
         submit_views.ApplicationJobsView.as_view(),
         name="application_jobs",
     ),
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/eligibility",
+        "<uuid:session_uuid>/create/eligibility",
         submit_views.ApplicationEligibilityView.as_view(),
         name="application_eligibility",
     ),
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/geiq_eligibility",
+        "<uuid:session_uuid>/create/geiq_eligibility",
         submit_views.ApplicationGEIQEligibilityView.as_view(),
         name="application_geiq_eligibility",
     ),
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/resume",
+        "<uuid:session_uuid>/create/resume",
         submit_views.ApplicationResumeView.as_view(),
         name="application_resume",
     ),
@@ -62,31 +62,31 @@ urlpatterns = [
     ),
     # Direct hire process
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/check-previous-applications",
+        "<uuid:session_uuid>/hire/check-previous-applications",
         submit_views.CheckPreviousApplications.as_view(),
         name="check_prev_applications_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/eligibility",
+        "<uuid:session_uuid>/hire/eligibility",
         submit_views.IAEEligibilityForHireView.as_view(),
         name="eligibility_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/geiq-eligibility",
+        "<uuid:session_uuid>/hire/geiq-eligibility",
         submit_views.GEIQEligibilityForHireView.as_view(),
         name="geiq_eligibility_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/geiq-eligibility-criteria",
+        "<uuid:session_uuid>/hire/geiq-eligibility-criteria",
         submit_views.GEIQEligiblityCriteriaForHireView.as_view(),
         name="geiq_eligibility_criteria_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/confirm",
+        "<uuid:session_uuid>/hire/confirm",
         submit_views.HireConfirmationView.as_view(),
         name="hire_confirmation",
         kwargs={"hire_process": True},

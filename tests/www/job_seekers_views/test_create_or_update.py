@@ -41,7 +41,7 @@ class TestGetOrCreateAsOther:
         institution_member = InstitutionMembershipFactory().user
 
         client.force_login(institution_member)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in self.TUNNELS:
             params = {
@@ -59,7 +59,7 @@ class TestGetOrCreateAsOther:
         user = ItouStaffFactory()
 
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in self.TUNNELS:
             params = {
@@ -93,7 +93,7 @@ class TestGetOrCreateForJobSeeker:
         job_seeker = JobSeekerFactory()
 
         client.force_login(job_seeker)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in TUNNELS:
             params = {
@@ -186,9 +186,9 @@ class TestGetOrCreateForJobSeeker:
         response = client.get(next_url)
         assertRedirects(
             response,
-            reverse(
-                "job_seekers_views:check_job_seeker_info",
-                kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": user.public_id},
+            add_url_params(
+                reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
+                {"job_seeker_public_id": user.public_id},
             ),
         )
 
@@ -223,7 +223,7 @@ class TestGetOrCreateForSender:
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         match company_value:
             case "valid":
@@ -246,10 +246,7 @@ class TestGetOrCreateForSender:
                 tunnel = None
 
         if from_url_value == "valid":
-            from_url = reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            )
+            from_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name})
         else:
             from_url = None
 
@@ -886,14 +883,11 @@ class TestUpdateForJobSeeker:
         job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         company = CompanyFactory(with_membership=True)
         client.force_login(job_seeker)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         company_pk = company.pk
 
-        from_url = reverse(
-            "apply:application_jobs",
-            kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        from_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "company": company_pk,
@@ -923,7 +917,7 @@ class TestUpdateForSender:
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, None, {})
 
         match job_seeker_value:
             case "valid":
@@ -936,10 +930,7 @@ class TestUpdateForSender:
                 job_seeker_public_id = None
 
         if from_url_value == "valid":
-            from_url = reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            )
+            from_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name})
         else:
             from_url = None
 
@@ -1010,13 +1001,10 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
-            "from_url": reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            ),
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
@@ -1058,13 +1046,10 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
-            "from_url": reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            ),
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
@@ -1107,13 +1092,10 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
-            "from_url": reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            ),
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
         client.get(start_url)
@@ -1164,13 +1146,10 @@ class TestUpdateForSender:
         )
 
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, {})
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
-            "from_url": reverse(
-                "apply:application_jobs",
-                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
-            ),
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
         response = client.get(reverse("job_seekers_views:update_job_seeker_start"), params)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
