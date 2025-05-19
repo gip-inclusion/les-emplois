@@ -81,7 +81,7 @@ def approval_state_badge(
 
 
 @register.simple_tag
-def iae_eligibility_badge(*, is_eligible, extra_class=""):
+def iae_eligibility_badge(*, is_eligible, extra_class="", for_job_seeker=False):
     if is_eligible:
         return mark_safe(f"""\
         <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
@@ -89,15 +89,16 @@ def iae_eligibility_badge(*, is_eligible, extra_class=""):
             Éligible à l’IAE
         </span>""")
     else:
+        span_class = "bg-accent-02-lighter text-primary" if for_job_seeker else "bg-warning-lighter text-warning"
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill bg-warning-lighter text-warning">
+        <span class="badge {extra_class} rounded-pill {span_class}">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité IAE à valider
         </span>""")
 
 
 @register.simple_tag
-def geiq_eligibility_badge(*, is_eligible, extra_class=""):
+def geiq_eligibility_badge(*, is_eligible, extra_class="", for_job_seeker=False):
     if is_eligible:
         return mark_safe(f"""\
         <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
@@ -105,8 +106,9 @@ def geiq_eligibility_badge(*, is_eligible, extra_class=""):
             Éligibilité GEIQ confirmée
         </span>""")
     else:
+        span_class = "bg-accent-02-lighter text-primary" if for_job_seeker else "bg-warning-lighter text-warning"
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill bg-warning-lighter text-warning">
+        <span class="badge {extra_class} rounded-pill {span_class}">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité GEIQ non confirmée
         </span>""")
