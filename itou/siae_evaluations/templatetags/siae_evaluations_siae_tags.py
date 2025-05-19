@@ -33,16 +33,16 @@ def success_lighter_badge(content):
     return badge(content, "bg-success-lighter", "text-success")
 
 
-def warning_badge(content):
+def action_required_badge(content):
     return badge(content, "bg-accent-03", "text-primary")
 
 
 ACCEPTED_BADGE = success_badge("Validé")
-PENDING_AFTER_REVIEW_BADGE = warning_badge("Nouveaux justificatifs à traiter")
+PENDING_AFTER_REVIEW_BADGE = action_required_badge("Nouveaux justificatifs à traiter")
 REFUSED_BADGE = danger_badge("Problème constaté")
 SUBMITTED_BADGE = success_lighter_badge("Transmis")
-TODO_BADGE = warning_badge("À traiter")
-UPLOADED_BADGE = warning_badge("Justificatifs téléversés")
+TODO_BADGE = action_required_badge("À traiter")
+UPLOADED_BADGE = action_required_badge("Justificatifs téléversés")
 
 BADGES = {
     EvaluatedJobApplicationsState.PENDING: TODO_BADGE,
