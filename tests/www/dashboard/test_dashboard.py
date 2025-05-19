@@ -742,7 +742,7 @@ class TestDashboardView:
         assertContains(response, self.SUSPEND_TEXT)
 
     @freeze_time("2022-09-15")
-    def test_dashboard_access_by_a_jobseeker(self, client):
+    def test_jobseeker_approval_card(self, client):
         WAITING_PERIOD_WITH_VALID_DIAGNOSIS = (
             "Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau "
             "diagnostic d’éligibilité IAE."
@@ -752,11 +752,22 @@ class TestDashboardView:
             "doit réaliser un nouveau diagnostic d’éligibilité IAE : France Travail, Mission Locale, Cap emploi par "
             "exemple."
         )
+        HOW_TO_GET_PASS = (
+            "Pour obtenir un PASS IAE, vous devez avoir un diagnostic d’éligibilité à l’IAE valide et avoir une "
+            "candidature acceptée dans une SIAE (Structure d’insertion par l’activité économique)."
+        )
 
         user = JobSeekerFactory(with_address=True)
-        approval = ApprovalFactory(user=user, start_at=date(2022, 6, 21), end_at=date(2022, 12, 6))
         client.force_login(user)
         url = reverse("dashboard:index")
+        response = client.get(url)
+        assertContains(response, "PASS IAE inexistant")
+        assertContains(response, HOW_TO_GET_PASS, html=True)
+        assertNotContains(response, "Numéro de PASS IAE")
+        assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS, html=True)
+        assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
+
+        approval = ApprovalFactory(user=user, start_at=date(2022, 6, 21), end_at=date(2022, 12, 6))
         response = client.get(url)
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, format_approval_number(approval))
