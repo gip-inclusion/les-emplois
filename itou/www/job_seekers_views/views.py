@@ -33,7 +33,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.apply.views.submit_views import ApplicationBaseView
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
@@ -221,6 +221,9 @@ class GetOrCreateJobSeekerStartView(View):
         if self.tunnel == "sender" or self.tunnel == "hire":
             apply_data = {}
             if apply_session_uuid := request.GET.get("apply_session_uuid"):
+                apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+                if not apply_session.exists():
+                    raise Http404("Session de candidature invalide")
                 apply_data["session_uuid"] = apply_session_uuid
             try:
                 company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
