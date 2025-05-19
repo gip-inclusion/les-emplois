@@ -32,7 +32,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.apply.views.submit_views import ApplicationBaseView
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
@@ -310,9 +310,14 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
     def get_apply_kwargs(self, job_seeker):
         apply_data = self.job_seeker_session.get("apply", {})
         if session_uuid := apply_data.get("session_uuid"):
+            self.assign_job_seeker_in_apply_session(session_uuid, job_seeker)
             return {"session_uuid": session_uuid}
         # There's only the company_pk, it's the old session format
         return apply_data | {"job_seeker_public_id": job_seeker.public_id}
+
+    def assign_job_seeker_in_apply_session(self, apply_session_uuid, job_seeker):
+        apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+        apply_session.set("job_seeker_public_id", str(job_seeker.public_id))
 
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:

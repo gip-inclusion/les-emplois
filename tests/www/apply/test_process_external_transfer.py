@@ -300,7 +300,11 @@ def test_start_session(client):
     )
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
     assertRedirects(response, transfer_step_2_url)
-    assert client.session[apply_session_name] == {"reset_url": transfer_step_1_url, "company_pk": other_company.pk}
+    assert client.session[apply_session_name] == {
+        "reset_url": transfer_step_1_url,
+        "company_pk": other_company.pk,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
+    }
 
     # With selected job
     transfer_start_session_url = (
@@ -316,7 +320,11 @@ def test_start_session(client):
         f"{transfer_step_2_base_url}?job_description_id={job_id}&back_url={quote(transfer_step_1_url)}"
     )
     assertRedirects(response, transfer_step_2_url)
-    assert client.session[apply_session_name] == {"reset_url": transfer_step_1_url, "company_pk": other_company.pk}
+    assert client.session[apply_session_name] == {
+        "reset_url": transfer_step_1_url,
+        "company_pk": other_company.pk,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
+    }
 
 
 def test_step_2(client, snapshot):
@@ -329,7 +337,9 @@ def test_step_2(client, snapshot):
     transfer_step_1_url = reverse(
         "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
     )
-    apply_session = fake_session_initialization(client, other_company, {"reset_url": transfer_step_1_url})
+    apply_session = fake_session_initialization(
+        client, other_company, job_application.job_seeker, {"reset_url": transfer_step_1_url}
+    )
     transfer_step_2_base_url = reverse(
         "apply:job_application_external_transfer_step_2",
         kwargs={"job_application_id": job_application.pk, "session_uuid": apply_session.name},
@@ -354,6 +364,7 @@ def test_step_2(client, snapshot):
         "selected_jobs": [],
         "reset_url": transfer_step_1_url,
         "company_pk": other_company.pk,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
     }
 
     # With selected job
@@ -373,6 +384,7 @@ def test_step_2(client, snapshot):
         "selected_jobs": [job_id],
         "reset_url": transfer_step_1_url,
         "company_pk": other_company.pk,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
     }
 
 
@@ -426,7 +438,7 @@ def test_step_3(client, snapshot, pdf_file):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     apply_session = fake_session_initialization(
-        client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"}
+        client, other_company, job_application.job_seeker, {"selected_jobs": [], "reset_url": "/dashboard"}
     )
 
     transfer_step_2_url = reverse(
@@ -472,7 +484,7 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     apply_session = fake_session_initialization(
-        client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"}
+        client, other_company, job_application.job_seeker, {"selected_jobs": [], "reset_url": "/dashboard"}
     )
 
     transfer_step_2_url = reverse(
@@ -514,7 +526,7 @@ def test_step_3_remove_previous_CV(client):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     apply_session = fake_session_initialization(
-        client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"}
+        client, other_company, job_application.job_seeker, {"selected_jobs": [], "reset_url": "/dashboard"}
     )
 
     transfer_step_2_url = reverse(
@@ -555,7 +567,7 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
     apply_session = fake_session_initialization(
-        client, other_company, {"selected_jobs": [], "reset_url": "/dashboard"}
+        client, other_company, job_application.job_seeker, {"selected_jobs": [], "reset_url": "/dashboard"}
     )
 
     transfer_step_2_url = reverse(
@@ -681,6 +693,7 @@ def test_full_process(client, pdf_file):
         "company_pk": other_company.pk,
         "selected_jobs": [],
         "reset_url": transfer_step_1_url,
+        "job_seeker_public_id": str(job_application.job_seeker.public_id),
     }
 
     # STEP 3

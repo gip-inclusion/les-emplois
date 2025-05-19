@@ -114,10 +114,7 @@ class TestApplyAsPrescriber:
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
-        next_url = reverse(
-            "apply:application_jobs",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step apply to job
@@ -133,12 +130,10 @@ class TestApplyAsPrescriber:
             "company_pk": guerande_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
+            "job_seeker_public_id": job_seeker.public_id,
         }
 
-        next_url = reverse(
-            "apply:application_eligibility",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's eligibility
@@ -160,10 +155,7 @@ class TestApplyAsPrescriber:
 
         assert EligibilityDiagnosis.objects.has_considered_valid(job_seeker, for_siae=guerande_company)
 
-        next_url = reverse(
-            "apply:application_resume",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's resume.
@@ -287,10 +279,7 @@ class TestApplyAsPrescriber:
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
-        next_url = reverse(
-            "apply:application_jobs",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step apply to job
@@ -306,12 +295,10 @@ class TestApplyAsPrescriber:
             "company_pk": guerande_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
+            "job_seeker_public_id": job_seeker.public_id,
         }
 
-        next_url = reverse(
-            "apply:application_resume",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
@@ -447,10 +434,7 @@ class TestApplyAsCompany:
         response = client.get(apply_company_url)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
 
-        next_url = reverse(
-            "apply:application_jobs",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's jobs.
@@ -466,12 +450,10 @@ class TestApplyAsCompany:
             "company_pk": other_company.pk,
             "selected_jobs": [selected_job.pk],
             "reset_url": reverse("dashboard:index"),
+            "job_seeker_public_id": job_seeker.public_id,
         }
 
-        next_url = reverse(
-            "apply:application_resume",
-            kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": job_seeker.public_id},
-        )
+        next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's resume (eligibility step is skipped as the user is not a authorized prescriber)
@@ -539,10 +521,7 @@ class TestApplyAsJobSeeker:
         client.force_login(job_seeker)
 
         def _check_info_url(session_uuid):
-            return reverse(
-                "job_seekers_views:check_job_seeker_info",
-                kwargs={"session_uuid": session_uuid, "job_seeker_public_id": job_seeker.public_id},
-            )
+            return reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": session_uuid})
 
         # Step apply to company
         # ----------------------------------------------------------------------
@@ -562,7 +541,7 @@ class TestApplyAsJobSeeker:
 
         apply_job_description_url_other_uuid = (
             reverse("apply:start", kwargs={"company_pk": company.pk})
-            + f"?job_description_id={job_description.pk}&job_seeker_public_id=123"
+            + f"?job_description_id={job_description.pk}&job_seeker_public_id={other_job_seeker.public_id}"
         )
 
         response = client.get(apply_job_description_url_other_uuid, follow=True)

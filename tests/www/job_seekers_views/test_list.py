@@ -32,6 +32,7 @@ from tests.users.factories import (
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.www.apply.test_submit import fake_session_initialization
 
 
 def assert_contains_button_apply_for(response, job_seeker, with_city=True):
@@ -362,6 +363,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
     client.get(company_url)
 
     # Init complete session
+    apply_session = fake_session_initialization(client, company, None, {})
     session = client.session
     session_name = str(uuid.uuid4())
     session[session_name] = {
@@ -371,7 +373,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
         },
         "apply": {
             "company_pk": company.pk,
-            "session_uuid": uuid.uuid4(),  # We don't need the apply_session to exist in this test
+            "session_uuid": apply_session.name,
         },
         "user": {
             "email": "jeandujardin@inclusion.gouv.fr",
