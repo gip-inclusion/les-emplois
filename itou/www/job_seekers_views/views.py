@@ -219,8 +219,10 @@ class GetOrCreateJobSeekerStartView(View):
         # apply data
         if self.tunnel == "sender" or self.tunnel == "hire":
             apply_data = {}
-            if apply_session_uuid := request.GET.get("apply_session_uuid"):
-                apply_data["session_uuid"] = apply_session_uuid
+            apply_session_uuid = request.GET.get("apply_session_uuid")
+            if not apply_session_uuid:
+                raise Http404()
+            apply_data["session_uuid"] = apply_session_uuid
             try:
                 company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
                 apply_data["company_pk"] = company.pk
@@ -308,16 +310,10 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         )
 
     def get_apply_kwargs(self, job_seeker):
-        apply_data = self.job_seeker_session.get("apply", {})
-        if session_uuid := apply_data.get("session_uuid"):
-            self.assign_job_seeker_in_apply_session(session_uuid, job_seeker)
-            return {"session_uuid": session_uuid}
-        # There's only the company_pk, it's the old session format
-        return apply_data | {"job_seeker_public_id": job_seeker.public_id}
-
-    def assign_job_seeker_in_apply_session(self, apply_session_uuid, job_seeker):
-        apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+        session_uuid = self.job_seeker_session.get("apply")["session_uuid"]
+        apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, session_uuid)
         apply_session.set("job_seeker_public_id", str(job_seeker.public_id))
+        return {"session_uuid": session_uuid}
 
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
@@ -331,7 +327,6 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-        kwargs = self.get_apply_kwargs(job_seeker)
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -347,7 +342,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         else:
             # We found a job seeker to apply for, so we check their info
             view_name = "job_seekers_views:check_job_seeker_info"
-        return reverse(view_name, kwargs=kwargs)
+        return reverse(view_name, kwargs=self.get_apply_kwargs(job_seeker))
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -1201,7 +1196,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
 
     def get_redirect_url(self):
-        return reverse("apply:step_check_prev_applications", kwargs=self.get_base_kwargs())
+        return reverse("apply:step_check_prev_applications", kwargs={"session_uuid": self.apply_session.name})
 
     def get(self, request, *args, **kwargs):
         # Check required info that will allow us to find a pre-existing approval.
@@ -1242,5 +1237,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
-            "next_url": reverse("apply:check_prev_applications_for_hire", kwargs=self.get_base_kwargs()),
+            "next_url": reverse(
+                "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            ),
         }
