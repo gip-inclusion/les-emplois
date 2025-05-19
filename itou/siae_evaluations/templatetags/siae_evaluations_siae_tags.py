@@ -44,33 +44,36 @@ SUBMITTED_BADGE = success_lighter_badge("Transmis")
 TODO_BADGE = action_required_badge("À traiter")
 UPLOADED_BADGE = action_required_badge("Justificatifs téléversés")
 
-BADGES = {
-    EvaluatedJobApplicationsState.PENDING: TODO_BADGE,
-    EvaluatedJobApplicationsState.PROCESSING: info_badge("En cours"),
-    EvaluatedJobApplicationsState.SUBMITTED: SUBMITTED_BADGE,
-    EvaluatedJobApplicationsState.UPLOADED: UPLOADED_BADGE,
-    # When the institution evaluation is in progress, the institution updates
-    # the job application state. Don’t reveal the new state before the review
-    # is published.
-    EvaluatedJobApplicationsState.ACCEPTED: SUBMITTED_BADGE,
-    EvaluatedJobApplicationsState.REFUSED: SUBMITTED_BADGE,
-}
 
-REVIEWED_BADGES = {
-    EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
-    EvaluatedJobApplicationsState.UPLOADED: UPLOADED_BADGE,
-    EvaluatedJobApplicationsState.SUBMITTED: SUBMITTED_BADGE,
-    EvaluatedJobApplicationsState.REFUSED: REFUSED_BADGE,
-    EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
-    EvaluatedJobApplicationsState.PROCESSING: TODO_BADGE,
-    EvaluatedJobApplicationsState.PENDING: PENDING_AFTER_REVIEW_BADGE,
-}
+def get_employer_badges(adversarial_stage):
+    if adversarial_stage:
+        return {
+            EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
+            EvaluatedJobApplicationsState.UPLOADED: UPLOADED_BADGE,
+            EvaluatedJobApplicationsState.SUBMITTED: SUBMITTED_BADGE,
+            EvaluatedJobApplicationsState.REFUSED: REFUSED_BADGE,
+            EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
+            EvaluatedJobApplicationsState.PROCESSING: TODO_BADGE,
+            EvaluatedJobApplicationsState.PENDING: PENDING_AFTER_REVIEW_BADGE,
+        }
+    return {
+        EvaluatedJobApplicationsState.PENDING: TODO_BADGE,
+        EvaluatedJobApplicationsState.PROCESSING: info_badge("En cours"),
+        EvaluatedJobApplicationsState.SUBMITTED: SUBMITTED_BADGE,
+        EvaluatedJobApplicationsState.UPLOADED: UPLOADED_BADGE,
+        # When the institution evaluation is in progress, the institution updates
+        # the job application state. Don’t reveal the new state before the review
+        # is published.
+        EvaluatedJobApplicationsState.ACCEPTED: SUBMITTED_BADGE,
+        EvaluatedJobApplicationsState.REFUSED: SUBMITTED_BADGE,
+    }
 
 
 @register.simple_tag
 def evaluated_job_application_state_for_siae(evaluated_job_application):
     state = evaluated_job_application.compute_state()
-    if evaluated_job_application.evaluated_siae.evaluation_campaign.ended_at:
+    evaluated_siae = evaluated_job_application.evaluated_siae
+    if evaluated_siae.evaluation_campaign.ended_at:
         if state in [EvaluatedJobApplicationsState.ACCEPTED, EvaluatedJobApplicationsState.SUBMITTED]:
             return ACCEPTED_BADGE
         return REFUSED_BADGE
@@ -81,6 +84,4 @@ def evaluated_job_application_state_for_siae(evaluated_job_application):
         submitted_state_priority = EvaluatedJobApplication.STATES_PRIORITY.index(submitted_state)
         if real_state_priority < submitted_state_priority:
             state = submitted_state
-    if evaluated_job_application.evaluated_siae.reviewed_at:
-        return REVIEWED_BADGES[state]
-    return BADGES[state]
+    return get_employer_badges(bool(evaluated_siae.reviewed_at))[state]
