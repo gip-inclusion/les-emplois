@@ -389,8 +389,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
@@ -1334,8 +1333,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_selectedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
@@ -1797,8 +1795,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
@@ -2670,8 +2667,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_selectedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
@@ -3107,8 +3103,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC

@@ -153,13 +153,6 @@ class AbstractAdministrativeCriteria(models.Model):
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name="créé par",
-        null=True,
-        blank=True,
-        on_delete=models.RESTRICT,  # For traceability and accountability
-    )
 
     class Meta:
         abstract = True

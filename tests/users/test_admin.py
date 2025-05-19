@@ -80,7 +80,6 @@ def test_get_fields_to_transfer_for_job_seekers():
     # Get list of fields pointing to the User models
     relation_fields = {field for field in User._meta.get_fields() if field.is_relation and not field.many_to_one}
     fields_to_ignore = {
-        "administrativecriteria",  # AdministrativeCriteria.created_by
         "approval",  # Approval.created_by
         "approval_manually_delivered",  # JobApplication.approval_manually_delivered_by
         "approval_manually_refused",  # JobApplication.approval_manually_refused_by
@@ -97,7 +96,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "follow_up_group",  # gps.FollowUpGroup: do I have a GPS follow group as a jobseeker
         "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
         "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
-        "geiqadministrativecriteria",  # GEIQAdministrativeCriteria.created_by
         "geiqeligibilitydiagnosis",  # GEIQEligibilityDiagnosis.author
         "groups",  # django.contrib.auth.models.Group
         "institution",  # Institution.members

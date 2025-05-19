@@ -187,8 +187,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           WHERE "eligibility_administrativecriteria"."id" IN (%s,
                                                               %s,
