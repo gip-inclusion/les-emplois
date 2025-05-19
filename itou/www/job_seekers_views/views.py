@@ -309,11 +309,11 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             and self.company == request.current_organization
         )
 
-    def get_apply_kwargs(self, job_seeker):
-        session_uuid = self.job_seeker_session.get("apply")["session_uuid"]
-        apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, session_uuid)
+    def assign_job_seeker_in_apply_session(self, job_seeker):
+        apply_session = SessionNamespace(
+            self.request.session, APPLY_SESSION_KIND, self.job_seeker_session.get("apply")["session_uuid"]
+        )
         apply_session.set("job_seeker_public_id", str(job_seeker.public_id))
-        return {"session_uuid": session_uuid}
 
     def get_exit_url(self, job_seeker, created=False):
         if self.is_gps:
@@ -327,6 +327,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
+        self.assign_job_seeker_in_apply_session(job_seeker)
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
             if self.company.kind == CompanyKind.GEIQ:
@@ -342,7 +343,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         else:
             # We found a job seeker to apply for, so we check their info
             view_name = "job_seekers_views:check_job_seeker_info"
-        return reverse(view_name, kwargs=self.get_apply_kwargs(job_seeker))
+        return reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.get("apply")["session_uuid"]})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -400,9 +401,11 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
         if self.job_seeker.jobseeker_profile.nir:
+            self.assign_job_seeker_in_apply_session(self.job_seeker)
             # get_apply_kwargs requires the job_seeker_session
             next_url = reverse(
-                "job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker)
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"session_uuid": self.job_seeker_session.get("apply")["session_uuid"]},
             )
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
             # so we delete the session here.
@@ -412,7 +415,11 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs=self.get_apply_kwargs(self.job_seeker))
+        self.assign_job_seeker_in_apply_session(self.job_seeker)
+        next_url = reverse(
+            "job_seekers_views:check_job_seeker_info",
+            kwargs={"session_uuid": self.job_seeker_session.get("apply")["session_uuid"]},
+        )
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
