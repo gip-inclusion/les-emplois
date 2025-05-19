@@ -25,7 +25,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     assert_previous_step,
@@ -844,7 +844,7 @@ def test_list_snapshot(client, snapshot):
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert str(page) == snapshot(name="empty")
 
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
     prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
 

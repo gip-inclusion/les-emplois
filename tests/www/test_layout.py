@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -16,7 +16,7 @@ def test_navigation_not_authenticated(snapshot, client):
 @pytest.mark.parametrize(
     "user_factory",
     [
-        pytest.param(JobSeekerFactory, id="JobSeeker"),
+        pytest.param(JobSeekerUserFactory, id="JobSeeker"),
         pytest.param(
             partial(
                 EmployerFactory,

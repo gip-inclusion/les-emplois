@@ -18,7 +18,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup, reload_module
 
 
@@ -55,7 +55,7 @@ class TestJobSeekerSignup:
         response = client.get(url)
         assert response.status_code == 200
 
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -163,7 +163,7 @@ class TestJobSeekerSignup:
         # Temporary numbers don't have a consistent format.
         nir = "1234567895GHTUI"
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -189,7 +189,7 @@ class TestJobSeekerSignup:
         # Temporary numbers don't have a consistent format.
         nir = "1234567895GHTUI"
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -213,7 +213,7 @@ class TestJobSeekerSignup:
     def test_job_seeker_signup_temporary_nir_invalid_birthdate(self, client):
         nir = "1234567895GHTUI"
 
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -242,7 +242,7 @@ class TestJobSeekerSignup:
         }
 
     def test_job_seeker_signup_with_existing_email(self, client):
-        alice = JobSeekerFactory(email="alice@evil.com", born_in_france=True)
+        alice = JobSeekerUserFactory(email="alice@evil.com", born_in_france=True)
         url = reverse("signup:job_seeker")
         response = client.post(
             url,
@@ -273,7 +273,7 @@ class TestJobSeekerSignup:
         response = client.get(url)
         assert response.status_code == 200
 
-        job_seeker_data = JobSeekerFactory.build(for_snapshot=True)
+        job_seeker_data = JobSeekerUserFactory.build(for_snapshot=True)
         birth_country = Country.objects.get(name="FRANCE")
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
@@ -313,7 +313,7 @@ class TestJobSeekerSignup:
         assert str(form) == snapshot
 
     def test_born_in_france_shows_in_job_seeker_credentials(self, client):
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         birth_place = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
@@ -384,7 +384,7 @@ class TestJobSeekerSignup:
         assert user.jobseeker_profile.birth_country_id == birth_country.pk
 
     def test_born_in_france_no_birthplace(self, client):
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         response = client.post(
             reverse("signup:job_seeker"),
             {
@@ -423,7 +423,7 @@ class TestJobSeekerSignup:
         )
 
     def test_born_outside_of_france_specifies_birth_place(self, client, mocker):
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         response = client.post(
@@ -474,7 +474,7 @@ class TestJobSeekerSignup:
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_signup
         nir = "141068078200557"
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -516,7 +516,7 @@ class TestJobSeekerSignup:
         # See self.test_job_seeker_temporary_nir
 
         nir = ""
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -565,9 +565,9 @@ class TestJobSeekerSignup:
         Test registration error behaviour when key fields (NIR/email) conflict with existing user(s)
         A modal with detailed error information is displayed to the user
         """
-        existing_user = JobSeekerFactory(for_snapshot=True)
+        existing_user = JobSeekerUserFactory(for_snapshot=True)
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         post_data = {
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
@@ -606,10 +606,10 @@ class TestJobSeekerSignup:
             assert response.context["form"].errors["nir"] == ["Un compte avec ce numéro existe déjà."]
 
     def test_job_seeker_signup_with_conflicting_email_not_verified(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True)
+        existing_user = JobSeekerUserFactory(for_snapshot=True)
         unverified_email_address = existing_user.emailaddress_set.create(email=existing_user.email, verified=False)
 
-        job_seeker_data = JobSeekerFactory.build()
+        job_seeker_data = JobSeekerUserFactory.build()
         post_data = {
             "nir": job_seeker_data.jobseeker_profile.nir,
             "title": job_seeker_data.title,
@@ -628,7 +628,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_with_conflicting_email_temporary_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True)
+        existing_user = JobSeekerUserFactory(for_snapshot=True)
 
         post_data = {
             "nir": "1234567895GHTUI",
@@ -648,7 +648,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_temporary_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
+        existing_user = JobSeekerUserFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
 
         post_data = {
             "nir": "1234567895GHTUI",
@@ -673,7 +673,7 @@ class TestJobSeekerSignup:
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
     def test_job_seeker_signup_birth_fields_conflict_redefine_nir(self, client, snapshot):
-        existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
+        existing_user = JobSeekerUserFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
 
         post_data = {
             "nir": "141068078200557",
@@ -727,7 +727,7 @@ class TestJobSeekerSignup:
         The NIR is normally a more reliable source of unicity than email
         When the NIR is undefined (e.g. temporary), then a matching email is more important
         """
-        existing_user = JobSeekerFactory(jobseeker_profile__nir="")
+        existing_user = JobSeekerUserFactory(jobseeker_profile__nir="")
 
         post_data = {
             "nir": "",

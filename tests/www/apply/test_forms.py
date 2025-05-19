@@ -12,7 +12,7 @@ from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestAcceptForm:
@@ -391,7 +391,7 @@ class TestJobApplicationRefusalReasonForm:
 
         # Prescriber only
         prescriber_apps_with_same_job_seeker = JobApplicationFactory.create_batch(
-            2, job_seeker=JobSeekerFactory(), to_company=company, sent_by_authorized_prescriber_organisation=True
+            2, job_seeker=JobSeekerUserFactory(), to_company=company, sent_by_authorized_prescriber_organisation=True
         )
         form = apply_forms.JobApplicationRefusalReasonForm(prescriber_apps_with_same_job_seeker)
         assert (

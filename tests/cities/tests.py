@@ -5,7 +5,7 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.cities.models import City, EditionModeChoices
 from tests.cities.factories import create_city_guerande, create_test_cities
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_create_test_cities():
@@ -232,9 +232,9 @@ def test_sync_cities(settings, caplog, respx_mock):
 
 def test_resolve_insee_cities(caplog, snapshot):
     guerande = create_city_guerande()  # Guérande, 44350
-    user = JobSeekerFactory(city="GUERAND", post_code="44350", geocoding_score=0.9)
-    non_resolved_user_1 = JobSeekerFactory(city="Guérande", post_code="54350", geocoding_score=0.9)
-    non_resolved_user_2 = JobSeekerFactory(city="ERAND", post_code="44350", geocoding_score=0.9)
+    user = JobSeekerUserFactory(city="GUERAND", post_code="44350", geocoding_score=0.9)
+    non_resolved_user_1 = JobSeekerUserFactory(city="Guérande", post_code="54350", geocoding_score=0.9)
+    non_resolved_user_2 = JobSeekerUserFactory(city="ERAND", post_code="44350", geocoding_score=0.9)
     call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
     assert caplog.messages[:-1] == snapshot(name="first_pass")
     assert caplog.messages[-1].startswith(

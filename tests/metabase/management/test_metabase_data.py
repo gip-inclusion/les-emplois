@@ -8,7 +8,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.metabase.management.commands import metabase_data
 from itou.metabase.models import DatumKey
 from itou.users.models import User
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 @pytest.fixture(name="command")
@@ -63,9 +63,9 @@ def test_show(capsys, snapshot, command):
 def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     settings.METABASE_API_KEY = "metabase-api-key"
 
-    entering_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=False)
-    exiting_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
-    noop_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
+    entering_job_seeker = JobSeekerUserFactory(jobseeker_profile__is_stalled=False)
+    exiting_job_seeker = JobSeekerUserFactory(jobseeker_profile__is_stalled=True)
+    noop_job_seeker = JobSeekerUserFactory(jobseeker_profile__is_stalled=True)
     mocker.patch(
         "itou.utils.apis.metabase.Client.fetch_card_results",
         return_value=[

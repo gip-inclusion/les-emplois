@@ -15,7 +15,7 @@ from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 faker = Faker()
@@ -49,7 +49,7 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
         lambda obj: timezone.localdate(obj.created_at)
         + relativedelta(months=AbstractEligibilityDiagnosisModel.EXPIRATION_DELAY_MONTHS)
     )
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+    job_seeker = factory.SubFactory(JobSeekerUserFactory)
 
 
 class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):

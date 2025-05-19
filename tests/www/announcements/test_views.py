@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains
 
 from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -54,7 +54,7 @@ class TestNewsRender:
 
         # candidates only receive news relating to them
         assert campaign.items.exclude(user_kind_tags__contains=[UserKind.JOB_SEEKER]).exists()
-        client.force_login(JobSeekerFactory())
+        client.force_login(JobSeekerUserFactory())
         response = client.get(url)
         assert response.status_code == 200
 
@@ -108,11 +108,11 @@ class TestNewsRender:
 
         # it's also possible that there are live campaigns without content for my user kind
         AnnouncementItemFactory(user_kind_tags=[UserKind.PRESCRIBER])
-        client.force_login(JobSeekerFactory())
+        client.force_login(JobSeekerUserFactory())
         assert_content_matches_snapshot(client.get(url))
 
     def test_rendering_invalid_file_does_not_crash(self, client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         item = AnnouncementItemFactory(with_image=True, user_kind_tags=[user.kind])
 
         with patch.object(storages["public"], "_open", side_effect=FileNotFoundError("File does not exist")):

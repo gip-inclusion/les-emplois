@@ -12,7 +12,7 @@ from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
@@ -71,7 +71,7 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     "user_factory,is_redirected",
     [
         (ItouStaffFactory, True),
-        (JobSeekerFactory, True),
+        (JobSeekerUserFactory, True),
         (PrescriberFactory, False),
         (partial(EmployerFactory, with_company=True), False),
         (partial(LaborInspectorFactory, membership=True), True),

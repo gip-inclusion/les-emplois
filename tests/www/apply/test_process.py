@@ -69,7 +69,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users import constants as users_test_constants
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     assert_previous_step,
@@ -525,7 +525,7 @@ class TestProcessViews:
 
     def test_details_for_job_seeker(self, client, snapshot):
         """As a job seeker, I can access the job_applications details for job seekers."""
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         job_application = JobApplicationFactory(job_seeker=job_seeker)
         job_application.process()
@@ -574,7 +574,7 @@ class TestProcessViews:
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
 
         for user in [
-            JobSeekerFactory(),
+            JobSeekerUserFactory(),
             EmployerFactory(with_company=True),
             PrescriberFactory(),
             LaborInspectorFactory(membership=True),
@@ -655,7 +655,7 @@ class TestProcessViews:
         assert str(html_fragment) == snapshot
 
     def test_external_transfer_log_display(self, client, snapshot):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_app = JobApplicationFactory(
                 for_snapshot=True,
@@ -681,7 +681,7 @@ class TestProcessViews:
         assert str(html_fragment) == snapshot
 
     def test_details_for_company_transition_logs_hides_hired_by_other(self, client, snapshot):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_app1 = JobApplicationFactory(
                 for_snapshot=True,
@@ -1271,7 +1271,7 @@ class TestProcessViews:
             job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
         ]
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
@@ -1314,7 +1314,7 @@ class TestProcessViews:
             job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
         ]
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
@@ -1354,7 +1354,7 @@ class TestProcessViews:
             job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
         ]
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
         for state in states:
@@ -1392,7 +1392,7 @@ class TestProcessViews:
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            job_seeker=JobSeekerUserFactory(with_address_in_qpv=True),
             eligibility_diagnosis=None,
         )
 
@@ -1470,7 +1470,7 @@ class TestProcessViews:
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address=True),
+            job_seeker=JobSeekerUserFactory(with_address=True),
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -1490,7 +1490,7 @@ class TestProcessViews:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
-            to_company=company, job_seeker=JobSeekerFactory(with_address=True)
+            to_company=company, job_seeker=JobSeekerUserFactory(with_address=True)
         )
 
         # Right states
@@ -1901,7 +1901,7 @@ class TestProcessAcceptViews:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         self.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
-        self.job_seeker = JobSeekerFactory(
+        self.job_seeker = JobSeekerUserFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
@@ -2534,7 +2534,7 @@ class TestProcessAcceptViews:
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
-        other_job_seeker = JobSeekerFactory(
+        other_job_seeker = JobSeekerUserFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
@@ -3002,7 +3002,7 @@ class TestProcessAcceptViews:
 
     @freeze_time("2024-09-11")
     def test_accept_personal_data_readonly_with_certified_criteria(self, client):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             born_in_france=True,
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
@@ -3377,7 +3377,7 @@ class TestProcessTransferJobApplication:
     def test_job_application_transfer_without_rights(self, client):
         company = CompanyFactory()
         other_company = CompanyFactory()
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
@@ -4014,7 +4014,7 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     url = reverse(
         "apply:reload_qualification_fields",
         kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -4042,7 +4042,7 @@ def test_reload_qualification_fields_404(client, missing_field):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
     kwargs[missing_field[0]] = missing_field[1]
     url = reverse("apply:reload_qualification_fields", kwargs=kwargs)
@@ -4072,7 +4072,7 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     url = reverse(
         "apply:reload_contract_type_and_options",
         kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
@@ -4100,7 +4100,7 @@ def test_reload_contract_type_and_options_404(client, missing_field):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     kwargs = {"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
     kwargs[missing_field[0]] = missing_field[1]
     url = reverse("apply:reload_contract_type_and_options", kwargs=kwargs)

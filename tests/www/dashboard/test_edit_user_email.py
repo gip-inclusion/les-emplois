@@ -5,14 +5,14 @@ from itou.users.enums import IdentityProvider
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.users.factories import (
     DEFAULT_PASSWORD,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
 
 class TestChangeEmailView:
     def test_update_email(self, client, mailoutbox):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         old_email = user.email
         new_email = "jean@gabin.fr"
 
@@ -72,7 +72,7 @@ class TestChangeEmailView:
     def test_update_email_forbidden(self, client):
         url = reverse("dashboard:edit_user_email")
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        job_seeker = JobSeekerUserFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         client.force_login(job_seeker)
         response = client.get(url)
         assert response.status_code == 403
@@ -95,7 +95,7 @@ class TestEditUserEmailForm:
         assert not form.is_valid()
 
         # Email already taken by another user. Bad luck!
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         data = {"email": user.email, "email_confirmation": user.email}
         form = EditUserEmailForm(data=data, user_email=old_email)
         assert not form.is_valid()

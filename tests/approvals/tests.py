@@ -43,7 +43,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerUserFactory
 
 
 class TestCommonApprovalQuerySet:
@@ -187,7 +187,7 @@ class TestCommonApprovalMixin:
 
     def test_is_pass_iae(self):
         # PoleEmploiApproval.
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
@@ -279,7 +279,7 @@ class TestApprovalModel:
         assert approval.number_with_spaces == expected
 
     def test_is_last_for_user(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
 
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
@@ -777,19 +777,19 @@ class TestPoleEmploiApprovalModel:
 
 class TestPoleEmploiApprovalManager:
     def test_find_for_no_queries(self):
-        user = JobSeekerFactory(jobseeker_profile__pole_emploi_id="")
+        user = JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="")
         with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
+        user = JobSeekerUserFactory(jobseeker_profile__birthdate=None)
         with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
     def test_find_for_user(self):
         # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
         today = timezone.localdate()
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
@@ -854,7 +854,7 @@ class TestPoleEmploiApprovalManager:
         assert search_results[3] == other_nir_approval
 
     def test_find_for_no_nir(self):
-        user = JobSeekerFactory(jobseeker_profile__nir="")
+        user = JobSeekerUserFactory(jobseeker_profile__nir="")
         PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
         with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
@@ -927,7 +927,7 @@ class TestCustomApprovalAdminViews:
     def test_manually_add_approval(self, client, mailoutbox):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
@@ -944,7 +944,7 @@ class TestCustomApprovalAdminViews:
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
         # Not enough perms.
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 302
@@ -1664,14 +1664,14 @@ class TestApprovalConcurrentModel:
     def test_nominal_process(self):
         with transaction.atomic():
             # create a first approval out of the blue, ensure the number is correct.
-            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, origin_pe_approval=True)
+            approval_1 = ApprovalFactory.build(user=JobSeekerUserFactory(), number=None, origin_pe_approval=True)
             assert Approval.objects.count() == 0
             approval_1.save()
             assert approval_1.number == "XXXXX0000001"
             assert Approval.objects.count() == 1
 
             # if a second one is created after the save, no worries man.
-            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, origin_pe_approval=True)
+            approval_2 = ApprovalFactory.build(user=JobSeekerUserFactory(), number=None, origin_pe_approval=True)
             approval_2.save()
             assert approval_2.number == "XXXXX0000002"
 
@@ -1686,10 +1686,10 @@ class TestApprovalConcurrentModel:
         # create a first Approval so that the last() in get_next_number actually has something
         # to select_for_update() and will effectively lock the last row.
         with transaction.atomic():
-            ApprovalFactory(user=JobSeekerFactory(), number=None)
+            ApprovalFactory(user=JobSeekerUserFactory(), number=None)
 
-        user1 = JobSeekerFactory()
-        user2 = JobSeekerFactory()
+        user1 = JobSeekerUserFactory()
+        user2 = JobSeekerUserFactory()
 
         approval = None
         approval2 = None

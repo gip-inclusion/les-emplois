@@ -12,7 +12,7 @@ from itou.utils.urls import add_url_params
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -31,7 +31,7 @@ class TestApplyAsPrescriber:
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
         prescriber = PrescriberFactory(membership__organization__authorized=True)
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             first_name="Alain",
             last_name="Zorro",
             public_id="11111111-2222-3333-4444-555566667777",
@@ -203,7 +203,7 @@ class TestApplyAsPrescriber:
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
         prescriber = PrescriberFactory(membership__organization__authorized=False)
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             first_name="Alain",
             last_name="Zorro",
             public_id="11111111-2222-3333-4444-555566667777",
@@ -388,7 +388,7 @@ class TestApplyAsCompany:
         )
         JobDescriptionFactory(company=other_company, location=guerande)
         employer = guerande_company.members.first()
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             first_name="Alain",
             last_name="Zorro",
             public_id="11111111-2222-3333-4444-555566667777",
@@ -527,8 +527,8 @@ class TestApplyAsJobSeeker:
     def test_cannot_apply_as_job_seeker_for_someone_else(self, client):
         company = CompanyWithMembershipAndJobsFactory()
         job_description = JobDescriptionFactory(company=company)
-        job_seeker = JobSeekerFactory()
-        other_job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
+        other_job_seeker = JobSeekerUserFactory()
 
         client.force_login(job_seeker)
 

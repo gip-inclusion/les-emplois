@@ -9,7 +9,7 @@ from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
@@ -59,7 +59,7 @@ def test_solo_adviser_allowed(client, snapshot):
 
 
 def test_job_seeker_allowed(client, snapshot):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     client.force_login(job_seeker)
     url = reverse("dashboard:edit_user_notifications")
     with assertSnapshotQueries(snapshot(name="view queries")):
@@ -227,7 +227,7 @@ def test_solo_adviser_create_update_notification_settings(client, snapshot):
 
 
 def test_job_seeker_create_update_notification_settings(client, snapshot):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     client.force_login(job_seeker)
     url = reverse("dashboard:edit_user_notifications")
 

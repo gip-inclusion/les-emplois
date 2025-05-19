@@ -19,7 +19,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
 )
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
@@ -50,7 +50,7 @@ def test_list_for_job_seeker_queries(client, snapshot):
 
 
 def test_filters(client, snapshot):
-    client.force_login(JobSeekerFactory())
+    client.force_login(JobSeekerUserFactory())
 
     response = client.get(reverse("apply:list_for_job_seeker"))
     assert response.status_code == 200
@@ -80,7 +80,7 @@ def test_list_for_job_seeker_filtered_by_dates(client):
     and filtered by dates
     """
     now = timezone.now()
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     for diff_day in [7, 5, 3, 0]:
         JobApplicationSentByJobSeekerFactory(created_at=now - timezone.timedelta(days=diff_day), job_seeker=job_seeker)
     client.force_login(job_seeker)
@@ -101,7 +101,7 @@ def test_list_for_job_seeker_filtered_by_dates(client):
 
 
 def test_list_display_kind(client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
@@ -124,7 +124,7 @@ def test_list_display_kind(client):
 
 
 def test_list_for_job_seeker_htmx_filters(client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
     client.force_login(job_seeker)
 
@@ -154,7 +154,7 @@ def test_list_for_job_seeker_htmx_filters(client):
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     client.force_login(job_seeker)
     url = reverse("apply:list_for_job_seeker")
 

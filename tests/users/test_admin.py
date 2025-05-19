@@ -10,12 +10,12 @@ from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_search(admin_client):
-    user = JobSeekerFactory()
-    other_user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
+    other_user = JobSeekerUserFactory()
 
     response = admin_client.get(reverse("admin:users_user_changelist") + f"?q={user.public_id}")
     assertContains(response, user.email)
@@ -23,17 +23,17 @@ def test_search(admin_client):
 
 
 def test_filter():
-    ft_certified = JobSeekerFactory(first_name="FT", last_name="Certified")
+    ft_certified = JobSeekerUserFactory(first_name="FT", last_name="Certified")
     IdentityCertification.objects.create(
         certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
         jobseeker_profile=ft_certified.jobseeker_profile,
     )
-    api_particulier_certified = JobSeekerFactory(first_name="API Particulier", last_name="Certified")
+    api_particulier_certified = JobSeekerUserFactory(first_name="API Particulier", last_name="Certified")
     IdentityCertification.objects.create(
         certifier=IdentityCertificationAuthorities.API_PARTICULIER,
         jobseeker_profile=api_particulier_certified.jobseeker_profile,
     )
-    not_certified = JobSeekerFactory(first_name="NOT", last_name="Certified")
+    not_certified = JobSeekerUserFactory(first_name="NOT", last_name="Certified")
 
     filter = admin.CertifierFilter(
         None,

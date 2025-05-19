@@ -4,12 +4,12 @@ from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import compute_hexa_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def _users_with_mock_address(idx):
     address = BAN_GEOCODING_API_RESULTS_MOCK[idx]
-    return JobSeekerFactory(
+    return JobSeekerUserFactory(
         with_address=True,
         address_line_1=address.get("address_line_1"),
         post_code=address.get("post_code"),
@@ -24,7 +24,7 @@ def mock_api(mocker):
 
 class TestFormatASPBadAdresses:
     def test_not_existing_address(self):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             address_line_1="9 avenue de Huet", post_code="32531", city="MalletVille", department="32"
         )
         result, error = compute_hexa_address(job_seeker)

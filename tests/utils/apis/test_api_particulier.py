@@ -13,11 +13,11 @@ from itou.utils.mocks.api_particulier import (
     ResponseKind,
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_build_params_from(snapshot):
-    job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(born_in_france=True, for_snapshot=True)
     job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
         "07141", job_seeker.jobseeker_profile.birthdate
     )
@@ -25,10 +25,10 @@ def test_build_params_from(snapshot):
     assert api_particulier._build_params_from(job_seeker) == snapshot(name="api_particulier_build_params")
     assert api_particulier.has_required_info(job_seeker) is True
 
-    job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None)
+    job_seeker = JobSeekerUserFactory(jobseeker_profile__birthdate=None)
     assert api_particulier.has_required_info(job_seeker) is False
 
-    job_seeker = JobSeekerFactory(born_outside_france=True)
+    job_seeker = JobSeekerUserFactory(born_outside_france=True)
     params = api_particulier._build_params_from(job_seeker)
     assert api_particulier.has_required_info(job_seeker) is True
     assert "codeInseeLieuDeNaissance" not in params.keys()

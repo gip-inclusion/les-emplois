@@ -10,7 +10,7 @@ from itou.users.enums import UserKind
 from itou.www.invitations_views.forms import EmployerInvitationForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory
 
 
 INVITATION_URL = reverse("invitations_views:invite_employer")
@@ -96,7 +96,7 @@ class TestSendSingleCompanyInvitation:
         assert invitation.USER_KIND == UserKind.EMPLOYER
 
     def test_send_invitation_to_not_employer(self, client):
-        user = JobSeekerFactory(**self.guest_data)
+        user = JobSeekerUserFactory(**self.guest_data)
         client.force_login(self.sender)
 
         for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
@@ -264,7 +264,7 @@ class TestSendInvitationToSpecialGuest:
         assert EmployerInvitation.objects.count() == 0
 
     def test_invite_existing_user_is_job_seeker(self, client):
-        guest = JobSeekerFactory()
+        guest = JobSeekerUserFactory()
         client.force_login(self.sender)
         self.post_data.update(
             {

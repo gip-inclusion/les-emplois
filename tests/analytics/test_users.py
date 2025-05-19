@@ -36,7 +36,7 @@ def test_collect_analytics_when_no_user_exists():
 
 
 def test_collect_analytics_with_data():
-    users_factories.JobSeekerFactory.create_batch(2)
+    users_factories.JobSeekerUserFactory.create_batch(2)
     users_factories.PrescriberFactory.create_batch(3)
     users_factories.EmployerFactory.create_batch(4)
     users_factories.LaborInspectorFactory.create_batch(5)

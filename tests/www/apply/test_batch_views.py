@@ -16,7 +16,7 @@ from tests.job_applications.factories import (
     JobApplicationFactory,
 )
 from tests.users.factories import (
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
 )
 from tests.utils.test import session_data_without_known_keys
@@ -831,7 +831,7 @@ class TestBatchRefuse:
         client.force_login(employer)
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         refusable_apps = JobApplicationFactory.create_batch(
             2,
             to_company=company,

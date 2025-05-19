@@ -11,7 +11,7 @@ from itou.job_applications.enums import (
     RefusalReason,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 @pytest.mark.parametrize("state", AUTO_REJECT_JOB_APPLICATION_STATES)
@@ -31,7 +31,7 @@ def test_reject_job_applications_after_delay(state, django_capture_on_commit_cal
         updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY,
     )
     # second job_seeker with numerous oldish job applications
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     other_expected_job_applications = JobApplicationFactory.create_batch(
         limit + 1,
         job_seeker=job_seeker,

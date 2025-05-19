@@ -10,7 +10,7 @@ from pytest_django.asserts import assertNumQueries
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestAnnouncementCampaignCache:
@@ -85,7 +85,7 @@ class TestAnnouncementCampaignCache:
             sentry_mock.reset_mock()
 
             # Page should not crash.
-            client.force_login(JobSeekerFactory(with_address=True))
+            client.force_login(JobSeekerUserFactory(with_address=True))
             response = client.get(reverse("dashboard:index"))
             assert response.status_code == 200
             sentry_mock.assert_called()

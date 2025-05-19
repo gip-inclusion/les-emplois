@@ -33,7 +33,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 from tests.www.siae_evaluations_views.test_siaes_views import TestSiaeEvaluatedJobApplicationView
 
@@ -44,7 +44,7 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_
     user = membership.user
     siae = membership.company
 
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
 
     administrative_criteria = AdministrativeCriteria.objects.get(pk=1)
     eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(

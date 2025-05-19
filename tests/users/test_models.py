@@ -46,8 +46,8 @@ from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
@@ -57,16 +57,16 @@ from tests.users.factories import (
 class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
         # Unique user.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="5555555A")
 
         # 2 users using the same `pole_emploi_id`.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="6666666B")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="6666666B")
 
         # 3 users using the same `pole_emploi_id`.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="7777777C")
 
         duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
 
@@ -75,33 +75,33 @@ class TestManager:
 
     def test_get_duplicates_by_pole_emploi_id(self):
         # 2 users using the same `pole_emploi_id` and different birthdates.
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
         )
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(2001, 12, 12)
         )
 
         # 2 users using the same `pole_emploi_id` and the same birthdates.
-        user1 = JobSeekerFactory(
+        user1 = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
         )
-        user2 = JobSeekerFactory(
+        user2 = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
         )
 
         # 3 users using the same `pole_emploi_id` and the same birthdates.
-        user3 = JobSeekerFactory(
+        user3 = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
         )
-        user4 = JobSeekerFactory(
+        user4 = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
         )
-        user5 = JobSeekerFactory(
+        user5 = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
         )
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(1978, 12, 20)
         )
 
@@ -117,8 +117,8 @@ class TestManager:
         assert duplicated_users == expected_result
 
     def test_search_by_full_name(self):
-        user_1 = JobSeekerFactory(first_name="Jean-Paul", last_name="II")
-        JobSeekerFactory(first_name="Jean-Michel", last_name="Relou")
+        user_1 = JobSeekerUserFactory(first_name="Jean-Paul", last_name="II")
+        JobSeekerUserFactory(first_name="Jean-Michel", last_name="Relou")
 
         assert User.objects.search_by_full_name("Jean").count() == 2
         assert User.objects.search_by_full_name("Jean II").get() == user_1
@@ -129,14 +129,14 @@ class TestManager:
         prescriber = PrescriberMembershipFactory(organization=organization).user
 
         # From the prescriber as a member of no organization
-        job_seeker_created_by_user_no_organization = JobSeekerFactory(created_by=prescriber)
+        job_seeker_created_by_user_no_organization = JobSeekerUserFactory(created_by=prescriber)
         job_seeker_with_sent_job_app_no_organization = JobApplicationFactory(
             sender=prescriber, eligibility_diagnosis=None
         ).job_seeker
         # It's not possible to make a eligibility diagnosis with no organization
 
         # From the prescriber as a member of the organization
-        job_seeker_created_by_user_in_organization = JobSeekerFactory(
+        job_seeker_created_by_user_in_organization = JobSeekerUserFactory(
             created_by=prescriber,
             jobseeker_profile__created_by_prescriber_organization=organization,
         )
@@ -152,7 +152,7 @@ class TestManager:
         ).job_seeker
 
         # From the prescriber as a member of another organization. We won't display those
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             created_by=prescriber,
             jobseeker_profile__created_by_prescriber_organization=other_organization,
         )
@@ -167,7 +167,7 @@ class TestManager:
             from_prescriber=True,
         )
 
-        job_seeker_created_by_organization_coworker = JobSeekerFactory(
+        job_seeker_created_by_organization_coworker = JobSeekerUserFactory(
             jobseeker_profile__created_by_prescriber_organization=organization
         )
         job_seeker_with_job_app_sent_by_organization_coworker = JobApplicationFactory(
@@ -300,7 +300,7 @@ class TestModel:
 
     def test_clean_pole_emploi_fields(self):
         # Both fields cannot be empty.
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="", jobseeker_profile__lack_of_pole_emploi_id_reason=""
         )
         cleaned_data = {
@@ -311,7 +311,7 @@ class TestModel:
             JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="69970749",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -325,7 +325,7 @@ class TestModel:
 
         # No exception should be raised for the following cases.
 
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="62723349", jobseeker_profile__lack_of_pole_emploi_id_reason=""
         )
         cleaned_data = {
@@ -334,7 +334,7 @@ class TestModel:
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -345,7 +345,7 @@ class TestModel:
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
     def test_email_already_exists(self):
-        JobSeekerFactory(email="foo@bar.com")
+        JobSeekerUserFactory(email="foo@bar.com")
         assert User.email_already_exists("foo@bar.com")
         assert User.email_already_exists("FOO@bar.com")
 
@@ -355,14 +355,14 @@ class TestModel:
         """
 
         email = "juste@leblanc.com"
-        JobSeekerFactory(email=email)
+        JobSeekerUserFactory(email=email)
 
         # Creating a user with an existing email should raise an error.
         with pytest.raises(ValidationError):
-            JobSeekerFactory(email=email)
+            JobSeekerUserFactory(email=email)
 
         # Updating a user with an existing email should raise an error.
-        user = JobSeekerFactory(email="francois@pignon.com")
+        user = JobSeekerUserFactory(email="francois@pignon.com")
         user.email = email
         with pytest.raises(ValidationError):
             user.save()
@@ -370,14 +370,14 @@ class TestModel:
         # Make sure it's case insensitive.
         email = email.title()
         with pytest.raises(ValidationError):
-            JobSeekerFactory(email=email)
+            JobSeekerUserFactory(email=email)
 
     def test_is_handled_by_proxy(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         assert not job_seeker.is_handled_by_proxy
 
         prescriber = PrescriberFactory()
-        job_seeker = JobSeekerFactory(created_by=prescriber)
+        job_seeker = JobSeekerUserFactory(created_by=prescriber)
         assert job_seeker.is_handled_by_proxy
 
         # Job seeker activates his account. He is in control now!
@@ -385,16 +385,16 @@ class TestModel:
         assert not job_seeker.is_handled_by_proxy
 
     def test_has_sso_provider(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         assert not user.has_sso_provider
 
-        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
+        user = JobSeekerUserFactory(identity_provider=IdentityProvider.DJANGO)
         assert not user.has_sso_provider
 
-        user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        user = JobSeekerUserFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         assert user.has_sso_provider
 
-        user = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
+        user = JobSeekerUserFactory(identity_provider=IdentityProvider.PE_CONNECT)
         assert user.has_sso_provider
 
         user = PrescriberFactory()
@@ -540,42 +540,42 @@ class TestModel:
 
     def test_can_edit_email(self):
         user = PrescriberFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         # Same user.
         assert not user.can_edit_email(user)
 
         # All conditions are met.
-        job_seeker = JobSeekerFactory(created_by=user)
+        job_seeker = JobSeekerUserFactory(created_by=user)
         assert user.can_edit_email(job_seeker)
 
         # Job seeker logged in, he is not longer handled by a proxy.
-        job_seeker = JobSeekerFactory(last_login=timezone.now())
+        job_seeker = JobSeekerUserFactory(last_login=timezone.now())
         assert not user.can_edit_email(job_seeker)
 
         # User did not create the job seeker's account.
-        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
+        job_seeker = JobSeekerUserFactory(created_by=PrescriberFactory())
         assert not user.can_edit_email(job_seeker)
 
         # Job seeker has verified his email.
-        job_seeker = JobSeekerFactory(created_by=user)
+        job_seeker = JobSeekerUserFactory(created_by=user)
         job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
         assert not user.can_edit_email(job_seeker)
 
     def test_is_account_creator(self):
         user = PrescriberFactory()
 
-        job_seeker = JobSeekerFactory(created_by=user)
+        job_seeker = JobSeekerUserFactory(created_by=user)
         assert job_seeker.is_created_by(user)
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         assert not job_seeker.is_created_by(user)
 
-        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
+        job_seeker = JobSeekerUserFactory(created_by=PrescriberFactory())
         assert not job_seeker.is_created_by(user)
 
     def test_has_verified_email(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
 
         assert not user.has_verified_email
         address = user.emailaddress_set.create(email=user.email, verified=False)
@@ -626,7 +626,7 @@ class TestModel:
         assert user.is_staff
 
     def test_get_kind_display(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         assert "candidat" == job_seeker.get_kind_display()
 
         prescriber = PrescriberFactory()
@@ -657,10 +657,10 @@ class TestModel:
 
     def test_identity_provider_vs_kind(self, subtests):
         cases = [
-            [JobSeekerFactory, IdentityProvider.DJANGO, False],
-            [JobSeekerFactory, IdentityProvider.PE_CONNECT, False],
-            [JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False],
-            [JobSeekerFactory, IdentityProvider.INCLUSION_CONNECT, True],
+            [JobSeekerUserFactory, IdentityProvider.DJANGO, False],
+            [JobSeekerUserFactory, IdentityProvider.PE_CONNECT, False],
+            [JobSeekerUserFactory, IdentityProvider.FRANCE_CONNECT, False],
+            [JobSeekerUserFactory, IdentityProvider.INCLUSION_CONNECT, True],
             [PrescriberFactory, IdentityProvider.DJANGO, False],
             [PrescriberFactory, IdentityProvider.PE_CONNECT, True],
             [PrescriberFactory, IdentityProvider.FRANCE_CONNECT, True],
@@ -687,18 +687,18 @@ class TestModel:
                     factory(identity_provider=identity_provider)
 
     def test_get_full_name(self):
-        assert JobSeekerFactory(first_name="CLÉMENT", last_name="Dupont").get_full_name() == "Clément DUPONT"
+        assert JobSeekerUserFactory(first_name="CLÉMENT", last_name="Dupont").get_full_name() == "Clément DUPONT"
         assert (
-            JobSeekerFactory(first_name="JEAN-FRANÇOIS", last_name="de Saint Exupéry").get_full_name()
+            JobSeekerUserFactory(first_name="JEAN-FRANÇOIS", last_name="de Saint Exupéry").get_full_name()
             == "Jean-François DE SAINT EXUPÉRY"
         )
         assert (
-            JobSeekerFactory(first_name=" marie aurore", last_name="maréchal").get_full_name()
+            JobSeekerUserFactory(first_name=" marie aurore", last_name="maréchal").get_full_name()
             == "Marie Aurore MARÉCHAL"
         )
         too_long_name = "a" * 149
 
-        assert len(JobSeekerFactory(first_name=too_long_name, last_name="maréchal").get_full_name()) == 70
+        assert len(JobSeekerUserFactory(first_name=too_long_name, last_name="maréchal").get_full_name()) == 70
 
     @pytest.mark.parametrize(
         "first_name,last_name,expected",
@@ -714,7 +714,7 @@ class TestModel:
         ],
     )
     def test_get_redacted_full_name(self, first_name, last_name, expected):
-        user = JobSeekerFactory(first_name=first_name, last_name=last_name)
+        user = JobSeekerUserFactory(first_name=first_name, last_name=last_name)
         assert user.get_redacted_full_name() == expected
 
     @pytest.mark.parametrize(
@@ -730,13 +730,13 @@ class TestModel:
         ],
     )
     def test_get_truncated_full_name(self, first_name, last_name, expected):
-        user = JobSeekerFactory(first_name=first_name, last_name=last_name)
+        user = JobSeekerUserFactory(first_name=first_name, last_name=last_name)
         assert user.get_truncated_full_name() == expected
 
 
 class TestJobSeekerProfileModel:
     def setup_method(self):
-        self.user = JobSeekerFactory(
+        self.user = JobSeekerUserFactory(
             with_address=True,
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
             jobseeker_profile__education_level=random.choice(EducationLevel.values),
@@ -894,7 +894,7 @@ class TestJobSeekerProfileModel:
         Otherwise, if the job seeker is born in another country,
         the commune must remain empty.
         """
-        profile = JobSeekerFactory().jobseeker_profile
+        profile = JobSeekerUserFactory().jobseeker_profile
 
         # Valid use cases:
 
@@ -902,15 +902,15 @@ class TestJobSeekerProfileModel:
         assert profile._clean_birth_fields() is None
 
         # France and Commune filled
-        profile = JobSeekerFactory(born_in_france=True).jobseeker_profile
+        profile = JobSeekerUserFactory(born_in_france=True).jobseeker_profile
         assert profile._clean_birth_fields() is None
 
-        profile = JobSeekerFactory(born_outside_france=True).jobseeker_profile
+        profile = JobSeekerUserFactory(born_outside_france=True).jobseeker_profile
         assert profile._clean_birth_fields() is None
 
 
 def user_with_approval_in_waiting_period():
-    user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
     end_at = timezone.localdate() - relativedelta(days=30)
     start_at = end_at - datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
     # diagnosis.created_at is a datetime, approval.start_at is a date
@@ -929,7 +929,7 @@ def user_with_approval_in_waiting_period():
 class TestLatestApproval:
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case1(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
 
         ApprovalFactory(
             user=user,
@@ -962,7 +962,7 @@ class TestLatestApproval:
 
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case2(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
 
         # PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
@@ -988,7 +988,7 @@ class TestLatestApproval:
         assert user.latest_pe_approval == pe_approval_2
 
     def test_merge_approvals_pass_and_pe_valid(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         start_at = timezone.localdate() - relativedelta(months=2)
         end_at = start_at + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
 
@@ -1017,14 +1017,14 @@ class TestLatestApproval:
         assert user.latest_approval == pass_iae
 
     def test_status_without_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         assert user.has_no_common_approval
         assert not user.has_valid_approval
         assert not user.has_latest_common_approval_in_waiting_period
         assert user.latest_approval is None
 
     def test_status_with_valid_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
         assert not user.has_no_common_approval
         assert user.has_valid_approval
@@ -1039,7 +1039,7 @@ class TestLatestApproval:
         assert user.latest_approval == user.latest_approval
 
     def test_status_approval_with_elapsed_waiting_period(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
@@ -1049,7 +1049,7 @@ class TestLatestApproval:
         assert user.latest_approval is None
 
     def test_status_with_valid_pole_emploi_approval(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
@@ -1060,7 +1060,7 @@ class TestLatestApproval:
         assert user.latest_pe_approval == pe_approval
 
     def test_status_with_expired_pole_emploi_approval_and_valid_approval(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.jobseeker_profile.birthdate,
@@ -1136,16 +1136,16 @@ class TestLatestApproval:
         )
 
     def test_latest_common_approval_no_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         assert user.latest_common_approval is None
 
     def test_latest_common_approval_when_only_pe_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         pe_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_with_expired_pe_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         today = timezone.localdate()
         PoleEmploiApprovalFactory(
             nir=user.jobseeker_profile.nir,
@@ -1160,13 +1160,13 @@ class TestLatestApproval:
         assert user.latest_common_approval == approval
 
     def test_latest_common_approval_is_approval_if_valid(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         approval = ApprovalFactory(user=user)
         PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == approval
 
     def test_latest_common_approval_is_pe_approval_if_approval_is_expired(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         # expired approval
@@ -1175,7 +1175,7 @@ class TestLatestApproval:
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_is_pe_approval_edge_case(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         end_at = timezone.localdate() - relativedelta(days=10)
         start_at = end_at - relativedelta(years=2)
         # approval in waiting period
@@ -1184,7 +1184,7 @@ class TestLatestApproval:
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_is_none_if_both_expired(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
@@ -1240,7 +1240,7 @@ def test_job_seeker_profile_asp_uid_field_history():
 @pytest.mark.parametrize(
     "factory",
     [
-        JobSeekerFactory,
+        JobSeekerUserFactory,
         PrescriberFactory,
         EmployerFactory,
         LaborInspectorFactory,
@@ -1401,7 +1401,7 @@ def test_is_prescriber_with_authorized_org_memberships(user_active, membership_a
 
 
 def test_user_first_login(client):
-    user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
     assert user.last_login is None
     assert user.first_login is None
 
@@ -1421,43 +1421,43 @@ def test_user_first_login(client):
     "factory, related_object_factory, expected_last_activity",
     [
         pytest.param(
-            JobSeekerFactory,
+            JobSeekerUserFactory,
             None,
             lambda jobseeker: jobseeker.date_joined,
             id="jobseeker_without_login",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now()),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now()),
             None,
             lambda jobseeker: jobseeker.last_login,
             id="jobseeker_with_login",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
             lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
             lambda jobseeker: jobseeker.job_applications.last().updated_at,
             id="jobseeker_with_recent_jobapplication",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
             lambda jobseeker: ApprovalFactory(user=jobseeker),
             lambda jobseeker: jobseeker.approvals.last().updated_at,
             id="jobseeker_with_recent_approval",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
             lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
             lambda jobseeker: jobseeker.eligibility_diagnoses.last().updated_at,
             id="jobseeker_with_eligibility_diagnosis",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
             lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
             lambda jobseeker: jobseeker.geiq_eligibility_diagnoses.last().updated_at,
             id="jobseeker_with_geiq_eligibility_diagnosis",
         ),
         pytest.param(
-            lambda: JobSeekerFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
+            lambda: JobSeekerUserFactory(joined_days_ago=365, last_login=timezone.now() - datetime.timedelta(days=1)),
             lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
             lambda jobseeker: jobseeker.follow_up_group.updated_at,
             id="jobseeker_with_followup_group",

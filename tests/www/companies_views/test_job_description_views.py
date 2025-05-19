@@ -19,7 +19,7 @@ from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, session_data_without_known_keys
 
 
@@ -790,7 +790,7 @@ class TestUpdateJobDescriptionView(JobDescriptionAbstract):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in client.session
 
     @pytest.mark.parametrize(
-        "UserFactory", [partial(EmployerFactory, with_company=True), PrescriberFactory, JobSeekerFactory]
+        "UserFactory", [partial(EmployerFactory, with_company=True), PrescriberFactory, JobSeekerUserFactory]
     )
     def test_update_job_description_as_other_user(self, client, UserFactory):
         job_description = JobDescriptionFactory()
@@ -852,7 +852,7 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         )
 
     def test_job_seeker_card_actions(self, client, snapshot):
-        client.force_login(JobSeekerFactory())
+        client.force_login(JobSeekerUserFactory())
 
         with assertSnapshotQueries(snapshot):
             response = client.get(self.url)

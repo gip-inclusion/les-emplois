@@ -15,7 +15,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 def test_selected_criteria_inline(admin_client):
@@ -117,7 +117,7 @@ class TestAdminForm:
     @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
     def test_add_eligibility_diagnostic(self, admin_client, kind, user_kind):
         author = self.user_factory(kind, user_kind)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerUserFactory())
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
 
@@ -135,7 +135,7 @@ class TestAdminForm:
         author = self.user_factory(kind, user_kind)
         author.prescribermembership_set.update(is_active=False)
         author.companymembership_set.update(is_active=False)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerUserFactory())
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
 
@@ -144,7 +144,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_no_criteria(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assertRedirects(response, self.get_list_url(kind))
@@ -164,7 +164,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_author(self, admin_client, kind):
         author = ItouStaffFactory()
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         post_data["author_kind"] = "prescriber"
         post_data["author_prescriber_organization"] = PrescriberOrganizationFactory().pk
 
@@ -176,7 +176,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_author_kind(self, admin_client, kind):
         author = PrescriberFactory(membership=True, membership__organization__authorized=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         post_data["author_kind"] = "geiq" if kind == "iae" else "employer"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -189,7 +189,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_bad_prescriber(self, admin_client, kind):
         author = PrescriberFactory(membership=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         author.prescribermembership_set.all().delete()
         post_data["author_kind"] = "employer" if kind == "iae" else "geiq"
 
@@ -203,7 +203,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_unauthorized_prescriber(self, admin_client, kind):
         author = PrescriberFactory(membership=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
 
         response = admin_client.post(self.get_add_url(kind), data=post_data, follow=True)
         assertRedirects(response, self.get_list_url(kind))
@@ -215,7 +215,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_employer_bad_author_kind(self, admin_client, kind):
         author = self.user_factory(kind, UserKind.EMPLOYER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         post_data["author_kind"] = "prescriber"
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -225,7 +225,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_employer_bad_company_kind(self, admin_client, kind):
         author = EmployerFactory(with_company=True)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         Company.objects.filter(pk=post_data[self.company_field_name(kind)]).update(kind=CompanyKind.EA)  # Not a siae
         response = admin_client.post(self.get_add_url(kind), data=post_data)
         assert response.status_code == 200
@@ -240,7 +240,7 @@ class TestAdminForm:
 
     def test_add_eligibility_diagnostic_employer_not_a_member(self, admin_client, kind):
         author = self.user_factory(kind, UserKind.EMPLOYER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
         author.companymembership_set.all().delete()
 
         response = admin_client.post(self.get_add_url(kind), data=post_data)
@@ -250,7 +250,7 @@ class TestAdminForm:
     @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
     def test_add_eligibility_not_both_org_and_company(self, admin_client, kind, user_kind):
         author = self.user_factory(kind, user_kind)
-        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
+        post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerUserFactory())
         if user_kind == UserKind.EMPLOYER:
             post_data["author_prescriber_organization"] = PrescriberOrganizationFactory().pk
         else:
@@ -272,7 +272,7 @@ class TestAdminForm:
 
     def test_dont_edit_eligibility_diagnostic_expires_at(self, admin_client, kind):
         author = self.user_factory(kind, UserKind.PRESCRIBER)
-        post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
+        post_data = self.build_post_data(kind, author, JobSeekerUserFactory(), with_administrative_criteria=False)
 
         with freeze_time("2025-01-21"):
             response = admin_client.post(self.get_add_url(kind), data=post_data)

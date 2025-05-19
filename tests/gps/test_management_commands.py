@@ -26,7 +26,7 @@ from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
@@ -39,7 +39,7 @@ class TestSyncGroupsManagementCommand:
         ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
     def test_get_users_contacts(ids):
-        beneficiary = JobSeekerFactory()
+        beneficiary = JobSeekerUserFactory()
         staff = ItouStaffFactory()
 
         # employer with multiple contacts
@@ -135,9 +135,9 @@ class TestSyncGroupsManagementCommand:
         staff = ItouStaffFactory()
 
         # A beneficiary with no existing group, staff user will be ignored
-        beneficiary_1 = JobSeekerFactory(created_by=staff)
+        beneficiary_1 = JobSeekerUserFactory(created_by=staff)
         # Another one with a group but we found new contacts
-        beneficiary_2 = JobSeekerFactory()
+        beneficiary_2 = JobSeekerUserFactory()
         group_2 = FollowUpGroupFactory(beneficiary=beneficiary_2)
         membership_2_1 = FollowUpGroupMembershipFactory(
             follow_up_group=group_2,
@@ -185,7 +185,7 @@ class TestSyncGroupsManagementCommand:
         )
 
         # simple contact with created job seeker
-        beneficiary_3 = JobSeekerFactory(created_by=follower_1)
+        beneficiary_3 = JobSeekerUserFactory(created_by=follower_1)
 
         contacts_data = sync_follow_up_groups_and_members.get_users_contacts(
             [beneficiary_1.pk, beneficiary_2.pk, beneficiary_3.pk]
@@ -237,7 +237,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     batch_group_creator = ItouStaffFactory()
     settings.GPS_GROUPS_CREATED_BY_EMAIL = batch_group_creator.email
 
-    job_seeker_with_no_correct_data = JobSeekerFactory()
+    job_seeker_with_no_correct_data = JobSeekerUserFactory()
     employer = EmployerFactory()
 
     unknown_safir = "22222"
@@ -245,11 +245,11 @@ def test_import_advisor_information(settings, caplog, mocker):
     organization = PrescriberOrganizationFactory(code_safir_pole_emploi=known_safir)
 
     # A job seeker whose advisor is a prescriber that already exists, with no follow up group
-    job_seeker_1 = JobSeekerFactory()
+    job_seeker_1 = JobSeekerUserFactory()
     prescriber_1 = PrescriberFactory()
 
     # A job seeker whose advisor is a prescriber that already exists, with a follow up group
-    job_seeker_2 = JobSeekerFactory()
+    job_seeker_2 = JobSeekerUserFactory()
     prescriber_2 = PrescriberFactory()
     membership_2 = FollowUpGroupMembershipFactory(
         follow_up_group__beneficiary=job_seeker_2,
@@ -261,14 +261,14 @@ def test_import_advisor_information(settings, caplog, mocker):
     )
 
     # A job seeker whose advisor is a prescriber that does not exist, with a safir that exists
-    job_seeker_3 = JobSeekerFactory()
+    job_seeker_3 = JobSeekerUserFactory()
     # previous certified referent
     previous_membership_3 = FollowUpGroupMembershipFactory(
         follow_up_group__beneficiary=job_seeker_3, is_referent_certified=True
     )
 
     # A job seeker whose advisor is a prescriber that does not exist, with a safir that does not exist
-    job_seeker_4 = JobSeekerFactory()
+    job_seeker_4 = JobSeekerUserFactory()
 
     # An old membership that had is_referent_certified=True
     old_certified_referent_membership = FollowUpGroupMembershipFactory(is_referent_certified=True)
@@ -430,14 +430,14 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
     PrescriberFactory(post_code="30000")
 
     # Not in the correct department
-    JobSeekerFactory(post_code="40000")
+    JobSeekerUserFactory(post_code="40000")
 
-    job_seeker_1 = JobSeekerFactory(
+    job_seeker_1 = JobSeekerUserFactory(
         post_code="30000",
         jobseeker_profile__birthdate=datetime.date(2000, 12, 31),
         jobseeker_profile__nir="",
     )
-    job_seeker_2 = JobSeekerFactory(
+    job_seeker_2 = JobSeekerUserFactory(
         post_code="30000",
         jobseeker_profile__birthdate=None,
     )

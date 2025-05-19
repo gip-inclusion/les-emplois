@@ -29,7 +29,7 @@ from tests.companies.factories import (
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 class TestCompanyFactories:
@@ -404,7 +404,7 @@ class TestCompanyQuerySet:
 class TestJobDescriptionQuerySet:
     def test_with_annotation_is_overwhelmed(self):
         company = CompanyFactory(with_jobs=True)
-        job_seeker = JobSeekerFactory()  # We don't care if it's always the same
+        job_seeker = JobSeekerUserFactory()  # We don't care if it's always the same
         siae_job_descriptions = company.job_description_through.all()
         threshold_exceeded = JobDescription.OVERWHELMED_THRESHOLD + 1
 

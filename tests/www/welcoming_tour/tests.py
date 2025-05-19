@@ -8,7 +8,7 @@ from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerUserFactory
 
 
 def get_confirm_email_url(request, email):
@@ -27,7 +27,7 @@ def verify_email(client, email, request):
 
 class TestWelcomingTour:
     def test_new_job_seeker_sees_welcoming_tour_test(self, client):
-        job_seeker = JobSeekerFactory.build(born_in_france=True)
+        job_seeker = JobSeekerUserFactory.build(born_in_france=True)
 
         # First signup step: job seeker personal info.
         url = reverse("signup:job_seeker")
@@ -91,7 +91,7 @@ class TestWelcomingTour:
 class TestWelcomingTourExceptions:
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self, client, mailoutbox):
         company = CompanyFactory(with_membership=True)
-        job_seeker = JobSeekerFactory.build(born_in_france=True)
+        job_seeker = JobSeekerUserFactory.build(born_in_france=True)
 
         # First signup step: job seeker personal info.
         next_to = reverse("apply:start", kwargs={"company_pk": company.pk})

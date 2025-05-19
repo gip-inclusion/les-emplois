@@ -7,7 +7,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -15,7 +15,7 @@ class TestApplicantsAPI:
     URL = reverse_lazy("v1:applicants-list")
 
     def test_login_as_job_seeker(self, api_client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         api_client.force_authenticate(user)
 
         response = api_client.get(self.URL, format="json")

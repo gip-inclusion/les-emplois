@@ -27,7 +27,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users import constants as users_test_constants
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup, session_data_without_known_keys
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
 
@@ -85,7 +85,7 @@ class TestGetOrCreateForJobSeeker:
     def test_start_create_forbidden_for_job_seekers(self, client):
         TUNNELS = ["sender", "hire", "gps"]
         company = CompanyFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(job_seeker)
 
@@ -102,7 +102,7 @@ class TestGetOrCreateForJobSeeker:
     def test_create_forbidden_for_job_seekers(self, client):
         TUNNELS = ["sender", "hire", "gps"]
         company = CompanyFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(job_seeker)
 
@@ -131,7 +131,7 @@ class TestGetOrCreateForJobSeeker:
 
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerUserFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         reset_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
 
@@ -160,7 +160,7 @@ class TestGetOrCreateForJobSeeker:
 
     def test_cannot_check_nir_if_already_set(self, client):
         company = CompanyFactory(with_membership=True)
-        user = JobSeekerFactory(
+        user = JobSeekerUserFactory(
             jobseeker_profile__birthdate=datetime.date(1994, 2, 22), jobseeker_profile__nir="194022734304328"
         )
         client.force_login(user)
@@ -210,7 +210,7 @@ class TestGetOrCreateForSender:
         expected_status_code,
         client,
     ):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
@@ -466,7 +466,7 @@ class TestStandaloneCreateAsPrescriber:
         other_user_in_other_organization = other_organization.members.first()
         client.force_login(user)
 
-        existing_job_seeker = JobSeekerFactory(for_snapshot=True)
+        existing_job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
         match case:
             case "in_list_user":
@@ -544,7 +544,7 @@ class TestStandaloneCreateAsPrescriber:
         other_user_in_other_organization = other_organization.members.first()
         client.force_login(user)
 
-        existing_job_seeker = JobSeekerFactory(for_snapshot=True)
+        existing_job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
         match case:
             case "in_list_user":
@@ -616,7 +616,7 @@ class TestStandaloneCreateAsPrescriber:
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -840,7 +840,7 @@ class TestStandaloneCreateAsPrescriber:
 class TestUpdateAsOther:
     def test_labor_inspectors_are_not_allowed_update_job_seeker(self, client):
         institution_member = InstitutionMembershipFactory().user
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(institution_member)
 
@@ -854,7 +854,7 @@ class TestUpdateAsOther:
 
     def test_itou_staff_are_not_allowed_to_update_job_seeker(self, client):
         user = ItouStaffFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(user)
 
@@ -867,7 +867,7 @@ class TestUpdateAsOther:
         assert response.status_code == 403
 
     def test_anonymous_access(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         params = {
             "job_seeker_public_id": job_seeker.public_id,
@@ -880,7 +880,7 @@ class TestUpdateAsOther:
 
 class TestUpdateForJobSeeker:
     def test_start_update_job_seeker_forbidden(self, client):
-        job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        job_seeker = JobSeekerUserFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         company = CompanyFactory(with_membership=True)
         client.force_login(job_seeker)
 
@@ -915,7 +915,7 @@ class TestUpdateForSender:
         ],
     )
     def test_start_update(self, job_seeker_value, from_url_value, expected_status_code, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
@@ -971,7 +971,7 @@ class TestUpdateForSender:
             )
 
     def test_update_with_wrong_session(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         client.force_login(prescriber)
@@ -1001,7 +1001,7 @@ class TestUpdateForSender:
     def test_update_step_1(self, born_in_france, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerUserFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1048,7 +1048,7 @@ class TestUpdateForSender:
     def test_birth_country_not_france_and_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerUserFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1096,7 +1096,7 @@ class TestUpdateForSender:
     def test_birth_country_france_and_no_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerUserFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
         client.force_login(user)
 
         # Init session
@@ -1143,7 +1143,7 @@ class TestUpdateForSender:
     def test_fields_readonly_with_certified_criteria(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             created_by=user,
             title=Title.M,
             born_in_france=True,

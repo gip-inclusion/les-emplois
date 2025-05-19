@@ -14,7 +14,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByCompanyFactory,
     JobApplicationSentByPrescriberFactory,
 )
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import assertSnapshotQueries
 
 
@@ -51,7 +51,7 @@ def test_can_be_transferred():
 
     origin_user = origin_company.members.first()
     target_user = target_company.members.first()
-    lambda_user = JobSeekerFactory()
+    lambda_user = JobSeekerUserFactory()
     target_company.members.add(origin_user)
 
     job_application = JobApplicationFactory(to_company=origin_company, state=JobApplicationState.ACCEPTED)
@@ -79,7 +79,7 @@ def test_transfer():
 
     origin_user = origin_company.members.first()
     target_user = target_company.members.first()
-    lambda_user = JobSeekerFactory()
+    lambda_user = JobSeekerUserFactory()
     target_company.members.add(origin_user)
 
     job_application = JobApplicationFactory(

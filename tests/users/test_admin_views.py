@@ -16,8 +16,8 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
@@ -42,7 +42,7 @@ def test_add_user(client):
 
 
 def test_no_email_sent(client):
-    user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+    user = JobSeekerUserFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
 
     # Typical admin user.
     admin_user = ItouStaffFactory(is_superuser=True)
@@ -84,7 +84,7 @@ def test_no_email_sent(client):
 
 
 def test_hijack_button(client):
-    user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
     hijack_url = reverse("hijack:acquire")
 
     # Basic staff users don't have access to the button
@@ -107,7 +107,7 @@ class TestTransferUserData:
     CHOOSE_TARGET_TEXT = "Choisissez l'utilisateur cible :"
 
     def test_transfer_button(self, client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         transfer_url = reverse("admin:transfer_user_data", kwargs={"from_user_pk": user.pk})
 
         # Basic staff users without write access don't see the button
@@ -125,8 +125,8 @@ class TestTransferUserData:
         assertContains(response, transfer_url)
 
     def test_transfer_without_change_permission(self, client):
-        from_user = JobSeekerFactory()
-        to_user = JobSeekerFactory()
+        from_user = JobSeekerUserFactory()
+        to_user = JobSeekerUserFactory()
         transfer_url_1 = reverse("admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk})
         transfer_url_2 = reverse(
             "admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk, "to_user_pk": to_user.pk}
@@ -142,7 +142,7 @@ class TestTransferUserData:
         assert response.status_code == 403
 
     def test_transfer_no_data_to_transfer(self, admin_client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         transfer_url = reverse("admin:transfer_user_data", kwargs={"from_user_pk": user.pk})
         response = admin_client.get(transfer_url)
         assertContains(response, self.IMPOSSIBLE_TRANSFER_TEXT)
@@ -154,7 +154,7 @@ class TestTransferUserData:
         approval = job_application.approval
 
         from_user = job_application.job_seeker
-        to_user = JobSeekerFactory()
+        to_user = JobSeekerUserFactory()
 
         transfer_url_1 = reverse("admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk})
         transfer_url_2 = reverse(
@@ -218,7 +218,7 @@ class TestTransferUserData:
 
 
 def test_app_model_change_url(admin_client):
-    user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
     # Check that the page does not crash
     response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
     assert response.status_code == 200
@@ -356,7 +356,7 @@ def test_num_queries(admin_client, snapshot):
 
 
 def test_check_inconsistency_check(admin_client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
 
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
@@ -399,14 +399,14 @@ def test_check_inconsistency_check(admin_client):
 
 def test_search_fields(admin_client):
     list_url = reverse("admin:users_jobseekerprofile_changelist")
-    job_seeker1 = JobSeekerFactory(
+    job_seeker1 = JobSeekerUserFactory(
         first_name="Jean Michel",
         last_name="Dupont",
         email="jean.michel@example.com",
         jobseeker_profile__nir="190031398700953",
     )
     url_1 = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker1.jobseeker_profile.pk})
-    job_seeker2 = JobSeekerFactory(
+    job_seeker2 = JobSeekerUserFactory(
         first_name="Pierre François",
         last_name="Martin",
         email="pierre.francois@example.com",
@@ -511,7 +511,7 @@ user_permissions_markup = (
     ],
 )
 def test_change_hides_permission_section_on_regular_users(client, superuser, assertion):
-    viewed = JobSeekerFactory()
+    viewed = JobSeekerUserFactory()
     user = ItouStaffFactory(is_superuser=superuser, is_staff=True)
     if not superuser:
         perms = Permission.objects.filter(codename__in=("change_user", "view_user"))

@@ -24,7 +24,7 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import JobSeekerUserFactory, LaborInspectorFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -47,7 +47,7 @@ class TestApprovalDetailView:
         approval = JobApplicationFactory(with_approval=True).approval
         url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
 
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
@@ -382,7 +382,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             hiring_start_at=datetime.date(2021, 3, 1),
             to_company=membership.company,
-            job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
+            job_seeker=JobSeekerUserFactory(last_name="John", first_name="Doe"),
             with_approval=True,
             # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
             approval__number="XXXXX1234568",

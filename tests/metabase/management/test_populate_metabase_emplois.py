@@ -48,7 +48,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 @freeze_time("2023-03-10")
@@ -146,7 +146,7 @@ def test_populate_job_seekers():
     #  - has no PE number
     #  - logged_in recently
     #  - in QPV
-    user_1 = JobSeekerFactory(
+    user_1 = JobSeekerUserFactory(
         created_by=PrescriberFactory(),
         identity_provider=IdentityProvider.PE_CONNECT,
         jobseeker_profile__pole_emploi_id="",
@@ -162,7 +162,7 @@ def test_populate_job_seekers():
     #  - created by an employer
     #  - outside QPV
     #  - expired eligibility diagnosis
-    user_2 = JobSeekerFactory(
+    user_2 = JobSeekerUserFactory(
         created_by=EmployerFactory(),
         jobseeker_profile__nir="271049232724647",
         geocoding_score=1,
@@ -184,7 +184,7 @@ def test_populate_job_seekers():
     #  - last eligibility diagnosis with a certified criteria from an employer
     #  - not an AI
     #  - outside QPV but missing geocoding score
-    user_3 = JobSeekerFactory(
+    user_3 = JobSeekerUserFactory(
         jobseeker_profile__nir="297016314515713",
         with_pole_emploi_id=True,
         geocoding_score=None,
@@ -955,7 +955,7 @@ def test_populate_users_exclude_job_seekers():
     Job seeker personal data (email...) should never ever ever ever ever ever end up in Metabase.
     Only pro users end up there.
     """
-    JobSeekerFactory()
+    JobSeekerUserFactory()
     management.call_command("populate_metabase_emplois", mode="users")
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM utilisateurs_v0 ORDER BY id")

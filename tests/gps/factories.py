@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerUserFactory, PrescriberFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
@@ -22,7 +22,7 @@ class FollowUpGroupFactory(AutoNowOverrideMixin, factory.django.DjangoModelFacto
             created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
         )
 
-    beneficiary = factory.SubFactory(JobSeekerFactory)
+    beneficiary = factory.SubFactory(JobSeekerUserFactory)
     created_at = factory.LazyAttribute(
         lambda o: datetime.datetime.combine(
             settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC

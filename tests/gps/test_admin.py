@@ -7,11 +7,11 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.utils.urls import add_url_params
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 def test_job_seeker_admin_link(admin_client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
 
     response = admin_client.get(reverse("admin:users_user_change", args=(job_seeker.pk,)))
     assertContains(response, "Pas de groupe de suivi")

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from pytest_django.asserts import assertRedirects
 
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -17,7 +17,7 @@ class TestPasswordReset:
         return reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
 
     def test_password_reset_flow(self, client, mailoutbox):
-        user = JobSeekerFactory(last_login=timezone.now(), password="somethingElse%")
+        user = JobSeekerUserFactory(last_login=timezone.now(), password="somethingElse%")
 
         # Ask for password reset.
         url = reverse("account_reset_password")
@@ -69,7 +69,7 @@ class TestPasswordReset:
 
     def test_password_reset_user_creation(self, client, snapshot):
         # user creation differs because they are logged in and redirected to the welcoming tour on creation
-        user = JobSeekerFactory(last_login=None)
+        user = JobSeekerUserFactory(last_login=None)
 
         password_change_url = self._get_password_change_from_key_url(user)
         response = client.get(password_change_url)
@@ -118,7 +118,7 @@ class TestPasswordChange:
         and redirects to the right place.
         """
 
-        user = JobSeekerFactory(with_address=True)
+        user = JobSeekerUserFactory(with_address=True)
         client.force_login(user)
 
         # Change password.

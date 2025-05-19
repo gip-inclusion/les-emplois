@@ -15,7 +15,7 @@ from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -271,7 +271,7 @@ class TestApprovalSuspendActionChoiceView:
         self.url = reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.pk})
 
     def test_not_current_siae(self, client):
-        client.force_login(JobSeekerFactory())
+        client.force_login(JobSeekerUserFactory())
 
         response = client.get(self.url)
         assert response.status_code == 404
@@ -370,7 +370,7 @@ class TestApprovalSuspendUpdateEndDateView:
         self.url = reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk})
 
     def test_not_current_siae(self, client):
-        client.force_login(JobSeekerFactory())
+        client.force_login(JobSeekerUserFactory())
 
         response = client.get(self.url)
         assert response.status_code == 404

@@ -16,7 +16,7 @@ from itou.communications.dispatch.utils import (
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 class TestBaseNotification:
@@ -314,7 +314,7 @@ class TestEmailNotification:
 
 class TestProfiledNotification:
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory()
+        self.job_seeker = JobSeekerUserFactory()
         self.employer = EmployerFactory(with_company=True)
         self.employer_structure = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(membership=True)

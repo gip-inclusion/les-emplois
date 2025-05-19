@@ -22,7 +22,7 @@ from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users import constants as users_test_constants
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -325,7 +325,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         # No geoloc mock used, basic factory with:
         # - simple / fake address
         # - birth place and country
-        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data = _get_user_form_data(JobSeekerUserFactory.build(with_address=True, born_in_france=True))
         response = client.post(self.url, data=data)
 
         # Redirects must go to step 2
@@ -356,7 +356,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         assertContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
 
     def test_job_seeker_address_geolocated(self, client, snapshot):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             for_snapshot=True,
             with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
         )
@@ -398,7 +398,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         # Job seeker has an address filled but can't be geolocated
         job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerFactory(with_address=True),
+            job_seeker=JobSeekerUserFactory(with_address=True),
         )
 
         # Changed job application: new URL

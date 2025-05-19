@@ -26,7 +26,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -85,7 +85,7 @@ def test_anonymous_user(client, url):
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
 def test_refused_access(client, url):
     for user in [
-        JobSeekerFactory(),
+        JobSeekerUserFactory(),
         LaborInspectorFactory(membership=True),
         CompanyWithMembershipAndJobsFactory().members.first(),
     ]:
@@ -254,7 +254,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     [prescriber, other_prescriber] = organization.members.all()
 
     # Job seeker created by this prescriber
-    alain = JobSeekerFactory(
+    alain = JobSeekerUserFactory(
         first_name="Alain",
         last_name="Zorro",
         public_id="11111111-1111-1111-1111-111111111111",
@@ -265,7 +265,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     )
 
     # Job seeker created by another member of the organization
-    bernard = JobSeekerFactory(
+    bernard = JobSeekerUserFactory(
         first_name="Bernard",
         last_name="Ygrec",
         public_id="22222222-2222-2222-2222-222222222222",
@@ -279,7 +279,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     prescriber_not_in_org_anymore = PrescriberFactory(
         membership__organization=organization, membership__is_active=False
     )
-    charlotte = JobSeekerFactory(
+    charlotte = JobSeekerUserFactory(
         first_name="Charlotte",
         last_name="Xerus",
         public_id="33333333-3333-3333-3333-333333333333",
@@ -299,7 +299,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
 
     # Job seeker created by the prescriber but for another organization; will not be shown
     other_organization = PrescriberOrganizationFactory()
-    david = JobSeekerFactory(
+    david = JobSeekerUserFactory(
         first_name="David",
         last_name="Waterford",
         public_id="44444444-4444-4444-4444-444444444444",
@@ -310,7 +310,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     )
 
     # Job seeker created by someone else, for another organization
-    edouard = JobSeekerFactory(
+    edouard = JobSeekerUserFactory(
         first_name="Edouard",
         last_name="Vivant",
         public_id="55555555-5555-5555-5555-555555555555",
@@ -435,7 +435,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     client.force_login(prescriber)
 
     # Job seeker created by this prescriber
-    alain = JobSeekerFactory(
+    alain = JobSeekerUserFactory(
         first_name="Alain",
         last_name="Zorro",
         public_id="11111111-1111-1111-1111-111111111111",
@@ -446,7 +446,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     )
 
     # Job seeker created by another member of the organization
-    bernard = JobSeekerFactory(
+    bernard = JobSeekerUserFactory(
         first_name="Bernard",
         last_name="Ygrec",
         public_id="22222222-2222-2222-2222-222222222222",
@@ -485,7 +485,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     organization = PrescriberOrganizationFactory()
 
     # Job seeker created by another prescriber
-    alain = JobSeekerFactory(
+    alain = JobSeekerUserFactory(
         first_name="Alain",
         last_name="Zorro",
         public_id="11111111-1111-1111-1111-111111111111",
@@ -494,7 +494,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
         created_by=other_prescriber,
     )
     # Job seeker created by this prescriber
-    bernard = JobSeekerFactory(
+    bernard = JobSeekerUserFactory(
         first_name="Bernard",
         last_name="Ygrec",
         public_id="22222222-2222-2222-2222-222222222222",
@@ -504,7 +504,7 @@ def test_job_seeker_created_by_prescriber_without_org(client):
     )
     # Job seeker created by this prescriber when he was in an organization.
     # He is not member of it anymore, it won't be shown anymore
-    charlotte = JobSeekerFactory(
+    charlotte = JobSeekerUserFactory(
         first_name="Charlotte",
         last_name="Xerus",
         public_id="33333333-3333-3333-3333-333333333333",
@@ -744,19 +744,19 @@ def test_filtered_by_organization_members(client):
     old_member = PrescriberMembershipFactory(organization=organization, user__is_active=False).user
     other_prescriber_not_in_orga = PrescriberFactory()
 
-    job_seeker_created_by_user = JobSeekerFactory(
+    job_seeker_created_by_user = JobSeekerUserFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_user",
         last_name="Zorro",
     )
-    job_seeker_created_by_member = JobSeekerFactory(
+    job_seeker_created_by_member = JobSeekerUserFactory(
         created_by=member,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_member",
         last_name="Zorro",
     )
-    job_seeker_created_by_old_member = JobSeekerFactory(
+    job_seeker_created_by_old_member = JobSeekerUserFactory(
         created_by=old_member,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="created_by_old_member",
@@ -855,13 +855,13 @@ def test_job_seekers_order(client, url, subtests):
         job_seeker__last_name="Deux candidatures",
     ).job_seeker
     JobApplicationFactory(sender=prescriber, job_seeker=c_d_job_seeker)
-    created_job_seeker = JobSeekerFactory(
+    created_job_seeker = JobSeekerUserFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",
         last_name="Martin",
     )
-    second_created_job_seeker = JobSeekerFactory(
+    second_created_job_seeker = JobSeekerUserFactory(
         created_by=prescriber,
         jobseeker_profile__created_by_prescriber_organization=organization,
         first_name="Zorro",

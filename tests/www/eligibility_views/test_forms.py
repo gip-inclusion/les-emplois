@@ -8,7 +8,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestAdministrativeCriteriaForm:
@@ -174,7 +174,7 @@ class TestAdministrativeCriteriaOfJobApplicationForm:
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,

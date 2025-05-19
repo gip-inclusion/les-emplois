@@ -36,7 +36,7 @@ from tests.eligibility.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestEligibilityDiagnosisQuerySet:
@@ -61,7 +61,7 @@ class TestEligibilityDiagnosisQuerySet:
 
 class TestEligibilityDiagnosisManager:
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        self.job_seeker = JobSeekerUserFactory(with_pole_emploi_id=True)
 
     def test_no_diagnosis(self):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
@@ -265,7 +265,7 @@ class TestEligibilityDiagnosisManager:
 class TestEligibilityDiagnosisModel:
     @freeze_time("2024-12-03")
     def test_create_diagnosis_employer(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
@@ -289,7 +289,7 @@ class TestEligibilityDiagnosisModel:
 
     @freeze_time("2024-12-03")
     def test_create_diagnosis_prescriber(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         organization = PrescriberOrganizationWithMembershipFactory()
         prescriber = organization.members.first()
 
@@ -316,7 +316,7 @@ class TestEligibilityDiagnosisModel:
         assert membership.creator == prescriber
 
     def test_create_diagnosis_with_administrative_criteria(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
 
@@ -499,7 +499,7 @@ class TestAdministrativeCriteriaModel:
     def test_for_job_application(self):
         company = CompanyFactory(department="14", with_membership=True)
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         user = company.members.first()
 
         criteria1 = AdministrativeCriteria.objects.get(
@@ -577,7 +577,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
         "itou.utils.apis.api_particulier._request",
         return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
     )
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
+    job_seeker = JobSeekerUserFactory(with_address=True, born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
@@ -617,7 +617,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
 def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, EligibilityDiagnosisFactory):
     RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
     respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
-    job_seeker = JobSeekerFactory()  # Missing data.
+    job_seeker = JobSeekerUserFactory()  # Missing data.
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         certifiable=True,

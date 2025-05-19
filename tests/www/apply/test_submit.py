@@ -63,8 +63,8 @@ from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
@@ -151,7 +151,7 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
 class TestApply:
     def test_company_with_no_members(self, client):
         company = CompanyFactory()
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         url = reverse("apply:start", kwargs={"company_pk": company.pk})
         response = client.get(url)
@@ -176,7 +176,7 @@ class TestApply:
             response = client.get(url)
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         for viewname in (
             "job_seekers_views:check_job_seeker_info",
             "apply:step_check_prev_applications",
@@ -190,7 +190,7 @@ class TestApply:
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_we_raise_a_404_on_missing_session(self, client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
 
         response = client.get(
@@ -208,7 +208,7 @@ class TestApply:
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             "job_seekers_views:create_job_seeker_step_end_for_sender",
         }
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         for route in routes:
             with subtests.test(route=route):
@@ -233,7 +233,7 @@ class TestApply:
 
     def test_access_without_session(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(job_seeker)
         response = client.post(
             reverse(
@@ -255,7 +255,7 @@ class TestApply:
     def test_blocked_application(self, client, view_name, post_data):
         # It's possible that for example the user loaded this page before spontaneous applications were closed.
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -282,7 +282,7 @@ class TestApply:
     )
     def test_spontaneous_application_blocked(self, client, view_name, post_data):
         company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -316,7 +316,7 @@ class TestApply:
     def test_recruitment_closed_on_position(self, client, view_name, post_data):
         # No block is active, but one of the selected jobs is no longer active.
         company = CompanyFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
 
         jobs = company.job_description_through.all()
@@ -352,7 +352,7 @@ class TestApply:
     def test_application_block_ineffective_against_company_member(self, client):
         # A member of the SIAE can bypass the block.
         company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -367,7 +367,7 @@ class TestApply:
 
     def test_resume_is_optional(self, client):
         company = CompanyFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(job_seeker)
         fake_session_initialization(client, company, {"selected_jobs": []})
         response = client.post(
@@ -421,7 +421,7 @@ class TestHire:
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         for viewname in (
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
@@ -435,7 +435,7 @@ class TestHire:
             assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_we_raise_a_404_on_missing_session(self, client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
 
         response = client.get(
@@ -453,7 +453,7 @@ class TestHire:
             "job_seekers_views:create_job_seeker_step_3_for_hire",
             "job_seekers_views:create_job_seeker_step_end_for_hire",
         }
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
 
         client.force_login(user)
         for route in routes:
@@ -525,7 +525,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-    user = JobSeekerFactory(
+    user = JobSeekerUserFactory(
         jobseeker_profile__birthdate=None,
         jobseeker_profile__nir="",
         jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
@@ -568,7 +568,7 @@ class TestApplyAsJobSeeker:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerUserFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         client.force_login(user)
 
         response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
@@ -589,7 +589,7 @@ class TestApplyAsJobSeeker:
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerUserFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         client.force_login(user)
 
         # Entry point.
@@ -733,7 +733,7 @@ class TestApplyAsJobSeeker:
         """
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         client.force_login(user)
 
         # Entry point.
@@ -782,7 +782,7 @@ class TestApplyAsJobSeeker:
             "companies_views:job_description_card", kwargs={"job_description_id": job_description.pk}
         )
 
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="141068078200557",
             with_pole_emploi_id=True,
             jobseeker_profile__birthdate=datetime.date(1941, 6, 12),
@@ -830,7 +830,7 @@ class TestApplyAsJobSeeker:
         employer = company.members.get()
         # Inactive user that should not receive an email
         CompanyMembershipFactory(company=company, user__is_active=False)
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -861,7 +861,7 @@ class TestApplyAsJobSeeker:
 
     def test_apply_as_job_seeker_resume_not_pdf(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"Plain text") as text_file:
@@ -901,7 +901,7 @@ class TestApplyAsJobSeeker:
 
     def test_apply_as_job_seeker_resume_not_pdf_disguised_as_pdf(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"Plain text") as text_file:
@@ -940,7 +940,7 @@ class TestApplyAsJobSeeker:
 
     def test_apply_as_job_seeker_resume_too_large(self, client):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         client.force_login(user)
         fake_session_initialization(client, company, {"selected_jobs": []})
         with io.BytesIO(b"A" * (5 * 1024 * 1024 + 1)) as text_file:
@@ -999,12 +999,12 @@ class TestApplyAsAuthorizedPrescriber:
         user = prescriber_organization.members.first()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
         )
-        existing_job_seeker = JobSeekerFactory()
+        existing_job_seeker = JobSeekerUserFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1296,14 +1296,14 @@ class TestApplyAsAuthorizedPrescriber:
         user = prescriber_organization.members.first()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
             first_name="John",
             last_name="DOE",
         )
-        existing_job_seeker = JobSeekerFactory()
+        existing_job_seeker = JobSeekerUserFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1360,7 +1360,7 @@ class TestApplyAsAuthorizedPrescriber:
         # Step get job seeker e-mail. Second try: email is found, attached to a
         # user without NIR
         # ----------------------------------------------------------------------
-        existing_job_seeker_without_nir = JobSeekerFactory(jobseeker_profile__nir="")
+        existing_job_seeker_without_nir = JobSeekerUserFactory(jobseeker_profile__nir="")
 
         response = client.post(
             next_url,
@@ -1677,7 +1677,7 @@ class TestApplyAsAuthorizedPrescriber:
 
     def test_apply_step_eligibility_does_not_show_employer_diagnosis(self, client):
         company = CompanyFactory(name="Les petits pains", with_membership=True, subject_to_eligibility=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, job_seeker=job_seeker)
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         prescriber = prescriber_organization.members.get()
@@ -1787,7 +1787,7 @@ class TestApplyAsPrescriber:
         user = PrescriberFactory()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -1795,7 +1795,7 @@ class TestApplyAsPrescriber:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
-        existing_job_seeker = JobSeekerFactory()
+        existing_job_seeker = JobSeekerUserFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -2011,7 +2011,7 @@ class TestApplyAsPrescriber:
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=dummy_job_seeker.jobseeker_profile.nir)
+        other_job_seeker = JobSeekerUserFactory(jobseeker_profile__nir=dummy_job_seeker.jobseeker_profile.nir)
 
         response = client.post(next_url)
         assertMessages(
@@ -2121,7 +2121,7 @@ class TestApplyAsPrescriber:
         client.force_login(user)
         fake_session_initialization(client, company, {})
 
-        dummy_job_seeker = JobSeekerFactory(
+        dummy_job_seeker = JobSeekerUserFactory(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2179,7 +2179,7 @@ class TestApplyAsPrescriberNirExceptions:
         This NIR account is empty.
         An update is expected.
         """
-        job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        job_seeker = JobSeekerUserFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(
             birthdate=job_seeker.jobseeker_profile.birthdate,
@@ -2230,7 +2230,7 @@ class TestApplyAsPrescriberNirExceptions:
 
         # Create a job seeker with this NIR right after the check. Sorry.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
+        other_job_seeker = JobSeekerUserFactory(jobseeker_profile__nir=nir)
 
         # Enter an existing email.
         # ----------------------------------------------------------------------
@@ -2266,7 +2266,7 @@ class TestApplyAsPrescriberNirExceptions:
         assert job_seeker.jobseeker_profile.nir == nir
 
     def test_one_account_lack_of_nir_reason(self, client):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             with_pole_emploi_id=True,
@@ -2397,7 +2397,7 @@ class TestApplyAsCompany:
             else reverse("companies_views:card", kwargs={"siae_id": company.pk})
         )
 
-        existing_job_seeker = JobSeekerFactory()
+        existing_job_seeker = JobSeekerUserFactory()
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -2699,7 +2699,7 @@ class TestApplyAsCompany:
         employer = company.members.first()
         client.force_login(employer)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2715,7 +2715,7 @@ class TestApplyAsCompany:
         employer = EmployerFactory(with_company=True)
         client.force_login(employer)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2731,7 +2731,7 @@ class TestApplyAsCompany:
         client.force_login(employer)
         fake_session_initialization(client, company, {})
 
-        dummy_job_seeker = JobSeekerFactory(
+        dummy_job_seeker = JobSeekerUserFactory(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2833,7 +2833,7 @@ class TestDirectHireFullProcess:
         response = client.get(
             reverse(
                 "apply:eligibility_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": JobSeekerFactory().public_id},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": JobSeekerUserFactory().public_id},
             )
         )
         assertContains(
@@ -2853,7 +2853,7 @@ class TestDirectHireFullProcess:
         user = company.members.first()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2861,7 +2861,7 @@ class TestDirectHireFullProcess:
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
-        existing_job_seeker = JobSeekerFactory()
+        existing_job_seeker = JobSeekerUserFactory()
 
         geispolsheim = create_city_geispolsheim()
 
@@ -3180,7 +3180,7 @@ class TestDirectHireFullProcess:
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
         reset_url_dashboard = reverse("dashboard:index")
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         user = company.members.first()
         client.force_login(user)
@@ -3382,7 +3382,7 @@ class TestApplicationView:
 
         client.force_login(company.members.first())
         selected_job = company.job_description_through.first()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         fake_session_initialization(client, company, {"selected_jobs": [selected_job.pk]})
 
         response = client.get(
@@ -3399,7 +3399,7 @@ class TestApplicationView:
         company = CompanyFactory(with_membership=True, with_jobs=True, spontaneous_applications_open_since=None)
 
         client.force_login(company.members.first())
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         fake_session_initialization(client, company, {})
 
         response = client.get(
@@ -3415,7 +3415,7 @@ class TestApplicationView:
         # No jobs available and spontaneous applications closed.
         company = CompanyFactory(with_membership=True, spontaneous_applications_open_since=None)
         client.force_login(company.members.first())
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         fake_session_initialization(client, company, {})
 
         response = client.get(
@@ -3452,7 +3452,7 @@ class TestApplicationView:
 
     def test_access_without_session(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         client.force_login(prescriber)
         response = client.get(
@@ -3465,7 +3465,7 @@ class TestApplicationView:
 
     def test_application_resume_hidden_fields(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {"selected_jobs": company.job_description_through.all()})
@@ -3480,7 +3480,7 @@ class TestApplicationView:
 
     def test_application_resume_diagoriente_shown_as_job_seeker(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(job_seeker)
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -3498,7 +3498,7 @@ class TestApplicationView:
 
     def test_application_resume_diagoriente_not_shown_as_company(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -3517,7 +3517,7 @@ class TestApplicationView:
     def test_application_resume_diagoriente_shown_as_prescriber(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(prescriber)
         fake_session_initialization(client, company, {"selected_jobs": []})
 
@@ -3535,7 +3535,7 @@ class TestApplicationView:
 
     def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self, client):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(company.members.first())
         fake_session_initialization(client, company, {})
@@ -3558,7 +3558,7 @@ class TestApplicationView:
     def test_application_eligibility_is_bypassed_for_unauthorized_prescriber(self, client):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         client.force_login(prescriber)
         fake_session_initialization(client, company, {})
@@ -3716,7 +3716,7 @@ class TestLastCheckedAtView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        self.job_seeker = JobSeekerFactory()
+        self.job_seeker = JobSeekerUserFactory()
 
     def _check_last_checked_at(self, client, user, sees_warning, sees_verify_link):
         client.force_login(user)
@@ -3774,7 +3774,7 @@ class UpdateJobSeekerTestMixin:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        self.job_seeker = JobSeekerFactory(
+        self.job_seeker = JobSeekerUserFactory(
             with_ban_geoloc_address=True,
             jobseeker_profile__nir="178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
@@ -4387,7 +4387,9 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
 class TestUpdateJobSeekerStep3View:
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
+        job_seeker = JobSeekerUserFactory(
+            jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS
+        )
 
         client.force_login(company.members.first())
         apply_session = SessionNamespace(client.session, "apply_session", f"job_application-{company.pk}")
@@ -4432,7 +4434,7 @@ def test_detect_existing_job_seeker(client):
     user = prescriber_organization.members.first()
     client.force_login(user)
 
-    job_seeker = JobSeekerFactory(
+    job_seeker = JobSeekerUserFactory(
         jobseeker_profile__nir="",
         jobseeker_profile__birthdate=datetime.date(1997, 1, 1),
         title="M",
@@ -4589,7 +4591,7 @@ class TestApplicationGEIQEligibilityView:
         # When creating a job application, should bypass GEIQ eligibility form step:
         # - if user is an authorized prescriber
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         # Redirect orienter
         client.force_login(self.orienter)
@@ -4613,7 +4615,7 @@ class TestApplicationGEIQEligibilityView:
         assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_bypass_geiq_diagnosis_for_staff_members(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(self.geiq.members.first())
         fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
@@ -4636,7 +4638,7 @@ class TestApplicationGEIQEligibilityView:
 
     def test_bypass_geiq_diagnosis_for_job_seeker(self, client):
         # A job seeker must not have access to GEIQ eligibility form
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(job_seeker)
         fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
@@ -4658,7 +4660,7 @@ class TestApplicationGEIQEligibilityView:
         assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_sanity_check_geiq_diagnosis_for_non_geiq(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         # See comment im previous test:
         # assert we're not somewhere we don't belong to (non-GEIQ)
         client.force_login(self.company.members.first())
@@ -4673,7 +4675,7 @@ class TestApplicationGEIQEligibilityView:
         assert response.status_code == 404
 
     def test_access_as_authorized_prescriber(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(self.prescriber_org.members.first())
         fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
 
@@ -4696,7 +4698,7 @@ class TestApplicationGEIQEligibilityView:
         assertContains(response, geiq_eligibility_url)
 
     def test_authorized_prescriber_can_see_other_authorized_prescriber_eligibility_diagnosis(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
         client.force_login(self.prescriber_org.members.get())
@@ -4712,7 +4714,7 @@ class TestApplicationGEIQEligibilityView:
         assertContains(response, self.UPDATE_ELIGIBILITY)
 
     def test_authorized_prescriber_do_not_see_company_eligibility_diagnosis(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         GEIQEligibilityDiagnosisFactory(from_employer=True, author_geiq=self.geiq, job_seeker=job_seeker)
         url = reverse(
             "apply:application_geiq_eligibility",
@@ -4745,7 +4747,7 @@ class TestApplicationGEIQEligibilityView:
         assert prescriber_diag.author_geiq is None
 
     def test_access_without_session(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         client.force_login(self.prescriber_org.members.first())
         response = client.get(
             reverse(
@@ -4776,7 +4778,7 @@ class TestApplicationGEIQEligibilityView:
         assertContains(response, self.DIAG_VALIDITY_TXT)
 
         # Badge KO if job seeker has no diagnosis
-        job_seeker_without_diagnosis = JobSeekerFactory()
+        job_seeker_without_diagnosis = JobSeekerUserFactory()
         fake_session_initialization(client, self.geiq, {"selected_jobs": self.geiq.job_description_through.all()})
         response = client.get(
             reverse(
@@ -4868,7 +4870,7 @@ class TestCheckPreviousApplicationsView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        self.job_seeker = JobSeekerFactory()
+        self.job_seeker = JobSeekerUserFactory()
         self.check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info",
             kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
@@ -5056,7 +5058,7 @@ class TestFindJobSeekerForHireView:
         user = self.company.members.first()
         client.force_login(user)
 
-        job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
+        job_seeker = JobSeekerUserFactory(first_name="Sylvie", last_name="Martin")
 
         check_nir_url = self.get_check_nir_url(client)
         response = client.get(check_nir_url)
@@ -5080,7 +5082,7 @@ class TestFindJobSeekerForHireView:
         user = self.company.members.first()
         client.force_login(user)
 
-        job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
+        job_seeker = JobSeekerUserFactory(first_name="Sylvie", last_name="Martin")
         INVALID_NIR = "123456"
 
         check_nir_url = self.get_check_nir_url(client)
@@ -5134,7 +5136,7 @@ class TestFindJobSeekerForHireView:
         user = self.company.members.first()
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             with_address=True,
             jobseeker_profile__with_hexa_address=True,
         )
@@ -5185,7 +5187,7 @@ class TestFindJobSeekerForHireView:
 class TestCheckJobSeekerInformationsForHire:
     def test_company(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
             jobseeker_profile__nir="",
@@ -5226,7 +5228,7 @@ class TestCheckJobSeekerInformationsForHire:
 
     def test_geiq(self, client):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
             jobseeker_profile__nir="",
@@ -5264,7 +5266,7 @@ class TestCheckJobSeekerInformationsForHire:
 class TestCheckPreviousApplicationsForHireView:
     @pytest.fixture(autouse=True)
     def self(cls):
-        cls.job_seeker = JobSeekerFactory()
+        cls.job_seeker = JobSeekerUserFactory()
 
     def _reverse(self, view_name):
         return reverse(
@@ -5320,7 +5322,7 @@ class TestCheckPreviousApplicationsForHireView:
 class TestEligibilityForHire:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+        self.job_seeker = JobSeekerUserFactory(first_name="Ellie", last_name="Gibilitay")
 
     def _reverse(self, view_name):
         return reverse(
@@ -5372,7 +5374,7 @@ class TestEligibilityForHire:
 class TestGEIQEligibilityForHire:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+        self.job_seeker = JobSeekerUserFactory(first_name="Ellie", last_name="Gibilitay")
 
     def _reverse(self, view_name):
         return reverse(
@@ -5440,7 +5442,7 @@ class TestGEIQEligibilityForHire:
 class TestHireConfirmation:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
-        self.job_seeker = JobSeekerFactory(
+        self.job_seeker = JobSeekerUserFactory(
             first_name="Clara",
             last_name="Sion",
             with_pole_emploi_id=True,
@@ -5675,7 +5677,7 @@ class TestNewHireProcessInfo:
     def setup_method(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         self.geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        self.job_seeker = JobSeekerFactory(jobseeker_profile__nir="")
+        self.job_seeker = JobSeekerUserFactory(jobseeker_profile__nir="")
 
     def test_as_job_seeker(self, client):
         client.force_login(self.job_seeker)

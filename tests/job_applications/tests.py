@@ -63,7 +63,7 @@ from tests.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import get_rows_from_streaming_response
 
 
@@ -1013,7 +1013,7 @@ class TestJobApplicationNotifications:
             assert [mail.to for mail in mailoutbox] == [[job_application.job_seeker.email]]
 
     def test_notifications_deliver_approval(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1046,7 +1046,7 @@ class TestJobApplicationNotifications:
         assert job_application.to_company.accept_survey_url in email.body
 
     def test_notifications_deliver_approval_without_hiring_end_at(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1081,7 +1081,7 @@ class TestJobApplicationNotifications:
 
     def test_manually_deliver_approval(self, django_capture_on_commit_callbacks, mailoutbox):
         staff_member = ItouStaffFactory()
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
@@ -1106,7 +1106,7 @@ class TestJobApplicationNotifications:
 
     def test_manually_refuse_approval(self, django_capture_on_commit_callbacks, mailoutbox):
         staff_member = ItouStaffFactory()
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
@@ -1213,7 +1213,7 @@ class TestJobApplicationWorkflow:
         """
         When a job seeker's application is accepted, the others are marked obsolete.
         """
-        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        job_seeker = JobSeekerUserFactory(with_pole_emploi_id=True)
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
@@ -1248,7 +1248,7 @@ class TestJobApplicationWorkflow:
         """
         An obsolete job application can be accepted.
         """
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         kwargs = {
             "job_seeker": job_seeker,
@@ -1287,7 +1287,7 @@ class TestJobApplicationWorkflow:
         """
         When an approval already exists, it is reused.
         """
-        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        job_seeker = JobSeekerUserFactory(with_pole_emploi_id=True)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1308,7 +1308,7 @@ class TestJobApplicationWorkflow:
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
-        job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
+        job_seeker = JobSeekerUserFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1332,7 +1332,7 @@ class TestJobApplicationWorkflow:
         """
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
@@ -1354,7 +1354,7 @@ class TestJobApplicationWorkflow:
     def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__pole_emploi_id="",
         )
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1379,7 +1379,7 @@ class TestJobApplicationWorkflow:
     def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             with_pole_emploi_id=True,
         )
@@ -1401,7 +1401,7 @@ class TestJobApplicationWorkflow:
     def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(
         self, django_capture_on_commit_callbacks, mailoutbox
     ):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -1497,7 +1497,7 @@ class TestJobApplicationWorkflow:
         """
         An authorized prescriber can bypass the waiting period.
         """
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerUserFactory(with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1540,7 +1540,7 @@ class TestJobApplicationWorkflow:
         """
         An "orienteur" cannot bypass the waiting period.
         """
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1566,7 +1566,7 @@ class TestJobApplicationWorkflow:
         A job seeker with a valid diagnosis can start an IAE path
         even if he's in a waiting period.
         """
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1691,7 +1691,7 @@ class TestJobApplicationWorkflow:
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
 
     def test_refuse(self, django_capture_on_commit_callbacks, mailoutbox):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
 
         JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
@@ -1828,7 +1828,7 @@ def test_job_application_transition_unarchives(transition, from_state):
 class TestJobApplicationXlsxExport:
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
-        job_seeker = JobSeekerFactory(title=Title.MME)
+        job_seeker = JobSeekerUserFactory(title=Title.MME)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
@@ -1878,7 +1878,7 @@ class TestJobApplicationXlsxExport:
         """Even expired approval should be displayed."""
         with freeze_time(timezone.now() - relativedelta(days=Approval.DEFAULT_APPROVAL_DAYS + 2)):
             create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
-            job_seeker = JobSeekerFactory(title=Title.MME)
+            job_seeker = JobSeekerUserFactory(title=Title.MME)
             job_application = JobApplicationSentByJobSeekerFactory(
                 job_seeker=job_seeker,
                 state=JobApplicationState.PROCESSING,
@@ -1924,7 +1924,7 @@ class TestJobApplicationXlsxExport:
         ]
 
     def test_refused_job_application_has_reason_in_xlsx_export(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         kwargs = {
             "job_seeker": job_seeker,
             "sender": job_seeker,
@@ -1972,7 +1972,7 @@ class TestJobApplicationXlsxExport:
 
     @freeze_time("2024-07-05")
     def test_auto_prescription_xlsx_export(self):
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
         employer = company.members.get()
         start = datetime.date(2024, 7, 5)
@@ -2031,7 +2031,7 @@ class TestJobApplicationXlsxExport:
 
     def test_xlsx_export_as_prescriber(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
-        job_seeker = JobSeekerFactory(title=Title.MME, first_name="Very Secret", last_name="Name")
+        job_seeker = JobSeekerUserFactory(title=Title.MME, first_name="Very Secret", last_name="Name")
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
@@ -2238,7 +2238,7 @@ class TestJobApplicationAdminForm:
         assert ["SIAE émettrice manquante."] == form.errors["__all__"]
         job_application.sender_company = sender_company
 
-        job_application.sender = JobSeekerFactory()
+        job_application.sender = JobSeekerUserFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Émetteur du mauvais type."] == form.errors["__all__"]
@@ -2265,7 +2265,7 @@ class TestJobApplicationAdminForm:
         sender = job_application.sender
         sender_prescriber_organization = job_application.sender_prescriber_organization
 
-        job_application.sender = JobSeekerFactory()
+        job_application.sender = JobSeekerUserFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Émetteur du mauvais type."] == form.errors["__all__"]
@@ -2295,7 +2295,7 @@ class TestJobApplicationAdminForm:
         job_application = JobApplicationSentByPrescriberFactory()
         sender = job_application.sender
 
-        job_application.sender = JobSeekerFactory()
+        job_application.sender = JobSeekerUserFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Émetteur du mauvais type."] == form.errors["__all__"]
@@ -2325,7 +2325,7 @@ class TestJobApplicationAdminForm:
 
     def test_application_bad_eligibility_diagnosis_job_seeker(self):
         job_application = JobApplicationFactory()
-        job_application.job_seeker = JobSeekerFactory()
+        job_application.job_seeker = JobSeekerUserFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."] == form.errors[

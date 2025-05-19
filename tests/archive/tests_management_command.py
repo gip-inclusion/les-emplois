@@ -18,7 +18,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -50,7 +50,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         ],
     )
     def test_dry_run(self, kwargs, model, wet_run):
-        jobseeker = JobSeekerFactory(**kwargs)
+        jobseeker = JobSeekerUserFactory(**kwargs)
         call_command("notify_archive_jobseekers", wet_run=wet_run)
 
         if not wet_run or model == "user":
@@ -76,7 +76,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         ],
     )
     def test_batch_size(self, kwargs, model):
-        JobSeekerFactory.create_batch(3, **kwargs)
+        JobSeekerUserFactory.create_batch(3, **kwargs)
         call_command("notify_archive_jobseekers", batch_size=2, wet_run=True)
 
         if model == "user":
@@ -90,55 +90,55 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         "factory, related_object_factory, updated_notification_date",
         [
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 None,
                 True,
                 id="jobseeker_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, is_active=False),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, is_active=False),
                 None,
                 True,
                 id="deactivated_jobseeker_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True),
                 None,
                 False,
                 id="jobseeker_soon_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now()),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now()),
                 None,
                 False,
                 id="jobseeker_with_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 False,
                 id="jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: ApprovalFactory(user=jobseeker),
                 False,
                 id="jobseeker_with_recent_approval",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 False,
                 id="jobseeker_with_recent_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 False,
                 id="jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: FollowUpGroupFactory(
                     beneficiary=jobseeker, updated_at=timezone.now() - INACTIVITY_PERIOD
                 ),
@@ -146,7 +146,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="jobseeker_in_followup_group_without_recent_activity",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY),
                 lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
                 False,
                 id="jobseeker_in_followup_group_with_recent_activity",
@@ -221,7 +221,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         "factory, related_object_factory, notification_reset",
         [
             pytest.param(
-                lambda: JobSeekerFactory(
+                lambda: JobSeekerUserFactory(
                     joined_days_ago=DAYS_OF_INACTIVITY,
                     notified_days_ago=29,
                 ),
@@ -230,7 +230,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="notified_jobseeker",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(
+                lambda: JobSeekerUserFactory(
                     joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
                 ),
                 None,
@@ -238,7 +238,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="notified_jobseeker_with_recent_login",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(
+                lambda: JobSeekerUserFactory(
                     date_joined=timezone.now(),
                     notified_days_ago=1,
                 ),
@@ -247,37 +247,37 @@ class TestNotifyArchiveJobSeekersManagementCommand:
                 id="notified_jobseeker_with_recent_date_joined",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, is_active=False),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, is_active=False),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 True,
                 id="inactive_jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_job_application",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: ApprovalFactory(user=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_approval",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 True,
                 id="notified_jobseeker_with_recent_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 True,
                 id="notified_jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
+                lambda: JobSeekerUserFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_follow_up_group",
@@ -330,13 +330,13 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         "user_factory",
         [
             pytest.param(
-                lambda: JobSeekerFactory(
+                lambda: JobSeekerUserFactory(
                     notified_days_ago=29,
                 ),
                 id="jobseeker_notified_still_in_grace_period",
             ),
             pytest.param(
-                lambda: JobSeekerFactory(
+                lambda: JobSeekerUserFactory(
                     upcoming_deletion_notified_at=None,
                 ),
                 id="jobseeker_never_notified",
@@ -438,7 +438,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
         if kwargs.get("created_by"):
             kwargs["created_by"] = kwargs["created_by"]()
 
-        jobseeker = JobSeekerFactory(notified_days_ago=31, **kwargs)
+        jobseeker = JobSeekerUserFactory(notified_days_ago=31, **kwargs)
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_archive_jobseekers", wet_run=True)
@@ -476,7 +476,7 @@ class TestNotifyArchiveJobSeekersManagementCommand:
             assert not mailoutbox
 
     def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks):
-        jobseeker = JobSeekerFactory(
+        jobseeker = JobSeekerUserFactory(
             joined_days_ago=365,
             notified_days_ago=31,
         )

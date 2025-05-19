@@ -16,7 +16,7 @@ from itou.employee_record.serializers import (
     _PersonSerializer,
 )
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestEmployeeRecordPersonSerializer:
@@ -97,7 +97,7 @@ class TestEmployeeRecordAddressSerializer:
 
     def test_with_empty_fields(self):
         commune = Commune.objects.order_by("?").first()
-        serializer = _AddressSerializer(JobSeekerFactory(jobseeker_profile__hexa_commune=commune))
+        serializer = _AddressSerializer(JobSeekerUserFactory(jobseeker_profile__hexa_commune=commune))
 
         assert serializer.data == {
             "adrTelephone": None,

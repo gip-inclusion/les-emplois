@@ -10,7 +10,7 @@ from itou.external_data.apis.pe_connect import import_user_pe_data
 from itou.external_data.models import ExternalDataImport, RejectedEmailEventData
 from itou.external_data.signals import store_rejected_email_event
 from itou.users.enums import IdentityProvider
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 # Test data import status (All ok, failed, partial)
@@ -112,7 +112,7 @@ def mock_api_esd(settings):
 class TestExternalDataImport:
     @respx.mock
     def test_status_ok(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
 
         # Mock all PE APIs
         _mock_status_ok()
@@ -130,7 +130,7 @@ class TestExternalDataImport:
 
     @respx.mock
     def test_status_partial(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         _mock_status_partial()
 
         result = import_user_pe_data(user, FOO_TOKEN)
@@ -146,7 +146,7 @@ class TestExternalDataImport:
 
     @respx.mock
     def test_status_failed(self):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         _mock_status_failed()
 
         result = import_user_pe_data(user, FOO_TOKEN)
@@ -164,7 +164,7 @@ class TestJobSeekerExternalData:
         _mock_status_ok()
 
         # Check override of birthdate / of a field
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
+        user = JobSeekerUserFactory(jobseeker_profile__birthdate=None)
 
         result = import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
@@ -185,7 +185,7 @@ class TestJobSeekerExternalData:
         assert 12 == len(report.get("fields_fetched"))
 
         # Just checking birthdate is not overridden
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         birthdate = user.jobseeker_profile.birthdate
 
         report = import_user_pe_data(user, FOO_TOKEN).report
@@ -200,7 +200,7 @@ class TestJobSeekerExternalData:
     def test_import_partial(self):
         _mock_status_partial()
 
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
         assert user.has_external_data
@@ -219,7 +219,7 @@ class TestJobSeekerExternalData:
     def test_import_failed(self):
         _mock_status_failed()
 
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
         assert user.has_external_data
@@ -232,8 +232,8 @@ class TestJobSeekerExternalData:
     def test_has_external_data(self):
         _mock_status_ok()
 
-        user1 = JobSeekerFactory()
-        user2 = JobSeekerFactory()
+        user1 = JobSeekerUserFactory()
+        user2 = JobSeekerUserFactory()
 
         import_user_pe_data(user1, FOO_TOKEN)
         user1.refresh_from_db()

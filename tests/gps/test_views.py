@@ -25,7 +25,7 @@ from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFac
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -79,7 +79,7 @@ class TestGroupLists:
     @pytest.mark.parametrize(
         "factory,status_code",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), 403],
+            [partial(JobSeekerUserFactory, for_snapshot=True), 403],
             [partial(EmployerFactory, with_company=True), 200],
             [PrescriberFactory, 200],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), 403],
@@ -258,7 +258,7 @@ class TestGroupLists:
 
     def test_mask_names(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=False)
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
         masked_name = "J… D…"
         full_name = "Jane DOE"
@@ -305,7 +305,7 @@ class TestGroupDetailsMembershipTab:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             [partial(EmployerFactory, with_company=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
@@ -339,7 +339,7 @@ class TestGroupDetailsMembershipTab:
             membership__organization__name="Les Olivades",
             membership__organization__authorized=True,
         )
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary=beneficiary,
             member=prescriber,
@@ -410,7 +410,7 @@ class TestGroupDetailsMembershipTab:
 
     def test_group_memberships_order(self, client):
         prescriber = PrescriberFactory(membership=True)
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
         participant = FollowUpGroupMembershipFactory(follow_up_group=group, created_at=timezone.now()).member
         certified_referent = FollowUpGroupMembershipFactory(
@@ -438,7 +438,7 @@ class TestGroupDetailsMembershipTab:
             membership__organization__name="Les Olivades",
             membership__organization__authorized=True,
         )
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
         target_participant = FollowUpGroupMembershipFactory(
             follow_up_group=group,
@@ -482,7 +482,7 @@ class TestGroupDetailsMembershipTab:
 
     def test_ask_access(self, client, mocker, snapshot):
         user = PrescriberFactory()
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=job_seeker, memberships=1, memberships__member=user)
         membership = group.memberships.get()
         slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
@@ -530,7 +530,7 @@ class TestGroupDetailsBeneficiaryTab:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             [partial(EmployerFactory, with_company=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
@@ -558,7 +558,7 @@ class TestGroupDetailsBeneficiaryTab:
 
     def test_tab(self, client, snapshot):
         prescriber = PrescriberFactory(membership=True, for_snapshot=True)
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
         client.force_login(prescriber)
@@ -640,7 +640,7 @@ class TestGroupDetailsContributionTab:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             [partial(EmployerFactory, with_company=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
@@ -669,7 +669,7 @@ class TestGroupDetailsContributionTab:
     @freezegun.freeze_time("2024-06-21")
     def test_tab(self, client, snapshot):
         prescriber = PrescriberFactory(membership=True)
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
         client.force_login(prescriber)
@@ -705,7 +705,7 @@ class TestGroupDetailsEditionTab:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             [partial(EmployerFactory, with_company=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
@@ -734,7 +734,7 @@ class TestGroupDetailsEditionTab:
     @freezegun.freeze_time("2024-06-21")
     def test_tab(self, client, snapshot):
         prescriber = PrescriberFactory(membership=True)
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary)
         membership = FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
 
@@ -851,7 +851,7 @@ class TestGroupDetailsEditionTab:
     @freezegun.freeze_time("2024-06-21")
     def test_form_validation(self, client):
         prescriber = PrescriberFactory(membership=True)
-        beneficiary = JobSeekerFactory(for_snapshot=True)
+        beneficiary = JobSeekerUserFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary)
         FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
 
@@ -927,7 +927,7 @@ class TestBeneficiariesAutocomplete:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=False), True),
             (PrescriberFactory, False),
@@ -966,7 +966,7 @@ class TestBeneficiariesAutocomplete:
         coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
 
         # created and followed by prescriber : he will always see the personal informations
-        first_beneficiary = JobSeekerFactory(
+        first_beneficiary = JobSeekerUserFactory(
             first_name="gps beneficiary Bob",
             last_name="Le Brico",
             created_by=prescriber,
@@ -976,7 +976,7 @@ class TestBeneficiariesAutocomplete:
         FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=1, memberships__member=prescriber)
 
         # followed by prescriber : he will only see personal info if he's authorized or if the memberships allows it
-        second_beneficiary = JobSeekerFactory(
+        second_beneficiary = JobSeekerUserFactory(
             first_name="gps second beneficiary Martin",
             last_name="Pêcheur",
             jobseeker_profile__birthdate=date(1990, 1, 1),
@@ -985,7 +985,7 @@ class TestBeneficiariesAutocomplete:
         FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=1, memberships__member=prescriber)
 
         # follow by coworker_1: the prescriber will only see personal info if he's authorized
-        third_beneficiary = JobSeekerFactory(
+        third_beneficiary = JobSeekerUserFactory(
             first_name="gps third beneficiary Jeanne",
             last_name="Bonneau",
             jobseeker_profile__birthdate=date(2000, 1, 1),
@@ -994,11 +994,11 @@ class TestBeneficiariesAutocomplete:
         FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=1, memberships__member=coworker_1)
 
         # Followed by coworker_2: not the active organization, but the prescriber will still see it
-        fourth_beneficiary = JobSeekerFactory(first_name="gps fourth beneficiary Foo", last_name="Bar")
+        fourth_beneficiary = JobSeekerUserFactory(first_name="gps fourth beneficiary Foo", last_name="Bar")
         FollowUpGroupFactory(beneficiary=fourth_beneficiary, memberships=1, memberships__member=coworker_2)
 
         # No link to the prescriber : don't display him
-        JobSeekerFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
+        JobSeekerUserFactory(first_name="gps other beneficiary Joe", last_name="Dalton")
 
         if can_view_personal_info == "membership":
             FollowUpGroupMembership.objects.filter(member=prescriber).update(can_view_personal_information=True)
@@ -1081,7 +1081,7 @@ class TestJoinGroupFromCoworker:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=False), True),
             (PrescriberFactory, False),
@@ -1115,20 +1115,20 @@ class TestJoinGroupFromCoworker:
         response = client.get(self.URL)
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot
 
-        followed_job_seeker = JobSeekerFactory()
+        followed_job_seeker = JobSeekerUserFactory()
         FollowUpGroupFactory(beneficiary=followed_job_seeker, memberships=1, memberships__member=user)
         response = client.post(self.URL, data={"user": followed_job_seeker.pk})
         assertRedirects(response, reverse("gps:group_list"))
         assert_already_followed_beneficiary_toast(response, followed_job_seeker)
 
-        coworker_job_seeker = JobSeekerFactory()
+        coworker_job_seeker = JobSeekerUserFactory()
         group = FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
         response = client.post(self.URL, data={"user": coworker_job_seeker.pk})
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, coworker_job_seeker)
         assert FollowUpGroupMembership.objects.filter(follow_up_group=group, member=user).exists()
 
-        another_job_seeker = JobSeekerFactory()
+        another_job_seeker = JobSeekerUserFactory()
         response = client.post(self.URL, data={"user": another_job_seeker.pk})
         assert response.status_code == 200
         assert response.context["form"].errors == {"user": ["Ce candidat ne peut être suivi."]}
@@ -1140,7 +1140,7 @@ class TestJoinGroupFromCoworker:
         coworker = PrescriberMembershipFactory(organization=organization).user
         client.force_login(user)
 
-        coworker_job_seeker = JobSeekerFactory()
+        coworker_job_seeker = JobSeekerUserFactory()
         FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
         response = client.post(self.URL, data={"user": coworker_job_seeker.pk}, follow=True)
         assert_new_beneficiary_toast(response, coworker_job_seeker, can_view_personal_info)
@@ -1155,7 +1155,7 @@ class TestJoinGroupFromNir:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=False), False),
             (PrescriberFactory, False),
@@ -1188,7 +1188,7 @@ class TestJoinGroupFromNir:
         assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
 
         # unknown NIR :
-        dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
+        dummy_job_seeker = JobSeekerUserFactory.build(for_snapshot=True)
         response = client.post(self.URL, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": "1"})
         [job_seeker_session_name] = session_data_without_known_keys(client.session)
         next_url = reverse(
@@ -1208,7 +1208,7 @@ class TestJoinGroupFromNir:
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
         # existing nit
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "preview": "1"})
         assert str(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(name="modal")
 
@@ -1230,7 +1230,7 @@ class TestJoinGroupFromNir:
 
     def test_unknown_nir_known_email_with_no_nir(self, client, snapshot):
         user = EmployerFactory(with_company=True)
-        existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
+        existing_job_seeker_without_nir = JobSeekerUserFactory(for_snapshot=True, jobseeker_profile__nir="")
         nir = "276024719711371"
 
         client.force_login(user)
@@ -1288,7 +1288,7 @@ class TestJoinGroupFromNir:
 
     def test_unknown_nir_known_email_with_another_nir(self, client, snapshot):
         user = EmployerFactory(with_company=True)
-        existing_job_seeker_with_nir = JobSeekerFactory(for_snapshot=True)
+        existing_job_seeker_with_nir = JobSeekerUserFactory(for_snapshot=True)
         job_seeker_nir = existing_job_seeker_with_nir.jobseeker_profile.nir
         nir = "276024719711371"
 
@@ -1344,7 +1344,7 @@ class TestJoinGroupFromNir:
 
     def test_unknown_nir_and_unknown_email(self, client, settings, mocker):
         user = EmployerFactory(with_company=True)
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -1505,7 +1505,7 @@ class TestJoinGroupFromNameAndEmail:
     @pytest.mark.parametrize(
         "factory,access",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), False],
+            [partial(JobSeekerUserFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
             (partial(PrescriberFactory, membership__organization__authorized=False), True),
             (PrescriberFactory, True),
@@ -1538,7 +1538,7 @@ class TestJoinGroupFromNameAndEmail:
 
         client.force_login(user)
 
-        dummy_job_seeker = JobSeekerFactory.build(
+        dummy_job_seeker = JobSeekerUserFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -1548,7 +1548,7 @@ class TestJoinGroupFromNameAndEmail:
 
         # Unknown email -> redirect to job seeker creation flow
         # ----------------------------------------------------------------------
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         first_name = job_seeker.first_name if known_name else "John"
         last_name = job_seeker.last_name if known_name else "Snow"
         post_data = {
@@ -1588,7 +1588,7 @@ class TestJoinGroupFromNameAndEmail:
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
 
         # If we use an existing NIR
-        existing_nir = JobSeekerFactory().jobseeker_profile.nir
+        existing_nir = JobSeekerUserFactory().jobseeker_profile.nir
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": first_name,
@@ -1709,7 +1709,7 @@ class TestJoinGroupFromNameAndEmail:
         user = PrescriberFactory(membership__organization__authorized=True)
         client.force_login(user)
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         post_data = {
             "email": job_seeker.email,
             "first_name": job_seeker.first_name,
@@ -1735,7 +1735,7 @@ class TestJoinGroupFromNameAndEmail:
         slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
         client.force_login(user)
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         post_data = {
             "email": job_seeker.email,
             "first_name": job_seeker.first_name,
@@ -1791,7 +1791,7 @@ class TestJoinGroupFromNameAndEmail:
 
         response = client.get(self.URL)
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         post_data = {
             "email": job_seeker.email,
             "first_name": "John",
@@ -1818,7 +1818,7 @@ class TestJoinGroupFromNameAndEmail:
 
         response = client.get(self.URL)
 
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         post_data = {
             "email": job_seeker.email,
             "first_name": "John",

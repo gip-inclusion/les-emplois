@@ -26,7 +26,7 @@ from itou.utils.mocks.pole_emploi import (
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 @pytest.fixture(autouse=True)
@@ -240,7 +240,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
             side_effect=httpx.ConnectTimeout
         )
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -256,7 +256,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_MANY_RESULTS
         )
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -273,7 +273,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
             return_status = approval.notify_pole_emploi()
@@ -290,7 +290,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.ACCEPTED)
@@ -309,7 +309,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.POSTPONED)
@@ -330,7 +330,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
         JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED)

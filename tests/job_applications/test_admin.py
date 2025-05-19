@@ -14,7 +14,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -62,7 +62,7 @@ def test_create_employee_record_when_it_already_exists(admin_client):
 
 
 def test_create_job_application_does_not_crash(admin_client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     company = CompanyFactory()
     response = admin_client.post(
         reverse("admin:job_applications_jobapplication_add"),
@@ -92,11 +92,11 @@ def test_check_inconsistency_check(admin_client):
     assertContains(response, "Aucune incohérence trouvée")
 
     inconsistent_application_1 = factories.JobApplicationFactory(with_approval=True)
-    inconsistent_application_1.approval.user = JobSeekerFactory()
+    inconsistent_application_1.approval.user = JobSeekerUserFactory()
     inconsistent_application_1.approval.save()
 
     inconsistent_application_2 = factories.JobApplicationFactory(with_approval=True)
-    inconsistent_application_2.eligibility_diagnosis.job_seeker = JobSeekerFactory()
+    inconsistent_application_2.eligibility_diagnosis.job_seeker = JobSeekerUserFactory()
     inconsistent_application_2.eligibility_diagnosis.save()
 
     response = admin_client.post(
@@ -168,7 +168,7 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
 
 
 def test_create_then_accept_job_application(admin_client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
     employer = company.members.first()
     post_data = {
@@ -423,7 +423,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
 
 
 def test_create_inconsistent_job_application(admin_client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
     employer = company.members.first()
     approval = ApprovalFactory()

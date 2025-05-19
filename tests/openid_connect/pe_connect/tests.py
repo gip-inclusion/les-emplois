@@ -22,7 +22,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.users.factories import JobSeekerFactory, UserFactory
+from tests.users.factories import JobSeekerUserFactory, UserFactory
 from tests.utils.test import reload_module
 
 
@@ -155,7 +155,7 @@ class TestPoleEmploiConnect:
         we use it and we update it
         """
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username=peamu_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
@@ -173,7 +173,7 @@ class TestPoleEmploiConnect:
         The email is also different, so it will crash while trying to create a new user.
         """
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username=peamu_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
@@ -194,7 +194,7 @@ class TestPoleEmploiConnect:
             user.delete()
 
     def test_update_readonly_with_certified_criteria(self, caplog):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             username=PEAMU_USERINFO["sub"],
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
@@ -272,7 +272,7 @@ class TestPoleEmploiConnect:
     def test_callback_with_nir(self, client):
         # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir
         nir = "141068078200557"
-        job_seeker_data = JobSeekerFactory.build(born_in_france=True)
+        job_seeker_data = JobSeekerUserFactory.build(born_in_france=True)
         post_data = {
             "nir": nir,
             "title": job_seeker_data.title,
@@ -315,7 +315,7 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
         # EmailInUseException raised by the email conflict
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             email=peamu_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT, for_snapshot=True
         )
 
@@ -326,7 +326,7 @@ class TestPoleEmploiConnect:
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username="another_sub", email=peamu_user_data.email, identity_provider=IdentityProvider.PE_CONNECT
         )
 
@@ -380,7 +380,7 @@ def test_create_peamu_user_with_already_existing_email_fails(identity_provider):
     However, we require that emails are unique as well.
     """
     peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-    JobSeekerFactory(
+    JobSeekerUserFactory(
         username="another_username",
         email=peamu_user_data.email,
         identity_provider=identity_provider,
@@ -395,7 +395,7 @@ def test_create_peamu_user_with_already_existing_peamu_email_fails():
     However, we require that emails are unique as well.
     """
     peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-    JobSeekerFactory(
+    JobSeekerUserFactory(
         username="another_username",
         email=peamu_user_data.email,
         identity_provider=IdentityProvider.PE_CONNECT,

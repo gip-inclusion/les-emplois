@@ -26,7 +26,7 @@ from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import ItouClient, assert_previous_step
 
 
@@ -151,7 +151,7 @@ class TestSendPrescriberWithOrgInvitationExceptions:
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_invite_existing_user_is_job_seeker(self, client):
-        guest = JobSeekerFactory()
+        guest = JobSeekerUserFactory()
         client.force_login(self.sender)
         post_data = {
             "form-TOTAL_FORMS": "1",

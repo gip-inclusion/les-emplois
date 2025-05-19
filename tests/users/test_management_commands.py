@@ -40,7 +40,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, LaborInspectorFactory
 
 
 class TestDeduplicateJobSeekersManagementCommands:
@@ -571,37 +571,37 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2025-02-25")
     def test_wet_run_job_seekers(self, caplog, respx_mock):
-        billy = JobSeekerFactory(
+        billy = JobSeekerUserFactory(
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
             with_ban_geoloc_address=True,
             with_verified_email=True,
         )
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             first_name="Sonny",
             last_name="Sunder",
             email="sonny.sunder@mailinator.com",
             date_joined=datetime.datetime(2025, 1, 25, tzinfo=timezone.get_current_timezone()),
             with_verified_email=True,
         )
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             first_name="Timmy",
             last_name="Timber",
             email="timmy.timber@mailinator.com",
             is_active=False,
             with_verified_email=True,
         )
-        valery = JobSeekerFactory(
+        valery = JobSeekerUserFactory(
             first_name="Valery",
             last_name="Vanda",
             email="valery.vanda@mailinator.com",
             identity_provider=IdentityProvider.PE_CONNECT,
             with_ban_geoloc_address=True,
         )
-        not_primary = JobSeekerFactory()
+        not_primary = JobSeekerUserFactory()
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
-        not_verified = JobSeekerFactory()
+        not_verified = JobSeekerUserFactory()
         allauth_models.EmailAddress.objects.create(
             user=not_verified,
             email="new@mailinator.com",
@@ -670,7 +670,7 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2025-02-25")
     def test_wet_run_stalled_autonomous_job_seekers(self, caplog, respx_mock):
-        billy = JobSeekerFactory(
+        billy = JobSeekerUserFactory(
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
@@ -692,7 +692,7 @@ class TestCommandSendUsersToBrevo:
             created_at=timezone.now() - datetime.timedelta(days=181),
             eligibility_diagnosis=None,
         )
-        valery = JobSeekerFactory(
+        valery = JobSeekerUserFactory(
             first_name="Valery",
             last_name="Vanda",
             email="valery.vanda@mailinator.com",
@@ -711,14 +711,14 @@ class TestCommandSendUsersToBrevo:
 
         # The following job seekers are not sent.
         # Too recent.
-        too_recent_job_seeker = JobSeekerFactory(first_name="recent", last_name="recent", with_verified_email=True)
+        too_recent_job_seeker = JobSeekerUserFactory(first_name="recent", last_name="recent", with_verified_email=True)
         JobApplicationFactory(
             job_seeker=too_recent_job_seeker,
             sender=too_recent_job_seeker,
             eligibility_diagnosis=None,
         )
         # Too old.
-        too_old_job_seeker = JobSeekerFactory(first_name="old", last_name="old", with_verified_email=True)
+        too_old_job_seeker = JobSeekerUserFactory(first_name="old", last_name="old", with_verified_email=True)
         JobApplicationFactory(
             created_at=timezone.now() - datetime.timedelta(days=185),
             job_seeker=too_old_job_seeker,
@@ -726,7 +726,9 @@ class TestCommandSendUsersToBrevo:
             eligibility_diagnosis=None,
         )
         # Accepted
-        accepted_job_seeker = JobSeekerFactory(first_name="accepted", last_name="accepted", with_verified_email=True)
+        accepted_job_seeker = JobSeekerUserFactory(
+            first_name="accepted", last_name="accepted", with_verified_email=True
+        )
         JobApplicationFactory(
             created_at=valid_stalled_created_at,
             state=JobApplicationState.ACCEPTED,
@@ -740,14 +742,16 @@ class TestCommandSendUsersToBrevo:
             eligibility_diagnosis=None,
         )
         # Has diagnosis.
-        iae_job_seeker = JobSeekerFactory(first_name="iae_diag", last_name="iae_diag", with_verified_email=True)
+        iae_job_seeker = JobSeekerUserFactory(first_name="iae_diag", last_name="iae_diag", with_verified_email=True)
         JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker)
         JobApplicationFactory(job_seeker=iae_job_seeker, sender=iae_job_seeker, created_at=valid_stalled_created_at)
-        geiq_job_seeker = JobSeekerFactory(first_name="geiq_diag", last_name="geiq_diag", with_verified_email=True)
+        geiq_job_seeker = JobSeekerUserFactory(first_name="geiq_diag", last_name="geiq_diag", with_verified_email=True)
         JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker)
         JobApplicationFactory(job_seeker=geiq_job_seeker, sender=geiq_job_seeker, created_at=valid_stalled_created_at)
         # Has approval.
-        approval_job_seeker = JobSeekerFactory(first_name="approval", last_name="approval", with_verified_email=True)
+        approval_job_seeker = JobSeekerUserFactory(
+            first_name="approval", last_name="approval", with_verified_email=True
+        )
         approval = ApprovalFactory(user=approval_job_seeker)
         JobApplicationFactory(
             job_seeker=approval_job_seeker,
@@ -953,14 +957,14 @@ class TestCommandSendUsersToBrevo:
 
 @freeze_time("2023-05-01")
 def test_update_job_seeker_coords(settings, capsys, respx_mock):
-    js1 = JobSeekerFactory(
+    js1 = JobSeekerUserFactory(
         with_address=True, coords="POINT (2.387311 48.917735)", geocoding_score=0.65
     )  # score too low
-    js2 = JobSeekerFactory(with_address=True, coords=None, geocoding_score=0.9)  # no coords
-    js3 = JobSeekerFactory(
+    js2 = JobSeekerUserFactory(with_address=True, coords=None, geocoding_score=0.9)  # no coords
+    js3 = JobSeekerUserFactory(
         with_address=True, coords="POINT (5.43567 12.123876)", geocoding_score=0.76
     )  # score too low
-    JobSeekerFactory(with_address_in_qpv=True)
+    JobSeekerUserFactory(with_address_in_qpv=True)
 
     settings.API_BAN_BASE_URL = "https://geo.foo"
     respx_mock.post("https://geo.foo/search/csv/").respond(
@@ -998,7 +1002,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
 
 @freeze_time("2022-09-13")
 def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
-    user = JobSeekerFactory(
+    user = JobSeekerUserFactory(
         pk=424242,
         first_name="Yoder",
         last_name="Olson",
@@ -1060,7 +1064,7 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
 
 @freeze_time("2022-09-13")
 def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
-    user = JobSeekerFactory(
+    user = JobSeekerUserFactory(
         pk=424243,
         first_name="Balthazar",
         last_name="Durand",
@@ -1116,14 +1120,14 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
 
 
 def test_pe_certify_users_retry(caplog, snapshot):
-    new_user = JobSeekerFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
-    old_failure = JobSeekerFactory(
+    new_user = JobSeekerUserFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
+    old_failure = JobSeekerUserFactory(
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
     )
-    really_old_failure = JobSeekerFactory(
+    really_old_failure = JobSeekerUserFactory(
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=900),
     )
-    JobSeekerFactory(
+    JobSeekerUserFactory(
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(seconds=90),
     )  # recent failure that should not be called
     with mock.patch(

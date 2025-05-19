@@ -16,7 +16,7 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -26,9 +26,9 @@ from tests.users.factories import (
     "user_factory,identity_provider,is_redirected",
     [
         (ItouStaffFactory, IdentityProvider.DJANGO, False),
-        (JobSeekerFactory, IdentityProvider.DJANGO, False),
-        (JobSeekerFactory, IdentityProvider.PE_CONNECT, False),
-        (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
+        (JobSeekerUserFactory, IdentityProvider.DJANGO, False),
+        (JobSeekerUserFactory, IdentityProvider.PE_CONNECT, False),
+        (JobSeekerUserFactory, IdentityProvider.FRANCE_CONNECT, False),
         (PrescriberFactory, IdentityProvider.DJANGO, True),
         (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, True),
         (PrescriberFactory, IdentityProvider.PRO_CONNECT, False),
@@ -81,13 +81,13 @@ class TestUtils:
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
-        job_seeker = JobSeekerFactory()
-        user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
-        logged_user_created_by_prescriber = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory()
+        user_created_by_prescriber = JobSeekerUserFactory(created_by=unauthorized_prescriber, last_login=None)
+        logged_user_created_by_prescriber = JobSeekerUserFactory(
             created_by=unauthorized_prescriber, last_login=timezone.now()
         )
-        user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=None)
-        logged_user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=timezone.now())
+        user_created_by_employer = JobSeekerUserFactory(created_by=employer, last_login=None)
+        logged_user_created_by_employer = JobSeekerUserFactory(created_by=employer, last_login=timezone.now())
 
         specs = {
             "authorized_prescriber": {
@@ -144,9 +144,9 @@ class TestUtils:
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
-        job_seeker = JobSeekerFactory()
-        user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
-        user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=None)
+        job_seeker = JobSeekerUserFactory()
+        user_created_by_prescriber = JobSeekerUserFactory(created_by=unauthorized_prescriber, last_login=None)
+        user_created_by_employer = JobSeekerUserFactory(created_by=employer, last_login=None)
 
         specs = {
             "authorized_prescriber": {

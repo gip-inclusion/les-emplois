@@ -8,7 +8,7 @@ from pytest_django.asserts import assertRedirects
 from itou.users.enums import IdentityProvider
 from tests.users.factories import (
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
@@ -21,7 +21,7 @@ class TestUserHijack:
         assert response.status_code == 404
 
     def test_superuser(self, client, caplog):
-        hijacked = JobSeekerFactory()
+        hijacked = JobSeekerUserFactory()
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
@@ -86,7 +86,7 @@ class TestUserHijack:
         assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_release_redirects_to_admin(self, client):
-        hijacked = JobSeekerFactory()
+        hijacked = JobSeekerUserFactory()
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 
@@ -100,7 +100,7 @@ class TestUserHijack:
 
     def test_keep_otp_after_hijack(self, client, settings):
         settings.REQUIRE_OTP_FOR_STAFF = True
-        hijacked = JobSeekerFactory()
+        hijacked = JobSeekerUserFactory()
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 

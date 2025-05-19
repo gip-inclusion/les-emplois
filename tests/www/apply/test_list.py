@@ -10,7 +10,7 @@ from itou.www.apply.views.list_views import JobApplicationOrder, JobApplications
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -23,7 +23,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         membership__user__first_name="Max", membership__user__last_name="Throughput"
     )
     sender = org.active_members.get()
-    job_seeker = JobSeekerFactory(
+    job_seeker = JobSeekerUserFactory(
         first_name="Jacques", last_name="Henry", public_id=uuid.UUID("00000000-1111-2222-3333-444444444444")
     )
     JobApplicationFactory(

@@ -11,7 +11,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.utils.urls import add_url_params
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -19,7 +19,7 @@ class TestUpdateEligibilityView:
     @pytest.mark.parametrize(
         "factory,status_code",
         [
-            [partial(JobSeekerFactory, for_snapshot=True), 403],
+            [partial(JobSeekerUserFactory, for_snapshot=True), 403],
             (partial(PrescriberFactory, membership__organization__authorized=True), 200),
             (partial(PrescriberFactory, membership__organization__authorized=False), 403),
             (PrescriberFactory, 403),
@@ -37,7 +37,7 @@ class TestUpdateEligibilityView:
     )
     def test_permissions(self, client, factory, status_code):
         user = factory()
-        job_seeker = user if user.is_job_seeker else JobSeekerFactory()
+        job_seeker = user if user.is_job_seeker else JobSeekerUserFactory()
         client.force_login(user)
         url = add_url_params(
             reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
@@ -48,7 +48,7 @@ class TestUpdateEligibilityView:
 
     def test_standalone_no_valid_eligibility_diagnosis(self, client, snapshot):
         prescriber = PrescriberFactory(membership__organization__authorized=True)
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
         client.force_login(prescriber)
 
@@ -75,7 +75,7 @@ class TestUpdateEligibilityView:
     @freeze_time("2025-03-22")
     def test_standalone_valid_eligibility_diagnosis(self, client, snapshot):
         prescriber = PrescriberFactory(membership__organization__authorized=True)
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=job_seeker, from_prescriber=True, author_prescriber_organization__for_snapshot=True
         )
@@ -108,7 +108,7 @@ class TestUpdateEligibilityView:
 
     def test_valid_approval(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=True)
-        job_seeker = JobSeekerFactory(for_snapshot=True)
+        job_seeker = JobSeekerUserFactory(for_snapshot=True)
         ApprovalFactory(user=job_seeker)
 
         client.force_login(prescriber)

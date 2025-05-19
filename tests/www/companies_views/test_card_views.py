@@ -13,7 +13,7 @@ from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
@@ -49,7 +49,7 @@ class TestCardView:
     def test_card_tally_url_with_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
-        user = JobSeekerFactory(pk=10)
+        user = JobSeekerUserFactory(pk=10)
         client.force_login(user)
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
@@ -304,7 +304,7 @@ class TestCardView:
         assertNotContains(response, BANNER_TXT)
 
         # # If job seeker, return a  200 without the banner
-        other_job_seeker = JobSeekerFactory()
+        other_job_seeker = JobSeekerUserFactory()
         client.force_login(other_job_seeker)
         assert response.status_code == 200
         assertNotContains(response, BANNER_TXT)
@@ -449,7 +449,7 @@ class TestJobDescriptionCardView:
             company__for_snapshot=True,
         )
         url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-        client.force_login(JobSeekerFactory(pk=10))
+        client.force_login(JobSeekerUserFactory(pk=10))
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
         assert str(soup) == snapshot(name="without_other_jobs")
@@ -504,7 +504,7 @@ class TestJobDescriptionCardView:
         assertNotContains(response, BANNER_TXT)
 
         # If job seeker, return a 200 without banner
-        other_job_seeker = JobSeekerFactory()
+        other_job_seeker = JobSeekerUserFactory()
         client.force_login(other_job_seeker)
         response = client.get(url)
         assert response.status_code == 200

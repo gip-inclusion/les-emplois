@@ -30,7 +30,7 @@ from tests.prescribers.factories import (
     PrescriberPoleEmploiWithMembershipFactory,
 )
 from tests.users.factories import (
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 from tests.utils.factory_boy import AutoNowOverrideMixin
@@ -109,7 +109,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.LazyAttribute(lambda obj: obj.job_seeker),
         )
 
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+    job_seeker = factory.SubFactory(JobSeekerUserFactory)
     to_company = factory.SubFactory(CompanyFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
@@ -245,7 +245,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     """
 
     job_seeker = factory.SubFactory(
-        JobSeekerFactory,
+        JobSeekerUserFactory,
         with_mocked_address=True,
         jobseeker_profile__with_hexa_address=True,
         jobseeker_profile__with_education_level=True,

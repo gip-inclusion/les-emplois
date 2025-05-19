@@ -14,7 +14,7 @@ from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -86,7 +86,7 @@ def test_assigned_company(admin_client):
 
 def test_filter_assigned_company(admin_client):
     company = CompanyFactory()
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     JobApplicationFactory(to_company=company, job_seeker=job_seeker)
     approval = ApprovalFactory(user=job_seeker)
     JobApplicationFactory(
@@ -144,7 +144,7 @@ def test_check_inconsistency_check(admin_client):
     assertContains(response, "Aucune incohérence trouvée")
 
     inconsistent_approval = ApprovalFactory()
-    inconsistent_approval.eligibility_diagnosis.job_seeker = JobSeekerFactory()
+    inconsistent_approval.eligibility_diagnosis.job_seeker = JobSeekerUserFactory()
     inconsistent_approval.eligibility_diagnosis.save()
 
     response = admin_client.post(

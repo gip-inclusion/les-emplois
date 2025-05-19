@@ -22,13 +22,13 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import assertSnapshotQueries
 
 
 # fixme vincentporte : convert this method into factory
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
 
     eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
         job_seeker,

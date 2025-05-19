@@ -1,10 +1,10 @@
 from itou.utils.constants import IMMERSION_FACILE_SITE_URL
 from itou.utils.immersion_facile import immersion_search_url
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_immersion_search_url():
-    user = JobSeekerFactory(
+    user = JobSeekerUserFactory(
         post_code="58160",
         city="Sauvigny-les-Bois",
         with_geoloc=True,
@@ -20,7 +20,7 @@ def test_immersion_search_url():
     )
     assert immersion_search_url(user) == expected_url
 
-    user = JobSeekerFactory(without_geoloc=True)
+    user = JobSeekerUserFactory(without_geoloc=True)
     expected_url = (
         f"{IMMERSION_FACILE_SITE_URL}/recherche?"
         f"mtm_campaign=les-emplois-recherche-immersion"

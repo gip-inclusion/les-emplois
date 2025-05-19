@@ -17,7 +17,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -39,7 +39,7 @@ class TestJobApplicationSearchApi:
     def setup_method(self, settings):
         settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] |= {"job-applications-search": "10/minute"}
 
-        self.job_seeker_1 = JobSeekerFactory(
+        self.job_seeker_1 = JobSeekerUserFactory(
             jobseeker_profile__nir="269054958815780",
             jobseeker_profile__birthdate=date(1969, 5, 12),
             last_name="Durand",
@@ -47,7 +47,7 @@ class TestJobApplicationSearchApi:
             born_in_france=True,
             with_address=True,
         )
-        self.job_seeker_2 = JobSeekerFactory(
+        self.job_seeker_2 = JobSeekerUserFactory(
             jobseeker_profile__nir="199127524528683",
             jobseeker_profile__birthdate=date(1999, 12, 3),
             last_name="Dupont-Maréchal",
@@ -90,7 +90,7 @@ class TestJobApplicationSearchApi:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            lambda: JobSeekerFactory(),
+            lambda: JobSeekerUserFactory(),
             lambda: PrescriberFactory(),
             lambda: EmployerFactory(),
             lambda: LaborInspectorFactory(),

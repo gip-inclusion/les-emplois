@@ -10,7 +10,7 @@ from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.www.apply.test_submit import fake_session_initialization
 
 
@@ -324,7 +324,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_not_resident_in_qpv_or_zrr(self, client):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
         job_application = JobApplicationFactory(job_seeker=job_seeker, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
@@ -335,7 +335,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
 
     def test_job_seeker_not_resident_in_qpv_or_zrr_for_prescriber(self, client):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
@@ -351,7 +351,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_qpv_details_display(self, client):
         # Check QPV fragment is displayed:
-        job_seeker_in_qpv = JobSeekerFactory(with_address_in_qpv=True)
+        job_seeker_in_qpv = JobSeekerUserFactory(with_address_in_qpv=True)
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker_in_qpv)
         job_application = JobApplicationFactory(job_seeker=job_seeker_in_qpv, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
@@ -364,7 +364,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_qpv_details_display_for_prescriber(self, client):
         # Check QPV fragment is displayed for prescriber:
-        job_seeker_in_qpv = JobSeekerFactory(with_address_in_qpv=True)
+        job_seeker_in_qpv = JobSeekerUserFactory(with_address_in_qpv=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         client.force_login(prescriber)
@@ -381,7 +381,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_zrr_details_display(self, client):
         # Check ZRR fragment is displayed
-        job_seeker_in_zrr = JobSeekerFactory(with_city_in_zrr=True)
+        job_seeker_in_zrr = JobSeekerUserFactory(with_city_in_zrr=True)
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker_in_zrr)
         job_application = JobApplicationFactory(job_seeker=job_seeker_in_zrr, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
@@ -394,7 +394,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_zrr_details_display_for_prescriber(self, client):
         # Check QPV fragment is displayed for prescriber:
-        job_seeker_in_zrr = JobSeekerFactory(with_city_in_zrr=True)
+        job_seeker_in_zrr = JobSeekerUserFactory(with_city_in_zrr=True)
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)

@@ -12,19 +12,19 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import JobSeekerUserFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
 
 
 def test_anonymous_user(client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
     response = client.get(url)
     assertRedirects(response, reverse("account_login") + f"?next={url}")
 
 
 def test_refused_access(client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
     for user in [job_seeker, LaborInspectorFactory(membership=True)]:
@@ -35,7 +35,7 @@ def test_refused_access(client):
 
 @freeze_time("2024-08-14")
 def test_single_iae_diag_from_prescriber(client, snapshot):
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
     prescriber_membership = PrescriberMembershipFactory(
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
@@ -71,7 +71,7 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
 
 @freeze_time("2024-08-14")
 def test_with_approval(client, snapshot):
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
     approval = ApprovalFactory(user=job_seeker, for_snapshot=True)
 
@@ -93,7 +93,7 @@ def test_with_approval(client, snapshot):
 
 @freeze_time("2024-08-14")
 def test_single_geiq_diag_from_prescriber(client, snapshot):
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
     prescriber_membership = PrescriberMembershipFactory(
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
@@ -128,7 +128,7 @@ def test_single_geiq_diag_from_prescriber(client, snapshot):
 
 @freeze_time("2024-08-14")
 def test_both_diag_from_prescriber(client, snapshot):
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
     prescriber_membership = PrescriberMembershipFactory(
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
@@ -156,7 +156,7 @@ def test_both_diag_from_prescriber(client, snapshot):
 
 @freeze_time("2024-08-14")
 def test_both_diag_from_company(client, snapshot):
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
 
     geiq_membership = CompanyMembershipFactory(
         company__kind=CompanyKind.GEIQ,
@@ -327,7 +327,7 @@ def test_update_iae_eligibility_buttons(client):
     authorized_prescriber = PrescriberFactory(membership__organization__authorized=True)
     unauthorized_prescriber = PrescriberFactory(membership__organization__authorized=False)
 
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
     # A unauthorized prescriber doesn't see the button

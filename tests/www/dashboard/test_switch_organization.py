@@ -8,7 +8,7 @@ from tests.companies.factories import (
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import (
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
@@ -128,7 +128,7 @@ class TestSwitchOrganization:
         organization = prescribers_factories.PrescriberOrganizationFactory()
 
         for user in (
-            JobSeekerFactory(),
+            JobSeekerUserFactory(),
             PrescriberFactory(),
         ):
             client.force_login(user)
@@ -178,7 +178,7 @@ class TestSwitchInstitution:
         institution = InstitutionFactory()
 
         for user in (
-            JobSeekerFactory(),
+            JobSeekerUserFactory(),
             # Create a user with other membership
             # (otherwise the middleware intercepts labor inspector without any membership)
             InstitutionMembershipFactory().user,

@@ -15,7 +15,7 @@ from tests.prescribers.factories import (
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -218,7 +218,7 @@ def test_can_view_stats_staff():
         EmployerFactory(with_company=True),
         PrescriberFactory(),
         LaborInspectorFactory(membership=True),
-        JobSeekerFactory(),
+        JobSeekerUserFactory(),
     ]:
         request = get_request(user)
         assert request.user.is_authenticated

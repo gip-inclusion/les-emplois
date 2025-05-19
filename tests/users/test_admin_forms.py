@@ -3,11 +3,11 @@ from django.forms.models import model_to_dict
 
 from itou.users.admin_forms import UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_kind():
-    user = JobSeekerFactory()
+    user = JobSeekerUserFactory()
     data_user = model_to_dict(user)
     data_user["kind"] = UserKind.ITOU_STAFF
     form = UserAdminForm(data=data_user, instance=user)
@@ -21,10 +21,10 @@ def test_kind():
 def test_email_already_exists():
     # setup existing user
     email = "quention@django-unchained.com"
-    JobSeekerFactory(email=email)
+    JobSeekerUserFactory(email=email)
 
     # setup existing user for update tests
-    user = JobSeekerFactory(email="christopher@nolan.com")
+    user = JobSeekerUserFactory(email="christopher@nolan.com")
     data_user = model_to_dict(user)
 
     data_new_user = {

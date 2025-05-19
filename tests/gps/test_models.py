@@ -13,7 +13,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -31,7 +31,7 @@ def test_bulk_created():
 
 class TestFollowBeneficiary:
     def test_dates(self):
-        beneficiary = JobSeekerFactory()
+        beneficiary = JobSeekerUserFactory()
         prescriber = PrescriberFactory()
 
         with freeze_time() as frozen_time:
@@ -65,12 +65,12 @@ class TestFollowBeneficiary:
 
     def test_non_prescriber_or_employer(self):
         staff = ItouStaffFactory()
-        beneficiary = JobSeekerFactory()
+        beneficiary = JobSeekerUserFactory()
         FollowUpGroup.objects.follow_beneficiary(beneficiary, staff)
         assert not FollowUpGroup.objects.exists()
 
     def test_is_referent(self):
-        beneficiary = JobSeekerFactory()
+        beneficiary = JobSeekerUserFactory()
         prescriber = PrescriberFactory()
 
         # New follower uses kwarg value
@@ -115,7 +115,7 @@ class TestFollowBeneficiary:
         assert other_membership.is_referent is True  # No limit to the number of referent
 
     def test_is_active(self):
-        beneficiary = JobSeekerFactory()
+        beneficiary = JobSeekerUserFactory()
         prescriber = PrescriberFactory()
 
         # New follower uses kwarg value

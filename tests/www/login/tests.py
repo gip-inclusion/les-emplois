@@ -26,7 +26,7 @@ from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
@@ -41,7 +41,7 @@ class TestItouLogin:
     def test_generic_view(self, client):
         # If a user type cannot be determined, don't prevent login.
         # Just show a generic login form.
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         url = reverse("account_login")
         response = client.get(url)
         assert response.status_code == 200
@@ -64,7 +64,7 @@ class TestItouLoginForm:
         We should block him upstream but this means hard work (overriding default Allauth views),
         too long for this quite uncommon use case.
         """
-        user = JobSeekerFactory(identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
+        user = JobSeekerUserFactory(identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,
@@ -222,7 +222,7 @@ class TestJobSeekerPreLogin:
         assert response.context["form"].errors["email"] == ["Saisissez une adresse e-mail valide."]
 
     def test_pre_login_redirects_to_existing_user(self, client):
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         url = reverse("login:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
@@ -260,8 +260,8 @@ class TestJobSeekerPreLogin:
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
         """
-        JobSeekerFactory(email=FC_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(email=FC_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerUserFactory(
             username=FC_USERINFO["sub"],
             email="seconde@email.com",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
@@ -295,7 +295,7 @@ class TestExistingUserLogin:
             context["login_provider"] = "somethingInvalid"
             return context
 
-        user = JobSeekerFactory()
+        user = JobSeekerUserFactory()
         with patch.object(ExistingUserLoginView, "get_context_data", override_identity_provider_in_context):
             response = client.get(reverse("login:existing_user", args=(user.public_id,)))
             assertContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
@@ -326,7 +326,7 @@ class TestExistingUserLogin:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            JobSeekerFactory,
+            JobSeekerUserFactory,
             PrescriberFactory,
             partial(EmployerFactory, with_company=True),
             LaborInspectorFactory,
@@ -349,7 +349,7 @@ class TestExistingUserLogin:
     def test_login_email_prefilled(self, client, snapshot):
         # Login is not pre-filled just by visiting the page.
         # The user must prove they know this information
-        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO, for_snapshot=True)
+        user = JobSeekerUserFactory(identity_provider=IdentityProvider.DJANGO, for_snapshot=True)
         url = reverse("login:existing_user", args=(user.public_id,))
         response = client.get(url)
         assert response.status_code == 200

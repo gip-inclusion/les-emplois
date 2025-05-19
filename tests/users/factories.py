@@ -166,7 +166,7 @@ class LaborInspectorFactory(UserFactory):
             InstitutionMembershipFactory(user=self, **kwargs)
 
 
-class JobSeekerFactory(UserFactory):
+class JobSeekerUserFactory(UserFactory):
     title = random.choice(Title.values)
     kind = UserKind.JOB_SEEKER
     jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
@@ -353,7 +353,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_post_code="35000",
         )
 
-    user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
+    user = factory.SubFactory(JobSeekerUserFactory, jobseeker_profile=None)
     # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 

@@ -1,7 +1,7 @@
 from itou.www.job_seekers_views import forms as job_seekers_forms
 from tests.users.factories import (
-    JobSeekerFactory,
     JobSeekerProfileFactory,
+    JobSeekerUserFactory,
     PrescriberFactory,
 )
 
@@ -18,7 +18,7 @@ class TestCheckJobSeekerNirForm:
     def test_form_job_seeker_found(self):
         # A job seeker with this NIR already exists.
         nir = "141062A78200555"
-        job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
+        job_seeker = JobSeekerUserFactory(jobseeker_profile__nir=nir)
         form_data = {"nir": job_seeker.jobseeker_profile.nir}
         form = job_seekers_forms.CheckJobSeekerNirForm(data=form_data)
         # A job seeker has been found.
@@ -34,8 +34,8 @@ class TestCheckJobSeekerNirForm:
 
     def test_form_not_valid(self):
         # Application sent by a job seeker whose NIR is already used by another account.
-        existing_account = JobSeekerFactory(email="unlikely@random.tld")
-        user = JobSeekerFactory()
+        existing_account = JobSeekerUserFactory(email="unlikely@random.tld")
+        user = JobSeekerUserFactory()
         form_data = {"nir": existing_account.jobseeker_profile.nir}
         form = job_seekers_forms.CheckJobSeekerNirForm(job_seeker=user, data=form_data)
         assert not form.is_valid()

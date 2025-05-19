@@ -18,7 +18,7 @@ from itou.utils.apis.pole_emploi import (
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 class TestPoleEmploiAPIClient:
@@ -43,7 +43,7 @@ class TestPoleEmploiAPIClient:
 
     @respx.mock
     def test_get_token_fails(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
             side_effect=httpx.ConnectTimeout
         )
@@ -58,7 +58,7 @@ class TestPoleEmploiAPIClient:
 
     @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
         )
@@ -85,7 +85,7 @@ class TestPoleEmploiAPIClient:
 
     @respx.mock
     def test_recherche_individu_certifie_individual_api_errors(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR
         )
@@ -100,7 +100,7 @@ class TestPoleEmploiAPIClient:
 
     @respx.mock
     def test_recherche_individu_certifie_retryable_errors(self):
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
 
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(401, json="")
         with pytest.raises(PoleEmploiAPIException) as ctx:
@@ -121,7 +121,7 @@ class TestPoleEmploiAPIClient:
                 job_seeker.jobseeker_profile.nir,
             )
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").mock(
             side_effect=httpx.ConnectTimeout
         )

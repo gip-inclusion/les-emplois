@@ -42,7 +42,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -53,7 +53,7 @@ class TestExportJobApplications:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 403),
+            (JobSeekerUserFactory, {}, 403),
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
@@ -79,7 +79,7 @@ class TestExportJobApplications:
         client.force_login(ItouStaffFactory(is_superuser=True))
         siae = CompanyFactory(for_snapshot=True, with_membership=True, siret="32112345600020", naf="1234Z")
         with freeze_time("2024-05-10T11:11:11+02:00"):
-            job_seeker = JobSeekerFactory(
+            job_seeker = JobSeekerUserFactory(
                 for_snapshot=True,
                 jobseeker_profile__pe_last_certification_attempt_at=timezone.now(),
                 jobseeker_profile__hexa_post_code="35000",
@@ -150,7 +150,7 @@ class TestExportPEApiRejections:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 403),
+            (JobSeekerUserFactory, {}, 403),
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
@@ -202,7 +202,7 @@ class TestExportCTA:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {}, 403),
+            (JobSeekerUserFactory, {}, 403),
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
@@ -236,7 +236,7 @@ class TestMergeUsers:
     @pytest.mark.parametrize(
         "factory,factory_kwargs,expected_status",
         [
-            (JobSeekerFactory, {"for_snapshot": True}, 403),
+            (JobSeekerUserFactory, {"for_snapshot": True}, 403),
             (EmployerFactory, {"with_company": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
@@ -288,7 +288,7 @@ class TestMergeUsers:
     def test_check_user_kind(self, client, mocker):
         prescriber = PrescriberFactory()
         employer = EmployerFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         labor_inspector = LaborInspectorFactory()
         itou_staff = ItouStaffFactory(is_superuser=True)
 
@@ -535,7 +535,7 @@ class TestMergeUsers:
             declared_by=prescriber_2,
             processed_by=prescriber_2,
         )
-        job_seeker = JobSeekerFactory(created_by=prescriber_2)
+        job_seeker = JobSeekerUserFactory(created_by=prescriber_2)
         invitation = EmployerInvitationFactory(sender=prescriber_2)
         gps_group = FollowUpGroupMembershipFactory(member=prescriber_2)
         iae_diagnosis = IAEEligibilityDiagnosisFactory(author=prescriber_2, from_prescriber=True)
@@ -627,7 +627,7 @@ class TestOTP:
     @pytest.mark.parametrize(
         "factory,expected_status",
         [
-            (JobSeekerFactory, 403),
+            (JobSeekerUserFactory, 403),
             (partial(EmployerFactory, with_company=True), 403),
             (PrescriberFactory, 403),
             (partial(LaborInspectorFactory, membership=True), 403),

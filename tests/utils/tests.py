@@ -89,7 +89,7 @@ from tests.prescribers.factories import PrescriberOrganizationFactory, Prescribe
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
-    JobSeekerFactory,
+    JobSeekerUserFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -124,7 +124,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_job_seeker(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        request.user = JobSeekerFactory()
+        request.user = JobSeekerUserFactory()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(0):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -710,7 +710,7 @@ class TestUtilsTemplateTags:
     @pytest.mark.parametrize(
         "user,expected_query_params",
         [
-            (lambda: JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT), ""),
+            (lambda: JobSeekerUserFactory(identity_provider=IdentityProvider.FRANCE_CONNECT), ""),
             (
                 lambda: PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT),
                 "?proconnect_login=true",
@@ -1312,7 +1312,7 @@ class TestJSON:
         for obj, expected, *_ in self.ASYMMETRIC_CONVERSION:
             assert dumps(obj) == expected
 
-        model_object = JobSeekerFactory()
+        model_object = JobSeekerUserFactory()
         assert dumps(model_object) == str(model_object.pk)
 
     def test_decode(self):
@@ -1679,7 +1679,7 @@ def test_all_admin(admin_client, model):
 
 
 def test_profile_city_display():
-    user = JobSeekerFactory.build(with_address=True)
+    user = JobSeekerUserFactory.build(with_address=True)
     profile = user.jobseeker_profile
 
     # Tests with hexa_commune

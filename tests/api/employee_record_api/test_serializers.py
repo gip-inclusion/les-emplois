@@ -14,7 +14,7 @@ from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 def test_address_serializer_hexa_additional_address():
@@ -73,7 +73,7 @@ def test_address_serializer_hexa_lane_name():
 
 
 def test_address_serializer_with_empty_fields():
-    serializer = _API_AddressSerializer(JobSeekerFactory(phone="", email=None))
+    serializer = _API_AddressSerializer(JobSeekerUserFactory(phone="", email=None))
 
     assert serializer.data == {
         "adrTelephone": "",

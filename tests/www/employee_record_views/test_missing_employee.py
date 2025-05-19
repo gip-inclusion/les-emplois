@@ -10,7 +10,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -26,7 +26,7 @@ def test_missing_employee(client, snapshot):
     assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(name="form")
 
     # job_seeker that was never hired
-    job_seeker = JobSeekerFactory(first_name="André", last_name="Alonso")
+    job_seeker = JobSeekerUserFactory(first_name="André", last_name="Alonso")
     JobApplicationFactory(to_company=siae, job_seeker=job_seeker)
     response = client.post(url, data={"employee": job_seeker.pk})
     assert str(
@@ -44,7 +44,7 @@ def test_missing_employee(client, snapshot):
     ) == snapshot(name=MissingEmployeeCase.NO_HIRING)
 
     # hired without approval (not possible anymore)
-    job_seeker = JobSeekerFactory(first_name="Béatrice", last_name="Beauregard")
+    job_seeker = JobSeekerUserFactory(first_name="Béatrice", last_name="Beauregard")
     JobApplicationFactory(to_company=siae, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED, approval=None)
     response = client.post(url, data={"employee": job_seeker.pk})
     assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(
@@ -52,7 +52,7 @@ def test_missing_employee(client, snapshot):
     )
 
     # hired with an approval (nominal case)
-    job_seeker = JobSeekerFactory(first_name="Charles", last_name="Constantin")
+    job_seeker = JobSeekerUserFactory(first_name="Charles", last_name="Constantin")
     approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00001")
     JobApplicationFactory(
         to_company=siae,
@@ -66,7 +66,7 @@ def test_missing_employee(client, snapshot):
     assert response.context["approvals_data"][0][2] == MissingEmployeeCase.NO_EMPLOYEE_RECORD
 
     # hired and already has an employee record
-    job_seeker = JobSeekerFactory(first_name="Damien", last_name="Danone")
+    job_seeker = JobSeekerUserFactory(first_name="Damien", last_name="Danone")
     approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00002")
     job_application = JobApplicationFactory(
         to_company=siae,
@@ -92,7 +92,7 @@ def test_missing_employee(client, snapshot):
     ) == snapshot(name=MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_SAME_COMPANY)
 
     # hired and already has an employee record in another siae on the same convention
-    job_seeker = JobSeekerFactory(first_name="Eliott", last_name="Emery")
+    job_seeker = JobSeekerUserFactory(first_name="Eliott", last_name="Emery")
     approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00003")
     JobApplicationFactory(
         to_company=siae,
@@ -116,7 +116,7 @@ def test_missing_employee(client, snapshot):
     )
 
     # hired without an employee record
-    job_seeker = JobSeekerFactory(first_name="Fabienne", last_name="Favriseau")
+    job_seeker = JobSeekerUserFactory(first_name="Fabienne", last_name="Favriseau")
     approval = ApprovalFactory(user=job_seeker, number="XXXXXXX00004")
     job_application = JobApplicationFactory(
         to_company=siae,

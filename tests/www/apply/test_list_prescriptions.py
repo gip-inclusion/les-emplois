@@ -22,7 +22,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerUserFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     assert_previous_step,
@@ -149,7 +149,7 @@ def test_filtered_by_sender(client):
 
 
 def test_filtered_by_job_seeker(client):
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     prescriber = PrescriberMembershipFactory(organization__authorized=True).user
     JobApplicationFactory(sender=prescriber, job_seeker=job_seeker)
     JobApplicationFactory.create_batch(2, sender=prescriber)
@@ -377,7 +377,7 @@ def test_list_snapshot(client, snapshot):
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert str(page) == snapshot(name="empty")
 
-    job_seeker = JobSeekerFactory(for_snapshot=True)
+    job_seeker = JobSeekerUserFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
     common_kwargs = {
         "job_seeker": job_seeker,

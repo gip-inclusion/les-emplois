@@ -9,7 +9,7 @@ from itou.communications.dispatch.base import BaseNotification
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.communications.factories import AnnouncementCampaignFactory
 from tests.companies.factories import CompanyMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerUserFactory, PrescriberFactory
 
 
 class TestNotificationModel:
@@ -52,7 +52,7 @@ class TestNotificationModel:
 
 class TestNotificationSettingsModel:
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(first_name="John", last_name="Doe", with_disabled_notifications=True)
+        self.job_seeker = JobSeekerUserFactory(first_name="John", last_name="Doe", with_disabled_notifications=True)
         self.employer = EmployerFactory(
             first_name="Alice", last_name="Doe", with_company=True, with_disabled_notifications=True
         )

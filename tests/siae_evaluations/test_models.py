@@ -46,7 +46,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerUserFactory, PrescriberFactory
 from tests.utils.test import assertSnapshotQueries
 
 
@@ -72,7 +72,7 @@ def create_batch_of_job_applications(company, *, size=evaluation_enums.Evaluatio
 class TestEvaluationCampaignMiscMethods:
     def test_select_min_max_job_applications(self):
         company = CompanyFactory()
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerUserFactory()
         sender = PrescriberFactory()
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
@@ -161,7 +161,7 @@ class TestEvaluationCampaignQuerySet:
 @pytest.fixture
 def campaign_eligible_job_app_objects():
     company = CompanyWith2MembershipsFactory(department="14")
-    job_seeker = JobSeekerFactory()
+    job_seeker = JobSeekerUserFactory()
     start = timezone.localdate() - relativedelta(months=2)
     approval = ApprovalFactory(user=job_seeker, start_at=start)
     diag = IAEEligibilityDiagnosisFactory(

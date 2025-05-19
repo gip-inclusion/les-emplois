@@ -28,7 +28,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from tests.users.factories import JobSeekerProfileFactory, JobSeekerUserFactory, PrescriberFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
@@ -67,7 +67,7 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             )
         )
 
-    user = factory.SubFactory(JobSeekerFactory)
+    user = factory.SubFactory(JobSeekerUserFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = factory.LazyFunction(timezone.localdate)
     end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))

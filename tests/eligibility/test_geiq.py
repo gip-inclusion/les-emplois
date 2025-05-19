@@ -12,7 +12,7 @@ from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerUserFactory
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 
     # Default kind : IAE eligibility diagnosis
     diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-        job_seeker=JobSeekerFactory(),
+        job_seeker=JobSeekerUserFactory(),
         author_structure=prescriber_org,
         author=prescriber_org.members.first(),
     )
@@ -61,7 +61,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     assert membership.creator == diagnosis.author
 
     diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-        job_seeker=JobSeekerFactory(),
+        job_seeker=JobSeekerUserFactory(),
         author_structure=geiq,
         author=geiq.members.first(),
         administrative_criteria=[administrative_criteria_annex_1],
@@ -83,7 +83,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
         match="Impossible de créer un diagnostic GEIQ avec une structure de type",
     ):
         GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-            job_seeker=JobSeekerFactory(),
+            job_seeker=JobSeekerUserFactory(),
             author_structure=company,
             author=company.members.first(),
         )
@@ -93,7 +93,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
         match="Un diagnostic effectué par un GEIQ doit avoir au moins un critère d'éligibilité",
     ):
         GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-            job_seeker=JobSeekerFactory(),
+            job_seeker=JobSeekerUserFactory(),
             author_structure=geiq,
             author=geiq.members.first(),
             administrative_criteria=(),
@@ -149,7 +149,7 @@ def test_geiq_eligibility_diagnosis_validation():
     ):
         GEIQEligibilityDiagnosis(
             author_geiq=geiq,
-            job_seeker=JobSeekerFactory(),
+            job_seeker=JobSeekerUserFactory(),
             author_prescriber_organization=PrescriberOrganizationWithMembershipFactory(),
         ).full_clean()
 

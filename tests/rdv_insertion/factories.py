@@ -7,7 +7,7 @@ from itou.rdv_insertion.models import Appointment, Invitation, InvitationRequest
 from itou.users.enums import Title
 from itou.utils.mocks import rdv_insertion as rdvi_mocks
 from tests.companies.factories import CompanyFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerUserFactory
 
 
 fake = Faker("fr_FR")
@@ -94,7 +94,7 @@ class InvitationRequestFactory(factory.django.DjangoModelFactory):
             set_api_response=factory.PostGeneration(set_api_response),
         )
 
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+    job_seeker = factory.SubFactory(JobSeekerUserFactory)
     company = factory.SubFactory(CompanyFactory, with_membership=True)
     email_invitation = factory.RelatedFactory(
         "tests.rdv_insertion.factories.InvitationFactory",
@@ -197,7 +197,7 @@ class ParticipationFactory(factory.django.DjangoModelFactory):
             job_seeker__for_snapshot=True,
         )
 
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+    job_seeker = factory.SubFactory(JobSeekerUserFactory)
     appointment = factory.SubFactory(AppointmentFactory)
     status = factory.Faker("random_element", elements=Participation.Status.values)
     rdv_insertion_user_id = factory.Sequence(lambda n: n)

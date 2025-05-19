@@ -17,7 +17,7 @@ from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
-from tests.users.factories import JobSeekerFactory, UserFactory
+from tests.users.factories import JobSeekerUserFactory, UserFactory
 from tests.utils.test import reload_module
 
 
@@ -191,7 +191,7 @@ class TestFranceConnect:
         we use it and we update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
@@ -209,7 +209,7 @@ class TestFranceConnect:
         The email is also different, so it will crash while trying to create a new user.
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.DJANGO,
@@ -230,7 +230,7 @@ class TestFranceConnect:
             user.delete()
 
     def test_update_readonly_with_certified_criteria(self, caplog):
-        job_seeker = JobSeekerFactory(
+        job_seeker = JobSeekerUserFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
@@ -294,7 +294,9 @@ class TestFranceConnect:
     def test_callback_redirect_on_email_in_use_exception(self, client, snapshot):
         # EmailInUseException raised by the email conflict
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
+        JobSeekerUserFactory(
+            email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True
+        )
 
         # Test redirection and modal content
         response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
@@ -303,7 +305,7 @@ class TestFranceConnect:
     @respx.mock
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(
+        JobSeekerUserFactory(
             username="another_sub", email=fc_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT
         )
 
@@ -357,7 +359,7 @@ def test_create_fc_user_with_already_existing_email_fails(identity_provider):
     However, we require that emails are unique as well.
     """
     fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-    JobSeekerFactory(
+    JobSeekerUserFactory(
         username="another_username",
         email=fc_user_data.email,
         identity_provider=identity_provider,
@@ -372,7 +374,7 @@ def test_create_fc_user_with_already_existing_fc_email_fails():
     However, we require that emails are unique as well.
     """
     fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-    JobSeekerFactory(
+    JobSeekerUserFactory(
         username="another_username",
         email=fc_user_data.email,
         identity_provider=IdentityProvider.FRANCE_CONNECT,
