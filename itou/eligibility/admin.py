@@ -237,7 +237,6 @@ class AbstractAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
     # Administrative criteria are updated via fixtures
     list_display_links = ("pk", "name")
     list_filter = ("level",)
-    raw_id_fields = ("created_by",)
     readonly_fields = ("created_at",)
     search_fields = ("name", "desc")
 

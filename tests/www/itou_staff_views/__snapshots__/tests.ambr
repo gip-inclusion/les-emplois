@@ -2226,8 +2226,7 @@
                  "eligibility_administrativecriteria"."written_proof_validity",
                  "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."ui_rank",
-                 "eligibility_administrativecriteria"."created_at",
-                 "eligibility_administrativecriteria"."created_by_id"
+                 "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
