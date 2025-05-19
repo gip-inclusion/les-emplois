@@ -12,7 +12,7 @@
             {% endif %}
         </p>
 
-        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber request=request only %}
+        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request only %}
 
     {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
         <hr class="my-4">

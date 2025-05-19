@@ -23,7 +23,7 @@
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
                 {% endcomment %}
-                {% if not is_sent_by_authorized_prescriber %}
+                {% if not flat_criteria_list %}
                     <li>
                         <span class="fw-bold">{{ level }}</span>
                         <ul>
@@ -31,7 +31,7 @@
                         {% for criterion in criteria %}
                             {% include "apply/includes/selected_administrative_criteria_display.html" with diagnosis=eligibility_diagnosis criterion=criterion %}
                         {% endfor %}
-                        {% if not is_sent_by_authorized_prescriber %}
+                        {% if not flat_criteria_list %}
                         </ul>
                     </li>
                 {% endif %}
