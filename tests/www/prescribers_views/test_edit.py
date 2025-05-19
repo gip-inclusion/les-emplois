@@ -47,7 +47,10 @@ class TestCardView:
     def test_card_subtitle(self, client):
         prescriber_org = PrescriberOrganizationFactory(
             authorized=True,
-            kind=FuzzyChoice(set(PrescriberOrganizationKind.values) - {PrescriberOrganizationKind.FT}),
+            kind=FuzzyChoice(
+                set(PrescriberOrganizationKind.values)
+                - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.OTHER}
+            ),
         )
         url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
         response = client.get(url)
@@ -257,7 +260,10 @@ class TestEditOrganization:
     )
     def test_display_banner(self, client, factory, assertion):
         organization = factory(
-            kind=FuzzyChoice(set(PrescriberOrganizationKind.values) - {PrescriberOrganizationKind.FT})
+            kind=FuzzyChoice(
+                set(PrescriberOrganizationKind.values)
+                - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.OTHER}
+            )
         )
         client.force_login(organization.members.first())
         response = client.get(reverse("prescribers_views:edit_organization"))
