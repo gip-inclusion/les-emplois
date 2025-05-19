@@ -93,7 +93,7 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     path(
-        "<uuid:session_uuid>/hire/<uuid:job_seeker_public_id>/check-infos",
+        "<uuid:session_uuid>/hire/check-infos",
         views.CheckJobSeekerInformationsForHire.as_view(),
         name="check_job_seeker_info_for_hire",
         kwargs={"hire_process": True},
@@ -139,7 +139,7 @@ urlpatterns = [
     ),
     # Common
     path(
-        "<uuid:session_uuid>/create/<uuid:job_seeker_public_id>/check-infos",
+        "<uuid:session_uuid>/create/check-infos",
         views.CheckJobSeekerInformations.as_view(),
         name="check_job_seeker_info",
     ),

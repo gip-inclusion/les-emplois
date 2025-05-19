@@ -363,7 +363,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
     client.get(company_url)
 
     # Init complete session
-    apply_session = fake_session_initialization(client, company, {})
+    apply_session = fake_session_initialization(client, company, None, {})
     session = client.session
     session_name = str(uuid.uuid4())
     session[session_name] = {
