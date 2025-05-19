@@ -186,9 +186,7 @@
 
                                 {% if user.is_job_seeker %}
                                     {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
-                                    {% if user.latest_common_approval %}
-                                        {% include "dashboard/includes/job_seeker_approval_card.html" %}
-                                    {% endif %}
+                                    {% include "dashboard/includes/job_seeker_approval_card.html" with user=user itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                 {% endif %}
                                 {# end of if user.is_job_seeker #}
 
