@@ -93,16 +93,16 @@ def state_display_for_employer(evaluated_job_application):
 
 def get_labor_inspector_badges(adversarial_stage, submission_freezed):
     NOT_SUBMITTED = danger_badge("Justificatifs non transmis")
-    submission_freezed_badges = {
-        EvaluatedJobApplicationsState.PENDING: NOT_SUBMITTED,
-        EvaluatedJobApplicationsState.PROCESSING: NOT_SUBMITTED,
-        EvaluatedJobApplicationsState.UPLOADED: NOT_SUBMITTED,
-        EvaluatedJobApplicationsState.SUBMITTED: TODO_BADGE,
-        EvaluatedJobApplicationsState.REFUSED: REFUSED_BADGE,
-        EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
-        EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
-    }
     if submission_freezed:
+        submission_freezed_badges = {
+            EvaluatedJobApplicationsState.PENDING: NOT_SUBMITTED,
+            EvaluatedJobApplicationsState.PROCESSING: NOT_SUBMITTED,
+            EvaluatedJobApplicationsState.UPLOADED: NOT_SUBMITTED,
+            EvaluatedJobApplicationsState.SUBMITTED: TODO_BADGE,
+            EvaluatedJobApplicationsState.REFUSED: REFUSED_BADGE,
+            EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
+            EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
+        }
         if adversarial_stage:
             # TODO: Use the TODO_BADGE and drop if adversarial_stage above.
             submission_freezed_badges[EvaluatedJobApplicationsState.SUBMITTED] = PENDING_AFTER_REVIEW_BADGE
