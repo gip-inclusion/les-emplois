@@ -155,6 +155,24 @@ def test_grant_view(client):
     assert prolongation_request.status == ProlongationRequestStatus.GRANTED
 
 
+def test_grant_view_already_granted(client):
+    prolongation_request = approvals_factories.ProlongationRequestFactory(
+        approval__user__for_snapshot=True,
+        status=ProlongationRequestStatus.GRANTED,
+    )
+    client.force_login(prolongation_request.validated_by)
+
+    # Someone already granted the prolongation (maybe me, maybe a colleague) and I try again
+    response = client.post(
+        reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}),
+    )
+    assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
+    assertMessages(
+        response,
+        [messages.Message(messages.SUCCESS, "La prolongation de Jane DOE a déjà été acceptée.")],
+    )
+
+
 def test_grant_view_invalid_dates(client):
     prolongation = approvals_factories.ProlongationFactory()
     prolongation_request = approvals_factories.ProlongationRequestFactory(

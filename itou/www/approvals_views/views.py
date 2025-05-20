@@ -520,6 +520,14 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
     http_method_names = ["post"]
 
     def post(self, request, *args, **kwargs):
+        if self.prolongation_request.status == approvals_enums.ProlongationRequestStatus.GRANTED:
+            messages.success(
+                request,
+                f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a déjà été acceptée.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+
         try:
             self.prolongation_request.grant(request.user)
         except IntegrityError:
