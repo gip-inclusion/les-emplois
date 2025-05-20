@@ -355,11 +355,11 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -384,11 +384,11 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker_in_qpv.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker_in_qpv.public_id},
             )
         )
 
@@ -414,11 +414,11 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         client.force_login(prescriber)
-        fake_session_initialization(client, geiq, {"selected_jobs": []})
+        apply_session = fake_session_initialization(client, geiq, {"selected_jobs": []})
         response = client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": geiq.pk, "job_seeker_public_id": job_seeker_in_zrr.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker_in_zrr.public_id},
             )
         )
 
