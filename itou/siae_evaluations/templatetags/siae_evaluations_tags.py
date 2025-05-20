@@ -43,7 +43,6 @@ def action_required_badge(content):
 
 
 ACCEPTED_BADGE = success_badge("Validé")
-PENDING_AFTER_REVIEW_BADGE = action_required_badge("Nouveaux justificatifs à traiter")
 REFUSED_BADGE = danger_badge("Problème constaté")
 TODO_BADGE = action_required_badge("À traiter")
 UPLOADED_BADGE = action_required_badge("Justificatifs téléversés")
@@ -59,7 +58,7 @@ def get_employer_badges(adversarial_stage):
             EvaluatedJobApplicationsState.REFUSED: REFUSED_BADGE,
             EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
             EvaluatedJobApplicationsState.PROCESSING: TODO_BADGE,
-            EvaluatedJobApplicationsState.PENDING: PENDING_AFTER_REVIEW_BADGE,
+            EvaluatedJobApplicationsState.PENDING: TODO_BADGE,
         }
     return {
         EvaluatedJobApplicationsState.PENDING: TODO_BADGE,
@@ -107,7 +106,7 @@ def get_labor_inspector_badges(adversarial_stage, submission_freezed, evaluation
 
     NOT_SUBMITTED = danger_badge("Justificatifs non transmis")
     if submission_freezed:
-        submission_freezed_badges = {
+        return {
             EvaluatedJobApplicationsState.PENDING: NOT_SUBMITTED,
             EvaluatedJobApplicationsState.PROCESSING: NOT_SUBMITTED,
             EvaluatedJobApplicationsState.UPLOADED: NOT_SUBMITTED,
@@ -116,11 +115,6 @@ def get_labor_inspector_badges(adversarial_stage, submission_freezed, evaluation
             EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
             EvaluatedJobApplicationsState.REFUSED_2: REFUSED_BADGE,
         }
-        if adversarial_stage:
-            # TODO: Use the TODO_BADGE and drop if adversarial_stage above.
-            submission_freezed_badges[EvaluatedJobApplicationsState.SUBMITTED] = PENDING_AFTER_REVIEW_BADGE
-            return submission_freezed_badges
-        return submission_freezed_badges
 
     PENDING_BADGE = info_badge("En attente")
     if adversarial_stage:
@@ -128,8 +122,7 @@ def get_labor_inspector_badges(adversarial_stage, submission_freezed, evaluation
             EvaluatedJobApplicationsState.PENDING: PENDING_BADGE,
             EvaluatedJobApplicationsState.PROCESSING: PENDING_BADGE,
             EvaluatedJobApplicationsState.UPLOADED: UPLOADED_BADGE,
-            # TODO: Use the TODO_BADGE.
-            EvaluatedJobApplicationsState.SUBMITTED: PENDING_AFTER_REVIEW_BADGE,
+            EvaluatedJobApplicationsState.SUBMITTED: TODO_BADGE,
             # Show “Problème constaté” until the review is submitted, which starts
             # the “phase contradictoire” (tracked by the reviewed_at field).
             EvaluatedJobApplicationsState.REFUSED: info_badge("Phase contradictoire - En attente"),
