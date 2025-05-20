@@ -17,6 +17,8 @@ from tests.utils.test import parse_response_to_soup
 
 
 class TestApplyAsPrescriber:
+    JOB_SEEKER_INPUT_MARKUP = '<input type="hidden" name="job_seeker_public_id" value="%s">'
+
     @freeze_time("2025-04-03 10:03")
     def test_apply_as_prescriber(self, client, snapshot):
         guerande = create_city_guerande()
@@ -102,6 +104,8 @@ class TestApplyAsPrescriber:
             response,
             company_url_with_job_seeker_id,
         )
+        # Two hidden inputs: next to city input and next to structure select
+        assertContains(response, self.JOB_SEEKER_INPUT_MARKUP % job_seeker.public_id, html=True, count=2)
 
         # Step apply to company
         # ----------------------------------------------------------------------
@@ -274,6 +278,8 @@ class TestApplyAsPrescriber:
             response,
             company_url_with_job_seeker_id,
         )
+        # Two hidden inputs: next to city input and next to structure select
+        assertContains(response, self.JOB_SEEKER_INPUT_MARKUP % job_seeker.public_id, html=True, count=2)
 
         # Step apply to company
         # ----------------------------------------------------------------------
