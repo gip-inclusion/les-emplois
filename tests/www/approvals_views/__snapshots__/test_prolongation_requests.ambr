@@ -2100,7 +2100,7 @@
               <h2 class="visually-hidden">Actions rapides</h2>
               <div class="form-row align-items-center gx-3">
                   <div class="form-group col-12 col-lg-auto">
-                      <form action="/approvals/prolongation/request/666/grant" method="post">
+                      <form action="/approvals/prolongation/request/666/grant" class="js-prevent-multiple-submit" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
                               <i aria-hidden="true" class="ri-check-line"></i>

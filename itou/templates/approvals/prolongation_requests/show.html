@@ -28,7 +28,7 @@
             <h2 class="visually-hidden">Actions rapides</h2>
             <div class="form-row align-items-center gx-3">
                 <div class="form-group col-12 col-lg-auto">
-                    <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}">
+                    <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}" class="js-prevent-multiple-submit">
                         {% csrf_token %}
                         <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
                             <i class="ri-check-line" aria-hidden="true"></i>
