@@ -166,10 +166,59 @@ class LaborInspectorFactory(UserFactory):
             InstitutionMembershipFactory(user=self, **kwargs)
 
 
-class JobSeekerUserFactory(UserFactory):
+class JobSeekerProfileMixin:
+    class Params:
+        with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
+        with_hexa_address = factory.Trait(
+            hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
+            hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
+            hexa_post_code=factory.Faker("postalcode"),
+            hexa_commune=factory.LazyAttribute(lambda _: Commune.objects.order_by("?").first()),
+        )
+        with_required_eiti_fields = factory.Trait(
+            actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
+            mean_monthly_income_before_process=factory.Faker("pydecimal", left_digits=5, right_digits=2),
+            eiti_contributions=factory.fuzzy.FuzzyChoice(EITIContributions.values),
+        )
+        for_snapshot = factory.Trait(
+            birthdate=datetime.date(1990, 1, 1),
+            nir="290010101010125",
+            asp_uid="a08dbdb523633cfc59dfdb297307a1",
+            education_level=EducationLevel.BAC_LEVEL,
+            hexa_lane_number=12,
+            hexa_lane_type=LaneType.RUE,
+            hexa_lane_name="Georges Bizet",
+            hexa_post_code="35000",
+        )
+
+    # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
+    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
+
+    education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
+
+    @factory.lazy_attribute
+    def nir(self):
+        gender = "1" if self.user.title == Title.M else "2"
+        if self.birthdate:
+            year = self.birthdate.strftime("%y")
+            month = self.birthdate.strftime("%m")
+        else:
+            year = "87"
+            month = "06"
+        department = str(random.randint(1, 99)).zfill(2)
+        random_1 = str(random.randint(0, 399)).zfill(3)
+        random_2 = str(random.randint(0, 399)).zfill(3)
+        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
+        assert len(incomplete_nir) == 13
+        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
+        nir = f"{incomplete_nir}{control_key}"
+        validate_nir(nir)
+        return nir
+
+
+class JobSeekerUserMixin(UserFactory):
     title = random.choice(Title.values)
     kind = UserKind.JOB_SEEKER
-    jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
     class Params:
         born_in_france = factory.Trait(
@@ -250,10 +299,6 @@ class JobSeekerUserFactory(UserFactory):
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
-        # Deactivate automatic creation of JobSeekerProfile in User.save
-        # since the RelatedFactory will take care of it
-        kwargs["_auto_create_job_seeker_profile"] = False
-
         # Using ZRR or QPV means that we must have some factories / data ready beforehand
         # Did not find a better way to do Traits additional setup...
         if kwargs.get("with_address_in_qpv"):
@@ -324,56 +369,26 @@ class JobSeekerUserFactory(UserFactory):
             self.save()
 
 
-class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
+class JobSeekerUserFactory(JobSeekerUserMixin):
+    kind = UserKind.JOB_SEEKER
+    jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
+
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Deactivate automatic creation of JobSeekerProfile in User.save
+        # since the RelatedFactory will take care of it
+        kwargs["_auto_create_job_seeker_profile"] = False
+        return super()._adjust_kwargs(**kwargs)
+
+
+class JobSeekerProfileFactory(JobSeekerProfileMixin):
     class Meta:
         model = models.JobSeekerProfile
         skip_postgeneration_save = True
 
-    class Params:
-        with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
-        with_hexa_address = factory.Trait(
-            hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
-            hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
-            hexa_post_code=factory.Faker("postalcode"),
-            hexa_commune=factory.LazyAttribute(lambda _: Commune.objects.order_by("?").first()),
-        )
-        with_required_eiti_fields = factory.Trait(
-            actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
-            mean_monthly_income_before_process=factory.Faker("pydecimal", left_digits=5, right_digits=2),
-            eiti_contributions=factory.fuzzy.FuzzyChoice(EITIContributions.values),
-        )
-        for_snapshot = factory.Trait(
-            birthdate=datetime.date(1990, 1, 1),
-            nir="290010101010125",
-            asp_uid="a08dbdb523633cfc59dfdb297307a1",
-            education_level=EducationLevel.BAC_LEVEL,
-            hexa_lane_number=12,
-            hexa_lane_type=LaneType.RUE,
-            hexa_lane_name="Georges Bizet",
-            hexa_post_code="35000",
-        )
-
     user = factory.SubFactory(JobSeekerUserFactory, jobseeker_profile=None)
-    # Limit the upper value to 1999-12-31 so we don't exclude 36995 (of 76777) `Commune()` with a "1999-12-31" end date
-    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(1999, 12, 31))
 
-    education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
 
-    @factory.lazy_attribute
-    def nir(self):
-        gender = "1" if self.user.title == Title.M else "2"
-        if self.birthdate:
-            year = self.birthdate.strftime("%y")
-            month = self.birthdate.strftime("%m")
-        else:
-            year = "87"
-            month = "06"
-        department = str(random.randint(1, 99)).zfill(2)
-        random_1 = str(random.randint(0, 399)).zfill(3)
-        random_2 = str(random.randint(0, 399)).zfill(3)
-        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
-        assert len(incomplete_nir) == 13
-        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
-        nir = f"{incomplete_nir}{control_key}"
-        validate_nir(nir)
-        return nir
+class JobSeekerFactory(JobSeekerProfileMixin, JobSeekerUserMixin):
+    class Meta:
+        model = models.JobSeeker
