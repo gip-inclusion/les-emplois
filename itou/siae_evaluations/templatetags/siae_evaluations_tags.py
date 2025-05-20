@@ -45,12 +45,12 @@ def action_required_badge(content):
 ACCEPTED_BADGE = success_badge("Validé")
 PENDING_AFTER_REVIEW_BADGE = action_required_badge("Nouveaux justificatifs à traiter")
 REFUSED_BADGE = danger_badge("Problème constaté")
-SUBMITTED_BADGE = success_lighter_badge("Transmis")
 TODO_BADGE = action_required_badge("À traiter")
 UPLOADED_BADGE = action_required_badge("Justificatifs téléversés")
 
 
 def get_employer_badges(adversarial_stage):
+    SUBMITTED_BADGE = success_lighter_badge("Transmis")
     if adversarial_stage:
         return {
             EvaluatedJobApplicationsState.ACCEPTED: ACCEPTED_BADGE,
