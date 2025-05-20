@@ -26,7 +26,7 @@
 {% block title_extra %}
     <form class="mt-md-4">
         {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
-        {% if job_seeker %}<input type="hidden" name="job_seeker" value="{{ job_seeker.public_id }}">{% endif %}
+        {% if job_seeker %}<input type="hidden" name="job_seeker_public_id" value="{{ job_seeker.public_id }}">{% endif %}
     </form>
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endblock %}
