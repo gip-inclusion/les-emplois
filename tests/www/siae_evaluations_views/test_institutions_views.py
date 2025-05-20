@@ -1028,27 +1028,21 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria submitted
-        submitted_status = "À traiter"
-        adversarial_submitted_status = "Nouveaux justificatifs à traiter"
+        submitted_badge = """\
+        <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+            À traiter
+        </span>
+        """
+
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = client.get(url)
         assertContains(response, evaluated_job_application_url)
         assertNotContains(response, uploaded_status)
         assertNotContains(response, pending_status)
-        assertNotContains(response, adversarial_submitted_status)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
-        assertContains(
-            response,
-            f"""
-            <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-             {submitted_status}
-            </span>
-            """,
-            html=True,
-            count=1,
-        )
+        assertContains(response, submitted_badge, html=True, count=1)
 
         # EvaluatedAdministrativeCriteria Accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
@@ -1156,7 +1150,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertNotContains(response, uploaded_status)
         assertNotContains(response, pending_status)
         assertNotContains(response, refused_status)
-        assertContains(response, adversarial_submitted_status)
+        assertContains(response, submitted_badge, html=True, count=1)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
 
@@ -1316,23 +1310,21 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria submitted
-        submitted_status = "À traiter"
-        adversarial_submitted_status = "Nouveaux justificatifs à traiter"
+        submitted_badge = """\
+        <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+            À traiter
+        </span>
+        """
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = client.get(url)
         assertContains(response, evaluated_job_application_url)
         assertNotContains(response, not_transmitted_status)
-        assertNotContains(response, adversarial_submitted_status)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
         assertContains(
             response,
-            f"""
-            <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-             {submitted_status}
-            </span>
-            """,
+            submitted_badge,
             html=True,
             count=1,
         )
@@ -1359,7 +1351,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         response = client.get(url)
         assertContains(response, evaluated_job_application_url)
         assertNotContains(response, not_transmitted_status)
-        assertContains(response, adversarial_submitted_status)
+        assertContains(response, submitted_badge, html=True, count=1)
         assertContains(response, validation_button_disabled, html=True, count=1)
         assertContains(response, self.control_text)
 
