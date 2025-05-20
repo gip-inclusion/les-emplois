@@ -16,6 +16,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory
@@ -29,7 +30,7 @@ from tests.prescribers.factories import (
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import get_session_name, parse_response_to_soup
-from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP
+from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
 
 
 class TestGetOrCreateAsOther:
@@ -45,6 +46,7 @@ class TestGetOrCreateAsOther:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
+                "apply_session_uuid": str(uuid.uuid4()),
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
@@ -61,6 +63,7 @@ class TestGetOrCreateAsOther:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
+                "apply_session_uuid": str(uuid.uuid4()),
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
@@ -93,6 +96,7 @@ class TestGetOrCreateForJobSeeker:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
+                "apply_session_uuid": str(uuid.uuid4()),
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
             start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
@@ -175,12 +179,13 @@ class TestGetOrCreateForJobSeeker:
         )
         assertRedirects(response, next_url, fetch_redirect_response=False)
 
+        apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
         response = client.get(next_url)
         assertRedirects(
             response,
             reverse(
                 "job_seekers_views:check_job_seeker_info",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
+                kwargs={"session_uuid": apply_session_name, "job_seeker_public_id": user.public_id},
             ),
         )
 
@@ -215,6 +220,7 @@ class TestGetOrCreateForSender:
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
+        apply_session = fake_session_initialization(client, company, {})
 
         match company_value:
             case "valid":
@@ -239,13 +245,14 @@ class TestGetOrCreateForSender:
         if from_url_value == "valid":
             from_url = reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             )
         else:
             from_url = None
 
         params = {
             "tunnel": tunnel,
+            "apply_session_uuid": apply_session.name,
             "company": company_pk,
             "from_url": from_url,
         }
@@ -876,12 +883,13 @@ class TestUpdateForJobSeeker:
         job_seeker = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         company = CompanyFactory(with_membership=True)
         client.force_login(job_seeker)
+        apply_session = fake_session_initialization(client, company, {})
 
         company_pk = company.pk
 
         from_url = reverse(
             "apply:application_jobs",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
         )
         params = {
             "job_seeker_public_id": job_seeker.public_id,
@@ -912,6 +920,7 @@ class TestUpdateForSender:
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
+        apply_session = fake_session_initialization(client, company, {})
 
         match job_seeker_value:
             case "valid":
@@ -926,7 +935,7 @@ class TestUpdateForSender:
         if from_url_value == "valid":
             from_url = reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             )
         else:
             from_url = None
@@ -998,11 +1007,12 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
+        apply_session = fake_session_initialization(client, company, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -1045,11 +1055,12 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
+        apply_session = fake_session_initialization(client, company, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -1093,11 +1104,12 @@ class TestUpdateForSender:
         client.force_login(user)
 
         # Init session
+        apply_session = fake_session_initialization(client, company, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             ),
         }
         start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
@@ -1149,11 +1161,12 @@ class TestUpdateForSender:
         )
 
         client.force_login(user)
+        apply_session = fake_session_initialization(client, company, {})
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse(
                 "apply:application_jobs",
-                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+                kwargs={"session_uuid": apply_session.name, "job_seeker_public_id": job_seeker.public_id},
             ),
         }
         response = client.get(reverse("job_seekers_views:update_job_seeker_start"), params)
