@@ -91,7 +91,7 @@
                         {# navigation : anchor to scroll to a specific card when returning to this page #}
                         <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="{{ evaluated_job_application.pk }}">
                             <div class="c-box--results__header">
-                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
+                                {% include "siae_evaluations/includes/job_seeker_infos.html" with request=request evaluated_job_application=evaluated_job_application only %}
                             </div>
                             {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
                                 {% if not evaluated_siae.evaluation_is_final and evaluated_job_application_state == "SUBMITTED" %}
