@@ -9,22 +9,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="administrativecriteria",
-                    name="created_by",
-                ),
-            ],
-            database_operations=[],
+        migrations.RemoveField(
+            model_name="administrativecriteria",
+            name="created_by",
         ),
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="geiqadministrativecriteria",
-                    name="created_by",
-                ),
-            ],
-            database_operations=[],
+        migrations.RemoveField(
+            model_name="geiqadministrativecriteria",
+            name="created_by",
         ),
     ]
