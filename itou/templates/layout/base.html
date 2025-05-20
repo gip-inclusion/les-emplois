@@ -129,14 +129,14 @@
         <script nonce="{{ CSP_NONCE }}">
             // Gives focus and scroll to a specific element
             const thisElToFocus = document.querySelector("[data-emplois-give-focus-if-exist]");
-            const focusAndScrollTo = () => {
-                thisElToFocus.focus();
-                window.scrollTo({
-                    top: thisElToFocus.offsetTop,
+            if (thisElToFocus) {
+                if (typeof thisElToFocus.focus === "function") {
+                    thisElToFocus.focus();
+                }
+                thisElToFocus.scrollIntoView({
                     behavior: "smooth"
                 });
-            };
-            focusAndScrollTo();
+            }
         </script>
 
         <script nonce="{{ CSP_NONCE }}">
