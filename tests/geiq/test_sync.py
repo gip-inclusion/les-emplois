@@ -1,16 +1,11 @@
 import datetime
 
 import pytest
-from django.core.exceptions import ImproperlyConfigured
 
-from itou.companies.enums import CompanyKind
 from itou.eligibility.models import GEIQAdministrativeCriteria
 from itou.geiq import models, sync
 from itou.utils.apis import geiq_label
-from tests.companies.factories import CompanyFactory
 from tests.geiq.factories import (
-    GeiqLabelDataFactory,
-    ImplementationAssessmentCampaignFactory,
     ImplementationAssessmentFactory,
     SalarieContratLabelDataFactory,
     SalariePreQualificationLabelDataFactory,
@@ -34,56 +29,11 @@ def test_nb_days(periods, year, expected):
     assert sync._nb_days(parsed_periods, year=year) == expected
 
 
-def test_sync_assessments_without_configuration(settings):
-    settings.API_GEIQ_LABEL_TOKEN = ""
-    campaign = ImplementationAssessmentCampaignFactory()
-    with pytest.raises(ImproperlyConfigured):
-        sync.sync_assessments(campaign)
-
-
 @pytest.fixture
 def label_settings(settings):
     settings.API_GEIQ_LABEL_BASE_URL = "https://geiq.label"
     settings.API_GEIQ_LABEL_TOKEN = "S3cr3t!"
     return settings
-
-
-def test_sync_assessments(caplog, label_settings, mocker):
-    label_settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = "29,35"
-
-    mocker.patch.object(
-        geiq_label.LabelApiClient,
-        "get_all_geiq",
-        lambda self: [
-            GeiqLabelDataFactory(id=0, siret="", nom="Pas de SIRET"),
-            GeiqLabelDataFactory(id=1, siret="1" * 14, nom="SIRET Inconnu"),
-            GeiqLabelDataFactory(id=2, siret="2" * 14, nom="SIRET connu et departement OK", cp="29000"),
-            GeiqLabelDataFactory(id=3, siret="3" * 14, nom="SIRET connu mais departement KO", cp="75000"),
-            GeiqLabelDataFactory(id=4, siret="4" * 14, nom="SIRET connu mais non GEIQ", cp="29000"),
-        ],
-    )
-    siret_OK_and_department_OK = CompanyFactory(kind=CompanyKind.GEIQ, siret="2" * 14)
-    siret_OK_and_department_KO = CompanyFactory(kind=CompanyKind.GEIQ, siret="3" * 14)
-    siret_OK_but_non_GEIQ = CompanyFactory(kind=CompanyKind.AI, siret="4" * 14)
-
-    campaign = ImplementationAssessmentCampaignFactory()
-    creations, updates, deletions = sync.sync_assessments(campaign)
-    assert not updates
-    assert not deletions
-    assert len(creations) == 1
-    assert creations[0].label_id == 2
-    assert siret_OK_and_department_OK.implementation_assessments.get().label_id == 2
-    assert not siret_OK_and_department_KO.implementation_assessments.exists()
-    assert not siret_OK_but_non_GEIQ.implementation_assessments.exists()
-    assert caplog.messages == [
-        "Ignoring geiq='Pas de SIRET' without SIRET",
-        "Ignoring geiq='SIRET Inconnu' with unknown SIRET=11111111111111",
-        "Ignoring geiq='SIRET connu mais departement KO' since its cp=75000 is not allowed",
-        "Ignoring geiq='SIRET connu mais non GEIQ' with unknown SIRET=44444444444444",
-        "Label sync will create nb=1 type=bilan d’exécution",
-        "Label sync will update nb=0 type=bilan d’exécution",
-        "Label sync would delete nb=0 type=bilan d’exécution",
-    ]
 
 
 def test_sync_employee_and_contracts(caplog, label_settings, mocker):

@@ -1,10 +1,8 @@
 import datetime
 import logging
 
-from django.conf import settings
 from django.utils import timezone
 
-from itou.companies.models import Company, CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria
 from itou.eligibility.utils import geiq_allowance_amount
@@ -30,11 +28,6 @@ def label_data_to_django(data, *, mapping, model):
         other_data.pop(label_key)
     model_data["other_data"] = other_data
     return model(**model_data)
-
-
-GEIQ_MAPPING = {
-    "label_id": "id",
-}
 
 
 def sync_to_db(api_data, db_queryset, *, model, mapping, data_to_django_obj, with_delete=False):
@@ -72,59 +65,6 @@ def sync_to_db(api_data, db_queryset, *, model, mapping, data_to_django_obj, wit
     if with_delete:
         model.objects.filter(label_id__in=obj_to_delete).delete()
     return obj_to_create, obj_to_update, obj_to_delete
-
-
-def sync_assessments(campaign):
-    siret_to_company = {
-        company.siret: company for company in Company.objects.filter(kind=CompanyKind.GEIQ).exclude(siret="")
-    }
-    client = geiq_label.get_client()
-    geiq_infos = client.get_all_geiq()
-
-    geiq_label_infos = []
-    for geiq_info in geiq_infos:
-        if not geiq_info["siret"]:
-            logger.info("Ignoring geiq=%r without SIRET", geiq_info["nom"])
-            continue
-        if geiq_info["siret"] not in siret_to_company:
-            logger.info("Ignoring geiq=%r with unknown SIRET=%s", geiq_info["nom"], geiq_info["siret"])
-            continue
-        if geiq_info["id"] == 27 and geiq_info["nom"] == "GEIQ ACCUEIL MIDI-PYRENEES":
-            # Duplicate of 45053310400045
-            logger.info("Ignoring geiq=%r with duplicate SIRET of geiq 107", geiq_info["nom"])
-            continue
-        if geiq_info["id"] == 133 and geiq_info["nom"] == "GEIQ METIERS DU TOURISME PAYS DE SAVOIE":
-            # Duplicate of 80784132500010
-            logger.info("Ignoring geiq=%r with duplicate SIRET of geiq 216", geiq_info["nom"])
-            continue
-        if geiq_info["id"] == 190 and geiq_info["nom"] == "JOUBERT":
-            # Duplicate of 44041441500040
-            logger.info("Ignoring geiq=%r with duplicate SIRET of geiq 151", geiq_info["nom"])
-            continue
-        if geiq_info["id"] == 191 and geiq_info["nom"] == "POURRET ":
-            # Duplicate of 75121328100015
-            logger.info("Ignoring geiq=%r with duplicate SIRET of geiq 112", geiq_info["nom"])
-            continue
-        if (allowed_postcode_prefixes := settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES) and not geiq_info[
-            "cp"
-        ].startswith(tuple(allowed_postcode_prefixes)):
-            logger.info("Ignoring geiq=%r since its cp=%s is not allowed", geiq_info["nom"], geiq_info["cp"])
-            continue
-        geiq_label_infos.append(geiq_info)
-
-    def geiq_data_to_django(data, *, mapping, model):
-        assessment = label_data_to_django(data, mapping=mapping, model=model)
-        assessment.company = siret_to_company[data["siret"]]
-        assessment.campaign = campaign
-        return assessment
-
-    return sync_to_db(
-        geiq_label_infos,
-        models.ImplementationAssessment.objects.filter(campaign=campaign),
-        model=models.ImplementationAssessment,
-        mapping=GEIQ_MAPPING,
-        data_to_django_obj=geiq_data_to_django,
-    )
 
 
 EMPLOYEE_MAPPING = {
