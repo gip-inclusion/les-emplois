@@ -223,24 +223,14 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     @classmethod
     @transaction.atomic()
     def update_diagnosis(cls, eligibility_diagnosis, *, author, author_organization, administrative_criteria):
-        # If we have the same author and the same criteria then extend the life of the current one
-        extend_conditions = [
-            eligibility_diagnosis.author == author,
-            set(eligibility_diagnosis.administrative_criteria.all()) == set(administrative_criteria),
-        ]
-        if all(extend_conditions):
-            eligibility_diagnosis.expires_at = cls._expiration_date(author)
-            eligibility_diagnosis.save(update_fields=["expires_at", "updated_at"])
-            return eligibility_diagnosis
-
-        # Otherwise, we create a new one...
+        # Create a new diagnostic to be aligned with the criteria certification period.
         new_eligibility_diagnosis = cls.create_diagnosis(
             eligibility_diagnosis.job_seeker,
             author=author,
             author_organization=author_organization,
             administrative_criteria=administrative_criteria,
         )
-        # and mark the current one as expired
+        # And mark the current one as expired.
         eligibility_diagnosis.expires_at = timezone.localdate(new_eligibility_diagnosis.created_at)
         eligibility_diagnosis.save(update_fields=["expires_at", "updated_at"])
         return new_eligibility_diagnosis
