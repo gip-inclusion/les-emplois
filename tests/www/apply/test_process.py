@@ -654,7 +654,6 @@ class TestProcessViews:
         assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_job_seeker_with_transition_logs(self, client, snapshot):
-        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
@@ -677,7 +676,6 @@ class TestProcessViews:
         assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_company_with_transition_logs(self, client, snapshot):
-        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
