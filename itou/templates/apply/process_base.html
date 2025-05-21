@@ -16,6 +16,7 @@
                 {% endif %}
                 {% job_application_state_badge job_application extra_class="badge-base" %}
             </h1>
+            {% include "includes/job_seekers/copy_public_id.html" with public_id=job_application.job_seeker.public_id only %}
         {% endfragment %}
         {% fragment as c_title__cta %}
             <button class="btn btn-lg btn-ico-only btn-link"

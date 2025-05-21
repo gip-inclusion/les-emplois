@@ -3357,6 +3357,18 @@
   </ul>
   '''
 # ---
+# name: TestProcessViews.test_details_for_company_with_transition_logs[copy_public_id]
+  '''
+  <small id="copy_public_id">Copier l'ID du candidat
+      
+      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="PUBLIC_ID" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </small>
+  '''
+# ---
 # name: TestProcessViews.test_details_for_company_with_transition_logs[transition_logs]
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
@@ -4273,6 +4285,18 @@
     ]),
   })
 # ---
+# name: TestProcessViews.test_details_for_job_seeker[copy_public_id]
+  '''
+  <small id="copy_public_id">Copier l'ID du candidat
+      
+      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="PUBLIC_ID" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </small>
+  '''
+# ---
 # name: TestProcessViews.test_details_for_job_seeker_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
@@ -4304,6 +4328,18 @@
           </li>
       
   </ul>
+  '''
+# ---
+# name: TestProcessViews.test_details_for_prescriber[copy_public_id]
+  '''
+  <small id="copy_public_id">Copier l'ID du candidat
+      
+      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="PUBLIC_ID" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+  </small>
   '''
 # ---
 # name: TestProcessViews.test_details_for_prescriber_with_transition_logs
