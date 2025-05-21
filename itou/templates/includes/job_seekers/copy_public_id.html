@@ -1,0 +1,9 @@
+{% load matomo %}
+
+{% matomo_event "candidature" "clic" "copied_jobseeker_public_id" as matomo_event_attrs %}
+{% if small|default:False %}
+    Copier l'ID du candidat
+    {% include "includes/copy_to_clipboard.html" with content=public_id matomo_event_attrs=matomo_event_attrs css_classes="btn-link" only_icon=True %}
+{% else %}
+    {% include "includes/copy_to_clipboard.html" with content=public_id matomo_event_attrs=matomo_event_attrs css_classes="btn btn-ico btn-secondary" text="Copier l'ID du candidat" %}
+{% endif %}
