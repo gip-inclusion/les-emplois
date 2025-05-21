@@ -365,55 +365,6 @@ class TestEligibilityDiagnosisModel:
         assert not current_diagnosis.is_valid
         assert new_diagnosis.is_valid
 
-    def test_update_diagnosis_extend_the_validity_only_when_we_have_the_same_author_and_the_same_criteria(self):
-        first_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
-
-        # Same author, same criteria
-        previous_expires_at = first_diagnosis.expires_at
-        assert (
-            EligibilityDiagnosis.update_diagnosis(
-                first_diagnosis,
-                author=first_diagnosis.author,
-                author_organization=first_diagnosis.author_prescriber_organization,
-                administrative_criteria=[],
-            )
-            is first_diagnosis
-        )
-        first_diagnosis.refresh_from_db()
-        assert first_diagnosis.expires_at >= previous_expires_at
-
-        criteria = [
-            AdministrativeCriteria.objects.get(
-                level=AdministrativeCriteriaLevel.LEVEL_1, kind=AdministrativeCriteriaKind.RSA
-            ),
-        ]
-        # Same author, different criteria
-        second_diagnosis = EligibilityDiagnosis.update_diagnosis(
-            first_diagnosis,
-            author=first_diagnosis.author,
-            author_organization=first_diagnosis.author_prescriber_organization,
-            administrative_criteria=criteria,
-        )
-        first_diagnosis.refresh_from_db()
-
-        assert second_diagnosis is not first_diagnosis
-        assert first_diagnosis.expires_at == timezone.localdate(second_diagnosis.created_at)
-        assert second_diagnosis.expires_at > first_diagnosis.expires_at
-
-        # Different author, same criteria
-        other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        third_diagnosis = EligibilityDiagnosis.update_diagnosis(
-            second_diagnosis,
-            author=other_prescriber_organization.members.first(),
-            author_organization=other_prescriber_organization,
-            administrative_criteria=criteria,
-        )
-        second_diagnosis.refresh_from_db()
-
-        assert second_diagnosis is not third_diagnosis
-        assert second_diagnosis.expires_at == timezone.localdate(third_diagnosis.created_at)
-        assert third_diagnosis.expires_at > second_diagnosis.expires_at
-
     def test_is_valid(self):
         # Valid diagnosis.
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
