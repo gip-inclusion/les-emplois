@@ -13,6 +13,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -275,6 +285,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -514,6 +534,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -714,6 +744,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -1935,6 +1975,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -2200,6 +2250,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -2448,6 +2508,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -2641,6 +2711,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -2882,6 +2962,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
@@ -3130,6 +3220,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
@@ -3323,6 +3423,16 @@
                               <h1>
                                   Candidat : Jane DOE
                               </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
