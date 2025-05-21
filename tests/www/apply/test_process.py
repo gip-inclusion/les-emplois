@@ -694,7 +694,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == snapshot
+        assert str(html_fragment) == snapshot(name="transition_logs")
 
     def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
