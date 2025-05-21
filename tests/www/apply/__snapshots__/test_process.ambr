@@ -3470,7 +3470,7 @@
   
   '''
 # ---
-# name: TestProcessViews.test_details_for_company_with_transition_logs
+# name: TestProcessViews.test_details_for_company_with_transition_logs[transition_logs]
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
       <li>
