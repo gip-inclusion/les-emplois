@@ -1,0 +1,5 @@
+{% load matomo %}
+<small id="copy_public_id">Copier l'ID du candidat
+    {% matomo_event "candidature" "clic" "copied_jobseeker_public_id" as matomo_event_attrs %}
+    {% include "includes/copy_to_clipboard.html" with content=public_id css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+</small>
