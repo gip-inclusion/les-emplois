@@ -456,7 +456,7 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_details_for_prescriber(self, client):
+    def test_details_for_prescriber(self, client, snapshot):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         appelation = Appellation.objects.first()
@@ -504,6 +504,13 @@ class TestProcessViews:
 
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert str(content) == snapshot(name="copy_public_id")
 
     def test_details_for_prescriber_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -599,6 +606,13 @@ class TestProcessViews:
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
 
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert str(content) == snapshot(name="copy_public_id")
+
     def test_details_for_job_seeker_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         sender = job_application.sender
@@ -675,7 +689,6 @@ class TestProcessViews:
         assert str(html_fragment) == snapshot
 
     def test_details_for_company_with_transition_logs(self, client, snapshot):
-        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
@@ -695,7 +708,14 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == snapshot
+        assert str(html_fragment) == snapshot(name="transition_logs")
+
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert str(content) == snapshot(name="copy_public_id")
 
     def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
