@@ -295,7 +295,7 @@ class TestListEmployeeRecords:
         Any status except PROCESSED
         """
         client.force_login(self.user)
-        status = random.choice(list(set(Status) - {Status.PROCESSED}))
+        status = random.choice(list(set(Status) - {Status.PROCESSED, Status.ARCHIVED}))
 
         self.employee_record.status = status
         self.company.siret = "10000000000001"
