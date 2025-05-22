@@ -850,7 +850,9 @@ def test_list_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
 
     job_applications = [
-        JobApplicationFactory(sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, **common_kwargs),
+        JobApplicationFactory(
+            sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, sender=job_seeker, **common_kwargs
+        ),
         JobApplicationFactory(
             sender_kind=SenderKind.EMPLOYER,
             sender=company.members.first(),

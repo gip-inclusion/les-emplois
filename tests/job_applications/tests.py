@@ -7,6 +7,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.test import RequestFactory
@@ -196,6 +197,28 @@ class TestJobApplicationModel:
         membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
         assert membership.member == user
         assert membership.creator == user
+
+
+@pytest.mark.parametrize(
+    "factory, validation_should_pass",
+    [
+        pytest.param(lambda: JobApplicationSentByJobSeekerFactory(), True, id="job_application_sent_by_job_seeker"),
+        pytest.param(
+            lambda: JobApplicationSentByJobSeekerFactory(sender=JobSeekerFactory()),
+            False,
+            id="job_application_sent_by_other_job_seeker",
+        ),
+        pytest.param(lambda: JobApplicationSentByPrescriberFactory(), True, id="job_application_sent_by_prescriber"),
+        pytest.param(lambda: JobApplicationSentByCompanyFactory(), True, id="job_application_sent_by_company"),
+    ],
+)
+def test_sender_jobseeker_constraint(factory, validation_should_pass):
+    if validation_should_pass:
+        assert factory().validate_constraints() is None
+
+    else:
+        with pytest.raises(IntegrityError, match="job_seeker_sender_coherence"):
+            factory()
 
 
 def test_can_be_cancelled():
