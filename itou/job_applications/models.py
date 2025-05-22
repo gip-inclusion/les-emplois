@@ -756,6 +756,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 violation_error_message="Une candidature active ne peut pas avoir été archivée par un utilisateur.",
                 condition=~models.Q(archived_at=None, archived_by__isnull=False),
             ),
+            models.CheckConstraint(
+                name="job_seeker_sender_coherence",
+                violation_error_message="Le candidat doit être l'émetteur de la candidature",
+                condition=(~models.Q(sender_kind="job_seeker") | models.Q(job_seeker=F("sender"))),
+            ),
         ]
 
     def __str__(self):
