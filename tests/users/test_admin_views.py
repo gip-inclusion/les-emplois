@@ -12,7 +12,12 @@ from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
 from itou.utils.models import PkSupportRemark
-from tests.job_applications.factories import JobApplicationFactory
+from tests.job_applications.factories import (
+    JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberFactory,
+)
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -215,6 +220,28 @@ class TestTransferUserData:
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "- CANDIDATURES" in remark
         assert "- PASS IAE" in remark
+
+    @pytest.mark.parametrize(
+        "factory",
+        [
+            JobApplicationSentByJobSeekerFactory,
+            JobApplicationSentByCompanyFactory,
+            JobApplicationSentByPrescriberFactory,
+        ],
+    )
+    def test_transfer_sender(self, admin_client, factory):
+        job_application = factory()
+        from_user = job_application.job_seeker
+        to_user = JobSeekerFactory()
+        sender = to_user if job_application.sender_kind == SenderKind.JOB_SEEKER else job_application.sender
+        transfer_url = reverse(
+            "admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk, "to_user_pk": to_user.pk}
+        )
+        admin_client.post(transfer_url, data={"fields_to_transfer": ["job_applications"]})
+
+        job_application.refresh_from_db()
+        assert job_application.job_seeker == to_user
+        assert job_application.sender == sender
 
 
 def test_app_model_change_url(admin_client):

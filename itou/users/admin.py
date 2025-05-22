@@ -645,6 +645,9 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                     field = transfer_fields[field_name]
                     for item in transfer_data[field_name]["from"]:
                         setattr(item, field.remote_field.name, to_user)
+                        if field.name == "job_applications" and item.sender_kind == UserKind.JOB_SEEKER:
+                            # Keep sender & job_seeker consistent to comply with job_seeker_sender_coherence constraint
+                            item.sender = to_user
                         item.save()
                         transferred_items.append((transfer_data[field_name]["title"], item))
                 if transferred_items:
