@@ -241,6 +241,7 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "eligibility_diagnoses",  # EligibilityDiagnosis.job_seeker
     "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
     "job_applications",  # JobApplication.job_seeker
+    "job_applications_sent",  # JobApplication.sender
 }
 
 
