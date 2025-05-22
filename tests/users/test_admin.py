@@ -101,7 +101,8 @@ def test_get_fields_to_transfer_for_job_seekers():
         "institution",  # Institution.members
         "institution_invitations",  # LaborInspectorInvitation.sender
         "institutionmembership",  # InstitutionMembership.user
-        "job_applications_sent",  # JobApplication.sender
+        "job_applications_sent",  # JobApplication.sender, but might be replaced when transferring application
+        # sent by the job seeker
         "jobapplication",  # JobApplication.transferred_by
         "jobapplicationtransitionlog",  # JobApplicationTransitionLog.user
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
