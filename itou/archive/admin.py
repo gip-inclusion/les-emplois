@@ -61,3 +61,24 @@ class ArchiveApplicationAdmin(ItouModelAdmin):
     )
 
     readonly_fields = fields
+
+
+@admin.register(models.ArchivedApproval)
+class ArchiveApprovalAdmin(ItouModelAdmin):
+    fields = (
+        "archived_at",
+        "origin",
+        "origin_company_kind",
+        "origin_company_department",
+        "origin_company_naf",
+        "origin_sender_kind",
+        "origin_prescriber_organization_kind",
+        "start_at",
+        "end_at",
+        "had_eligibility_diagnosis",
+        "number_of_prolongations",
+        "number_of_suspensions",
+        "number_of_accepted_job_applications",
+    )
+
+    readonly_fields = fields
