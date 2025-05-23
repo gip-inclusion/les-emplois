@@ -15,8 +15,6 @@ urlpatterns = [
         name="start_hire",
         kwargs={"hire_process": True},
     ),
-    # ===============================================================
-    # New views
     # Submit - sender.
     path(
         "<uuid:session_uuid>/sender/pending_authorization",
@@ -54,12 +52,6 @@ urlpatterns = [
         submit_views.ApplicationEndView.as_view(),
         name="application_end",
     ),
-    # FIXME(alaurent) Remove in a week
-    path(
-        "<int:company_pk>/application/<uuid:application_pk>/end",
-        submit_views.ApplicationEndView.as_view(),
-        name="application_end",
-    ),
     # Direct hire process
     path(
         "<uuid:session_uuid>/hire/check-previous-applications",
@@ -91,72 +83,6 @@ urlpatterns = [
         name="hire_confirmation",
         kwargs={"hire_process": True},
     ),
-    # ===============================================================
-    # Legacy views : Remove one week after merge
-    # Submit - sender.
-    path(
-        "<int:company_pk>/sender/pending_authorization",
-        submit_views.PendingAuthorizationForSender.as_view(),
-        name="pending_authorization_for_sender",
-    ),
-    # Submit - common.
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_prev_applications",
-        submit_views.CheckPreviousApplications.as_view(),
-        name="step_check_prev_applications",
-    ),
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/select_jobs",
-        submit_views.ApplicationJobsView.as_view(),
-        name="application_jobs",
-    ),
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/eligibility",
-        submit_views.ApplicationEligibilityView.as_view(),
-        name="application_eligibility",
-    ),
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/geiq_eligibility",
-        submit_views.ApplicationGEIQEligibilityView.as_view(),
-        name="application_geiq_eligibility",
-    ),
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/resume",
-        submit_views.ApplicationResumeView.as_view(),
-        name="application_resume",
-    ),
-    # Direct hire process
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-previous-applications",
-        submit_views.CheckPreviousApplications.as_view(),
-        name="check_prev_applications_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/eligibility",
-        submit_views.IAEEligibilityForHireView.as_view(),
-        name="eligibility_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility",
-        submit_views.GEIQEligibilityForHireView.as_view(),
-        name="geiq_eligibility_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility-criteria",
-        submit_views.GEIQEligiblityCriteriaForHireView.as_view(),
-        name="geiq_eligibility_criteria_for_hire",
-        kwargs={"hire_process": True},
-    ),
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/confirm",
-        submit_views.HireConfirmationView.as_view(),
-        name="hire_confirmation",
-        kwargs={"hire_process": True},
-    ),
-    # ===============================================================
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriptions/list", list_views.list_prescriptions, name="list_prescriptions"),
@@ -246,8 +172,6 @@ urlpatterns = [
         process_views.job_application_external_transfer_start_view,
         name="job_application_external_transfer_start_session",
     ),
-    # ===============================================================
-    # New views
     path(
         "<uuid:job_application_id>/siae/external-transfer/2/<uuid:session_uuid>",
         process_views.JobApplicationExternalTransferStep2View.as_view(),
@@ -258,19 +182,6 @@ urlpatterns = [
         process_views.JobApplicationExternalTransferStep3View.as_view(),
         name="job_application_external_transfer_step_3",
     ),
-    # ===============================================================
-    # Legacy views : Remove one week after merge
-    path(
-        "<uuid:job_application_id>/siae/external-transfer/2/<int:company_pk>",
-        process_views.JobApplicationExternalTransferStep2View.as_view(),
-        name="job_application_external_transfer_step_2",
-    ),
-    path(
-        "<uuid:job_application_id>/siae/external-transfer/3/<int:company_pk>",
-        process_views.JobApplicationExternalTransferStep3View.as_view(),
-        name="job_application_external_transfer_step_3",
-    ),
-    # ===============================================================
     path(
         "<uuid:job_application_id>/siae/external-transfer/end",
         process_views.JobApplicationExternalTransferStepEndView.as_view(),
