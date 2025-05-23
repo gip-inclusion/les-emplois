@@ -141,6 +141,7 @@ class AssessmentAdmin(ReadonlyMixin, ItouModelAdmin):
             {
                 "fields": (
                     "label_geiq_id",
+                    "with_main_geiq",
                     "label_antennas",
                     "contracts_synced_at",
                     "summary_document_file",
