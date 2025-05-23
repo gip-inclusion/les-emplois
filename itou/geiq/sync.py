@@ -140,6 +140,8 @@ def sync_employee_and_contracts(assessment):
     assessment_antenna_ids = (
         [antenna["id"] for antenna in assessment.label_antennas] if assessment.label_antennas else []
     )
+    if assessment.with_main_geiq:
+        assessment_antenna_ids.append(0)  # 0 means the main GEIQ in Label contracts's infos
     client = geiq_label.get_client()
 
     contract_infos = []
