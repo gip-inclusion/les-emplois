@@ -1,3 +1,26 @@
 <div class="col mb-3 mb-md-5">
-    {% include "approvals/includes/box.html" with approval=user.latest_common_approval link_from_current_url=request.get_full_path job_seeker_dashboard_version=True extra_class="h-100" only %}
+    {% if not user.latest_common_approval %}
+        <div class="col mb-3 mb-md-5">
+            <div class="c-box bg-warning-lightest border-warning h-100 d-flex flex-column">
+                <div class="mb-3 mb-md-4">
+                    <span class="badge badge-base rounded-pill bg-warning text-white">
+                        <i class="ri-pass-expired-line" aria-hidden="true"></i>
+                        PASS IAE inexistant
+                    </span>
+                </div>
+                <div class="flex-grow-1">
+                    <p class="mb-0">
+                        Pour obtenir un PASS IAE, vous devez avoir un diagnostic d’éligibilité à l’IAE valide et avoir une candidature acceptée dans une SIAE (Structure d’insertion par l’activité économique).
+                    </p>
+                </div>
+                <a href="{{ itou_help_center_url }}/articles/16923064254353--Mon-PASS-IAE-Candidat" rel="noopener" target="_blank" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3 has-external-link">
+                    <i class="ri-question-line font-weight-medium" aria-hidden="true"></i>
+                    <span>En savoir plus sur le PASS IAE</span>
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        {% include "approvals/includes/box.html" with approval=user.latest_common_approval link_from_current_url=request.get_full_path job_seeker_dashboard_version=True extra_class="h-100" only %}
+    {% endif %}
 </div>
