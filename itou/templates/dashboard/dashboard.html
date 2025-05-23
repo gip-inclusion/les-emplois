@@ -185,6 +185,7 @@
                                 {% if user.is_job_seeker %}
                                     {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
                                     {% include "dashboard/includes/job_seeker_approval_card.html" with user=user itou_help_center_url=ITOU_HELP_CENTER_URL only %}
+                                    {% include "dashboard/includes/job_seeker_eligibility_card.html" with eligibility_diagnosis=iae_eligibility_diagnosis itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                 {% endif %}
                                 {# end of if user.is_job_seeker #}
 

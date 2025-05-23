@@ -20,6 +20,8 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.eligibility.utils import iae_criteria_for_display
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
@@ -168,6 +170,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
+        iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
+        if iae_eligibility_diagnosis:
+            iae_eligibility_diagnosis.criteria_display = iae_criteria_for_display(iae_eligibility_diagnosis)
+
+        context |= {
+            "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
+        }
     return render(request, template_name, context)
 
 
