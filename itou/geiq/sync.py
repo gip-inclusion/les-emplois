@@ -3,10 +3,7 @@ import logging
 
 from django.utils import timezone
 
-from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
-from itou.eligibility.models import GEIQAdministrativeCriteria
-from itou.eligibility.utils import geiq_allowance_amount
-from itou.geiq import models
+from itou.geiq_assessments import models as geiq_assessments_models
 from itou.users.enums import Title
 from itou.utils.apis import geiq_label
 from itou.utils.sync import DiffItemKind, yield_sync_diff
@@ -67,20 +64,27 @@ def sync_to_db(api_data, db_queryset, *, model, mapping, data_to_django_obj, wit
     return obj_to_create, obj_to_update, obj_to_delete
 
 
+def get_geiq_infos():
+    FIELDS = ("id", "nom", "siret", "ville", "cp")
+    client = geiq_label.get_client()
+
+    geiq_infos = []
+    for geiq in client.get_all_geiq():
+        geiq_info = {k: geiq[k] for k in FIELDS}
+        geiq_info["antennes"] = []
+        for antenne in geiq["antennes"]:
+            geiq_info["antennes"].append({k: antenne[k] for k in FIELDS})
+        geiq_infos.append(geiq_info)
+    return geiq_infos
+
+
 EMPLOYEE_MAPPING = {
     "label_id": "id",
     "last_name": "nom",
     "first_name": "prenom",
     "title": "sexe",
     "birthdate": "date_naissance",
-    # Those are computed locally
-    # based on statuts_prioritaire field & GEIQAdministrativeCriteria objects
-    "annex1_nb": "annex1_nb",
-    "annex2_level1_nb": "annex2_level1_nb",
-    "annex2_level2_nb": "annex2_level2_nb",
-    "allowance_amount": "allowance_amount",
-    # based on contracts & prequalification periods
-    "support_days_nb": "support_days_nb",
+    "allowance_amount": "montant_aide",
 }
 
 
@@ -104,128 +108,52 @@ def _cleanup_employee_info(employee_info):
     employee_info["sexe"] = {"H": Title.M, "F": Title.MME}[employee_info["sexe"]]
 
 
-def _compute_eligibility_fields(api_codes, code_to_criteria, support_days_nb):
-    authorized_prescriber = False
-    emplois_codes = set()
-    # Handle Demandeur d'asile / Réfugiés statutaire ou bénéficiaire de la protection subsidiaire special case
-    REFUG = "Refug."
-    RS_PS_DA = "RS/PS/DA"
-    if REFUG in api_codes:
-        # Refug. code should imply the presence of RS/PS/DA code
-        # Add our Annex 1+2 criteria "Réfugiés statutaire ou bénéficiaire de la protection subsidiaire"
-        emplois_codes.add(f"{REFUG}|{RS_PS_DA}")
-        # Remove REFUG & RS/PS/DA to avoid also adding Annex 1 criteria "Demandeur d'asile" with the RS/PS/DA api_code
-        api_codes = {code for code in api_codes if code not in (REFUG, RS_PS_DA)}
-
-    if "QPV/ZRR" in api_codes:
-        if not {"QPV", "ZRR"} & api_codes:
-            # Label has the QPV/ZRR Annex 1 criteria but none of the QPV & ZRR annex 2 criteria
-            # since both are at the same level: we arbitrarly choose QPV for our computation
-            api_codes |= {"QPV"}
-        api_codes -= {"QPV/ZRR"}
-
-    # Add all the known criteria
-    emplois_codes |= api_codes & set(code_to_criteria)
-
-    for unknown_code in api_codes - set(code_to_criteria):
-        match unknown_code:
-            # Codes to ignore
-            case "Aucun":
-                pass
-            case "Reconv.Vol":
-                # It states it is an "Expérimentation. Hors critères": ignore it
-                pass
-            case "Prescrit":
-                # Prescrit means "Est prescrit via la Plateforme de l’inclusion par un prescripteur habilité" in Label
-                # but we should really use the prescripteur field
-                authorized_prescriber = True
-            # Travailleur handicapé
-            case "Pers. SH" | "TH":
-                emplois_codes.add("Pers. SH|TH")
-            # Sortant de détention ou personne placée sous main de justice
-            case "Detention/MJ" | "Prison":
-                emplois_codes.add("Detention/MJ|Prison")
-            # QPV & ZRR
-            case "QPV":
-                emplois_codes.add("QPV|QPV/ZRR")
-            case "ZRR":
-                emplois_codes.add("ZRR|QPV/ZRR")
-            case _:
-                raise ValueError(f"Unknown code: {unknown_code}")
-
-    annex1_nb = annex2_level1_nb = annex2_level2_nb = 0
-    administrative_criteria = [code_to_criteria[code] for code in emplois_codes]
-    for criteria in administrative_criteria:
-        if criteria.annex in (AdministrativeCriteriaAnnex.ANNEX_1, AdministrativeCriteriaAnnex.BOTH_ANNEXES):
-            annex1_nb += 1
-        if criteria.annex in (AdministrativeCriteriaAnnex.ANNEX_2, AdministrativeCriteriaAnnex.BOTH_ANNEXES):
-            match criteria.level:
-                case AdministrativeCriteriaLevel.LEVEL_1:
-                    annex2_level1_nb += 1
-                case AdministrativeCriteriaLevel.LEVEL_2:
-                    annex2_level2_nb += 1
-    if support_days_nb < 90:
-        allowance_amount = 0
-    else:
-        allowance_amount = geiq_allowance_amount(
-            is_authorized_prescriber=authorized_prescriber, administrative_criteria=administrative_criteria
-        )
-
-    return {
-        "annex1_nb": annex1_nb,
-        "annex2_level1_nb": annex2_level1_nb,
-        "annex2_level2_nb": annex2_level2_nb,
-        "allowance_amount": allowance_amount,
-    }
-
-
-def _nb_days(periods: list[tuple[datetime.date, datetime.date]], *, year: int):
-    YEAR_START = datetime.date(year, 1, 1)
-    YEAR_END = datetime.date(year, 12, 31)
-    nb_days = 0
-    cleaned_periods = []
-    # Sort & truncate periods to target year
-    for start, end in sorted(periods):
-        if start > end:
-            # Ignore invalid period
-            continue
-        if end < YEAR_START or start > YEAR_END:
-            # Period outside of year
-            continue
-        new_end = min(end, YEAR_END)
-        new_start = max(start, YEAR_START)
-        cleaned_periods.append((new_start, new_end))
-    if not cleaned_periods:
-        return nb_days
-
-    current_start, current_end = cleaned_periods.pop(0)
-    while cleaned_periods:
-        new_start, new_end = cleaned_periods.pop(0)
-        if new_start <= current_end:  # overlapping periods
-            if new_end <= current_end:
-                # Drop the new period that is totally included in current one
-                continue
-            # else new_end > current_end
-            current_end = new_end
-        else:  # new_start > current_end
-            # new distinct period found: count the current one and switch to the new one
-            nb_days += (current_end - current_start).days + 1
-            current_start, current_end = new_start, new_end
-    # All periods have been either counted or collapsed
-    nb_days += (current_end - current_start).days + 1
-    return nb_days
+def _nb_days_in_year(start: datetime.date, end: datetime.date, *, year: int):
+    if start.year < year:
+        start = datetime.date(year, 1, 1)
+    elif start.year > year:
+        # This shouldn't happen
+        return 0
+    if end.year < year:
+        return 0
+    elif end.year > year:
+        end = datetime.date(year, 12, 31)
+    return (end - start).days + 1
 
 
 def sync_employee_and_contracts(assessment):
-    assert not assessment.submitted_at
+    assessment_antenna_ids = []
+    assert not assessment.contracts_synced_at
+    # Prevent concurrent sync on the same assessment
+    assessment = geiq_assessments_models.Assessment.objects.select_for_update().get(pk=assessment.pk)
+    if assessment.contracts_synced_at:
+        logger.info(
+            "Assessment pk=%s: contract already synced at %s - aborting",
+            assessment.pk,
+            assessment.contracts_synced_at,
+        )
+        return
+    geiq_id = assessment.label_geiq_id
+    Employee = geiq_assessments_models.Employee
+    EmployeeContract = geiq_assessments_models.EmployeeContract
+    EmployeePrequalification = geiq_assessments_models.EmployeePrequalification
+    assessment_antenna_ids = (
+        [antenna["id"] for antenna in assessment.label_antennas] if assessment.label_antennas else []
+    )
+    if assessment.with_main_geiq:
+        assessment_antenna_ids.append(0)  # 0 means the main GEIQ in Label contracts's infos
     client = geiq_label.get_client()
-    geiq_id = assessment.label_id
 
     contract_infos = []
     prequalification_infos = []
     employee_infos = {}
     employee_support_periods = {}
-    for contract_info in client.get_all_contracts(geiq_id):
+    employees_in_assessment_year = set()
+
+    limit_end_date = datetime.date(assessment.campaign.year - 1, 10, 1)
+    label_rates = client.get_taux_geiq(geiq_id=geiq_id)[0]
+    # TODO: rajouter filtre sur antennes ?
+    for contract_info in client.get_all_contracts(geiq_id, date_fin=limit_end_date - datetime.timedelta(days=1)):
         contract_info["date_debut"] = convert_iso_datetime_to_date(contract_info["date_debut"])
         contract_info["date_fin"] = convert_iso_datetime_to_date(contract_info["date_fin"])
         contract_info["date_fin_contrat"] = (
@@ -240,11 +168,17 @@ def sync_employee_and_contracts(assessment):
         # If a contract was planned to end in 2023 but ended in 2022,
         # its data is irrelevant for 2023 assessment: ignore it
         end_date = contract_info["date_fin_contrat"] or contract_info["date_fin"]
-        if end_date.year < assessment.campaign.year:
+        if end_date < limit_end_date:
             # Ignoring contract ending before assessment year
+            continue
+        if contract_info["antenne"]["id"] not in assessment_antenna_ids:
+            # Contract on other antenna
             continue
 
         employee_info = contract_info["salarie"]
+        if end_date >= datetime.date(assessment.campaign.year, 1, 1):
+            employees_in_assessment_year.add(employee_info["id"])
+
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
             # Check consistency between contracts
@@ -256,6 +190,8 @@ def sync_employee_and_contracts(assessment):
         contract_info["salarie"] = employee_info["id"]
         contract_infos.append(contract_info)
         employee_support_periods.setdefault(employee_info["id"], []).append((contract_info["date_debut"], end_date))
+
+    prequalif_limit_end_date = datetime.date(assessment.campaign.year - 2, 1, 1)
 
     for prequalification_info in client.get_all_prequalifications(geiq_id):
         employee_info = prequalification_info["salarie"]
@@ -271,27 +207,18 @@ def sync_employee_and_contracts(assessment):
         prequalification_info["salarie"] = employee_info["id"]
         prequalification_info["date_debut"] = convert_iso_datetime_to_date(prequalification_info["date_debut"])
         prequalification_info["date_fin"] = convert_iso_datetime_to_date(prequalification_info["date_fin"])
+        if prequalification_info["date_debut"].year > assessment.campaign.year:
+            # Ignoring prequalifications starting after assessment year
+            continue
+        if prequalification_info["date_fin"] < prequalif_limit_end_date:
+            # Ignoring prequalifications ending before the year preceding the assessment
+            continue
         prequalification_infos.append(prequalification_info)
         employee_support_periods.setdefault(employee_info["id"], []).append(
             (prequalification_info["date_debut"], prequalification_info["date_fin"])
         )
 
-    code_to_criteria = {
-        criteria.api_code: criteria for criteria in GEIQAdministrativeCriteria.objects.exclude(api_code="")
-    }
-    for employee_info in employee_infos.values():
-        support_days_nb = _nb_days(employee_support_periods[employee_info["id"]], year=assessment.campaign.year)
-        employee_info.update(
-            _compute_eligibility_fields(
-                {statut["libelle_abr"] for statut in employee_info["statuts_prioritaire"]},
-                code_to_criteria,
-                support_days_nb,
-            )
-        )
-        employee_info["support_days_nb"] = support_days_nb
-
     # Sync data to DB
-
     def employee_data_to_django(data, *, mapping, model):
         employee = label_data_to_django(data, mapping=mapping, model=model)
         employee.assessment = assessment
@@ -299,8 +226,8 @@ def sync_employee_and_contracts(assessment):
 
     sync_to_db(
         employee_infos.values(),
-        models.Employee.objects.filter(assessment=assessment).all(),
-        model=models.Employee,
+        Employee.objects.filter(assessment=assessment).all(),
+        model=Employee,
         mapping=EMPLOYEE_MAPPING,
         data_to_django_obj=employee_data_to_django,
         with_delete=True,
@@ -311,12 +238,22 @@ def sync_employee_and_contracts(assessment):
     def contract_data_to_django(data, *, mapping, model):
         contract = label_data_to_django(data, mapping=mapping, model=model)
         contract.employee = label_id_to_employee[data["salarie"]]
+        contract.allowance_granted = False
+        contract.nb_days_in_campaign_year = _nb_days_in_year(
+            contract.start_at,
+            contract.end_at or contract.planned_end_at,
+            year=assessment.campaign.year,
+        )
+        contract.allowance_requested = (
+            contract.nb_days_in_campaign_year > geiq_assessments_models.MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
+        )
+
         return contract
 
     sync_to_db(
         contract_infos,
-        models.EmployeeContract.objects.filter(employee__assessment=assessment).all(),
-        model=models.EmployeeContract,
+        EmployeeContract.objects.filter(employee__assessment=assessment).all(),
+        model=EmployeeContract,
         mapping=CONTRACT_MAPPING,
         data_to_django_obj=contract_data_to_django,
         with_delete=True,
@@ -329,12 +266,15 @@ def sync_employee_and_contracts(assessment):
 
     sync_to_db(
         prequalification_infos,
-        models.EmployeePrequalification.objects.filter(employee__assessment=assessment).all(),
-        model=models.EmployeePrequalification,
+        EmployeePrequalification.objects.filter(employee__assessment=assessment).all(),
+        model=EmployeePrequalification,
         mapping=PREQUALIFICATION_MAPPING,
         data_to_django_obj=prequalification_data_to_django,
         with_delete=True,
     )
 
-    assessment.last_synced_at = timezone.now()
-    assessment.save(update_fields={"last_synced_at"})
+    assessment.contracts_synced_at = timezone.now()
+    assessment.employee_nb = len(employees_in_assessment_year)
+    assessment.label_rates = label_rates
+    assessment.save(update_fields={"contracts_synced_at", "employee_nb", "label_rates"})
+    return assessment

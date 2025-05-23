@@ -1,0 +1,66 @@
+{% if not assessment.submitted_at %}
+    <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
+        <h4>Bilan d’exécution à valider</h4>
+        <p class="mb-0">
+            Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son rapport d’activité et valider le bilan.
+        </p>
+    </div>
+{% elif not assessment.reviewed_at %}
+    <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
+        <h4>Bilan d’exécution à contrôler</h4>
+        <p>
+            Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour contrôler les informations de ce bilan d’exécution.
+        </p>
+        {% if assessment.missing_actions_to_review %}
+            <p class="mb-0">Actions restantes :</p>
+            <ul>
+                {% for action in assessment.missing_actions_to_review %}
+                    <li>
+                        <strong>{{ action }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn btn-primary btn-block" disabled>
+                <span>Contrôler le dossier</span>
+            </button>
+        {% elif request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+            <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
+                Valider le dossier
+            </button>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ico btn-primary btn-block" name="action" value="{{ InstitutionAction.REVIEW }}">
+                    <i aria-hidden="true" class="ri-check-line"></i>
+                    <span>Valider le contrôle</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+{% elif not assessment.final_reviewed_at %}
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
+        <h4>Bilan d’exécution à valider</h4>
+        <p>
+            Ce bilan a été contrôlé le {{ assessment.reviewed_at|date:"d/m/Y" }} par {{ assessment.reviewed_by.get_full_name }}. Il doit désormais être validé par la DREETS.
+        </p>
+        {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-primary btn-block mb-2" name="action" value="{{ InstitutionAction.FIX }}">
+                    Corriger le dossier
+                </button>
+            </form>
+            <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal" data-bs-target="#final_review_modal">
+                Valider le dossier
+            </button>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
+        <h4>Bilan d’exécution traité le {{ assessment.final_reviewed_at|date:"d/m/Y" }}</h4>
+        <p>La décision a été envoyée au GEIQ.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'geiq_assessments_views:assessment_review' pk=assessment.pk %}">
+            <span>Afficher la décision</span>
+        </a>
+    </div>
+{% endif %}

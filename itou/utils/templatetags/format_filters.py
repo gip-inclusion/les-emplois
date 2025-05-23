@@ -86,9 +86,23 @@ def remove_json_extension(filename):
 
 @register.filter(is_safe=True)
 def formatfloat_with_unit(number, unit):
+    if number == "":
+        # Special case for missing label_rates values
+        # XXX: should we handle this case when saving the value?
+        number = None
     if number is not None:
         return f"{floatformat(number)} {unit}"
     return None
+
+
+@register.filter(is_safe=True)
+def format_int_euros(number):
+    try:
+        number = int(number)
+    except (TypeError, ValueError):
+        return "-"
+    number_str = f"{number:_}".replace("_", " ")
+    return f"{number_str} €"
 
 
 @register.filter
