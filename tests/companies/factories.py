@@ -108,7 +108,6 @@ class CompanyFactory(factory.django.DjangoModelFactory):
                     create_fake_postcode,
                     ignore=[
                         *settings.GPS_NAV_ENTRY_DEPARTMENTS,
-                        *settings.JOB_APPLICATION_OPTIONAL_REFUSAL_REASON_DEPARTMENTS,
                         *settings.MON_RECAP_BANNER_DEPARTMENTS,
                     ],
                 )
