@@ -1,0 +1,55 @@
+{% load badges %}
+<div class="col-12 col-md-12 col-xl-12 col-xxxl-6 mb-3 mb-md-5">
+    <div class="c-box p-0 h-100">
+        <div class="p-3 p-lg-4">
+            <span class="h4 mb-0">
+                Diagnostic d’éligibilité à l’IAE
+                {% if not eligibility_diagnosis %}
+                    non renseigné
+                {% else %}
+                    {{ eligibility_diagnosis.is_considered_valid|yesno:"valide,expiré" }}
+                {% endif %}
+            </span>
+            {% iae_eligibility_badge is_eligible=eligibility_diagnosis.is_considered_valid extra_class="badge-sm float-end" for_job_seeker=True %}
+        </div>
+        <div class="px-3 px-lg-4">
+            {% if not eligibility_diagnosis or not eligibility_diagnosis.is_considered_valid %}
+                <ul class="list-unstyled">
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{{ itou_help_center_url }}/articles/14733921254161--Les-crit%C3%A8res-d-%C3%A9ligibilit%C3%A9-IAE"
+                           rel="noopener"
+                           target="_blank"
+                           aria-label="En savoir plus sur l’éligibilité à l’IAE (ouverture dans un nouvel onglet)"
+                           class="btn-link btn-ico">
+                            <i class="ri-question-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>En savoir plus sur l’éligibilité à l’IAE</span>
+                            <i class="ri-external-link-line fw-normal ms-2"></i>
+                        </a>
+                    </li>
+                </ul>
+                <hr class="mb-3">
+
+                <p class="fs-sm mb-lg-5">
+                    {% if not eligibility_diagnosis %}
+                        Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE.
+                    {% else %}
+                        Votre diagnostic d’éligibilité IAE a expiré le {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}. Pour en savoir plus, veuillez vous rapprocher d’un prescripteur habilité.
+                    {% endif %}
+                </p>
+            {% else %}
+                <div class="fs-sm mb-lg-5">
+                    <p class="text-success mb-1">
+                        Critères validés
+                        le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
+                        <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
+                        {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
+                        {% if eligibility_diagnosis.author_prescriber_organization %}
+                            ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
+                        {% endif %}
+                    </p>
+                    {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True only %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
