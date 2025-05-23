@@ -202,6 +202,8 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         if administrative_criteria:
             result.administrative_criteria.set(administrative_criteria)
+            if any([criterion.is_certifiable for criterion in administrative_criteria]):
+                result.certify_criteria()
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
@@ -212,7 +214,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     @transaction.atomic()
     def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
         if not issubclass(diagnosis.__class__, cls):
-            raise ValueError("Le diagnositic fourni n'est pas un diagnostic GEIQ")
+            raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
 
         if not diagnosis.is_valid:
             raise ValueError("Impossible de modifier un diagnostic GEIQ expiré")
@@ -225,6 +227,8 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # - permission management is not handled by the model
         # - only administrative criteria are updatable
         diagnosis.administrative_criteria.set(administrative_criteria)
+        if any([criterion.is_certifiable for criterion in administrative_criteria]):
+            diagnosis.certify_criteria()
 
         return diagnosis
 

@@ -41,7 +41,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
@@ -2701,8 +2701,9 @@ class TestProcessAcceptViews:
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
-    def test_accept_iae_criteria_can_be_certified(self, client, mocker):
+    def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
@@ -2713,8 +2714,9 @@ class TestProcessAcceptViews:
         birthdate = datetime.date(1995, 12, 27)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=self.company,
+            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
             certifiable=True,
+            **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
         )
         job_application = self.create_job_application(
@@ -2788,8 +2790,9 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
-    def test_accept_geiq_criteria_can_be_certified(self, client, mocker):
+    def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
@@ -2800,8 +2803,9 @@ class TestProcessAcceptViews:
         self.company.save()
         diagnosis = GEIQEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_geiq=self.company,
-            from_employer=True,
+            author_geiq=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
             criteria_kinds=[criteria_kind],
         )
         job_application = self.create_job_application(
@@ -2859,8 +2863,9 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
-    def test_accept_no_siae_criteria_can_be_certified(self, client, mocker):
+    def test_accept_no_siae_criteria_can_be_certified(self, client, mocker, from_kind):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
@@ -2868,8 +2873,9 @@ class TestProcessAcceptViews:
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=self.company,
+            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
             certifiable=True,
+            **{f"from_{from_kind}": True},
             criteria_kinds=[AdministrativeCriteriaKind.RSA],
         )
         job_application = self.create_job_application(

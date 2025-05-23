@@ -1,17 +1,26 @@
+import functools
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Max
+from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaKind, AdministrativeCriteriaLevel
+from itou.eligibility.enums import (
+    AdministrativeCriteriaAnnex,
+    AdministrativeCriteriaLevel,
+)
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
+from itou.eligibility.utils import _criteria_for_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from itou.users.enums import UserKind
+from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
+from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 
@@ -100,9 +109,36 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
         )
 
 
+@pytest.mark.parametrize(
+    "organization_factory",
+    [
+        pytest.param(functools.partial(CompanyFactory, kind=CompanyKind.GEIQ), id="CompanyFactory"),
+        PrescriberOrganizationFactory,
+    ],
+)
+def test_create_eligibility_diagnosis_certify_certifiable_criteria(mocker, organization_factory):
+    criterion = GEIQAdministrativeCriteria.objects.certifiable().order_by("?").first()
+    mocker.patch(
+        "itou.utils.apis.api_particulier._request",
+        return_value=RESPONSES[criterion.kind][ResponseKind.CERTIFIED],
+    )
+    organization = organization_factory(with_membership=True)
+
+    diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
+        JobSeekerFactory(certifiable=True),
+        author=organization.members.first(),
+        author_structure=organization,
+        administrative_criteria=[criterion],
+    )
+    [criterion] = _criteria_for_display(
+        [diagnosis.selected_administrative_criteria.get()], hiring_start_at=timezone.localdate()
+    )
+    assert criterion.is_considered_certified is True
+
+
 def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # Updating nothing
-    with pytest.raises(ValueError, match="Le diagnositic fourni n'est pas un diagnostic GEIQ"):
+    with pytest.raises(ValueError, match="Le diagnostic fourni n'est pas un diagnostic GEIQ"):
         GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
 
     # Trying to update an expired diagnosis
@@ -126,6 +162,24 @@ def test_update_geiq_eligibility_diagnosis_author():
     diagnosis.refresh_from_db()
 
     assert diagnosis.author == other_user
+
+
+@pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+def test_update_eligibility_diagnosis_certify_certifiable_criteria(mocker, from_kind):
+    criterion = GEIQAdministrativeCriteria.objects.certifiable().order_by("?").first()
+    mocker.patch(
+        "itou.utils.apis.api_particulier._request",
+        return_value=RESPONSES[criterion.kind][ResponseKind.CERTIFIED],
+    )
+    diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker__certifiable=True, **{f"from_{from_kind}": True})
+
+    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+        diagnosis, diagnosis.author, administrative_criteria=[criterion]
+    )
+    [criterion] = _criteria_for_display(
+        [diagnosis.selected_administrative_criteria.get()], hiring_start_at=timezone.localdate()
+    )
+    assert criterion.is_considered_certified is True
 
 
 def test_geiq_eligibility_diagnosis_validation():
@@ -455,43 +509,3 @@ def test_administrativecriteria_level_annex_consistency():
                 level=AdministrativeCriteriaLevel.LEVEL_2,
                 annex=AdministrativeCriteriaAnnex.NO_ANNEX,
             )
-
-
-@pytest.mark.parametrize(
-    "factory_params,expected",
-    [
-        pytest.param(
-            {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-            False,
-            id="prescriber_certified_criteria",
-        ),
-        pytest.param(
-            {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-            False,
-            id="prescriber_no_certified_criteria",
-        ),
-        pytest.param(
-            {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-            False,
-            id="employer_no_certified_criteria",
-        ),
-        pytest.param(
-            {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-            True,
-            id="employer_certified_criteria__rsa",
-        ),
-        pytest.param(
-            {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
-            True,
-            id="employer_certified_criteria__aah",
-        ),
-        pytest.param(
-            {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.PI]},
-            True,
-            id="employer_certified_criteria__pi",
-        ),
-    ],
-)
-def test_criteria_can_be_certified(factory_params, expected):
-    diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker__born_in_france=True, **factory_params)
-    assert diagnosis.criteria_can_be_certified() == expected

@@ -72,6 +72,48 @@ class AdministrativeCriteriaKind(models.TextChoices):
     FT = "FT", "Personne inscrite à France Travail"
     SANS_TRAVAIL_12 = "SANS_TRAVAIL_12", "Personne éloignée du marché du travail (> 1 an)"
 
+    @classmethod
+    def common(cls):
+        return {
+            cls.AAH,
+            cls.ASE,
+            cls.ASS,
+            cls.CAP_BEP,
+            cls.DELD,
+            cls.DETENTION_MJ,
+            cls.DETLD,
+            cls.FLE,
+            cls.JEUNE,
+            cls.PI,
+            cls.PM,
+            cls.PSH_PR,
+            cls.QPV,
+            cls.REF_DA,
+            cls.RSA,
+            cls.SENIOR,
+            cls.TH,
+            cls.ZRR,
+        }
+
+    @classmethod
+    def for_iae(cls):
+        return cls.common()
+
+    @classmethod
+    def for_geiq(cls):
+        return cls.common() | {
+            cls.AUTRE_MINIMA,
+            cls.DE_45,
+            cls.DELD_12,
+            cls.FT,
+            cls.JEUNE_SQ,
+            cls.MINIMA,
+            cls.RECONVERSION,
+            cls.RS_PS_DA,
+            cls.SANS_TRAVAIL_12,
+            cls.SIAE_CUI,
+        }
+
 
 CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset(
     [AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.PI]

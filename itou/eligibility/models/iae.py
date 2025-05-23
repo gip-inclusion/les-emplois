@@ -214,6 +214,8 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)
+            if any([criterion.is_certifiable for criterion in administrative_criteria]):
+                diagnosis.certify_criteria()
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)

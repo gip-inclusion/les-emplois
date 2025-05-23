@@ -16,6 +16,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.eligibility.utils import _criteria_for_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification, JobSeekerProfile
@@ -30,7 +31,7 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -340,6 +341,26 @@ class TestEligibilityDiagnosisModel:
         assert criteria2 in administrative_criteria
         assert criteria3 in administrative_criteria
 
+    @pytest.mark.parametrize("organization_factory", [CompanyFactory, PrescriberOrganizationFactory])
+    def test_create_diagnosis_certify_certifiable_criteria(self, mocker, organization_factory):
+        criterion = AdministrativeCriteria.objects.certifiable().order_by("?").first()
+        mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criterion.kind][ResponseKind.CERTIFIED],
+        )
+        organization = organization_factory(with_membership=True)
+
+        diagnosis = EligibilityDiagnosis.create_diagnosis(
+            JobSeekerFactory(certifiable=True),
+            author=organization.members.first(),
+            author_organization=organization,
+            administrative_criteria=[criterion],
+        )
+        [criterion] = _criteria_for_display(
+            [diagnosis.selected_administrative_criteria.get()], hiring_start_at=timezone.localdate()
+        )
+        assert criterion.is_considered_certified is True
+
     @freeze_time("2024-12-03")
     def test_update_diagnosis(self):
         company = CompanyFactory(with_membership=True)
@@ -387,46 +408,6 @@ class TestEligibilityDiagnosisModel:
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
-
-    @pytest.mark.parametrize(
-        "factory_params,expected",
-        [
-            # Criteria selected by prescribers are never certified, whatever the kind.
-            pytest.param(
-                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-                False,
-                id="prescriber_certified_criteria",
-            ),
-            pytest.param(
-                {"from_prescriber": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-                False,
-                id="prescriber_no_certified_criteria",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.CAP_BEP]},
-                False,
-                id="employer_no_certified_criteria",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.RSA]},
-                True,
-                id="employer_certified_criteria__rsa",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.AAH]},
-                True,
-                id="employer_certified_criteria__aah",
-            ),
-            pytest.param(
-                {"from_employer": True, "criteria_kinds": [AdministrativeCriteriaKind.PI]},
-                True,
-                id="employer_certified_criteria__pi",
-            ),
-        ],
-    )
-    def test_criteria_can_be_certified(self, factory_params, expected):
-        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker__born_in_france=True, **factory_params)
-        assert diagnosis.criteria_can_be_certified() == expected
 
 
 class TestAdministrativeCriteriaModel:
