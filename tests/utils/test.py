@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import inspect
 import io
@@ -178,6 +179,13 @@ def get_rows_from_streaming_response(response):
     workbook = openpyxl.load_workbook(io.BytesIO(content))
     worksheet = workbook.active
     return [[cell.value or "" for cell in row] for row in worksheet.rows]
+
+
+def excel_date_format(value):
+    if isinstance(value, datetime.datetime):
+        return datetime.datetime.combine(value.date(), datetime.time.min)
+    if isinstance(value, datetime.date):
+        return datetime.datetime.combine(value, datetime.time.min)
 
 
 def assert_previous_step(response, url, back_to_list=False):
