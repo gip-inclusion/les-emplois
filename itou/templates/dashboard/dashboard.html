@@ -189,6 +189,7 @@
                                     {% if user.latest_common_approval %}
                                         {% include "dashboard/includes/job_seeker_approval_card.html" %}
                                     {% endif %}
+                                    {% include "dashboard/includes/job_seeker_eligibility_card.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                 {% endif %}
                                 {# end of if user.is_job_seeker #}
 

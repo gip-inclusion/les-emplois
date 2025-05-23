@@ -219,7 +219,7 @@ class TestCertifiedBadgeIae:
         )
         return {
             "eligibility_diagnosis": diagnosis,
-            "request": RequestFactory(),
+            "request": get_request(),
             "siae": job_application.to_company,
             "job_seeker": diagnosis.job_seeker,
             "itou_help_center_url": "https://help.com",

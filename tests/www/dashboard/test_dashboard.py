@@ -12,6 +12,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
@@ -32,6 +33,7 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyPendingGracePeriodFactory,
 )
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -787,6 +789,125 @@ class TestDashboardView:
             assertContains(response, format_approval_number(approval))
             assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS, html=True)
             assertContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
+
+    @freeze_time("2025-05-19")
+    def test_jobseeker_iae_eligibility_diagnosis(self, client):
+        DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE valide"
+        DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE</span>"""
+        VALIDATED_CRITERIA = """<p class="text-success mb-1">Critères validés le
+            <span class="fw-bold">%(date)s</span> par <strong>%(author)s</strong> (%(org)s).</p>"""
+        NO_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE non renseigné"
+        NO_DIAG_TEXT = "Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE."
+        NO_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
+            <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité IAE à valider</span>"""
+        EXPIRED_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE expiré"
+        EXPIRED_DIAG_TEXT = (
+            "Votre diagnostic d’éligibilité IAE a expiré le %s. Pour en savoir plus, veuillez vous rapprocher "
+            "d’un prescripteur habilité."
+        )
+
+        user = JobSeekerFactory(with_address=True)
+        client.force_login(user)
+        url = reverse("dashboard:index")
+
+        # No diagnosis
+        response = client.get(url)
+        assertNotContains(response, DIAG_TITLE, html=True)
+        assertNotContains(response, DIAG_BADGE, html=True)
+        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
+        assertContains(response, NO_DIAG_TEXT, html=True, count=1)
+        assertContains(response, NO_DIAG_BADGE, html=True, count=1)
+
+        # A diagnosis from an employer, without approval yet
+        diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=user)
+        response = client.get(url)
+        assertNotContains(response, DIAG_TITLE, html=True)
+        assertNotContains(response, DIAG_BADGE, html=True)
+        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
+        assertContains(response, NO_DIAG_TEXT, html=True, count=1)
+        assertContains(response, NO_DIAG_BADGE, html=True, count=1)
+
+        # A diagnosis from an employer with an approval and a job application
+        JobApplicationFactory(
+            with_approval=True,
+            job_seeker=user,
+            to_company=diagnosis.author_siae,
+            eligibility_diagnosis=diagnosis,
+        )
+        response = client.get(url)
+        assertContains(response, DIAG_TITLE, html=True, count=1)
+        assertContains(response, DIAG_BADGE, html=True, count=1)
+        assertContains(
+            response,
+            VALIDATED_CRITERIA
+            % {
+                "date": "19/05/2025",
+                "author": diagnosis.author.get_full_name(),
+                "org": diagnosis.author_siae.display_name,
+            },
+            html=True,
+            count=1,
+        )
+        assertNotContains(response, NO_DIAG_TITLE, html=True)
+        assertNotContains(response, NO_DIAG_TEXT, html=True)
+        assertNotContains(response, NO_DIAG_BADGE, html=True)
+
+        # An expired diagnosis from an employer with a valid approval and a job application
+        with freeze_time(diagnosis.expires_at + timedelta(days=1)):
+            client.force_login(user)
+            response = client.get(url)
+            assertContains(response, DIAG_TITLE, html=True, count=1)
+            assertContains(response, DIAG_BADGE, html=True, count=1)
+            assertContains(
+                response,
+                VALIDATED_CRITERIA
+                % {
+                    "date": "19/05/2025",
+                    "author": diagnosis.author.get_full_name(),
+                    "org": diagnosis.author_siae.display_name,
+                },
+                html=True,
+                count=1,
+            )
+            assertNotContains(response, NO_DIAG_TITLE, html=True)
+            assertNotContains(response, NO_DIAG_TEXT, html=True)
+            assertNotContains(response, NO_DIAG_BADGE, html=True)
+
+        # An expired diagnosis with an expired approval
+        approval = Approval.objects.first()
+        with freeze_time(approval.end_at + timedelta(days=1)):
+            client.force_login(user)
+            response = client.get(url)
+            assertNotContains(response, DIAG_TITLE, html=True)
+            assertNotContains(response, DIAG_BADGE, html=True)
+            assertContains(response, EXPIRED_DIAG_TITLE, html=True, count=1)
+            print(response.content)
+            assertContains(response, EXPIRED_DIAG_TEXT % "19/11/2025", html=True, count=1)
+            assertContains(response, NO_DIAG_BADGE, html=True, count=1)
+
+        # A diagnosis from an authorized prescriber, takes precedence over the
+        # employer's diagnosis, even if it is older.
+        prescriber_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=user, created_at=timezone.now() - relativedelta(days=2)
+        )
+        response = client.get(url)
+        assertContains(response, DIAG_TITLE, html=True, count=1)
+        assertContains(response, DIAG_BADGE, html=True, count=1)
+        assertContains(
+            response,
+            VALIDATED_CRITERIA
+            % {
+                "date": "17/05/2025",
+                "author": prescriber_diagnosis.author.get_full_name(),
+                "org": prescriber_diagnosis.author_prescriber_organization.display_name,
+            },
+            html=True,
+            count=1,
+        )
+        assertNotContains(response, NO_DIAG_TITLE, html=True)
+        assertNotContains(response, NO_DIAG_TEXT, html=True)
+        assertNotContains(response, NO_DIAG_BADGE, html=True)
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
