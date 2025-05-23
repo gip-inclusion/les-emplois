@@ -168,9 +168,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
-        iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(
-            request.user, prefetch=["selected_administrative_criteria__administrative_criteria"]
-        )
+        iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_for_job_seeker(request.user)
         if iae_eligibility_diagnosis:
             iae_eligibility_diagnosis.criteria_display = iae_criteria_for_display(iae_eligibility_diagnosis)
 

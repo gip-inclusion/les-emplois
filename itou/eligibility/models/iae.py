@@ -122,10 +122,8 @@ class EligibilityDiagnosisManager(models.Manager):
             .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
             .filter(Q(with_approval=True) | Q(author_kind=AuthorKind.PRESCRIBER))
             .order_by("-from_prescriber", "-created_at")
+            .prefetch_related("selected_administrative_criteria__administrative_criteria")
         )
-
-        if prefetch:
-            query = query.prefetch_related(*prefetch)
 
         return query.first()
 
