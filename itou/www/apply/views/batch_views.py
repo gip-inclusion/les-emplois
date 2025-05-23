@@ -318,11 +318,13 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
         }
         if self.step != RefuseViewStep.REASON:
             reason_data = self.wizard_session.get(RefuseViewStep.REASON, {})
-
             if refusal_reason := reason_data.get("refusal_reason"):
                 context["refusal_reason_label"] = job_applications_enums.RefusalReason(refusal_reason).label
             else:
                 context["refusal_reason_label"] = "Non renseigné"
+            # FIXME(alaurent) Replace in a week with
+            # context["refusal_reason_label"] = job_applications_enums.RefusalReason(
+            # reason_data["refusal_reason"]).label
             context["refusal_reason_shared_with_job_seeker"] = reason_data.get("refusal_reason_shared_with_job_seeker")
 
         return context
