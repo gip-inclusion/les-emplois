@@ -81,6 +81,7 @@ class Assessment(models.Model):
     )
     name_for_institution = models.CharField(verbose_name="nom du bilan pour les institutions")
     label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
+    with_main_geiq = models.BooleanField(verbose_name="avec les contrats du GEIQ principal", default=False)
     label_antennas = models.JSONField(verbose_name="antennes label concernées par le bilan")
 
     summary_document_file = models.OneToOneField(
@@ -277,6 +278,11 @@ class Assessment(models.Model):
                         final_reviewed_by_institution__isnull=False,
                     )
                 ),
+            ),
+            models.UniqueConstraint(
+                fields=["campaign", "label_geiq_id"],
+                name="geiq_assessment_unique_label_geiq_id_with_main_geiq",
+                condition=models.Q(with_main_geiq=True),
             ),
         ]
 
