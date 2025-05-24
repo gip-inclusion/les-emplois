@@ -96,6 +96,17 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
             raise forms.ValidationError("Ce champ ne peut pas être dans le futur.")
         return ended_at
 
+    def get_changed_data(self):
+        # Return changed_data based on cleaned_data
+        changed_data = []
+        for fieldname, value in self.cleaned_data.items():
+            if fieldname == "is_ongoing":
+                continue
+            field = self.fields[fieldname]
+            if field.has_changed(self.initial[fieldname], value):
+                changed_data.append(fieldname)
+        return changed_data
+
     def clean(self):
         cleaned_data = super().clean()
 

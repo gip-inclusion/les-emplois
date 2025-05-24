@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
 
-from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -26,7 +25,7 @@ from itou.www.gps.forms import (
     JoinGroupChannelForm,
     MembershipsFiltersForm,
 )
-from itou.www.gps.utils import add_beneficiary, get_all_coworkers, send_slack_message_for_gps
+from itou.www.gps.utils import add_beneficiary, get_all_coworkers, logger, send_slack_message_for_gps
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
@@ -45,6 +44,7 @@ def show_gps_as_a_nav_entry(request):
 
 @check_request(is_allowed_to_use_gps)
 def group_list(request, current, template_name="gps/group_list.html"):
+    logger.info(f"GPS visit_list_groups{'_old' if current is False else ''}")
     qs = FollowUpGroupMembership.objects.filter(member=request.user, is_active=True)
 
     if current:
@@ -114,9 +114,16 @@ class GroupDetailsMixin:
             "can_print_page": True,
         }
 
+    def get_logger_base_extra(self):
+        return {"group": self.group.pk, "membership": self.membership.pk}
+
 
 class GroupMembershipsView(GroupDetailsMixin, TemplateView):
     template_name = "gps/group_memberships.html"
+
+    def get(self, request, *args, **kwargs):
+        logger.info("GPS visit_group_memberships", extra=self.get_logger_base_extra())
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -160,6 +167,10 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
 class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
     template_name = "gps/group_beneficiary.html"
 
+    def get(self, request, *args, **kwargs):
+        logger.info("GPS visit_group_beneficiary", extra=self.get_logger_base_extra())
+        return super().get(request, *args, **kwargs)
+
     def get_live_department_codes(self):
         """For the initial release only some departments have the feature"""
         return [
@@ -188,6 +199,10 @@ class GroupBeneficiaryView(GroupDetailsMixin, TemplateView):
 class GroupContributionView(GroupDetailsMixin, TemplateView):
     template_name = "gps/group_contribution.html"
 
+    def get(self, request, *args, **kwargs):
+        logger.info("GPS visit_group_contribution", extra=self.get_logger_base_extra())
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context | {
@@ -202,6 +217,10 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
     form_class = FollowUpGroupMembershipForm
     model = FollowUpGroupMembership
 
+    def get(self, request, *args, **kwargs):
+        logger.info("GPS visit_group_edition", extra=self.get_logger_base_extra())
+        return super().get(request, *args, **kwargs)
+
     def get_object(self, queryset=None):
         return self.membership
 
@@ -213,6 +232,35 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("gps:group_contribution", args=(self.group.pk,))
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        changed_data = form.get_changed_data()
+        if "reason" in changed_data:
+            logger.info(
+                "GPS changed_reason",
+                extra=self.get_logger_base_extra() | {"length": len(form.cleaned_data["reason"])},
+            )
+        if "started_at" in changed_data:
+            logger.info("GPS changed_start_date", extra=self.get_logger_base_extra())
+        if "ended_at" in changed_data:
+            logger.info("GPS changed_end_date", extra=self.get_logger_base_extra())
+        if "is_referent" in changed_data:
+            logger.info(
+                "GPS changed_referent",
+                extra=self.get_logger_base_extra() | {"state": form.cleaned_data["is_referent"]},
+            )
+        return res
+
+
+def get_user_kind_display(user):
+    if user.kind == UserKind.EMPLOYER:
+        return "employeur"
+    elif user.kind == UserKind.PRESCRIBER:
+        if user.is_prescriber_with_authorized_org_memberships:
+            return "prescripteur habilité"
+        return "orienteur"
+    raise ValueError("Invalid user kind: %s", user.kind)
 
 
 @require_POST
@@ -230,7 +278,27 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
         User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
         public_id=target_participant_public_id,
     )
-    log_contact_info_display(request.user, follow_up_group, target_participant, mode)
+    are_colleagues = False
+    if request.organizations and request.user.kind == target_participant.kind:
+        org_ids = [org.pk for org in request.organizations]
+        if request.user.is_employer:
+            are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
+        if request.user.is_prescriber:
+            are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
+
+    logger.info(
+        "GPS display_contact_information",
+        extra={
+            "group": group_id,
+            "target_participant": target_participant.pk,
+            "target_participant_type": get_user_kind_display(target_participant),
+            "beneficiary": follow_up_group.beneficiary_id,
+            "current_user": request.user.pk,
+            "current_user_type": get_user_kind_display(request.user),
+            "mode": mode,
+            "are_colleagues": are_colleagues,
+        },
+    )
     return render(request, template_name, {"member": target_participant})
 
 
@@ -257,6 +325,7 @@ def ask_access(request, group_id):
             f"<{beneficiary_admin_url}|{mask_unless(follow_up_group.beneficiary.get_full_name(), False)}> "
             f"(<{membership_url}|relation>)."
         )
+        logger.info("GPS group_requested_full_access", extra={"group": group_id, "membership": membership.pk})
     return HttpResponse(
         '<button class="btn btn-sm btn-primary" disabled>Demander l’autorisation d’un administrateur</button>'
     )
@@ -276,6 +345,8 @@ def join_group(request, template_name="gps/join_group.html"):
     if request.POST and form.is_valid():
         return HttpResponseRedirect(urls[form.cleaned_data["channel"]])
 
+    logger.info("GPS visit_join_group_index")
+
     context = {
         "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("gps:group_list")),
         "can_use_gps_advanced_features": is_allowed_to_use_gps_advanced_features(request),
@@ -292,8 +363,10 @@ def join_group_from_coworker(request, template_name="gps/join_group_from_coworke
     form = JobSeekersFollowedByCoworkerSearchForm(data=request.POST or None, organizations=request.organizations)
 
     if request.method == "POST" and form.is_valid():
-        add_beneficiary(request, form.job_seeker)
+        add_beneficiary(request, form.job_seeker, channel="coworker")
         return HttpResponseRedirect(reverse("gps:group_list"))
+
+    logger.info("GPS visit_join_group_from_coworker")
 
     context = {
         "form": form,
@@ -336,7 +409,7 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
             )
 
         if form.data.get("confirm"):
-            add_beneficiary(request, job_seeker)
+            add_beneficiary(request, job_seeker, channel="nir")
             return HttpResponseRedirect(reverse("gps:group_list"))
 
         context |= {
@@ -345,6 +418,8 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
             "job_seeker": job_seeker,
             "nir_not_found": job_seeker is None,
         }
+
+    logger.info("GPS visit_join_group_from_nir")
 
     return render(request, template_name, context)
 
@@ -411,14 +486,14 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
 
         # For authorized prescribers + employers
         if form.data.get("confirm") and is_allowed_to_use_gps_advanced_features(request):
-            add_beneficiary(request, job_seeker)
+            add_beneficiary(request, job_seeker, channel="name_and_email")
             return HttpResponseRedirect(reverse("gps:group_list"))
 
         # For non authorized prescribers
         if form.data.get("ask"):
             job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
             user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(request.user.pk,)))
-            membership = add_beneficiary(request, job_seeker, is_active=False)
+            membership = add_beneficiary(request, job_seeker, is_active=False, channel="name_and_email")
             membership_url = get_absolute_url(
                 reverse("admin:gps_followupgroupmembership_change", args=(membership.pk,))
             )
@@ -428,6 +503,8 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
                 f"(<{membership_url}|relation>)."
             )
             return HttpResponseRedirect(reverse("gps:group_list"))
+
+        logger.info("GPS visit_join_group_from_name_and_email")
 
         context |= {
             # Ask the sender to confirm the found user is correct
