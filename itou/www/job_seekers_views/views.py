@@ -552,7 +552,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
             if self.form.data.get("confirm"):
                 if not can_add_nir:
                     if self.is_gps:
-                        gps_utils.add_beneficiary(request, job_seeker)
+                        gps_utils.add_beneficiary(request, job_seeker, created=True)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
                 try:
@@ -571,7 +571,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
                     if self.is_gps:
-                        gps_utils.add_beneficiary(request, job_seeker)
+                        gps_utils.add_beneficiary(request, job_seeker, created=True)
                     return HttpResponseRedirect(self.get_exit_url(job_seeker))
 
         return self.render_to_response(
@@ -859,7 +859,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                     .exclude(pk=user.pk)
                     .exists()
                 )
-                gps_utils.add_beneficiary(request, user, notify_duplicate)
+                gps_utils.add_beneficiary(request, user, notify_duplicate, created=True)
             else:
                 FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
 
