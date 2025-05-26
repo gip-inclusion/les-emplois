@@ -425,6 +425,16 @@ def stats_ft_beneficiaries(request):
     )
 
 
+def stats_ft_hiring(request):
+    return render_stats_ft(
+        request=request,
+        page_title="Analyse de l'ensemble des candidatures reçues par les SIAE",
+        # The Metabase filter is not "locked" so it's not required,
+        # and sending the parameter for DGFT will break because of the max URL length
+        with_region_param=not request.current_organization.is_dgft,
+    )
+
+
 def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied

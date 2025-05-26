@@ -107,6 +107,11 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "wo1GOe",
         "tally_embed_form_id": "w2yPrL",
     },
+    "stats_ft_hiring": {
+        "dashboard_id": 160,
+        "tally_popup_form_id": "wo1EYP",
+        "tally_embed_form_id": "mBlaYQ",
+    },
     #
     # Authorized Prescribers' stats
     #

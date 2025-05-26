@@ -29,6 +29,7 @@ urlpatterns = [
     path("pe/state/main", views.stats_ft_state_main, name="stats_ft_state_main"),
     path("pe/state/raw", views.stats_ft_state_raw, name="stats_ft_state_raw"),
     path("pe/beneficiaries", views.stats_ft_beneficiaries, name="stats_ft_beneficiaries"),
+    path("pe/hiring", views.stats_ft_hiring, name="stats_ft_hiring"),
     # Authorized prescribers' stats
     path("ph/state/main", views.stats_ph_state_main, name="stats_ph_state_main"),
     path("ph/beneficiaries", views.stats_ph_beneficiaries, name="stats_ph_beneficiaries"),
