@@ -7,6 +7,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
+from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
@@ -17,7 +18,6 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser, InactiveUser
 from itou.utils.command import BaseCommand
-from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 logger = logging.getLogger(__name__)

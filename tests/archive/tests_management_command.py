@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.archive.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -14,7 +15,6 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.jobs.models import Appellation, Rome
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import JobDescriptionFactory
 from tests.eligibility.factories import (
