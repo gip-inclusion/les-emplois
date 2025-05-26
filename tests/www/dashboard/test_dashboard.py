@@ -742,7 +742,7 @@ class TestDashboardView:
         assertContains(response, self.SUSPEND_TEXT)
 
     @freeze_time("2022-09-15")
-    def test_jobseeker_approval_card(self, client):
+    def test_jobseeker_approval_card(self, client, snapshot):
         WAITING_PERIOD_WITH_VALID_DIAGNOSIS = (
             "Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau "
             "diagnostic d’éligibilité IAE."
@@ -768,7 +768,8 @@ class TestDashboardView:
         assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
 
         approval = ApprovalFactory(user=user, start_at=date(2022, 6, 21), end_at=date(2022, 12, 6))
-        response = client.get(url)
+        with assertSnapshotQueries(snapshot(name="job seeker with approval queries")):
+            response = client.get(url)
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, format_approval_number(approval))
         assertContains(response, "<small>Date de début</small><strong>21/06/2022</strong>", html=True)
