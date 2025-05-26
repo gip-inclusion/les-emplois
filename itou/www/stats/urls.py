@@ -20,6 +20,7 @@ urlpatterns = [
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
     path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
     path("cd/orga_etp", views.stats_cd_orga_etp, name="stats_cd_orga_etp"),
+    path("cd/beneficiaries", views.stats_cd_beneficiaries, name="stats_cd_beneficiaries"),
     # Prescriber stats - FT.
     # Legacy `pe` term is used in URLs for retroactivity in Matomo stats but in fact it means `ft`.
     path("pe/delay/raw", views.stats_ft_delay_raw, name="stats_ft_delay_raw"),
@@ -27,8 +28,10 @@ urlpatterns = [
     path("pe/conversion/raw", views.stats_ft_conversion_raw, name="stats_ft_conversion_raw"),
     path("pe/state/main", views.stats_ft_state_main, name="stats_ft_state_main"),
     path("pe/state/raw", views.stats_ft_state_raw, name="stats_ft_state_raw"),
+    path("pe/beneficiaries", views.stats_ft_beneficiaries, name="stats_ft_beneficiaries"),
     # Authorized prescribers' stats
     path("ph/state/main", views.stats_ph_state_main, name="stats_ph_state_main"),
+    path("ph/beneficiaries", views.stats_ph_beneficiaries, name="stats_ph_beneficiaries"),
     # Institution stats - DDETS IAE - department level.
     # Legacy `ddets` term is used in URLs for retroactivity in Matomo stats but in fact it means `ddets_iae`.
     path(
