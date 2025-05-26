@@ -1372,141 +1372,74 @@
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
       </div>
-      <section class="s-section mb-3 mb-md-5">
+      <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
-              <div class="row mt-3 mt-md-4">
-                  <h3>
-                      Indicateurs clés
-                  </h3>
-                  <p class="fs-sm mb-3">
-                      Dernière mise à jour des données du flux IAE : Jamais
-                  </p>
-                  <div class="col-12">
-                      <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.
-                                  </p>
-                              </div>
-                              <div>
-                                  <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">
-                                      Consulter ces données
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.
-                                  </p>
-                              </div>
-                          </div>
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A%
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C'est le taux d'embauches en auto prescription.
-                                  </p>
-                              </div>
-                              <div>
-                                  <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">
-                                      Consulter ces données
-                                  </a>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
-                      <div class="c-box p-0 h-100">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
                           <div class="p-3 p-lg-4">
-                              <span class="h4 mb-0">
-                                  Données personnalisées
-                              </span>
+                              <h4 class="mb-0">
+                                  Conventionnement
+                              </h4>
                           </div>
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/auto_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/orga_etp">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Les auto-prescription et suivi du contrôle à posteriori des structures de mon département
+                                              Suivi des effectifs annuels et mensuels (ETP)
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 mt-3 mt-lg-4">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/ph_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/ph_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/state">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Suivi des prescriptions des prescripteurs habilités de mon département
+                                              Analyse des candidatures émises par les acteurs AHI
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/follow_prolongation">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Suivi des demandes de prolongation de mon département
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <!-- Stats temporarily suspended until we stabilize them
-                              <li class="d-flex justify-content-between align-items-center mb-3">
-                                  <a href="/stats/ddets/iae" class="btn-link btn-ico">
-                                      <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                      <span>Données IAE de mon département</span>
-                                  </a>
-                              </li>
-                          -->
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/hiring">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                          </i>
-                                          <span>
-                                              Données facilitation à l'embauche de mon département
+                                              Analyse des auto-prescriptions et de leur contrôle
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/state">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/hiring">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Prescriptions des acteurs AHI de ma région
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/ddets/orga_etp">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                          </i>
-                                          <span>
-                                              Suivre les effectifs annuels et mensuels en ETP des structures de mon département
+                                              Analyse des candidatures reçues et de leur traitement
                                           </span>
                                       </a>
                                   </li>
@@ -1514,14 +1447,12 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
-                      <div class="c-box p-0 h-100">
-                          <div class="p-3 p-lg-4">
-                              <span class="h4 mb-0">
-                                  Données publiques
-                              </span>
-                          </div>
-                          <div class="px-3 px-lg-4">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données publiques
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
@@ -1819,7 +1750,7 @@
                                           <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                           </i>
                                           <span>
-                                              Suivi des prescriptions des prescripteurs habilités de ma région
+                                              Analyse des candidatures émises et de leur traitement
                                           </span>
                                       </a>
                                   </li>
@@ -1876,7 +1807,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Les auto-prescription et suivi du contrôle à posteriori des structures de mon département
+                                                  Analyse des auto-prescriptions et de leur contrôle
                                               </span>
                                           </a>
                                       </li>
@@ -1885,16 +1816,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Suivi des prescriptions des prescripteurs habilités de mon département
-                                              </span>
-                                          </a>
-                                      </li>
-                                      <li class="d-flex justify-content-between align-items-center mb-3">
-                                          <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_follow_prolongation">
-                                              <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                              </i>
-                                              <span>
-                                                  Suivi des demandes de prolongation de mon département
+                                                  Analyse des candidatures émises et de leur traitement
                                               </span>
                                           </a>
                                       </li>
@@ -1903,7 +1825,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Données facilitation à l'embauche de mon département
+                                                  Analyse des candidatures reçues et de leur traitement
                                               </span>
                                           </a>
                                       </li>
@@ -1912,7 +1834,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Prescriptions des acteurs AHI de ma région
+                                                  Analyse des candidatures émises par les acteurs AHI
                                               </span>
                                           </a>
                                       </li>
@@ -1921,7 +1843,7 @@
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Suivre les effectifs annuels et mensuels en ETP des structures de mon département
+                                                  Suivi des effectifs annuels et mensuels  (ETP)
                                               </span>
                                           </a>
                                       </li>
@@ -2247,141 +2169,74 @@
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
       </div>
-      <section class="s-section mb-3 mb-md-5">
+      <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
-              <div class="row mt-3 mt-md-4">
-                  <h3>
-                      Indicateurs clés
-                  </h3>
-                  <p class="fs-sm mb-3">
-                      Dernière mise à jour des données du flux IAE : Jamais
-                  </p>
-                  <div class="col-12">
-                      <div class="d-flex flex-column flex-lg-row gap-3 gap-lg-4 p-3 p-lg-4 bg-light rounded-3">
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C’est le nombre de candidats dans la file active IAE de votre territoire depuis plus de 30 jours à l’instant t.
-                                  </p>
-                              </div>
-                              <div>
-                                  <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/bilan-candidatures-iae/" rel="noopener" target="_blank">
-                                      Consulter ces données
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C’est le nombre de fiches de poste en tension chez les SIAE de votre territoire à l’instant t.
-                                  </p>
-                              </div>
-                          </div>
-                          <div class="d-flex flex-column w-100">
-                              <div class="flex-grow-1">
-                                  <p class="mb-0 mb-lg-3">
-                                      <i aria-hidden="true" class="ri-bar-chart-line ri-2x text-pilotage">
-                                      </i>
-                                      <span class="h1">
-                                          N/A%
-                                      </span>
-                                  </p>
-                                  <p>
-                                      C'est le taux d'embauches en auto prescription.
-                                  </p>
-                              </div>
-                              <div>
-                                  <a aria-label="En savoir plus sur ces données (ouverture dans un nouvel onglet)" class="btn btn-link ps-0 has-external-link" href="/stats/redirect/auto_prescription" rel="noopener" target="_blank">
-                                      Consulter ces données
-                                  </a>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
-                      <div class="c-box p-0 h-100">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
                           <div class="p-3 p-lg-4">
-                              <span class="h4 mb-0">
-                                  Données personnalisées
-                              </span>
+                              <h4 class="mb-0">
+                                  Conventionnement
+                              </h4>
                           </div>
                           <div class="px-3 px-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/auto_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/orga_etp">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Les auto-prescription et suivi du contrôle à posteriori des structures de ma région
+                                              Suivi des effectifs annuels et mensuels (ETP)
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 mt-3 mt-lg-4">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/ph_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/ph_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/state">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Suivi des prescriptions des prescripteurs habilités de ma région
+                                              Analyse des candidatures émises par les acteurs AHI
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/follow_prolongation">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Suivi des demandes de prolongation de ma région
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <!-- Stats temporarily suspended until we stabilize them
-                              <li class="d-flex justify-content-between align-items-center mb-3">
-                                  <a href="/stats/dreets/iae" class="btn-link btn-ico">
-                                      <i class="ri-bar-chart-line ri-lg fw-normal align-self-start" aria-hidden="true"></i>
-                                      <span>Données IAE de ma région</span>
-                                  </a>
-                              </li>
-                          -->
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/hiring">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                          </i>
-                                          <span>
-                                              Données facilitation à l'embauche des structures de ma région
+                                              Analyse des auto-prescriptions et de leur contrôle
                                           </span>
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/state">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/hiring">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
-                                              Prescriptions des acteurs AHI de ma région
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/dreets/orga_etp">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                          </i>
-                                          <span>
-                                              Suivre les effectifs annuels et mensuels en ETP des structures de ma région
+                                              Analyse des candidatures reçues et de leur traitement
                                           </span>
                                       </a>
                                   </li>
@@ -2389,14 +2244,12 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
-                      <div class="c-box p-0 h-100">
-                          <div class="p-3 p-lg-4">
-                              <span class="h4 mb-0">
-                                  Données publiques
-                              </span>
-                          </div>
-                          <div class="px-3 px-lg-4">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données publiques
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
                               <ul class="list-unstyled mb-lg-5">
                                   <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">

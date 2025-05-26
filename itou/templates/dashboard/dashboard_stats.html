@@ -61,6 +61,8 @@
                                 {% include "dashboard/includes/stats/prescriber_ft.html" %}
                             {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
                                 {% include "dashboard/includes/stats/prescriber_dept.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.SD_IAE %}
+                                {% include "dashboard/includes/stats/sd_iae.html" %}
                             {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
                                 {% include "dashboard/includes/stats/dgefp.html" %}
                             {% endif %}

@@ -525,19 +525,11 @@ def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats
 
 
 def stats_ddets_iae_auto_prescription(request):
-    return render_stats_ddets_iae(request=request, page_title="Focus auto-prescription")
+    return render_stats_ddets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
 
 
 def stats_ddets_iae_ph_prescription(request):
-    return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
-
-
-def stats_ddets_iae_follow_prolongation(request):
-    return render_stats_ddets_iae(request=request, page_title="Suivi des demandes de prolongation")
-
-
-def stats_ddets_iae_iae(request):
-    return render_stats_ddets_iae(request=request, page_title="Données IAE de mon département")
+    return render_stats_ddets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
 
 
 def stats_ddets_iae_siae_evaluation(request):
@@ -553,14 +545,14 @@ def stats_ddets_iae_siae_evaluation(request):
 def stats_ddets_iae_hiring(request):
     return render_stats_ddets_iae(
         request=request,
-        page_title="Données facilitation de l'embauche de mon département",
+        page_title="Analyse des candidatures reçues et de leur traitement",
     )
 
 
 def stats_ddets_iae_state(request):
     return render_stats_ddets_iae(
         request=request,
-        page_title="Suivi des prescriptions des AHI de ma région",
+        page_title="Analyse des candidatures émises par les acteurs AHI",
         extend_stats_to_whole_region=True,
     )
 
@@ -571,7 +563,7 @@ def stats_ddets_iae_orga_etp(request):
 
     return render_stats_ddets_iae(
         request=request,
-        page_title="Suivi des effectifs annuels et mensuels en ETP",
+        page_title="Suivi des effectifs annuels et mensuels (ETP)",
     )
 
 
@@ -610,35 +602,24 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None):
 
 
 def stats_dreets_iae_auto_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Focus auto-prescription")
+    return render_stats_dreets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
 
 
 def stats_dreets_iae_ph_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
-
-
-def stats_dreets_iae_follow_prolongation(request):
-    return render_stats_dreets_iae(request=request, page_title="Suivi des demandes de prolongation")
-
-
-def stats_dreets_iae_iae(request):
-    return render_stats_dreets_iae(
-        request=request,
-        page_title="Données IAE de ma région",
-    )
+    return render_stats_dreets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
 
 
 def stats_dreets_iae_hiring(request):
     return render_stats_dreets_iae(
         request=request,
-        page_title="Données facilitation de l'embauche de ma région",
+        page_title="Analyse des candidatures reçues et de leur traitement",
     )
 
 
 def stats_dreets_iae_state(request):
     return render_stats_dreets_iae(
         request=request,
-        page_title="Suivi des prescriptions des AHI de ma région",
+        page_title="Analyse des candidatures émises par les acteurs AHI",
     )
 
 
@@ -648,7 +629,7 @@ def stats_dreets_iae_orga_etp(request):
 
     return render_stats_dreets_iae(
         request=request,
-        page_title="Suivi des effectifs annuels et mensuels en ETP",
+        page_title="Suivi des effectifs annuels et mensuels (ETP)",
     )
 
 
