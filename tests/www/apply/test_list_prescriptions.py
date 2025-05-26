@@ -29,6 +29,7 @@ from tests.utils.test import (
     assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
+    pretty_indented,
 )
 
 
@@ -262,7 +263,7 @@ def test_filters(client, snapshot):
     response = client.get(reverse("apply:list_prescriptions"))
     assert response.status_code == 200
     filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
-    assert str(filter_form) == snapshot()
+    assert pretty_indented(filter_form) == snapshot()
 
 
 def test_archived(client):
@@ -375,7 +376,7 @@ def test_list_snapshot(client, snapshot):
     ]:
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
-        assert str(page) == snapshot(name="empty")
+        assert pretty_indented(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
@@ -423,7 +424,7 @@ def test_list_snapshot(client, snapshot):
             ),
         ),
     )
-    assert str(page) == snapshot(name="applications list")
+    assert pretty_indented(page) == snapshot(name="applications list")
 
     # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
@@ -448,7 +449,7 @@ def test_list_snapshot(client, snapshot):
             )
         ),
     )
-    assert str(page) == snapshot(name="applications table")
+    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_exports_without_organization(client):
@@ -478,7 +479,7 @@ def test_exports_as_pole_emploi_prescriber(client, snapshot):
     assert_previous_step(response, reverse("dashboard:index"))
     assertContains(response, "Toutes les candidatures")
     soup = parse_response_to_soup(response, selector=f"#{BESOIN_DUN_CHIFFRE}")
-    assert str(soup) == snapshot
+    assert pretty_indented(soup) == snapshot
 
 
 def test_exports_as_employer(client):
@@ -558,10 +559,10 @@ def test_reset_filter_button_snapshot(client, snapshot):
     filter_params = {"states": [job_application.state]}
     response = client.get(reverse("apply:list_prescriptions"), filter_params)
 
-    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
         name="reset-filter button in list view"
     )
-    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
         name="off-canvas buttons in list view"
     )
 
@@ -569,10 +570,10 @@ def test_reset_filter_button_snapshot(client, snapshot):
     filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_prescriptions"), filter_params)
 
-    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
         name="reset-filter button in table view & created_at ascending order"
     )
-    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
         name="off-canvas buttons in table view & created_at ascending order"
     )
 

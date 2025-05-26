@@ -14,7 +14,7 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestCardView:
@@ -44,7 +44,7 @@ class TestCardView:
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = client.get(url)
         soup = parse_response_to_soup(response, selector="#main")
-        assert str(soup) == snapshot()
+        assert pretty_indented(soup) == snapshot()
 
     def test_card_tally_url_with_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
@@ -53,14 +53,14 @@ class TestCardView:
         client.force_login(user)
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
-        assert str(soup) == snapshot()
+        assert pretty_indented(soup) == snapshot()
 
     def test_card_tally_url_no_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
-        assert str(soup) == snapshot()
+        assert pretty_indented(soup) == snapshot()
 
     def test_card_no_active_jobs(self, client, snapshot):
         company = CompanyFactory(name="les petits jardins", with_membership=True)
@@ -75,7 +75,7 @@ class TestCardView:
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
-        assert str(nav_tabs_soup) == snapshot(name="nav-tabs")
+        assert pretty_indented(nav_tabs_soup) == snapshot(name="nav-tabs")
 
         tab_content_soup = parse_response_to_soup(
             response,
@@ -90,7 +90,7 @@ class TestCardView:
                 ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
-        assert str(tab_content_soup) == snapshot(name="tab-content")
+        assert pretty_indented(tab_content_soup) == snapshot(name="tab-content")
 
         assertContains(response, self.APPLY)
         assertContains(response, self.SPONTANEOUS_APPLICATIONS_OPEN)
@@ -126,7 +126,7 @@ class TestCardView:
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
-        assert str(nav_tabs_soup) == snapshot(name="nav-tabs")
+        assert pretty_indented(nav_tabs_soup) == snapshot(name="nav-tabs")
 
         tab_content_soup = parse_response_to_soup(
             response,
@@ -141,7 +141,7 @@ class TestCardView:
                 ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
-        assert str(tab_content_soup) == snapshot(name="tab-content")
+        assert pretty_indented(tab_content_soup) == snapshot(name="tab-content")
 
         assertContains(response, self.APPLY)
 
@@ -168,7 +168,7 @@ class TestCardView:
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
-        assert str(nav_tabs_soup) == snapshot(name="nav-tabs")
+        assert pretty_indented(nav_tabs_soup) == snapshot(name="nav-tabs")
 
         tab_content_soup = parse_response_to_soup(
             response,
@@ -188,7 +188,7 @@ class TestCardView:
                 ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
-        assert str(tab_content_soup) == snapshot(name="tab-content")
+        assert pretty_indented(tab_content_soup) == snapshot(name="tab-content")
 
         assertContains(response, self.APPLY)
 
@@ -204,7 +204,7 @@ class TestCardView:
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
-        assert str(nav_tabs_soup) == snapshot(name="nav-tabs")
+        assert pretty_indented(nav_tabs_soup) == snapshot(name="nav-tabs")
 
         tab_content_soup = parse_response_to_soup(
             response,
@@ -219,7 +219,7 @@ class TestCardView:
                 ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
-        assert str(tab_content_soup) == snapshot(name="tab-content")
+        assert pretty_indented(tab_content_soup) == snapshot(name="tab-content")
 
         assertNotContains(response, self.APPLY)
 
@@ -233,7 +233,7 @@ class TestCardView:
         )
         response = client.get(company_card_initial_url)
         navinfo = parse_response_to_soup(response, selector=".c-navinfo")
-        assert str(navinfo) == snapshot(name="navinfo-company-card")
+        assert pretty_indented(navinfo) == snapshot(name="navinfo-company-card")
 
         # Has link to job description
         job = company.job_description_through.first()
@@ -243,7 +243,7 @@ class TestCardView:
         # Job description card has link back to list again
         response = client.get(job_description_link)
         navinfo = parse_response_to_soup(response, selector=".c-navinfo")
-        assert str(navinfo) == snapshot(name="navinfo-job-description")
+        assert pretty_indented(navinfo) == snapshot(name="navinfo-job-description")
 
         # And also a link to the company card with a return link to list_url (the same as the first visited page)
         company_card_url_other_formatting = f"{company_card_base_url}?back_url={urlencode(list_url)}"
@@ -393,7 +393,7 @@ class TestJobDescriptionCardView:
 
         response = client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
         navinfo = parse_response_to_soup(response, selector=".c-navinfo")
-        assert str(navinfo) == snapshot(name="navinfo")
+        assert pretty_indented(navinfo) == snapshot(name="navinfo")
 
     def test_job_description_card_render_markdown(self, client):
         company = CompanyWithMembershipAndJobsFactory()
@@ -452,12 +452,12 @@ class TestJobDescriptionCardView:
         client.force_login(JobSeekerFactory(pk=10))
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
-        assert str(soup) == snapshot(name="without_other_jobs")
+        assert pretty_indented(soup) == snapshot(name="without_other_jobs")
         # Create other job_description
         JobDescriptionFactory(pk=43, company=job_description.company)
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
-        assert str(soup) == snapshot(name="with_other_jobs")
+        assert pretty_indented(soup) == snapshot(name="with_other_jobs")
         # Check link consistency
         assert parse_response_to_soup(response, selector="#recrutements")
 
@@ -471,7 +471,7 @@ class TestJobDescriptionCardView:
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
 
-        assert str(soup) == snapshot()
+        assert pretty_indented(soup) == snapshot()
 
     def test_card_with_job_seeker_public_id(self, client):
         """

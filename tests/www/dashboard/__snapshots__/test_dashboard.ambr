@@ -2,31 +2,32 @@
 # name: TestDashboardView.test_dashboard
   '''
   <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
-  <div class="row">
-      <div class="col-12">
-          <label class="visually-hidden" for="id_city">Ville</label>
-          <div class="input-group input-group-xl input-group-search flex-nowrap">
-              <div class="input-group-text bg-white rounded-start ps-3 pe-2">
-                  <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled"></i>
-              </div>
-              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-  </select>
-              <div class="input-group-text bg-white p-0">
-                  <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                      <i aria-hidden="true" class="ri-search-line fw-medium"></i>
-                      <span class="d-none d-sm-inline-flex me-0 me-sm-1">Rechercher</span>
-                  </button>
+      <div class="row">
+          <div class="col-12">
+              <label class="visually-hidden" for="id_city">
+                  Ville
+              </label>
+              <div class="input-group input-group-xl input-group-search flex-nowrap">
+                  <div class="input-group-text bg-white rounded-start ps-3 pe-2">
+                      <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
+                      </i>
+                  </div>
+                  <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                  </select>
+                  <div class="input-group-text bg-white p-0">
+                      <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
+                          <i aria-hidden="true" class="ri-search-line fw-medium">
+                          </i>
+                          <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+                              Rechercher
+                          </span>
+                      </button>
+                  </div>
               </div>
           </div>
       </div>
-  </div>
+  </form>
   
-                              </form>
   '''
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
@@ -505,14 +506,19 @@
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
           <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
+              <span class="h4 m-0">
+                  GPS – Guide de partage et de suivi
+              </span>
           </div>
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start">
+                          </i>
+                          <span>
+                              Visualiser les bénéficiaires
+                          </span>
                       </a>
                   </li>
               </ul>
@@ -523,6 +529,7 @@
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestDashboardView.test_gps_card[prescriber]
@@ -530,14 +537,19 @@
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
           <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
+              <span class="h4 m-0">
+                  GPS – Guide de partage et de suivi
+              </span>
           </div>
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start">
+                          </i>
+                          <span>
+                              Visualiser les bénéficiaires
+                          </span>
                       </a>
                   </li>
               </ul>
@@ -548,6 +560,7 @@
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestDashboardView.test_gps_card[prescriber_no_org]
@@ -555,14 +568,19 @@
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
           <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
+              <span class="h4 m-0">
+                  GPS – Guide de partage et de suivi
+              </span>
           </div>
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start">
+                          </i>
+                          <span>
+                              Visualiser les bénéficiaires
+                          </span>
                       </a>
                   </li>
               </ul>
@@ -573,6 +591,7 @@
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestDashboardView.test_gps_card[prescriber_non_authorized_org]
@@ -580,14 +599,19 @@
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
           <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS – Guide de partage et de suivi</span>
+              <span class="h4 m-0">
+                  GPS – Guide de partage et de suivi
+              </span>
           </div>
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled">
                   <li class="d-flex justify-content-between align-items-center mb-3">
                       <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
-                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
+                          <i aria-hidden="true" class="ri-article-line ri-lg fw-normal align-self-start">
+                          </i>
+                          <span>
+                              Visualiser les bénéficiaires
+                          </span>
                       </a>
                   </li>
               </ul>
@@ -598,6 +622,7 @@
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestDashboardView.test_jobseeker_approval_card[job seeker with approval queries]
@@ -816,233 +841,234 @@
 # name: TestDashboardView.test_staff_users[full]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="col-12">
-                      <div class="tab-content">
-                          <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
-                              <h2>Vue d’ensemble</h2>
-                              <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
-  <div class="row">
-      <div class="col-12">
-          <label class="visually-hidden" for="id_city">Ville</label>
-          <div class="input-group input-group-xl input-group-search flex-nowrap">
-              <div class="input-group-text bg-white rounded-start ps-3 pe-2">
-                  <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled"></i>
-              </div>
-              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-  </select>
-              <div class="input-group-text bg-white p-0">
-                  <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                      <i aria-hidden="true" class="ri-search-line fw-medium"></i>
-                      <span class="d-none d-sm-inline-flex me-0 me-sm-1">Rechercher</span>
-                  </button>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-                              </form>
-                              <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
-                                  
-                                      <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Admin</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/admin/">
-                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal"></i>
-                      <span>Admin</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                      
-                                          <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Exports de données</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/staff/export-job-applications-unknown-to-ft">
-                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal"></i>
-                      <span>Candidatures inconnues de France Travail</span>
-                  </a>
-              </p>
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/staff/export-ft-api-rejections">
-                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
-                      <span>Rejets de l'API FranceTravail</span>
-                  </a>
-              </p>
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/staff/export-cta">
-                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
-                      <span>Export des prescripteurs et employeurs</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                          <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Actions</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/staff/merge-users">
-                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal"></i>
-                      <span>Fusion de comptes</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                      
-                                      <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Statistiques</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                      <span>Indicateurs à suivre</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="col-12">
+                  <div class="tab-content">
+                      <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
+                          <h2>
+                              Vue d’ensemble
+                          </h2>
+                          <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <label class="visually-hidden" for="id_city">
+                                          Ville
+                                      </label>
+                                      <div class="input-group input-group-xl input-group-search flex-nowrap">
+                                          <div class="input-group-text bg-white rounded-start ps-3 pe-2">
+                                              <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
+                                              </i>
+                                          </div>
+                                          <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                          </select>
+                                          <div class="input-group-text bg-white p-0">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
+                                                  <i aria-hidden="true" class="ri-search-line fw-medium">
+                                                  </i>
+                                                  <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+                                                      Rechercher
+                                                  </span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
                               </div>
-                              
+                          </form>
+                          <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Admin
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/admin/">
+                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Admin
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Exports de données
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/staff/export-job-applications-unknown-to-ft">
+                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Candidatures inconnues de France Travail
+                                                  </span>
+                                              </a>
+                                          </p>
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/staff/export-ft-api-rejections">
+                                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Rejets de l'API FranceTravail
+                                                  </span>
+                                              </a>
+                                          </p>
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/staff/export-cta">
+                                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Export des prescripteurs et employeurs
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Actions
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/staff/merge-users">
+                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Fusion de comptes
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Statistiques
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
+                                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                  </i>
+                                                  <span>
+                                                      Indicateurs à suivre
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
-                          
                       </div>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: TestDashboardView.test_staff_users[partial]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="col-12">
-                      <div class="tab-content">
-                          <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
-                              <h2>Vue d’ensemble</h2>
-                              <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
-                                  
-  
-  
-  
-  
-  <div class="row">
-      <div class="col-12">
-          <label class="visually-hidden" for="id_city">Ville</label>
-          <div class="input-group input-group-xl input-group-search flex-nowrap">
-              <div class="input-group-text bg-white rounded-start ps-3 pe-2">
-                  <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled"></i>
-              </div>
-              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-  </select>
-              <div class="input-group-text bg-white p-0">
-                  <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                      <i aria-hidden="true" class="ri-search-line fw-medium"></i>
-                      <span class="d-none d-sm-inline-flex me-0 me-sm-1">Rechercher</span>
-                  </button>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-                              </form>
-                              <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
-                                  
-                                      <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Admin</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/admin/">
-                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal"></i>
-                      <span>Admin</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                      
-                                      <div class="col mb-3 mb-md-5">
-      <div class="c-box p-0 h-100">
-          <div class="p-3 p-lg-4">
-              <span class="h4 m-0">Statistiques</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <p class="mb-3 mb-lg-5">
-                  <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start"></i>
-                      <span>Indicateurs à suivre</span>
-                  </a>
-              </p>
-          </div>
-      </div>
-  </div>
-  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
-  
-                                  
-                                  
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="col-12">
+                  <div class="tab-content">
+                      <div aria-labelledby="ensemble-tab" class="tab-pane fade show active" id="ensemble" role="tabpanel">
+                          <h2>
+                              Vue d’ensemble
+                          </h2>
+                          <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <label class="visually-hidden" for="id_city">
+                                          Ville
+                                      </label>
+                                      <div class="input-group input-group-xl input-group-search flex-nowrap">
+                                          <div class="input-group-text bg-white rounded-start ps-3 pe-2">
+                                              <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
+                                              </i>
+                                          </div>
+                                          <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                          </select>
+                                          <div class="input-group-text bg-white p-0">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
+                                                  <i aria-hidden="true" class="ri-search-line fw-medium">
+                                                  </i>
+                                                  <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+                                                      Rechercher
+                                                  </span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
                               </div>
-                              
+                          </form>
+                          <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxxl-4 mt-3 mt-md-5">
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Admin
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/admin/">
+                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                  </i>
+                                                  <span>
+                                                      Admin
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col mb-3 mb-md-5">
+                                  <div class="c-box p-0 h-100">
+                                      <div class="p-3 p-lg-4">
+                                          <span class="h4 m-0">
+                                              Statistiques
+                                          </span>
+                                      </div>
+                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                                          <p class="mb-3 mb-lg-5">
+                                              <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
+                                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                  </i>
+                                                  <span>
+                                                      Indicateurs à suivre
+                                                  </span>
+                                              </a>
+                                          </p>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
-                          
                       </div>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---

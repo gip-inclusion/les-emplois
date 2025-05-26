@@ -9,7 +9,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
 def test_wizard(snapshot, client):
@@ -85,7 +85,7 @@ def test_wizard(snapshot, client):
             ("href", wizard_session_name, "[UUID of session]"),
         ],
     )
-    assert str(soup) == snapshot(name="choose-approval")
+    assert pretty_indented(soup) == snapshot(name="choose-approval")
 
     # ERROR : Submit data for the "choose-approval" step when the employee already has an employee record
     # typically if two members of the company want to create the record at the same time

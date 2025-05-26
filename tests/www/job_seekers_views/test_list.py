@@ -31,7 +31,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_session_initialization
 
 
@@ -163,7 +163,7 @@ def test_empty_list(client, url, snapshot):
     organization = PrescriberOrganizationWith2MembershipFactory(not_in_territorial_experimentation=True)
     client.force_login(organization.members.first())
     response = client.get(url)
-    assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
 
 @freeze_time("2024-08-30")
@@ -229,7 +229,9 @@ def test_multiple(client, snapshot):
     client.force_login(prescriber)
     with assertSnapshotQueries(snapshot(name="job seekers list SQL")):
         response = client.get(url)
-        assert str(parse_response_to_soup(response, selector="table")) == snapshot(name="job seekers list table")
+        assert pretty_indented(parse_response_to_soup(response, selector="table")) == snapshot(
+            name="job seekers list table"
+        )
 
         # Address is in search URL
         for i, application in enumerate([job_app, job_app2, job_app3]):
@@ -325,7 +327,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
     with assertSnapshotQueries(snapshot(name="job seekers created by organization list with SQL")):
         response = client.get(url_organization)
         soup = parse_response_to_soup(response, selector="tbody")
-        assert str(soup) == snapshot(name="job seekers list tbody")
+        assert pretty_indented(soup) == snapshot(name="job seekers list tbody")
 
         # Job seekers are displayed for the prescriber
         for job_seeker in [alain, bernard, charlotte]:

@@ -13,7 +13,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 def test_anonymous_user(client):
@@ -54,19 +54,19 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
     client.force_login(prescriber_membership.user)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with diag_and_update_eligibility")
+    assert pretty_indented(soup) == snapshot(name="snapshot with diag_and_update_eligibility")
 
     client.force_login(iae_employer)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot with diag")
 
     non_iae_employer = CompanyMembershipFactory(company__not_subject_to_eligibility=True).user
 
     client.force_login(non_iae_employer)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot without diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot without diag")
 
 
 @freeze_time("2024-08-14")
@@ -88,7 +88,7 @@ def test_with_approval(client, snapshot):
             ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
         ],
     )
-    assert str(soup) == snapshot(name="HTML page")
+    assert pretty_indented(soup) == snapshot(name="HTML page")
 
 
 @freeze_time("2024-08-14")
@@ -112,18 +112,18 @@ def test_single_geiq_diag_from_prescriber(client, snapshot):
     client.force_login(geiq_employer)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with diag and details")
+    assert pretty_indented(soup) == snapshot(name="snapshot with diag and details")
 
     client.force_login(prescriber_membership.user)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with diag but without details")
+    assert pretty_indented(soup) == snapshot(name="snapshot with diag but without details")
 
     non_geiq_employer = CompanyMembershipFactory(company__subject_to_eligibility=True).user
     client.force_login(non_geiq_employer)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot without diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot without diag")
 
 
 @freeze_time("2024-08-14")
@@ -151,7 +151,7 @@ def test_both_diag_from_prescriber(client, snapshot):
     client.force_login(prescriber_membership.user)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with GEIQ & IAE diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot with GEIQ & IAE diag")
 
 
 @freeze_time("2024-08-14")
@@ -188,17 +188,17 @@ def test_both_diag_from_company(client, snapshot):
     client.force_login(authorized_prescriber)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with both diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot with both diag")
 
     client.force_login(geiq_membership.user)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with GEIQ diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot with GEIQ diag")
 
     client.force_login(iae_membership.user)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
-    assert str(soup) == snapshot(name="snapshot with IAE diag")
+    assert pretty_indented(soup) == snapshot(name="snapshot with IAE diag")
 
 
 @freeze_time("2024-08-14")
@@ -234,7 +234,7 @@ def test_job_application_tab(client, snapshot):
             ("href", f"/company/{job_application_2.to_company.pk}/card", "/company/[PK of Company]/card"),
         ],
     )
-    assert str(soup) == snapshot
+    assert pretty_indented(soup) == snapshot
 
 
 @freeze_time("2024-08-14")

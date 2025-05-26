@@ -16,7 +16,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 
@@ -303,7 +303,7 @@ class TestEditUserInfoView:
         assert not response.context["form"].is_valid()
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
         results_section = parse_response_to_soup(response, selector="#id_address_for_autocomplete")
-        assert str(results_section) == snapshot(name="user address input on error")
+        assert pretty_indented(results_section) == snapshot(name="user address input on error")
 
         # Now try again in fallback mode (ban_api_resolved_address is missing)
         post_data = post_data | self.address_form_fields(fill_mode="fallback")
@@ -325,7 +325,7 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
         results_section = parse_response_to_soup(response, selector="#id_address_for_autocomplete")
-        assert str(results_section) == snapshot(name="user address input")
+        assert pretty_indented(results_section) == snapshot(name="user address input")
 
     def test_update_address_unavailable_api(self, client):
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
@@ -660,7 +660,7 @@ class TestEditUserInfoView:
         # No phone and no title and no address
         response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
-        assert str(warning_text) == snapshot(name="missing title warning with phone and address")
+        assert pretty_indented(warning_text) == snapshot(name="missing title warning with phone and address")
 
         # Phone but no title and no birthdate
         user.phone = "0123456789"
@@ -675,7 +675,7 @@ class TestEditUserInfoView:
         user.jobseeker_profile.save(update_fields={"birthdate"})
         response = client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
-        assert str(warning_text) == snapshot(name="missing title warning without phone and with birthdate")
+        assert pretty_indented(warning_text) == snapshot(name="missing title warning without phone and with birthdate")
 
         # No phone but title
         user.phone = ""

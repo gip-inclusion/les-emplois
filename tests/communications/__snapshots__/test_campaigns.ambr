@@ -5,29 +5,43 @@
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
               <div class="modal-header">
-                  <h3 class="modal-title" id="news-modal-label">Il y a du nouveau !</h3>
-                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                  <h3 class="modal-title" id="news-modal-label">
+                      Il y a du nouveau !
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
               </div>
               <div class="modal-body">
                   <div aria-hidden="true" class="text-center mb-5">
                       <img alt="Dessin d'étoiles" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
                   </div>
-                  
-                      <h6>1. Item A</h6>
-                      <p>Item A</p>
-                  
-                      <h6>2. Item B</h6>
-                      <p>Item B</p>
-                  
-                      <h6>3. Item C</h6>
-                      <p>Item C</p>
-                  
+                  <h6>
+                      1. Item A
+                  </h6>
+                  <p>
+                      Item A
+                  </p>
+                  <h6>
+                      2. Item B
+                  </h6>
+                  <p>
+                      Item B
+                  </p>
+                  <h6>
+                      3. Item C
+                  </h6>
+                  <p>
+                      Item C
+                  </p>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">Voir toutes les nouveautés</a>
+                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
+                      Voir toutes les nouveautés
+                  </a>
               </div>
           </div>
       </div>
   </div>
+  
   '''
 # ---

@@ -2,69 +2,92 @@
 # name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_no_pending_request
   '''
   <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
-          </span>
+      <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
+      </i>
+      Invitation envoyée
+      <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
+      </i>
+  </span>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[invitation_request_created]
   '''
   <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
-          </span>
+      <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
+      </i>
+      Invitation envoyée
+      <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
+      </i>
+  </span>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_still_too_recent]
   '''
   <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
-          </span>
+      <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
+      </i>
+      Invitation envoyée
+      <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
+      </i>
+  </span>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_too_recent]
   '''
   <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
-              <i aria-hidden="true" class="ri-check-line ri-xl fw-medium"></i>
-              Invitation envoyée
-              <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. &lt;br&gt; Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0"></i>
-          </span>
+      <i aria-hidden="true" class="ri-check-line ri-xl fw-medium">
+      </i>
+      Invitation envoyée
+      <i aria-label="Une relance sera envoyée 3 jours après. Vous pourrez renvoyer une invitation sous 10J." class="ri-error-warning-line" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après. <br> Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" role="button" tabindex="0">
+      </i>
+  </span>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_invalid_job_application
   '''
   <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
-                  <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
-                  Une erreur s’est produite, l’envoi n’a pas abouti
-              </span>
+      <i aria-hidden="true" class="ri-alert-line fw-medium">
+      </i>
+      Une erreur s’est produite, l’envoi n’a pas abouti
+  </span>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_configured_with_failed_rdv_insertion_exchange
   '''
   <form class="d-inline-flex" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv-insertion-invite" hx-swap="outerHTML">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-danger btn-ico w-100 w-md-auto" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
-                      <div class="stable-text">
-                          <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
-                          <span>Réessayer un envoi</span>
-                      </div>
-                      <div class="loading-text">
-                          <span aria-hidden="true" class="spinner-border spinner-border-sm"></span>
-                          <span role="status">Envoi en cours</span>
-                      </div>
-                  </button>
-              </form>
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-danger btn-ico w-100 w-md-auto" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+          <div class="stable-text">
+              <i aria-hidden="true" class="ri-alert-line fw-medium">
+              </i>
+              <span>
+                  Réessayer un envoi
+              </span>
+          </div>
+          <div class="loading-text">
+              <span aria-hidden="true" class="spinner-border spinner-border-sm">
+              </span>
+              <span role="status">
+                  Envoi en cours
+              </span>
+          </div>
+      </button>
+  </form>
+  
   '''
 # ---
 # name: TestRdvInsertionView.test_rdv_insertion_not_configured_for_employer
   '''
   <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
-                  <i aria-hidden="true" class="ri-alert-line fw-medium"></i>
-                  Une erreur s’est produite, l’envoi n’a pas abouti
-              </span>
+      <i aria-hidden="true" class="ri-alert-line fw-medium">
+      </i>
+      Une erreur s’est produite, l’envoi n’a pas abouti
+  </span>
+  
   '''
 # ---

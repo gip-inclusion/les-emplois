@@ -2750,30 +2750,30 @@
 # name: TestOTP.test_devices[no_device]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-6">
-                      <div class="c-box">
-                          <h2>Mes appareils</h2>
-                          <form method="post">
-                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              
-                                  <p>Vous n'avez pas configuré d'appareil OTP.</p>
-                              
-                              <button class="btn btn-block btn-primary" name="action" type="submit" value="new">
-                                  Configurer un
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-6">
+                  <div class="c-box">
+                      <h2>
+                          Mes appareils
+                      </h2>
+                      <form method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <p>
+                              Vous n'avez pas configuré d'appareil OTP.
+                          </p>
+                          <button class="btn btn-block btn-primary" name="action" type="submit" value="new">
+                              Configurer un
                                   
                                   appareil
-                              </button>
-  
-                              
-                              
-                          </form>
-                      </div>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: TestOTP.test_devices[with_device]

@@ -9,7 +9,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats.utils import STATS_PH_ORGANISATION_KIND_WHITELIST
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def test_index_stats_for_employer(snapshot, client):
@@ -21,7 +21,7 @@ def test_index_stats_for_employer(snapshot, client):
     )
 
     response = client.get(reverse("dashboard:index_stats"))
-    assert str(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
 
 
 @pytest.mark.parametrize(
@@ -37,7 +37,7 @@ def test_index_stats_for_authorized_prescriber(snapshot, client, kind):
     )
 
     response = client.get(reverse("dashboard:index_stats"))
-    assert str(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
 
 
 def test_index_stats_for_non_authorized_prescriber(snapshot, client):
@@ -48,7 +48,7 @@ def test_index_stats_for_non_authorized_prescriber(snapshot, client):
     )
 
     response = client.get(reverse("dashboard:index_stats"))
-    assert str(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
 
 
 @pytest.mark.parametrize("kind", InstitutionKind)
@@ -56,4 +56,4 @@ def test_index_stats_for_labor_inspector(snapshot, client, kind):
     client.force_login(LaborInspectorFactory(membership__institution__kind=kind))
 
     response = client.get(reverse("dashboard:index_stats"))
-    assert str(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()

@@ -27,6 +27,7 @@ from tests.utils.test import (
     assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
+    pretty_indented,
 )
 
 
@@ -36,7 +37,7 @@ class TestCompanyAdmin:
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = admin_client.get(reverse("admin:companies_company_add"))
         response = parse_response_to_soup(response, selector=".field-approvals_list")
-        assert str(response) == snapshot(name="approvals list")
+        assert pretty_indented(response) == snapshot(name="approvals list")
 
     def test_remove_last_admin_status(self, admin_client, mailoutbox):
         company = CompanyFactory(with_membership=True)

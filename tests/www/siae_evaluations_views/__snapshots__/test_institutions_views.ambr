@@ -844,69 +844,63 @@
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              Notification à faire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_access[waiting state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
-                          
-                          En attente
-                      </span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
+              En attente
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_notified_siae[final refused state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Résultat négatif</span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
+              Résultat négatif
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_num_queries
@@ -1206,304 +1200,296 @@
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Résultat positif</span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
+              Résultat positif
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_incomplete_refused_can_be_notified[notification pending state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              Notification à faire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_incomplete_refused_can_be_notified_after_review[notification pending state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              Notification à faire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[adversarial in progress state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">Phase contradictoire</span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">
+              Phase contradictoire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[adversarial stage state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">Phase contradictoire</span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">
+              Phase contradictoire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[adversarial to process state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-                      Phase contradictoire -
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              Phase contradictoire -
                       À traiter
-                  </span>
-              
-          
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[adversarial waiting state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
-                          Phase contradictoire -
+          <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
+              Phase contradictoire -
                           En attente
-                      </span>
-                  
-              
-          
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[final accepted state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Résultat positif</span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
+              Résultat positif
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[in progress state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">En cours</span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              En cours
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[to process state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-                      
-                      À traiter
-                  </span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              À traiter
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos[waiting state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
-                          
-                          En attente
-                      </span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
+              En attente
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos_with_submission_freezed_at[identified issue state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
-                          
-                          Problème constaté
-                      </span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
+              Problème constaté
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_infos_with_submission_freezed_at[to process state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-                  <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
-                      
-                      À traiter
-                  </span>
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              À traiter
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_siae_refused_can_be_notified[notification pending state]
   '''
   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-1000">
       <div class="c-box--results__summary flex-grow-1">
-          <i aria-hidden="true" class="ri-community-line"></i>
+          <i aria-hidden="true" class="ri-community-line">
+          </i>
           <div>
-              <h3>ACME Inc.</h3>
+              <h3>
+                  ACME Inc.
+              </h3>
           </div>
       </div>
       <div>
-          
-              
-              
-                  
-                      <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
-                  
-              
-          
+          <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+              Notification à faire
+          </span>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions

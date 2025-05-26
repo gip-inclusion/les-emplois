@@ -34,47 +34,55 @@
 # name: TestListEmployeeRecords.test_missing_employee_records_alert[plural]
   '''
   <div class="alert alert-info" id="id_missing_employee_records_alert" role="status">
-              <div class="row align-items-center">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
-                  </div>
-                  <div class="col">
-                      
-                          <p class="mb-0">
-                              2 nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
-                          </p>
-                      
-                  </div>
-                  <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                      <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
-                          <i aria-hidden="true" class="ri-file-add-line ri-lg"></i>
-                          <span>Créer une fiche salarié</span>
-                      </a>
-                  </div>
-              </div>
+      <div class="row align-items-center">
+          <div class="col-auto pe-0">
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+              </i>
           </div>
+          <div class="col">
+              <p class="mb-0">
+                  2 nouveaux salariés, embauchés il y a moins de 4 mois, n’ont pas encore de fiches salarié.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
+                  <i aria-hidden="true" class="ri-file-add-line ri-lg">
+                  </i>
+                  <span>
+                      Créer une fiche salarié
+                  </span>
+              </a>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestListEmployeeRecords.test_missing_employee_records_alert[singular]
   '''
   <div class="alert alert-info" id="id_missing_employee_records_alert" role="status">
-              <div class="row align-items-center">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
-                  </div>
-                  <div class="col">
-                      
-                          <p class="mb-0">1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.</p>
-                      
-                  </div>
-                  <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                      <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
-                          <i aria-hidden="true" class="ri-file-add-line ri-lg"></i>
-                          <span>Créer une fiche salarié</span>
-                      </a>
-                  </div>
-              </div>
+      <div class="row align-items-center">
+          <div class="col-auto pe-0">
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+              </i>
           </div>
+          <div class="col">
+              <p class="mb-0">
+                  1 nouveau salarié, embauché il y a moins de 4 mois, n’a pas encore de fiche salarié.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a class="btn btn-primary btn-ico" href="/employee_record/add/?reset_url=/employee_record/list%3Fstatus%3DNEW%26status%3DREJECTED%26order%3D">
+                  <i aria-hidden="true" class="ri-file-add-line ri-lg">
+                  </i>
+                  <span>
+                      Créer une fiche salarié
+                  </span>
+              </a>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]

@@ -2,597 +2,380 @@
 # name: TestSummaryEmployeeRecords.test_action_bar[ARCHIVED]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-emploi-lightest text-primary">
-          Archivée le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-emploi-lightest text-primary">
+                      Archivée le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
+      </div>
   </div>
   
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[DISABLED]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-emploi-lightest text-primary">
-          Désactivée le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-emploi-lightest text-primary">
+                      Désactivée le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
-  </div>
-  
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <div class="form-row align-items-center gx-3">
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/reactivate/[Pk of EmployeeRecord]">
-                              <i aria-hidden="true" class="ri-reset-right-line font-weight-medium"></i>
-                              <span>Réactiver</span>
-                          </a>
-                      </div>
-                  
-                  
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/reactivate/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-reset-right-line font-weight-medium">
+                      </i>
+                      <span>
+                          Réactiver
+                      </span>
+                  </a>
               </div>
           </div>
-      
+      </div>
+  </div>
   
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[NEW]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-emploi">Nouvelle à compléter</span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-emploi">
+                      Nouvelle à compléter
+                  </span>
               </h1>
           </div>
-      
-      
-  </div>
-  
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <div class="form-row align-items-center gx-3">
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/create/[Pk of JobApplication]?from_status=NEW">
-                              <i aria-hidden="true" class="ri-file-edit-line font-weight-medium"></i>
-                              <span>Compléter</span>
-                          </a>
-                      </div>
-                  
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
-                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
-                              <span>Désactiver</span>
-                          </a>
-                      </div>
-                  
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/create/[Pk of JobApplication]?from_status=NEW">
+                      <i aria-hidden="true" class="ri-file-edit-line font-weight-medium">
+                      </i>
+                      <span>
+                          Compléter
+                      </span>
+                  </a>
+              </div>
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
+                      </i>
+                      <span>
+                          Désactiver
+                      </span>
+                  </a>
               </div>
           </div>
-      
+      </div>
+  </div>
   
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[PROCESSED]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-success">
-          Intégrée par l'ASP le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-success">
+                      Intégrée par l'ASP le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
-  </div>
-  
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <div class="form-row align-items-center gx-3">
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" type="button">
-      Renvoyer cette fiche salarié
-  </button>
-  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
-      <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
-      </form>
-      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
-  </div>
-  
-                      </div>
-                  
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
-                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
-                              <span>Désactiver</span>
-                          </a>
-                      </div>
-                  
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                      Renvoyer cette fiche salarié
+                  </button>
+                  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+                      <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">
+                              Renvoyer
+                          </button>
+                      </form>
+                      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">
+                          Modifier et renvoyer
+                      </a>
+                  </div>
+              </div>
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
+                      </i>
+                      <span>
+                          Désactiver
+                      </span>
+                  </a>
               </div>
           </div>
-      
+      </div>
+  </div>
   
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[READY]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
-          Complétée le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
+                      Complétée le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
+      </div>
   </div>
   
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[REJECTED]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-danger">
-          Retour en erreur le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-danger">
+                      Retour en erreur le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
-  </div>
-  
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <div class="form-row align-items-center gx-3">
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/create/[Pk of JobApplication]?from_status=REJECTED">
-                              <i aria-hidden="true" class="ri-pencil-line font-weight-medium"></i>
-                              <span>Modifier</span>
-                          </a>
-                      </div>
-                  
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
-                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
-                              <span>Désactiver</span>
-                          </a>
-                      </div>
-                  
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-white btn-block btn-ico" href="/employee_record/create/[Pk of JobApplication]?from_status=REJECTED">
+                      <i aria-hidden="true" class="ri-pencil-line font-weight-medium">
+                      </i>
+                      <span>
+                          Modifier
+                      </span>
+                  </a>
+              </div>
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
+                      </i>
+                      <span>
+                          Désactiver
+                      </span>
+                  </a>
               </div>
           </div>
-      
+      </div>
+  </div>
   
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar[SENT]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-warning">
-          Envoyée à l'ASP le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-warning">
+                      Envoyée à l'ASP le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
+      </div>
   </div>
   
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar_with_changed_siret[PROCESSED]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-success">
-          Intégrée par l'ASP le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-success">
+                      Intégrée par l'ASP le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
-  </div>
-  
-  
-      
-          <div class="alert alert-warning alert-dismissible fade show" role="status">
-              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
-              <div class="row">
-                  <div class="col-auto pe-0">
-                      <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
-                  </div>
-                  <div class="col">
-                      <p class="mb-0">
-                          <strong>Incohérence de numéro SIRET détectée</strong>
-                      </p>
-                      <p class="mb-0">
-                          Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
+      </div>
+      <div class="alert alert-warning alert-dismissible fade show" role="status">
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+          </button>
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      <strong>
+                          Incohérence de numéro SIRET détectée
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le numéro SIRET associé à cette fiche salarié est différent de votre numéro SIRET actuel.
                           Si ce salarié est toujours présent dans vos effectifs, vous pouvez renvoyer cette fiche salarié afin de retrouver ses informations dans votre espace Extranet IAE 2.0 de l'ASP.
                           Si ce salarié ne fait plus partie de votre entreprise, vous pouvez désactiver sa fiche salarié.
-                      </p>
+                  </p>
+              </div>
+          </div>
+      </div>
+      <div class="c-box c-box--action">
+          <div class="form-row align-items-center gx-3">
+              <div class="form-group col-12 col-lg-auto">
+                  <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                      Renvoyer cette fiche salarié
+                  </button>
+                  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+                      <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">
+                              Renvoyer
+                          </button>
+                      </form>
+                      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">
+                          Modifier et renvoyer
+                      </a>
                   </div>
               </div>
-          </div>
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <div class="form-row align-items-center gx-3">
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" type="button">
-      Renvoyer cette fiche salarié
-  </button>
-  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
-      <form action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit" method="post">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
-      </form>
-      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
-  </div>
-  
-                      </div>
-                  
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
-                              <i aria-hidden="true" class="ri-file-close-line font-weight-medium"></i>
-                              <span>Désactiver</span>
-                          </a>
-                      </div>
-                  
+              <div class="form-group col-12 col-lg-auto">
+                  <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="/employee_record/disable/[Pk of EmployeeRecord]">
+                      <i aria-hidden="true" class="ri-file-close-line font-weight-medium">
+                      </i>
+                      <span>
+                          Désactiver
+                      </span>
+                  </a>
               </div>
           </div>
-      
+      </div>
+  </div>
   
-                          </div>
   '''
 # ---
 # name: TestSummaryEmployeeRecords.test_action_bar_with_changed_siret[READY]
   '''
   <div class="s-title-02__col col-12">
-                              
-      
-  
-  
       <div class="c-prevstep">
           <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/employee_record/list">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
               <span>
                   Retour
                   à la liste
               </span>
           </a>
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
+      <div class="c-title">
+          <div class="c-title__main">
               <h1>
                   Fiche salarié ASP : Lauren MATA
-                  
-      <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
-          Complétée le 29/04/2025 13:11
-      </span>
-  
-  
+                  <span class="badge rounded-pill badge-base text-nowrap bg-secondary">
+                      Complétée le 29/04/2025 13:11
+                  </span>
               </h1>
           </div>
-      
-      
+      </div>
   </div>
   
-  
-      
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
-                          </div>
   '''
 # ---

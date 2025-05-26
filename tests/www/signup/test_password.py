@@ -7,7 +7,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertRedirects
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestPasswordReset:
@@ -108,7 +108,7 @@ class TestPasswordReset:
             "account_reset_password_from_key", kwargs={"uidb36": "something", "key": "invalid"}
         )
         response = client.get(password_change_url)
-        assert str(parse_response_to_soup(response, "#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
 
 class TestPasswordChange:

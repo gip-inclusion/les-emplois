@@ -2,121 +2,127 @@
 # name: test_filters
   '''
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
-          <div class="offcanvas-header">
-              <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
-                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
-                  <span>Filtrer</span>
-              </h4>
-              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
-          </div>
-          
-  
-  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
-      
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
-                  Statut
-              </button>
-          </legend>
-          <div class="my-3 collapse" id="collapseStates">
-              <ul>
-                  
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+              </i>
+              <span>
+                  Filtrer
+              </span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+          </button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
+                      Statut
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapseStates">
+                  <ul>
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
-                              <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                              <label class="form-check-label" for="id_states_0">
+                                  Nouvelle candidature
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
-                              <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                              <label class="form-check-label" for="id_states_1">
+                                  Candidature à l'étude
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
-                              <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                              <label class="form-check-label" for="id_states_2">
+                                  Candidature en attente
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
-                              <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
+                              <label class="form-check-label" for="id_states_3">
+                                  Action préalable à l’embauche
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
-                              <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
+                              <label class="form-check-label" for="id_states_4">
+                                  Candidature acceptée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
-                              <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
+                              <label class="form-check-label" for="id_states_5">
+                                  Candidature déclinée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
-                              <label class="form-check-label" for="id_states_6">Embauche annulée</label>
+                              <label class="form-check-label" for="id_states_6">
+                                  Embauche annulée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
-                              <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
+                              <label class="form-check-label" for="id_states_7">
+                                  Embauché ailleurs
+                              </label>
                           </div>
                       </li>
-                  
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-      <input id="display-kind" name="display" type="hidden" value="list"/>
-      <input id="id_order" name="order" type="hidden" value="-created_at"/>
-      
-      
-  
-  <hr/>
-  <fieldset>
-      <legend>
-          <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
-              Date d'envoi de la candidature
+                  </ul>
+              </div>
+          </fieldset>
+          <input id="display-kind" name="display" type="hidden" value="list"/>
+          <input id="id_order" name="order" type="hidden" value="-created_at"/>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
+                      Date d'envoi de la candidature
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDate">
+                  <div class="form-group">
+                      <label class="form-label" for="id_start_date">
+                          À partir du
+                      </label>
+                      <duet-date-picker class="" identifier="id_start_date" name="start_date">
+                      </duet-date-picker>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_end_date">
+                          Jusqu'au
+                      </label>
+                      <duet-date-picker class="" identifier="id_end_date" name="end_date">
+                      </duet-date-picker>
+                  </div>
+              </div>
+          </fieldset>
+      </div>
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+          <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+              Voir
           </button>
-      </legend>
-      <div class="mt-3 collapse" id="collapseDate">
-          <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date"></duet-date-picker></div>
-          <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date"></duet-date-picker></div>
       </div>
-  </fieldset>
-  
   </div>
   
-          <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-  
-  
-  </div>
-  
-      </div>
   '''
 # ---
 # name: test_list_for_job_seeker_queries[SQL queries in list mode]
@@ -1272,495 +1278,366 @@
 # name: test_list_snapshot[applications list]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              
-                  <strong>Pres. Org.</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-              
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <span>Entreprise d'insertion</span>
-                      <h3>Acme inc.</h3>
-                      
-  
-  
-                  
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <strong>
+                          Pres. Org.
+                      </strong>
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1">
+                      </i>
+                      Orienteur
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">
+                          Candidature déclinée
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <span>
+                          Entreprise d'insertion
+                      </span>
+                      <h3>
+                          Acme inc.
+                      </h3>
+                  </div>
               </div>
           </div>
-      </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
           </div>
-      
-  
-  
-          </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                   <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
-              
-          </div>
-      </div>
-  </div>
-  
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              <strong>Acme inc.</strong>
-              
-                  <i aria-hidden="true" class="ri-community-line me-1"></i>Employeur
-              
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <span>Entreprise d'insertion</span>
-                      <h3>Acme inc.</h3>
-                      
-  
-  
-                  
               </div>
           </div>
       </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <strong>
+                          Acme inc.
+                      </strong>
+                      <i aria-hidden="true" class="ri-community-line me-1">
+                      </i>
+                      Employeur
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
+                          Nouvelle candidature
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <span>
+                          Entreprise d'insertion
+                      </span>
+                      <h3>
+                          Acme inc.
+                      </h3>
+                  </div>
+              </div>
           </div>
-      
-  
-  
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
           </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                   <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
-              
-          </div>
-      </div>
-  </div>
-  
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              <strong>Vous</strong>
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <span>Entreprise d'insertion</span>
-                      <h3>Acme inc.</h3>
-                      
-  
-  
-                  
               </div>
           </div>
       </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <strong>
+                          Vous
+                      </strong>
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
+                          Candidature acceptée
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <span>
+                          Entreprise d'insertion
+                      </span>
+                      <h3>
+                          Acme inc.
+                      </h3>
+                  </div>
+              </div>
           </div>
-      
-  
-  
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
           </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
                   <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dlist">
                       Voir ma candidature
                   </a>
-              
+              </div>
           </div>
       </div>
-  </div>
-  
-              
-          
-          
-  
-  
-  
-      
   </section>
+  
   '''
 # ---
 # name: test_list_snapshot[applications table]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
-              <div class="table-responsive mt-3 mt-md-4">
-                  
-                      <table class="table table-hover table-sortable">
-      <caption class="visually-hidden">Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)</caption>
-      <thead>
-          <tr>
-              
-              
-                  <th scope="col">Candidature chez</th>
-              
-              <th aria-sort="descending" scope="col">
-      <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
-          Émise le
-      </button>
-  </th>
-  
-              <th scope="col">Statut</th>
-              
-              <th scope="col">Poste</th>
-              <th scope="col">Emetteur</th>
-              
-              <th class="text-end w-50px" scope="col"></th>
-          </tr>
-      </thead>
-      <tbody>
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  Acme inc.
-              </a>
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              <i aria-hidden="true" class="ri-home-smile-2-line"></i>
-              
-                  Pres. Org.
-              
-          
-      </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  Acme inc.
-              </a>
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              <i aria-hidden="true" class="ri-community-line"></i>
-              Acme inc.
-          
-      </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  Acme inc.
-              </a>
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              Vous
-          
-      </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                  <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-      </tbody>
-  </table>
-  
-                  
-              </div>
-          
-          
-  
-  
-  
-      
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover table-sortable">
+              <caption class="visually-hidden">
+                  Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Candidature chez
+                      </th>
+                      <th aria-sort="descending" scope="col">
+                          <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
+                              Émise le
+                          </button>
+                      </th>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Poste
+                      </th>
+                      <th scope="col">
+                          Emetteur
+                      </th>
+                      <th class="text-end w-50px" scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr class="align-top">
+                      <td>
+                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              Acme inc.
+                          </a>
+                      </td>
+                      <td>
+                          27/11/2024
+                      </td>
+                      <td>
+                          <span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">
+                              Candidature déclinée
+                          </span>
+                      </td>
+                      <td>
+                          Candidature spontanée
+                      </td>
+                      <td>
+                          <i aria-hidden="true" class="ri-home-smile-2-line">
+                          </i>
+                          Pres. Org.
+                      </td>
+                      <td class="text-end w-50px align-middle">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
+                              </i>
+                          </a>
+                      </td>
+                  </tr>
+                  <tr class="align-top">
+                      <td>
+                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              Acme inc.
+                          </a>
+                      </td>
+                      <td>
+                          27/11/2024
+                      </td>
+                      <td>
+                          <span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">
+                              Nouvelle candidature
+                          </span>
+                      </td>
+                      <td>
+                          Candidature spontanée
+                      </td>
+                      <td>
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          Acme inc.
+                      </td>
+                      <td class="text-end w-50px align-middle">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
+                              </i>
+                          </a>
+                      </td>
+                  </tr>
+                  <tr class="align-top">
+                      <td>
+                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              Acme inc.
+                          </a>
+                      </td>
+                      <td>
+                          27/11/2024
+                      </td>
+                      <td>
+                          <span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">
+                              Candidature acceptée
+                          </span>
+                      </td>
+                      <td>
+                          Candidature spontanée
+                      </td>
+                      <td>
+                          Vous
+                      </td>
+                      <td class="text-end w-50px align-middle">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                              <i aria-label="Voir ma candidature" class="ri-arrow-drop-right-line fs-lg">
+                              </i>
+                          </a>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
   </section>
+  
   '''
 # ---
 # name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          <div class="text-center my-3 my-md-4">
-              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
-              <p class="mb-1 mt-3">
-                  <strong>
-                      
-                          Aucune candidature pour le moment
-                      
-                  </strong>
-              </p>
-              <p>
-                  <i>
-                      
-                          Vous trouverez ici vos candidatures, émises par un prescripteur
-                          <br class="d-none d-lg-inline"/>
-                          ou par vous même.
-                      
-                  </i>
-              </p>
-              
-                  <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers">
-                      <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal"></i>
-                      <span>Rechercher un emploi inclusif</span>
-                  </a>
-              
-          </div>
-      
+      <div class="text-center my-3 my-md-4">
+          <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
+          <p class="mb-1 mt-3">
+              <strong>
+                  Aucune candidature pour le moment
+              </strong>
+          </p>
+          <p>
+              <i>
+                  Vous trouverez ici vos candidatures, émises par un prescripteur
+                  <br class="d-none d-lg-inline"/>
+                  ou par vous même.
+              </i>
+          </p>
+          <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers">
+              <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal">
+              </i>
+              <span>
+                  Rechercher un emploi inclusif
+              </span>
+          </a>
+      </div>
   </section>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[off-canvas buttons in list view]
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=list&amp;order=-created_at">
-              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-              <span>Effacer tout</span>
-          </a>
-      
-  
-  
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+          Voir
+      </button>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=list&order=-created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
   </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[off-canvas buttons in table view & created_at ascending order]
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=table&amp;order=created_at">
-              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-              <span>Effacer tout</span>
-          </a>
-      
-  
-  
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+          Voir
+      </button>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=table&order=created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
   </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in list view]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=list&amp;order=-created_at">
-                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-                  <span>Effacer tout</span>
-              </a>
-          
-      </div>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=list&order=-created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
+  </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in table view & created_at ascending order]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=table&amp;order=created_at">
-                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-                  <span>Effacer tout</span>
-              </a>
-          
-      </div>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=table&order=created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
+  </div>
+  
   '''
 # ---

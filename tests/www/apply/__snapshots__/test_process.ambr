@@ -982,17 +982,18 @@
           Transférer cette candidature vers
       </button>
       <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-          
-          
-              <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                  <div class="dropdown-item disabled">
-                      <i aria-hidden="true" class="ri-home-smile-line"></i>
-                      <strong>Une autre structure</strong>
-                  </div>
+          <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+              <div class="dropdown-item disabled">
+                  <i aria-hidden="true" class="ri-home-smile-line">
+                  </i>
+                  <strong>
+                      Une autre structure
+                  </strong>
               </div>
-          
+          </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: TestProcessTransferJobApplication.test_job_application_external_transfer_only_for_lone_users
@@ -3393,57 +3394,59 @@
 # name: TestProcessViews.test_details_for_company_transition_logs_hides_hired_by_other
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
-                  <span>
-                      
-                          Passé en "Embauché ailleurs"
-                      
-                      
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+      <li>
+          <time datetime="2023-12-12T12:38:00+00:00">
+              Le 12 décembre 2023 à 13:38
+          </time>
+          <span>
+              Passé en "Embauché ailleurs"
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:00+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: TestProcessViews.test_details_for_company_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
-                  <span>
-                      
-                          Passé en "Candidature acceptée"
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature à l'étude"
+      <li>
+          <time datetime="2023-12-12T12:38:00+00:00">
+              Le 12 décembre 2023 à 13:38
+          </time>
+          <span>
+              Passé en "Candidature acceptée"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature à l'étude"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:00+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: TestProcessViews.test_details_for_job_seeker
@@ -4332,100 +4335,106 @@
 # name: TestProcessViews.test_details_for_job_seeker_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
-                  <span>
-                      
-                          Passé en "Candidature acceptée"
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature à l'étude"
+      <li>
+          <time datetime="2023-12-12T12:38:00+00:00">
+              Le 12 décembre 2023 à 13:38
+          </time>
+          <span>
+              Passé en "Candidature acceptée"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature à l'étude"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:00+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: TestProcessViews.test_details_for_prescriber_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
-                  <span>
-                      
-                          Passé en "Candidature acceptée"
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature à l'étude"
+      <li>
+          <time datetime="2023-12-12T12:38:00+00:00">
+              Le 12 décembre 2023 à 13:38
+          </time>
+          <span>
+              Passé en "Candidature acceptée"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature à l'étude"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:00+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: TestProcessViews.test_external_transfer_log_display
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
-                  <span>
-                      
-                          Candidature transférée à un autre employeur
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature déclinée"
+      <li>
+          <time datetime="2023-12-12T12:38:00+00:00">
+              Le 12 décembre 2023 à 13:38
+          </time>
+          <span>
+              Candidature transférée à un autre employeur
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature déclinée"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:00+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_body]
@@ -4518,90 +4527,96 @@
 # name: test_add_prior_action_processing
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Action préalable à l’embauche"
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Action préalable à l’embauche"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:11+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: test_delete_prior_action[False]
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:40:00+00:00">Le 12 décembre 2023 à 13:40</time>
-                  <span>
-                      
-                          Passé en "Action préalable à l’embauche"
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature à l'étude"
+      <li>
+          <time datetime="2023-12-12T12:40:00+00:00">
+              Le 12 décembre 2023 à 13:40
+          </time>
+          <span>
+              Passé en "Action préalable à l’embauche"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature à l'étude"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:11+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: test_delete_prior_action[True]
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
-      
-          
-              <li>
-                  <time datetime="2023-12-12T12:40:00+00:00">Le 12 décembre 2023 à 13:40</time>
-                  <span>
-                      
-                          Passé en "Action préalable à l’embauche"
-                      
-                      par John DOE
-                  </span>
-              </li>
-          
-              <li>
-                  <time datetime="2023-12-12T12:37:00+00:00">Le 12 décembre 2023 à 13:37</time>
-                  <span>
-                      
-                          Passé en "Candidature à l'étude"
+      <li>
+          <time datetime="2023-12-12T12:40:00+00:00">
+              Le 12 décembre 2023 à 13:40
+          </time>
+          <span>
+              Passé en "Action préalable à l’embauche"
                       
                       par John DOE
-                  </span>
-              </li>
-          
-          <li>
-              <time datetime="2023-12-10T10:11:11+00:00">Le 10 décembre 2023 à 11:11</time>
-              <span>Nouvelle candidature</span>
-          </li>
-      
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-12T12:37:00+00:00">
+              Le 12 décembre 2023 à 13:37
+          </time>
+          <span>
+              Passé en "Candidature à l'étude"
+                      
+                      par John DOE
+          </span>
+      </li>
+      <li>
+          <time datetime="2023-12-10T10:11:11+00:00">
+              Le 10 décembre 2023 à 11:11
+          </time>
+          <span>
+              Nouvelle candidature
+          </span>
+      </li>
   </ul>
+  
   '''
 # ---
 # name: test_reload_contract_type_and_options[APPRENTICESHIP]

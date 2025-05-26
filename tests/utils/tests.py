@@ -93,7 +93,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import create_fake_postcode, parse_response_to_soup
+from tests.utils.test import create_fake_postcode, parse_response_to_soup, pretty_indented
 
 
 def get_response_for_middlewaremixin(request):
@@ -1526,7 +1526,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert response.status_code == 404
     assert response.context["matomo_custom_url"] == "/doesnotexist?mtm_foo=truc"
     script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
-    assert str(script_content) == snapshot(name="matomo custom init 404")
+    assert pretty_indented(script_content) == snapshot(name="matomo custom init 404")
 
     # canonical case
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1537,7 +1537,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
-    assert str(script_content) == snapshot(name="matomo custom init siae card")
+    assert pretty_indented(script_content) == snapshot(name="matomo custom init siae card")
 
 
 @pytest.mark.parametrize("state", JobApplicationState.values)

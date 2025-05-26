@@ -11,7 +11,7 @@ from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 @freeze_time("2025-02-14")
@@ -23,7 +23,7 @@ def test_missing_employee(client, snapshot):
     url = reverse("employee_record_views:missing_employee")
 
     response = client.get(url)
-    assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(name="form")
+    assert pretty_indented(parse_response_to_soup(response, selector=".s-section")) == snapshot(name="form")
 
     # job_seeker that was never hired
     job_seeker = JobSeekerFactory(first_name="André", last_name="Alonso")
@@ -47,7 +47,7 @@ def test_missing_employee(client, snapshot):
     job_seeker = JobSeekerFactory(first_name="Béatrice", last_name="Beauregard")
     JobApplicationFactory(to_company=siae, job_seeker=job_seeker, state=JobApplicationState.ACCEPTED, approval=None)
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector=".s-section")) == snapshot(
         name=MissingEmployeeCase.NO_APPROVAL
     )
 
@@ -111,7 +111,7 @@ def test_missing_employee(client, snapshot):
     )
     employee_record = EmployeeRecordFactory(job_application=job_application)
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(parse_response_to_soup(response, selector=".s-section")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector=".s-section")) == snapshot(
         name=MissingEmployeeCase.EXISTING_EMPLOYEE_RECORD_OTHER_COMPANY
     )
 

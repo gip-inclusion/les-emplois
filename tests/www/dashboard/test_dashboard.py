@@ -44,7 +44,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -74,7 +74,7 @@ class TestDashboardView:
         response = client.get(url)
         assert response.status_code == 200
         cities_search = parse_response_to_soup(response, selector="form[method=get]")
-        assert str(cities_search) == snapshot
+        assert pretty_indented(cities_search) == snapshot
 
     def test_user_with_inactive_company_can_still_login_during_grace_period(self, client):
         company = CompanyPendingGracePeriodFactory(with_membership=True)
@@ -669,7 +669,7 @@ class TestDashboardView:
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
         if gps_info == "card":
-            assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
+            assert pretty_indented(parse_response_to_soup(response, "#gps-card")) == snapshot
             assertContains(response, GPS_CARD_TXT)
         else:
             assertNotContains(response, GPS_CARD_TXT)
@@ -849,18 +849,18 @@ class TestDashboardView:
         staff_user = ItouStaffFactory()
         client.force_login(staff_user)
         response = client.get(reverse("dashboard:index"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="partial")
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(name="partial")
 
         call_command("sync_group_and_perms")
         staff_user.groups.add(Group.objects.get(name="itou-admin"))
         response = client.get(reverse("dashboard:index"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
 
         staff_user.is_superuser = True
         staff_user.save()
         staff_user.groups.clear()
         response = client.get(reverse("dashboard:index"))
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(name="full")
 
 
 @pytest.mark.parametrize(

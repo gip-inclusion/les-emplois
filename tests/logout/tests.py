@@ -5,7 +5,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def tests_employers_without_company(client, snapshot):
@@ -14,7 +14,7 @@ def tests_employers_without_company(client, snapshot):
     response = client.get("dashboard:index", follow=True)
 
     assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_no_company"}))
-    assert str(parse_response_to_soup(response, ".s-section__container")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 
 def tests_employers_with_inactive_company(client, snapshot):
@@ -23,7 +23,7 @@ def tests_employers_with_inactive_company(client, snapshot):
     response = client.get("dashboard:index", follow=True)
 
     assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
-    assert str(parse_response_to_soup(response, ".s-section__container")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 
 def test_labor_inspector_with_no_institution(client, snapshot):
@@ -32,7 +32,7 @@ def test_labor_inspector_with_no_institution(client, snapshot):
     response = client.get("dashboard:index", follow=True)
 
     assertRedirects(response, reverse("logout:warning", kwargs={"kind": "labor_inspector_no_institution"}))
-    assert str(parse_response_to_soup(response, ".s-section__container")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()
 
 
 def test_ft_prescriber_with_no_ft_organization(client, snapshot):
@@ -43,4 +43,4 @@ def test_ft_prescriber_with_no_ft_organization(client, snapshot):
     response = client.get("dashboard:index", follow=True)
 
     assertRedirects(response, reverse("logout:warning", kwargs={"kind": "ft_no_ft_organization"}))
-    assert str(parse_response_to_soup(response, ".s-section__container")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, ".s-section__container")) == snapshot()

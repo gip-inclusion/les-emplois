@@ -483,118 +483,124 @@
 # name: test_wizard[choose-approval]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-stepper mb-3 mb-lg-5">
-                          <div class="progress">
-                              <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="100" class="progress-bar progress-bar-100" role="progressbar">
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-stepper mb-3 mb-lg-5">
+                      <div class="progress">
+                          <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="100" class="progress-bar progress-bar-100" role="progressbar">
+                          </div>
+                      </div>
+                      <p>
+                          <strong>
+                              Étape 2
+                          </strong>
+                          /2
+                      </p>
+                  </div>
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Rechercher un PASS IAE
+                      </h2>
+                      <form method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <p>
+                              Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
+                              <br/>
+                              Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
+                          </p>
+                          <div class="form-group form-group-required">
+                              <label class="form-label" for="id_approval">
+                                  PASS IAE de Jane DOE
+                              </label>
+                              <select aria-describedby="id_approval_helptext" class="form-select" id="id_approval" name="approval">
+                                  <option value="[PK of Approval]">
+                                      999999999999 — Du 01/01/2000 au 01/01/3000
+                                  </option>
+                              </select>
+                              <div class="form-text" id="id_approval_helptext">
+                                  Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP
                               </div>
                           </div>
-                          <p>
-                              <strong>Étape 2</strong>/2
-                          </p>
-                      </div>
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Rechercher un PASS IAE</h2>
-                          
-                          <form method="post">
-                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-  
-                              
+                          <div class="c-info">
+                              <span class="c-info__summary">
+                                  Vous ne trouvez pas le PASS souhaité ?
+                              </span>
+                              <div class="c-info__detail">
                                   <p>
-                                      Dans le menu déroulant ci-dessous, vous trouverez les PASS IAE du salarié selectionné à l'étape précédente.
-                                      <br/>
-                                      Seuls les PASS n'ayant pas encore de fiche salarié sont affichés.
+                                      Vous pouvez faire
+                                      <a aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure" href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-approval">
+                                          une recherche avancée
+                                      </a>
+                                      parmi l’ensemble des candidats ou salariés de votre structure.
                                   </p>
-                              
-                              <div class="form-group form-group-required"><label class="form-label" for="id_approval">PASS IAE de Jane DOE</label><select aria-describedby="id_approval_helptext" class="form-select" id="id_approval" name="approval">
-    <option value="[PK of Approval]">999999999999 — Du 01/01/2000 au 01/01/3000</option>
-  
-  </select><div class="form-text" id="id_approval_helptext">Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
-  </div>
-  
-                              <div class="c-info">
-                                  <span class="c-info__summary">
-                                      
-                                          Vous ne trouvez pas le PASS souhaité ?
-                                      
-                                  </span>
-                                  <div class="c-info__detail">
-                                      <p>
-                                          Vous pouvez faire <a aria-label="Recherche avancée parmi l’ensemble des candidats ou salariés de votre structure" href="/employee_record/missing?back_url=/employee_record/add/[UUID of session]/choose-approval">une recherche avancée</a> parmi l’ensemble des candidats ou salariés de votre structure.
-                                      </p>
+                              </div>
+                          </div>
+                          <hr/>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/add/[UUID of session]/choose-employee">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="fiches-salarié" data-matomo-event="true" data-matomo-option="création" type="submit">
+                                              <span>
+                                                  Confirmer
+                                              </span>
+                                          </button>
+                                      </div>
                                   </div>
                               </div>
-                              <hr/>
-                              
-                                  
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3"/>
-          <small class="d-inline-block mb-3">* champs obligatoires</small>
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      
-                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
-                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                          <span>Annuler</span>
-                      </button>
-                  
-              </div>
-              
-                  <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/add/[UUID of session]/choose-employee">
-                              <span>Retour</span>
-                          </a>
-                      
-                  </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="fiches-salarié" data-matomo-event="true" data-matomo-option="création" type="submit">
-                          <span>Confirmer</span>
-                      </button>
-                  
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  
-      <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
-          <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
-                  </div>
-                  <div class="modal-body">
-                      Les informations renseignées ne seront pas enregistrées.
-                      <br/>
-                      Cette action est irréversible.
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      
-                          <a class="btn btn-sm btn-danger" href="/employee_record/list">Confirmer l'annulation</a>
-                      
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/employee_record/list">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
                   </div>
               </div>
           </div>
       </div>
+  </section>
   
-  
-                              
-                          </form>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
   '''
 # ---
 # name: test_wizard[choose-employee-queries]

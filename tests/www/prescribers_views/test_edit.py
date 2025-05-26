@@ -11,7 +11,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import add_url_params
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
-from tests.utils.test import assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, parse_response_to_soup, pretty_indented
 
 
 class TestCardView:
@@ -209,7 +209,7 @@ class TestEditOrganization:
         client.force_login(user)
         response = client.get(url)
         form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
-        assert str(form) == snapshot(name="Fields are disabled")
+        assert pretty_indented(form) == snapshot(name="Fields are disabled")
         assertContains(response, "Affichage des informations en lecture seule", count=1)
 
         post_data = {

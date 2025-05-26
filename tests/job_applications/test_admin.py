@@ -15,7 +15,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def test_create_employee_record(admin_client):
@@ -383,7 +383,7 @@ def test_available_transitions(client, state, snapshot):
 
     client.force_login(superuser)
     response = client.get(url)
-    assert str(parse_response_to_soup(response, "#job-app-transitions")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, "#job-app-transitions")) == snapshot
 
     client.force_login(ro_user)
     response = client.get(url)

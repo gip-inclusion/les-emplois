@@ -2,739 +2,721 @@
 # name: TestCardView.test_block_job_applications[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  <span>Recrutement en cours</span>
-                                  
-                              </a>
-                          </li>
-                          
-                              <li class="nav-item" role="presentation">
-                                  <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      <span>Autre métier exercé</span>
-                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
-                                  </a>
-                              </li>
-                          
-                      </ul>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
+              <span>
+                  Recrutement en cours
+              </span>
+          </a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
+              <span>
+                  Autre métier exercé
+              </span>
+              <span class="badge badge-sm rounded-pill ms-2">
+                  1
+              </span>
+          </a>
+      </li>
+  </ul>
+  
   '''
 # ---
 # name: TestCardView.test_block_job_applications[tab-content]
   '''
   <div class="tab-content">
-                          <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
-                              
-                                  <p class="mb-0">Cet employeur n’a pas de recrutement en cours.</p>
-                              
-                          </div>
-                          
-                              <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-                                  <ul class="list-group list-group-flush list-group-link">
-                                      
-                                          
-  
-  
-  <li class="list-group-item list-group-item-action">
-      <div class="d-flex align-items-center">
-          <div>
-              <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                  
-                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
-                  
-                  
-              </div>
-              <span class="fs-sm mt-1 d-flex align-items-center">
-                  <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1"></i>
-                  
-                      Vannes (56)
-                  
-              </span>
-          </div>
-          <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-              
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">CDI</span>
-              
-              
-          </div>
+      <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
+          <p class="mb-0">
+              Cet employeur n’a pas de recrutement en cours.
+          </p>
       </div>
-  </li>
-  
-                                      
-                                  </ul>
-                              </div>
-                          
-                          
+      <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+          <ul class="list-group list-group-flush list-group-link">
+              <li class="list-group-item list-group-item-action">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                                  Plaquiste
+                              </a>
+                          </div>
+                          <span class="fs-sm mt-1 d-flex align-items-center">
+                              <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                              </i>
+                              Vannes (56)
+                          </span>
                       </div>
+                      <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                          <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
+                              CDI
+                          </span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_active_and_other_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  <span>Recrutement en cours</span>
-                                  
-                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
-                                  
-                              </a>
-                          </li>
-                          
-                              <li class="nav-item" role="presentation">
-                                  <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      <span>Autre métier exercé</span>
-                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
-                                  </a>
-                              </li>
-                          
-                      </ul>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
+              <span>
+                  Recrutement en cours
+              </span>
+              <span class="badge badge-sm rounded-pill ms-2">
+                  1
+              </span>
+          </a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
+              <span>
+                  Autre métier exercé
+              </span>
+              <span class="badge badge-sm rounded-pill ms-2">
+                  1
+              </span>
+          </a>
+      </li>
+  </ul>
+  
   '''
 # ---
 # name: TestCardView.test_card_active_and_other_jobs[tab-content]
   '''
   <div class="tab-content">
-                          <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
-                              
-                                  <ul class="list-group list-group-flush list-group-link">
-                                      
-                                          
-  
-  
-  <li class="list-group-item list-group-item-action">
-      <div class="d-flex align-items-center">
-          <div>
-              <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                  
-                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
-                  
-                  
-              </div>
-              <span class="fs-sm mt-1 d-flex align-items-center">
-                  <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1"></i>
-                  
-                      Vannes (56)
-                  
-              </span>
-          </div>
-          <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-              
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">CDI</span>
-              
-              
-          </div>
-      </div>
-  </li>
-  
-                                      
-                                  </ul>
-                              
+      <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
+          <ul class="list-group list-group-flush list-group-link">
+              <li class="list-group-item list-group-item-action">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                                  Plaquiste
+                              </a>
                           </div>
-                          
-                              <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-                                  <ul class="list-group list-group-flush list-group-link">
-                                      
-                                          
-  
-  
-  <li class="list-group-item list-group-item-action">
-      <div class="d-flex align-items-center">
-          <div>
-              <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                  
-                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Peintre</a>
-                  
-                  
-              </div>
-              <span class="fs-sm mt-1 d-flex align-items-center">
-                  <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1"></i>
-                  
-                      Vannes (56)
-                  
-              </span>
-          </div>
-          <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-              
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">CDI</span>
-              
-              
-          </div>
-      </div>
-  </li>
-  
-                                      
-                                  </ul>
-                              </div>
-                          
-                          
-                              
-                                  <div class="d-flex justify-content-end mt-3">
-                                      
-                                      <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-                                          <i aria-hidden="true" class="ri-draft-line"></i>
-                                          <span>Postuler</span>
-                                      </a>
-                                  </div>
-                              
-                          
+                          <span class="fs-sm mt-1 d-flex align-items-center">
+                              <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                              </i>
+                              Vannes (56)
+                          </span>
                       </div>
+                      <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                          <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
+                              CDI
+                          </span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+          <ul class="list-group list-group-flush list-group-link">
+              <li class="list-group-item list-group-item-action">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                                  Peintre
+                              </a>
+                          </div>
+                          <span class="fs-sm mt-1 d-flex align-items-center">
+                              <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                              </i>
+                              Vannes (56)
+                          </span>
+                      </div>
+                      <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                          <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
+                              CDI
+                          </span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
+              <i aria-hidden="true" class="ri-draft-line">
+              </i>
+              <span>
+                  Postuler
+              </span>
+          </a>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_flow[navinfo-company-card]
   '''
   <div class="c-navinfo">
-          
-              <div class="c-navinfo__prevstep">
-                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
-                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-                      <span>
-                          Retour
+      <div class="c-navinfo__prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
                           à la liste
-                      </span>
-                  </a>
-              </div>
-          
-          
-          
+              </span>
+          </a>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_flow[navinfo-job-description]
   '''
   <div class="c-navinfo">
-          
-              <div class="c-navinfo__prevstep">
-                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
-                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-                      <span>
-                          Retour
+      <div class="c-navinfo__prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/search/employers/results">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
                           à la liste
-                      </span>
-                  </a>
-              </div>
-          
-          
-          
+              </span>
+          </a>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_no_active_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  <span>Recrutement en cours</span>
-                                  
-                              </a>
-                          </li>
-                          
-                              <li class="nav-item" role="presentation">
-                                  <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      <span>Autre métier exercé</span>
-                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
-                                  </a>
-                              </li>
-                          
-                      </ul>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
+              <span>
+                  Recrutement en cours
+              </span>
+          </a>
+      </li>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
+              <span>
+                  Autre métier exercé
+              </span>
+              <span class="badge badge-sm rounded-pill ms-2">
+                  1
+              </span>
+          </a>
+      </li>
+  </ul>
+  
   '''
 # ---
 # name: TestCardView.test_card_no_active_jobs[tab-content]
   '''
   <div class="tab-content">
-                          <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
-                              
-                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
-                              
-                          </div>
-                          
-                              <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-                                  <ul class="list-group list-group-flush list-group-link">
-                                      
-                                          
-  
-  
-  <li class="list-group-item list-group-item-action">
-      <div class="d-flex align-items-center">
-          <div>
-              <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                  
-                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
-                  
-                  
-              </div>
-              <span class="fs-sm mt-1 d-flex align-items-center">
-                  <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1"></i>
-                  
-                      Vannes (56)
-                  
-              </span>
-          </div>
-          <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-              
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">CDI</span>
-              
-              
-          </div>
+      <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
+          <p class="mb-0">
+              Cet employeur accepte de recevoir des candidatures spontanées.
+          </p>
       </div>
-  </li>
-  
-                                      
-                                  </ul>
-                              </div>
-                          
-                          
-                              
-                                  <div class="d-flex justify-content-end mt-3">
-                                      
-                                      <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-                                          <i aria-hidden="true" class="ri-draft-line"></i>
-                                          <span>Postuler</span>
-                                      </a>
-                                  </div>
-                              
-                          
+      <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+          <ul class="list-group list-group-flush list-group-link">
+              <li class="list-group-item list-group-item-action">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                                  Plaquiste
+                              </a>
+                          </div>
+                          <span class="fs-sm mt-1 d-flex align-items-center">
+                              <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                              </i>
+                              Vannes (56)
+                          </span>
                       </div>
+                      <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                          <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
+                              CDI
+                          </span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
+              <i aria-hidden="true" class="ri-draft-line">
+              </i>
+              <span>
+                  Postuler
+              </span>
+          </a>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_no_active_members
   '''
   <main class="s-main" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
-  </div>
-  
-              <section class="s-title-02">
-                  <div class="s-title-02__container container">
-                      <div class="s-title-02__row row">
-                          <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-  
-  
-  
-                              
-      
-      
-  <div class="c-title">
-      <div class="c-title__main">
-              <h1>Acme inc.</h1>
-              <p>Entreprise d'insertion</p>
-          </div>
-      
-      
-  </div>
-  
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
-              
-              <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                      <span class="d-lg-none">Autres actions</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                      <li>
-                          <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche entreprise</span>
-  </button>
-  
-                      </li>
-                      <li>
-                          <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                              <span>Signaler cette fiche entreprise</span>
-                          </a>
-                      </li>
-                  </ul>
-              </div>
-          </div>
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
       </div>
-  
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Acme inc.
+                              </h1>
+                              <p>
+                                  Entreprise d'insertion
+                              </p>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+                                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                                      </i>
+                                      <span class="d-lg-none">
+                                          Autres actions
+                                      </span>
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                      <li>
+                                          <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span>
+                                                  Copier le lien de cette fiche entreprise
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
+                                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                                              </i>
+                                              <span>
+                                                  Signaler cette fiche entreprise
+                                              </span>
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
                           </div>
                       </div>
                   </div>
-              </section>
-  
-              
+              </div>
+          </div>
+      </section>
       <section class="s-section">
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0 d-none d-lg-block">
                       <div class="c-box h-100 d-flex align-items-center justify-content-center">
-                          
-  
-                          
-  
-                          
-                              <div class="text-center">
-                                  <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
-                                  <p class="mb-0 mt-3">
-                                      <strong>Oups ! Aucune information en vue !</strong>
-                                  </p>
-                                  <p>
-                                      <i>La structure n’a pas encore renseigné son activité
-                                          <br class="d-none d-lg-inline"/>
-                                      et l’accompagnement proposé.</i>
-                                  </p>
-                              </div>
-                          
+                          <div class="text-center">
+                              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
+                              <p class="mb-0 mt-3">
+                                  <strong>
+                                      Oups ! Aucune information en vue !
+                                  </strong>
+                              </p>
+                              <p>
+                                  <i>
+                                      La structure n’a pas encore renseigné son activité
+                                      <br class="d-none d-lg-inline"/>
+                                      et l’accompagnement proposé.
+                                  </i>
+                              </p>
+                          </div>
                       </div>
                   </div>
                   <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
-                      
-                          <div class="c-box mb-3 mb-lg-5 bg-emploi-lightest border-info">
-                              <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
-                          </div>
-                      
+                      <div class="c-box mb-3 mb-lg-5 bg-emploi-lightest border-info">
+                          <p class="mb-0">
+                              Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.
+                          </p>
+                      </div>
                       <div class="c-box">
-                          <h3 class="mb-2">Coordonnées</h3>
+                          <h3 class="mb-2">
+                              Coordonnées
+                          </h3>
                           <div class="d-flex text-secondary fs-sm">
-                              <i aria-hidden="true" class="ri-map-pin-2-line me-2"></i>
-                              <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                              <i aria-hidden="true" class="ri-map-pin-2-line me-2">
+                              </i>
+                              <address class="m-0">
+                                  112 rue de la Croix-Nivert, 75015 Paris
+                              </address>
                           </div>
                           <hr class="my-3"/>
                           <ul class="fs-sm list-unstyled mb-0">
-                              
-                                  <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-                              
-                              
-                                  
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-                              
-                              
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                      contact@acmeinc.com
+                                  </a>
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  06 12 34 56 78
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
                           </ul>
                       </div>
                   </div>
               </div>
           </div>
       </section>
-  
       <section class="s-tabs-01 mt-0 pt-0" id="metiers">
           <div class="s-tabs-01__container container">
               <div class="s-tabs-01__row row">
                   <div class="s-tabs-01__col col-12">
-                      <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
+                      <h2 class="visually-hidden" id="metiers-title">
+                          Métiers de la structure
+                      </h2>
                       <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  <span>Recrutement en cours</span>
-                                  
+                                  <span>
+                                      Recrutement en cours
+                                  </span>
                               </a>
                           </li>
-                          
                       </ul>
                       <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
-                              
-                                  <p class="mb-0">Cet employeur accepte de recevoir des candidatures spontanées.</p>
-                              
+                              <p class="mb-0">
+                                  Cet employeur accepte de recevoir des candidatures spontanées.
+                              </p>
                           </div>
-                          
-                          
                       </div>
                   </div>
               </div>
           </div>
       </section>
+  </main>
   
-      
-  
-          </main>
   '''
 # ---
 # name: TestCardView.test_card_no_other_jobs[nav-tabs]
   '''
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  <span>Recrutement en cours</span>
-                                  
-                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
-                                  
-                              </a>
-                          </li>
-                          
-                      </ul>
+      <li class="nav-item" role="presentation">
+          <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
+              <span>
+                  Recrutement en cours
+              </span>
+              <span class="badge badge-sm rounded-pill ms-2">
+                  1
+              </span>
+          </a>
+      </li>
+  </ul>
+  
   '''
 # ---
 # name: TestCardView.test_card_no_other_jobs[tab-content]
   '''
   <div class="tab-content">
-                          <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
-                              
-                                  <ul class="list-group list-group-flush list-group-link">
-                                      
-                                          
-  
-  
-  <li class="list-group-item list-group-item-action">
-      <div class="d-flex align-items-center">
-          <div>
-              <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                  
-                      <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">Plaquiste</a>
-                  
-                  
-              </div>
-              <span class="fs-sm mt-1 d-flex align-items-center">
-                  <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1"></i>
-                  
-                      Vannes (56)
-                  
-              </span>
-          </div>
-          <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-              
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">CDI</span>
-              
-              
-          </div>
-      </div>
-  </li>
-  
-                                      
-                                  </ul>
-                              
+      <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
+          <ul class="list-group list-group-flush list-group-link">
+              <li class="list-group-item list-group-item-action">
+                  <div class="d-flex align-items-center">
+                      <div>
+                          <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                              <a class="fw-bold stretched-link order-2 order-md-1" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="clic-metiers" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/company/[PK of Company]/card">
+                                  Plaquiste
+                              </a>
                           </div>
-                          
-                          
-                              
-                                  <div class="d-flex justify-content-end mt-3">
-                                      
-                                      <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-                                          <i aria-hidden="true" class="ri-draft-line"></i>
-                                          <span>Postuler</span>
-                                      </a>
-                                  </div>
-                              
-                          
+                          <span class="fs-sm mt-1 d-flex align-items-center">
+                              <i aria-hidden="true" class="ri-map-pin-2-line ri-sm me-1">
+                              </i>
+                              Vannes (56)
+                          </span>
                       </div>
+                      <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                          <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
+                              CDI
+                          </span>
+                      </div>
+                  </div>
+              </li>
+          </ul>
+      </div>
+      <div class="d-flex justify-content-end mt-3">
+          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
+              <i aria-hidden="true" class="ri-draft-line">
+              </i>
+              <span>
+                  Postuler
+              </span>
+          </a>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_tally_url_no_user
   '''
   <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
-              
-              <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                      <span class="d-lg-none">Autres actions</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                      <li>
-                          <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche entreprise</span>
-  </button>
-  
-                      </li>
-                      <li>
-                          <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                              <span>Signaler cette fiche entreprise</span>
-                          </a>
-                      </li>
-                  </ul>
-              </div>
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+              <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                  </i>
+                  <span class="d-lg-none">
+                      Autres actions
+                  </span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li>
+                      <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette fiche entreprise
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                          </i>
+                          <span>
+                              Signaler cette fiche entreprise
+                          </span>
+                      </a>
+                  </li>
+              </ul>
           </div>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestCardView.test_card_tally_url_with_user
   '''
   <div class="c-box c-box--action">
-          <h2 class="visually-hidden">Actions rapides</h2>
-          <div class="form-row align-items-center gx-3">
-              
-              
-              <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                  <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                      <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                      <span class="d-lg-none">Autres actions</span>
-                  </button>
-                  <ul class="dropdown-menu">
-                      <li>
-                          <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche entreprise</span>
-  </button>
-  
-                      </li>
-                      <li>
-                          <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10" rel="noopener" target="_blank">
-                              <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                              <span>Signaler cette fiche entreprise</span>
-                          </a>
-                      </li>
-                  </ul>
-              </div>
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+              <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                  </i>
+                  <span class="d-lg-none">
+                      Autres actions
+                  </span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li>
+                      <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/100/card" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette fiche entreprise
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&UserID=10" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                          </i>
+                          <span>
+                              Signaler cette fiche entreprise
+                          </span>
+                      </a>
+                  </li>
+              </ul>
           </div>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestJobDescriptionCardView.test_card_tally_url_no_user
   '''
   <div class="c-box c-box--action">
-              <h2 class="visually-hidden">Actions rapides</h2>
-              <div class="form-row align-items-center gx-3">
-                  
-                      
-                          <div class="form-group col-12 col-lg-auto">
-                              
-                              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&amp;back_url=/company/job_description/42/card">
-                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                                  <span>Postuler</span>
-                              </a>
-                          </div>
-                      
-                  
-                  
-                  <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                      <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                          <span class="d-lg-none">Autres actions</span>
-                      </button>
-                      <ul class="dropdown-menu">
-                          <li>
-                              <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche de poste</span>
-  </button>
-  
-                          </li>
-                          <li>
-                              <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                                  <span>Signaler cette fiche de poste</span>
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&back_url=/company/job_description/42/card">
+                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                  </i>
+                  <span>
+                      Postuler
+                  </span>
+              </a>
           </div>
+          <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+              <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                  </i>
+                  <span class="d-lg-none">
+                      Autres actions
+                  </span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li>
+                      <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette fiche de poste
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&jobdescriptionID=42" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                          </i>
+                          <span>
+                              Signaler cette fiche de poste
+                          </span>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestJobDescriptionCardView.test_card_tally_url_with_user[with_other_jobs]
   '''
   <div class="c-box c-box--action">
-              <h2 class="visually-hidden">Actions rapides</h2>
-              <div class="form-row align-items-center gx-3">
-                  
-                      
-                          <div class="form-group col-12 col-lg-auto">
-                              
-                              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&amp;back_url=/company/job_description/42/card">
-                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                                  <span>Postuler</span>
-                              </a>
-                          </div>
-                      
-                  
-                  
-                      <div class="form-group col-12 col-lg-auto">
-                          <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="#recrutements">
-                              <i aria-hidden="true" class="ri-eye-line fw-medium"></i>
-                              <span>Voir tous les métiers</span>
-                          </a>
-                      </div>
-                  
-                  <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                      <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                          <span class="d-lg-none">Autres actions</span>
-                      </button>
-                      <ul class="dropdown-menu">
-                          <li>
-                              <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche de poste</span>
-  </button>
-  
-                          </li>
-                          <li>
-                              <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                                  <span>Signaler cette fiche de poste</span>
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&back_url=/company/job_description/42/card">
+                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                  </i>
+                  <span>
+                      Postuler
+                  </span>
+              </a>
           </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" href="#recrutements">
+                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                  </i>
+                  <span>
+                      Voir tous les métiers
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+              <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                  </i>
+                  <span class="d-lg-none">
+                      Autres actions
+                  </span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li>
+                      <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette fiche de poste
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&UserID=10&jobdescriptionID=42" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                          </i>
+                          <span>
+                              Signaler cette fiche de poste
+                          </span>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestJobDescriptionCardView.test_card_tally_url_with_user[without_other_jobs]
   '''
   <div class="c-box c-box--action">
-              <h2 class="visually-hidden">Actions rapides</h2>
-              <div class="form-row align-items-center gx-3">
-                  
-                      
-                          <div class="form-group col-12 col-lg-auto">
-                              
-                              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&amp;back_url=/company/job_description/42/card">
-                                  <i aria-hidden="true" class="ri-draft-line fw-medium"></i>
-                                  <span>Postuler</span>
-                              </a>
-                          </div>
-                      
-                  
-                  
-                  <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                      <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
-                          <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal"></i>
-                          <span class="d-lg-none">Autres actions</span>
-                      </button>
-                      <ul class="dropdown-menu">
-                          <li>
-                              <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier le lien de cette fiche de poste</span>
-  </button>
-  
-                          </li>
-                          <li>
-                              <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&amp;UserID=10&amp;jobdescriptionID=42" rel="noopener" target="_blank">
-                                  <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal"></i>
-                                  <span>Signaler cette fiche de poste</span>
-                              </a>
-                          </li>
-                      </ul>
-                  </div>
-              </div>
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42&back_url=/company/job_description/42/card">
+                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                  </i>
+                  <span>
+                      Postuler
+                  </span>
+              </a>
           </div>
+          <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+              <button aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires" class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-more-2-line ri-lg fw-normal">
+                  </i>
+                  <span class="d-lg-none">
+                      Autres actions
+                  </span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li>
+                      <button class="dropdown-item btn-ico btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="http://localhost:8000/company/job_description/42/card" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span>
+                              Copier le lien de cette fiche de poste
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <a class="dropdown-item btn-ico btn-link" href="https://tally.so/r/m62GYo?companyID=100&UserID=10&jobdescriptionID=42" rel="noopener" target="_blank">
+                          <i aria-hidden="true" class="ri-notification-4-line ri-lg fw-normal">
+                          </i>
+                          <span>
+                              Signaler cette fiche de poste
+                          </span>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestJobDescriptionCardView.test_job_description_card
@@ -943,19 +925,17 @@
 # name: TestJobDescriptionCardView.test_job_description_card[navinfo]
   '''
   <div class="c-navinfo">
-          
-              <div class="c-navinfo__prevstep">
-                  <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/company/job_description_list">
-                      <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-                      <span>
-                          Retour
+      <div class="c-navinfo__prevstep">
+          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/company/job_description_list">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+              </i>
+              <span>
+                  Retour
                           à la liste
-                      </span>
-                  </a>
-              </div>
-          
-          
-          
+              </span>
+          </a>
       </div>
+  </div>
+  
   '''
 # ---

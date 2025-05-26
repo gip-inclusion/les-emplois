@@ -11,7 +11,7 @@ from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 @freeze_time("2023-04-13")
@@ -55,17 +55,17 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
 
-    assert str(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")
+    assert pretty_indented(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")
 
     client.force_login(sender)
     response = client.get(reverse("apply:list_prescriptions"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
-    assert str(results_section) == snapshot(name="PRESCRIBER - warnings for 2222 and 3333")
+    assert pretty_indented(results_section) == snapshot(name="PRESCRIBER - warnings for 2222 and 3333")
 
     client.force_login(job_seeker)
     response = client.get(reverse("apply:list_for_job_seeker"))
     results_section = parse_response_to_soup(response, selector="#job-applications-section")
-    assert str(results_section) == snapshot(name="JOB SEEKER - no warnings")
+    assert pretty_indented(results_section) == snapshot(name="JOB SEEKER - no warnings")
 
 
 @pytest.mark.parametrize("order", JobApplicationOrder)

@@ -2,42 +2,40 @@
 # name: test_missing_employee[existing_employee_record_other_company]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Eliott EMERY</h2>
-  
-                              
-                                  <p>Ce salarié a 1 PASS IAE disponible</p>
-  
-                                  
-                                      <hr/>
-                                      <p>
-                                          <strong>XXXXXXX00003</strong> du 14/02/2025 au 13/02/2027
-                                      </p>
-                                      
-                                          <p>
-                                              Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : EI Acme inc. - SIRET 012 345 678 910
-                                          </p>
-                                          <p>
-                                              Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure.
-                                          </p>
-                                          <p>
-                                              Seule la première embauche avec ce PASS IAE nécessite une transmission de la fiche salarié.
-                                              <br/>
-                                              En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
-                                          </p>
-                                      
-                                  
-                              
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Eliott EMERY
+                      </h2>
+                      <p>
+                          Ce salarié a 1 PASS IAE disponible
+                      </p>
+                      <hr/>
+                      <p>
+                          <strong>
+                              XXXXXXX00003
+                          </strong>
+                          du 14/02/2025 au 13/02/2027
+                      </p>
+                      <p>
+                          Une fiche salarié existe déjà pour ce PASS IAE dans une autre structure avec la même convention : EI Acme inc. - SIRET 012 345 678 910
+                      </p>
+                      <p>
+                          Si vous souhaitez visualiser cette fiche salarié, vous devez vous connecter au tableau de bord de cette structure.
+                      </p>
+                      <p>
+                          Seule la première embauche avec ce PASS IAE nécessite une transmission de la fiche salarié.
+                          <br/>
+                          En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
+                      </p>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: test_missing_employee[existing_employee_record_same_company]
@@ -81,86 +79,85 @@
 # name: test_missing_employee[form]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Rechercher parmi tous les salariés</h2>
-                              <form method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-  
-                                  <p>
-                                      Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés et candidats pour lesquels il y a au moins une candidature au sein de votre structure.
-                                  </p>
-                                  <div class="form-group form-group-required"><label class="form-label" for="id_employee">Nom du salarié</label><select class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee" required="">
-    <option selected="" value="">Sélectionnez le salarié</option>
-  
-  </select></div>
-  
-                                  
-                                  
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3"/>
-          <small class="d-inline-block mb-3">* champs obligatoires</small>
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/employee_record/list">
-                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                          <span>Annuler</span>
-                      </a>
-                  
-              </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
-                          <span>Rechercher</span>
-                      </button>
-                  
-              </div>
-          </div>
-      </div>
-  </div>
-  
-  
-  
-                              </form>
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Rechercher parmi tous les salariés
+                      </h2>
+                      <form method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <p>
+                              Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés et candidats pour lesquels il y a au moins une candidature au sein de votre structure.
+                          </p>
+                          <div class="form-group form-group-required">
+                              <label class="form-label" for="id_employee">
+                                  Nom du salarié
+                              </label>
+                              <select class="form-select django-select2" data-allow-clear="false" data-minimum-input-length="0" data-theme="bootstrap-5" id="id_employee" lang="fr" name="employee" required="">
+                                  <option selected="" value="">
+                                      Sélectionnez le salarié
+                                  </option>
+                              </select>
+                          </div>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/employee_record/list">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Rechercher
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </form>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: test_missing_employee[no_approval]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Béatrice BEAUREGARD</h2>
-  
-                              
-                                  <p>
-                                      La création d’une fiche salarié pour cette personne est impossible car vous aviez déclaré une embauche sans aide au poste. Par conséquent, elle ne possède pas de PASS IAE.
-                                  </p>
-                                  <p>
-                                      Si vous souhaitez bénéficier d’une aide au poste, vous devez d’abord obtenir un PASS IAE en effectuant une nouvelle embauche, puis créer sa fiche salarié.
-                                  </p>
-                              
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Béatrice BEAUREGARD
+                      </h2>
+                      <p>
+                          La création d’une fiche salarié pour cette personne est impossible car vous aviez déclaré une embauche sans aide au poste. Par conséquent, elle ne possède pas de PASS IAE.
+                      </p>
+                      <p>
+                          Si vous souhaitez bénéficier d’une aide au poste, vous devez d’abord obtenir un PASS IAE en effectuant une nouvelle embauche, puis créer sa fiche salarié.
+                      </p>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: test_missing_employee[no_employee_record]

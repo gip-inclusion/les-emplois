@@ -32,6 +32,7 @@ from tests.utils.test import (
     assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
+    pretty_indented,
 )
 
 
@@ -690,7 +691,7 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
         # GEIQ and non IAE kind do not have a filter on approval and eligibility.
         # Non IAE kind do not have prior action.
-        assert str(filter_form) == snapshot(name=kind_snapshot[kind])
+        assert pretty_indented(filter_form) == snapshot(name=kind_snapshot[kind])
 
 
 def test_archived(client):
@@ -842,7 +843,7 @@ def test_list_snapshot(client, snapshot):
     ]:
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
-        assert str(page) == snapshot(name="empty")
+        assert pretty_indented(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
@@ -889,7 +890,7 @@ def test_list_snapshot(client, snapshot):
             )
         ),
     )
-    assert str(page) == snapshot(name="applications list")
+    assert pretty_indented(page) == snapshot(name="applications list")
 
     # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
@@ -929,7 +930,7 @@ def test_list_snapshot(client, snapshot):
             )
         ),
     )
-    assert str(page) == snapshot(name="applications table")
+    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_list_for_siae_exports(client, snapshot):
@@ -939,7 +940,7 @@ def test_list_for_siae_exports(client, snapshot):
     response = client.get(reverse("apply:list_for_siae_exports"))
     assertContains(response, "Toutes les candidatures")
     assert_previous_step(response, reverse("dashboard:index"))
-    assert str(parse_response_to_soup(response, selector="#besoin-dun-chiffre")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, selector="#besoin-dun-chiffre")) == snapshot
 
 
 def test_list_for_siae_exports_as_prescriber(client):
@@ -1029,7 +1030,7 @@ def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
     client.force_login(job_application.to_company.members.get())
     response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
     badge = parse_response_to_soup(response, selector=".c-box--results__summary span.badge")
-    assert str(badge) == snapshot
+    assert pretty_indented(badge) == snapshot
 
 
 def test_reset_filter_button_snapshot(client, snapshot):
@@ -1039,10 +1040,10 @@ def test_reset_filter_button_snapshot(client, snapshot):
     filter_params = {"states": [job_application.state], "display": JobApplicationsDisplayKind.LIST}
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
-    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
         name="reset-filter button in list view"
     )
-    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
         name="off-canvas buttons in list view"
     )
 
@@ -1050,10 +1051,10 @@ def test_reset_filter_button_snapshot(client, snapshot):
     filter_params["order"] = JobApplicationOrder.CREATED_AT_ASC
     response = client.get(reverse("apply:list_for_siae"), filter_params)
 
-    assert str(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#apply-list-filter-counter")) == snapshot(
         name="reset-filter button in table view & created_at ascending order"
     )
-    assert str(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
+    assert pretty_indented(parse_response_to_soup(response, selector="#offcanvasApplyFiltersButtons")) == snapshot(
         name="off-canvas buttons in table view & created_at ascending order"
     )
 
@@ -1192,10 +1193,10 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     archive_button = get_archive_button()
     assert archive_button is not None
     assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
-    assert str(archive_button) == snapshot(name="active archive button")
+    assert pretty_indented(archive_button) == snapshot(name="active archive button")
 
     modal = get_archive_modal()
-    assert str(modal) == snapshot(name="modal with 1 archivable application")
+    assert pretty_indented(modal) == snapshot(name="modal with 1 archivable application")
     # Check that the next_url is correctly transmitted
     modal_form_action = urlsplit(modal.find("form")["action"])
     assert modal_form_action.path == reverse("apply:batch_archive")
@@ -1206,8 +1207,8 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     archive_button = get_archive_button()
     assert archive_button is not None
     assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
-    assert str(archive_button) == snapshot(name="active archive button")
-    assert str(get_archive_modal()) == snapshot(name="modal with 2 archivable applications")
+    assert pretty_indented(archive_button) == snapshot(name="active archive button")
+    assert pretty_indented(get_archive_modal()) == snapshot(name="modal with 2 archivable applications")
 
     # Test with unarchivable batches
     for app_list in [
@@ -1220,7 +1221,7 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
         # No modal & linked button
         assert get_archive_modal() is None
         archive_button = get_archive_button()
-        assert str(archive_button) == snapshot(name="inactive archive button")
+        assert pretty_indented(archive_button) == snapshot(name="inactive archive button")
 
 
 def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
@@ -1291,13 +1292,13 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     simulate_applications_selection([transferable_app_1.pk])
     transfer_button = get_transfer_button()
     assert transfer_button is not None
-    assert str(transfer_button.parent) == snapshot(name="active transfer button")
+    assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
 
     other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
     modal_selector = other_company_1_button["data-bs-target"]
     assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
     modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
-    assert str(modal) == snapshot(name="modal with 1 transferable application")
+    assert pretty_indented(modal) == snapshot(name="modal with 1 transferable application")
 
     # Check that the next_url is correctly transmitted
     modal_form_action = urlsplit(modal.find("form")["action"])
@@ -1308,13 +1309,13 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     simulate_applications_selection([transferable_app_1.pk, transferable_app_2.pk])
     transfer_button = get_transfer_button()
     assert transfer_button is not None
-    assert str(transfer_button.parent) == snapshot(name="active transfer button")
+    assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
 
     other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
     modal_selector = other_company_1_button["data-bs-target"]
     assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
     modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
-    assert str(modal) == snapshot(name="modal with 2 transferable application")
+    assert pretty_indented(modal) == snapshot(name="modal with 2 transferable application")
 
     # Test with untransferable batches
     for app_list in [
@@ -1323,7 +1324,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     ]:
         simulate_applications_selection(app_list)
         transfer_button = get_transfer_button()
-        assert str(transfer_button) == snapshot(name="inactive archive button")
+        assert pretty_indented(transfer_button) == snapshot(name="inactive archive button")
         assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_1.pk}") is None
         assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_2.pk}") is None
 
@@ -1399,10 +1400,10 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     postpone_button = get_postpone_button()
     assert postpone_button is not None
     assert postpone_button["data-bs-target"] == f"#{MODAL_ID}"
-    assert str(postpone_button) == snapshot(name="active postpone button")
+    assert pretty_indented(postpone_button) == snapshot(name="active postpone button")
 
     modal = get_postpone_modal()
-    assert str(modal) == snapshot(name="modal with 1 postponable application")
+    assert pretty_indented(modal) == snapshot(name="modal with 1 postponable application")
     # Check that the next_url is correctly transmitted
     modal_form_action = urlsplit(modal.find("form")["action"])
     assert modal_form_action.path == reverse("apply:batch_postpone")
@@ -1413,8 +1414,8 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     postpone_button = get_postpone_button()
     assert postpone_button is not None
     assert postpone_button["data-bs-target"] == f"#{MODAL_ID}"
-    assert str(postpone_button) == snapshot(name="active postpone button")
-    assert str(get_postpone_modal()) == snapshot(name="modal with 2 postponable applications")
+    assert pretty_indented(postpone_button) == snapshot(name="active postpone button")
+    assert pretty_indented(get_postpone_modal()) == snapshot(name="modal with 2 postponable applications")
 
     # Test with unpostponable batches
     for app_list in [
@@ -1427,7 +1428,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
         # No modal & linked button
         assert get_postpone_modal() is None
         postpone_button = get_postpone_button()
-        assert str(postpone_button) == snapshot(name="inactive postpone button")
+        assert pretty_indented(postpone_button) == snapshot(name="inactive postpone button")
 
     # Check as GEIQ
     company.kind = CompanyKind.GEIQ
@@ -1436,7 +1437,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     # No modal & linked button
     assert get_postpone_modal() is None
     postpone_button = get_postpone_button()
-    assert str(postpone_button) == snapshot(name="inactive postpone button as GEIQ")
+    assert pretty_indented(postpone_button) == snapshot(name="inactive postpone button as GEIQ")
 
 
 def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
@@ -1503,7 +1504,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     simulate_applications_selection([refusable_app_1.pk])
     refuse_button = get_refuse_button()
     assert refuse_button is not None
-    assert str(refuse_button) == snapshot(name="active refuse button")
+    assert pretty_indented(refuse_button) == snapshot(name="active refuse button")
 
     # Check that the next_url is correctly transmitted
     refuse_form_action = urlsplit(refuse_button.parent["action"])
@@ -1514,7 +1515,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     simulate_applications_selection([refusable_app_1.pk, refusable_app_2.pk])
     refuse_button = get_refuse_button()
     assert refuse_button is not None
-    assert str(refuse_button) == snapshot(name="active refuse button")
+    assert pretty_indented(refuse_button) == snapshot(name="active refuse button")
 
     # Test with unpostponable batches
     for app_list in [
@@ -1524,14 +1525,14 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     ]:
         simulate_applications_selection(app_list)
         refuse_button = get_refuse_button()
-        assert str(refuse_button) == snapshot(name="inactive refuse button")
+        assert pretty_indented(refuse_button) == snapshot(name="inactive refuse button")
 
     # Check as GEIQ
     company.kind = CompanyKind.GEIQ
     company.save(update_fields={"kind", "updated_at"})
     simulate_applications_selection([refused_app.pk, refusable_app_1.pk])
     refuse_button = get_refuse_button()
-    assert str(refuse_button) == snapshot(name="inactive refuse button as GEIQ")
+    assert pretty_indented(refuse_button) == snapshot(name="inactive refuse button as GEIQ")
 
 
 def test_order(client, subtests):

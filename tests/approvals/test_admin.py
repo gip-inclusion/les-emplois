@@ -15,7 +15,7 @@ from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory,
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestApprovalAdmin:
@@ -41,13 +41,13 @@ def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, 
     suspension = SuspensionFactory(approval=approval)
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     field_helptext = parse_response_to_soup(response, selector=selector)
-    assert str(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
+    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
 
     suspension.delete()
     ProlongationFactory(approval=approval)
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     field_helptext = parse_response_to_soup(response, selector=selector)
-    assert str(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
+    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
 
 
 def test_prolongation_report_file_filter(admin_client):

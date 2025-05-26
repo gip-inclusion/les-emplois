@@ -3585,39 +3585,50 @@
 # name: test_list_for_siae_badge[no_eligibility_diag]
   '''
   <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-              <i aria-hidden="true" class="ri-error-warning-line"></i>
-              Éligibilité IAE à valider
-          </span>
+      <i aria-hidden="true" class="ri-error-warning-line">
+      </i>
+      Éligibilité IAE à valider
+  </span>
+  
   '''
 # ---
 # name: test_list_for_siae_badge[with_approval]
   '''
   <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide
-              </span>
+      <i aria-hidden="true" class="ri-pass-valid-line">
+      </i>
+      PASS IAE valide
+  </span>
+  
   '''
 # ---
 # name: test_list_for_siae_badge[with_eligibility_diag]
   '''
   <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
+      <i aria-hidden="true" class="ri-check-line">
+      </i>
+      Éligible à l’IAE
+  </span>
+  
   '''
 # ---
 # name: test_list_for_siae_exports
   '''
   <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
-                              <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
-                                  <span>Besoin d'un chiffre ?</span>
-                              </button>
-                              
-                                  <div class="c-info__detail collapse" id="collapseBesoinChiffre">
-                                      Accédez aux <a href="/stats/siae/hiring" rel="noopener" target="_blank">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
-                                  </div>
-                              
-                          </div>
+      <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
+          <span>
+              Besoin d'un chiffre ?
+          </span>
+      </button>
+      <div class="c-info__detail collapse" id="collapseBesoinChiffre">
+          Accédez aux
+          <a href="/stats/siae/hiring" rel="noopener" target="_blank">
+              données de recrutement de votre structure
+          </a>
+          (non nominatives) compilées, calculées et mises à jour quotidiennement.
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_exports_download[for_snapshot]
@@ -3739,1893 +3750,1800 @@
 # name: test_list_for_siae_filter_for_different_kind[geiq]
   '''
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
-          <div class="offcanvas-header">
-              <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
-                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
-                  <span>Filtrer</span>
-              </h4>
-              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
-          </div>
-          
-  
-  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
-      
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
-                  Statut
-              </button>
-          </legend>
-          <div class="my-3 collapse" id="collapseStates">
-              <ul>
-                  
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+              </i>
+              <span>
+                  Filtrer
+              </span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+          </button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
+                      Statut
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapseStates">
+                  <ul>
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
-                              <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                              <label class="form-check-label" for="id_states_0">
+                                  Nouvelle candidature
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
-                              <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                              <label class="form-check-label" for="id_states_1">
+                                  Candidature à l'étude
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
-                              <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                              <label class="form-check-label" for="id_states_2">
+                                  Candidature en attente
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
-                              <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
+                              <label class="form-check-label" for="id_states_3">
+                                  Action préalable à l’embauche
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
-                              <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
+                              <label class="form-check-label" for="id_states_4">
+                                  Candidature acceptée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
-                              <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
+                              <label class="form-check-label" for="id_states_5">
+                                  Candidature déclinée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
-                              <label class="form-check-label" for="id_states_6">Embauche annulée</label>
+                              <label class="form-check-label" for="id_states_6">
+                                  Embauche annulée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
-                              <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
+                              <label class="form-check-label" for="id_states_7">
+                                  Embauché ailleurs
+                              </label>
                           </div>
                       </li>
-                  
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-      <input id="display-kind" name="display" type="hidden" value="list"/>
-      <input id="id_order" name="order" type="hidden" value="-created_at"/>
-      
-          
-  
-          
-  
-  
-  
-          
-  
-  
-  
-          
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
-                  Émetteur
-              </button>
-          </legend>
-          <div class="mt-3 collapse" id="collapseSenders">
-              
-                  <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_prescriber_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_companies">Nom de l’employeur orienteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
-  </select></div>
-              
-          </div>
-      </fieldset>
-  
-  
-          
-              <hr/>
-              
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">Critères administratifs déclarés</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-criteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
-    <option value="1">Bénéficiaire du RSA</option>
-  
-    <option value="2">Allocataire ASS</option>
-  
-    <option value="3">Allocataire AAH</option>
-  
-    <option value="4">DETLD (+ 24 mois)</option>
-  
-    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
-  
-    <option value="6">Senior (+50 ans)</option>
-  
-    <option value="7">Jeune (-26 ans)</option>
-  
-    <option value="8">Sortant de l'ASE</option>
-  
-    <option value="9">DELD (12-24 mois)</option>
-  
-    <option value="10">Travailleur handicapé</option>
-  
-    <option value="11">Parent isolé</option>
-  
-    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
-  
-    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
-  
-    <option value="14">Résident ZRR</option>
-  
-    <option value="15">Résident QPV</option>
-  
-    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
-  
-    <option value="17">Maîtrise de la langue française</option>
-  
-    <option value="18">Mobilité</option>
-  
-  </select></div></div>
-  </fieldset>
-  
-          
-          
-  
-  
-  
-          
-  
-  
-  
-          
-          
+                  </ul>
+              </div>
+          </fieldset>
+          <input id="display-kind" name="display" type="hidden" value="list"/>
+          <input id="id_order" name="order" type="hidden" value="-created_at"/>
           <hr/>
-          
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
-      
-          
-          
-              <div class="form-check">
-                  <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
-                  <label class="form-check-label" for="id_archived_0">Candidatures actives (affichage par défaut)</label>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                      Émetteur
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseSenders">
+                  <div class="form-group">
+                      <label class="form-label" for="id_senders">
+                          Nom de la personne
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_prescriber_organizations">
+                          Nom de l'organisme prescripteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_companies">
+                          Nom de l’employeur orienteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
-                  <label class="form-check-label" for="id_archived_1">Candidatures archivées</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">
+                      Critères administratifs déclarés
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-criteria">
+                  <div class="form-group">
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+                          <option value="1">
+                              Bénéficiaire du RSA
+                          </option>
+                          <option value="2">
+                              Allocataire ASS
+                          </option>
+                          <option value="3">
+                              Allocataire AAH
+                          </option>
+                          <option value="4">
+                              DETLD (+ 24 mois)
+                          </option>
+                          <option value="5">
+                              Niveau d'étude 3 (CAP, BEP) ou infra
+                          </option>
+                          <option value="6">
+                              Senior (+50 ans)
+                          </option>
+                          <option value="7">
+                              Jeune (-26 ans)
+                          </option>
+                          <option value="8">
+                              Sortant de l'ASE
+                          </option>
+                          <option value="9">
+                              DELD (12-24 mois)
+                          </option>
+                          <option value="10">
+                              Travailleur handicapé
+                          </option>
+                          <option value="11">
+                              Parent isolé
+                          </option>
+                          <option value="12">
+                              Personne sans hébergement ou hébergée ou ayant un parcours de rue
+                          </option>
+                          <option value="13">
+                              Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile
+                          </option>
+                          <option value="14">
+                              Résident ZRR
+                          </option>
+                          <option value="15">
+                              Résident QPV
+                          </option>
+                          <option value="16">
+                              Sortant de détention ou personne placée sous main de justice
+                          </option>
+                          <option value="17">
+                              Maîtrise de la langue française
+                          </option>
+                          <option value="18">
+                              Mobilité
+                          </option>
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
-                  <label class="form-check-label" for="id_archived_2">Toutes les candidatures</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">
+                      Candidatures archivées
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-archived">
+                  <div class="form-group">
+                      <div class="" id="id_archived">
+                          <div class="form-check">
+                              <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
+                              <label class="form-check-label" for="id_archived_0">
+                                  Candidatures actives (affichage par défaut)
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_archived_1">
+                                  Candidatures archivées
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_archived_2">
+                                  Toutes les candidatures
+                              </label>
+                          </div>
+                      </div>
+                  </div>
               </div>
-          
-      
-  </div></div></div>
-  </fieldset>
-  
-      
-      
-  
-  <hr/>
-  <fieldset>
-      <legend>
-          <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
-              Date d'envoi de la candidature
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
+                      Date d'envoi de la candidature
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDate">
+                  <div class="form-group">
+                      <label class="form-label" for="id_start_date">
+                          À partir du
+                      </label>
+                      <duet-date-picker class="" identifier="id_start_date" name="start_date">
+                      </duet-date-picker>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_end_date">
+                          Jusqu'au
+                      </label>
+                      <duet-date-picker class="" identifier="id_end_date" name="end_date">
+                      </duet-date-picker>
+                  </div>
+              </div>
+          </fieldset>
+      </div>
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+          <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+              Voir
           </button>
-      </legend>
-      <div class="mt-3 collapse" id="collapseDate">
-          <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date"></duet-date-picker></div>
-          <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date"></duet-date-picker></div>
       </div>
-  </fieldset>
-  
   </div>
   
-          <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-  
-  
-  </div>
-  
-      </div>
   '''
 # ---
 # name: test_list_for_siae_filter_for_different_kind[iae]
   '''
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
-          <div class="offcanvas-header">
-              <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
-                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
-                  <span>Filtrer</span>
-              </h4>
-              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
-          </div>
-          
-  
-  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
-      
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
-                  Statut
-              </button>
-          </legend>
-          <div class="my-3 collapse" id="collapseStates">
-              <ul>
-                  
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+              </i>
+              <span>
+                  Filtrer
+              </span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+          </button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
+                      Statut
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapseStates">
+                  <ul>
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
-                              <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                              <label class="form-check-label" for="id_states_0">
+                                  Nouvelle candidature
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
-                              <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                              <label class="form-check-label" for="id_states_1">
+                                  Candidature à l'étude
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
-                              <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                              <label class="form-check-label" for="id_states_2">
+                                  Candidature en attente
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="accepted"/>
-                              <label class="form-check-label" for="id_states_3">Candidature acceptée</label>
+                              <label class="form-check-label" for="id_states_3">
+                                  Candidature acceptée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="refused"/>
-                              <label class="form-check-label" for="id_states_4">Candidature déclinée</label>
+                              <label class="form-check-label" for="id_states_4">
+                                  Candidature déclinée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="cancelled"/>
-                              <label class="form-check-label" for="id_states_5">Embauche annulée</label>
+                              <label class="form-check-label" for="id_states_5">
+                                  Embauche annulée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
-                              <label class="form-check-label" for="id_states_6">Embauché ailleurs</label>
+                              <label class="form-check-label" for="id_states_6">
+                                  Embauché ailleurs
+                              </label>
                           </div>
                       </li>
-                  
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-      <input id="display-kind" name="display" type="hidden" value="list"/>
-      <input id="id_order" name="order" type="hidden" value="-created_at"/>
-      
-          
-  
-          
-  
-  
-  
-          
-  
-  
-  
-          
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
-                  Émetteur
-              </button>
-          </legend>
-          <div class="mt-3 collapse" id="collapseSenders">
-              
-                  <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_prescriber_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_companies">Nom de l’employeur orienteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
-  </select></div>
-              
-          </div>
-      </fieldset>
-  
-  
-          
-              <hr/>
-              
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">Critères administratifs déclarés</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-criteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
-    <option value="1">Bénéficiaire du RSA</option>
-  
-    <option value="2">Allocataire ASS</option>
-  
-    <option value="3">Allocataire AAH</option>
-  
-    <option value="4">DETLD (+ 24 mois)</option>
-  
-    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
-  
-    <option value="6">Senior (+50 ans)</option>
-  
-    <option value="7">Jeune (-26 ans)</option>
-  
-    <option value="8">Sortant de l'ASE</option>
-  
-    <option value="9">DELD (12-24 mois)</option>
-  
-    <option value="10">Travailleur handicapé</option>
-  
-    <option value="11">Parent isolé</option>
-  
-    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
-  
-    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
-  
-    <option value="14">Résident ZRR</option>
-  
-    <option value="15">Résident QPV</option>
-  
-    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
-  
-    <option value="17">Maîtrise de la langue française</option>
-  
-    <option value="18">Mobilité</option>
-  
-  </select></div></div>
-  </fieldset>
-  
-          
-          
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
-          </legend>
-          <div class="my-3 collapse" id="collapseEligibility">
-              <ul>
-                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Valide</label></div></div></li>
-                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/><label class="form-check-label" for="id_eligibility_pending">À valider</label></div></div></li>
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-          
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapsePassIAE" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapsePassIAE" data-bs-toggle="collapse" type="button">
-                  Statut du PASS IAE
-              </button>
-          </legend>
-          <div class="my-3 collapse" id="collapsePassIAE">
-              <ul>
-                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div></li>
-                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div></li>
-                  <li><div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/><label class="form-check-label" for="id_pass_iae_expired">Expiré</label></div></div></li>
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-          
-          
+                  </ul>
+              </div>
+          </fieldset>
+          <input id="display-kind" name="display" type="hidden" value="list"/>
+          <input id="id_order" name="order" type="hidden" value="-created_at"/>
           <hr/>
-          
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
-      
-          
-          
-              <div class="form-check">
-                  <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
-                  <label class="form-check-label" for="id_archived_0">Candidatures actives (affichage par défaut)</label>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                      Émetteur
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseSenders">
+                  <div class="form-group">
+                      <label class="form-label" for="id_senders">
+                          Nom de la personne
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_prescriber_organizations">
+                          Nom de l'organisme prescripteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_companies">
+                          Nom de l’employeur orienteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
-                  <label class="form-check-label" for="id_archived_1">Candidatures archivées</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">
+                      Critères administratifs déclarés
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-criteria">
+                  <div class="form-group">
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+                          <option value="1">
+                              Bénéficiaire du RSA
+                          </option>
+                          <option value="2">
+                              Allocataire ASS
+                          </option>
+                          <option value="3">
+                              Allocataire AAH
+                          </option>
+                          <option value="4">
+                              DETLD (+ 24 mois)
+                          </option>
+                          <option value="5">
+                              Niveau d'étude 3 (CAP, BEP) ou infra
+                          </option>
+                          <option value="6">
+                              Senior (+50 ans)
+                          </option>
+                          <option value="7">
+                              Jeune (-26 ans)
+                          </option>
+                          <option value="8">
+                              Sortant de l'ASE
+                          </option>
+                          <option value="9">
+                              DELD (12-24 mois)
+                          </option>
+                          <option value="10">
+                              Travailleur handicapé
+                          </option>
+                          <option value="11">
+                              Parent isolé
+                          </option>
+                          <option value="12">
+                              Personne sans hébergement ou hébergée ou ayant un parcours de rue
+                          </option>
+                          <option value="13">
+                              Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile
+                          </option>
+                          <option value="14">
+                              Résident ZRR
+                          </option>
+                          <option value="15">
+                              Résident QPV
+                          </option>
+                          <option value="16">
+                              Sortant de détention ou personne placée sous main de justice
+                          </option>
+                          <option value="17">
+                              Maîtrise de la langue française
+                          </option>
+                          <option value="18">
+                              Mobilité
+                          </option>
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
-                  <label class="form-check-label" for="id_archived_2">Toutes les candidatures</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseEligibility" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibility" data-bs-toggle="collapse" type="button">
+                      Éligibilité IAE
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapseEligibility">
+                  <ul>
+                      <li>
+                          <div class="">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                                  <label class="form-check-label" for="id_eligibility_validated">
+                                      Valide
+                                  </label>
+                              </div>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                                  <label class="form-check-label" for="id_eligibility_pending">
+                                      À valider
+                                  </label>
+                              </div>
+                          </div>
+                      </li>
+                  </ul>
               </div>
-          
-      
-  </div></div></div>
-  </fieldset>
-  
-      
-      
-  
-  <hr/>
-  <fieldset>
-      <legend>
-          <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
-              Date d'envoi de la candidature
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapsePassIAE" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapsePassIAE" data-bs-toggle="collapse" type="button">
+                      Statut du PASS IAE
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapsePassIAE">
+                  <ul>
+                      <li>
+                          <div class="">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
+                                  <label class="form-check-label" for="id_pass_iae_active">
+                                      Actif
+                                  </label>
+                              </div>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/>
+                                  <label class="form-check-label" for="id_pass_iae_suspended">
+                                      Suspendu
+                                  </label>
+                              </div>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="">
+                              <div class="form-check">
+                                  <input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
+                                  <label class="form-check-label" for="id_pass_iae_expired">
+                                      Expiré
+                                  </label>
+                              </div>
+                          </div>
+                      </li>
+                  </ul>
+              </div>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">
+                      Candidatures archivées
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-archived">
+                  <div class="form-group">
+                      <div class="" id="id_archived">
+                          <div class="form-check">
+                              <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
+                              <label class="form-check-label" for="id_archived_0">
+                                  Candidatures actives (affichage par défaut)
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_archived_1">
+                                  Candidatures archivées
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_archived_2">
+                                  Toutes les candidatures
+                              </label>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
+                      Date d'envoi de la candidature
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDate">
+                  <div class="form-group">
+                      <label class="form-label" for="id_start_date">
+                          À partir du
+                      </label>
+                      <duet-date-picker class="" identifier="id_start_date" name="start_date">
+                      </duet-date-picker>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_end_date">
+                          Jusqu'au
+                      </label>
+                      <duet-date-picker class="" identifier="id_end_date" name="end_date">
+                      </duet-date-picker>
+                  </div>
+              </div>
+          </fieldset>
+      </div>
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+          <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+              Voir
           </button>
-      </legend>
-      <div class="mt-3 collapse" id="collapseDate">
-          <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date"></duet-date-picker></div>
-          <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date"></duet-date-picker></div>
       </div>
-  </fieldset>
-  
   </div>
   
-          <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-  
-  
-  </div>
-  
-      </div>
   '''
 # ---
 # name: test_list_for_siae_filter_for_different_kind[non_iae]
   '''
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
-          <div class="offcanvas-header">
-              <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
-                  <i aria-hidden="true" class="ri-sound-module-fill fw-medium"></i>
-                  <span>Filtrer</span>
-              </h4>
-              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
-          </div>
-          
-  
-  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
-      
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
-                  Statut
-              </button>
-          </legend>
-          <div class="my-3 collapse" id="collapseStates">
-              <ul>
-                  
+      <div class="offcanvas-header">
+          <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+              <i aria-hidden="true" class="ri-sound-module-fill fw-medium">
+              </i>
+              <span>
+                  Filtrer
+              </span>
+          </h4>
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button">
+          </button>
+      </div>
+      <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseStates" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseStates" data-bs-toggle="collapse" type="button">
+                      Statut
+                  </button>
+              </legend>
+              <div class="my-3 collapse" id="collapseStates">
+                  <ul>
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
-                              <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                              <label class="form-check-label" for="id_states_0">
+                                  Nouvelle candidature
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
-                              <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                              <label class="form-check-label" for="id_states_1">
+                                  Candidature à l'étude
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
-                              <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                              <label class="form-check-label" for="id_states_2">
+                                  Candidature en attente
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="accepted"/>
-                              <label class="form-check-label" for="id_states_3">Candidature acceptée</label>
+                              <label class="form-check-label" for="id_states_3">
+                                  Candidature acceptée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="refused"/>
-                              <label class="form-check-label" for="id_states_4">Candidature déclinée</label>
+                              <label class="form-check-label" for="id_states_4">
+                                  Candidature déclinée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="cancelled"/>
-                              <label class="form-check-label" for="id_states_5">Embauche annulée</label>
+                              <label class="form-check-label" for="id_states_5">
+                                  Embauche annulée
+                              </label>
                           </div>
                       </li>
-                  
                       <li>
                           <div class="form-check">
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
-                              <label class="form-check-label" for="id_states_6">Embauché ailleurs</label>
+                              <label class="form-check-label" for="id_states_6">
+                                  Embauché ailleurs
+                              </label>
                           </div>
                       </li>
-                  
-              </ul>
-          </div>
-      </fieldset>
-  
-  
-      <input id="display-kind" name="display" type="hidden" value="list"/>
-      <input id="id_order" name="order" type="hidden" value="-created_at"/>
-      
-          
-  
-          
-  
-  
-  
-          
-  
-  
-  
-          
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
-                  Émetteur
-              </button>
-          </legend>
-          <div class="mt-3 collapse" id="collapseSenders">
-              
-                  <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_prescriber_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
-  </select></div>
-              
-  
-              
-                  <div class="form-group"><label class="form-label" for="id_sender_companies">Nom de l’employeur orienteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
-  </select></div>
-              
-          </div>
-      </fieldset>
-  
-  
-          
-              <hr/>
-              
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">Critères administratifs déclarés</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-criteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
-    <option value="1">Bénéficiaire du RSA</option>
-  
-    <option value="2">Allocataire ASS</option>
-  
-    <option value="3">Allocataire AAH</option>
-  
-    <option value="4">DETLD (+ 24 mois)</option>
-  
-    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
-  
-    <option value="6">Senior (+50 ans)</option>
-  
-    <option value="7">Jeune (-26 ans)</option>
-  
-    <option value="8">Sortant de l'ASE</option>
-  
-    <option value="9">DELD (12-24 mois)</option>
-  
-    <option value="10">Travailleur handicapé</option>
-  
-    <option value="11">Parent isolé</option>
-  
-    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
-  
-    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
-  
-    <option value="14">Résident ZRR</option>
-  
-    <option value="15">Résident QPV</option>
-  
-    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
-  
-    <option value="17">Maîtrise de la langue française</option>
-  
-    <option value="18">Mobilité</option>
-  
-  </select></div></div>
-  </fieldset>
-  
-          
-          
-  
-  
-  
-          
-  
-  
-  
-          
-          
+                  </ul>
+              </div>
+          </fieldset>
+          <input id="display-kind" name="display" type="hidden" value="list"/>
+          <input id="id_order" name="order" type="hidden" value="-created_at"/>
           <hr/>
-          
-  
-  <fieldset>
-      <legend>
-          <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">Candidatures archivées</button>
-      </legend>
-      <div class="mt-3 collapse" id="collapse-archived"><div class="form-group"><div class="" id="id_archived">
-      
-          
-          
-              <div class="form-check">
-                  <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
-                  <label class="form-check-label" for="id_archived_0">Candidatures actives (affichage par défaut)</label>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
+                      Émetteur
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseSenders">
+                  <div class="form-group">
+                      <label class="form-label" for="id_senders">
+                          Nom de la personne
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_prescriber_organizations">
+                          Nom de l'organisme prescripteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_sender_companies">
+                          Nom de l’employeur orienteur
+                      </label>
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
-                  <label class="form-check-label" for="id_archived_1">Candidatures archivées</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">
+                      Critères administratifs déclarés
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-criteria">
+                  <div class="form-group">
+                      <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+                          <option value="1">
+                              Bénéficiaire du RSA
+                          </option>
+                          <option value="2">
+                              Allocataire ASS
+                          </option>
+                          <option value="3">
+                              Allocataire AAH
+                          </option>
+                          <option value="4">
+                              DETLD (+ 24 mois)
+                          </option>
+                          <option value="5">
+                              Niveau d'étude 3 (CAP, BEP) ou infra
+                          </option>
+                          <option value="6">
+                              Senior (+50 ans)
+                          </option>
+                          <option value="7">
+                              Jeune (-26 ans)
+                          </option>
+                          <option value="8">
+                              Sortant de l'ASE
+                          </option>
+                          <option value="9">
+                              DELD (12-24 mois)
+                          </option>
+                          <option value="10">
+                              Travailleur handicapé
+                          </option>
+                          <option value="11">
+                              Parent isolé
+                          </option>
+                          <option value="12">
+                              Personne sans hébergement ou hébergée ou ayant un parcours de rue
+                          </option>
+                          <option value="13">
+                              Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile
+                          </option>
+                          <option value="14">
+                              Résident ZRR
+                          </option>
+                          <option value="15">
+                              Résident QPV
+                          </option>
+                          <option value="16">
+                              Sortant de détention ou personne placée sous main de justice
+                          </option>
+                          <option value="17">
+                              Maîtrise de la langue française
+                          </option>
+                          <option value="18">
+                              Mobilité
+                          </option>
+                      </select>
+                  </div>
               </div>
-          
-      
-          
-          
-              <div class="form-check">
-                  <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
-                  <label class="form-check-label" for="id_archived_2">Toutes les candidatures</label>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">
+                      Candidatures archivées
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-archived">
+                  <div class="form-group">
+                      <div class="" id="id_archived">
+                          <div class="form-check">
+                              <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
+                              <label class="form-check-label" for="id_archived_0">
+                                  Candidatures actives (affichage par défaut)
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
+                              <label class="form-check-label" for="id_archived_1">
+                                  Candidatures archivées
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
+                              <label class="form-check-label" for="id_archived_2">
+                                  Toutes les candidatures
+                              </label>
+                          </div>
+                      </div>
+                  </div>
               </div>
-          
-      
-  </div></div></div>
-  </fieldset>
-  
-      
-      
-  
-  <hr/>
-  <fieldset>
-      <legend>
-          <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
-              Date d'envoi de la candidature
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapseDate" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDate" data-bs-toggle="collapse" type="button">
+                      Date d'envoi de la candidature
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDate">
+                  <div class="form-group">
+                      <label class="form-label" for="id_start_date">
+                          À partir du
+                      </label>
+                      <duet-date-picker class="" identifier="id_start_date" name="start_date">
+                      </duet-date-picker>
+                  </div>
+                  <div class="form-group">
+                      <label class="form-label" for="id_end_date">
+                          Jusqu'au
+                      </label>
+                      <duet-date-picker class="" identifier="id_end_date" name="end_date">
+                      </duet-date-picker>
+                  </div>
+              </div>
+          </fieldset>
+      </div>
+      <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
+          <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+              Voir
           </button>
-      </legend>
-      <div class="mt-3 collapse" id="collapseDate">
-          <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date"></duet-date-picker></div>
-          <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date"></duet-date-picker></div>
       </div>
-  </fieldset>
-  
   </div>
   
-          <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-  
-  
-  </div>
-  
-      </div>
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[active archive button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-target="#archive_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-open-modal" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium"></i>
-                          <span>Archiver</span>
-                      </button>
+      <i aria-hidden="true" class="ri-archive-line fw-medium">
+      </i>
+      <span>
+          Archiver
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[inactive archive button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-archive-line fw-medium"></i>
-                          <span>Archiver</span>
-                      </button>
+      <i aria-hidden="true" class="ri-archive-line fw-medium">
+      </i>
+      <span>
+          Archiver
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[modal with 1 archivable application]
   '''
   <div aria-hidden="true" aria-labelledby="archive_modal_title" class="modal" id="archive_confirmation_modal" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h2 class="modal-title" id="archive_modal_title">
-                                  Archiver 1 candidature
-                              </h2>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                          </div>
-                          <div class="modal-body">
-                              <p>
-                                  Êtes-vous sûr de vouloir archiver
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="archive_modal_title">
+                      Archiver 1 candidature
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir archiver
                                   
                                       la candidature sélectionnée
                                   
                                   ?
-                              </p>
-                          </div>
-                          <div class="modal-footer">
-                              <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                              <form action="/apply/company/batch/archive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                  
-                                  <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-submit">
-                                      Confirmer
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
-                  </div>
+                  </p>
               </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/archive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[modal with 2 archivable applications]
   '''
   <div aria-hidden="true" aria-labelledby="archive_modal_title" class="modal" id="archive_confirmation_modal" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h2 class="modal-title" id="archive_modal_title">
-                                  Archiver 2 candidatures
-                              </h2>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                          </div>
-                          <div class="modal-body">
-                              <p>
-                                  Êtes-vous sûr de vouloir archiver
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="archive_modal_title">
+                      Archiver 2 candidatures
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir archiver
                                   
                                       les 2 candidatures sélectionnées
                                   
                                   ?
-                              </p>
-                          </div>
-                          <div class="modal-footer">
-                              <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                              <form action="/apply/company/batch/archive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                  
-                                  <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-submit">
-                                      Confirmer
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
-                  </div>
+                  </p>
               </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/archive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[active postpone button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-target="#postpone_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-open-modal" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium"></i>
-                          <span>Mettre en liste d’attente</span>
-                      </button>
+      <i aria-hidden="true" class="ri-history-line fw-medium">
+      </i>
+      <span>
+          Mettre en liste d’attente
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button as GEIQ]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium"></i>
-                          <span>Mettre en liste d’attente</span>
-                      </button>
+      <i aria-hidden="true" class="ri-history-line fw-medium">
+      </i>
+      <span>
+          Mettre en liste d’attente
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-history-line fw-medium"></i>
-                          <span>Mettre en liste d’attente</span>
-                      </button>
+      <i aria-hidden="true" class="ri-history-line fw-medium">
+      </i>
+      <span>
+          Mettre en liste d’attente
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[modal with 1 postponable application]
   '''
   <div aria-hidden="true" aria-labelledby="postpone_modal_title" class="modal" id="postpone_confirmation_modal" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h2 class="modal-title" id="postpone_modal_title">
-                                  Mettre en liste d’attente 1 candidature
-                              </h2>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="postpone_modal_title">
+                      Mettre en liste d’attente 1 candidature
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-body">
+                      <div class="form-group">
+                          <label class="form-label" for="id_answer">
+                              Commentaire à envoyer au candidat
+                          </label>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea>
+                          <div class="form-text" id="id_answer_helptext">
+                              Votre réponse sera visible par le candidat et le prescripteur
                           </div>
-                          <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                              <div class="modal-body"><div class="form-group"><label class="form-label" for="id_answer">Commentaire à envoyer au candidat</label><textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea><div class="form-text" id="id_answer_helptext">Votre réponse sera visible par le candidat et le prescripteur</div>
-  </div></div>
-                              <div class="modal-footer">
-                                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                  
-                                  <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-submit">
-                                      Confirmer
-                                  </button>
-                              </div>
-                          </form>
                       </div>
                   </div>
-              </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[modal with 2 postponable applications]
   '''
   <div aria-hidden="true" aria-labelledby="postpone_modal_title" class="modal" id="postpone_confirmation_modal" tabindex="-1">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h2 class="modal-title" id="postpone_modal_title">
-                                  Mettre en liste d’attente 2 candidatures
-                              </h2>
-                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="postpone_modal_title">
+                      Mettre en liste d’attente 2 candidatures
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-body">
+                      <div class="form-group">
+                          <label class="form-label" for="id_answer">
+                              Commentaire à envoyer aux 2 candidats
+                          </label>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea>
+                          <div class="form-text" id="id_answer_helptext">
+                              Votre réponse sera visible par le candidat et le prescripteur
                           </div>
-                          <form action="/apply/company/batch/postpone?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                              <div class="modal-body"><div class="form-group"><label class="form-label" for="id_answer">Commentaire à envoyer aux 2 candidats</label><textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" placeholder="Votre réponse sera visible par les candidats et les prescripteurs/orienteurs" rows="10"></textarea><div class="form-text" id="id_answer_helptext">Votre réponse sera visible par le candidat et le prescripteur</div>
-  </div></div>
-                              <div class="modal-footer">
-                                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
-                                  
-                                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                  
-                                  <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-submit">
-                                      Confirmer
-                                  </button>
-                              </div>
-                          </form>
                       </div>
                   </div>
-              </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[active refuse button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-refuse-applications-start-wizard" type="submit">
-                              <i aria-hidden="true" class="ri-close-line"></i>
-                              <span>Décliner</span>
-                          </button>
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Décliner
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button as GEIQ]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-close-line"></i>
-                          <span>Décliner</span>
-                      </button>
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Décliner
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
-                          <i aria-hidden="true" class="ri-close-line"></i>
-                          <span>Décliner</span>
-                      </button>
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Décliner
+      </span>
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[active transfer button]
   '''
   <div class="dropdown dropdown-structure text-end">
-                              <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                                  Transférer vers
-                              </button>
-                              <div aria-labelledby="transfer_to_button" class="dropdown-menu dropdown-menu-end w-100">
-                                  
-                                      
-                                          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_2222" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
-                                              <i aria-hidden="true" class="ri-community-line"></i>
-                                              <span>EI</span>
-                                              <strong>Acme inc.</strong>
-                                          </button>
-                                      
-                                  
-                                      
-                                  
-                                      
-                                          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_3333" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
-                                              <i aria-hidden="true" class="ri-community-line"></i>
-                                              <span>EITI</span>
-                                              <strong>Superbe snapshot</strong>
-                                          </button>
-                                      
-                                  
-                              </div>
-                          </div>
+      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+          Transférer vers
+      </button>
+      <div aria-labelledby="transfer_to_button" class="dropdown-menu dropdown-menu-end w-100">
+          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_2222" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
+              <i aria-hidden="true" class="ri-community-line">
+              </i>
+              <span>
+                  EI
+              </span>
+              <strong>
+                  Acme inc.
+              </strong>
+          </button>
+          <button class="dropdown-item dropdown-item__summary" data-bs-target="#transfer_confirmation_modal_3333" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-open-modal" type="button">
+              <i aria-hidden="true" class="ri-community-line">
+              </i>
+              <span>
+                  EITI
+              </span>
+              <strong>
+                  Superbe snapshot
+              </strong>
+          </button>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[inactive archive button]
   '''
   <button class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
-                              Transférer vers
-                          </button>
+      Transférer vers
+  </button>
+  
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[modal with 1 transferable application]
   '''
   <div aria-hidden="true" aria-labelledby="modal_title_2222" class="modal" id="transfer_confirmation_modal_2222" tabindex="-1">
-                          <div class="modal-dialog modal-dialog-centered">
-                              <div class="modal-content">
-                                  <div class="modal-header">
-                                      <h2 class="modal-title" id="modal_title_2222">
-                                          Transfert de 1 candidature
-                                      </h2>
-                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                                  </div>
-                                  <div class="modal-body">
-                                      <p>
-                                          Êtes-vous sûr de vouloir transférer
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="modal_title_2222">
+                      Transfert de 1 candidature
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir transférer
                                           
                                               la candidature sélectionnée
                                           
                                           vers la structure suivante ?
-                                      </p>
-                                      
-  
-  <div class="c-box c-box--structure mb-3 mb-lg-5">
-      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i aria-hidden="true" class="ri-community-line"></i>
-          <div>
-              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
-                  EI
-              </button>
-              <h3>Acme inc.</h3>
+                  </p>
+                  <div class="c-box c-box--structure mb-3 mb-lg-5">
+                      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                                  EI
+                              </button>
+                              <h3>
+                                  Acme inc.
+                              </h3>
+                          </div>
+                      </div>
+                      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+                          <hr class="my-4"/>
+                          <ul class="c-box--structure__list-contact">
+                              <li>
+                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
+                                  </i>
+                                  <address class="m-0">
+                                      112 rue de la Croix-Nivert, 75015 Paris
+                                  </address>
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                      contact@acmeinc.com
+                                  </a>
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  06 12 34 56 78
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
+                          <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">
+                              Voir la fiche de l'entreprise
+                          </a>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="target_company_id" type="hidden" value="2222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
           </div>
-      </div>
-      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
-          <hr class="my-4"/>
-          <ul class="c-box--structure__list-contact">
-              <li>
-                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
-                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-              </li>
-              
-      <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-      
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-  
-          </ul>
-          
-              
-                  
-                  
-                      
-                  
-                  <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">Voir la fiche de l'entreprise</a>
-              
-          
       </div>
   </div>
   
-                                  </div>
-                                  <div class="modal-footer">
-                                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                                      <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <input name="target_company_id" type="hidden" value="2222"/>
-                                          
-                                              <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                          
-                                          <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
-                                              Confirmer
-                                          </button>
-                                      </form>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[modal with 2 transferable application]
   '''
   <div aria-hidden="true" aria-labelledby="modal_title_2222" class="modal" id="transfer_confirmation_modal_2222" tabindex="-1">
-                          <div class="modal-dialog modal-dialog-centered">
-                              <div class="modal-content">
-                                  <div class="modal-header">
-                                      <h2 class="modal-title" id="modal_title_2222">
-                                          Transfert de 2 candidatures
-                                      </h2>
-                                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                                  </div>
-                                  <div class="modal-body">
-                                      <p>
-                                          Êtes-vous sûr de vouloir transférer
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="modal_title_2222">
+                      Transfert de 2 candidatures
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir transférer
                                           
                                               les 2 candidatures sélectionnées
                                           
                                           vers la structure suivante ?
-                                      </p>
-                                      
-  
-  <div class="c-box c-box--structure mb-3 mb-lg-5">
-      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i aria-hidden="true" class="ri-community-line"></i>
-          <div>
-              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
-                  EI
-              </button>
-              <h3>Acme inc.</h3>
+                  </p>
+                  <div class="c-box c-box--structure mb-3 mb-lg-5">
+                      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                          <i aria-hidden="true" class="ri-community-line">
+                          </i>
+                          <div>
+                              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                                  EI
+                              </button>
+                              <h3>
+                                  Acme inc.
+                              </h3>
+                          </div>
+                      </div>
+                      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+                          <hr class="my-4"/>
+                          <ul class="c-box--structure__list-contact">
+                              <li>
+                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
+                                  </i>
+                                  <address class="m-0">
+                                      112 rue de la Croix-Nivert, 75015 Paris
+                                  </address>
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                  </i>
+                                  <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                      contact@acmeinc.com
+                                  </a>
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                  </i>
+                                  06 12 34 56 78
+                                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
+                          <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">
+                              Voir la fiche de l'entreprise
+                          </a>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="target_company_id" type="hidden" value="2222"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
           </div>
-      </div>
-      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
-          <hr class="my-4"/>
-          <ul class="c-box--structure__list-contact">
-              <li>
-                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
-                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-              </li>
-              
-      <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-      
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-  
-          </ul>
-          
-              
-                  
-                  
-                      
-                  
-                  <a class="btn btn-secondary btn-block mt-4" href="/company/2222/card" target="_blank">Voir la fiche de l'entreprise</a>
-              
-          
       </div>
   </div>
   
-                                  </div>
-                                  <div class="modal-footer">
-                                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Retour</button>
-                                      <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <input name="target_company_id" type="hidden" value="2222"/>
-                                          
-                                              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
-                                          
-                                              <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-                                          
-                                          <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
-                                              Confirmer
-                                          </button>
-                                      </form>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
   '''
 # ---
 # name: test_list_snapshot[applications list]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              
-                  <strong>Pres. Org.</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-              
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <h3>Jane DOE</h3>
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <strong>
+                          Pres. Org.
+                      </strong>
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1">
+                      </i>
+                      Orienteur
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger" id="state_[PK of JobApplication]">
+                          Candidature déclinée
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <h3>
+                          Jane DOE
+                      </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
-                              <span>
-                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
-                                  35 -
+                          <span>
+                              <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                              </i>
+                              35 -
                                   Rennes
-                              </span>
-                          
-                          
-                              
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-                          
-                          
-  
-  
+                          </span>
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-check-line">
+                              </i>
+                              Éligible à l’IAE
+                          </span>
                       </div>
-                  
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                      Voir sa candidature
+                  </a>
               </div>
           </div>
       </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
-          </div>
-      
-  
-  
-          </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
-                  
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
-          </div>
-      </div>
-  </div>
-  
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              <strong>Vous</strong>
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <h3>Jane DOE</h3>
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <strong>
+                          Vous
+                      </strong>
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_[PK of JobApplication]">
+                          Nouvelle candidature
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <h3>
+                          Jane DOE
+                      </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
-                              <span>
-                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
-                                  35 -
+                          <span>
+                              <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                              </i>
+                              35 -
                                   Rennes
-                              </span>
-                          
-                          
-                              
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-                          
-                          
-  
-  
+                          </span>
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-check-line">
+                              </i>
+                              Éligible à l’IAE
+                          </span>
                       </div>
-                  
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                      Voir sa candidature
+                  </a>
               </div>
           </div>
       </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
-          </div>
-      
-  
-  
-          </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
-                  
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
-          </div>
-      </div>
-  </div>
-  
-              
-                  
-  
-  
-  
-  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-      <div class="c-box--results__header">
-          
-  
-  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
-      <p class="fs-sm mb-0 flex-grow-1">
-          Émise le 27 novembre 2024 par
-          
-              <i aria-hidden="true" class="ri-user-line me-1"></i><strong>Le candidat lui-même</strong>
-          
-          
-      </p>
-      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></div>
-  </div>
-  
-          <div class="c-box--results__summary">
-              <i aria-hidden="true" class="ri-user-line"></i>
-              <div>
-                  
-                      <h3>Jane DOE</h3>
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+                  <p class="fs-sm mb-0 flex-grow-1">
+                      Émise le 27 novembre 2024 par
+                      <i aria-hidden="true" class="ri-user-line me-1">
+                      </i>
+                      <strong>
+                          Le candidat lui-même
+                      </strong>
+                  </p>
+                  <div>
+                      <span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-success" id="state_[PK of JobApplication]">
+                          Candidature acceptée
+                      </span>
+                  </div>
+              </div>
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <h3>
+                          Jane DOE
+                      </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          
-                              <span>
-                                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1"></i>
-                                  35 -
+                          <span>
+                              <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                              </i>
+                              35 -
                                   Rennes
-                              </span>
-                          
-                          
-                              
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-                          
-                          
-  
-  
+                          </span>
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-check-line">
+                              </i>
+                              Éligible à l’IAE
+                          </span>
                       </div>
-                  
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <div class="c-box--results__list-data">
+                  <div class="c-info c-info--secondary">
+                      <span class="c-info__summary">
+                          Candidature spontanée
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="c-box--results__footer">
+              <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
+                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">
+                      Voir sa candidature
+                  </a>
               </div>
           </div>
       </div>
-      <hr class="m-0"/>
-      <div class="c-box--results__body">
-          <div class="c-box--results__list-data">
-              
-              
-  
-  
-      
-          <div class="c-info c-info--secondary">
-              <span class="c-info__summary">Candidature spontanée</span>
-          </div>
-      
-  
-  
-          </div>
-      </div>
-      <div class="c-box--results__footer">
-          <div class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3">
-              
-              
-                  
-                  <a aria-label="Gérer la candidature de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dlist">Voir sa candidature</a>
-              
-          </div>
-      </div>
-  </div>
-  
-              
-          
-          
-  
-  
-  
-      
   </section>
+  
   '''
 # ---
 # name: test_list_snapshot[applications table]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          
-              <div class="table-responsive mt-3 mt-md-4">
-                  
-                      <form data-emplois-elements-visibility-on-selection-controller="selected-application" hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator=".selection-indicator" hx-swap="none" hx-trigger="change delay:.5">
-                          <table class="table table-hover table-sortable">
-      <caption class="visually-hidden">Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)</caption>
-      <thead>
-          <tr>
-              
-                  <th class="text-start w-50px" scope="col">
-                      <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
-                      <label class="visually-hidden" for="select-all-applications">Sélectionner toutes les candidatures</label>
-                  </th>
-              
-              
-                  <th aria-sort="none" scope="col">
-      <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="job_seeker_full_name" type="button">
-          Candidature de
-      </button>
-  </th>
-  
-              
-              <th aria-sort="descending" scope="col">
-      <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
-          Émise le
-      </button>
-  </th>
-  
-              <th scope="col">Statut</th>
-              
-              <th scope="col">Poste</th>
-              <th scope="col">Emetteur</th>
-              
-                  
-                  <th class="text-nowrap" scope="col">Critères administratifs IAE</th>
-              
-              <th class="text-end w-50px" scope="col"></th>
-          </tr>
-      </thead>
-      <tbody>
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-          <th class="text-start w-50px" scope="row">
-              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
-              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
-          </th>
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  Jane DOE
-              </a>
-              <span class="d-block">
-                  35 -
+      <div class="table-responsive mt-3 mt-md-4">
+          <form data-emplois-elements-visibility-on-selection-controller="selected-application" hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator=".selection-indicator" hx-swap="none" hx-trigger="change delay:.5">
+              <table class="table table-hover table-sortable">
+                  <caption class="visually-hidden">
+                      Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
+                  </caption>
+                  <thead>
+                      <tr>
+                          <th class="text-start w-50px" scope="col">
+                              <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
+                              <label class="visually-hidden" for="select-all-applications">
+                                  Sélectionner toutes les candidatures
+                              </label>
+                          </th>
+                          <th aria-sort="none" scope="col">
+                              <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="job_seeker_full_name" type="button">
+                                  Candidature de
+                              </button>
+                          </th>
+                          <th aria-sort="descending" scope="col">
+                              <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
+                                  Émise le
+                              </button>
+                          </th>
+                          <th scope="col">
+                              Statut
+                          </th>
+                          <th scope="col">
+                              Poste
+                          </th>
+                          <th scope="col">
+                              Emetteur
+                          </th>
+                          <th class="text-nowrap" scope="col">
+                              Critères administratifs IAE
+                          </th>
+                          <th class="text-end w-50px" scope="col">
+                          </th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
                   Rennes
-              </span>
-              
-                  
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-              
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">Candidature déclinée</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              <i aria-hidden="true" class="ri-home-smile-2-line"></i>
-              
-                  Pres. Org.
-              
-          
-      </td>
-      
-          
-          <td>
-              
-                  <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
-          </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-          <th class="text-start w-50px" scope="row">
-              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
-              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
-          </th>
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  Jane DOE
-              </a>
-              <span class="d-block">
-                  35 -
+                              </span>
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              <span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">
+                                  Candidature déclinée
+                              </span>
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              <i aria-hidden="true" class="ri-home-smile-2-line">
+                              </i>
+                              Pres. Org.
+                          </td>
+                          <td>
+                              <i class="text-disabled">
+                                  Aucun critère sélectionné
+                              </i>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
                   Rennes
-              </span>
-              
-                  
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-              
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">Nouvelle candidature</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              Vous
-          
-      </td>
-      
-          
-          <td>
-              
-                  <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
-          </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-              
-  
-  
-  
-  
-      
-  
-  
-  <tr class="align-top">
-      
-          <th class="text-start w-50px" scope="row">
-              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
-              <label class="visually-hidden" for="select-[PK of JobApplication]">Sélectionner cette candidature</label>
-          </th>
-      
-      
-          <td>
-              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  Jane DOE
-              </a>
-              <span class="d-block">
-                  35 -
+                              </span>
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              <span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">
+                                  Nouvelle candidature
+                              </span>
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <i class="text-disabled">
+                                  Aucun critère sélectionné
+                              </i>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
                   Rennes
-              </span>
-              
-                  
-  
-      
-          
-                      <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-              <i aria-hidden="true" class="ri-check-line"></i>
-              Éligible à l’IAE
-          </span>
-          
-      
-  
-  
-              
-          </td>
-      
-  
-      <td>27/11/2024</td>
-      <td><span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">Candidature acceptée</span></td>
-  
-      
-  
-      <td>
-          
-              
-                  Candidature spontanée
-              
-          
-      </td>
-      <td>
-          
-              <i aria-hidden="true" class="ri-user-line me-1"></i>Le candidat lui-même
-          
-      </td>
-      
-          
-          <td>
-              
-                  <i class="text-disabled">Aucun critère sélectionné</i>
-              
-              
-          </td>
-      
-  
-      <td class="text-end w-50px align-middle">
-          
-              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
-                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg"></i>
-              </a>
-          
-      </td>
-  </tr>
-  
-          
-      </tbody>
-  </table>
-  
-                      </form>
-                  
-              </div>
-          
-          
-  
-  
-  
-      
+                              </span>
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              <span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">
+                                  Candidature acceptée
+                              </span>
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              <i aria-hidden="true" class="ri-user-line me-1">
+                              </i>
+                              Le candidat lui-même
+                          </td>
+                          <td>
+                              <i class="text-disabled">
+                                  Aucun critère sélectionné
+                              </i>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </form>
+      </div>
   </section>
+  
   '''
 # ---
 # name: test_list_snapshot[empty]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">
-      
-          <div class="text-center my-3 my-md-4">
-              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
-              <p class="mb-1 mt-3">
-                  <strong>
-                      
-                          
-                              Aucune candidature pour le moment
-                          
-                      
-                  </strong>
-              </p>
-              <p>
-                  <i>
-                      
-                          Pour recevoir des candidatures, vérifiez que les postes ouverts
-                          <br class="d-none d-lg-inline"/>
-                          dans votre structure sont bien à jour.
-                      
-                  </i>
-              </p>
-              
-                  <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/company/job_description_list">
-                      <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal"></i>
-                      <span>Gérer les métiers et recrutements</span>
-                  </a>
-              
-          </div>
-      
+      <div class="text-center my-3 my-md-4">
+          <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
+          <p class="mb-1 mt-3">
+              <strong>
+                  Aucune candidature pour le moment
+              </strong>
+          </p>
+          <p>
+              <i>
+                  Pour recevoir des candidatures, vérifiez que les postes ouverts
+                  <br class="d-none d-lg-inline"/>
+                  dans votre structure sont bien à jour.
+              </i>
+          </p>
+          <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/company/job_description_list">
+              <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal">
+              </i>
+              <span>
+                  Gérer les métiers et recrutements
+              </span>
+          </a>
+      </div>
   </section>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[off-canvas buttons in list view]
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/siae/list?display=list&amp;order=-created_at">
-              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-              <span>Effacer tout</span>
-          </a>
-      
-  
-  
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+          Voir
+      </button>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/siae/list?display=list&order=-created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
   </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[off-canvas buttons in table view & created_at ascending order]
   '''
   <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
-      
-  
-  
-      
-  
-  
-      
-          <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/siae/list?display=table&amp;order=created_at">
-              <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-              <span>Effacer tout</span>
-          </a>
-      
-  
-  
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
+          Voir
+      </button>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/siae/list?display=table&order=created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
   </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in list view]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/siae/list?display=list&amp;order=-created_at">
-                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-                  <span>Effacer tout</span>
-              </a>
-          
-      </div>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/siae/list?display=list&order=-created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
+  </div>
+  
   '''
 # ---
 # name: test_reset_filter_button_snapshot[reset-filter button in table view & created_at ascending order]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-          
-              <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/siae/list?display=table&amp;order=created_at">
-                  <i aria-hidden="true" class="ri-eraser-line fw-medium"></i>
-                  <span>Effacer tout</span>
-              </a>
-          
-      </div>
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/siae/list?display=table&order=created_at">
+          <i aria-hidden="true" class="ri-eraser-line fw-medium">
+          </i>
+          <span>
+              Effacer tout
+          </span>
+      </a>
+  </div>
+  
   '''
 # ---

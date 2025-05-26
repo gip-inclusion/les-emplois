@@ -43,7 +43,7 @@ class TestSearchCompany:
         assert "company" not in response.context["form"]
 
     @override_settings(MATOMO_BASE_URL="https://matomo.example.com")
-    def test_district(self, client, snapshot):
+    def test_dipretty_indentedict(self, client, snapshot):
         city_slug = "paris-75"
         paris_city = City.objects.create(
             name="Paris",
@@ -661,7 +661,7 @@ class TestJobDescriptionSearchView:
         company_url = f"{company.get_card_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
         assertContains(response, company_url)
 
-    def test_district(self, client, snapshot):
+    def test_dipretty_indentedict(self, client, snapshot):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city_slug = "paris-75"
         paris_city = City.objects.create(

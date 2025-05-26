@@ -17,7 +17,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestEmployeeDetailView:
@@ -196,21 +196,23 @@ class TestEmployeeDetailView:
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
-        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant bientôt")
+        assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant bientôt")
 
         approval.end_at = today - datetime.timedelta(days=1)
         approval.save()
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
-        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expiré")
+        assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expiré")
 
         approval.end_at = today + datetime.timedelta(days=90)
         approval.save()
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
-        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant dans longtemps")
+        assert pretty_indented(alert) == snapshot(
+            name="alerte à l'opportunité immersion facile PASS expirant dans longtemps"
+        )
 
         approval.start_at = today + datetime.timedelta(days=2)
         approval.end_at = today + datetime.timedelta(days=365)
@@ -218,4 +220,4 @@ class TestEmployeeDetailView:
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
-        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS non démarré")
+        assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS non démarré")

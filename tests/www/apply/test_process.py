@@ -78,6 +78,7 @@ from tests.utils.test import (
     assertSnapshotQueries,
     get_session_name,
     parse_response_to_soup,
+    pretty_indented,
 )
 from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML
 
@@ -649,7 +650,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_job_seeker_with_transition_logs(self, client, snapshot):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
@@ -672,7 +673,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_company_with_transition_logs(self, client, snapshot):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
@@ -695,7 +696,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert str(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot
 
     def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
@@ -721,7 +722,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_app)
 
-        assert str(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_company_transition_logs_hides_hired_by_other(self, client, snapshot):
         job_seeker = JobSeekerFactory()
@@ -750,7 +751,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_app1)
 
-        assert str(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_job_seeker_when_refused(self, client):
         job_application = JobApplicationFactory(
@@ -3343,7 +3344,7 @@ class TestProcessTransferJobApplication:
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-        assert str(parse_response_to_soup(response, ".c-box--action .dropdown-structure")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, ".c-box--action .dropdown-structure")) == snapshot
 
     def test_job_application_transfer_disabled_for_bad_state(self, client):
         # A user member of multiple companies must not be able to transfer
@@ -3665,7 +3666,7 @@ def test_add_prior_action_processing(client, snapshot):
     assert prior_action.dates.lower == today
     assert prior_action.dates.upper == today + relativedelta(days=2)
     soup = parse_response_to_soup(response, selector=f"#transition_logs_{job_application.pk}")
-    assert str(soup) == snapshot
+    assert pretty_indented(soup) == snapshot
 
     # State is accepted
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
@@ -3822,7 +3823,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     response = client.post(delete_prior_action2_url, data={})
     assert response.status_code == 200
     soup = parse_response_to_soup(response, selector=f"#transition_logs_{job_application.pk}")
-    assert str(soup) == snapshot
+    assert pretty_indented(soup) == snapshot
     update_page_with_htmx(
         simulated_page,
         f"#delete_prior_action_{prior_action2.pk}_modal > div > div > div > form",

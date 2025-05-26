@@ -8,7 +8,7 @@ from django.urls import reverse
 from itou.communications.models import AnnouncementCampaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestAnnouncementCampaignValidator:
@@ -85,7 +85,7 @@ class TestRenderAnnouncementCampaign:
         response = client.get(reverse("search:employers_home"))
         assert response.status_code == 200
         content = parse_response_to_soup(response, "#news-modal")
-        assert str(content) == snapshot
+        assert pretty_indented(content) == snapshot
         assert len(content.select("p")) == 3
         assert "Item D" not in str(content)
 

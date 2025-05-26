@@ -18,7 +18,7 @@ from itou.utils.mocks.rdv_insertion import (
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.job_applications.factories import JobApplicationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture(autouse=True)
@@ -266,7 +266,7 @@ class TestRdvInsertionView:
         assert not respx.routes["rdv_solidarites_create_and_invite"].called
 
         error_button = parse_response_to_soup(response, selector=".text-danger")
-        assert str(error_button) == snapshot()
+        assert pretty_indented(error_button) == snapshot()
 
     @respx.mock
     def test_rdv_insertion_configured_invalid_job_application(self, client, snapshot):
@@ -283,7 +283,7 @@ class TestRdvInsertionView:
         assert not respx.routes["rdv_solidarites_create_and_invite"].called
 
         error_button = parse_response_to_soup(response, selector=".text-danger")
-        assert str(error_button) == snapshot()
+        assert pretty_indented(error_button) == snapshot()
 
     @respx.mock
     def test_rdv_insertion_configured_with_failed_rdv_insertion_exchange(self, client, snapshot, mocker):
@@ -305,7 +305,7 @@ class TestRdvInsertionView:
         assert response.context["job_application"] == self.job_application
 
         retry_button = parse_response_to_soup(response, selector="form")
-        assert str(retry_button) == snapshot()
+        assert pretty_indented(retry_button) == snapshot()
 
     @respx.mock
     def test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_no_pending_request(
@@ -330,7 +330,7 @@ class TestRdvInsertionView:
         assert response.context["job_application"] == self.job_application
 
         success_button = parse_response_to_soup(response, selector=".text-success")
-        assert str(success_button) == snapshot()
+        assert pretty_indented(success_button) == snapshot()
 
     @respx.mock
     def test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request(
@@ -357,7 +357,7 @@ class TestRdvInsertionView:
             assert not respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
             pending_request_exists = parse_response_to_soup(response, selector=".text-success")
-            assert str(pending_request_exists) == snapshot(name="pending_invitation_request_too_recent")
+            assert pretty_indented(pending_request_exists) == snapshot(name="pending_invitation_request_too_recent")
 
             # Go to next tick
             frozen_time.move_to("2024-07-30T23:59:59Z")
@@ -369,7 +369,9 @@ class TestRdvInsertionView:
             assert not respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
             pending_request_exists = parse_response_to_soup(response, selector=".text-success")
-            assert str(pending_request_exists) == snapshot(name="pending_invitation_request_still_too_recent")
+            assert pretty_indented(pending_request_exists) == snapshot(
+                name="pending_invitation_request_still_too_recent"
+            )
 
             # Go to next tick
             frozen_time.move_to("2024-07-31T00:00:00Z")
@@ -381,4 +383,4 @@ class TestRdvInsertionView:
             assert respx.routes["rdv_solidarites_create_and_invite"].called
             assert response.context["job_application"] == self.job_application
             success_button = parse_response_to_soup(response, selector=".text-success")
-            assert str(success_button) == snapshot(name="invitation_request_created")
+            assert pretty_indented(success_button) == snapshot(name="invitation_request_created")

@@ -21,7 +21,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 POSTULER = "Postuler"
@@ -195,7 +195,8 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         client.force_login(self.user)
         response = client.get(self.url)
         assert (
-            str(parse_response_to_soup(response, "#toggle_job_description_form_spontaneous_applications")) == snapshot
+            pretty_indented(parse_response_to_soup(response, "#toggle_job_description_form_spontaneous_applications"))
+            == snapshot
         )
 
         post_data = {"action": "toggle_spontaneous_applications"}
