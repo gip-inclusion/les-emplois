@@ -1667,13 +1667,15 @@
               <strong>01/01/2000</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong>01/01/3000</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong>01/01/3000</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -1681,6 +1683,8 @@
                       </i>
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -1927,13 +1931,15 @@
               <strong>01/01/2000</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong>01/01/3000</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong>01/01/3000</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -1941,6 +1947,8 @@
                       </i>
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -2200,13 +2208,15 @@
               <strong>01/01/2000</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong>01/01/3000</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong>01/01/3000</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -2214,6 +2224,8 @@
                       </i>
                   </small>
                   <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>

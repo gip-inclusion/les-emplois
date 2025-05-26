@@ -30,18 +30,20 @@ Arguments:
             </li>
             <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}"></li>
         {% else %}
-            <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
-                <small>Date de fin prévisionnelle
-                    <i class="ri-information-line ri-xl text-info"
-                       aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                       data-bs-toggle="tooltip"
-                       data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                       role="button"
-                       tabindex="0">
-                    </i>
-                </small>
-                <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
-            </li>
+            {% if approval.state != "SUSPENDED" %}
+                <li class="order-3{% if detail_view_version|default:False %} order-lg-4{% endif %}">
+                    <small>Date de fin prévisionnelle
+                        <i class="ri-information-line ri-xl text-info"
+                           aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                           data-bs-toggle="tooltip"
+                           data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                           role="button"
+                           tabindex="0">
+                        </i>
+                    </small>
+                    <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
+                </li>
+            {% endif %}
             <li class="order-4{% if detail_view_version|default:False %} order-lg-3{% endif %}">
                 <small>
                     Durée de validité
@@ -54,6 +56,8 @@ Arguments:
                     </i>
                 </small>
                 <strong {% if approval.state == "VALID" or approval.state == "FUTURE" %}class="text-success"{% endif %}>{{ approval.get_remainder_display }}</strong>
+                <br>
+                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
             </li>
         {% endif %}
     </ul>
