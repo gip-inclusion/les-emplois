@@ -321,18 +321,20 @@
               <strong>01/01/2025</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i class="ri-information-line ri-xl text-info"
-                         aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         role="button"
-                         tabindex="0">
-                      </i>
-                  </small>
-                  <strong>31/12/2026</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i class="ri-information-line ri-xl text-info"
+                             aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             data-bs-toggle="tooltip"
+                             data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             role="button"
+                             tabindex="0">
+                          </i>
+                      </small>
+                      <strong>31/12/2026</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -345,6 +347,8 @@
                       </i>
                   </small>
                   <strong class="text-success">730 jours (Environ 2 ans)</strong>
+                  <br>
+                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -384,18 +388,7 @@
               <strong>01/01/2024</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i class="ri-information-line ri-xl text-info"
-                         aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         role="button"
-                         tabindex="0">
-                      </i>
-                  </small>
-                  <strong>04/12/2025</strong>
-              </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -408,6 +401,8 @@
                       </i>
                   </small>
                   <strong >486 jours (Environ 1 an et 3 mois)</strong>
+                  <br>
+                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -459,18 +454,20 @@
               <strong>01/01/2024</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i class="ri-information-line ri-xl text-info"
-                         aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         role="button"
-                         tabindex="0">
-                      </i>
-                  </small>
-                  <strong>30/12/2025</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i class="ri-information-line ri-xl text-info"
+                             aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             data-bs-toggle="tooltip"
+                             data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             role="button"
+                             tabindex="0">
+                          </i>
+                      </small>
+                      <strong>30/12/2025</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -483,6 +480,8 @@
                       </i>
                   </small>
                   <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
+                  <br>
+                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -521,18 +520,20 @@
               <strong>01/01/2024</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i class="ri-information-line ri-xl text-info"
-                         aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         role="button"
-                         tabindex="0">
-                      </i>
-                  </small>
-                  <strong>30/12/2025</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i class="ri-information-line ri-xl text-info"
+                             aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             data-bs-toggle="tooltip"
+                             data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             role="button"
+                             tabindex="0">
+                          </i>
+                      </small>
+                      <strong>30/12/2025</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -545,6 +546,8 @@
                       </i>
                   </small>
                   <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
+                  <br>
+                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
@@ -598,18 +601,20 @@
               <strong>01/01/2024</strong>
           </li>
           
-              <li class="order-3">
-                  <small>Date de fin prévisionnelle
-                      <i class="ri-information-line ri-xl text-info"
-                         aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         data-bs-toggle="tooltip"
-                         data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
-                         role="button"
-                         tabindex="0">
-                      </i>
-                  </small>
-                  <strong>31/12/2025</strong>
-              </li>
+              
+                  <li class="order-3">
+                      <small>Date de fin prévisionnelle
+                          <i class="ri-information-line ri-xl text-info"
+                             aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             data-bs-toggle="tooltip"
+                             data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."
+                             role="button"
+                             tabindex="0">
+                          </i>
+                      </small>
+                      <strong>31/12/2025</strong>
+                  </li>
+              
               <li class="order-4">
                   <small>
                       Durée de validité
@@ -622,6 +627,8 @@
                       </i>
                   </small>
                   <strong class="text-success">513 jours (Environ 1 an et 4 mois)</strong>
+                  <br>
+                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">Comment est calculée cette durée ?</a>
               </li>
           
       </ul>
