@@ -105,3 +105,26 @@ class AnonymizedApplication(models.Model):
 
     def __str__(self):
         return f"candidature {self.id} anonymisée le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+class AnonymizedProfessional(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # from User model
+    date_joined = models.DateField(verbose_name="année et mois d'inscription")
+    first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
+    last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
+    department = models.CharField(max_length=3, verbose_name="département", blank=True, null=True)
+    title = models.CharField(
+        max_length=3,
+        verbose_name="civilité",
+        blank=True,
+        null=True,
+    )
+    identity_provider = models.CharField(max_length=20, verbose_name="fournisseur d'identité (SSO)")
+
+    class Meta:
+        verbose_name = "professionnel anonymisé"
+        verbose_name_plural = "professionnels anonymisés"
+        ordering = ["-anonymized_at"]
