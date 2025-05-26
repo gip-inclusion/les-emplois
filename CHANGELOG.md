@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2025-05-19
+
+### Ajouté
+
+- [Fiches de poste: Ajout d'une action permettant d'actualiser la date de mise à jour en un clic](https://github.com/gip-inclusion/les-emplois/pull/5769) 🖼
+- [Prescripteur : ajout d'une page « Présentation » pour l'organisation des prescripteurs habilités et d'une entrée dans le menu latéral](https://github.com/gip-inclusion/les-emplois/pull/6060)
+- [Vie privée : Notifier puis archiver les comptes candidats avec candidatures hors parcours IAE inactifs depuis plus de 24 mois](https://github.com/gip-inclusion/les-emplois/pull/6029)
+
+### Modifié
+
+- [Candidature: Remplissage des CV des anciennes candidatures](https://github.com/gip-inclusion/les-emplois/pull/6102)
+- [Candidature: Stockage du CV dans un objet de la base de données](https://github.com/gip-inclusion/les-emplois/pull/6087)
+- [Inscription: Nouvelles règles pour l’identifiant France Travail](https://github.com/gip-inclusion/les-emplois/pull/6106)
+- [Interface : Petite amélioration de l’encart justificatif du contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/6128) 🖼
+- [Notifications : Utiliser les données Pilotage de l’inclusion pour identifier les candidats autonomes sans solutions](https://github.com/gip-inclusion/les-emplois/pull/6127)
+- [Prescripteur : mieux afficher le nom et type d'organisation dans la fiche publique dans le cas de France Travail](https://github.com/gip-inclusion/les-emplois/pull/6110) 🖼
+
 ## 2025-05-12
 
 ### Ajouté
