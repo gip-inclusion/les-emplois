@@ -46,7 +46,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestExportJobApplications:
@@ -651,7 +651,7 @@ class TestOTP:
         url = reverse("itou_staff_views:otp_devices")
 
         response = client.get(url)
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
 
         response = client.post(url, data={"action": "new"})
         device = TOTPDevice.objects.get()
@@ -659,7 +659,7 @@ class TestOTP:
 
         # As long as the device isn't confirmed it isn't shown, and we don't create a new one.
         response = client.get(url)
-        assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(name="no_device")
 
         response = client.post(url, data={"action": "new"})
         device = TOTPDevice.objects.get()  # Still only one

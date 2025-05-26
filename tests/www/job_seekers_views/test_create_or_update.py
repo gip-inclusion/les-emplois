@@ -29,7 +29,7 @@ from tests.prescribers.factories import (
 )
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import get_session_name, parse_response_to_soup
+from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
 
 
@@ -528,7 +528,7 @@ class TestStandaloneCreateAsPrescriber:
 
         response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "preview": 1})
         modal = parse_response_to_soup(response, selector="#nir-confirmation-modal")
-        assert str(modal) == snapshot()
+        assert pretty_indented(modal) == snapshot()
 
         response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assertRedirects(response, next_url)
@@ -606,7 +606,7 @@ class TestStandaloneCreateAsPrescriber:
 
         response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "preview": 1})
         modal = parse_response_to_soup(response, selector="#email-confirmation-modal")
-        assert str(modal) == snapshot()
+        assert pretty_indented(modal) == snapshot()
 
         response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "confirm": 1})
         assertRedirects(response, next_url)

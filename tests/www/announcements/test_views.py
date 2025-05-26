@@ -8,7 +8,7 @@ from pytest_django.asserts import assertContains
 from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestNewsRender:
@@ -34,7 +34,7 @@ class TestNewsRender:
 
         # rendering in HTML
         content = parse_response_to_soup(response, ".s-section__container")
-        assert str(content) == snapshot
+        assert pretty_indented(content) == snapshot
 
     def test_announcements_anonymous_user(self, client):
         campaign = AnnouncementCampaignFactory(for_snapshot=True, with_items_for_every_user_kind=True)
@@ -96,7 +96,7 @@ class TestNewsRender:
     def test_none_exists(self, client, snapshot):
         def assert_content_matches_snapshot(response):
             content = parse_response_to_soup(response, ".s-section__container")
-            assert str(content) == snapshot(name="none_exists")
+            assert pretty_indented(content) == snapshot(name="none_exists")
 
         client.force_login(PrescriberFactory())
         url = reverse("announcements:news")

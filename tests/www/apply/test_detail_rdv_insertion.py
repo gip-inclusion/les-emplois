@@ -15,7 +15,7 @@ from itou.utils.mocks.rdv_insertion import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture(autouse=True)
@@ -222,7 +222,7 @@ class TestRdvInsertionAppointmentsList:
         profile_login(profile, self.job_application)
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
-        assert str(table) == snapshot()
+        assert pretty_indented(table) == snapshot()
 
     @pytest.mark.parametrize(
         "profile,view_name",
@@ -251,7 +251,7 @@ class TestRdvInsertionAppointmentsList:
         profile_login(profile, self.job_application)
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
-        assert str(table) == snapshot()
+        assert pretty_indented(table) == snapshot()
 
     @pytest.mark.parametrize(
         "profile,view_name",
@@ -315,7 +315,7 @@ class TestRdvInsertionAppointmentsList:
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
 
         table = parse_response_to_soup(response, selector="#rdvi-appointments")
-        assert str(table) == snapshot()
+        assert pretty_indented(table) == snapshot()
 
     @pytest.mark.parametrize(
         "profile,view_name",
@@ -332,7 +332,7 @@ class TestRdvInsertionAppointmentsList:
         details_button = parse_response_to_soup(
             response, selector="#participation-11111111-1111-1111-1111-111111111111-row"
         )
-        assert str(details_button) == snapshot()
+        assert pretty_indented(details_button) == snapshot()
 
 
 @freeze_time("2024-08-01")
@@ -370,7 +370,7 @@ class TestRdvInsertionInvitationRequestsList:
         response = client.get(reverse(view_name, kwargs={"job_application_id": self.job_application.pk}))
         if invitations_presence:
             table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
-            assert str(table) == snapshot()
+            assert pretty_indented(table) == snapshot()
         else:
             # Selector not found
             with assertRaisesMessage(ValueError, "not enough values to unpack (expected 1, got 0)"):
@@ -409,7 +409,7 @@ class TestRdvInsertionInvitationRequestsList:
             reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
         )
         table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
-        assert str(table) == snapshot(name="existing_invitation_requests")
+        assert pretty_indented(table) == snapshot(name="existing_invitation_requests")
 
         # Call the invite endpoint
         response = client.post(
@@ -418,7 +418,7 @@ class TestRdvInsertionInvitationRequestsList:
         )
         assert InvitationRequest.objects.count() == 2
         invitation_requests_table = parse_response_to_soup(response, selector="#rdvi-invitation-requests")
-        assert str(invitation_requests_table) == snapshot(name="updated_invitation_requests")
+        assert pretty_indented(invitation_requests_table) == snapshot(name="updated_invitation_requests")
 
     @respx.mock
     @pytest.mark.parametrize("profile", ["prescriber", "job_seeker"])

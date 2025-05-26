@@ -24,7 +24,7 @@ from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 # Helper functions
@@ -389,7 +389,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
                 ),  # Go to previous step button
             ],
         )
-        assert str(form_soup) == snapshot
+        assert pretty_indented(form_soup) == snapshot
 
         response = client.get(reverse("employee_record_views:create_step_3", args=(job_application.pk,)))
         assertNotContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)

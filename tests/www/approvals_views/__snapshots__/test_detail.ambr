@@ -2,163 +2,245 @@
 # name: TestApprovalDetailView.test_approval_detail_box[expired approval]
   '''
   <div class="c-box c-box--pass bg-danger-lightest border-danger mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-danger text-white">
-                  <i aria-hidden="true" class="ri-pass-expired-line"></i>
-                  PASS IAE expiré
-              </span></div>
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-danger text-white">
+              <i aria-hidden="true" class="ri-pass-expired-line">
+              </i>
+              PASS IAE expiré
+          </span>
+      </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
+              <small>
+                  Numéro de PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      99
+                  </span>
+                  <span class="ms-1">
+                      99999
+                  </span>
+              </strong>
           </li>
           <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
+              <small>
+                  Date de début
+              </small>
+              <strong>
+                  01/01/2000
+              </strong>
           </li>
-          
-              <li class="order-3 order-lg-4">
-                  <small>A expiré le</small>
-                  <strong class="text-danger">02/01/2000</strong>
-              </li>
-              <li class="order-4 order-lg-3"></li>
-          
+          <li class="order-3 order-lg-4">
+              <small>
+                  A expiré le
+              </small>
+              <strong class="text-danger">
+                  02/01/2000
+              </strong>
+          </li>
+          <li class="order-4 order-lg-3">
+          </li>
       </ul>
-      
-          
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
-          
-      
+      <p class="fs-sm fst-italic mt-3">
+          Ce PASS IAE a été importé depuis un agrément Pôle emploi.
+      </p>
   </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[future approval]
   '''
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide (non démarré)
-              </span></div>
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-success text-white">
+              <i aria-hidden="true" class="ri-pass-valid-line">
+              </i>
+              PASS IAE valide (non démarré)
+          </span>
+      </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
+              <small>
+                  Numéro de PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      99
+                  </span>
+                  <span class="ms-1">
+                      99999
+                  </span>
+              </strong>
           </li>
           <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2025</strong>
+              <small>
+                  Date de début
+              </small>
+              <strong>
+                  01/01/2025
+              </strong>
           </li>
-          
-              
-                  <li class="order-3 order-lg-4">
-                      <small>Date de fin prévisionnelle
-                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                          </i>
-                      </small>
-                      <strong>02/01/2025</strong>
-                  </li>
-              
-              <li class="order-4 order-lg-3">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong class="text-success">2 jours</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
+          <li class="order-3 order-lg-4">
+              <small>
+                  Date de fin prévisionnelle
+                  <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </small>
+              <strong>
+                  02/01/2025
+              </strong>
+          </li>
+          <li class="order-4 order-lg-3">
+              <small>
+                  Durée de validité
+                  <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </small>
+              <strong class="text-success">
+                  2 jours
+              </strong>
+              <br/>
+              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                  Comment est calculée cette durée ?
+              </a>
+          </li>
       </ul>
-      
-          
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
-          
-      
+      <p class="fs-sm fst-italic mt-3">
+          Ce PASS IAE a été importé depuis un agrément Pôle emploi.
+      </p>
   </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[in progress approval from pe approval]
   '''
   <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide
-              </span></div>
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-success text-white">
+              <i aria-hidden="true" class="ri-pass-valid-line">
+              </i>
+              PASS IAE valide
+          </span>
+      </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
+              <small>
+                  Numéro de PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      99
+                  </span>
+                  <span class="ms-1">
+                      99999
+                  </span>
+              </strong>
           </li>
           <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
+              <small>
+                  Date de début
+              </small>
+              <strong>
+                  01/01/2000
+              </strong>
           </li>
-          
-              
-                  <li class="order-3 order-lg-4">
-                      <small>Date de fin prévisionnelle
-                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                          </i>
-                      </small>
-                      <strong>01/01/3000</strong>
-                  </li>
-              
-              <li class="order-4 order-lg-3">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong class="text-success">356210 jours (Environ 975 ans et 3 mois)</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
+          <li class="order-3 order-lg-4">
+              <small>
+                  Date de fin prévisionnelle
+                  <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </small>
+              <strong>
+                  01/01/3000
+              </strong>
+          </li>
+          <li class="order-4 order-lg-3">
+              <small>
+                  Durée de validité
+                  <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </small>
+              <strong class="text-success">
+                  356210 jours (Environ 975 ans et 3 mois)
+              </strong>
+              <br/>
+              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                  Comment est calculée cette durée ?
+              </a>
+          </li>
       </ul>
-      
-          
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
-          
-      
+      <p class="fs-sm fst-italic mt-3">
+          Ce PASS IAE a été importé depuis un agrément Pôle emploi.
+      </p>
   </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_box[suspended approval]
   '''
   <div class="c-box c-box--pass bg-info-lightest border-info mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-info text-white">
-                  <i aria-hidden="true" class="ri-pass-pending-line"></i>
-                  PASS IAE valide (suspendu)
-              </span></div>
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-info text-white">
+              <i aria-hidden="true" class="ri-pass-pending-line">
+              </i>
+              PASS IAE valide (suspendu)
+          </span>
+      </div>
       <ul class="list-data list-data__two-column-lg">
           <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
+              <small>
+                  Numéro de PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      99
+                  </span>
+                  <span class="ms-1">
+                      99999
+                  </span>
+              </strong>
           </li>
           <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
+              <small>
+                  Date de début
+              </small>
+              <strong>
+                  01/01/2000
+              </strong>
           </li>
-          
-              
-              <li class="order-4 order-lg-3">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong>356216 jours (Environ 975 ans et 3 mois)</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
+          <li class="order-4 order-lg-3">
+              <small>
+                  Durée de validité
+                  <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                  </i>
+              </small>
+              <strong>
+                  356216 jours (Environ 975 ans et 3 mois)
+              </strong>
+              <br/>
+              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                  Comment est calculée cette durée ?
+              </a>
+          </li>
       </ul>
-      
-          
-              <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
-          
-      
+      <p class="fs-sm fst-italic mt-3">
+          Ce PASS IAE a été importé depuis un agrément Pôle emploi.
+      </p>
   </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
@@ -2241,264 +2323,292 @@
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval prolongations list as employer]
   '''
   <div class="c-box mb-3 mb-lg-5">
-                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                              <h2>Prolongations</h2>
-                              
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
-                                      
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." data-bs-toggle="tooltip" disabled="" type="button">
-                                              <i aria-hidden="true" class="ri-refresh-line fw-medium"></i>
-                                              <span>Prolonger</span>
-                                          </button>
-                                      
-                                  </div>
-                              
-                          </div>
-                          
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">Liste des prolongations</caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">Statut</th>
-                                              <th scope="col">Du</th>
-                                              <th scope="col">Jusqu’au</th>
-                                              <th scope="col">Motif</th>
-                                              <th scope="col">Émise par</th>
-                                              <th scope="col">Validée par</th>
-                                          </tr>
-                                      </thead>
-                                      <tbody>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          
-                                                          
-                                                              <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">En attente</span>
-                                                          
-                                                      
-                                                  </td>
-                                                  <td>01/10/2026</td>
-                                                  <td>07/10/2026</td>
-                                                  <td>50 ans et plus</td>
-                                                  <td>
-                                                      
-                                                          Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          -
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          
-                                                          
-                                                              <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">Refusée</span>
-                                                          
-                                                      
-                                                  </td>
-                                                  <td>01/10/2026</td>
-                                                  <td>06/10/2026</td>
-                                                  <td>CDI conclu avec une personne de plus de 57 ans</td>
-                                                  <td>
-                                                      
-                                                          John DOE
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          <i class="text-disabled">Non applicable</i>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
-                                                      
-                                                  </td>
-                                                  <td>27/09/2026</td>
-                                                  <td>01/10/2026</td>
-                                                  <td>Fin d'une formation</td>
-                                                  <td>
-                                                      
-                                                          John DOE - Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          Ack CEPTÉ
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
-                                                      
-                                                  </td>
-                                                  <td>24/09/2026</td>
-                                                  <td>27/09/2026</td>
-                                                  <td>RQTH - Reconnaissance de la qualité de travailleur handicapé</td>
-                                                  <td>
-                                                      
-                                                          John DOE - Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          Apou VÉPAR - Une orga
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                      </tbody>
-                                  </table>
-                              </div>
-                          
-                          
-                              <div class="c-info">
-                                  <button aria-controls="collapseProlongationInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseProlongationInfo" data-bs-toggle="collapse">
-                                      <span>Comment gérer mes prolongations ?</span>
-                                  </button>
-                                  <div class="c-info__detail collapse" id="collapseProlongationInfo">
-                                      <p>
-                                          Retrouvez toutes les informations sur le fonctionnement des prolongations dans notre
-                                          <a aria-label="Documentation sur le fonctionnement des prolongations (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">documentation</a>.
-                                      </p>
-                                  </div>
-                              </div>
-                          
-                      </div>
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h2>
+              Prolongations
+          </h2>
+          <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+              <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." data-bs-toggle="tooltip" disabled="" type="button">
+                  <i aria-hidden="true" class="ri-refresh-line fw-medium">
+                  </i>
+                  <span>
+                      Prolonger
+                  </span>
+              </button>
+          </div>
+      </div>
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover">
+              <caption class="visually-hidden">
+                  Liste des prolongations
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Du
+                      </th>
+                      <th scope="col">
+                          Jusqu’au
+                      </th>
+                      <th scope="col">
+                          Motif
+                      </th>
+                      <th scope="col">
+                          Émise par
+                      </th>
+                      <th scope="col">
+                          Validée par
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">
+                              En attente
+                          </span>
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          07/10/2026
+                      </td>
+                      <td>
+                          50 ans et plus
+                      </td>
+                      <td>
+                          Acme inc.
+                      </td>
+                      <td>
+                          -
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">
+                              Refusée
+                          </span>
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          06/10/2026
+                      </td>
+                      <td>
+                          CDI conclu avec une personne de plus de 57 ans
+                      </td>
+                      <td>
+                          John DOE
+                      </td>
+                      <td>
+                          <i class="text-disabled">
+                              Non applicable
+                          </i>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                              Acceptée
+                          </span>
+                      </td>
+                      <td>
+                          27/09/2026
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          Fin d'une formation
+                      </td>
+                      <td>
+                          John DOE - Acme inc.
+                      </td>
+                      <td>
+                          Ack CEPTÉ
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                              Acceptée
+                          </span>
+                      </td>
+                      <td>
+                          24/09/2026
+                      </td>
+                      <td>
+                          27/09/2026
+                      </td>
+                      <td>
+                          RQTH - Reconnaissance de la qualité de travailleur handicapé
+                      </td>
+                      <td>
+                          John DOE - Acme inc.
+                      </td>
+                      <td>
+                          Apou VÉPAR - Une orga
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <div class="c-info">
+          <button aria-controls="collapseProlongationInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseProlongationInfo" data-bs-toggle="collapse">
+              <span>
+                  Comment gérer mes prolongations ?
+              </span>
+          </button>
+          <div class="c-info__detail collapse" id="collapseProlongationInfo">
+              <p>
+                  Retrouvez toutes les informations sur le fonctionnement des prolongations dans notre
+                  <a aria-label="Documentation sur le fonctionnement des prolongations (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">
+                      documentation
+                  </a>
+                  .
+              </p>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval prolongations list as job_seeker/prescriber]
   '''
   <div class="c-box mb-3 mb-lg-5">
-                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                              <h2>Prolongations</h2>
-                              
-                          </div>
-                          
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">Liste des prolongations</caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">Statut</th>
-                                              <th scope="col">Du</th>
-                                              <th scope="col">Jusqu’au</th>
-                                              <th scope="col">Motif</th>
-                                              <th scope="col">Émise par</th>
-                                              <th scope="col">Validée par</th>
-                                          </tr>
-                                      </thead>
-                                      <tbody>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          
-                                                          
-                                                              <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">En attente</span>
-                                                          
-                                                      
-                                                  </td>
-                                                  <td>01/10/2026</td>
-                                                  <td>07/10/2026</td>
-                                                  <td>50 ans et plus</td>
-                                                  <td>
-                                                      
-                                                          Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          -
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          
-                                                          
-                                                              <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">Refusée</span>
-                                                          
-                                                      
-                                                  </td>
-                                                  <td>01/10/2026</td>
-                                                  <td>06/10/2026</td>
-                                                  <td>CDI conclu avec une personne de plus de 57 ans</td>
-                                                  <td>
-                                                      
-                                                          John DOE
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          <i class="text-disabled">Non applicable</i>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
-                                                      
-                                                  </td>
-                                                  <td>27/09/2026</td>
-                                                  <td>01/10/2026</td>
-                                                  <td>Fin d'une formation</td>
-                                                  <td>
-                                                      
-                                                          John DOE - Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          Ack CEPTÉ
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
-                                                      
-                                                  </td>
-                                                  <td>24/09/2026</td>
-                                                  <td>27/09/2026</td>
-                                                  <td>RQTH - Reconnaissance de la qualité de travailleur handicapé</td>
-                                                  <td>
-                                                      
-                                                          John DOE - Acme inc.
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          Apou VÉPAR - Une orga
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                      </tbody>
-                                  </table>
-                              </div>
-                          
-                          
-                      </div>
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h2>
+              Prolongations
+          </h2>
+      </div>
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover">
+              <caption class="visually-hidden">
+                  Liste des prolongations
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Du
+                      </th>
+                      <th scope="col">
+                          Jusqu’au
+                      </th>
+                      <th scope="col">
+                          Motif
+                      </th>
+                      <th scope="col">
+                          Émise par
+                      </th>
+                      <th scope="col">
+                          Validée par
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">
+                              En attente
+                          </span>
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          07/10/2026
+                      </td>
+                      <td>
+                          50 ans et plus
+                      </td>
+                      <td>
+                          Acme inc.
+                      </td>
+                      <td>
+                          -
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">
+                              Refusée
+                          </span>
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          06/10/2026
+                      </td>
+                      <td>
+                          CDI conclu avec une personne de plus de 57 ans
+                      </td>
+                      <td>
+                          John DOE
+                      </td>
+                      <td>
+                          <i class="text-disabled">
+                              Non applicable
+                          </i>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                              Acceptée
+                          </span>
+                      </td>
+                      <td>
+                          27/09/2026
+                      </td>
+                      <td>
+                          01/10/2026
+                      </td>
+                      <td>
+                          Fin d'une formation
+                      </td>
+                      <td>
+                          John DOE - Acme inc.
+                      </td>
+                      <td>
+                          Ack CEPTÉ
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                              Acceptée
+                          </span>
+                      </td>
+                      <td>
+                          24/09/2026
+                      </td>
+                      <td>
+                          27/09/2026
+                      </td>
+                      <td>
+                          RQTH - Reconnaissance de la qualité de travailleur handicapé
+                      </td>
+                      <td>
+                          John DOE - Acme inc.
+                      </td>
+                      <td>
+                          Apou VÉPAR - Une orga
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
@@ -4582,268 +4692,330 @@
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as employer with modification buttons]
   '''
   <div class="c-box mb-3 mb-lg-5">
-                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                              <h2>Suspensions</h2>
-                              
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
-                                      
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
-                                              <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
-                                              <span>Suspendre</span>
-                                          </button>
-                                      
-                                  </div>
-                              
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h2>
+              Suspensions
+          </h2>
+          <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+              <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
+                  <i aria-hidden="true" class="ri-pause-circle-line fw-medium">
+                  </i>
+                  <span>
+                      Suspendre
+                  </span>
+              </button>
+          </div>
+      </div>
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover">
+              <caption class="visually-hidden">
+                  Liste des suspensions
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Du
+                      </th>
+                      <th scope="col">
+                          Jusqu’au
+                      </th>
+                      <th scope="col">
+                          Motif
+                      </th>
+                      <th scope="col">
+                          Émetteur
+                      </th>
+                      <th scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-info">
+                              En cours
+                          </span>
+                      </td>
+                      <td class="text-info fw-bold">
+                          18/09/2024
+                      </td>
+                      <td class="text-info fw-bold">
+                          28/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une siae
+                      </td>
+                      <td>
+                          <a class="btn btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
+                              <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                              </i>
+                              <span class="visually-hidden">
+                                  Modifier la suspension
+                              </span>
+                          </a>
+                          <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-link btn-ico-only btn-sm" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
+                              <i aria-hidden="true" class="ri-more-2-fill">
+                              </i>
+                          </button>
+                          <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
+                              <a class="dropdown-item" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">
+                                  Supprimer la suspension
+                              </a>
                           </div>
-                          
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">Liste des suspensions</caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">Statut</th>
-                                              <th scope="col">Du</th>
-                                              <th scope="col">Jusqu’au</th>
-                                              <th scope="col">Motif</th>
-                                              <th scope="col">Émetteur</th>
-                                              <th scope="col">
-                                          </th></tr>
-                                      </thead>
-                                      <tbody>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-info">En cours</span>
-                                                      
-                                                  </td>
-                                                  <td class="text-info fw-bold">18/09/2024</td>
-                                                  <td class="text-info fw-bold">28/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                          <a class="btn btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
-                                                              <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
-                                                              <span class="visually-hidden">Modifier la suspension</span>
-                                                          </a>
-                                                          <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-link btn-ico-only btn-sm" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
-                                                              <i aria-hidden="true" class="ri-more-2-fill"></i>
-                                                          </button>
-                                                          <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                                                              <a class="dropdown-item" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">Supprimer la suspension</a>
-                                                          </div>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-light text-primary">Passée</span>
-                                                      
-                                                  </td>
-                                                  <td>26/08/2024</td>
-                                                  <td>05/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une autre siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                      </tbody>
-                                  </table>
-                              </div>
-                          
-                          
-                              <div class="c-info">
-                                  <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
-                                      <span>Comment gérer mes suspensions ?</span>
-                                  </button>
-                                  <div class="c-info__detail collapse" id="collapseSuspensionInfo">
-                                      <p>
-                                          Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
-                                          <a aria-label="Documentation sur le fonctionnement des suspensions (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14739233143953--Suspendre-un-PASS-IAE" rel="noopener" target="_blank">documentation</a>.
-                                      </p>
-                                  </div>
-                              </div>
-                          
-                      </div>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                              Passée
+                          </span>
+                      </td>
+                      <td>
+                          26/08/2024
+                      </td>
+                      <td>
+                          05/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une autre siae
+                      </td>
+                      <td>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <div class="c-info">
+          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
+              <span>
+                  Comment gérer mes suspensions ?
+              </span>
+          </button>
+          <div class="c-info__detail collapse" id="collapseSuspensionInfo">
+              <p>
+                  Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
+                  <a aria-label="Documentation sur le fonctionnement des suspensions (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14739233143953--Suspendre-un-PASS-IAE" rel="noopener" target="_blank">
+                      documentation
+                  </a>
+                  .
+              </p>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as employer without modification buttons]
   '''
   <div class="c-box mb-3 mb-lg-5">
-                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                              <h2>Suspensions</h2>
-                              
-                                  <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
-                                      
-                                          <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
-                                              <i aria-hidden="true" class="ri-pause-circle-line fw-medium"></i>
-                                              <span>Suspendre</span>
-                                          </button>
-                                      
-                                  </div>
-                              
-                          </div>
-                          
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">Liste des suspensions</caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">Statut</th>
-                                              <th scope="col">Du</th>
-                                              <th scope="col">Jusqu’au</th>
-                                              <th scope="col">Motif</th>
-                                              <th scope="col">Émetteur</th>
-                                              <th scope="col">
-                                          </th></tr>
-                                      </thead>
-                                      <tbody>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-info">En cours</span>
-                                                      
-                                                  </td>
-                                                  <td class="text-info fw-bold">18/09/2024</td>
-                                                  <td class="text-info fw-bold">28/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-light text-primary">Passée</span>
-                                                      
-                                                  </td>
-                                                  <td>26/08/2024</td>
-                                                  <td>05/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une autre siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                      </tbody>
-                                  </table>
-                              </div>
-                          
-                          
-                              <div class="c-info">
-                                  <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
-                                      <span>Comment gérer mes suspensions ?</span>
-                                  </button>
-                                  <div class="c-info__detail collapse" id="collapseSuspensionInfo">
-                                      <p>
-                                          Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
-                                          <a aria-label="Documentation sur le fonctionnement des suspensions (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14739233143953--Suspendre-un-PASS-IAE" rel="noopener" target="_blank">documentation</a>.
-                                      </p>
-                                  </div>
-                              </div>
-                          
-                      </div>
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h2>
+              Suspensions
+          </h2>
+          <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
+              <button class="btn btn-block btn-outline-primary btn-ico" data-bs-placement="top" data-bs-title="La suspension n’est pas possible car une suspension est déjà en cours." data-bs-toggle="tooltip" disabled="" type="button">
+                  <i aria-hidden="true" class="ri-pause-circle-line fw-medium">
+                  </i>
+                  <span>
+                      Suspendre
+                  </span>
+              </button>
+          </div>
+      </div>
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover">
+              <caption class="visually-hidden">
+                  Liste des suspensions
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Du
+                      </th>
+                      <th scope="col">
+                          Jusqu’au
+                      </th>
+                      <th scope="col">
+                          Motif
+                      </th>
+                      <th scope="col">
+                          Émetteur
+                      </th>
+                      <th scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-info">
+                              En cours
+                          </span>
+                      </td>
+                      <td class="text-info fw-bold">
+                          18/09/2024
+                      </td>
+                      <td class="text-info fw-bold">
+                          28/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une siae
+                      </td>
+                      <td>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                              Passée
+                          </span>
+                      </td>
+                      <td>
+                          26/08/2024
+                      </td>
+                      <td>
+                          05/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une autre siae
+                      </td>
+                      <td>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <div class="c-info">
+          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
+              <span>
+                  Comment gérer mes suspensions ?
+              </span>
+          </button>
+          <div class="c-info__detail collapse" id="collapseSuspensionInfo">
+              <p>
+                  Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
+                  <a aria-label="Documentation sur le fonctionnement des suspensions (nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14739233143953--Suspendre-un-PASS-IAE" rel="noopener" target="_blank">
+                      documentation
+                  </a>
+                  .
+              </p>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as job_seeker/prescriber without modification buttons]
   '''
   <div class="c-box mb-3 mb-lg-5">
-                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                              <h2>Suspensions</h2>
-                              
-                          </div>
-                          
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">Liste des suspensions</caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">Statut</th>
-                                              <th scope="col">Du</th>
-                                              <th scope="col">Jusqu’au</th>
-                                              <th scope="col">Motif</th>
-                                              <th scope="col">Émetteur</th>
-                                              <th scope="col">
-                                          </th></tr>
-                                      </thead>
-                                      <tbody>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-info">En cours</span>
-                                                      
-                                                  </td>
-                                                  <td class="text-info fw-bold">18/09/2024</td>
-                                                  <td class="text-info fw-bold">28/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                              <tr>
-                                                  <td>
-                                                      
-                                                          <span class="badge badge-base rounded-pill bg-light text-primary">Passée</span>
-                                                      
-                                                  </td>
-                                                  <td>26/08/2024</td>
-                                                  <td>05/09/2024</td>
-                                                  <td>Contrat de travail suspendu depuis plus de 15 jours</td>
-                                                  <td>
-                                                      
-                                                          Une autre siae
-                                                      
-                                                  </td>
-                                                  <td>
-                                                      
-                                                  </td>
-                                              </tr>
-                                          
-                                      </tbody>
-                                  </table>
-                              </div>
-                          
-                          
-                      </div>
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+          <h2>
+              Suspensions
+          </h2>
+      </div>
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover">
+              <caption class="visually-hidden">
+                  Liste des suspensions
+              </caption>
+              <thead>
+                  <tr>
+                      <th scope="col">
+                          Statut
+                      </th>
+                      <th scope="col">
+                          Du
+                      </th>
+                      <th scope="col">
+                          Jusqu’au
+                      </th>
+                      <th scope="col">
+                          Motif
+                      </th>
+                      <th scope="col">
+                          Émetteur
+                      </th>
+                      <th scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-info">
+                              En cours
+                          </span>
+                      </td>
+                      <td class="text-info fw-bold">
+                          18/09/2024
+                      </td>
+                      <td class="text-info fw-bold">
+                          28/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une siae
+                      </td>
+                      <td>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                              Passée
+                          </span>
+                      </td>
+                      <td>
+                          26/08/2024
+                      </td>
+                      <td>
+                          05/09/2024
+                      </td>
+                      <td>
+                          Contrat de travail suspendu depuis plus de 15 jours
+                      </td>
+                      <td>
+                          Une autre siae
+                      </td>
+                      <td>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
-                      <i aria-hidden="true" class="ri-pass-expired-line fw-medium"></i>
-                      <span>Clôturer ce PASS IAE</span>
-                  </a>
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=Aci+de+la+rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+      <i aria-hidden="true" class="ri-pass-expired-line fw-medium">
+      </i>
+      <span>
+          Clôturer ce PASS IAE
+      </span>
+  </a>
+  
   '''
 # ---

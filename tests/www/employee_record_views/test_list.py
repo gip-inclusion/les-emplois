@@ -27,7 +27,7 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestListEmployeeRecords:
@@ -666,17 +666,17 @@ class TestListEmployeeRecords:
         ) == {job_application_1.job_seeker_id, job_application_3.job_seeker_id}
 
         response = client.get(self.URL, follow=True)
-        assert str(parse_response_to_soup(response, selector="#id_missing_employee_records_alert")) == snapshot(
-            name="plural"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(response, selector="#id_missing_employee_records_alert")
+        ) == snapshot(name="plural")
 
         # Remove one of the employee from the "missing record" count
         EmployeeRecordFactory(job_application=job_application_1, status=Status.NEW)
 
         response = client.get(self.URL, follow=True)
-        assert str(parse_response_to_soup(response, selector="#id_missing_employee_records_alert")) == snapshot(
-            name="singular"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(response, selector="#id_missing_employee_records_alert")
+        ) == snapshot(name="singular")
 
 
 def test_an_active_siae_without_convention_can_not_access_the_view(client):

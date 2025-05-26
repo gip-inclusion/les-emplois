@@ -15,7 +15,7 @@ from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.test import get_session_name, parse_response_to_soup
+from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_old_session_initialization, fake_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 
@@ -92,7 +92,7 @@ def test_step_1(client, snapshot):
     )
     response = client.get(transfer_step_1_url, follow=True)
     assertRedirects(response, transfer_step_1_url + "?city=vannes-56")
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
 
     # search is centered on job app company city : only vannes companies should be displayed
     assertContains(
@@ -141,7 +141,7 @@ def test_step_1(client, snapshot):
 
     # Check company card
     response = client.get(company_card_url)
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(
         response,
         f"{transfer_start_session_base_url}?back_url={quote(company_card_url)}",
@@ -157,7 +157,7 @@ def test_step_1(client, snapshot):
 
     # Check job description card
     response = client.get(job_card_url)
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(
         response,
         f"{transfer_start_session_base_url}?job_description_id={job.pk}&back_url={quote(job_card_url)}",
@@ -349,7 +349,7 @@ def test_step_2(client, snapshot):
     transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
     response = client.get(transfer_step_2_url)
 
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
     assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
 
@@ -373,7 +373,7 @@ def test_step_2(client, snapshot):
     )
     response = client.get(transfer_step_2_url)
 
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
     assert response.context["form"].initial == {"selected_jobs": [str(job_id)]}
 
@@ -452,7 +452,7 @@ def test_step_3(client, snapshot, pdf_file):
     transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
     response = client.get(transfer_step_3_url)
 
-    assert str(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
+    assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     expected_message = (
         f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, Pierre DUPONT a écrit :\n\n{job_application.message}"
     )

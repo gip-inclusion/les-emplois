@@ -25,7 +25,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestApprovalDetailView:
@@ -76,7 +76,7 @@ class TestApprovalDetailView:
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
-            assert str(approval_box) == snapshot(name="in progress approval from pe approval")
+            assert pretty_indented(approval_box) == snapshot(name="in progress approval from pe approval")
 
         # Tweak origin for following snapshots
         approval.origin = Origin.DEFAULT
@@ -94,7 +94,7 @@ class TestApprovalDetailView:
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
-            assert str(approval_box) == snapshot(name="suspended approval")
+            assert pretty_indented(approval_box) == snapshot(name="suspended approval")
         suspension.delete()
 
         # Expired
@@ -104,7 +104,7 @@ class TestApprovalDetailView:
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
-            assert str(approval_box) == snapshot(name="expired approval")
+            assert pretty_indented(approval_box) == snapshot(name="expired approval")
 
         # Future
         approval.start_at = datetime.date(2025, 1, 1)
@@ -114,7 +114,7 @@ class TestApprovalDetailView:
             client.force_login(user)
             response = client.get(url)
             approval_box = parse_response_to_soup(response, selector=".c-box--pass")
-            assert str(approval_box) == snapshot(name="future approval")
+            assert pretty_indented(approval_box) == snapshot(name="future approval")
 
     @freeze_time("2024-09-25", tick=True)  # tick is important for job applications' created_at
     def test_approval_detail_with_suspensions(self, client, snapshot):
@@ -168,7 +168,7 @@ class TestApprovalDetailView:
         assertContains(response, suspension_update_url)
         assertContains(response, suspension_delete_url)
 
-        assert str(get_suspensions_section(response)) == snapshot(
+        assert pretty_indented(get_suspensions_section(response)) == snapshot(
             name="Approval suspensions list as employer with modification buttons"
         )
 
@@ -182,7 +182,7 @@ class TestApprovalDetailView:
 
         assertNotContains(response, suspension_update_url)
         assertNotContains(response, suspension_delete_url)
-        assert str(get_suspensions_section(response)) == snapshot(
+        assert pretty_indented(get_suspensions_section(response)) == snapshot(
             name="Approval suspensions list as employer without modification buttons"
         )
 
@@ -193,7 +193,7 @@ class TestApprovalDetailView:
         assertNotContains(response, suspension_update_url)
         assertNotContains(response, suspension_delete_url)
 
-        assert str(get_suspensions_section(response)) == snapshot(
+        assert pretty_indented(get_suspensions_section(response)) == snapshot(
             name="Approval suspensions list as job_seeker/prescriber without modification buttons"
         )
 
@@ -204,7 +204,7 @@ class TestApprovalDetailView:
         assertNotContains(response, suspension_update_url)
         assertNotContains(response, suspension_delete_url)
 
-        assert str(get_suspensions_section(response)) == snapshot(
+        assert pretty_indented(get_suspensions_section(response)) == snapshot(
             name="Approval suspensions list as job_seeker/prescriber without modification buttons"
         )
 
@@ -286,14 +286,16 @@ class TestApprovalDetailView:
         with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations as employer")):
             response = client.get(url)
 
-        assert str(get_prolongations_section(response)) == snapshot(name="Approval prolongations list as employer")
+        assert pretty_indented(get_prolongations_section(response)) == snapshot(
+            name="Approval prolongations list as employer"
+        )
 
         # As prescriber
         client.force_login(prescriber)
         with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations as prescriber")):
             response = client.get(url)
 
-        assert str(get_prolongations_section(response)) == snapshot(
+        assert pretty_indented(get_prolongations_section(response)) == snapshot(
             name="Approval prolongations list as job_seeker/prescriber"
         )
 
@@ -302,7 +304,7 @@ class TestApprovalDetailView:
         with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations as job_seeker")):
             response = client.get(url)
 
-        assert str(get_prolongations_section(response)) == snapshot(
+        assert pretty_indented(get_prolongations_section(response)) == snapshot(
             name="Approval prolongations list as job_seeker/prescriber"
         )
 
@@ -406,7 +408,7 @@ class TestApprovalDetailView:
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+        assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
 
         # suspension now is inactive
         suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
@@ -414,7 +416,7 @@ class TestApprovalDetailView:
         response = client.get(url)
 
         delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert str(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+        assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
 
         # An accepted job application exists after suspension end
         JobApplicationFactory(

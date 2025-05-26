@@ -5,7 +5,7 @@ import httpcore
 from django.urls import reverse
 
 from itou.www.companies_views import views
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def test_displayable_thematique():
@@ -227,7 +227,7 @@ def test_hx_dora_services(htmx_client, snapshot, settings, respx_mock):
     )
     response = htmx_client.get(reverse("companies_views:hx_dora_services", kwargs={"code_insee": "75056"}))
     dora_service_card = parse_response_to_soup(response, selector=".card-body")
-    assert str(dora_service_card) == snapshot(name="Dora service card")
+    assert pretty_indented(dora_service_card) == snapshot(name="Dora service card")
 
 
 def test_hx_dora_services_with_address(htmx_client, snapshot, settings, respx_mock):
@@ -258,7 +258,7 @@ def test_hx_dora_services_with_address(htmx_client, snapshot, settings, respx_mo
 
     response = htmx_client.get(reverse("companies_views:hx_dora_services", kwargs={"code_insee": "75056"}))
     dora_service_card = parse_response_to_soup(response, selector=".card-body")
-    assert str(dora_service_card) == snapshot(name="Dora service card with address")
+    assert pretty_indented(dora_service_card) == snapshot(name="Dora service card with address")
 
 
 def test_dora_service_redirect(client, settings, respx_mock):

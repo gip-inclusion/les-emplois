@@ -16,7 +16,7 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestApprovalSuspendView:
@@ -239,7 +239,7 @@ class TestApprovalSuspendView:
                 ),
             ],
         )
-        assert str(form) == snapshot(name="delete_suspension_form")
+        assert pretty_indented(form) == snapshot(name="delete_suspension_form")
         assert response.context["reset_url"] == back_url
 
         lost_days = (timezone.localdate() - start_at).days + 1  # including start and end dates

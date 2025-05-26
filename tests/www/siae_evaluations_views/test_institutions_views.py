@@ -34,7 +34,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
 
@@ -215,7 +215,7 @@ class TestInstitutionEvaluatedSiaeListView:
         )
         assertContains(response, "Liste des Siae à contrôler", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="waiting state")
+        assert pretty_indented(state_div) == snapshot(name="waiting state")
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
@@ -228,7 +228,7 @@ class TestInstitutionEvaluatedSiaeListView:
         )
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="notification pending state")
+        assert pretty_indented(state_div) == snapshot(name="notification pending state")
 
     def test_recently_closed_campaign(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -261,7 +261,7 @@ class TestInstitutionEvaluatedSiaeListView:
         )
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="final accepted state")
+        assert pretty_indented(state_div) == snapshot(name="final accepted state")
 
     def test_siae_refused_can_be_notified(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -279,7 +279,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="notification pending state")
+        assert pretty_indented(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -328,7 +328,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="notification pending state")
+        assert pretty_indented(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -375,7 +375,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="notification pending state")
+        assert pretty_indented(state_div) == snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -426,7 +426,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="final refused state")
+        assert pretty_indented(state_div) == snapshot(name="final refused state")
         sanction_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_sanction",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -501,7 +501,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="waiting state")
+        assert pretty_indented(state_div) == snapshot(name="waiting state")
         assertContains(
             response,
             reverse(
@@ -516,7 +516,7 @@ class TestInstitutionEvaluatedSiaeListView:
         )
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="to process state")
+        assert pretty_indented(state_div) == snapshot(name="to process state")
 
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
@@ -524,7 +524,7 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="in progress state")
+        assert pretty_indented(state_div) == snapshot(name="in progress state")
 
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
@@ -532,7 +532,7 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="in progress state")
+        assert pretty_indented(state_div) == snapshot(name="in progress state")
 
         # REVIEWED
         review_time = timezone.now()
@@ -541,7 +541,7 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="adversarial stage state")
+        assert pretty_indented(state_div) == snapshot(name="adversarial stage state")
 
         # Upload new proof
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -554,14 +554,14 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="adversarial waiting state")
+        assert pretty_indented(state_div) == snapshot(name="adversarial waiting state")
 
         # Submit new proof
         EvaluatedAdministrativeCriteria.objects.update(submitted_at=timezone.now())
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="adversarial to process state")
+        assert pretty_indented(state_div) == snapshot(name="adversarial to process state")
 
         # DDETS sets to refused
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -570,7 +570,7 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="adversarial in progress state")
+        assert pretty_indented(state_div) == snapshot(name="adversarial in progress state")
 
         # DDETS sets to accepted
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -579,14 +579,14 @@ class TestInstitutionEvaluatedSiaeListView:
 
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="adversarial in progress state")
+        assert pretty_indented(state_div) == snapshot(name="adversarial in progress state")
 
         # DDETS validates its final review
         evaluated_siae.final_reviewed_at = review_time
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         response = client.get(url)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="final accepted state")
+        assert pretty_indented(state_div) == snapshot(name="final accepted state")
 
     def test_siae_infos_with_submission_freezed_at(self, client, snapshot):
         client.force_login(self.user)
@@ -611,7 +611,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="identified issue state")
+        assert pretty_indented(state_div) == snapshot(name="identified issue state")
 
         # Simulate the SUBMITTABLE state
         del evaluated_siae.state_from_applications
@@ -620,7 +620,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="identified issue state")
+        assert pretty_indented(state_div) == snapshot(name="identified issue state")
 
         # Simulate the SUBMITTED state
         del evaluated_siae.state_from_applications
@@ -629,7 +629,7 @@ class TestInstitutionEvaluatedSiaeListView:
         response = client.get(url)
         assertContains(response, evaluated_siae)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
-        assert str(state_div) == snapshot(name="to process state")
+        assert pretty_indented(state_div) == snapshot(name="to process state")
 
     def test_num_queries(self, client, snapshot):
         client.force_login(self.user)

@@ -19,7 +19,7 @@ from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, reload_module
+from tests.utils.test import parse_response_to_soup, pretty_indented, reload_module
 
 
 class TestJobSeekerSignup:
@@ -98,7 +98,7 @@ class TestJobSeekerSignup:
         assert response.status_code == 200
         replace_in_attr = [("max", str(DuetDatePickerWidget.max_birthdate()), "2008-10-23")]
         form = parse_response_to_soup(response, selector="form.js-format-nir", replace_in_attr=replace_in_attr)
-        assert str(form) == snapshot(name="job_seeker_signup_form")
+        assert pretty_indented(form) == snapshot(name="job_seeker_signup_form")
 
         nir = "141068078200557"
         user = self._test_job_seeker_signup_forms(client, nir)
@@ -310,7 +310,7 @@ class TestJobSeekerSignup:
             ]
         }
         form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
-        assert str(form) == snapshot
+        assert pretty_indented(form) == snapshot
 
     def test_born_in_france_shows_in_job_seeker_credentials(self, client):
         job_seeker_data = JobSeekerFactory.build()
@@ -589,7 +589,7 @@ class TestJobSeekerSignup:
 
         # Modal is rendered with expected error message according to the conflicting fields
         assertMessages(response, [messages.Message(messages.ERROR, snapshot(name=snapshot_name))])
-        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+        assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name=f"{snapshot_name}_title"
         )
         assertContains(response, reverse("login:existing_user", args=(existing_user.public_id,)))
@@ -667,7 +667,7 @@ class TestJobSeekerSignup:
         # Non-blocking, the user can return to the signup process if it's not them
         assertRedirects(response, reverse("signup:job_seeker_credentials"))
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
-        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+        assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name="birth_fields_conflict_title"
         )
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
@@ -691,7 +691,7 @@ class TestJobSeekerSignup:
         # Non-blocking, the user can return to the signup process if it's not them
         assertRedirects(response, reverse("signup:job_seeker_credentials"))
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
-        assert str(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
+        assert pretty_indented(parse_response_to_soup(response, selector="#message-modal-1-label")) == snapshot(
             name="birth_fields_conflict_title"
         )
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))

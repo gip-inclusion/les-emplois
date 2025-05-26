@@ -5,12 +5,12 @@ from django.urls import reverse
 
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def test_navigation_not_authenticated(snapshot, client):
     response = client.get(reverse("home:hp"), follow=True)
-    assert str(parse_response_to_soup(response, "#nav-primary")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, "#nav-primary")) == snapshot
 
 
 @pytest.mark.parametrize(
@@ -86,5 +86,5 @@ def test_navigation_authenticated(snapshot, client, user_factory):
         )
     )
     response = client.get(reverse("home:hp"), follow=True)
-    assert str(parse_response_to_soup(response, "#nav-primary")) == snapshot(name="user menu")
-    assert str(parse_response_to_soup(response, "#offcanvasNav")) == snapshot(name="navigation")
+    assert pretty_indented(parse_response_to_soup(response, "#nav-primary")) == snapshot(name="user menu")
+    assert pretty_indented(parse_response_to_soup(response, "#offcanvasNav")) == snapshot(name="navigation")

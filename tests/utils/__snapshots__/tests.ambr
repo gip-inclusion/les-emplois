@@ -93,7 +93,7 @@
 # name: test_matomo_context_processor[matomo custom init 404]
   '''
   <script id="matomo-custom-init" nonce="NORMALIZED_CSP_NONCE">
-                  /* beautify ignore:start */
+      /* beautify ignore:start */
                   window._paq = window._paq || [];
                   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                   window._paq.push(['setCustomDimension', 1, "employer"]);
@@ -111,13 +111,14 @@
                       window._paq.push(['setDocumentTitle', title]);
                   
                   /* beautify ignore:end */
-              </script>
+  </script>
+  
   '''
 # ---
 # name: test_matomo_context_processor[matomo custom init siae card]
   '''
   <script id="matomo-custom-init" nonce="NORMALIZED_CSP_NONCE">
-                  /* beautify ignore:start */
+      /* beautify ignore:start */
                   window._paq = window._paq || [];
                   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                   window._paq.push(['setCustomDimension', 1, "employer"]);
@@ -132,6 +133,7 @@
                       window._paq.push(['setDocumentTitle', 'Fiche de la structure d&#x27;insertion']);
                   
                   /* beautify ignore:end */
-              </script>
+  </script>
+  
   '''
 # ---

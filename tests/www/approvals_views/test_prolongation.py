@@ -18,7 +18,7 @@ from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestApprovalProlongation:
@@ -129,7 +129,7 @@ class TestApprovalProlongation:
         )
         soup = parse_response_to_soup(response)
         [end_at_field] = soup.select("[name=end_at]")
-        assert str(end_at_field.parent) == snapshot(name="value is set to max_end_at")
+        assert pretty_indented(end_at_field.parent) == snapshot(name="value is set to max_end_at")
 
     def test_prolong_approval_view_bad_reason(self, client):
         client.force_login(self.employer)
@@ -175,7 +175,7 @@ class TestApprovalProlongation:
             response = client.get(url)
             # Check the information card
             soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
-            assert str(soup) == snapshot(name="missing_reason_info")
+            assert pretty_indented(soup) == snapshot(name="missing_reason_info")
             # Check the reason field
             assert response.context["form"]["reason"].field.widget.disabled_values == {"RQTH"}
             assert {v for v, _label in response.context["form"]["reason"].field._choices} == {
@@ -185,7 +185,7 @@ class TestApprovalProlongation:
             }
             # Check reason field
             soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
-            assert str(soup) == snapshot(name="RQTH disabled")
+            assert pretty_indented(soup) == snapshot(name="RQTH disabled")
 
             # Try using a disabled choice
             response = client.post(url, data={"reason": ProlongationReason.RQTH})
@@ -203,7 +203,7 @@ class TestApprovalProlongation:
             response = client.get(url)
             # Check the information card is still there
             soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
-            assert str(soup) == snapshot(name="missing_reason_info")
+            assert pretty_indented(soup) == snapshot(name="missing_reason_info")
             # Check the reason field: SENIOR is now also disabled
             assert response.context["form"]["reason"].field.widget.disabled_values == {
                 "RQTH",
@@ -215,7 +215,7 @@ class TestApprovalProlongation:
             }
             # Check reason field
             soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
-            assert str(soup) == snapshot(name="RQTH & SENIOR disabled")
+            assert pretty_indented(soup) == snapshot(name="RQTH & SENIOR disabled")
 
     def test_prolong_approval_view_no_end_at(self, client, snapshot):
         client.force_login(self.employer)
@@ -229,7 +229,7 @@ class TestApprovalProlongation:
         )
         soup = parse_response_to_soup(response)
         [end_at_field] = soup.select("[name=end_at]")
-        assert str(end_at_field.parent) == snapshot()
+        assert pretty_indented(end_at_field.parent) == snapshot()
 
     def test_htmx_on_reason(self, client):
         client.force_login(self.employer)
@@ -272,7 +272,7 @@ class TestApprovalProlongation:
         assert response.status_code == 200
         page = parse_response_to_soup(response, selector="#main")
         [reset_button] = page.select("a[aria-label='Annuler la saisie de ce formulaire']")
-        assert str(reset_button) == snapshot(name="reset button with correct back_url")
+        assert pretty_indented(reset_button) == snapshot(name="reset button with correct back_url")
 
         [reason] = page.select("#id_reason")
         expected_hx_post = add_url_params(
@@ -297,7 +297,7 @@ class TestApprovalProlongation:
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
         [reset_button] = fresh_page.select("a[aria-label='Annuler la saisie de ce formulaire']")
-        assert str(reset_button) == snapshot(name="reset button with correct back_url")
+        assert pretty_indented(reset_button) == snapshot(name="reset button with correct back_url")
 
     @freeze_time("2023-08-23")
     def test_end_at_limits(self, client, snapshot, subtests):
@@ -324,7 +324,7 @@ class TestApprovalProlongation:
                 )
                 soup = parse_response_to_soup(response)
                 [end_at_field] = soup.select("[name=end_at]")
-                assert str(end_at_field.parent) == snapshot(name=reason)
+                assert pretty_indented(end_at_field.parent) == snapshot(name=reason)
 
     def test_end_at_with_existing_prolongation(self, client, snapshot):
         reason = ProlongationReason.RQTH
@@ -349,7 +349,7 @@ class TestApprovalProlongation:
             )
             # Check the information card
             soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
-            assert str(soup) == snapshot(name="max_limit_info")
+            assert pretty_indented(soup) == snapshot(name="max_limit_info")
 
             url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
             response = client.post(
@@ -363,7 +363,7 @@ class TestApprovalProlongation:
                 },
             )
             soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
-            assert str(soup) == snapshot(name="max_limit_info")
+            assert pretty_indented(soup) == snapshot(name="max_limit_info")
             max_end_at = self.approval.end_at + timedelta(days=3 * 365)
             assertContains(
                 response,
@@ -540,7 +540,7 @@ class TestApprovalProlongation:
         assertNotContains(response, inactive_prescriber_organization)
 
         error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
-        assert str(error_msg) == snapshot(name="prescriber is member of many organizations")
+        assert pretty_indented(error_msg) == snapshot(name="prescriber is member of many organizations")
 
     def test_check_invalid_prescriber(self, client, snapshot, faker):
         unauthorized_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=False)
@@ -564,4 +564,4 @@ class TestApprovalProlongation:
         response = client.post(url, data=post_data)
 
         error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
-        assert str(error_msg) == snapshot(name="unknown authorized prescriber")
+        assert pretty_indented(error_msg) == snapshot(name="unknown authorized prescriber")

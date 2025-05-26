@@ -2,14 +2,28 @@
 # name: test_approval_form_has_warnings_if_suspension_or_prolongation[end_at][obnoxious start_at and end_at warning]
   '''
   <div class="help" id="id_end_at_helptext">
-                              <div><ul class="messagelist"><li class="warning">En cas de modification, vérifier la cohérence avec les périodes de suspension et de prolongation.</li></ul></div>
-                          </div>
+      <div>
+          <ul class="messagelist">
+              <li class="warning">
+                  En cas de modification, vérifier la cohérence avec les périodes de suspension et de prolongation.
+              </li>
+          </ul>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_approval_form_has_warnings_if_suspension_or_prolongation[start_at][obnoxious start_at and end_at warning]
   '''
   <div class="help" id="id_start_at_helptext">
-                              <div><ul class="messagelist"><li class="warning">En cas de modification, vérifier la cohérence avec les périodes de suspension et de prolongation.</li></ul></div>
-                          </div>
+      <div>
+          <ul class="messagelist">
+              <li class="warning">
+                  En cas de modification, vérifier la cohérence avec les périodes de suspension et de prolongation.
+              </li>
+          </ul>
+      </div>
+  </div>
+  
   '''
 # ---

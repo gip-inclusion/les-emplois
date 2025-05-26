@@ -31,7 +31,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
 def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
@@ -157,7 +157,7 @@ class TestGroupLists:
                 ),
             ),
         )
-        assert str(groups) == snapshot(name="test_my_groups__group_card")
+        assert pretty_indented(groups) == snapshot(name="test_my_groups__group_card")
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
@@ -199,7 +199,7 @@ class TestGroupLists:
                 ("href", f"/gps/groups/{membership.follow_up_group.pk}", "/gps/groups/[PK of FollowUpGroup]")
             ],
         )
-        assert str(groups) == snapshot(name="test_my_groups__group_card")
+        assert pretty_indented(groups) == snapshot(name="test_my_groups__group_card")
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
 
@@ -391,7 +391,7 @@ class TestGroupDetailsMembershipTab:
                 ("id", f"email-{participant.pk}", "email-[PK of participant]"),
             ],
         )
-        assert str(html_details) == snapshot
+        assert pretty_indented(html_details) == snapshot
 
         display_phone_txt = "<span>Afficher le téléphone</span>"
         display_email_txt = "<span>Afficher l'email</span>"
@@ -474,7 +474,7 @@ class TestGroupDetailsMembershipTab:
         assertContains(response, target_participant.email)
         update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
 
-        assert str(simulated_page) == snapshot
+        assert pretty_indented(simulated_page) == snapshot
 
         assert grist_log_mock.call_args_list == [
             ((prescriber, group, target_participant, "phone"),),
@@ -498,11 +498,15 @@ class TestGroupDetailsMembershipTab:
         ask_access_url = reverse("gps:ask_access", args=(group.pk,))
         ask_access_url_for_snapshot = ask_access_url.replace(str(group.pk), "[PK of FollowUpGroup]")
         page_soup = parse_response_to_soup(response, selector="#ask_access_modal")
-        assert str(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(name="enabled_button")
+        assert pretty_indented(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(
+            name="enabled_button"
+        )
 
         htmx_response = client.post(ask_access_url)
         update_page_with_htmx(page_soup, f'button[hx-post="{ask_access_url}"]', htmx_response)
-        assert str(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(name="disabled_button")
+        assert pretty_indented(page_soup).replace(ask_access_url, ask_access_url_for_snapshot) == snapshot(
+            name="disabled_button"
+        )
 
         job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
         user_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(user.pk,)))
@@ -575,7 +579,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="masked_info")
+        assert pretty_indented(html_details) == snapshot(name="masked_info")
 
         # When he can but is not from an authorized organization
         beneficiary.created_by = prescriber
@@ -589,7 +593,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="no_diagnostic_can_edit")
+        assert pretty_indented(html_details) == snapshot(name="no_diagnostic_can_edit")
 
         # Same if the membership allow it
         beneficiary.created_by = None
@@ -604,7 +608,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="no_diagnostic")
+        assert pretty_indented(html_details) == snapshot(name="no_diagnostic")
 
         # When he is in an authorized organization
         PrescriberOrganization.objects.update(
@@ -619,7 +623,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="with_diagnostic")
+        assert pretty_indented(html_details) == snapshot(name="with_diagnostic")
 
         # When the user can edit the beneficiary details
         beneficiary.created_by = prescriber
@@ -634,7 +638,7 @@ class TestGroupDetailsBeneficiaryTab:
                 ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="with_diagnostic_can_edit")
+        assert pretty_indented(html_details) == snapshot(name="with_diagnostic_can_edit")
 
 
 class TestGroupDetailsContributionTab:
@@ -684,7 +688,7 @@ class TestGroupDetailsContributionTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="ongoing_membership_no_reason")
+        assert pretty_indented(html_details) == snapshot(name="ongoing_membership_no_reason")
 
         membership = group.memberships.get()
         membership.ended_at = timezone.localdate()
@@ -699,7 +703,7 @@ class TestGroupDetailsContributionTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot(name="ended_membership_with_reason")
+        assert pretty_indented(html_details) == snapshot(name="ended_membership_with_reason")
 
 
 class TestGroupDetailsEditionTab:
@@ -749,7 +753,7 @@ class TestGroupDetailsEditionTab:
                 ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
             ],
         )
-        assert str(html_details) == snapshot()
+        assert pretty_indented(html_details) == snapshot()
 
         # The user just clics on "Accompagnement terminé" without setting the ended_at field
         post_data = {
@@ -904,7 +908,7 @@ class TestJoinGroup:
         user = user_factory()
         client.force_login(user)
         response = client.get(url)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         # All redirection work : the join_group_from_* view will check if the user is allowed
         response = client.post(url, data={"channel": "from_coworker"})
@@ -1114,7 +1118,7 @@ class TestJoinGroupFromCoworker:
 
         client.force_login(user)
         response = client.get(self.URL)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         followed_job_seeker = JobSeekerFactory()
         FollowUpGroupFactory(beneficiary=followed_job_seeker, memberships=1, memberships__member=user)
@@ -1186,7 +1190,7 @@ class TestJoinGroupFromNir:
 
         client.force_login(user)
         response = client.get(self.URL)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
 
         # unknown NIR :
         dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
@@ -1211,13 +1215,15 @@ class TestJoinGroupFromNir:
         # existing nit
         job_seeker = JobSeekerFactory(for_snapshot=True)
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "preview": "1"})
-        assert str(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(name="modal")
+        assert pretty_indented(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(
+            name="modal"
+        )
 
         # if we cancel: back to start with the nir we didn't find in the input
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
         html_detail = parse_response_to_soup(response, selector="#main")
         del html_detail.find(id="id_nir").attrs["value"]
-        assert str(html_detail) == snapshot(name="get")
+        assert pretty_indented(html_detail) == snapshot(name="get")
 
         # But if we accept:
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
@@ -1266,7 +1272,7 @@ class TestJoinGroupFromNir:
             next_url,
             data={"email": existing_job_seeker_without_nir.email, "preview": 1},
         )
-        assert str(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
 
         # The job seeker isn't followed yet
         assert not FollowUpGroupMembership.objects.filter(
@@ -1322,7 +1328,7 @@ class TestJoinGroupFromNir:
             next_url,
             data={"email": existing_job_seeker_with_nir.email, "preview": 1},
         )
-        assert str(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, "#email-confirmation-modal")) == snapshot
 
         # The job seeker isn't followed yet
         assert not FollowUpGroupMembership.objects.filter(
@@ -1718,7 +1724,7 @@ class TestJoinGroupFromNameAndEmail:
             "preview": "1",
         }
         response = client.post(self.URL, data=post_data)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         post_data = {
             "email": job_seeker.email,
@@ -1744,7 +1750,7 @@ class TestJoinGroupFromNameAndEmail:
             "preview": "1",
         }
         response = client.post(self.URL, data=post_data)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         # Cannot confirm
         post_data = {
@@ -1800,7 +1806,7 @@ class TestJoinGroupFromNameAndEmail:
             "preview": "1",
         }
         response = client.post(self.URL, data=post_data)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         post_data = {
             "email": job_seeker.email,
@@ -1827,7 +1833,7 @@ class TestJoinGroupFromNameAndEmail:
             "preview": "1",
         }
         response = client.post(self.URL, data=post_data)
-        assert str(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
 
         # Cannot confirm
         post_data = {

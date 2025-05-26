@@ -12,7 +12,7 @@ from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 def test_schedule_approval_update_notification_when_notification_do_not_exists(admin_client):
@@ -126,7 +126,9 @@ def test_available_transitions(snapshot, client, status):
         client.force_login(user)
         response = client.get(url)
         if status not in {Status.READY, Status.SENT}:
-            assert str(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot(name="actions")
+            assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot(
+                name="actions"
+            )
         else:
             assertNotContains(response, '<div class="submit-row" id="employee-record-transitions">')
 
@@ -140,4 +142,4 @@ def test_available_transitions_for_unarchive(faker, snapshot, admin_client, code
     employee_record = EmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=faker.numerify(code))
 
     response = admin_client.get(reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk]))
-    assert str(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()
+    assert pretty_indented(parse_response_to_soup(response, "#employee-record-transitions")) == snapshot()

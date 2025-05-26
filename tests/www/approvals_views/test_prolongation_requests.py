@@ -19,7 +19,7 @@ from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,9 @@ def test_empty_list_view(snapshot, client):
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="prolongation requests list")
+    assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+        name="prolongation requests list"
+    )
 
     assert_previous_step(response, reverse("dashboard:index"))
 
@@ -53,7 +55,7 @@ def test_list_view(snapshot, client):
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot
 
 
 def test_list_view_no_siae(snapshot, client):
@@ -63,7 +65,9 @@ def test_list_view_no_siae(snapshot, client):
     client.force_login(prolongation_request.validated_by)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="prolongation requests list")
+    assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+        name="prolongation requests list"
+    )
 
 
 def test_list_view_only_pending_filter(client):
@@ -122,7 +126,7 @@ def test_show_view(snapshot, client):
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
-    assert str(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
     assert_previous_step(response, reverse("approvals:prolongation_requests_list") + "?only_pending=on")
 
 
@@ -232,10 +236,14 @@ def test_deny_view_for_reasons(snapshot, client, reason):
     # Starting the tunnel should redirect to the first step
     assertRedirects(client.get(start_url), reason_url)
     # Checking the title at least once
-    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-title-02")) == snapshot(name="title")
+    assert pretty_indented(parse_response_to_soup(client.get(reason_url), selector="#main .s-title-02")) == snapshot(
+        name="title"
+    )
 
     # Submit data for the "reason" step
-    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(name="reason")
+    assert pretty_indented(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(
+        name="reason"
+    )
     response = client.post(
         reason_url,
         {"reason-reason": reason, "prolongation_request_deny_view-current_step": "reason"},
@@ -243,9 +251,9 @@ def test_deny_view_for_reasons(snapshot, client, reason):
     assertRedirects(response, reason_explanation_url)
 
     # Submit data for the "reason_explanation" step
-    assert str(parse_response_to_soup(client.get(reason_explanation_url), selector="#main .s-section")) == snapshot(
-        name="reason_explanation"
-    )
+    assert pretty_indented(
+        parse_response_to_soup(client.get(reason_explanation_url), selector="#main .s-section")
+    ) == snapshot(name="reason_explanation")
     response = client.post(
         reason_explanation_url,
         {
@@ -257,9 +265,9 @@ def test_deny_view_for_reasons(snapshot, client, reason):
 
     if reason is ProlongationRequestDenyReason.IAE:
         assertRedirects(response, proposed_actions_url)
-        assert str(parse_response_to_soup(client.get(proposed_actions_url), selector="#main .s-section")) == snapshot(
-            name="proposed_actions"
-        )
+        assert pretty_indented(
+            parse_response_to_soup(client.get(proposed_actions_url), selector="#main .s-section")
+        ) == snapshot(name="proposed_actions")
         # Submit data for the "proposed_actions" step
         response = client.post(
             proposed_actions_url,

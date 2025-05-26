@@ -4,27 +4,29 @@
   <div class="c-stepper mb-3 mb-lg-5">
       <div class="d-flex">
           <div class="flex-fill">
-              <h2>Transférer la candidature de Jane DOE</h2>
+              <h2>
+                  Transférer la candidature de Jane DOE
+              </h2>
               <div class="progress">
-                  
-                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="25" class="progress-bar progress-bar-25" role="progressbar">
-                      </div>
-                  
+                  <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="25" class="progress-bar progress-bar-25" role="progressbar">
+                  </div>
               </div>
               <p>
-                  
-                      Rechercher un emploi inclusif
-                  
+                  Rechercher un emploi inclusif
               </p>
           </div>
           <div class="d-flex justify-content-end">
               <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
-                  <i aria-hidden="true" class="ri-close-line"></i>
-                  <span>Quitter</span>
+                  <i aria-hidden="true" class="ri-close-line">
+                  </i>
+                  <span>
+                      Quitter
+                  </span>
               </a>
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: test_step_2[progress]
@@ -32,27 +34,29 @@
   <div class="c-stepper mb-3 mb-lg-5">
       <div class="d-flex">
           <div class="flex-fill">
-              <h2>Transférer la candidature de Jane DOE</h2>
+              <h2>
+                  Transférer la candidature de Jane DOE
+              </h2>
               <div class="progress">
-                  
-                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
-                      </div>
-                  
+                  <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
+                  </div>
               </div>
               <p>
-                  
-                      Sélectionner les métiers recherchés
-                  
+                  Sélectionner les métiers recherchés
               </p>
           </div>
           <div class="d-flex justify-content-end">
               <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
-                  <i aria-hidden="true" class="ri-close-line"></i>
-                  <span>Quitter</span>
+                  <i aria-hidden="true" class="ri-close-line">
+                  </i>
+                  <span>
+                      Quitter
+                  </span>
               </a>
           </div>
       </div>
   </div>
+  
   '''
 # ---
 # name: test_step_3[progress]
@@ -60,26 +64,28 @@
   <div class="c-stepper mb-3 mb-lg-5">
       <div class="d-flex">
           <div class="flex-fill">
-              <h2>Transférer la candidature de Jane DOE</h2>
+              <h2>
+                  Transférer la candidature de Jane DOE
+              </h2>
               <div class="progress">
-                  
-                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" class="progress-bar progress-bar-75" role="progressbar">
-                      </div>
-                  
+                  <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" class="progress-bar progress-bar-75" role="progressbar">
+                  </div>
               </div>
               <p>
-                  
-                      Finaliser la candidature
-                  
+                  Finaliser la candidature
               </p>
           </div>
           <div class="d-flex justify-content-end">
               <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
-                  <i aria-hidden="true" class="ri-close-line"></i>
-                  <span>Quitter</span>
+                  <i aria-hidden="true" class="ri-close-line">
+                  </i>
+                  <span>
+                      Quitter
+                  </span>
               </a>
           </div>
       </div>
   </div>
+  
   '''
 # ---

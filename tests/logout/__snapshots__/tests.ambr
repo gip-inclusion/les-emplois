@@ -2,124 +2,147 @@
 # name: test_ft_prescriber_with_no_ft_organization
   '''
   <div class="s-section__container container">
-              <div class="s-section__row row g-0">
-                  <div class="s-section__col col-12 col-lg-2 bg-lg-white">
-                      <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
-                  </div>
-                  <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-                      
-                          <p>
-                              En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
-                          </p>
-                          <p>Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.</p>
-                      
-                      <div class="row">
-                          <div class="col-2">
-                              <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
-                                      <span>Se déconnecter</span>
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.
+              </p>
+              <p>
+                  Veuillez vous faire inviter par un collaborateur de votre agence afin d’accéder au service.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: test_labor_inspector_with_no_institution
   '''
   <div class="s-section__container container">
-              <div class="s-section__row row g-0">
-                  <div class="s-section__col col-12 col-lg-2 bg-lg-white">
-                      <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
-                  </div>
-                  <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-                      
-                          <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
-                          <p>Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.</p>
-                      
-                      <div class="row">
-                          <div class="col-2">
-                              <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
-                                      <span>Se déconnecter</span>
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.
+              </p>
+              <p>
+                  Veuillez vous faire inviter par un collaborateur de votre institution afin de pouvoir accéder au service.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: tests_employers_with_inactive_company
   '''
   <div class="s-section__container container">
-              <div class="s-section__row row g-0">
-                  <div class="s-section__col col-12 col-lg-2 bg-lg-white">
-                      <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
-                  </div>
-                  <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-                      
-                          <p>
-                              Nous sommes désolés, votre compte n’est malheureusement plus actif car la ou les structures associées ne sont plus conventionnées.
-                          </p>
-                          <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
-                      
-                      <div class="row">
-                          <div class="col-2">
-                              <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
-                                      <span>Se déconnecter</span>
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  Nous sommes désolés, votre compte n’est malheureusement plus actif car la ou les structures associées ne sont plus conventionnées.
+              </p>
+              <p>
+                  Nous espérons vous revoir et vous rendre service à nouveau.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: tests_employers_without_company
   '''
   <div class="s-section__container container">
-              <div class="s-section__row row g-0">
-                  <div class="s-section__col col-12 col-lg-2 bg-lg-white">
-                      <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
-                  </div>
-                  <div class="s-section__col col-12 col-lg-10 bg-lg-white">
-                      
-                          <p>Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.</p>
-                          <ul>
-                              <li>
-                                  Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser <a href="https://tally.so/r/npPpNq">ce formulaire d’aide</a>.
-                              </li>
-                              <li>
-                                  Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
-                              </li>
-                              <li>
-                                  Si votre structure ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, merci d’utiliser
-                                  <a href="/signup/siae/select">le formulaire d'inscription</a>.
-                              </li>
-                          </ul>
-                          <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
-                      
-                      <div class="row">
-                          <div class="col-2">
-                              <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
-                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                  <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
-                                      <span>Se déconnecter</span>
-                                  </button>
-                              </form>
-                          </div>
-                      </div>
+      <div class="s-section__row row g-0">
+          <div class="s-section__col col-12 col-lg-2 bg-lg-white">
+              <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-error.png"/>
+          </div>
+          <div class="s-section__col col-12 col-lg-10 bg-lg-white">
+              <p>
+                  Nous sommes désolés, votre compte n’est actuellement rattaché à aucune structure.
+              </p>
+              <ul>
+                  <li>
+                      Si vous avez changé d’adresse e-mail et que vous souhaitez retrouver l’accès à votre compte existant, vous pouvez utiliser
+                      <a href="https://tally.so/r/npPpNq">
+                          ce formulaire d’aide
+                      </a>
+                      .
+                  </li>
+                  <li>
+                      Si vous souhaitez rejoindre une structure présente sur les Emplois de l’inclusion, vous pouvez demander à un de vos collègues de vous inviter.
+                  </li>
+                  <li>
+                      Si votre structure ne dispose pas encore d'un espace professionnel sur les Emplois de l’inclusion, merci d’utiliser
+                      <a href="/signup/siae/select">
+                          le formulaire d'inscription
+                      </a>
+                      .
+                  </li>
+              </ul>
+              <p>
+                  Nous espérons vous revoir et vous rendre service à nouveau.
+              </p>
+              <div class="row">
+                  <div class="col-2">
+                      <form action="/accounts/logout/" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button aria-label="Se déconnecter" class="btn btn-block btn-primary" type="submit">
+                              <span>
+                                  Se déconnecter
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
+      </div>
+  </div>
+  
   '''
 # ---

@@ -8,7 +8,7 @@ from itou.utils.templatetags.format_filters import format_approval_number, forma
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestSummaryEmployeeRecords:
@@ -126,7 +126,7 @@ class TestSummaryEmployeeRecords:
         response = client.get(self.url)
         title_section_soup = self.get_title_section_soup(response)
 
-        assert str(title_section_soup) == snapshot
+        assert pretty_indented(title_section_soup) == snapshot
 
     @freeze_time("2025-04-29 11:11:11")
     @pytest.mark.parametrize(
@@ -147,4 +147,4 @@ class TestSummaryEmployeeRecords:
         response = client.get(self.url)
         title_section_soup = self.get_title_section_soup(response)
 
-        assert str(title_section_soup) == snapshot
+        assert pretty_indented(title_section_soup) == snapshot

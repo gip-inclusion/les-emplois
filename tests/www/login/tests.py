@@ -31,7 +31,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.test import parse_response_to_soup, reload_module
+from tests.utils.test import parse_response_to_soup, pretty_indented, reload_module
 
 
 PRO_CONNECT_BTN = 'class="proconnect-button"'
@@ -321,7 +321,7 @@ class TestExistingUserLogin:
         url = f"{reverse('login:existing_user', args=(user.public_id,))}?back_url={reverse('signup:choose_user_kind')}"
         response = client.get(url)
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot
 
     @pytest.mark.parametrize(
         "user_factory",
@@ -355,7 +355,9 @@ class TestExistingUserLogin:
         assert response.status_code == 200
 
         assert response.context["form"]["login"].initial is None
-        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_not_prefilled")
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
+            name="login_not_prefilled"
+        )
 
         # If the email has been populated in the session, but the email populated does not match the user requested,
         # then it is ignored.
@@ -365,7 +367,9 @@ class TestExistingUserLogin:
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["form"]["login"].initial is None
-        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_not_prefilled")
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
+            name="login_not_prefilled"
+        )
 
         # If the login has been populated in the session with the correct email,
         # then the user will not need to re-enter it a second time.
@@ -374,7 +378,9 @@ class TestExistingUserLogin:
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["form"]["login"].initial == user.email
-        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot(name="login_prefilled")
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot(
+            name="login_prefilled"
+        )
 
     @pytest.mark.parametrize(
         "identity_provider",
@@ -395,7 +401,7 @@ class TestExistingUserLogin:
         user = UserFactory(kind=user_kind, identity_provider=identity_provider, for_snapshot=True)
         response = client.get(reverse("login:existing_user", args=(user.public_id,)))
         assertNotContains(response, self.UNSUPPORTED_IDENTITY_PROVIDER_TEXT)
-        assert str(parse_response_to_soup(response, selector=".c-form")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-form")) == snapshot
 
     def test_login_404(self, client):
         response = client.get(reverse("login:existing_user", args=("c0fee70e-cf34-4d37-919d-a1ae3e3bf7e5",)))
