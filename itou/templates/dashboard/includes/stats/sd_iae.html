@@ -1,0 +1,60 @@
+{% load pilotage %}
+
+<section class="s-section mb-3 mb-lg-5">
+    <div class="s-section__container">
+        <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+            <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                <h3>Mes données</h3>
+                <div class="c-box p-0 flex-grow-1">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Conventionnement</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "orga_etp" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Suivi des effectifs annuels et mensuels (ETP)</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="c-box p-0 mt-3 mt-lg-4">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Recrutement</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "ph_prescription" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Analyse des candidatures émises et de leur traitement</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "state" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Analyse des candidatures émises par les acteurs AHI</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "auto_prescription" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Analyse des auto-prescriptions et de leur contrôle</span>
+                                </a>
+                            </li>
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:redirect" "hiring" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Analyse des candidatures reçues et de leur traitement</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% include "dashboard/includes/stats/_institution_public_links.html" %}
+        </div>
+    </div>
+</section>
