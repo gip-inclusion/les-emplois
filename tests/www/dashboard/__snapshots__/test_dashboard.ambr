@@ -600,6 +600,219 @@
   </div>
   '''
 # ---
+# name: TestDashboardView.test_jobseeker_approval_card[job seeker with approval queries]
+  dict({
+    'num_queries': 8,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'User.latest_approval[users/models.py]',
+          'User.latest_common_approval[users/models.py]',
+          'IfNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IncludeNode[dashboard/dashboard.html]',
+          'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" = %s
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IfNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IncludeNode[dashboard/dashboard.html]',
+          'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.remainder[approvals/models.py]',
+          'Approval.remainder_as_date[approvals/models.py]',
+          'VariableNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IfNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IncludeNode[dashboard/dashboard.html]',
+          'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" = %s
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IncludeNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IfNode[dashboard/includes/job_seeker_approval_card.html]',
+          'IncludeNode[dashboard/dashboard.html]',
+          'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."validated_by_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
 # name: TestDashboardView.test_staff_users[full]
   '''
   <section class="s-section">
