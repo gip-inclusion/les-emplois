@@ -41,6 +41,21 @@
                         </ul>
                     </div>
                 </div>
+                <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                    <div class="p-3 p-lg-4">
+                        <h4 class="mb-0">Parcours en IAE</h4>
+                    </div>
+                    <div class="px-3 px-lg-4">
+                        <ul class="list-unstyled mb-lg-5">
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url "stats:stats_cd_beneficiaries" %}" class="btn-link btn-ico">
+                                    <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                                    <span>Suivi des bénéficiaires, taux d’encadrement et présence en emploi</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             {% include 'dashboard/includes/stats/_prescriber_public_links.html' %}
         </div>

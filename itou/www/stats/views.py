@@ -283,6 +283,7 @@ def render_stats_cd(request, page_title, *, params=None, extra_context=None):
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
+        "tally_hidden_fields": {"type_prescripteur": current_org.kind},
     }
     if extra_context:
         context.update(extra_context)
@@ -312,7 +313,13 @@ def stats_cd_orga_etp(request):
     )
 
 
-def render_stats_ft(request, page_title, extra_params=None):
+def stats_cd_beneficiaries(request):
+    return render_stats_cd(
+        request=request, page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi"
+    )
+
+
+def render_stats_ft(request, page_title, extra_params=None, *, with_region_param=False):
     """
     FT ("France Travail") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
@@ -328,6 +335,9 @@ def render_stats_ft(request, page_title, extra_params=None):
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
+    if with_region_param:
+        regions = {DEPARTMENT_TO_REGION[d] for d in departments}
+        params[mb.REGION_FILTER_KEY] = list(regions)
     if extra_params is None:
         # Do not use mutable default arguments,
         # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
@@ -335,6 +345,7 @@ def render_stats_ft(request, page_title, extra_params=None):
     params.update(extra_params)
     context = {
         "page_title": page_title,
+        "tally_hidden_fields": {"type_prescripteur": current_org.kind},
     }
     if current_org.is_dgft:
         context |= {
@@ -406,6 +417,14 @@ def stats_ft_state_raw(request):
     )
 
 
+def stats_ft_beneficiaries(request):
+    return render_stats_ft(
+        request=request,
+        page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
+        with_region_param=True,
+    )
+
+
 def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
@@ -445,6 +464,15 @@ def stats_ph_state_main(request):
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
             mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
+        extra_context={"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}},
+    )
+
+
+def stats_ph_beneficiaries(request):
+    return render_stats_ph(
+        request=request,
+        page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
+        extra_params=get_params_for_departement(request.current_organization.department),
         extra_context={"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}},
     )
 

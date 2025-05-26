@@ -35,6 +35,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -126,6 +146,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -211,6 +251,26 @@
                                           </i>
                                           <span>
                                               Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
                                           </span>
                                       </a>
                                   </li>
@@ -337,6 +397,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/cd/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -437,6 +517,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/pe/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -522,6 +622,26 @@
                                           </i>
                                           <span>
                                               Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
                                           </span>
                                       </a>
                                   </li>
@@ -619,6 +739,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -710,6 +850,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
                   </div>
                   <div class="col mb-3 mb-lg-5 d-flex flex-column">
                       <h3>
@@ -795,6 +955,26 @@
                                           </i>
                                           <span>
                                               Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
                                           </span>
                                       </a>
                                   </li>

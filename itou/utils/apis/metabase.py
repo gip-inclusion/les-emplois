@@ -75,6 +75,11 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "3N0oLB",
         "tally_embed_form_id": "mOoDva",
     },
+    "stats_cd_beneficiaries": {
+        "dashboard_id": 545,
+        "tally_popup_form_id": "wo1GOe",
+        "tally_embed_form_id": "w2yPrL",
+    },
     #
     # Prescriber stats - FT.
     #
@@ -97,6 +102,11 @@ METABASE_DASHBOARDS = {
     "stats_ft_state_raw": {
         "dashboard_id": 183,
     },
+    "stats_ft_beneficiaries": {
+        "dashboard_id": 545,
+        "tally_popup_form_id": "wo1GOe",
+        "tally_embed_form_id": "w2yPrL",
+    },
     #
     # Authorized Prescribers' stats
     #
@@ -104,6 +114,11 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 488,
         "tally_popup_form_id": "3XQ5D4",
         "tally_embed_form_id": "mVNGgv",
+    },
+    "stats_ph_beneficiaries": {
+        "dashboard_id": 545,
+        "tally_popup_form_id": "wo1GOe",
+        "tally_embed_form_id": "w2yPrL",
     },
     #
     # Institution stats - DDETS IAE - department level.
