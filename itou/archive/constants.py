@@ -1,0 +1,7 @@
+import datetime
+
+
+DAYS_OF_GRACE = 30
+GRACE_PERIOD = datetime.timedelta(days=DAYS_OF_GRACE)
+DAYS_OF_INACTIVITY = 365 * 2 - DAYS_OF_GRACE
+INACTIVITY_PERIOD = datetime.timedelta(DAYS_OF_INACTIVITY)
