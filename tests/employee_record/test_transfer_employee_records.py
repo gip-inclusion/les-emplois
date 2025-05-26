@@ -126,12 +126,15 @@ def test_upload_file_error(faker, snapshot, sftp_directory, command, caplog):
 @freezegun.freeze_time("2021-09-27")
 def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_directory, command, caplog):
     mocker.patch.object(EmployeeRecordBatch, "MAX_EMPLOYEE_RECORDS", 1)
-    EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
+    EmployeeRecordFactory(pk=1234, ready_for_transfer=True)
+    EmployeeRecordFactory(pk=4321, ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
     assert len(list(sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir())) == command.MAX_UPLOADED_FILES
 
-    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
+    assert [
+        re.sub(r"<EmployeeRecord: PK:1234 .+?>", "<EmployeeRecord pk=1234>", msg) for msg in caplog.messages
+    ] == snapshot()
 
 
 @freezegun.freeze_time("2021-09-27")
