@@ -139,7 +139,9 @@ class Command(EmployeeRecordTransferCommand):
         },
     )
     def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
-        new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
+        new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).order_by(
+            "updated_at"
+        )
 
         if len(new_notifications) > 0:
             self.logger.info(f"Starting UPLOAD of {len(new_notifications)} notification(s)")

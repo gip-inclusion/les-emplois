@@ -106,7 +106,7 @@
     'Current remote dir is "/"',
     'Starting UPLOAD of employee records',
     'Successfully uploaded: RIAE_FS_20210927000000.json',
-    '[EMPLOYEE RECORD] performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)',
+    '<EmployeeRecord pk=1234> performed transition EmployeeRecordWorkflow.wait_for_asp_response (READY -> SENT)',
     '[chan 0] sftp session closed.',
     'Employee records processing done!',
   ])
