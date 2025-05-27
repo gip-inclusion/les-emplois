@@ -39,9 +39,7 @@
                    aria-selected="false"
                    {% matomo_event "candidature" "clic-onglet" "appointments" %}>
                     <span>Rendez-vous</span>
-                    {% if job_application.upcoming_participations_count %}
-                        <span id="upcoming-appointments-count" class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>
-                    {% endif %}
+                    {% if job_application.upcoming_participations_count %}<span id="upcoming-appointments-count" class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>{% endif %}
                 </a>
             </li>
         {% endif %}
@@ -115,7 +113,29 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
                         <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                            {% block sidebar %}{{ block.super }}{% endblock %}
+                            {% block sidebar %}
+                                {{ block.super }}
+
+                                <div class="c-box c-box--note mb-3 mb-md-4">
+                                    <form action="">
+                                        <div class="form-group">
+                                            <label class="form-label">Note partagée avec tous les membres de la structure</label>
+                                            <textarea class="form-control" rows="10" data-it-expandable="true">Rendez-vous prévu le 12/05</textarea>
+                                            <div class="form-text">le 29/04/2025 par Marie SIMON</div>
+                                        </div>
+                                        <div class="form-row">
+                                            <button type="reset" class="btn btn-sm btn-ico-only">
+                                                <span class="visually-hidden">Annuler l'ajout d'une note partagée avec tous les membres de la structure</span>
+                                                <i class="ri-close-line" aria-hidden="true"></i>
+                                            </button>
+                                            <button type="submit" class="btn btn-sm btn-ico-only">
+                                                <span class="visually-hidden">Valider l'ajout d'une note partagée avec tous les membres de la structure</span>
+                                                <i class="ri-check-line" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            {% endblock %}
                         </div>
                     </div>
                 </div>
@@ -190,9 +210,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="cancel_hire_modal_title">
-                            Annuler l’embauche de {{ job_application.job_seeker.get_full_name }}
-                        </h5>
+                        <h5 class="modal-title" id="cancel_hire_modal_title">Annuler l’embauche de {{ job_application.job_seeker.get_full_name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
@@ -201,9 +219,7 @@
                                 En validant, <strong>vous renoncez aux aides au poste</strong> liées à cette candidature pour tous les jours travaillés de ce salarié.
                                 Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE.
                             </p>
-                            <p>
-                                {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
-                            </p>
+                            <p>{{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.</p>
                         {% else %}
                             <p>En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.</p>
                         {% endif %}
