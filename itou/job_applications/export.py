@@ -1,47 +1,43 @@
 import functools
 
+from django.utils import timezone
+
 from itou.approvals.models import Approval
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.users.enums import Title, UserKind
-from itou.utils.export import to_streaming_response
+from itou.utils.export import Format, to_streaming_response
 from itou.utils.perms import utils as perms_utils
 from itou.utils.templatetags import str_filters
 
 
-JOB_APPLICATION_CSV_HEADERS = [
-    "Civilité candidat",
-    "Nom candidat",
-    "Prénom candidat",
-    "Email candidat",
-    "Téléphone candidat",
-    "Date de naissance candidat",
-    "Ville candidat",
-    "Département candidat",
-    "Nom structure employeur",
-    "Type employeur",
-    "Métiers",
-    "Source de la candidature",
-    "Nom organisation prescripteur",
-    "Nom utilisateur prescripteur",
-    "Date de la candidature",
-    "Statut de la candidature",
-    "Dates de début d’embauche",
-    "Dates de fin d’embauche",
-    "Motifs de refus",
-    "Éligibilité IAE validée",
-    "Eligible au contrôle",
-    "Numéro PASS IAE",
-    "Début PASS IAE",
-    "Fin PASS IAE",
-    "Statut PASS IAE",
-]
-
-DATE_FMT = "%d/%m/%Y"
-
-
-def _format_date(dt):
-    return dt.strftime(DATE_FMT) if dt else ""
+JOB_APPLICATION_XSLX_FORMAT = {
+    "Civilité candidat": Format.TEXT,
+    "Nom candidat": Format.TEXT,
+    "Prénom candidat": Format.TEXT,
+    "Email candidat": Format.TEXT,
+    "Téléphone candidat": Format.TEXT,
+    "Date de naissance candidat": Format.DATE,
+    "Ville candidat": Format.TEXT,
+    "Département candidat": Format.TEXT,
+    "Nom structure employeur": Format.TEXT,
+    "Type employeur": Format.TEXT,
+    "Métiers": Format.TEXT,
+    "Source de la candidature": Format.TEXT,
+    "Nom organisation prescripteur": Format.TEXT,
+    "Nom utilisateur prescripteur": Format.TEXT,
+    "Date de la candidature": Format.DATE,
+    "Statut de la candidature": Format.TEXT,
+    "Dates de début d’embauche": Format.DATE,
+    "Dates de fin d’embauche": Format.DATE,
+    "Motifs de refus": Format.TEXT,
+    "Éligibilité IAE validée": Format.TEXT,
+    "Eligible au contrôle": Format.TEXT,
+    "Numéro PASS IAE": Format.TEXT,
+    "Début PASS IAE": Format.DATE,
+    "Fin PASS IAE": Format.DATE,
+    "Statut PASS IAE": Format.TEXT,
+}
 
 
 def _get_prescriber_orgname(job_application):
@@ -137,7 +133,7 @@ def _serialize_job_application(job_application, request):
         str_filters.mask_unless(job_seeker.first_name, predicate=can_view_personal_information),
         job_seeker.email if can_view_personal_information else "",
         job_seeker.phone if can_view_personal_information else "",
-        _format_date(job_seeker.jobseeker_profile.birthdate) if can_view_personal_information else "",
+        job_seeker.jobseeker_profile.birthdate if can_view_personal_information else None,
         job_seeker.city if can_view_personal_information else "",
         job_seeker.post_code if can_view_personal_information else "",
         company.display_name,
@@ -146,16 +142,16 @@ def _serialize_job_application(job_application, request):
         _get_readable_sender_kind(job_application),
         _get_prescriber_orgname(job_application),
         _get_prescriber_username(job_application),
-        _format_date(job_application.created_at),
+        timezone.make_naive(job_application.created_at).date(),
         job_application.get_state_display(),
-        _format_date(job_application.hiring_start_at),
-        _format_date(job_application.hiring_end_at),
+        job_application.hiring_start_at,
+        job_application.hiring_end_at,
         job_application.get_refusal_reason_display(),
         _get_eligibility_status(job_application),
         _eligible_to_siae_evaluations(job_application),
         numero_pass_iae,
-        _format_date(approval_start_date),
-        _format_date(approval_end_date),
+        approval_start_date,
+        approval_end_date,
         approval_state,
     ]
 
@@ -172,6 +168,7 @@ def stream_xlsx_export(job_applications, filename, request):
     return to_streaming_response(
         job_applications,
         filename,
-        JOB_APPLICATION_CSV_HEADERS,
+        list(JOB_APPLICATION_XSLX_FORMAT.keys()),
         functools.partial(_job_applications_serializer, request=request),
+        columns=JOB_APPLICATION_XSLX_FORMAT.values(),
     )
