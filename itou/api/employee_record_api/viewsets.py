@@ -155,6 +155,10 @@ Permet de récupérer les fiches salarié créées à la date donnée en paramè
 
 ## `since` : depuis une certaine date
 Permet de récupérer les fiches salarié créées depuis date donnée en paramètre (au format `AAAA-MM-JJ`).
+
+# Limitations
+
+L’interrogation de cette API est limitée à 60 appels par minute.
 """
 
 
