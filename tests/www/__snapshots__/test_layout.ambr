@@ -333,7 +333,16 @@
                           <i aria-hidden="true" class="ri-draft-line fw-medium">
                           </i>
                           <span>
-                              Candidatures
+                              Candidatures reçues
+                          </span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures-envoyees" href="/apply/prescriptions/list">
+                          <i aria-hidden="true" class="ri-folder-shared-line fw-medium">
+                          </i>
+                          <span>
+                              Candidatures envoyées
                           </span>
                       </a>
                   </li>
