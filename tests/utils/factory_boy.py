@@ -4,12 +4,18 @@ class AutoNowOverrideMixin:
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         auto_now_desactivated = []
+        auto_now_add_desactivated = []
         for field in model_class._meta.get_fields():
             if getattr(field, "auto_now", False) and kwargs.get(field.name):
                 field.auto_now = False
                 auto_now_desactivated.append(field)
+            if getattr(field, "auto_now_add", False) and kwargs.get(field.name):
+                field.auto_now_add = False
+                auto_now_add_desactivated.append(field)
         try:
             return super()._create(model_class, *args, **kwargs)
         finally:
             for field in auto_now_desactivated:
                 field.auto_now = True
+            for field in auto_now_add_desactivated:
+                field.auto_now_add = True
