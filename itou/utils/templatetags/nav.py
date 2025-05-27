@@ -152,13 +152,22 @@ NAV_ENTRIES = {
     ),
     # Employers.
     "employer-job-apps": NavItem(
-        label="Candidatures",
+        label="Candidatures reçues",
         icon="ri-draft-line",
         target=reverse("apply:list_for_siae"),
         active_view_names=["apply:list_for_siae", "apply:list_for_siae_exports"],
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="candidatures",
+    ),
+    "employer-job-apps-sent": NavItem(
+        label="Candidatures envoyées",
+        icon="ri-folder-shared-line",
+        target=reverse("apply:list_prescriptions"),
+        active_view_names=["apply:list_prescriptions", "apply:list_prescriptions_exports"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="candidatures-envoyees",
     ),
     "employer-approvals": NavItem(
         label="Salariés et PASS IAE",
@@ -285,6 +294,7 @@ def nav(request):
                 )
         elif request.user.is_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
+            menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
             if request.current_organization.is_subject_to_eligibility_rules:
                 employee_group_items = [NAV_ENTRIES["employer-approvals"]]
                 if request.current_organization.can_use_employee_record:
