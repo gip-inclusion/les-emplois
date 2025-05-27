@@ -24,6 +24,8 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 gps.followupgroupmembership -o "$FIXTURES_DIRECTORY/27_follow_up_group_memberships.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 geiq.implementationassessmentcampaign -o "$FIXTURES_DIRECTORY/28_implementation_assessment_campaigns.json"
 ./manage.py dumpdata --format json-no-auto-fields --indent 2 geiq.implementationassessment -o "$FIXTURES_DIRECTORY/29_implementation_assessment.json"
+./manage.py dumpdata --format json-no-auto-fields --indent 2 eligibility.geiqeligibilitydiagnosis -o "$FIXTURES_DIRECTORY/30_geiq_eligibility_diagnoses.json"
+./manage.py dumpdata --format json-no-auto-fields --indent 2 eligibility.geiqselectedadministrativecriteria -o "$FIXTURES_DIRECTORY/31_geiq_selected_administrative_criteria.json"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do
