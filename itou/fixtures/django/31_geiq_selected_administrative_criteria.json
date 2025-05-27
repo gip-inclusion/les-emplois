@@ -1,0 +1,54 @@
+[
+  {
+    "fields": {
+      "administrative_criteria": 24,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-27T12:59:25.239Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 1
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "administrative_criteria": 1,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-27T12:59:25.239Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 1
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "administrative_criteria": 20,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-27T12:59:25.239Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 1
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "administrative_criteria": 5,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-27T12:59:25.239Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 1
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 4
+  }
+]
