@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import inspect
 import io
@@ -22,6 +23,7 @@ from django.template.base import Node
 from django.template.loader import render_to_string
 from django.test import Client, TestCase
 from django.test.utils import CaptureQueriesContext, TestContextDecorator
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -183,6 +185,13 @@ def get_rows_from_streaming_response(response):
     workbook = openpyxl.load_workbook(io.BytesIO(content))
     worksheet = workbook.active
     return [[cell.value or "" for cell in row] for row in worksheet.rows]
+
+
+def excel_date_format(value):
+    if isinstance(value, datetime.datetime):
+        return datetime.datetime.combine(timezone.make_naive(value).date(), datetime.time.min)
+    if isinstance(value, datetime.date):
+        return datetime.datetime.combine(value, datetime.time.min)
 
 
 def assert_previous_step(response, url, back_to_list=False):

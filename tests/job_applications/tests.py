@@ -36,7 +36,7 @@ from itou.job_applications.enums import (
     RefusalReason,
     SenderKind,
 )
-from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, _resolve_title, stream_xlsx_export
+from itou.job_applications.export import JOB_APPLICATION_XSLX_FORMAT, _resolve_title, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.users.enums import LackOfPoleEmploiId, Title
@@ -61,7 +61,7 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import get_rows_from_streaming_response
+from tests.utils.test import excel_date_format, get_rows_from_streaming_response
 
 
 class TestJobApplicationModel:
@@ -1841,14 +1841,14 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+                excel_date_format(job_seeker.jobseeker_profile.birthdate),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -1857,16 +1857,16 @@ class TestJobApplicationXlsxExport:
                 "Candidature spontanée",
                 "",
                 job_application.sender.get_full_name(),
-                job_application.created_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.created_at),
                 "Candidature acceptée",
-                job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.hiring_start_at),
+                excel_date_format(job_application.hiring_end_at),
                 "",  # no reafusal reason
                 "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
-                job_application.approval.start_at.strftime("%d/%m/%Y"),
-                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.approval.start_at),
+                excel_date_format(job_application.approval.end_at),
                 "Valide",
             ],
         ]
@@ -1890,14 +1890,14 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+                excel_date_format(job_seeker.jobseeker_profile.birthdate),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -1906,16 +1906,16 @@ class TestJobApplicationXlsxExport:
                 "Candidature spontanée",
                 "",
                 job_application.sender.get_full_name(),
-                job_application.created_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.created_at),
                 "Candidature acceptée",
-                job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.hiring_start_at),
+                excel_date_format(job_application.hiring_end_at),
                 "",  # no reafusal reason
                 "non",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
-                job_application.approval.start_at.strftime("%d/%m/%Y"),
-                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.approval.start_at),
+                excel_date_format(job_application.approval.end_at),
                 "Expiré",
             ],
         ]
@@ -1937,14 +1937,14 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 job_seeker.title,
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+                excel_date_format(job_seeker.jobseeker_profile.birthdate),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -1953,10 +1953,10 @@ class TestJobApplicationXlsxExport:
                 "Candidature spontanée",
                 "",
                 job_application.sender.get_full_name(),
-                job_application.created_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.created_at),
                 "Candidature déclinée",
-                job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.hiring_start_at),
+                excel_date_format(job_application.hiring_end_at),
                 "Candidat non joignable",
                 "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
@@ -1996,14 +1996,14 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
                 "Doe",
                 "Jane",
                 "jane.doe@test.local",
                 "0612345678",
-                "01/01/1990",
+                datetime.datetime(1990, 1, 1),
                 "Rennes",
                 "35000",
                 "Acme inc.",
@@ -2012,16 +2012,16 @@ class TestJobApplicationXlsxExport:
                 "Ma structure",
                 "",
                 "John DOE",
-                "05/07/2024",
+                datetime.datetime(2024, 7, 5),
                 "Candidature acceptée",
-                "05/07/2024",
-                "05/07/2026",
+                datetime.datetime(2024, 7, 5),
+                datetime.datetime(2026, 7, 5),
                 "",
                 "oui",  # Eligibility status.
                 "oui",  # Eligible to SIAE evaluations.
                 approval.number,
-                "05/07/2024",
-                "04/07/2026",
+                datetime.datetime(2024, 7, 5),
+                datetime.datetime(2026, 7, 4),
                 "Valide",
             ],
         ]
@@ -2048,7 +2048,7 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "",
                 "N…",
@@ -2064,16 +2064,16 @@ class TestJobApplicationXlsxExport:
                 "Orienteur",
                 "",
                 job_application.sender.get_full_name(),
-                job_application.created_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.created_at),
                 "Candidature acceptée",
-                job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.hiring_start_at),
+                excel_date_format(job_application.hiring_end_at),
                 "",  # no reafusal reason
                 "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
-                job_application.approval.start_at.strftime("%d/%m/%Y"),
-                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.approval.start_at),
+                excel_date_format(job_application.approval.end_at),
                 "Valide",
             ],
         ]
@@ -2084,14 +2084,14 @@ class TestJobApplicationXlsxExport:
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
-            JOB_APPLICATION_CSV_HEADERS,
+            list(JOB_APPLICATION_XSLX_FORMAT.keys()),
             [
                 "MME",
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+                excel_date_format(job_seeker.jobseeker_profile.birthdate),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -2100,16 +2100,16 @@ class TestJobApplicationXlsxExport:
                 "Orienteur",
                 "",
                 job_application.sender.get_full_name(),
-                job_application.created_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.created_at),
                 "Candidature acceptée",
-                job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.hiring_start_at),
+                excel_date_format(job_application.hiring_end_at),
                 "",  # no reafusal reason
                 "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
-                job_application.approval.start_at.strftime("%d/%m/%Y"),
-                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                excel_date_format(job_application.approval.start_at),
+                excel_date_format(job_application.approval.end_at),
                 "Valide",
             ],
         ]
