@@ -55,6 +55,7 @@ class MembersInline(ItouTabularInline):
     extra = 0
     raw_id_fields = ("user",)
     readonly_fields = ("created_at", "updated_at", "updated_by", "joined_at")
+    ordering = ("user__last_name", "user__first_name", "joined_at")
     formset = MembersInlineFormSet
 
     def has_delete_permission(self, *args, **kwargs):
