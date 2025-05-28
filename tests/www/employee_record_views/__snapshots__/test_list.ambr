@@ -2,33 +2,31 @@
 # name: TestListEmployeeRecords.test_employee_record_to_disable
   '''
   <div class="c-box--results__footer">
-          
-              <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                  
-                      <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                  
-                  <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">Voir la fiche salarié</a>
-                  
-                  
-                      <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter</a>
-                  
-              </div>
-          
+      <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
+              Désactiver
+          </a>
+          <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">
+              Voir la fiche salarié
+          </a>
+          <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">
+              Compléter
+          </a>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestListEmployeeRecords.test_employee_records_with_nir_associated_to_other[action]
   '''
   <div class="c-box--results__footer">
-          
-              <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                  
-  
-  <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]&amp;jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
-  
-              </div>
-          
+      <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+          <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]&jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">
+              Régulariser le n° de sécurité sociale
+          </a>
       </div>
+  </div>
+  
   '''
 # ---
 # name: TestListEmployeeRecords.test_missing_employee_records_alert[plural]
@@ -712,30 +710,31 @@
 # name: TestListEmployeeRecords.test_processed_employee_record_can_be_sent_back
   '''
   <div class="c-box--results__footer">
-          
-              <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-                  
-                      <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver</a>
-                  
-                  <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DPROCESSED">Voir la fiche salarié</a>
-                  
-                      <div class="dropdown w-md-auto">
-                          <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-primary w-100 w-md-auto dropdown-toggle dropdown-toggle" data-bs-toggle="dropdown" type="button">
-      Renvoyer cette fiche salarié
-  </button>
-  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
-      <form action="/employee_record/create_step_5/[PK of JobApplication]" class="js-prevent-multiple-submit" method="post">
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-          <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">Renvoyer</button>
-      </form>
-      <a class="dropdown-item" href="/employee_record/create/[PK of JobApplication]">Modifier et renvoyer</a>
+      <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
+              Désactiver
+          </a>
+          <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DPROCESSED">
+              Voir la fiche salarié
+          </a>
+          <div class="dropdown w-md-auto">
+              <button aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]" aria-expanded="false" aria-haspopup="true" class="btn btn-primary w-100 w-md-auto dropdown-toggle dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                  Renvoyer cette fiche salarié
+              </button>
+              <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+                  <form action="/employee_record/create_step_5/[PK of JobApplication]" class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <button aria-label="Renvoyer la fiche salarié sans modification" class="dropdown-item" type="submit">
+                          Renvoyer
+                      </button>
+                  </form>
+                  <a class="dropdown-item" href="/employee_record/create/[PK of JobApplication]">
+                      Modifier et renvoyer
+                  </a>
+              </div>
+          </div>
+      </div>
   </div>
   
-                      </div>
-                  
-                  
-              </div>
-          
-      </div>
   '''
 # ---

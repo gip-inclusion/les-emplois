@@ -14,7 +14,7 @@ from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import get_session_name, parse_response_to_soup
+from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
 
 
 class TestApplyAsPrescriber:
@@ -143,7 +143,7 @@ class TestApplyAsPrescriber:
         # Step application's eligibility
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 "#main",

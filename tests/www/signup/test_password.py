@@ -77,7 +77,7 @@ class TestPasswordReset:
 
         response = client.get(password_change_url_with_hidden_key)
         assert (
-            str(
+            pretty_indented(
                 parse_response_to_soup(
                     response,
                     "#main",

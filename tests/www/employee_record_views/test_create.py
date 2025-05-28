@@ -798,14 +798,14 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assert employee_record.status == Status.NEW
 
         response = client.get(self.url)
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 selector=".s-section .alert.alert-warning",
                 replace_in_attr=[],
             )
         ) == snapshot(name="alert")
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 selector=".s-section form",
