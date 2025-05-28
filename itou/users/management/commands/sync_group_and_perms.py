@@ -126,7 +126,7 @@ def get_permissions_dict():
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         prescribers_models.PrescriberOrganization: PERMS_READ,
         prescribers_models.PrescriberMembership: PERMS_READ,
-        users_models.User: PERMS_HIJACK,
+        users_models.User: PERMS_HIJACK | PERMS_EXPORT_CTA,
     }
 
     return {

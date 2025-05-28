@@ -277,6 +277,7 @@
     'view_jobapplicationtransitionlog',
     'view_prescribermembership',
     'view_prescriberorganization',
+    'export_cta',
     'hijack',
     'view_user',
   ])
