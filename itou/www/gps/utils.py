@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
@@ -10,7 +12,7 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 
 
-def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True):
+def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True, channel=None, created=False):
     membership, added = FollowUpGroup.objects.follow_beneficiary(
         beneficiary=beneficiary, user=request.user, is_active=is_active
     )
@@ -24,12 +26,17 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
             f"Demande d’ajout envoyée||Votre demande d’ajout pour {name} a bien été transmise pour validation.",
             extra_tags="toast",
         )
+        logger.info("GPS group_requested_access", extra={"group": membership.follow_up_group_id})
     elif added:
         messages.success(
             request,
             f"Bénéficiaire ajouté||{name} fait maintenant partie de la liste de vos bénéficiaires.",
             extra_tags="toast",
         )
+        if created:
+            logger.info("GPS group_created", extra={"group": membership.follow_up_group_id})
+        else:
+            logger.info("GPS group_joined", extra={"group": membership.follow_up_group_id, "channel": channel})
     else:
         messages.info(
             request,
@@ -53,3 +60,6 @@ def get_all_coworkers(organizations):
 
 def send_slack_message_for_gps(text):
     slack.send_slack_message(text, settings.GPS_SLACK_WEBHOOK_URL)
+
+
+logger = logging.getLogger("itou.gps")

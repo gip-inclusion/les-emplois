@@ -1128,7 +1128,7 @@
                                   <label class="form-label" for="id_started_at">
                                       Date de début
                                   </label>
-                                  <duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" required="" value="2024-06-21">
+                                  <duet-date-picker class="" identifier="id_started_at" max="2024-06-21" name="started_at" required="" value="2024-01-03">
                                   </duet-date-picker>
                               </div>
                               <div class="form-group form-group-required">
@@ -1273,7 +1273,86 @@
   
   '''
 # ---
-# name: TestGroupDetailsMembershipTab.test_display_participant_contact_info
+# name: TestGroupDetailsMembershipTab.test_display_participant_contact_info_as_employer
+  '''
+  <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
+      <div class="c-box--results__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="c-box--results__summary flex-grow-1">
+                  <i aria-hidden="true" class="ri-community-line">
+                  </i>
+                  <div>
+                      <div class="d-flex align-items-center gap-2">
+                          <h3>
+                              Jean DUPONT
+                          </h3>
+                      </div>
+                      <span>
+                          Employeur
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+              <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                  <li>
+                      <i aria-hidden="true" class="ri-calendar-line fw-normal me-1">
+                      </i>
+                      Accompagnateur depuis le 20/01/2025
+                  </li>
+              </ul>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <ul class="list-data mb-3">
+              <li>
+                  <small>
+                      Motif de l’accompagnement
+                  </small>
+                  <i class="text-disabled">
+                      Non renseigné
+                  </i>
+              </li>
+          </ul>
+          <ul class="list-data list-data__two-column-md">
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      jean@dupont.fr
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jean@dupont.fr" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0123456789
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestGroupDetailsMembershipTab.test_display_participant_contact_info_as_prescriber
   '''
   <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card'[Public ID of target_participant]">
       <div class="c-box--results__header">
