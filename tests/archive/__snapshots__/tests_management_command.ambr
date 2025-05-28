@@ -338,6 +338,30 @@
 # name: TestNotifyArchiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_subject]
   '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[False-False][suspend_notify_archive_users_command_log]
+  'Start notifying and archiving users in dry_run mode'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[False-None][suspend_notify_archive_users_command_log]
+  'Start notifying and archiving users in dry_run mode'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[False-True][suspend_notify_archive_users_command_log]
+  'Archiving users is suspended, exiting command'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[False-true][suspend_notify_archive_users_command_log]
+  'Archiving users is suspended, exiting command'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[True-False][suspend_notify_archive_users_command_log]
+  'Start notifying and archiving users in wet_run mode'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[True-None][suspend_notify_archive_users_command_log]
+  'Start notifying and archiving users in wet_run mode'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[True-True][suspend_notify_archive_users_command_log]
+  'Archiving users is suspended, exiting command'
+# ---
+# name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[True-true][suspend_notify_archive_users_command_log]
+  'Archiving users is suspended, exiting command'
+# ---
 # name: TestUserRelationsSanityCheckManagementCommand.test_job_seeker_related_objects_lists[ignored_related_objects]
   list([
     'logentry',
