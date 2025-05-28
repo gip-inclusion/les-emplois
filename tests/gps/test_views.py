@@ -7,9 +7,11 @@ import pytest
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
+from json_log_formatter import BUILTIN_ATTRS
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
+from itou.companies.models import Company
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
@@ -32,6 +34,16 @@ from tests.users.factories import (
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+
+
+def gps_logs(caplog):
+    ignored_keys = BUILTIN_ATTRS - {"message"}
+    records = []
+    for record in caplog.records:
+        if record.name == "itou.gps":
+            records.append({k: v for k, v in record.__dict__.items() if k not in ignored_keys})
+    caplog.clear()
+    return records
 
 
 def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
@@ -99,7 +111,7 @@ class TestGroupLists:
             assert response.status_code == status_code
 
     @freezegun.freeze_time("2024-06-21", tick=True)
-    def test_group_list(self, snapshot, client):
+    def test_group_list(self, snapshot, client, caplog):
         user = PrescriberFactory(
             membership__organization__authorized=True, membership__organization__for_snapshot=True
         )
@@ -161,6 +173,8 @@ class TestGroupLists:
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
+        assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
+
         # Test `is_referent` display.
         group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
         FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
@@ -168,7 +182,7 @@ class TestGroupLists:
         assertContains(response, "vous êtes référent")
 
     @freezegun.freeze_time("2024-06-21", tick=True)
-    def test_old_group_list(self, snapshot, client):
+    def test_old_group_list(self, snapshot, client, caplog):
         user = PrescriberFactory(
             membership__organization__authorized=True, membership__organization__for_snapshot=True
         )
@@ -202,6 +216,7 @@ class TestGroupLists:
         assert pretty_indented(groups) == snapshot(name="test_my_groups__group_card")
 
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:old_group_list")}">')
+        assert gps_logs(caplog) == [{"message": "GPS visit_list_groups_old"}]
 
     def test_groups_pagination_and_name_filter(self, client):
         prescriber = PrescriberFactory(membership__organization__authorized=True)
@@ -333,7 +348,7 @@ class TestGroupDetailsMembershipTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(
             membership=True,
             for_snapshot=True,
@@ -341,14 +356,15 @@ class TestGroupDetailsMembershipTab:
             membership__organization__authorized=True,
         )
         beneficiary = JobSeekerFactory(for_snapshot=True)
-        group = FollowUpGroupMembershipFactory(
+        membership = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary=beneficiary,
             member=prescriber,
             started_at=date(2024, 1, 1),
             ended_at=date(2024, 6, 20),
             end_reason=EndReason.MANUAL,
             reason="iae",  # With a reason
-        ).follow_up_group
+        )
+        group = membership.follow_up_group
         participant = FollowUpGroupMembershipFactory(
             member__first_name="François",
             member__last_name="Le Français",
@@ -392,6 +408,7 @@ class TestGroupDetailsMembershipTab:
             ],
         )
         assert pretty_indented(html_details) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_memberships", "group": group.pk}]
 
         display_phone_txt = "<span>Afficher le téléphone</span>"
         display_email_txt = "<span>Afficher l'email</span>"
@@ -432,7 +449,7 @@ class TestGroupDetailsMembershipTab:
         ]
 
     @freezegun.freeze_time("2025-01-20")
-    def test_display_participant_contact_info(self, client, mocker, snapshot):
+    def test_display_participant_contact_info_as_prescriber(self, client, snapshot, mocker, caplog):
         prescriber = PrescriberFactory(
             membership=True,
             for_snapshot=True,
@@ -460,6 +477,7 @@ class TestGroupDetailsMembershipTab:
         assertContains(response, display_phone_url)
         display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
         assertContains(response, display_email_url)
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_memberships", "group": group.pk}]
 
         simulated_page = parse_response_to_soup(
             response,
@@ -470,9 +488,40 @@ class TestGroupDetailsMembershipTab:
         response = client.post(display_phone_url)
         assertContains(response, target_participant.phone)
         update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "orienteur",
+                "beneficiary": beneficiary.pk,
+                "current_user": prescriber.pk,
+                "current_user_type": "prescripteur habilité",
+                "mode": "phone",
+                "are_colleagues": False,
+            },
+        ]
+
+        # Add target_participant to the current user org
+        organization = PrescriberOrganization.objects.get()
+        PrescriberMembershipFactory(user=target_participant, organization=organization)
+
         response = client.post(display_email_url)
         assertContains(response, target_participant.email)
         update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "prescripteur habilité",
+                "beneficiary": beneficiary.pk,
+                "current_user": prescriber.pk,
+                "current_user_type": "prescripteur habilité",
+                "mode": "email",
+                "are_colleagues": True,
+            },
+        ]
 
         assert pretty_indented(simulated_page) == snapshot
 
@@ -481,7 +530,82 @@ class TestGroupDetailsMembershipTab:
             ((prescriber, group, target_participant, "email"),),
         ]
 
-    def test_ask_access(self, client, mocker, snapshot):
+    @freezegun.freeze_time("2025-01-20")
+    def test_display_participant_contact_info_as_employer(self, client, snapshot, caplog):
+        employer = EmployerFactory(
+            with_company=True,
+            for_snapshot=True,
+            with_company__company__name="Les Olivades",
+        )
+        beneficiary = JobSeekerFactory(for_snapshot=True)
+        group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=employer)
+        target_participant = FollowUpGroupMembershipFactory(
+            member=EmployerFactory(
+                first_name="Jean",
+                last_name="Dupont",
+                email="jean@dupont.fr",
+                phone="0123456789",
+            ),
+            follow_up_group=group,
+        ).member
+
+        client.force_login(employer)
+
+        url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
+        response = client.get(url)
+        display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
+        assertContains(response, display_phone_url)
+        display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
+        assertContains(response, display_email_url)
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_memberships", "group": group.pk}]
+
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#card-{target_participant.public_id}",
+            replace_in_attr=[("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]")],
+        )
+
+        response = client.post(display_phone_url)
+        assertContains(response, target_participant.phone)
+        update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "employeur",
+                "beneficiary": beneficiary.pk,
+                "current_user": employer.pk,
+                "current_user_type": "employeur",
+                "mode": "phone",
+                "are_colleagues": False,
+            },
+        ]
+
+        # Add target_participant to the current user company
+        company = Company.objects.get()
+        CompanyMembershipFactory(user=target_participant, company=company)
+
+        response = client.post(display_email_url)
+        assertContains(response, target_participant.email)
+        update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "employeur",
+                "beneficiary": beneficiary.pk,
+                "current_user": employer.pk,
+                "current_user_type": "employeur",
+                "mode": "email",
+                "are_colleagues": True,
+            },
+        ]
+
+        assert pretty_indented(simulated_page) == snapshot
+
+    def test_ask_access(self, client, mocker, snapshot, caplog):
         user = PrescriberFactory()
         job_seeker = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=job_seeker, memberships=1, memberships__member=user)
@@ -523,8 +647,12 @@ class TestGroupDetailsMembershipTab:
             )
         ]
         assert slack_mock.mock_calls == expected_calls
-        slack_mock.reset_mock()
+        assert gps_logs(caplog) == [
+            {"message": "GPS visit_group_memberships", "group": group.pk},
+            {"message": "GPS group_requested_full_access", "group": group.pk},
+        ]
 
+        slack_mock.reset_mock()
         membership.can_view_personal_information = True
         membership.save()
         client.post(ask_access_url)
@@ -561,7 +689,7 @@ class TestGroupDetailsBeneficiaryTab:
         else:
             assert response.status_code == 403
 
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True, for_snapshot=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
@@ -580,6 +708,7 @@ class TestGroupDetailsBeneficiaryTab:
             ],
         )
         assert pretty_indented(html_details) == snapshot(name="masked_info")
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_beneficiary", "group": group.pk}]
 
         # When he can but is not from an authorized organization
         beneficiary.created_by = prescriber
@@ -672,10 +801,11 @@ class TestGroupDetailsContributionTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+        membership = group.memberships.get()
 
         client.force_login(prescriber)
 
@@ -689,6 +819,7 @@ class TestGroupDetailsContributionTab:
             ],
         )
         assert pretty_indented(html_details) == snapshot(name="ongoing_membership_no_reason")
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_contribution", "group": group.pk}]
 
         membership = group.memberships.get()
         membership.ended_at = timezone.localdate()
@@ -737,11 +868,16 @@ class TestGroupDetailsEditionTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
-    def test_tab(self, client, snapshot):
+    def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary)
-        membership = FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
+        membership = FollowUpGroupMembershipFactory(
+            member=prescriber,
+            is_referent=True,
+            follow_up_group=group,
+            started_at="2024-01-03",
+        )
 
         client.force_login(prescriber)
         url = reverse("gps:group_edition", kwargs={"group_id": group.pk})
@@ -754,6 +890,7 @@ class TestGroupDetailsEditionTab:
             ],
         )
         assert pretty_indented(html_details) == snapshot()
+        assert gps_logs(caplog) == [{"message": "GPS visit_group_edition", "group": group.pk}]
 
         # The user just clics on "Accompagnement terminé" without setting the ended_at field
         post_data = {
@@ -765,6 +902,11 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": False},
+            {"message": "GPS changed_referent", "group": group.pk, "state": False, "membership": membership.pk},
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -781,6 +923,10 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": True},
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -797,6 +943,10 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": False},
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -815,6 +965,9 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -832,6 +985,11 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": True},
+            {"message": "GPS changed_referent", "group": group.pk, "state": True, "membership": membership.pk},
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.started_at == date(2024, 1, 3)
@@ -839,9 +997,9 @@ class TestGroupDetailsEditionTab:
         assert membership.end_reason is None
         assert membership.is_referent is True
 
-        # The user sets a reason
+        # The user sets a reason and changes the start_date
         post_data = {
-            "started_at": "2024-01-03",
+            "started_at": "2024-01-02",
             "is_ongoing": "True",
             "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
             "is_referent": "on",
@@ -849,6 +1007,11 @@ class TestGroupDetailsEditionTab:
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
+        assert gps_logs(caplog) == [
+            {"message": "GPS changed_reason", "group": group.pk, "length": 3, "membership": membership.pk},
+            {"message": "GPS changed_start_date", "group": group.pk, "membership": membership.pk},
+            {"message": "GPS visit_group_contribution", "group": group.pk},
+        ]
 
         membership.refresh_from_db()
         assert membership.reason == "iae"
@@ -903,29 +1066,34 @@ class TestJoinGroup:
             "prescriber_with_org",
         ],
     )
-    def test_view_with_org(self, client, snapshot, user_factory):
+    def test_view_with_org(self, client, snapshot, user_factory, caplog):
         url = reverse("gps:join_group")
         user = user_factory()
         client.force_login(user)
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_index"}]
 
         # All redirection work : the join_group_from_* view will check if the user is allowed
         response = client.post(url, data={"channel": "from_coworker"})
         assertRedirects(response, reverse("gps:join_group_from_coworker"), fetch_redirect_response=False)
+        assert gps_logs(caplog) == []
 
         response = client.post(url, data={"channel": "from_nir"})
         assertRedirects(response, reverse("gps:join_group_from_nir"), fetch_redirect_response=False)
+        assert gps_logs(caplog) == []
 
         response = client.post(url, data={"channel": "from_name_email"})
         assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
+        assert gps_logs(caplog) == []
 
-    def test_view_without_org(self, client):
+    def test_view_without_org(self, client, caplog):
         url = reverse("gps:join_group")
         user = PrescriberFactory()
         client.force_login(user)
         response = client.get(url)
         assertRedirects(response, reverse("gps:join_group_from_name_and_email"), fetch_redirect_response=False)
+        assert gps_logs(caplog) == []
 
 
 class TestBeneficiariesAutocomplete:
@@ -1111,7 +1279,7 @@ class TestJoinGroupFromCoworker:
         else:
             assert response.status_code == 403
 
-    def test_view(self, client, snapshot):
+    def test_view(self, client, snapshot, caplog):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         coworker = CompanyMembershipFactory(company=company).user
@@ -1119,12 +1287,14 @@ class TestJoinGroupFromCoworker:
         client.force_login(user)
         response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_coworker"}]
 
         followed_job_seeker = JobSeekerFactory()
         FollowUpGroupFactory(beneficiary=followed_job_seeker, memberships=1, memberships__member=user)
         response = client.post(self.URL, data={"user": followed_job_seeker.pk})
         assertRedirects(response, reverse("gps:group_list"))
         assert_already_followed_beneficiary_toast(response, followed_job_seeker)
+        assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
 
         coworker_job_seeker = JobSeekerFactory()
         group = FollowUpGroupFactory(beneficiary=coworker_job_seeker, memberships=1, memberships__member=coworker)
@@ -1132,6 +1302,10 @@ class TestJoinGroupFromCoworker:
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, coworker_job_seeker)
         assert FollowUpGroupMembership.objects.filter(follow_up_group=group, member=user).exists()
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_joined", "group": group.pk, "channel": "coworker"},
+            {"message": "GPS visit_list_groups"},
+        ]
 
         another_job_seeker = JobSeekerFactory()
         response = client.post(self.URL, data={"user": another_job_seeker.pk})
@@ -1185,12 +1359,13 @@ class TestJoinGroupFromNir:
         else:
             assert response.status_code == 403
 
-    def test_view(self, client, snapshot):
+    def test_view(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
 
         client.force_login(user)
         response = client.get(self.URL)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot(name="get")
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_nir"}]
 
         # unknown NIR :
         dummy_job_seeker = JobSeekerFactory.build(for_snapshot=True)
@@ -1211,31 +1386,40 @@ class TestJoinGroupFromNir:
         }
         assertRedirects(response, next_url)
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
+        assert gps_logs(caplog) == []
 
-        # existing nit
+        # existing nir
         job_seeker = JobSeekerFactory(for_snapshot=True)
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "preview": "1"})
         assert pretty_indented(parse_response_to_soup(response, selector="#nir-confirmation-modal")) == snapshot(
             name="modal"
         )
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_nir"}]
 
         # if we cancel: back to start with the nir we didn't find in the input
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
         html_detail = parse_response_to_soup(response, selector="#main")
         del html_detail.find(id="id_nir").attrs["value"]
         assert pretty_indented(html_detail) == snapshot(name="get")
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_nir"}]
 
         # But if we accept:
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
+        group = FollowUpGroup.objects.get(beneficiary=job_seeker)
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_joined", "channel": "nir", "group": group.pk},
+            {"message": "GPS visit_list_groups"},
+        ]
 
         # If we were already following the user
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
         assertRedirects(response, reverse("gps:group_list"))
         assert_already_followed_beneficiary_toast(response, job_seeker)
+        assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
 
-    def test_unknown_nir_known_email_with_no_nir(self, client, snapshot):
+    def test_unknown_nir_known_email_with_no_nir(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
         existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
         nir = "276024719711371"
@@ -1289,11 +1473,14 @@ class TestJoinGroupFromNir:
         existing_job_seeker_without_nir.refresh_from_db()
         assert existing_job_seeker_without_nir.jobseeker_profile.nir == nir
 
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=existing_job_seeker_without_nir, member=user
-        ).exists()
+        group = FollowUpGroup.objects.get(beneficiary=existing_job_seeker_without_nir)
+        assert group.memberships.filter(member=user).exists()
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_created", "group": group.pk},
+            {"message": "GPS visit_list_groups"},
+        ]
 
-    def test_unknown_nir_known_email_with_another_nir(self, client, snapshot):
+    def test_unknown_nir_known_email_with_another_nir(self, client, snapshot, caplog):
         user = EmployerFactory(with_company=True)
         existing_job_seeker_with_nir = JobSeekerFactory(for_snapshot=True)
         job_seeker_nir = existing_job_seeker_with_nir.jobseeker_profile.nir
@@ -1345,11 +1532,14 @@ class TestJoinGroupFromNir:
         existing_job_seeker_with_nir.refresh_from_db()
         assert existing_job_seeker_with_nir.jobseeker_profile.nir == job_seeker_nir
 
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=existing_job_seeker_with_nir, member=user
-        ).exists()
+        group = FollowUpGroup.objects.get(beneficiary=existing_job_seeker_with_nir)
+        assert group.memberships.filter(member=user).exists()
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_created", "group": group.pk},
+            {"message": "GPS visit_list_groups"},
+        ]
 
-    def test_unknown_nir_and_unknown_email(self, client, settings, mocker):
+    def test_unknown_nir_and_unknown_email(self, client, settings, mocker, caplog):
         user = EmployerFactory(with_company=True)
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
@@ -1501,9 +1691,9 @@ class TestJoinGroupFromNir:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert_new_beneficiary_toast(response, new_job_seeker)
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).exists()
+        group = FollowUpGroup.objects.get(beneficiary=new_job_seeker)
+        assert group.memberships.filter(member=user).exists()
+        assert gps_logs(caplog) == [{"message": "GPS group_created", "group": group.pk}]
 
 
 class TestJoinGroupFromNameAndEmail:
@@ -1538,7 +1728,7 @@ class TestJoinGroupFromNameAndEmail:
             assert response.status_code == 403
 
     @pytest.mark.parametrize("known_name", [True, False])
-    def test_unknown_email(self, client, settings, mocker, known_name):
+    def test_unknown_email(self, client, settings, mocker, known_name, caplog):
         # This process is the same with or without gps advanced features
         user = PrescriberFactory()
         slack_mock = mocker.patch("itou.www.gps.utils.send_slack_message_for_gps")  # mock the imported link
@@ -1695,9 +1885,8 @@ class TestJoinGroupFromNameAndEmail:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert_new_beneficiary_toast(response, new_job_seeker)
-        assert FollowUpGroupMembership.objects.filter(
-            follow_up_group__beneficiary=new_job_seeker, member=user
-        ).exists()
+        group = FollowUpGroup.objects.get(beneficiary=new_job_seeker)
+        assert group.memberships.filter(member=user).exists()
 
         expected_mock_calls = []
         if known_name:
@@ -1711,8 +1900,9 @@ class TestJoinGroupFromNameAndEmail:
                 )
             ]
         assert slack_mock.mock_calls == expected_mock_calls
+        assert gps_logs(caplog) == [{"group": group.pk, "message": "GPS group_created"}]
 
-    def test_full_match_with_advanced_features(self, client, snapshot):
+    def test_full_match_with_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=True)
         client.force_login(user)
 
@@ -1725,6 +1915,7 @@ class TestJoinGroupFromNameAndEmail:
         }
         response = client.post(self.URL, data=post_data)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
 
         post_data = {
             "email": job_seeker.email,
@@ -1735,9 +1926,14 @@ class TestJoinGroupFromNameAndEmail:
         response = client.post(self.URL, data=post_data)
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
-        assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+        group = FollowUpGroup.objects.get(beneficiary=job_seeker)
+        assert group.memberships.filter(member=user).exists()
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_joined", "group": group.pk, "channel": "name_and_email"},
+            {"message": "GPS visit_list_groups"},
+        ]
 
-    def test_full_match_without_advanced_features(self, client, snapshot, mocker):
+    def test_full_match_without_advanced_features(self, client, snapshot, mocker, caplog):
         user = PrescriberFactory(membership__organization__authorized=False)
         slack_mock = mocker.patch("itou.www.gps.views.send_slack_message_for_gps")  # mock the imported link
         client.force_login(user)
@@ -1751,6 +1947,7 @@ class TestJoinGroupFromNameAndEmail:
         }
         response = client.post(self.URL, data=post_data)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
 
         # Cannot confirm
         post_data = {
@@ -1764,6 +1961,7 @@ class TestJoinGroupFromNameAndEmail:
         assert not FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
 
         # When asking
         post_data = {
@@ -1776,7 +1974,8 @@ class TestJoinGroupFromNameAndEmail:
         assertRedirects(response, reverse("gps:group_list"))
 
         assert_ask_to_follow_beneficiary_toast(response, job_seeker)
-        relation = FollowUpGroupMembership.objects.get(follow_up_group__beneficiary=job_seeker, member=user)
+        group = FollowUpGroup.objects.get(beneficiary=job_seeker)
+        relation = group.memberships.get(member=user)
         assert relation.is_active is False
 
         job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(job_seeker.pk,)))
@@ -1791,8 +1990,12 @@ class TestJoinGroupFromNameAndEmail:
                 ),
             )
         ]
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_requested_access", "group": group.pk},
+            {"message": "GPS visit_list_groups"},
+        ]
 
-    def test_partial_match_with_advanced_features(self, client, snapshot):
+    def test_partial_match_with_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=True)
         client.force_login(user)
 
@@ -1807,6 +2010,7 @@ class TestJoinGroupFromNameAndEmail:
         }
         response = client.post(self.URL, data=post_data)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
 
         post_data = {
             "email": job_seeker.email,
@@ -1817,9 +2021,14 @@ class TestJoinGroupFromNameAndEmail:
         response = client.post(self.URL, data=post_data)
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)
-        assert FollowUpGroupMembership.objects.filter(follow_up_group__beneficiary=job_seeker, member=user).exists()
+        group = FollowUpGroup.objects.get(beneficiary=job_seeker)
+        assert group.memberships.filter(member=user).exists()
+        assert gps_logs(caplog) == [
+            {"message": "GPS group_joined", "group": group.pk, "channel": "name_and_email"},
+            {"message": "GPS visit_list_groups"},
+        ]
 
-    def test_partial_match_without_advanced_features(self, client, snapshot):
+    def test_partial_match_without_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=False)
         client.force_login(user)
 
@@ -1834,6 +2043,7 @@ class TestJoinGroupFromNameAndEmail:
         }
         response = client.post(self.URL, data=post_data)
         assert pretty_indented(parse_response_to_soup(response, selector="#main")) == snapshot
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
 
         # Cannot confirm
         post_data = {
@@ -1847,3 +2057,4 @@ class TestJoinGroupFromNameAndEmail:
         assert not FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=job_seeker, member=user
         ).exists()
+        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_name_and_email"}]
