@@ -1564,6 +1564,13 @@ class CommonProlongation(models.Model):
         elif any([self.require_phone_interview, self.contact_email, self.contact_phone]):
             raise ValidationError("L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif")
 
+        # declared_by and declared_by_siae coherence
+        if self.declared_by and not self.declared_by_siae.members.filter(pk=self.declared_by.pk).exists():
+            raise ValidationError(
+                "Le déclarant doit être un membre de la SIAE du déclarant. "
+                f"Déclarant: {self.declared_by_id}, SIAE: {self.declared_by_siae_id}."
+            )
+
     def notify_authorized_prescriber(self):
         pass  # NOOP
 

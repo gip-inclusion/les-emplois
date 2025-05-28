@@ -43,7 +43,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory
 
 
 class TestCommonApprovalQuerySet:
@@ -1562,6 +1562,19 @@ class TestProlongationModel:
         with pytest.raises(ValidationError) as error:
             prolongation.clean()
         assert error.match("Cet utilisateur n'est pas un prescripteur habilité.")
+
+    def test_clean_declared_by_coherence(self):
+        prolongation = ProlongationFactory()
+        prolongation.clean()
+
+        employer = EmployerFactory()
+        prolongation.declared_by = employer
+        with pytest.raises(ValidationError) as error:
+            prolongation.clean()
+        assert error.match(
+            "Le déclarant doit être un membre de la SIAE du déclarant. "
+            f"Déclarant: {employer.id}, SIAE: {prolongation.declared_by_siae_id}."
+        )
 
     def test_get_max_end_at(self, subtests):
         start_at = datetime.date(2021, 2, 1)
