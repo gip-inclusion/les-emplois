@@ -6,6 +6,10 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.archive.management.commands.user_relations_sanity_check import (
+    JOB_SEEKER_IGNORED_RELATED_OBJECTS,
+    related_objects_to_check_for_jobseekers,
+)
 from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -16,7 +20,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -705,3 +709,21 @@ class TestNotifyArchiveUsersManagementCommand:
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Archived job applications after grace period, count: 1" in caplog.messages
+
+
+class TestUserRelationsSanityCheckManagementCommand:
+    def test_job_seeker_related_objects_lists(self, snapshot):
+        assert [rel.name for rel in related_objects_to_check_for_jobseekers()] == snapshot(
+            name="related_objects_to_check"
+        )
+        assert JOB_SEEKER_IGNORED_RELATED_OBJECTS == snapshot(name="ignored_related_objects")
+
+    def test_logs(self, caplog):
+        companies = CompanyFactory.create_batch(2, created_by=JobSeekerFactory())
+        other_company = CompanyFactory(created_by=JobSeekerFactory())
+
+        call_command("user_relations_sanity_check")
+        assert (
+            "Company | created_company_set | 3 undesired objects related | job_seeker ids: "
+            f"[{companies[0].created_by_id}, {other_company.created_by_id}]"
+        ) in caplog.text
