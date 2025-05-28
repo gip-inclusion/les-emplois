@@ -3,6 +3,7 @@ import itertools
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from freezegun import freeze_time
@@ -11,7 +12,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.management.commands import prolongation_requests_chores
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 
 
 @pytest.fixture(name="command")
@@ -164,3 +165,17 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
     for email in mailoutbox:
         assert email.subject == snapshot(name="subject")
         assert email.body == snapshot(name="body")
+
+
+def test_clean_declared_by_coherence():
+    prolongation_request = ProlongationRequestFactory()
+    prolongation_request.clean()
+
+    employer = EmployerFactory()
+    prolongation_request.declared_by = employer
+    with pytest.raises(ValidationError) as error:
+        prolongation_request.clean()
+    assert error.match(
+        "Le déclarant doit être un membre de la SIAE du déclarant. "
+        f"Déclarant: {employer.id}, SIAE: {prolongation_request.declared_by_siae_id}."
+    )
