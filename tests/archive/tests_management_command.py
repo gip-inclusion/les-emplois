@@ -33,6 +33,13 @@ from tests.users.factories import (
 
 
 class TestNotifyArchiveUsersManagementCommand:
+    @pytest.mark.parametrize("suspended", [True, False])
+    @pytest.mark.parametrize("wet_run", [True, False])
+    def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
+        settings.SUSPEND_NOTIFY_ARCHIVE_USERS = suspended
+        call_command("notify_archive_users", wet_run=wet_run)
+        assert caplog.messages[0] == snapshot(name="suspend_notify_archive_users_command_log")
+
     @pytest.mark.parametrize(
         "factory,kwargs",
         [

@@ -816,3 +816,7 @@ SERIALIZATION_MODULES = {
 OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
 OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
+
+# Notify_archive_users
+# ------------------------------------------------------------------------------
+SUSPEND_NOTIFY_ARCHIVE_USERS = os.getenv("SUSPEND_NOTIFY_ARCHIVE_USERS", "False") == "True"

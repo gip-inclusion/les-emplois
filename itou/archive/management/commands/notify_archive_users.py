@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.utils import timezone
@@ -257,6 +258,10 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *args, wet_run, batch_size, **options):
+        if settings.SUSPEND_NOTIFY_ARCHIVE_USERS:
+            self.logger.info("Archiving users is suspended, exiting command")
+            return
+
         self.wet_run = wet_run
         self.batch_size = batch_size
         self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
