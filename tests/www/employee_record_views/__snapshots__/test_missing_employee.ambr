@@ -41,39 +41,41 @@
 # name: test_missing_employee[existing_employee_record_same_company]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Damien DANONE</h2>
-  
-                              
-                                  <p>Ce salarié a 1 PASS IAE disponible</p>
-  
-                                  
-                                      <hr/>
-                                      <p>
-                                          <strong>XXXXXXX00002</strong> du 14/02/2025 au 13/02/2027
-                                      </p>
-                                      
-                                          <p>
-                                              Une fiche salarié existe déjà pour ce PASS IAE : <a href="/employee_record/summary/[PK of EmployeeRecord]">Voir la fiche salarié</a>.
-                                          </p>
-                                          <p>
-                                              Seule la première embauche avec ce PASS IAE, nécessite une transmission de la fiche salarié.
-                                              <br/>
-                                              En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
-                                          </p>
-                                      
-                                  
-                              
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Damien DANONE
+                      </h2>
+                      <p>
+                          Ce salarié a 1 PASS IAE disponible
+                      </p>
+                      <hr/>
+                      <p>
+                          <strong>
+                              XXXXXXX00002
+                          </strong>
+                          du 14/02/2025 au 13/02/2027
+                      </p>
+                      <p>
+                          Une fiche salarié existe déjà pour ce PASS IAE :
+                          <a href="/employee_record/summary/[PK of EmployeeRecord]">
+                              Voir la fiche salarié
+                          </a>
+                          .
+                      </p>
+                      <p>
+                          Seule la première embauche avec ce PASS IAE, nécessite une transmission de la fiche salarié.
+                          <br/>
+                          En cas de besoin vous pouvez ajouter un nouveau contrat depuis votre espace Extranet IAE 2.0 de l’ASP.
+                      </p>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: test_missing_employee[form]
@@ -163,56 +165,58 @@
 # name: test_missing_employee[no_employee_record]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>Fabienne FAVRISEAU</h2>
-  
-                              
-                                  <p>Ce salarié a 1 PASS IAE disponible</p>
-  
-                                  
-                                      <hr/>
-                                      <p>
-                                          <strong>XXXXXXX00004</strong> du 14/02/2025 au 13/02/2027
-                                      </p>
-                                      
-                                          <a href="/employee_record/create/[PK of JobApplication]">Créer la fiche salarié</a>
-                                      
-                                  
-                              
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          Fabienne FAVRISEAU
+                      </h2>
+                      <p>
+                          Ce salarié a 1 PASS IAE disponible
+                      </p>
+                      <hr/>
+                      <p>
+                          <strong>
+                              XXXXXXX00004
+                          </strong>
+                          du 14/02/2025 au 13/02/2027
+                      </p>
+                      <a href="/employee_record/create/[PK of JobApplication]">
+                          Créer la fiche salarié
+                      </a>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---
 # name: test_missing_employee[no_hiring]
   '''
   <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-md-9">
-                      <div class="c-form mb-3 mb-lg-5">
-                          
-                              <h2>André ALONSO</h2>
-  
-                              
-                                  <p>
-                                      Vous n’avez pas déclaré d’embauche pour ce candidat. Pour créer une fiche salarié vous devez accepter la candidature.
-                                      <br/>
-                                      Vous pouvez trouver la liste des candidatures de ce candidat en <a href="/apply/siae/list?job_seeker=[PK of Job seeker]&amp;archived=all">cliquant ici</a>.
-                                  </p>
-                              
-                          
-                      </div>
+      <div class="s-section__container container">
+          <div class="row">
+              <div class="col-12 col-md-9">
+                  <div class="c-form mb-3 mb-lg-5">
+                      <h2>
+                          André ALONSO
+                      </h2>
+                      <p>
+                          Vous n’avez pas déclaré d’embauche pour ce candidat. Pour créer une fiche salarié vous devez accepter la candidature.
+                          <br/>
+                          Vous pouvez trouver la liste des candidatures de ce candidat en
+                          <a href="/apply/siae/list?job_seeker=[PK of Job seeker]&archived=all">
+                              cliquant ici
+                          </a>
+                          .
+                      </p>
                   </div>
               </div>
           </div>
-      </section>
+      </div>
+  </section>
+  
   '''
 # ---

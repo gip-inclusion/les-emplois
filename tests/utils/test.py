@@ -66,6 +66,8 @@ def get_session_name(session, session_kind, ignore=()):
 
 
 def pretty_indented(soup, indent=4):
+    if isinstance(soup, str):
+        soup = BeautifulSoup(soup, "html5lib")
     return soup.prettify(formatter=HTMLFormatter(indent=indent))
 
 

@@ -1604,809 +1604,789 @@
 # name: test_snapshot_by_status[DENIED]
   '''
   <main class="s-main" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
-  </div>
-  
-              <section class="s-title-02">
-                  <div class="s-title-02__container container">
-                      <div class="s-title-02__row row">
-                          <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-      <div class="c-prevstep">
-          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-              <span>
-                  Retour
-                  
-              </span>
-          </a>
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
-              <h1>
-                  Demande de prolongation pour Jane DOE
-                  
-      
-          <span class="badge rounded-pill badge-base bg-danger">Refusée</span>
-      
-  
-  
-              </h1>
-          </div>
-      
-      
-  </div>
-  
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Demande de prolongation pour Jane DOE
+                                  <span class="badge rounded-pill badge-base bg-danger">
+                                      Refusée
+                                  </span>
+                              </h1>
                           </div>
                       </div>
-                  </div>
-              </section>
-  
-              
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
-                          <div class="c-box mb-3 mb-lg-5">
-                              <h2>Décision</h2>
-                              <hr/>
-                              <p class="mb-2 fw-bold text-danger">
-                                  Demande refusée le 01 janvier 2000 par Pierre DUPONT
-                              </p>
-                          </div>
-                      
-                      <div class="c-box mb-3 mb-lg-5">
-                          <h2>Détail de la demande</h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info"></i>
-                              </button>
-                          </h3>
-                          <p>Pierre DUPONT a été sollicité pour cette demande.</p>
-                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>Motif sélectionné par l’employeur</h3>
-                          <p>50 ans et plus</p>
-                          
-                              <h3>Bilan des actions réalisées</h3>
-                              <p>
-                                  Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                              </p>
-                              <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
-                                      <span>Télécharger le bilan</span>
-                                  </a>
-                              </p>
-                          
-                          
-                              <h3>Explications supplémentaires</h3>
-                              <p>
-                                  L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-mail-line"></i>
-                                  <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
-                                  <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier</span>
-  </button>
-  
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-phone-line"></i>
-                                  <a class="btn-link" href="tel:+33123456789">+33123456789</a>
-                              </p>
-                          
-                      </div>
-                      
-  
-                  </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
-  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide
-              </span></div>
-      <ul class="list-data">
-          <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
-          </li>
-          <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
-          </li>
-          
-              
-                  <li class="order-3">
-                      <small>Date de fin prévisionnelle
-                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                          </i>
-                      </small>
-                      <strong>01/01/3000</strong>
-                  </li>
-              
-              <li class="order-4">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
-      </ul>
-      
-          
-          
-              
-                  
-              
-          
-          
-          
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
-                  <span>Afficher le PASS IAE</span>
-              </a>
-          
-      
-  </div>
-  
-                      
-                      
-                          
-                              
-  
-  <div class="c-box c-box--structure">
-      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i aria-hidden="true" class="ri-community-line"></i>
-          <div>
-              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
-                  EI
-              </button>
-              <h3>Acme inc.</h3>
-          </div>
-      </div>
-      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
-          <hr class="my-4"/>
-          <ul class="c-box--structure__list-contact">
-              <li>
-                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
-                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-              </li>
-              
-      <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-      
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-  
-          </ul>
-          
-              
-                  
-                  
-                      
-                  
-                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
-      </div>
-  </div>
-  
-                          
-                      
                   </div>
               </div>
           </div>
       </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-lg-5">
+                          <h2>
+                              Décision
+                          </h2>
+                          <hr/>
+                          <p class="mb-2 fw-bold text-danger">
+                              Demande refusée le 01 janvier 2000 par Pierre DUPONT
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-lg-5">
+                          <h2>
+                              Détail de la demande
+                          </h2>
+                          <hr/>
+                          <h3>
+                              Adressé à
+                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                  </i>
+                              </button>
+                          </h3>
+                          <p>
+                              Pierre DUPONT a été sollicité pour cette demande.
+                          </p>
+                          <h3>
+                              Date de fin de PASS IAE demandée : 31/01/2000
+                          </h3>
+                          <p>
+                              La prolongation est demandée pour une durée de 30 jours.
+                          </p>
+                          <h3>
+                              Motif sélectionné par l’employeur
+                          </h3>
+                          <p>
+                              50 ans et plus
+                          </p>
+                          <h3>
+                              Bilan des actions réalisées
+                          </h3>
+                          <p>
+                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
+                          </p>
+                          <p>
+                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                  </i>
+                                  <span>
+                                      Télécharger le bilan
+                                  </span>
+                              </a>
+                          </p>
+                          <h3>
+                              Explications supplémentaires
+                          </h3>
+                          <p>
+                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-mail-line">
+                              </i>
+                              <a class="btn-link me-3" href="mailto:email@example.com">
+                                  email@example.com
+                              </a>
+                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span>
+                                      Copier
+                                  </span>
+                              </button>
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-phone-line">
+                              </i>
+                              <a class="btn-link" href="tel:+33123456789">
+                                  +33123456789
+                              </a>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+                          <div class="mb-3 mb-md-4">
+                              <span class="badge badge-base rounded-pill bg-success text-white">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
+                          <ul class="list-data">
+                              <li class="order-1">
+                                  <small>
+                                      Numéro de PASS IAE
+                                  </small>
+                                  <strong>
+                                      <span>
+                                          99999
+                                      </span>
+                                      <span class="ms-1">
+                                          99
+                                      </span>
+                                      <span class="ms-1">
+                                          99999
+                                      </span>
+                                  </strong>
+                              </li>
+                              <li class="order-2">
+                                  <small>
+                                      Date de début
+                                  </small>
+                                  <strong>
+                                      01/01/2000
+                                  </strong>
+                              </li>
+                              <li class="order-3">
+                                  <small>
+                                      Date de fin prévisionnelle
+                                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong>
+                                      01/01/3000
+                                  </strong>
+                              </li>
+                              <li class="order-4">
+                                  <small>
+                                      Durée de validité
+                                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong class="text-success">
+                                      356167 jours (Environ 975 ans et 1 mois)
+                                  </strong>
+                                  <br/>
+                                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                                      Comment est calculée cette durée ?
+                                  </a>
+                              </li>
+                          </ul>
+                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
+                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                              </i>
+                              <span>
+                                  Afficher le PASS IAE
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-box c-box--structure">
+                          <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                                      EI
+                                  </button>
+                                  <h3>
+                                      Acme inc.
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+                              <hr class="my-4"/>
+                              <ul class="c-box--structure__list-contact">
+                                  <li>
+                                      <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
+                                      </i>
+                                      <address class="m-0">
+                                          112 rue de la Croix-Nivert, 75015 Paris
+                                      </address>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                      </i>
+                                      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                          contact@acmeinc.com
+                                      </a>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                      </i>
+                                      06 12 34 56 78
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                              </ul>
+                              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">
+                                  Voir la fiche de l'entreprise
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
-          </main>
   '''
 # ---
 # name: test_snapshot_by_status[GRANTED]
   '''
   <main class="s-main" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
-  </div>
-  
-              <section class="s-title-02">
-                  <div class="s-title-02__container container">
-                      <div class="s-title-02__row row">
-                          <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-      <div class="c-prevstep">
-          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-              <span>
-                  Retour
-                  
-              </span>
-          </a>
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
-              <h1>
-                  Demande de prolongation pour Jane DOE
-                  
-      
-          <span class="badge rounded-pill badge-base bg-success">Acceptée</span>
-      
-  
-  
-              </h1>
-          </div>
-      
-      
-  </div>
-  
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-  
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Demande de prolongation pour Jane DOE
+                                  <span class="badge rounded-pill badge-base bg-success">
+                                      Acceptée
+                                  </span>
+                              </h1>
                           </div>
                       </div>
-                  </div>
-              </section>
-  
-              
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
-                          <div class="c-box mb-3 mb-lg-5">
-                              <h2>Décision</h2>
-                              <hr/>
-                              <p class="mb-2 fw-bold text-success">
-                                  Demande acceptée le 01 janvier 2000 par Pierre DUPONT
-                              </p>
-                          </div>
-                      
-                      <div class="c-box mb-3 mb-lg-5">
-                          <h2>Détail de la demande</h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info"></i>
-                              </button>
-                          </h3>
-                          <p>Pierre DUPONT a été sollicité pour cette demande.</p>
-                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>Motif sélectionné par l’employeur</h3>
-                          <p>50 ans et plus</p>
-                          
-                              <h3>Bilan des actions réalisées</h3>
-                              <p>
-                                  Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                              </p>
-                              <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
-                                      <span>Télécharger le bilan</span>
-                                  </a>
-                              </p>
-                          
-                          
-                              <h3>Explications supplémentaires</h3>
-                              <p>
-                                  L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-mail-line"></i>
-                                  <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
-                                  <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier</span>
-  </button>
-  
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-phone-line"></i>
-                                  <a class="btn-link" href="tel:+33123456789">+33123456789</a>
-                              </p>
-                          
-                      </div>
-                      
-  
-                  </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
-  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide
-              </span></div>
-      <ul class="list-data">
-          <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
-          </li>
-          <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
-          </li>
-          
-              
-                  <li class="order-3">
-                      <small>Date de fin prévisionnelle
-                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                          </i>
-                      </small>
-                      <strong>01/01/3000</strong>
-                  </li>
-              
-              <li class="order-4">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
-      </ul>
-      
-          
-          
-              
-                  
-              
-          
-          
-          
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
-                  <span>Afficher le PASS IAE</span>
-              </a>
-          
-      
-  </div>
-  
-                      
-                      
-                          
-                              
-  
-  <div class="c-box c-box--structure">
-      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i aria-hidden="true" class="ri-community-line"></i>
-          <div>
-              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
-                  EI
-              </button>
-              <h3>Acme inc.</h3>
-          </div>
-      </div>
-      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
-          <hr class="my-4"/>
-          <ul class="c-box--structure__list-contact">
-              <li>
-                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
-                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-              </li>
-              
-      <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-      
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-  
-          </ul>
-          
-              
-                  
-                  
-                      
-                  
-                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
-      </div>
-  </div>
-  
-                          
-                      
                   </div>
               </div>
           </div>
       </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-lg-5">
+                          <h2>
+                              Décision
+                          </h2>
+                          <hr/>
+                          <p class="mb-2 fw-bold text-success">
+                              Demande acceptée le 01 janvier 2000 par Pierre DUPONT
+                          </p>
+                      </div>
+                      <div class="c-box mb-3 mb-lg-5">
+                          <h2>
+                              Détail de la demande
+                          </h2>
+                          <hr/>
+                          <h3>
+                              Adressé à
+                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                  </i>
+                              </button>
+                          </h3>
+                          <p>
+                              Pierre DUPONT a été sollicité pour cette demande.
+                          </p>
+                          <h3>
+                              Date de fin de PASS IAE demandée : 31/01/2000
+                          </h3>
+                          <p>
+                              La prolongation est demandée pour une durée de 30 jours.
+                          </p>
+                          <h3>
+                              Motif sélectionné par l’employeur
+                          </h3>
+                          <p>
+                              50 ans et plus
+                          </p>
+                          <h3>
+                              Bilan des actions réalisées
+                          </h3>
+                          <p>
+                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
+                          </p>
+                          <p>
+                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                  </i>
+                                  <span>
+                                      Télécharger le bilan
+                                  </span>
+                              </a>
+                          </p>
+                          <h3>
+                              Explications supplémentaires
+                          </h3>
+                          <p>
+                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-mail-line">
+                              </i>
+                              <a class="btn-link me-3" href="mailto:email@example.com">
+                                  email@example.com
+                              </a>
+                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span>
+                                      Copier
+                                  </span>
+                              </button>
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-phone-line">
+                              </i>
+                              <a class="btn-link" href="tel:+33123456789">
+                                  +33123456789
+                              </a>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+                          <div class="mb-3 mb-md-4">
+                              <span class="badge badge-base rounded-pill bg-success text-white">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
+                          <ul class="list-data">
+                              <li class="order-1">
+                                  <small>
+                                      Numéro de PASS IAE
+                                  </small>
+                                  <strong>
+                                      <span>
+                                          99999
+                                      </span>
+                                      <span class="ms-1">
+                                          99
+                                      </span>
+                                      <span class="ms-1">
+                                          99999
+                                      </span>
+                                  </strong>
+                              </li>
+                              <li class="order-2">
+                                  <small>
+                                      Date de début
+                                  </small>
+                                  <strong>
+                                      01/01/2000
+                                  </strong>
+                              </li>
+                              <li class="order-3">
+                                  <small>
+                                      Date de fin prévisionnelle
+                                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong>
+                                      01/01/3000
+                                  </strong>
+                              </li>
+                              <li class="order-4">
+                                  <small>
+                                      Durée de validité
+                                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong class="text-success">
+                                      356167 jours (Environ 975 ans et 1 mois)
+                                  </strong>
+                                  <br/>
+                                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                                      Comment est calculée cette durée ?
+                                  </a>
+                              </li>
+                          </ul>
+                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
+                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                              </i>
+                              <span>
+                                  Afficher le PASS IAE
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-box c-box--structure">
+                          <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                                      EI
+                                  </button>
+                                  <h3>
+                                      Acme inc.
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+                              <hr class="my-4"/>
+                              <ul class="c-box--structure__list-contact">
+                                  <li>
+                                      <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
+                                      </i>
+                                      <address class="m-0">
+                                          112 rue de la Croix-Nivert, 75015 Paris
+                                      </address>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                      </i>
+                                      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                          contact@acmeinc.com
+                                      </a>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                      </i>
+                                      06 12 34 56 78
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                              </ul>
+                              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">
+                                  Voir la fiche de l'entreprise
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
-          </main>
   '''
 # ---
 # name: test_snapshot_by_status[PENDING]
   '''
   <main class="s-main" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-container">
-  
-  </div>
-  
-              <section class="s-title-02">
-                  <div class="s-title-02__container container">
-                      <div class="s-title-02__row row">
-                          <div class="s-title-02__col col-12">
-                              
-      
-  
-  
-      <div class="c-prevstep">
-          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
-              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium"></i>
-              <span>
-                  Retour
-                  
-              </span>
-          </a>
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
       </div>
-  
-  
-  
-                              
-      
-  <div class="c-title">
-      <div class="c-title__main">
-              <h1>
-                  Demande de prolongation pour Jane DOE
-                  
-      
-          <span class="badge rounded-pill badge-base bg-accent-03 text-primary">À traiter</span>
-      
-  
-  
-              </h1>
-          </div>
-      
-      
-  </div>
-  
-  
-                              
-                                  
-  
-  
-  
-                              
-                              
-      
-          <div class="c-box c-box--action">
-              <h2 class="visually-hidden">Actions rapides</h2>
-              <div class="form-row align-items-center gx-3">
-                  <div class="form-group col-12 col-lg-auto">
-                      <form action="/approvals/prolongation/request/666/grant" class="js-prevent-multiple-submit" method="post">
-                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                          <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
-                              <i aria-hidden="true" class="ri-check-line"></i>
-                              <span>Accepter</span>
-                          </button>
-                      </form>
-                  </div>
-                  <div class="form-group col-12 col-lg-auto">
-                      <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="/approvals/prolongation/request/666/deny?reset=1">
-                          <i aria-hidden="true" class="ri-close-line"></i>
-                          <span>Refuser</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
-      
-  
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/approvals/prolongation/requests?only_pending=on">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Demande de prolongation pour Jane DOE
+                                  <span class="badge rounded-pill badge-base bg-accent-03 text-primary">
+                                      À traiter
+                                  </span>
+                              </h1>
                           </div>
                       </div>
-                  </div>
-              </section>
-  
-              
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
-                      
-                      <div class="c-box mb-3 mb-lg-5">
-                          <h2>Détail de la demande</h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info"></i>
-                              </button>
-                          </h3>
-                          <p>Pierre DUPONT a été sollicité pour cette demande.</p>
-                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>Motif sélectionné par l’employeur</h3>
-                          <p>50 ans et plus</p>
-                          
-                              <h3>Bilan des actions réalisées</h3>
-                              <p>
-                                  Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                              </p>
-                              <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal"></i>
-                                      <span>Télécharger le bilan</span>
+                      <div class="c-box c-box--action">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <form action="/approvals/prolongation/request/666/grant" class="js-prevent-multiple-submit" method="post">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <button class="btn btn-lg btn-white btn-block btn-ico justify-content-center">
+                                          <i aria-hidden="true" class="ri-check-line">
+                                          </i>
+                                          <span>
+                                              Accepter
+                                          </span>
+                                      </button>
+                                  </form>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-outline-white btn-block btn-ico justify-content-center" href="/approvals/prolongation/request/666/deny?reset=1">
+                                      <i aria-hidden="true" class="ri-close-line">
+                                      </i>
+                                      <span>
+                                          Refuser
+                                      </span>
                                   </a>
-                              </p>
-                          
-                          
-                              <h3>Explications supplémentaires</h3>
-                              <p>
-                                  L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-mail-line"></i>
-                                  <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
-                                  <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span>Copier</span>
-  </button>
-  
-                              </p>
-                              <p>
-                                  <i aria-hidden="true" class="ri-phone-line"></i>
-                                  <a class="btn-link" href="tel:+33123456789">+33123456789</a>
-                              </p>
-                          
+                              </div>
+                          </div>
                       </div>
-                      
-  
-                  </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2">
-                      
-  
-  
-  
-  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
-      <div class="mb-3 mb-md-4">            <span class="badge badge-base rounded-pill bg-success text-white">
-                  <i aria-hidden="true" class="ri-pass-valid-line"></i>
-                  PASS IAE valide
-              </span></div>
-      <ul class="list-data">
-          <li class="order-1">
-              <small>Numéro de PASS IAE</small>
-              <strong><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></strong>
-          </li>
-          <li class="order-2">
-              <small>Date de début</small>
-              <strong>01/01/2000</strong>
-          </li>
-          
-              
-                  <li class="order-3">
-                      <small>Date de fin prévisionnelle
-                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
-                          </i>
-                      </small>
-                      <strong>01/01/3000</strong>
-                  </li>
-              
-              <li class="order-4">
-                  <small>
-                      Durée de validité
-                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
-                      </i>
-                  </small>
-                  <strong class="text-success">356167 jours (Environ 975 ans et 1 mois)</strong>
-                  <br/>
-                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">Comment est calculée cette durée ?</a>
-              </li>
-          
-      </ul>
-      
-          
-          
-              
-                  
-                      <hr class="my-3 my-md-4"/>
-                      <ul class="list-data">
-                          <li>
-                              <small>Demande de prolongation (en attente)</small>
-                              <strong>
-                                  du 01/01/2000 au 31/01/2000
-                              </strong>
-                          </li>
-                      </ul>
-                  
-              
-          
-          
-          
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
-                  <span>Afficher le PASS IAE</span>
-              </a>
-          
-      
-  </div>
-  
-                      
-                      
-                          
-                              
-  
-  <div class="c-box c-box--structure">
-      <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
-          <i aria-hidden="true" class="ri-community-line"></i>
-          <div>
-              <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
-                  EI
-              </button>
-              <h3>Acme inc.</h3>
-          </div>
-      </div>
-      <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
-          <hr class="my-4"/>
-          <ul class="c-box--structure__list-contact">
-              <li>
-                  <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2"></i>
-                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                  <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-              </li>
-              
-      <li>
-      <i aria-hidden="true" class="ri-mail-line fw-normal me-2"></i>
-      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-      
-  <li>
-      <i aria-hidden="true" class="ri-phone-line fw-normal me-2"></i>
-      06 12 34 56 78
-      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
-      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
-      <span class="visually-hidden">Copier</span>
-  </button>
-  
-  </li>
-  
-  
-  
-  
-  
-          </ul>
-          
-              
-                  
-                  
-                      
-                  
-                  <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
-              
-          
-      </div>
-  </div>
-  
-                          
-                      
                   </div>
               </div>
           </div>
       </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                      <div class="c-box mb-3 mb-lg-5">
+                          <h2>
+                              Détail de la demande
+                          </h2>
+                          <hr/>
+                          <h3>
+                              Adressé à
+                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                  </i>
+                              </button>
+                          </h3>
+                          <p>
+                              Pierre DUPONT a été sollicité pour cette demande.
+                          </p>
+                          <h3>
+                              Date de fin de PASS IAE demandée : 31/01/2000
+                          </h3>
+                          <p>
+                              La prolongation est demandée pour une durée de 30 jours.
+                          </p>
+                          <h3>
+                              Motif sélectionné par l’employeur
+                          </h3>
+                          <p>
+                              50 ans et plus
+                          </p>
+                          <h3>
+                              Bilan des actions réalisées
+                          </h3>
+                          <p>
+                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
+                          </p>
+                          <p>
+                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                  </i>
+                                  <span>
+                                      Télécharger le bilan
+                                  </span>
+                              </a>
+                          </p>
+                          <h3>
+                              Explications supplémentaires
+                          </h3>
+                          <p>
+                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-mail-line">
+                              </i>
+                              <a class="btn-link me-3" href="mailto:email@example.com">
+                                  email@example.com
+                              </a>
+                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                  </i>
+                                  <span>
+                                      Copier
+                                  </span>
+                              </button>
+                          </p>
+                          <p>
+                              <i aria-hidden="true" class="ri-phone-line">
+                              </i>
+                              <a class="btn-link" href="tel:+33123456789">
+                                  +33123456789
+                              </a>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4 order-1 order-lg-2">
+                      <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+                          <div class="mb-3 mb-md-4">
+                              <span class="badge badge-base rounded-pill bg-success text-white">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                          </div>
+                          <ul class="list-data">
+                              <li class="order-1">
+                                  <small>
+                                      Numéro de PASS IAE
+                                  </small>
+                                  <strong>
+                                      <span>
+                                          99999
+                                      </span>
+                                      <span class="ms-1">
+                                          99
+                                      </span>
+                                      <span class="ms-1">
+                                          99999
+                                      </span>
+                                  </strong>
+                              </li>
+                              <li class="order-2">
+                                  <small>
+                                      Date de début
+                                  </small>
+                                  <strong>
+                                      01/01/2000
+                                  </strong>
+                              </li>
+                              <li class="order-3">
+                                  <small>
+                                      Date de fin prévisionnelle
+                                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong>
+                                      01/01/3000
+                                  </strong>
+                              </li>
+                              <li class="order-4">
+                                  <small>
+                                      Durée de validité
+                                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                      </i>
+                                  </small>
+                                  <strong class="text-success">
+                                      356167 jours (Environ 975 ans et 1 mois)
+                                  </strong>
+                                  <br/>
+                                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                                      Comment est calculée cette durée ?
+                                  </a>
+                              </li>
+                          </ul>
+                          <hr class="my-3 my-md-4"/>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Demande de prolongation (en attente)
+                                  </small>
+                                  <strong>
+                                      du 01/01/2000 au 31/01/2000
+                                  </strong>
+                              </li>
+                          </ul>
+                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
+                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                              </i>
+                              <span>
+                                  Afficher le PASS IAE
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-box c-box--structure">
+                          <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <div>
+                                  <button data-bs-title="Entreprise d'insertion" data-bs-toggle="tooltip" type="button">
+                                      EI
+                                  </button>
+                                  <h3>
+                                      Acme inc.
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+                              <hr class="my-4"/>
+                              <ul class="c-box--structure__list-contact">
+                                  <li>
+                                      <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-2">
+                                      </i>
+                                      <address class="m-0">
+                                          112 rue de la Croix-Nivert, 75015 Paris
+                                      </address>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-mail-line fw-normal me-2">
+                                      </i>
+                                      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">
+                                          contact@acmeinc.com
+                                      </a>
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <i aria-hidden="true" class="ri-phone-line fw-normal me-2">
+                                      </i>
+                                      06 12 34 56 78
+                                      <button class="btn-link fw-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                              </ul>
+                              <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">
+                                  Voir la fiche de l'entreprise
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
-          </main>
   '''
 # ---

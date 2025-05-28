@@ -41,7 +41,7 @@ def test_wizard(snapshot, client):
     # ----------------------------------------------------------------
     with assertSnapshotQueries(snapshot(name="choose-employee-queries")):
         response = client.get(choose_employee_url)
-    assert str(
+    assert pretty_indented(
         parse_response_to_soup(
             response,
             selector="#main .s-section",

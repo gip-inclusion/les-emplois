@@ -471,77 +471,74 @@
 # name: TestCreateEmployeeRecordStep5.test_hiring_starts_in_future[alert]
   '''
   <div class="alert alert-warning mb-4" role="status">
-                      <div class="row">
-                          <div class="col-auto pe-0">
-                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning"></i>
-                          </div>
-                          <div class="col">
-                              <p class="mb-2">
-                                  <strong>Validation impossible avant la date d’embauche</strong>
-                              </p>
-                              <p>
-                                  La validation de la fiche salarié sera possible à compter de la date d’embauche : 26/02/2025.
-                                  <br/>
-                                  Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
-                              </p>
-                              <p>
-                                  <strong>Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".</strong>
-                              </p>
-                          </div>
-                      </div>
-                  </div>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+              </i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>
+                      Validation impossible avant la date d’embauche
+                  </strong>
+              </p>
+              <p>
+                  La validation de la fiche salarié sera possible à compter de la date d’embauche : 26/02/2025.
+                  <br/>
+                  Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
+              </p>
+              <p>
+                  <strong>
+                      Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".
+                  </strong>
+              </p>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCreateEmployeeRecordStep5.test_hiring_starts_in_future[form]
   '''
   <form action="/employee_record/create_step_5/[JOB APPLICATION PK]" class="js-prevent-multiple-submit" method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  
-                  
-                  
-                  
-                      
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3"/>
-          
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
                       <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
-                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                          <span>Annuler</span>
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
                       </button>
-                  
-              </div>
-              
-                  <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/create_step_4/[JOB APPLICATION PK]">
-                              <span>Retour</span>
-                          </a>
-                      
                   </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <a aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" href="/employee_record/list">
-                          <span>Sauvegarder les informations</span>
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/create_step_4/[JOB APPLICATION PK]">
+                          <span>
+                              Retour
+                          </span>
                       </a>
-                  
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <a aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" href="/employee_record/list">
+                          <span>
+                              Sauvegarder les informations
+                          </span>
+                      </a>
+                  </div>
               </div>
           </div>
       </div>
-  </div>
-  
-  
       <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
           <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                      <h3 class="modal-title">
+                          Êtes-vous sûr de vouloir annuler ?
+                      </h3>
                   </div>
                   <div class="modal-body">
                       Les informations renseignées ne seront pas enregistrées.
@@ -549,18 +546,18 @@
                       Cette action est irréversible.
                   </div>
                   <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      
-                          <a class="btn btn-sm btn-danger" href="/employee_record/list">Confirmer l'annulation</a>
-                      
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-danger" href="/employee_record/list">
+                          Confirmer l'annulation
+                      </a>
                   </div>
               </div>
           </div>
       </div>
+  </form>
   
-  
-                  
-              </form>
   '''
 # ---
 # name: TestCreateEmployeeRecordStep5ForEITI.test_employee_record_status
@@ -569,77 +566,74 @@
 # name: TestCreateEmployeeRecordStep5ForEITI.test_hiring_starts_in_future[alert]
   '''
   <div class="alert alert-warning mb-4" role="status">
-                      <div class="row">
-                          <div class="col-auto pe-0">
-                              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning"></i>
-                          </div>
-                          <div class="col">
-                              <p class="mb-2">
-                                  <strong>Validation impossible avant la date d’embauche</strong>
-                              </p>
-                              <p>
-                                  La validation de la fiche salarié sera possible à compter de la date d’embauche : 26/02/2025.
-                                  <br/>
-                                  Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
-                              </p>
-                              <p>
-                                  <strong>Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".</strong>
-                              </p>
-                          </div>
-                      </div>
-                  </div>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+              </i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>
+                      Validation impossible avant la date d’embauche
+                  </strong>
+              </p>
+              <p>
+                  La validation de la fiche salarié sera possible à compter de la date d’embauche : 26/02/2025.
+                  <br/>
+                  Vous ne pouvez donc pas envoyer cette fiche à l’Extranet IAE 2.0 de l'ASP, vous pouvez néanmoins sauvegarder les informations pour un envoi à compter du démarrage effectif du salarié.
+              </p>
+              <p>
+                  <strong>
+                      Si vous utilisez un logiciel de gestion RH, veuillez vous assurer que celui-ci prend également en compte les fiches salarié dont le statut est "Nouvelle à compléter".
+                  </strong>
+              </p>
+          </div>
+      </div>
+  </div>
+  
   '''
 # ---
 # name: TestCreateEmployeeRecordStep5ForEITI.test_hiring_starts_in_future[form]
   '''
   <form action="/employee_record/create_step_5/[JOB APPLICATION PK]" class="js-prevent-multiple-submit" method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  
-                  
-                  
-                  
-                      
-  
-  <div class="row">
-      <div class="col-12">
-          <hr class="mb-3"/>
-          
-          <div class="form-row align-items-center justify-content-end gx-3">
-              <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  
-                      
+      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
                       <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
-                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                          <span>Annuler</span>
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
                       </button>
-                  
-              </div>
-              
-                  <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      
-                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/create_step_4/[JOB APPLICATION PK]">
-                              <span>Retour</span>
-                          </a>
-                      
                   </div>
-              
-              <div class="form-group col col-lg-auto order-2 order-lg-3">
-                  
-                      <a aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" href="/employee_record/list">
-                          <span>Sauvegarder les informations</span>
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/create_step_4/[JOB APPLICATION PK]">
+                          <span>
+                              Retour
+                          </span>
                       </a>
-                  
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <a aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" href="/employee_record/list">
+                          <span>
+                              Sauvegarder les informations
+                          </span>
+                      </a>
+                  </div>
               </div>
           </div>
       </div>
-  </div>
-  
-  
       <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
           <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                      <h3 class="modal-title">
+                          Êtes-vous sûr de vouloir annuler ?
+                      </h3>
                   </div>
                   <div class="modal-body">
                       Les informations renseignées ne seront pas enregistrées.
@@ -647,18 +641,18 @@
                       Cette action est irréversible.
                   </div>
                   <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      
-                          <a class="btn btn-sm btn-danger" href="/employee_record/list">Confirmer l'annulation</a>
-                      
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-danger" href="/employee_record/list">
+                          Confirmer l'annulation
+                      </a>
                   </div>
               </div>
           </div>
       </div>
+  </form>
   
-  
-                  
-              </form>
   '''
 # ---
 # name: TestResendProcessedEmployeeRecord.test_resubmit_processed_record

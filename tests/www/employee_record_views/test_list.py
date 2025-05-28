@@ -198,7 +198,7 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, data={"status": Status.NEW})
 
         assert (
-            str(
+            pretty_indented(
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .c-box--results__footer",
@@ -232,7 +232,7 @@ class TestListEmployeeRecords:
 
         response = client.get(self.URL, data={"status": Status.PROCESSED})
         assert (
-            str(
+            pretty_indented(
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .c-box--results__footer",
@@ -330,7 +330,7 @@ class TestListEmployeeRecords:
 
         assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Item message alert
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .c-box--results__footer",
@@ -452,7 +452,7 @@ class TestListEmployeeRecords:
         with assertSnapshotQueries(snapshot(name="employee records")):
             client.get(self.URL, data={"status": Status.NEW})
 
-    def test_rejected_employee_records_sorted(self, client, snapshot):
+    def test_rejected_employee_records_sorted(self, client):
         client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
@@ -503,7 +503,7 @@ class TestListEmployeeRecords:
             recordA.job_application,
         )
 
-    def test_ready_employee_records_sorted(self, client, snapshot):
+    def test_ready_employee_records_sorted(self, client):
         client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(

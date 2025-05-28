@@ -67,7 +67,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup
+from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -1932,7 +1932,7 @@ class TestApplyAsAuthorizedPrescriber:
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
-        expected_snapshot = str(
+        expected_snapshot = pretty_indented(
             parse_response_to_soup(
                 response,
                 "#main",
@@ -2266,7 +2266,7 @@ class TestApplyAsAuthorizedPrescriber:
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
             assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
-        expected_snapshot = str(
+        expected_snapshot = pretty_indented(
             parse_response_to_soup(
                 response,
                 "#main",
@@ -5240,7 +5240,7 @@ class TestApplicationView:
 
         response = client.get(reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}))
         assert (
-            str(
+            pretty_indented(
                 parse_response_to_soup(
                     response,
                     ".c-form > form",

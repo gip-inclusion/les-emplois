@@ -301,7 +301,7 @@ def test_snapshot_by_status(client, snapshot, status):
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
     assert (
-        str(
+        pretty_indented(
             parse_response_to_soup(
                 response,
                 "#main",

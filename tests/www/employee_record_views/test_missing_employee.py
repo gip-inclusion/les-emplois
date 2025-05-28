@@ -29,7 +29,7 @@ def test_missing_employee(client, snapshot):
     job_seeker = JobSeekerFactory(first_name="André", last_name="Alonso")
     JobApplicationFactory(to_company=siae, job_seeker=job_seeker)
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(
+    assert pretty_indented(
         parse_response_to_soup(
             response,
             selector=".s-section",
@@ -77,7 +77,7 @@ def test_missing_employee(client, snapshot):
     )
     employee_record = EmployeeRecordFactory(job_application=job_application)
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(
+    assert pretty_indented(
         parse_response_to_soup(
             response,
             selector=".s-section",
@@ -126,7 +126,7 @@ def test_missing_employee(client, snapshot):
         hiring_start_at=datetime.date(2025, 2, 14),
     )
     response = client.post(url, data={"employee": job_seeker.pk})
-    assert str(
+    assert pretty_indented(
         parse_response_to_soup(
             response,
             selector=".s-section",

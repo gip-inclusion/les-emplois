@@ -356,7 +356,7 @@ class TestMergeUsers:
 
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))
         response = client.get(url)
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 "#users_info",
@@ -376,7 +376,7 @@ class TestMergeUsers:
 
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_2.public_id, prescriber_1.public_id))
         response = client.get(url)
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 "#users_info",
@@ -676,7 +676,7 @@ class TestOTP:
         response = client.post(reverse("login:verify_otp"), data=post_data)
         # The devices page is different
         response = client.get(url)
-        assert str(
+        assert pretty_indented(
             parse_response_to_soup(
                 response,
                 ".s-section",
@@ -760,7 +760,7 @@ class TestOTP:
             response = client.get(url)
             assertContains(response, device_1.name)
             assertContains(response, device_2.name)
-            assert str(
+            assert pretty_indented(
                 parse_response_to_soup(
                     response,
                     ".s-section",
