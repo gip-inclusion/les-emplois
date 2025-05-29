@@ -49,6 +49,7 @@ def get_permissions_dict():
         asp_models.Department: PERMS_READ,
         cities_models.City: PERMS_READ,
         communications_models.AnnouncementCampaign: PERMS_ALL,
+        communications_models.AnnouncementItem: PERMS_ALL,
         companies_models.SiaeFinancialAnnex: PERMS_READ,
         companies_models.Company: PERMS_ALL,
         companies_models.SiaeConvention: PERMS_EDIT,
