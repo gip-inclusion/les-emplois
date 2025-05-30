@@ -334,7 +334,7 @@ class ApplicationBaseView(ApplyStepBaseView):
                 self.job_seeker.has_valid_approval,
             ]
             if not any(bypass_eligibility_conditions):
-                return reverse("apply:application_eligibility", kwargs={"session_uuid": self.apply_session.name})
+                return reverse("apply:application_iae_eligibility", kwargs={"session_uuid": self.apply_session.name})
         return None
 
     def get_eligibility_for_hire_step_url(self):
@@ -350,7 +350,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             self.eligibility_diagnosis,
         ]
         if not any(bypass_eligibility_conditions):
-            return reverse("apply:eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
 
         return None
 

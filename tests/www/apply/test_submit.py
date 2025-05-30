@@ -180,7 +180,7 @@ class TestApply:
             "job_seekers_views:check_job_seeker_info",
             "apply:step_check_prev_applications",
             "apply:application_jobs",
-            "apply:application_eligibility",
+            "apply:application_iae_eligibility",
             "apply:application_geiq_eligibility",
             "apply:application_resume",
         ):
@@ -223,7 +223,7 @@ class TestApply:
             "job_seekers_views:check_job_seeker_info",
             "apply:step_check_prev_applications",
             "apply:application_jobs",
-            "apply:application_eligibility",
+            "apply:application_iae_eligibility",
             "apply:application_geiq_eligibility",
             "apply:application_resume",
         ):
@@ -244,7 +244,7 @@ class TestApply:
     @pytest.mark.parametrize(
         "view_name,post_data",
         [
-            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_iae_eligibility", {"level_1_1": True}),
             ("apply:application_resume", {"message": "Hire me?"}),
         ],
     )
@@ -266,7 +266,7 @@ class TestApply:
     @pytest.mark.parametrize(
         "view_name,post_data",
         [
-            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_iae_eligibility", {"level_1_1": True}),
             ("apply:application_resume", {"message": "Hire me?"}),
         ],
     )
@@ -287,7 +287,7 @@ class TestApply:
     @pytest.mark.parametrize(
         "view_name,post_data",
         [
-            ("apply:application_eligibility", {"level_1_1": True}),
+            ("apply:application_iae_eligibility", {"level_1_1": True}),
             ("apply:application_resume", {"message": "Hire me?"}),
         ],
     )
@@ -388,7 +388,7 @@ class TestHire:
         for viewname in (
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
-            "apply:eligibility_for_hire",
+            "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
             "apply:hire_confirmation",
@@ -444,7 +444,7 @@ class TestHire:
         for viewname in (
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
-            "apply:eligibility_for_hire",
+            "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
             "apply:hire_confirmation",
@@ -461,7 +461,7 @@ class TestHire:
         for viewname in (
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
-            "apply:eligibility_for_hire",
+            "apply:iae_eligibility_for_hire",
             "apply:hire_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
@@ -1462,7 +1462,7 @@ class TestApplyAsAuthorizedPrescriber:
             "job_seeker_public_id": str(new_job_seeker.public_id),
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session_name})
+        next_url = reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's eligibility.
@@ -1588,7 +1588,9 @@ class TestApplyAsAuthorizedPrescriber:
         prescriber = prescriber_organization.members.get()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
-        response = client.get(reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
         assert response.status_code == 200
         assert response.context["eligibility_diagnosis"] is None
 
@@ -2716,7 +2718,7 @@ class TestDirectHireFullProcess:
         client.force_login(user)
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
 
-        response = client.get(reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
         assertContains(
             response,
             "suite aux mesures prises dans le cadre du contrôle a posteriori",
@@ -2958,7 +2960,7 @@ class TestDirectHireFullProcess:
         assert new_job_seeker.jobseeker_profile.nir
 
         next_url = reverse(
-            "apply:eligibility_for_hire",
+            "apply:iae_eligibility_for_hire",
             kwargs={"session_uuid": apply_session_name},
             query={"job_seeker_public_id": new_job_seeker.public_id},
         )
@@ -3308,7 +3310,7 @@ class TestApplicationView:
     def test_access_without_session(self, client):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         client.force_login(prescriber)
-        response = client.get(reverse("apply:application_eligibility", kwargs={"session_uuid": uuid.uuid4()}))
+        response = client.get(reverse("apply:application_iae_eligibility", kwargs={"session_uuid": uuid.uuid4()}))
         assert response.status_code == 404
 
     def test_application_resume_hidden_fields(self, client):
@@ -3370,7 +3372,9 @@ class TestApplicationView:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})
 
-        response = client.get(reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
         assertRedirects(
             response,
             reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}),
@@ -3385,7 +3389,9 @@ class TestApplicationView:
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, job_seeker, {})
 
-        response = client.get(reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
         assertRedirects(
             response,
             reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}),
@@ -3399,7 +3405,9 @@ class TestApplicationView:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, eligibility_diagnosis.job_seeker, {})
 
-        response = client.get(reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
         assertRedirects(
             response,
             reverse("apply:application_resume", kwargs={"session_uuid": apply_session.name}),
@@ -3416,7 +3424,7 @@ class TestApplicationView:
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
         response = client.post(
-            reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name}),
             {"level_1_1": True, "shrouded": "whatever"},
         )
         assertRedirects(
@@ -3430,7 +3438,7 @@ class TestApplicationView:
 
         # If "shrouded" is NOT present then we update the eligibility diagnosis
         response = client.post(
-            reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name}),
             {"level_1_1": True},
         )
         assertRedirects(
@@ -5001,7 +5009,7 @@ class TestCheckPreviousApplicationsForHireView:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {})
 
         url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
-        next_url = reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name})
+        next_url = reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
         assertRedirects(response, next_url)
 
@@ -5070,7 +5078,7 @@ class TestEligibilityForHire:
         company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)  # We don't want a GEIQ here
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-        response = client.get(reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
         assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
 
     def test_job_seeker_with_valid_diagnosis(self, client):
@@ -5078,7 +5086,7 @@ class TestEligibilityForHire:
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-        response = client.get(reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
         assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
 
     def test_job_seeker_without_valid_diagnosis(self, client):
@@ -5086,7 +5094,7 @@ class TestEligibilityForHire:
         assert not self.job_seeker.has_valid_diagnosis(for_siae=company)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-        response = client.get(reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
         assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         assertContains(response, "Valider l'éligibilité IAE")
         assertContains(
@@ -5098,7 +5106,7 @@ class TestEligibilityForHire:
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
         criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
         response = client.post(
-            reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}),
             data={
                 # Administrative criteria level 1.
                 f"{criterion1.key}": "on",

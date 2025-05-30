@@ -62,7 +62,7 @@
                           <div class="c-title__secondary">
                               <p>
                                   Dernière actualisation du profil : Day Month Year à HH:MM
-                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&from_url=%2Fapply%2F[SessionUUID]%2Fcreate%2Feligibility">
+                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&from_url=%2Fapply%2F[SessionUUID]%2Fcreate%2Fiae-eligibility">
                                       Vérifier le profil
                                   </a>
                               </p>
