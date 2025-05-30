@@ -6,7 +6,7 @@
 {% block progress_title %}{{ block.super }} - Éligibilité IAE{% endblock %}
 {% block step_title %}Préciser la situation administrative du candidat (facultatif){% endblock %}
 {% block pre_step_title %}
-    {% if is_subject_to_eligibility_rules and eligibility_diagnosis %}
+    {% if eligibility_diagnosis %}
         {% if eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
@@ -38,27 +38,25 @@
 {% endblock %}
 
 {% block form_content %}
-    {% if is_subject_to_eligibility_rules and prescription_process %}
-        <div class="c-info mb-3">
-            <button class="c-info__summary">
-                <span>Pour valider l'éligibilité IAE du candidat</span>
-            </button>
-            <div class="c-info__detail">
-                <ul>
-                    <li>
-                        Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
-                        Vous pouvez vous appuyer sur le document
-                        <a class="has-external-link"
-                           href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
-                           target="_blank"
-                           rel="noreferrer noopener"
-                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                    </li>
-                    <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
-                </ul>
-            </div>
+    <div class="c-info mb-3">
+        <button class="c-info__summary">
+            <span>Pour valider l'éligibilité IAE du candidat</span>
+        </button>
+        <div class="c-info__detail">
+            <ul>
+                <li>
+                    Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                    Vous pouvez vous appuyer sur le document
+                    <a class="has-external-link"
+                       href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
+                       target="_blank"
+                       rel="noreferrer noopener"
+                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                </li>
+                <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
+            </ul>
         </div>
-    {% endif %}
+    </div>
 
     <div class="{% if eligibility_diagnosis and not form.is_bound %}js-shroud{% endif %}">
         <fieldset>
