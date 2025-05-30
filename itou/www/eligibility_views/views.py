@@ -11,8 +11,8 @@ from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
-class UpdateEligibilityView(UserPassesTestMixin, FormView):
-    template_name = "eligibility/update.html"
+class UpdateIAEEligibilityView(UserPassesTestMixin, FormView):
+    template_name = "eligibility/update_iae.html"
     form_class = AdministrativeCriteriaForm
     standalone_process = None
 
