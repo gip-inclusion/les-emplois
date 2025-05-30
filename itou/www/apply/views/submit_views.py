@@ -506,7 +506,7 @@ class CheckApplySessionMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView, BaseIAEEligibilityViewForPrescriber):
+class ApplicationIAEEligibilityView(CheckApplySessionMixin, ApplicationBaseView, BaseIAEEligibilityViewForPrescriber):
     template_name = "apply/submit/application/eligibility.html"
 
     def get_back_url(self):
