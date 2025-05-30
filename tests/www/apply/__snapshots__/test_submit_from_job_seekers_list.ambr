@@ -23,7 +23,7 @@
                           <div class="c-title__secondary">
                               <p>
                                   Dernière actualisation du profil : 3 avril 2025 à 12:03
-                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=11111111-2222-3333-4444-555566667777&from_url=%2Fapply%2F[Session UUID]%2Fcreate%2Feligibility">
+                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=11111111-2222-3333-4444-555566667777&from_url=%2Fapply%2F[Session UUID]%2Fcreate%2Fiae-eligibility">
                                       Vérifier le profil
                                   </a>
                               </p>

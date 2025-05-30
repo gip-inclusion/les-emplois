@@ -32,10 +32,16 @@ urlpatterns = [
         submit_views.ApplicationJobsView.as_view(),
         name="application_jobs",
     ),
+    # FIXME(alaurent) remove in a week
     path(
         "<uuid:session_uuid>/create/eligibility",
         submit_views.ApplicationIAEEligibilityView.as_view(),
         name="application_eligibility",
+    ),
+    path(
+        "<uuid:session_uuid>/create/iae-eligibility",
+        submit_views.ApplicationIAEEligibilityView.as_view(),
+        name="application_iae_eligibility",
     ),
     path(
         "<uuid:session_uuid>/create/geiq_eligibility",
@@ -59,10 +65,17 @@ urlpatterns = [
         name="check_prev_applications_for_hire",
         kwargs={"hire_process": True},
     ),
+    # FIXME(alaurent) remove in a week
     path(
         "<uuid:session_uuid>/hire/eligibility",
         submit_views.IAEEligibilityForHireView.as_view(),
         name="eligibility_for_hire",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/iae-eligibility",
+        submit_views.IAEEligibilityForHireView.as_view(),
+        name="iae_eligibility_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
