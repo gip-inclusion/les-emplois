@@ -28,7 +28,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.eligibility_views.views import BaseIAEEligibilityViewForPrescriber
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CreateOrUpdateJobSeekerStep2Form
@@ -507,66 +507,26 @@ class CheckApplySessionMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView):
+class ApplicationEligibilityView(CheckApplySessionMixin, ApplicationBaseView, BaseIAEEligibilityViewForPrescriber):
     template_name = "apply/submit/application/eligibility.html"
 
-    def __init__(self):
-        super().__init__()
-
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        initial_data = {}
-
-        if self.eligibility_diagnosis:
-            initial_data["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
-
-        self.form = AdministrativeCriteriaForm(
-            request.from_authorized_prescriber,
-            siae=self.company,
-            initial=initial_data,
-            data=request.POST or None,
-        )
+    def get_back_url(self):
+        return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
 
     def get_next_url(self):
         return reverse("apply:application_resume", kwargs={"session_uuid": self.apply_session.name})
+
+    get_success_url = get_next_url
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_eligibility_step_url() is None:
             return HttpResponseRedirect(self.get_next_url())
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        if self.form.is_valid():
-            if not self.eligibility_diagnosis:
-                EligibilityDiagnosis.create_diagnosis(
-                    self.job_seeker,
-                    author=request.user,
-                    author_organization=request.current_organization,
-                    administrative_criteria=self.form.cleaned_data,
-                )
-            elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
-                EligibilityDiagnosis.update_diagnosis(
-                    self.eligibility_diagnosis,
-                    author=request.user,
-                    author_organization=request.current_organization,
-                    administrative_criteria=self.form.cleaned_data,
-                )
-            return HttpResponseRedirect(self.get_next_url())
-
-        return self.render_to_response(self.get_context_data(**kwargs))
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = self.form
         context["progress"] = 50
-        context["job_seeker"] = self.job_seeker
-        context["back_url"] = reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
         context["full_content_width"] = True
-        if self.eligibility_diagnosis:
-            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
         return context
 
 
