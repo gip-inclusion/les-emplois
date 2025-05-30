@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import FormView
 
@@ -11,31 +11,13 @@ from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
-class UpdateIAEEligibilityView(UserPassesTestMixin, FormView):
-    template_name = "eligibility/update_iae.html"
+class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
+    template_name = None
     form_class = AdministrativeCriteriaForm
-    standalone_process = None
-
-    def setup(self, request, *args, job_seeker_public_id, tunnel=None, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        if tunnel not in ("standalone_process"):
-            raise Http404
-        setattr(self, tunnel, True)
-
-        self.job_seeker = get_object_or_404(
-            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
-        )
-
-        # FIXME: in other tunnels we need the company
-        self.company = None
-
-        self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, self.company)
+    display_success_messages = False
 
     def test_func(self):
-        if self.standalone_process:
-            return self.request.from_authorized_prescriber
-        return False
+        return self.request.from_authorized_prescriber
 
     def dispatch(self, request, *args, **kwargs):
         # No need for eligibility diagnosis if the job seeker already has a PASS IAE
@@ -64,8 +46,7 @@ class UpdateIAEEligibilityView(UserPassesTestMixin, FormView):
                 author_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            if self.standalone_process:
-                message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été validée."
+            message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été validée."
         elif self.eligibility_diagnosis and not form.data.get("shrouded"):
             EligibilityDiagnosis.update_diagnosis(
                 self.eligibility_diagnosis,
@@ -73,36 +54,43 @@ class UpdateIAEEligibilityView(UserPassesTestMixin, FormView):
                 author_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            if self.standalone_process:
-                message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été mise à jour."
-        if message:
+            message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été mise à jour."
+        if message and self.display_success_messages:
             messages.success(self.request, message, extra_tags="toast")
         return HttpResponseRedirect(self.get_success_url())
 
     def get_back_url(self):
-        back_url = None
-        if self.standalone_process:
-            back_url = get_safe_url(self.request, "back_url")
-        # Force developpers to always provide a proper back_url
-        if back_url:
-            return back_url
-        raise Http404
+        raise NotImplementedError
 
     def get_success_url(self):
-        # FIXME: it depends on the tunnel
-        if self.standalone_process:
-            return self.get_back_url()
+        raise NotImplementedError
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "back_url": self.get_back_url(),
-                "job_seeker": self.job_seeker,
-                "eligibility_diagnosis": self.eligibility_diagnosis,
-            }
-        )
-
+        context["back_url"] = self.get_back_url()
+        context["job_seeker"] = self.job_seeker
+        context["eligibility_diagnosis"] = self.eligibility_diagnosis
         if self.eligibility_diagnosis:
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
         return context
+
+
+class UpdateIAEEligibilityView(BaseIAEEligibilityViewForPrescriber):
+    template_name = "eligibility/update_iae.html"
+    display_success_messages = True
+
+    def setup(self, request, *args, job_seeker_public_id, **kwargs):
+        self.job_seeker = get_object_or_404(
+            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+        )
+        self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, None)
+        self.back_url = get_safe_url(request, "back_url")
+        self.company = None
+
+        super().setup(request, *args, **kwargs)
+
+    def get_back_url(self):
+        return self.back_url
+
+    def get_success_url(self):
+        return self.back_url
