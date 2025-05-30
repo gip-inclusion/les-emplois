@@ -39,7 +39,7 @@ class TestUpdateEligibilityView:
         job_seeker = user if user.is_job_seeker else JobSeekerFactory()
         client.force_login(user)
         url = reverse(
-            "eligibility_views:update",
+            "eligibility_views:update_iae",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
             query={"back_url": reverse("job_seekers_views:list")},
         )
@@ -54,7 +54,7 @@ class TestUpdateEligibilityView:
 
         # Without a eligibility diagnosis
         url = reverse(
-            "eligibility_views:update",
+            "eligibility_views:update_iae",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
             query={"back_url": reverse("job_seekers_views:list")},
         )
@@ -83,7 +83,7 @@ class TestUpdateEligibilityView:
 
         client.force_login(prescriber)
         url = reverse(
-            "eligibility_views:update",
+            "eligibility_views:update_iae",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
             query={"back_url": reverse("job_seekers_views:list")},
         )
@@ -115,7 +115,7 @@ class TestUpdateEligibilityView:
 
         client.force_login(prescriber)
         url = reverse(
-            "eligibility_views:update",
+            "eligibility_views:update_iae",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
             query={"back_url": reverse("job_seekers_views:list")},
         )

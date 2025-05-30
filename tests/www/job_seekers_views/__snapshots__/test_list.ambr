@@ -1481,7 +1481,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href=" /eligibility/update/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">
+                      <a class="dropdown-item" href=" /eligibility/update/iae/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list">
                           Mettre à jour son éligibilité IAE
                       </a>
                   </div>
@@ -1516,7 +1516,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href=" /eligibility/update/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
+                      <a class="dropdown-item" href=" /eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list">
                           Valider son éligibilité IAE
                       </a>
                   </div>
@@ -1581,7 +1581,7 @@
                       </i>
                   </button>
                   <div aria-labelledby="dropdown_4_action_menu" class="dropdown-menu">
-                      <a class="dropdown-item" href=" /eligibility/update/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
+                      <a class="dropdown-item" href=" /eligibility/update/iae/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
                           Mettre à jour son éligibilité IAE
                       </a>
                   </div>
@@ -2417,7 +2417,7 @@
                   </i>
               </button>
               <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                  <a class="dropdown-item" href=" /eligibility/update/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">
+                  <a class="dropdown-item" href=" /eligibility/update/iae/11111111-1111-1111-1111-111111111111?back_url=/job-seekers/list-organization">
                       Mettre à jour son éligibilité IAE
                   </a>
               </div>
@@ -2451,7 +2451,7 @@
                   </i>
               </button>
               <div aria-labelledby="dropdown_2_action_menu" class="dropdown-menu">
-                  <a class="dropdown-item" href=" /eligibility/update/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">
+                  <a class="dropdown-item" href=" /eligibility/update/iae/22222222-2222-2222-2222-222222222222?back_url=/job-seekers/list-organization">
                       Valider son éligibilité IAE
                   </a>
               </div>
@@ -2485,7 +2485,7 @@
                   </i>
               </button>
               <div aria-labelledby="dropdown_3_action_menu" class="dropdown-menu">
-                  <a class="dropdown-item" href=" /eligibility/update/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">
+                  <a class="dropdown-item" href=" /eligibility/update/iae/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">
                       Valider son éligibilité IAE
                   </a>
               </div>
