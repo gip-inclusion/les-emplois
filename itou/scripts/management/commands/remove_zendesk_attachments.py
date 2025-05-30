@@ -53,12 +53,23 @@ class Command(BaseCommand):
     def handle(self, **options):
         zendesk_client = ZendeskClient()
 
+        f = open("attachments_list.txt", "w")
+        attachments = []
+
         try:
             for ticket in zendesk_client.tickets():
                 if ticket["status"] != "closed":
                     continue
                 for comment in zendesk_client.comments(ticket["id"]):
                     for attachment in comment["attachments"]:
-                        zendesk_client.remove_attachment(ticket["id"], comment["id"], attachment["id"])
+                        attachment = (
+                            f"ticket_id={ticket['id']}, comment_id={comment['id']}, attachment_id={attachment['id']}"
+                        )
+                        attachments.append(attachment)
+                        f.write(attachment + "\n")
+                        f.flush()
+                        # zendesk_client.remove_attachment(ticket["id"], comment["id"], attachment["id"])
         except httpx.HTTPError as e:
             print(e.response.json()["message"])
+
+        f.close()
