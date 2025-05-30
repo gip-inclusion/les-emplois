@@ -16,6 +16,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
@@ -35,7 +36,7 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyPendingGracePeriodFactory,
 )
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -52,6 +53,11 @@ from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pret
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
+
+
+@pytest.fixture
+def administrative_criteria_annex_1():
+    return GEIQAdministrativeCriteria.objects.get(pk=19)
 
 
 class TestDashboardView:
@@ -940,6 +946,88 @@ class TestDashboardView:
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
         assertNotContains(response, INFO_BOX)
+
+    @freeze_time("2025-05-19")
+    def test_jobseeker_geiq_eligibility_diagnosis(self, client, administrative_criteria_annex_1):
+        DIAG_TITLE = "Diagnostic public prioritaire GEIQ valide"
+        DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ confirmée</span>"""
+        DIAG_EXPIRATION = "<i>Ce diagnostic expire le %s.</i>"
+        VALIDATED_ELIGIBILITY = """<p>Éligibilité GEIQ confirmée par <b>%(author)s (%(structure)s)</b></p>"""
+        EXPIRED_DIAG_TITLE = "Diagnostic public prioritaire GEIQ expiré"
+        EXPIRED_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
+            <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée</span>"""
+        EXPIRED_DIAG_EXPIRATION = "<i>Ce diagnostic a expiré le %s.</i>"
+        INFO_BOX = "Pourquoi certains critères peuvent-ils être certifiés"
+
+        user = JobSeekerFactory(with_address=True)
+        client.force_login(user)
+        url = reverse("dashboard:index")
+
+        # No diagnosis
+        response = client.get(url)
+        assertNotContains(response, DIAG_TITLE)
+        assertNotContains(response, DIAG_BADGE, html=True)
+
+        # A diagnosis from an employer without criteria (hence without allowance)
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            job_seeker=user,
+        )
+        response = client.get(url)
+        assertNotContains(response, DIAG_TITLE)
+        assertNotContains(response, DIAG_BADGE, html=True)
+        assertNotContains(
+            response,
+            VALIDATED_ELIGIBILITY
+            % {"author": diagnosis.author.get_full_name(), "structure": diagnosis.author_structure.display_name},
+            html=True,
+        )
+
+        # A diagnosis from an employer with criteria (hence with allowance)
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+            diagnosis,
+            diagnosis.author,
+            [administrative_criteria_annex_1],
+        )
+        response = client.get(url)
+        assertContains(response, DIAG_TITLE, count=1)
+        assertContains(response, DIAG_BADGE, html=True, count=1)
+        assertContains(
+            response,
+            VALIDATED_ELIGIBILITY
+            % {"author": diagnosis.author.get_full_name(), "structure": diagnosis.author_structure.display_name},
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            DIAG_EXPIRATION % "19/11/2025",
+            html=True,
+            count=1,
+        )
+        assertNotContains(response, INFO_BOX)
+
+        # An expired diagnosis from an employer with criteria (hence with allowance)
+        with freeze_time(diagnosis.expires_at + timedelta(days=1)):
+            client.force_login(user)
+            response = client.get(url)
+            assertContains(response, EXPIRED_DIAG_TITLE, count=1)
+            assertContains(response, EXPIRED_DIAG_BADGE, html=True, count=1)
+            assertContains(
+                response,
+                VALIDATED_ELIGIBILITY
+                % {"author": diagnosis.author.get_full_name(), "structure": diagnosis.author_structure.display_name},
+                html=True,
+                count=1,
+            )
+            assertContains(
+                response,
+                EXPIRED_DIAG_EXPIRATION % "19/11/2025",
+                html=True,
+                count=1,
+            )
+            assertNotContains(response, INFO_BOX)
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
