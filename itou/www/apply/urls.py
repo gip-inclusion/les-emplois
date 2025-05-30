@@ -34,7 +34,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:session_uuid>/create/eligibility",
-        submit_views.ApplicationEligibilityView.as_view(),
+        submit_views.ApplicationIAEEligibilityView.as_view(),
         name="application_eligibility",
     ),
     path(
