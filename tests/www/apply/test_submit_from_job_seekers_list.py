@@ -137,7 +137,7 @@ class TestApplyAsPrescriber:
             "job_seeker_public_id": job_seeker.public_id,
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"session_uuid": apply_session_name})
+        next_url = reverse("eligibility_views:update", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
         # Step application's eligibility

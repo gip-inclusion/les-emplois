@@ -62,7 +62,7 @@
                           <div class="c-title__secondary">
                               <p>
                                   Dernière actualisation du profil : Day Month Year à HH:MM
-                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&from_url=%2Fapply%2F[SessionUUID]%2Fcreate%2Feligibility">
+                                  <a class="btn-link ms-3" href="/job-seekers/update/start?job_seeker_public_id=[Public ID of JobSeeker]&from_url=%2Feligibility%2Fupdate%2Fapply%2F[SessionUUID]">
                                       Vérifier le profil
                                   </a>
                               </p>
@@ -82,9 +82,7 @@
                               </div>
                           </div>
                           <p>
-                              Postuler
-                                      
-                                   - Éligibilité IAE
+                              Postuler - Éligibilité IAE
                           </p>
                       </div>
                   </div>
@@ -189,32 +187,30 @@
                               Préciser la situation administrative du candidat (facultatif)
                           </h2>
                           <hr class="mt-5"/>
-                          <div id="form_errors">
+                          <div class="c-info mb-3">
+                              <button class="c-info__summary">
+                                  <span>
+                                      Pour valider l'éligibilité IAE du candidat
+                                  </span>
+                              </button>
+                              <div class="c-info__detail">
+                                  <ul>
+                                      <li>
+                                          Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                                          Vous pouvez vous appuyer sur le document
+                                          <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://communaute.inclusion.gouv.fr/surveys/dsp/create/?proconnect_login=true" rel="noreferrer noopener" target="_blank">
+                                              diagnostic socio-professionnel de référence
+                                          </a>
+                                          .
+                                      </li>
+                                      <li>
+                                          Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.
+                                      </li>
+                                  </ul>
+                              </div>
                           </div>
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <div class="c-info mb-3">
-                                  <button class="c-info__summary">
-                                      <span>
-                                          Pour valider l'éligibilité IAE du candidat
-                                      </span>
-                                  </button>
-                                  <div class="c-info__detail">
-                                      <ul>
-                                          <li>
-                                              Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
-                          Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="https://communaute.inclusion.gouv.fr/surveys/dsp/create/?proconnect_login=true" rel="noreferrer noopener" target="_blank">
-                                                  diagnostic socio-professionnel de référence
-                                              </a>
-                                              .
-                                          </li>
-                                          <li>
-                                              Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.
-                                          </li>
-                                      </ul>
-                                  </div>
-                              </div>
                               <div class="">
                                   <fieldset>
                                       <legend class="h3">

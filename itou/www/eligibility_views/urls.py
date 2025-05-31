@@ -12,4 +12,10 @@ urlpatterns = [
         name="update",
         kwargs={"tunnel": "standalone_process"},
     ),
+    path(
+        "update/apply/<uuid:session_uuid>",
+        views.UpdateEligibilityView.as_view(),
+        name="update",
+        kwargs={"tunnel": "prescription_process"},
+    ),
 ]

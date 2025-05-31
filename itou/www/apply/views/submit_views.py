@@ -333,7 +333,7 @@ class ApplicationBaseView(ApplyStepBaseView):
                 self.job_seeker.has_valid_approval,
             ]
             if not any(bypass_eligibility_conditions):
-                return reverse("apply:application_eligibility", kwargs={"session_uuid": self.apply_session.name})
+                return reverse("eligibility_views:update", kwargs={"session_uuid": self.apply_session.name})
         return None
 
     def get_eligibility_for_hire_step_url(self):
