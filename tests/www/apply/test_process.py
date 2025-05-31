@@ -3315,7 +3315,7 @@ class TestProcessTransferJobApplication:
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
         assert (
-            str(
+            pretty_indented(
                 parse_response_to_soup(
                     response,
                     ".c-box--action .dropdown-structure",
