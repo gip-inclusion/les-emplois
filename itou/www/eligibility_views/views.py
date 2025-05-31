@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.http import HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import FormView
 
@@ -75,6 +76,52 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         context["eligibility_diagnosis"] = self.eligibility_diagnosis
         if self.eligibility_diagnosis:
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
+        return context
+
+
+class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
+    template_name = None
+    form_class = AdministrativeCriteriaForm
+
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.company.is_subject_to_eligibility_rules:
+            raise Http404()
+
+        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+            raise PermissionDenied(
+                "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
+                "du contrôle a posteriori. " + suspension_explanation
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["is_authorized_prescriber"] = False
+        kwargs["siae"] = self.company
+        return kwargs
+
+    def get_cancel_url(self):
+        raise NotImplementedError
+
+    def form_valid(self, form):
+        EligibilityDiagnosis.create_diagnosis(
+            self.job_seeker,
+            author=self.request.user,
+            author_organization=self.request.current_organization,
+            administrative_criteria=form.cleaned_data,
+        )
+        messages.success(self.request, "Éligibilité confirmée !", extra_tags="toast")
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["job_seeker"] = self.job_seeker
+        context["cancel_url"] = self.get_cancel_url()
+        context["matomo_custom_title"] = "Evaluation de la candidature"
         return context
 
 

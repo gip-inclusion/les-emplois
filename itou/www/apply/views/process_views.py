@@ -47,6 +47,7 @@ from itou.www.apply.views.submit_views import (
     initialize_apply_session,
 )
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
+from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 from itou.www.search.views import EmployerSearchView
 
 
@@ -843,7 +844,7 @@ def send_diagoriente_invite(request, job_application_id):
     return HttpResponseRedirect(redirect_url)
 
 
-class IAEEligibilityView(common_views.BaseIAEEligibilityView):
+class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
     template_name = "apply/process_eligibility.html"
 
     def setup(self, request, job_application_id, *args, **kwargs):
