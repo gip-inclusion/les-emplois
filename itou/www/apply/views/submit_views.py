@@ -28,7 +28,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.eligibility_views.views import BaseIAEEligibilityViewForPrescriber
+from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer, BaseIAEEligibilityViewForPrescriber
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CreateOrUpdateJobSeekerStep2Form
@@ -736,7 +736,7 @@ class ApplicationEndView(TemplateView):
         }
 
 
-class IAEEligibilityForHireView(ApplicationBaseView, common_views.BaseIAEEligibilityView):
+class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEmployer):
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):

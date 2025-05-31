@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
@@ -16,7 +15,6 @@ from django_xworkflows import models as xwf_models
 from itou.asp.forms import BirthPlaceWithoutBirthdateModelForm
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
-from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.users.enums import UserKind
@@ -28,7 +26,6 @@ from itou.www.apply.forms import (
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
 )
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
@@ -190,52 +187,6 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
         self.clean_session()
 
         return HttpResponseClientRedirect(final_url)
-
-
-class BaseIAEEligibilityView(UserPassesTestMixin, FormView):
-    template_name = None
-    form_class = AdministrativeCriteriaForm
-
-    def test_func(self):
-        return self.request.user.is_employer
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.company.is_subject_to_eligibility_rules:
-            raise Http404()
-
-        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-            raise PermissionDenied(
-                "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
-                "du contrôle a posteriori. " + suspension_explanation
-            )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["is_authorized_prescriber"] = self.request.from_authorized_prescriber
-        kwargs["siae"] = self.company
-        return kwargs
-
-    def get_cancel_url(self):
-        raise NotImplementedError
-
-    def form_valid(self, form):
-        EligibilityDiagnosis.create_diagnosis(
-            self.job_seeker,
-            author=self.request.user,
-            author_organization=self.request.current_organization,
-            administrative_criteria=form.cleaned_data,
-        )
-        messages.success(self.request, "Éligibilité confirmée !", extra_tags="toast")
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["can_view_personal_information"] = True  # SIAE members have access to personal info
-        context["job_seeker"] = self.job_seeker
-        context["cancel_url"] = self.get_cancel_url()
-        context["matomo_custom_title"] = "Evaluation de la candidature"
-        return context
 
 
 class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
