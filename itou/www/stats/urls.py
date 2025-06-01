@@ -44,11 +44,6 @@ urlpatterns = [
         views.stats_ddets_iae_ph_prescription,
         name="stats_ddets_iae_ph_prescription",
     ),
-    path(
-        "ddets/follow_prolongation",
-        views.stats_ddets_iae_follow_prolongation,
-        name="stats_ddets_iae_follow_prolongation",
-    ),
     path("ddets/iae", views.stats_ddets_iae_iae, name="stats_ddets_iae_iae"),
     path("ddets/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
     path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
@@ -66,11 +61,6 @@ urlpatterns = [
         "dreets/ph_prescription",
         views.stats_dreets_iae_ph_prescription,
         name="stats_dreets_iae_ph_prescription",
-    ),
-    path(
-        "dreets/follow_prolongation",
-        views.stats_dreets_iae_follow_prolongation,
-        name="stats_dreets_iae_follow_prolongation",
     ),
     path("dreets/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
     path("dreets/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),

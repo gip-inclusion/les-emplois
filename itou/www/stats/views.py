@@ -522,10 +522,6 @@ def stats_ddets_iae_ph_prescription(request):
     return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
-def stats_ddets_iae_follow_prolongation(request):
-    return render_stats_ddets_iae(request=request, page_title="Suivi des demandes de prolongation")
-
-
 def stats_ddets_iae_iae(request):
     return render_stats_ddets_iae(request=request, page_title="Données IAE de mon département")
 
@@ -607,10 +603,6 @@ def stats_dreets_iae_ph_prescription(request):
     return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
-def stats_dreets_iae_follow_prolongation(request):
-    return render_stats_dreets_iae(request=request, page_title="Suivi des demandes de prolongation")
-
-
 def stats_dreets_iae_iae(request):
     return render_stats_dreets_iae(
         request=request,
@@ -663,10 +655,6 @@ def stats_dgefp_iae_auto_prescription(request):
 
 def stats_dgefp_iae_follow_siae_evaluation(request):
     return render_stats_dgefp_iae(request=request, page_title="Suivi du contrôle à posteriori")
-
-
-def stats_dgefp_iae_follow_prolongation(request):
-    return render_stats_dgefp_iae(request=request, page_title="Suivi des demandes de prolongation")
 
 
 def stats_dgefp_iae_hiring(request):
