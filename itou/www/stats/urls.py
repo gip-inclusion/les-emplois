@@ -73,11 +73,6 @@ urlpatterns = [
         name="stats_dgefp_iae_follow_siae_evaluation",
     ),
     path(
-        "dgefp/follow_prolongation",
-        views.stats_dgefp_iae_follow_prolongation,
-        name="stats_dgefp_iae_follow_prolongation",
-    ),
-    path(
         "dgefp/ph_prescription",
         views.stats_dgefp_iae_ph_prescription,
         name="stats_dgefp_iae_ph_prescription",
