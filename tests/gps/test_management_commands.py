@@ -1,8 +1,8 @@
+import csv
 import datetime
 import os
 from tempfile import NamedTemporaryFile
 
-import openpyxl
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -429,9 +429,6 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
     # Not a job seeker
     PrescriberFactory(post_code="30000")
 
-    # Not in the correct department
-    JobSeekerFactory(post_code="40000")
-
     job_seeker_1 = JobSeekerFactory(
         post_code="30000",
         jobseeker_profile__birthdate=datetime.date(2000, 12, 31),
@@ -440,19 +437,22 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
     job_seeker_2 = JobSeekerFactory(
         post_code="30000",
         jobseeker_profile__birthdate=None,
+        jobseeker_profile__nir="188073512757119",
+        jobseeker_profile__pole_emploi_id="12345678900",
     )
 
-    management.call_command("export_beneficiaries_for_advisor", "30")
+    management.call_command("export_beneficiaries_for_advisor")
 
-    path = os.path.join(settings.EXPORT_DIR, "gps_dpt_30_2025-04-03_11:44.xlsx")
-    workbook = openpyxl.load_workbook(path)
-    worksheet = workbook.active
-    assert [[cell.value or "" for cell in row] for row in worksheet.rows] == [
+    path = os.path.join(settings.EXPORT_DIR, "gps_export_beneficiaires_2025-04-03_11:44.csv")
+    with open(path) as file:
+        data = [line for line in csv.reader(file, delimiter=";")]
+    assert data == [
         [
             "ID",
             "prénom",
             "nom",
             "nir",
+            "identifiant_ft",
             "date_de_naissance",
         ],
         [
@@ -460,13 +460,15 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
             job_seeker_1.first_name,
             job_seeker_1.last_name.upper(),
             "",
+            "",
             "31/12/2000",
         ],
         [
             str(job_seeker_2.pk),
             job_seeker_2.first_name,
             job_seeker_2.last_name.upper(),
-            job_seeker_2.jobseeker_profile.nir,
+            "188073512757119",
+            "12345678900",
             "",
         ],
     ]
