@@ -169,7 +169,7 @@ class Command(EmployeeRecordTransferCommand):
         self.logger.info("Starting UPLOAD of employee records")
         employee_records_to_send = EmployeeRecord.objects.filter(
             status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
-        ).order_by("updated_at")
+        ).order_by("updated_at", "pk")
         for batch in chunks(
             employee_records_to_send, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
         ):
