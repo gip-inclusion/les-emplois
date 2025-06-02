@@ -271,7 +271,7 @@ METABASE_DASHBOARDS = {
 }
 
 
-SUSPENDED_DASHBOARD_IDS = [357, 298]
+SUSPENDED_DASHBOARD_IDS = []
 
 
 # Metabase private / signed URLs
