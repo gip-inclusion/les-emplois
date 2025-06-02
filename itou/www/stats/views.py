@@ -656,10 +656,6 @@ def stats_dgefp_iae_follow_siae_evaluation(request):
     return render_stats_dgefp_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
-def stats_dgefp_iae_follow_prolongation(request):
-    return render_stats_dgefp_iae(request=request, page_title="Suivi des demandes de prolongation")
-
-
 def stats_dgefp_iae_hiring(request):
     return render_stats_dgefp_iae(request=request, page_title="Données facilitation de l'embauche")
 
