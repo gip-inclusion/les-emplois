@@ -145,7 +145,7 @@ def get_permissions_dict():
 
 
 def to_perm_codenames(model, perms_set):
-    return [f"{perm}_{model._meta.model_name}" if perm in PERMS_ALL | PERMS_HIJACK else perm for perm in perms_set]
+    return [f"{perm}_{model._meta.model_name}" if perm in PERMS_ALL else perm for perm in perms_set]
 
 
 class Command(BaseCommand):

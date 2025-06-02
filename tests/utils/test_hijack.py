@@ -59,7 +59,7 @@ class TestUserHijack:
     def test_permission_staff_hijacker(self, client, caplog):
         hijacked = PrescriberFactory()
         hijacker = ItouStaffFactory(is_staff=True)
-        hijacker.user_permissions.add(Permission.objects.get(codename="hijack_user"))
+        hijacker.user_permissions.add(Permission.objects.get(codename="hijack"))
         client.force_login(hijacker)
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})

@@ -422,7 +422,7 @@ class User(AbstractUser, AddressMixin):
             ),
         ]
         permissions = [
-            ("hijack_user", "Can impersonate (hijack) other accounts"),
+            ("hijack", "Can impersonate (hijack) other accounts"),
             ("export_cta", "Can export CTA file"),
             ("merge_users", "Can merge users"),
         ]
