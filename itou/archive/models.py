@@ -99,3 +99,34 @@ class ArchivedApplication(models.Model):
         verbose_name = "candidature archivée"
         verbose_name_plural = "candidatures archivées"
         ordering = ["-archived_at"]
+
+
+class ArchivedApproval(models.Model):
+    archived_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    origin = models.CharField(verbose_name="origine du PASS")
+    origin_company_kind = models.CharField(verbose_name="type d'entreprise à l'origine du PASS", blank=True, null=True)
+    origin_company_department = models.CharField(
+        verbose_name="département de l'entreprise à l'origine du PASS", blank=True, null=True
+    )
+    origin_company_naf = models.CharField(
+        verbose_name="code NAF de l'entreprise à l'origine du PASS", blank=True, null=True
+    )
+    origin_sender_kind = models.CharField(
+        verbose_name="type d'emetteur de la candidature à l'origine du PASS", blank=True, null=True
+    )
+    origin_prescriber_organization_kind = models.CharField(
+        verbose_name="typologie du prescripteur à l'origine du PASS", blank=True, null=True
+    )
+    start_at = models.DateField(verbose_name="année et mois de début du PASS", blank=True, null=True)
+    end_at = models.DateField(verbose_name="année et mois de fin du PASS", blank=True, null=True)
+    had_eligibility_diagnosis = models.BooleanField(verbose_name="a eu un diagnostic d'éligibilité", default=False)
+    number_of_prolongations = models.PositiveIntegerField(verbose_name="nombre de prolongations", default=0)
+    number_of_suspensions = models.PositiveIntegerField(verbose_name="nombre de suspensions", default=0)
+    number_of_accepted_job_applications = models.PositiveIntegerField(
+        verbose_name="nombre de candidatures acceptées", default=0
+    )
+
+    class Meta:
+        verbose_name = "PASS IAE archivé"
+        verbose_name_plural = "PASS IAE archivés"
+        ordering = ["-archived_at"]
