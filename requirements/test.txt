@@ -1209,9 +1209,9 @@ pytest-django==4.11.1 \
     --hash=sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10 \
     --hash=sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991
     # via -r requirements/test.in
-pytest-mock==3.14.0 \
-    --hash=sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f \
-    --hash=sha256:2719255a1efeceadbc056d6bf3df3d1c5015530fb40cf347c0f9afac88410bd0
+pytest-mock==3.14.1 \
+    --hash=sha256:159e9edac4c451ce77a5cdb9fc5d1100708d2dd4ba3c3df572f14097351af80e \
+    --hash=sha256:178aefcd11307d874b4cd3100344e7e2d888d9791a6a1d9bfe90fbc1b74fd1d0
     # via -r requirements/test.in
 pytest-randomly==3.16.0 \
     --hash=sha256:11bf4d23a26484de7860d82f726c0629837cf4064b79157bd18ec9d41d7feb26 \
