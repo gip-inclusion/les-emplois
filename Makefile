@@ -4,6 +4,8 @@
 # > practice; so for compatibility, you must explicitly request it
 .DELETE_ON_ERROR:
 
+# Make a change.
+
 # Global tasks.
 # =============================================================================
 LINTER_CHECKED_DIRS := config itou scripts tests
