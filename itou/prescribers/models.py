@@ -179,6 +179,12 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         blank=True,
         on_delete=models.RESTRICT,  # Only staff can update it, and we shouldn't delete one of those accounts
     )
+    is_gps_authorized = models.BooleanField(
+        verbose_name="habilité GPS",
+        db_default=False,
+        help_text="Indique si l'organisation est autorisée à utiliser les fonctionnalité avancées de GPS."
+        " Une organisation habilitée y aura accès sans avoir besoin que cette case soit cochée.",
+    )
 
     # Use the generic relation to let NotificationSettings being collected on deletion
     notification_settings = GenericRelation(

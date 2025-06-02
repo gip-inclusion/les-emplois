@@ -26,7 +26,13 @@ from itou.www.gps.forms import (
     JoinGroupChannelForm,
     MembershipsFiltersForm,
 )
-from itou.www.gps.utils import add_beneficiary, get_all_coworkers, logger, send_slack_message_for_gps
+from itou.www.gps.utils import (
+    add_beneficiary,
+    get_all_coworkers,
+    is_gps_authorized,
+    logger,
+    send_slack_message_for_gps,
+)
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
@@ -36,7 +42,7 @@ def is_allowed_to_use_gps(request):
 
 
 def is_allowed_to_use_gps_advanced_features(request):
-    return request.user.is_employer or request.from_authorized_prescriber
+    return request.user.is_employer or request.from_authorized_prescriber or is_gps_authorized(request)
 
 
 def show_gps_as_a_nav_entry(request):
@@ -78,6 +84,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
     for membership in memberships_page:
         membership.user_can_view_personal_information = (
             membership.can_view_personal_information
+            or is_gps_authorized(request)
             or can_view_personal_information(request, membership.follow_up_group.beneficiary)
         )
 
@@ -110,6 +117,7 @@ class GroupDetailsMixin:
             "group": self.group,
             "can_view_personal_information": (
                 self.membership.can_view_personal_information
+                or is_gps_authorized(self.request)
                 or can_view_personal_information(self.request, self.group.beneficiary)
             ),
             "can_print_page": True,
@@ -562,7 +570,9 @@ def beneficiaries_autocomplete(request):
                 "name": mask_unless(
                     user.get_full_name(),
                     predicate=(
-                        user.membership_can_view_personal_information or can_view_personal_information(request, user)
+                        user.membership_can_view_personal_information
+                        or is_gps_authorized(request)
+                        or can_view_personal_information(request, user)
                     ),
                 ),
                 "birthdate": "",
@@ -571,13 +581,17 @@ def beneficiaries_autocomplete(request):
                 # only add a . after M, not Mme
                 data["title"] = (
                     f"{user.title.capitalize()}."[:3]
-                    if user.membership_can_view_personal_information or can_view_personal_information(request, user)
+                    if user.membership_can_view_personal_information
+                    or is_gps_authorized(request)
+                    or can_view_personal_information(request, user)
                     else ""
                 )
             if getattr(user.jobseeker_profile, "birthdate", None):
                 data["birthdate"] = (
                     user.jobseeker_profile.birthdate.strftime("%d/%m/%Y")
-                    if user.membership_can_view_personal_information or can_view_personal_information(request, user)
+                    if user.membership_can_view_personal_information
+                    or is_gps_authorized(request)
+                    or can_view_personal_information(request, user)
                     else ""
                 )
             return data

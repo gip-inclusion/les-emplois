@@ -119,6 +119,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                     "website",
                     "code_safir_pole_emploi",
                     "is_authorized",
+                    "is_gps_authorized",
                     "description",
                 )
             },

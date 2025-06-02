@@ -602,7 +602,8 @@
                              "prescribers_prescriberorganization"."created_by_id",
                              "prescribers_prescriberorganization"."authorization_status",
                              "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id"
+                             "prescribers_prescriberorganization"."authorization_updated_by_id",
+                             "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -1064,6 +1065,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -2013,7 +2015,8 @@
                              "prescribers_prescriberorganization"."created_by_id",
                              "prescribers_prescriberorganization"."authorization_status",
                              "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id"
+                             "prescribers_prescriberorganization"."authorization_updated_by_id",
+                             "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
@@ -2404,6 +2407,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",
@@ -3306,7 +3310,8 @@
                              "prescribers_prescriberorganization"."created_by_id",
                              "prescribers_prescriberorganization"."authorization_status",
                              "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id"
+                             "prescribers_prescriberorganization"."authorization_updated_by_id",
+                             "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "job_applications_jobapplication"
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s

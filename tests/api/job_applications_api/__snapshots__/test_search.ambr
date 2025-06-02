@@ -272,6 +272,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  "companies_company"."id",
                  "companies_company"."address_line_1",
                  "companies_company"."address_line_2",

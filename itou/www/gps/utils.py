@@ -12,6 +12,12 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
 
 
+def is_gps_authorized(request):
+    return (
+        request.user.is_prescriber and request.current_organization and request.current_organization.is_gps_authorized
+    )
+
+
 def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True, channel=None, created=False):
     membership, added = FollowUpGroup.objects.follow_beneficiary(
         beneficiary=beneficiary, user=request.user, is_active=is_active

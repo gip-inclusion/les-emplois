@@ -11,7 +11,7 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 from itou.www.gps.enums import Channel, EndReason
-from itou.www.gps.utils import get_all_coworkers
+from itou.www.gps.utils import get_all_coworkers, is_gps_authorized
 from itou.www.signup.forms import FullnameFormMixin
 
 
@@ -46,7 +46,9 @@ class MembershipsFiltersForm(forms.Form):
                 mask_unless(
                     beneficiary.get_full_name(),
                     predicate=(
-                        beneficiaries_data[beneficiary.pk] or can_view_personal_information(request, beneficiary)
+                        beneficiaries_data[beneficiary.pk]
+                        or is_gps_authorized(request)
+                        or can_view_personal_information(request, beneficiary)
                     ),
                 ),
             )

@@ -302,6 +302,16 @@ class TestGroupLists:
         assertContains(response, full_name)
         assertNotContains(response, masked_name)
 
+        # If the organization is "gps authorized"
+        PrescriberOrganization.objects.all().update(
+            authorization_status=PrescriberAuthorizationStatus.REFUSED,
+            is_gps_authorized=True,
+        )
+        my_groups_url = reverse("gps:group_list")
+        response = client.get(my_groups_url)
+        assertContains(response, full_name)
+        assertNotContains(response, masked_name)
+
 
 def test_backward_compat_urls(client):
     prescriber = PrescriberFactory()
@@ -754,6 +764,22 @@ class TestGroupDetailsBeneficiaryTab:
         )
         assert pretty_indented(html_details) == snapshot(name="with_diagnostic")
 
+        # When the organization is gps autorized instead
+        PrescriberOrganization.objects.update(
+            authorization_status=PrescriberAuthorizationStatus.REFUSED,
+            is_gps_authorized=True,
+        )
+        response = client.get(url)
+        html_details = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"%2Fgps%2Fgroups%2F{group.pk}", "%2Fgps%2Fgroups%2F[PK of FollowUpGroup]"),
+            ],
+        )
+        assert pretty_indented(html_details) == snapshot(name="with_diagnostic")
+
         # When the user can edit the beneficiary details
         beneficiary.created_by = prescriber
         beneficiary.save()
@@ -1056,13 +1082,15 @@ class TestJoinGroup:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            partial(PrescriberFactory, membership__organization__authorized=True),
             partial(EmployerFactory, with_company=True),
-            partial(PrescriberFactory, membership__organization__authorized=False),
+            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(PrescriberFactory, membership__organization__is_gps_authorized=True),
+            partial(PrescriberFactory, membership=True),
         ],
         ids=[
-            "authorized_prescriber",
             "employer",
+            "authorized_prescriber",
+            "gps_authorized_prescriber",
             "prescriber_with_org",
         ],
     )
@@ -1102,7 +1130,8 @@ class TestBeneficiariesAutocomplete:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
-            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
+            (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, False),
             (partial(EmployerFactory, with_company=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
@@ -1110,6 +1139,7 @@ class TestBeneficiariesAutocomplete:
         ids=[
             "job_seeker",
             "authorized_prescriber",
+            "gps_authorized_prescriber",
             "prescriber_with_org",
             "prescriber_no_org",
             "employer",
@@ -1126,15 +1156,19 @@ class TestBeneficiariesAutocomplete:
         else:
             assert response.status_code == 403
 
-    @pytest.mark.parametrize("can_view_personal_info", ["authorized", "membership", False])
+    @pytest.mark.parametrize("can_view_personal_info", ["authorized", "gps_authorized", "membership", False])
     def test_autocomplete(self, client, can_view_personal_info):
         prescriber = PrescriberFactory(first_name="gps member Vince")
         organization_1 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
+            user=prescriber,
+            organization__authorized=can_view_personal_info == "authorized",
+            organization__is_gps_authorized=can_view_personal_info == "gps_authorized",
         ).organization
         coworker_1 = PrescriberMembershipFactory(organization=organization_1).user
         organization_2 = PrescriberMembershipFactory(
-            user=prescriber, organization__authorized=can_view_personal_info == "authorized"
+            user=prescriber,
+            organization__authorized=can_view_personal_info == "authorized",
+            organization__is_gps_authorized=can_view_personal_info == "gps_authorized",
         ).organization
         coworker_2 = PrescriberMembershipFactory(organization=organization_2).user
 
@@ -1191,7 +1225,7 @@ class TestBeneficiariesAutocomplete:
             "title": "M.",
             "name": first_beneficiary.get_full_name(),
         }
-        if can_view_personal_info in ["authorized", "membership"]:
+        if can_view_personal_info:
             second_beneficiary_data = {
                 "birthdate": "01/01/1990",
                 "id": second_beneficiary.pk,
@@ -1206,7 +1240,7 @@ class TestBeneficiariesAutocomplete:
                 "name": mask_unless(second_beneficiary.get_full_name(), False),
             }
         assert data[second_beneficiary.pk] == second_beneficiary_data
-        if can_view_personal_info == "authorized":
+        if can_view_personal_info in ["authorized", "gps_authorized"]:
             third_beneficiary_data = {
                 "birthdate": "01/01/2000",
                 "id": third_beneficiary.pk,
@@ -1256,7 +1290,8 @@ class TestJoinGroupFromCoworker:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
-            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
+            (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, False),
             (partial(EmployerFactory, with_company=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
@@ -1264,6 +1299,7 @@ class TestJoinGroupFromCoworker:
         ids=[
             "job_seeker",
             "authorized_prescriber",
+            "gps_authorized_prescriber",
             "prescriber_with_org",
             "prescriber_no_org",
             "employer",
@@ -1336,7 +1372,8 @@ class TestJoinGroupFromNir:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
-            (partial(PrescriberFactory, membership__organization__authorized=False), False),
+            (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
+            (partial(PrescriberFactory, membership=True), False),
             (PrescriberFactory, False),
             (partial(EmployerFactory, with_company=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
@@ -1344,6 +1381,7 @@ class TestJoinGroupFromNir:
         ids=[
             "job_seeker",
             "authorized_prescriber",
+            "gps_authorized_prescriber",
             "prescriber_with_org",
             "prescriber_no_org",
             "employer",
@@ -1704,7 +1742,8 @@ class TestJoinGroupFromNameAndEmail:
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
             (partial(PrescriberFactory, membership__organization__authorized=True), True),
-            (partial(PrescriberFactory, membership__organization__authorized=False), True),
+            (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
+            (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, True),
             (partial(EmployerFactory, with_company=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
@@ -1712,6 +1751,7 @@ class TestJoinGroupFromNameAndEmail:
         ids=[
             "job_seeker",
             "authorized_prescriber",
+            "gps_authorized_prescriber",
             "prescriber_with_org",
             "prescriber_no_org",
             "employer",
