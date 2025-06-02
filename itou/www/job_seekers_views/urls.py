@@ -98,13 +98,6 @@ urlpatterns = [
         name="check_job_seeker_info_for_hire",
         kwargs={"hire_process": True},
     ),
-    # FIXME(alaurent) Remove in one week
-    path(
-        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
-        views.CheckJobSeekerInformationsForHire.as_view(),
-        name="check_job_seeker_info_for_hire",
-        kwargs={"hire_process": True},
-    ),
     # For job seeker
     path(
         "<uuid:session_uuid>/job-seeker/check-nir",
@@ -140,12 +133,6 @@ urlpatterns = [
     # Common
     path(
         "<uuid:session_uuid>/create/check-infos",
-        views.CheckJobSeekerInformations.as_view(),
-        name="check_job_seeker_info",
-    ),
-    # FIXME(alaurent) Remove in one week
-    path(
-        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check-infos",
         views.CheckJobSeekerInformations.as_view(),
         name="check_job_seeker_info",
     ),
