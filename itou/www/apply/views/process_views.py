@@ -691,7 +691,6 @@ class ApplicationOverrideMixin:
             ),
             pk=kwargs["job_application_id"],
         )
-        kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id  # FIXME(alaurent) Remove in a week
         return super().setup(request, *args, **kwargs)
 
 
@@ -702,16 +701,10 @@ class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, Applicat
             selected_jobs.append(job_id)
         return {"selected_jobs": selected_jobs}
 
-    # FIXME(alaurent) Remove in a week
-    def get_base_kwargs(self):
-        kwargs = super().get_base_kwargs()
-        kwargs.pop("job_seeker_public_id", None)
-        return kwargs
-
     def get_next_url(self):
         base_url = reverse(
             "apply:job_application_external_transfer_step_3",
-            kwargs=self.get_base_kwargs() | {"job_application_id": self.job_application.pk},
+            kwargs={"session_uuid": self.apply_session.name, "job_application_id": self.job_application.pk},
         )
         return f"{base_url}?back_url={quote(self.request.get_full_path())}"
 
@@ -737,7 +730,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
             return HttpResponseRedirect(
                 reverse(
                     "apply:job_application_external_transfer_step_2",
-                    kwargs=self.get_base_kwargs() | {"job_application_id": self.job_application.pk},
+                    kwargs={"session_uuid": self.apply_session.name, "job_application_id": self.job_application.pk},
                 )
             )
         return super().dispatch(request, *args, **kwargs)

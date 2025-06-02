@@ -16,7 +16,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
-from tests.www.apply.test_submit import fake_old_session_initialization, fake_session_initialization
+from tests.www.apply.test_submit import fake_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 
 
@@ -406,26 +406,6 @@ def test_step_2_without_session(client):
     assert response.status_code == 404
 
 
-# FIXME(alaurent) Remove in a week
-def test_step_2_without_old_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
-    employer = job_application.to_company.members.get()
-    other_company = CompanyFactory(with_membership=True, with_jobs=True)
-    client.force_login(employer)
-
-    transfer_step_1_url = reverse(
-        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
-    )
-    transfer_step_2_base_url = reverse(
-        "apply:job_application_external_transfer_step_2",
-        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
-    )
-
-    transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
-    response = client.get(transfer_step_2_url)
-    assert response.status_code == 404
-
-
 @freeze_time()
 def test_step_3(client, snapshot, pdf_file):
     job_application = JobApplicationFactory(
@@ -617,21 +597,6 @@ def test_access_step_3_without_session(client):
     assert response.status_code == 404
 
 
-# FIXME(alaurent) Remove in a week
-def test_access_step_3_without_old_session(client):
-    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
-    employer = job_application.to_company.members.get()
-    other_company = CompanyFactory(with_membership=True)
-    client.force_login(employer)
-    response = client.get(
-        reverse(
-            "apply:job_application_external_transfer_step_3",
-            kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
-        )
-    )
-    assert response.status_code == 404
-
-
 def test_full_process(client, pdf_file):
     create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
     vannes = create_city_vannes()
@@ -710,78 +675,6 @@ def test_full_process(client, pdf_file):
     assertRedirects(response, transfer_step_end_url)
     assert transfert_session_name not in client.session
 
-    assert new_job_application.message == "blah"
-    assert new_job_application.job_seeker == job_application.job_seeker
-    assert new_job_application.sender == employer
-    assert new_job_application.state == JobApplicationState.NEW
-
-    transfer_log = job_application.logs.last()
-    assert transfer_log.transition == "external_transfer"
-    assert transfer_log.user == employer
-    assert transfer_log.target_company == other_company
-
-
-# FIXME(alaurent) Remove in a week
-def test_full_process_old_session(client, pdf_file):
-    create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
-    vannes = create_city_vannes()
-    COMPANY_VANNES = "Entreprise Vannes"
-    other_company = CompanyFactory(name=COMPANY_VANNES, coords=vannes.coords, post_code="56760", with_membership=True)
-
-    job_application = JobApplicationFactory(
-        state=JobApplicationState.REFUSED,
-        to_company__post_code="56760",
-        to_company__coords=vannes.coords,
-        to_company__city=vannes.name,
-        resume__key="resume/old_file.pdf",
-        with_file=pdf_file,
-    )
-    employer = job_application.to_company.members.get()
-    client.force_login(employer)
-
-    # STEP 1
-    transfer_step_1_url = reverse(
-        "apply:job_application_external_transfer_step_1", kwargs={"job_application_id": job_application.pk}
-    )
-    fake_old_session_initialization(client, other_company, {"reset_url": transfer_step_1_url})
-    transfer_step_2_base_url = reverse(
-        "apply:job_application_external_transfer_step_2",
-        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
-    )
-    transfer_step_2_url = f"{transfer_step_2_base_url}?back_url={quote(transfer_step_1_url)}"
-
-    # STEP 2
-    response = client.get(transfer_step_2_url)
-    assertContains(response, "<h2>Sélectionner les métiers recherchés</h2>", html=True)
-    assert response.context["form"].initial == {"selected_jobs": [], "spontaneous_application": True}
-    # Check back_url
-    assertContains(response, transfer_step_1_url)
-
-    response = client.post(transfer_step_2_url, data={"spontaneous_application": "on"})
-
-    transfer_step_3_base_url = reverse(
-        "apply:job_application_external_transfer_step_3",
-        kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
-    )
-    transfer_step_3_url = f"{transfer_step_3_base_url}?back_url={quote(transfer_step_2_url)}"
-    assertRedirects(response, transfer_step_3_url)
-    assert client.session[f"job_application-{other_company.pk}"] == {
-        "selected_jobs": [],
-        "reset_url": transfer_step_1_url,
-    }
-
-    # STEP 3
-    response = client.get(transfer_step_3_url)
-    assertContains(response, "<h2>Finaliser la candidature</h2>", html=True)
-    # CHeck back_url
-    assertContains(response, transfer_step_2_url)
-
-    response = client.post(transfer_step_3_url, data={"message": "blah", "keep_original_resume": "True"})
-    new_job_application = JobApplication.objects.filter(to_company=other_company).get()
-    transfer_step_end_url = reverse(
-        "apply:job_application_external_transfer_step_end", kwargs={"job_application_id": new_job_application.pk}
-    )
-    assertRedirects(response, transfer_step_end_url)
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
     assert new_job_application.sender == employer
