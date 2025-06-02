@@ -124,11 +124,9 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
         "reviewed_assessments",  # Assessment.reviewed_by
-        "reviewed_geiq_assessment_set",  # ImplementationAssessment.reviewed_by
         "submitted_assessments",  # Assessment.submitted_by
         "company_invitations",  # EmployerInvitation.sender
         "companymembership",  # CompanyMembership.user
-        "submitted_geiq_assessment_set",  # ImplementationAssessment.submitted_by
         "suspension",  # Suspension.updated_by
         "totpdevice",  # TOTPDevice.user
         "updated_institutionmembership_set",  # InstitutionMembership.updated_by
