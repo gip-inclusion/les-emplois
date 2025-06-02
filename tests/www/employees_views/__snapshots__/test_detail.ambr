@@ -357,6 +357,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  T7."id",
                  T7."password",
                  T7."last_login",
@@ -459,6 +460,7 @@
                  T9."authorization_status",
                  T9."authorization_updated_at",
                  T9."authorization_updated_by_id",
+                 T9."is_gps_authorized",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -743,6 +745,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  T6."id",
                  T6."password",
                  T6."last_login",
@@ -1245,7 +1248,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."id" = %s
           LIMIT 21
@@ -1291,7 +1295,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."id" = %s
           LIMIT 21
@@ -1432,6 +1437,7 @@
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
                  T6."id",
                  T6."password",
                  T6."last_login",

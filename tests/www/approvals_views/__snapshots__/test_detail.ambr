@@ -753,7 +753,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
@@ -1483,7 +1484,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
@@ -1779,7 +1781,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
@@ -2130,7 +2133,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
@@ -3209,7 +3213,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
@@ -3852,7 +3857,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
@@ -4148,7 +4154,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
@@ -4499,7 +4506,8 @@
                  "prescribers_prescriberorganization"."created_by_id",
                  "prescribers_prescriberorganization"."authorization_status",
                  "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id"
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "approvals_prolongation"
           LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."declared_by_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongation"."declared_by_siae_id" = "companies_company"."id")
