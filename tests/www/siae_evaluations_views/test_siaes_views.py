@@ -676,6 +676,36 @@ class TestSiaeSelectCriteriaView:
             == EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
         )
 
+    def test_post_insufficient_criteria(self, client):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+            self.siae, self.user, level_1=False, level_2=True
+        )
+        level2_criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
+        )
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        client.force_login(self.user)
+        response = client.post(
+            url,
+            data={
+                level2_criterion.administrative_criteria.key: True,
+            },
+        )
+        assertContains(
+            response,
+            """
+            <ul class="mb-0">
+                <li>Vous devez sélectionner au moins un critère administratif de niveau 1 ou
+                le cumul d'au moins trois critères de niveau 2.</li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+
     def test_post_with_submission_freezed_at(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (

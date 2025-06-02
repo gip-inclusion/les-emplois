@@ -571,7 +571,6 @@ def siae_select_criteria(
     }
 
     form_administrative_criteria = AdministrativeCriteriaEvaluationForm(
-        request.user,
         siae=siae,
         job_app_selected_administrative_criteria=job_application_administrative_criteria,
         data=request.POST or None,

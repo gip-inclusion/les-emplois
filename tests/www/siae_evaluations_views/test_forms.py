@@ -48,7 +48,6 @@ class TestAdministrativeCriteriaEvaluationForm:
         )
 
         form = AdministrativeCriteriaEvaluationForm(
-            user,
             company,
             job_application.eligibility_diagnosis.selected_administrative_criteria.select_related(
                 "administrative_criteria"
