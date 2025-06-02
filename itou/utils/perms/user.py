@@ -19,7 +19,7 @@ def has_hijack_perm(*, hijacker, hijacked):
         return True
 
     # Only whitelisted staff members can hijack other accounts
-    if hijacker.is_staff and hijacker.has_perm("users.hijack_user"):
+    if hijacker.is_staff and hijacker.has_perm("users.hijack"):
         return True
 
     return False

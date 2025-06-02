@@ -29,7 +29,7 @@
     'view_jobseekerprofile',
     'add_user',
     'change_user',
-    'hijack_user',
+    'hijack',
     'view_user',
   ])
 # ---
@@ -215,7 +215,7 @@
     'change_user',
     'delete_user',
     'export_cta',
-    'hijack_user',
+    'hijack',
     'merge_users',
     'view_user',
     'add_pksupportremark',
@@ -277,7 +277,7 @@
     'view_jobapplicationtransitionlog',
     'view_prescribermembership',
     'view_prescriberorganization',
-    'hijack_user',
+    'hijack',
     'view_user',
   ])
 # ---
