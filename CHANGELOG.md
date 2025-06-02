@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2025-05-26
+
+### Ajouté
+
+- [Fiche salarié : Faciliter le nouvel envoi de la fiche si le SIRET de l'entreprise a changé](https://github.com/gip-inclusion/les-emplois/pull/5988) 🖼
+- [Interface : Ajout d'une bannière temporaire pour prévenir que Zendesk sera indisponible](https://github.com/gip-inclusion/les-emplois/pull/6190) 🖼
+
+### Modifié
+
+- [Connexion : Permettre de forcer la mise à jour du sub d'un compte SSO pour lequel l'email est associé à un autre sub](https://github.com/gip-inclusion/les-emplois/pull/6146)
+- [PASS IAE : Correction d'un bug lors de l'acceptation d'une demande de prolongation](https://github.com/gip-inclusion/les-emplois/pull/6165)
+- [Éligibilité : Correction de durées de certification de critères administratifs incorrects](https://github.com/gip-inclusion/les-emplois/pull/6173)
+- [Éligibilité : Correction de la durée de validité de la certification des critères](https://github.com/gip-inclusion/les-emplois/pull/6126)
+- [Éligibilité : Créer un nouveau diagnostic plutôt que modifier la date de fin lors de la mise à jour](https://github.com/gip-inclusion/les-emplois/pull/6177)
+
+### Tech
+
+- [Candidature : Passage à une session UUID](https://github.com/gip-inclusion/les-emplois/pull/6065)
+
+
 ## 2025-05-19
 
 ### Ajouté
