@@ -32,74 +32,83 @@ class Command(BaseCommand):
             help="Absolute path of the XLSX file to import",
         )
 
-        parser.add_argument(
-            "--company-id",
-            action="store",
-            dest="company_id",
-        )
-
-    def handle(self, wet_run, file_path, company_id, **options):
+    def handle(self, wet_run, file_path, **options):
         df = pd.read_excel(file_path)
         date_format = "%d/%m/%Y"
         df["num_pass_iae"] = df["PASS IAE"].str.replace(" ", "")
         df["debut_de_cddi"] = pd.to_datetime(df["Début de CDDI"], format=date_format).apply(lambda x: x.date())
+        df["siret"] = df["SIRET"].astype(str).str.replace(" ", "")
         df["pass_maj"] = False
-        df["commentaire"] = None
+        df["candidature_maj"] = False
+        df["commentaire PASS IAE"] = None
+        df["commentaire candidature"] = None
         df["date_debut_pass_iae"] = None
 
         job_applications_to_update = []
         approvals_to_update = []
         approvals_nb_with_errors = []
-        company = Company.objects.get(pk=company_id)
+        companies_qs = Company.objects.filter(siret__in=set(df["siret"].tolist())).values_list("siret", "pk")
+        companies_siret_to_pk = {siret: pk for siret, pk in companies_qs}
 
         approvals_qs = Approval.objects.filter(number__in=df["num_pass_iae"])
+        approvals = {approval.number: approval for approval in approvals_qs}
 
         for i, row in df.iterrows():
-            if row["num_pass_iae"] not in approvals_qs.values_list("number", flat=True):
-                approvals_nb_with_errors.append(row["num_pass_iae"])
-                df.loc[i, "commentaire"] = "PASS IAE inconnu."
+            update_job_application = False
+            if not companies_siret_to_pk.get(row["siret"]):
+                df.loc[i, "commentaire PASS IAE"] = "SIRET inconnu. Pas de modification possible."
                 continue
 
-            approval = approvals_qs.get(number=row["num_pass_iae"])
+            if row["num_pass_iae"] not in approvals:
+                approvals_nb_with_errors.append(row["num_pass_iae"])
+                df.loc[i, "commentaire PASS IAE"] = "PASS IAE inconnu."
+                continue
+
+            approval = approvals[row["num_pass_iae"]]
             # There should be only one.
             job_application_qs = approval.jobapplication_set.filter(
-                to_company_id=company.id, state=JobApplicationState.ACCEPTED
+                to_company_id=companies_siret_to_pk[row["siret"]], state=JobApplicationState.ACCEPTED
             )
             df.loc[i, "date_debut_pass_iae"] = approval.start_at
 
             # Job seeker had an approval before being hired by this company.
             if approval.start_at < row["debut_de_cddi"]:
                 approvals_nb_with_errors.append(row["num_pass_iae"])
-                df.loc[i, "commentaire"] = "PASS IAE débutant avant la nouvelle date."
+                df.loc[i, "commentaire PASS IAE"] = "PASS IAE débutant avant la nouvelle date."
+                update_job_application = True
             # Employee record has been integrated in the ASP.
-            elif job_application_qs.filter(employee_record__status=Status.PROCESSED).exists():
-                pks = job_application_qs.values_list("pk", flat=True)
+            elif pks := job_application_qs.filter(employee_record__status=Status.PROCESSED).values_list(
+                "pk", flat=True
+            ):
                 approvals_nb_with_errors.append(row["num_pass_iae"])
-                df.loc[i, "commentaire"] = f"Fiche salarié déjà créée pour les candidatures suivantes : {list(pks)}."
-            elif approval.suspension_set.exists():
+                df.loc[i, "commentaire PASS IAE"] = (
+                    f"Fiche salarié déjà créée pour les candidatures suivantes : {list(pks)}."
+                )
+            elif values := approval.suspension_set.values("start_at", "end_at"):
                 approvals_nb_with_errors.append(row["num_pass_iae"])
-                values = approval.suspension_set.values("start_at", "end_at")
-                df.loc[i, "commentaire"] = f"Des suspensions existent. {values}"
-            elif approval.prolongation_set.exists():
+                df.loc[i, "commentaire PASS IAE"] = f"Des suspensions existent. {values}"
+            elif values := approval.prolongation_set.values("start_at", "end_at"):
                 approvals_nb_with_errors.append(row["num_pass_iae"])
-                values = approval.prolongation_set.values("start_at", "end_at")
-                df.loc[i, "commentaire"] = f"Des prolongations existent. {values}"
+                df.loc[i, "commentaire PASS IAE"] = f"Des prolongations existent. {values}"
             else:
                 approval.start_at = row["debut_de_cddi"]
                 approval.updated_at = timezone.now()
                 approvals_to_update.append(approval)
                 df.loc[i, "date_debut_pass_iae"] = approval.start_at
                 df.loc[i, "pass_maj"] = True
+                update_job_application = True
+
+            if update_job_application:
                 try:
                     job_application = job_application_qs.get()
                     job_application.hiring_start_at = row["debut_de_cddi"]
                     job_application.updated_at = timezone.now()
                     job_applications_to_update.append(job_application)
-                    df.loc[i, "commentaire"] = "Candidature mise à jour"
+                    df.loc[i, "candidature_maj"] = True
                 except JobApplication.DoesNotExist:
-                    df.loc[i, "commentaire"] = "Aucune candidature trouvée."
+                    df.loc[i, "commentaire candidature"] = "Aucune candidature trouvée."
                 except JobApplication.MultipleObjectsReturned:
-                    df.loc[i, "commentaire"] = (
+                    df.loc[i, "commentaire candidature"] = (
                         "Mise à jour de la candidature reliée au PASS impossible car il y en a plusieurs."
                     )
 
@@ -110,11 +119,20 @@ class Command(BaseCommand):
         df["date_debut_pass_iae"] = df["date_debut_pass_iae"].apply(lambda x: x.strftime(date_format) if x else "")
         df["debut_de_cddi"] = df["debut_de_cddi"].apply(lambda x: x.strftime(date_format))
         df["pass_maj"] = df["pass_maj"].astype(str)
+        df["candidature_maj"] = df["candidature_maj"].astype(str)
 
         df.to_excel(
             f"{settings.EXPORT_DIR}/bulk_update_from_file.xlsx",
             index=False,
-            columns=["num_pass_iae", "date_debut_pass_iae", "debut_de_cddi", "pass_maj", "commentaire"],
+            columns=[
+                "num_pass_iae",
+                "date_debut_pass_iae",
+                "debut_de_cddi",
+                "pass_maj",
+                "candidature_maj",
+                "commentaire PASS IAE",
+                "commentaire candidature",
+            ],
         )
         if wet_run:
             self.logger.info("Wet run! Here we go!")
