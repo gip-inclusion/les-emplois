@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django_otp.oath import TOTP
 from django_otp.plugins.otp_totp.models import TOTPDevice
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
@@ -132,6 +133,21 @@ class TestPrescriberLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
+    def test_rate_limits(self, client):
+        user = PrescriberFactory()
+        url = reverse("login:prescriber")
+        form_data = {
+            "login": user.email,
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
+
 
 class TestEmployerLogin:
     def test_login_options(self, client, pro_connect):
@@ -191,6 +207,21 @@ class TestEmployerLogin:
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
 
+    def test_rate_limits(self, client):
+        user = EmployerFactory()
+        url = reverse("login:employer")
+        form_data = {
+            "login": user.email,
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
+
 
 class TestLaborInspectorLogin:
     def test_login_options(self, client):
@@ -212,6 +243,21 @@ class TestLaborInspectorLogin:
         }
         response = client.post(url, data=form_data)
         assertRedirects(response, reverse("account_email_verification_sent"))
+
+    def test_rate_limits(self, client):
+        user = LaborInspectorFactory()
+        url = reverse("login:labor_inspector")
+        form_data = {
+            "login": user.email,
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
 
 
 class TestJobSeekerPreLogin:
@@ -551,3 +597,18 @@ class TestItouStaffLogin:
         TOTPDevice.objects.create(user=user)
         response = client.post(next_url, data=form_data, follow=True)
         assertRedirects(response, admin_url)
+
+    def test_rate_limits(self, client):
+        user = ItouStaffFactory()
+        url = reverse("login:itou_staff")
+        form_data = {
+            "login": user.email,
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
