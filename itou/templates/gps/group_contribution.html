@@ -3,49 +3,53 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
-                <h2 class="mb-0">Mon intervention</h2>
-                <a href="{% url "gps:group_edition" group.pk %}?back_url={{ back_url|urlencode }}" class="btn btn-ico btn-primary">
-                    <i class="ri-pencil-line" aria-hidden="true"></i>
-                    <span>Modifier</span>
-                </a>
-            </div>
-            <div class="c-box mb-4">
-                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                    <h3 class="mb-0">Période de l’accompagnement</h3>
-                    {% if membership.ended_at %}
-                        <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
-                    {% else %}
-                        <div>{% include "gps/includes/badge_ongoing_membership.html" %}</div>
-                    {% endif %}
-                </div>
-                <ul class="list-data list-data__two-column-lg">
-                    <li>
-                        <small>Date de début</small>
-                        <strong>{{ membership.started_at|date:"F Y" }}</strong>
-                    </li>
-                    <li>
-                        <small>Date de fin</small>
-                        {% if membership.ended_at %}
-                            <strong>{{ membership.ended_at|date:"F Y" }}</strong>
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <h2 class="mb-0">Mon intervention</h2>
+                        <a href="{% url "gps:group_edition" group.pk %}?back_url={{ back_url|urlencode }}" class="btn btn-ico btn-primary">
+                            <i class="ri-pencil-line" aria-hidden="true"></i>
+                            <span>Modifier</span>
+                        </a>
+                    </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                            <h3 class="mb-0">Période de l’accompagnement</h3>
+                            {% if membership.ended_at %}
+                                <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                            {% else %}
+                                <div>{% include "gps/includes/badge_ongoing_membership.html" %}</div>
+                            {% endif %}
+                        </div>
+                        <ul class="list-data">
+                            <li>
+                                <small>Date de début</small>
+                                <strong>{{ membership.started_at|date:"F Y" }}</strong>
+                            </li>
+                            <li>
+                                <small>Date de fin</small>
+                                {% if membership.ended_at %}
+                                    <strong>{{ membership.ended_at|date:"F Y" }}</strong>
+                                {% else %}
+                                    <span class="text-disabled">(accompagnement en cours)</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                            <h3 class="mb-0">Motif de l’intervention</h3>
+                            {% if membership.is_referent %}
+                                <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
+                            {% endif %}
+                        </div>
+                        {% if membership.reason %}
+                            <strong>{{ membership.reason }}</strong>
                         {% else %}
-                            <span class="text-disabled">(accompagnement en cours)</span>
+                            <i class="text-disabled">Non renseigné</i>
                         {% endif %}
-                    </li>
-                </ul>
-            </div>
-            <div class="c-box mb-4">
-                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                    <h3 class="mb-0">Motif de l’intervention</h3>
-                    {% if membership.is_referent %}
-                        <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
-                    {% endif %}
+                    </div>
                 </div>
-                {% if membership.reason %}
-                    <strong>{{ membership.reason }}</strong>
-                {% else %}
-                    <i class="text-disabled">Non renseigné</i>
-                {% endif %}
             </div>
         </div>
     </section>
