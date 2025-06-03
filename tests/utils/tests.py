@@ -1759,6 +1759,39 @@ def test_log_current_command(client):
     assert uuid.UUID(log["command.run_uid"])
 
 
+def test_log_hijack_infos(client):
+    LOG_KEY = "usr.hijack_history"
+    dashboard_url = reverse("dashboard:index")
+    membership = CompanyMembershipFactory()
+    client.force_login(membership.user)
+    root_logger = logging.getLogger()
+    stream_handler = root_logger.handlers[0]
+    captured = io.StringIO()
+    assert isinstance(stream_handler, logging.StreamHandler)
+    # caplog cannot be used since the organization_id is written by the log formatter
+    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
+    with patch.object(stream_handler, "stream", captured):
+        response = client.get(dashboard_url)
+    assert response.status_code == 200
+    # Check that the hijack info is not there
+    assert f'"usr.id": {membership.user.id}' in captured.getvalue()
+    assert LOG_KEY not in captured.getvalue()
+
+    hijacker = ItouStaffFactory(is_superuser=True)
+    client.force_login(hijacker)
+    response = client.post(reverse("hijack:acquire"), {"user_pk": membership.user.pk, "next": dashboard_url})
+    assertRedirects(response, dashboard_url, fetch_redirect_response=False)
+    captured = io.StringIO()
+    # caplog cannot be used since the organization_id is written by the log formatter
+    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
+    with patch.object(stream_handler, "stream", captured):
+        response = client.get(dashboard_url)
+    assert response.status_code == 200
+    # Check that the hijack info is there
+    assert f'"usr.id": {membership.user.id}' in captured.getvalue()
+    assert f'"{LOG_KEY}": ["{hijacker.pk}"]' in captured.getvalue()
+
+
 def test_create_fake_postcode():
     with mock.patch.dict(DEPARTMENTS, {"2A": "2A - Corse-du-Sud"}):
         postcode = create_fake_postcode()
