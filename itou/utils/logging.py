@@ -22,22 +22,24 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
                 del log_entry_dict[log_key]
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
+            try:
+                user = datadog.get_wsgi_request_user(wsgi_request)
+            except Exception:  # NOQA: we cannot crash the log formatter under any circumstances
+                user = None
             if current_org := getattr(wsgi_request, "current_organization", None):
                 log_entry_dict["usr.organization_id"] = current_org.pk
             if token := getattr(wsgi_request, "auth", None):
                 if hasattr(token, "datadog_info"):
                     log_entry_dict["token"] = token.datadog_info()
                 else:
-                    try:
-                        user_pk = wsgi_request.user.pk
-                    except AttributeError:
-                        user_pk = None
-                    if user_pk is None and not getattr(wsgi_request, NO_RECURSIVE_LOG_FLAG, False):
+                    if getattr(user, "pk", None) is None and not getattr(wsgi_request, NO_RECURSIVE_LOG_FLAG, False):
                         # Avoid coming right back here with the following logger.warning
                         setattr(wsgi_request, NO_RECURSIVE_LOG_FLAG, True)
                         logger.warning(
                             "Request using token (%r) without datadog_info() method: please define one", token
                         )
+            if getattr(user, "is_hijacked", False):
+                log_entry_dict["usr.is_hijacked"] = True
         if (command_info := get_current_command_info()) is not None:
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
