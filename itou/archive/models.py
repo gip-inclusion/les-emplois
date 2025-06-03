@@ -10,7 +10,7 @@ class AnonymizedJobSeeker(models.Model):
     date_joined = models.DateField(verbose_name="année et mois d'inscription")
     first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
     last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
-    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
     user_signup_kind = models.CharField(
         max_length=50, verbose_name="créé par un utilisateur de type", blank=True, null=True
     )
@@ -37,9 +37,12 @@ class AnonymizedJobSeeker(models.Model):
     count_total_applications = models.PositiveIntegerField(verbose_name="nombre de candidatures totales", default=0)
 
     class Meta:
-        verbose_name = "candidat archivé"
-        verbose_name_plural = "candidats archivés"
+        verbose_name = "candidat anonymisé"
+        verbose_name_plural = "candidats anonymisés"
         ordering = ["-anonymized_at"]
+
+    def __str__(self):
+        return f"candidat {self.id} anonymisé le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 class AnonymizedApplication(models.Model):
@@ -70,7 +73,7 @@ class AnonymizedApplication(models.Model):
     company_has_convention = models.BooleanField(verbose_name="l'entreprise a une convention", default=False)
 
     # application
-    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
     applied_at = models.DateField(verbose_name="année et mois de la candidature")
     processed_at = models.DateField(verbose_name="année et mois de traitement", blank=True, null=True)
     last_transition_at = models.DateField(
@@ -96,6 +99,9 @@ class AnonymizedApplication(models.Model):
     hiring_without_approval = models.BooleanField(verbose_name="embauche sans PASS IAE", default=False)
 
     class Meta:
-        verbose_name = "candidature archivée"
-        verbose_name_plural = "candidatures archivées"
+        verbose_name = "candidature anonymisée"
+        verbose_name_plural = "candidatures anonymisées"
         ordering = ["-anonymized_at"]
+
+    def __str__(self):
+        return f"candidature {self.id} anonymisée le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
