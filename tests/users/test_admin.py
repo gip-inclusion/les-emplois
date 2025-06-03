@@ -407,8 +407,8 @@ def test_nir_modification_request_changelist(admin_client):
     url = reverse("admin:users_nirmodificationrequest_changelist")
     response = admin_client.get(url)
     for nir_modification_request in nir_modification_requests:
-        assertContains(response, nir_modification_request.jobseeker_profile.user.get_full_name())
-        assertContains(response, nir_modification_request.requested_by.get_full_name())
+        assertContains(response, nir_modification_request.jobseeker_profile)
+        assertContains(response, nir_modification_request.requested_by)
 
 
 def test_nir_modification_request_display_requested_by_kind(admin_client):
