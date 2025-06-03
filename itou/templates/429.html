@@ -1,0 +1,24 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Erreur 429 {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Erreur 429</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <p>Vous avez effectué trop de requêtes. Réessayez dans quelques minutes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

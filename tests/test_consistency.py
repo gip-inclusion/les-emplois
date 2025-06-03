@@ -43,6 +43,7 @@ def test_unused_templates():
         # Django
         "403.html",
         "404.html",
+        "429.html",
         "500.html",
         "django/forms/widgets/password.html",
         # Django allauth
