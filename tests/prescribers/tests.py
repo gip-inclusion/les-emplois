@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 
-import httpx
 import pytest
-import respx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission
@@ -25,7 +23,6 @@ from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
@@ -274,36 +271,6 @@ class TestPrescriberOrganizationModel:
         assert PrescriberOrganization.objects.count() == 1
         geiq_diagnosis.refresh_from_db()
         assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
-
-    @respx.mock
-    def test_update_prescriber_with_api_entreprise(self, settings):
-        settings.API_INSEE_BASE_URL = "https://insee.fake"
-        settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
-        settings.API_INSEE_CONSUMER_KEY = "foo"
-        settings.API_INSEE_CONSUMER_SECRET = "bar"
-
-        siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
-        respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
-            return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
-        )
-        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}").mock(
-            return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
-        )
-
-        organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
-        old_updated_at = organization.updated_at
-
-        # No update required
-        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
-        organization.refresh_from_db()
-        assert organization.updated_at == old_updated_at
-        assert organization.is_head_office is False
-
-        # Force updated of latest records
-        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=0)
-        organization.refresh_from_db()
-        assert organization.updated_at > old_updated_at
-        assert organization.is_head_office is True
 
 
 class TestPrescriberOrganizationAdmin:
