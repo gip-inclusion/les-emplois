@@ -10,7 +10,7 @@ class AnonymizedJobSeeker(models.Model):
     date_joined = models.DateField(verbose_name="année et mois d'inscription")
     first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
     last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
-    archived_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
     user_signup_kind = models.CharField(
         max_length=50, verbose_name="créé par un utilisateur de type", blank=True, null=True
     )
@@ -39,7 +39,7 @@ class AnonymizedJobSeeker(models.Model):
     class Meta:
         verbose_name = "candidat archivé"
         verbose_name_plural = "candidats archivés"
-        ordering = ["-archived_at"]
+        ordering = ["-anonymized_at"]
 
 
 class AnonymizedApplication(models.Model):
@@ -70,7 +70,7 @@ class AnonymizedApplication(models.Model):
     company_has_convention = models.BooleanField(verbose_name="l'entreprise a une convention", default=False)
 
     # application
-    archived_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="archivé le")
     applied_at = models.DateField(verbose_name="année et mois de la candidature")
     processed_at = models.DateField(verbose_name="année et mois de traitement", blank=True, null=True)
     last_transition_at = models.DateField(
@@ -98,4 +98,4 @@ class AnonymizedApplication(models.Model):
     class Meta:
         verbose_name = "candidature archivée"
         verbose_name_plural = "candidatures archivées"
-        ordering = ["-archived_at"]
+        ordering = ["-anonymized_at"]
