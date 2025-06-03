@@ -1,0 +1,3437 @@
+[
+  {
+    "fields": {
+      "campaign": 1,
+      "data": [
+        {
+          "antennes": [
+            {
+              "cp": "53600",
+              "id": 217,
+              "nom": "ANTENNE D'EVRON",
+              "siret": "",
+              "ville": "EVRON"
+            },
+            {
+              "cp": "53230",
+              "id": 218,
+              "nom": "ANTENNE DE COSSE LE VIVIEN",
+              "siret": "",
+              "ville": "COSSE LE VIVIEN"
+            },
+            {
+              "cp": "53500",
+              "id": 216,
+              "nom": "Antenne d'Ernée",
+              "siret": "",
+              "ville": "ERNEE"
+            }
+          ],
+          "cp": "53000",
+          "id": 11,
+          "nom": "GEIQ MULTISECTORIEL 53",
+          "siret": "75305474100016",
+          "ville": "LAVAL"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 12,
+          "nom": "FEDERATION FRANCAISE DES GEIQ",
+          "siret": "",
+          "ville": "Paris"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "24000",
+              "id": 70,
+              "nom": "ANTENNE PERIGUEUX",
+              "siret": "38280216300107",
+              "ville": "PERIGUEUX"
+            }
+          ],
+          "cp": "24100",
+          "id": 13,
+          "nom": "GEIQ 24",
+          "siret": "38280216300099",
+          "ville": "BERGERAC"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "32200",
+              "id": 50,
+              "nom": "Antenne de Gimont",
+              "siret": "42208724700025",
+              "ville": "GIMONT"
+            },
+            {
+              "cp": "32100",
+              "id": 48,
+              "nom": "Antenne de Condom",
+              "siret": "42208724700025",
+              "ville": "CONDOM"
+            }
+          ],
+          "cp": "32000",
+          "id": 14,
+          "nom": "GEIQ 32",
+          "siret": "42208724700025",
+          "ville": "AUCH"
+        },
+        {
+          "antennes": [],
+          "cp": "62223",
+          "id": 15,
+          "nom": "GEIQ 3A",
+          "siret": "80024094700013",
+          "ville": "ST LAURENT BLANGY"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "85000",
+              "id": 35,
+              "nom": "Antenne 85",
+              "siret": "53770936200025",
+              "ville": "LA ROCHE SUR YON"
+            }
+          ],
+          "cp": "72100",
+          "id": 16,
+          "nom": "GEIQ 3M MULTISECTORIEL",
+          "siret": "53770936200017",
+          "ville": "LE MANS"
+        },
+        {
+          "antennes": [],
+          "cp": "41018",
+          "id": 17,
+          "nom": "GEIQ 41",
+          "siret": "75029710300020",
+          "ville": "BLOIS CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "64230",
+          "id": 19,
+          "nom": "GEIQ 64",
+          "siret": "41425268400017",
+          "ville": "LESCAR"
+        },
+        {
+          "antennes": [],
+          "cp": "69100",
+          "id": 20,
+          "nom": "GEIQ 69",
+          "siret": "39049547100026",
+          "ville": "VILLEURBANNE"
+        },
+        {
+          "antennes": [],
+          "cp": "72000",
+          "id": 21,
+          "nom": "GEIQ 72 BTP ENVIRONNEMENT",
+          "siret": "48267194800040",
+          "ville": "LE MANS"
+        },
+        {
+          "antennes": [],
+          "cp": "87069",
+          "id": 22,
+          "nom": "GEIQ 87 CONSTRUCTION",
+          "siret": "43780723300022",
+          "ville": "LIMOGES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "00000",
+              "id": 114,
+              "nom": "ALBI",
+              "siret": null,
+              "ville": "ALBI"
+            },
+            {
+              "cp": "48000",
+              "id": 161,
+              "nom": "ANTENNE DE MENDE",
+              "siret": "",
+              "ville": "MENDE"
+            },
+            {
+              "cp": "66000",
+              "id": 209,
+              "nom": "ANTENNE DE PERPIGNAN",
+              "siret": "",
+              "ville": "PERPIGNAN"
+            },
+            {
+              "cp": "81000",
+              "id": 152,
+              "nom": "ANTENNE D'ALBI",
+              "siret": "",
+              "ville": "ALBI"
+            },
+            {
+              "cp": "12000",
+              "id": 214,
+              "nom": "ANTENNE DE RODEZ",
+              "siret": "",
+              "ville": "RODEZ"
+            }
+          ],
+          "cp": "34184",
+          "id": 23,
+          "nom": "GEIQ DOMICILE GRAND SUD",
+          "siret": "80362032700020",
+          "ville": "MONTPELLIER Cedex 4"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "82000",
+              "id": 160,
+              "nom": "ANTENNE DE MONTAUBAN",
+              "siret": "",
+              "ville": "Montauban"
+            },
+            {
+              "cp": "09000",
+              "id": 208,
+              "nom": "ANTENNE DU 09",
+              "siret": "",
+              "ville": "FOIX"
+            }
+          ],
+          "cp": "31200",
+          "id": 24,
+          "nom": "GEIQ DOMICILE OCCITANIE",
+          "siret": "81235450400027",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [],
+          "cp": "75017",
+          "id": 26,
+          "nom": "GEIQ ACCUEIL ILE-DE-FRANCE",
+          "siret": "81163530900016",
+          "ville": "PARIS"
+        },
+        {
+          "antennes": [],
+          "cp": "31000",
+          "id": 27,
+          "nom": "GEIQ ACCUEIL MIDI-PYRENEES",
+          "siret": "45053310400045",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "01000",
+              "id": 119,
+              "nom": "ANTENNE AIN",
+              "siret": "",
+              "ville": "BELLEGARDE"
+            },
+            {
+              "cp": "07000",
+              "id": 135,
+              "nom": "ANTENNE ARDECHE",
+              "siret": "",
+              "ville": "PRIVAS"
+            },
+            {
+              "cp": "38000",
+              "id": 71,
+              "nom": "ANTENNE ISERE",
+              "siret": "",
+              "ville": "GRENOBLE"
+            },
+            {
+              "cp": "74000",
+              "id": 118,
+              "nom": "ANTENNE SAVOIE - HAUTE SAVOIE",
+              "siret": "",
+              "ville": "ANNECY"
+            },
+            {
+              "cp": "26000",
+              "id": 137,
+              "nom": "ANTENNE DROME",
+              "siret": "",
+              "ville": "VALENCE"
+            }
+          ],
+          "cp": "73420",
+          "id": 31,
+          "nom": "GEIQ ADI ALPIN",
+          "siret": "52354280100023",
+          "ville": "VOGLANS"
+        },
+        {
+          "antennes": [],
+          "cp": "69200",
+          "id": 32,
+          "nom": "GEIQ AMS",
+          "siret": "80161927100035",
+          "ville": "VENISSIEUX"
+        },
+        {
+          "antennes": [],
+          "cp": "26000",
+          "id": 33,
+          "nom": "GEIQ ADRIAL",
+          "siret": "52153126900038",
+          "ville": "VALENCE"
+        },
+        {
+          "antennes": [],
+          "cp": "95727",
+          "id": 34,
+          "nom": "GEIQ AERO IDF",
+          "siret": "79364713200018",
+          "ville": "ROISSY CDG Cedex"
+        },
+        {
+          "antennes": [],
+          "cp": "21110",
+          "id": 35,
+          "nom": "GEIQ AGRI 21",
+          "siret": "53788455300026",
+          "ville": "BRETENIERE"
+        },
+        {
+          "antennes": [],
+          "cp": "66000",
+          "id": 36,
+          "nom": "GEIQ AGRI 66",
+          "siret": "50423130900015",
+          "ville": "PERPIGNAN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "72013",
+              "id": 129,
+              "nom": "ANTENNE LE MANS",
+              "siret": "",
+              "ville": "Le Mans"
+            },
+            {
+              "cp": "44939",
+              "id": 128,
+              "nom": "ANTENNE NANTES",
+              "siret": "",
+              "ville": "Nantes Cedex"
+            }
+          ],
+          "cp": "49100",
+          "id": 37,
+          "nom": "GEIQ AGRIQUALIF PAYS DE LA LOIRE",
+          "siret": "51316714800016",
+          "ville": "ANGERS "
+        },
+        {
+          "antennes": [
+            {
+              "cp": "24660",
+              "id": 133,
+              "nom": "Antenne de Dordogne",
+              "siret": "",
+              "ville": "COULOUNIEIX-CHAMIERS"
+            },
+            {
+              "cp": "19000",
+              "id": 121,
+              "nom": "Antenne de la Corrèze (Tulle)",
+              "siret": "",
+              "ville": "TULLE"
+            },
+            {
+              "cp": "23000",
+              "id": 120,
+              "nom": "Antenne de la Creuse (Guéret)",
+              "siret": "",
+              "ville": "GUERET"
+            }
+          ],
+          "cp": "87000",
+          "id": 38,
+          "nom": "GEIQ AGRI LIMOUSIN PERIGORD",
+          "siret": "48949963200011",
+          "ville": "LIMOGES"
+        },
+        {
+          "antennes": [],
+          "cp": "64078",
+          "id": 39,
+          "nom": "GEIQ AGRI QUALIF PAYS DE L'ADOUR",
+          "siret": "49305689900013",
+          "ville": "PAU"
+        },
+        {
+          "antennes": [],
+          "cp": "69960",
+          "id": 40,
+          "nom": "GEIQ AGROLOGIS",
+          "siret": "39937378600132",
+          "ville": "CORBAS"
+        },
+        {
+          "antennes": [],
+          "cp": "45000",
+          "id": 41,
+          "nom": "GEIQ AIDE A DOMICILE CENTRE VAL DE LOIRE",
+          "siret": "79055687200014",
+          "ville": "ORLEANS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "36130",
+              "id": 34,
+              "nom": "Antenne 36",
+              "siret": "81063554000034",
+              "ville": "DEOLS"
+            },
+            {
+              "cp": "18100",
+              "id": 36,
+              "nom": "Antenne de Bourges",
+              "siret": "",
+              "ville": "BOURGES"
+            }
+          ],
+          "cp": "18100",
+          "id": 42,
+          "nom": "GEIQ ALISE BERRY",
+          "siret": "81063554000018",
+          "ville": "VIERZON"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "74000",
+              "id": 132,
+              "nom": "ANTENNE ANNECY",
+              "siret": "",
+              "ville": "ANNECY"
+            }
+          ],
+          "cp": "74300",
+          "id": 43,
+          "nom": "GEIQ ALPEGE HORIZON",
+          "siret": "75315297400014",
+          "ville": "CLUSES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "69005",
+              "id": 175,
+              "nom": "ANTENNE 69",
+              "siret": "50904400400042",
+              "ville": "LYON"
+            },
+            {
+              "cp": "71000",
+              "id": 136,
+              "nom": "ANTENNE 71",
+              "siret": "50904400400034",
+              "ville": "MACON"
+            },
+            {
+              "cp": "74930",
+              "id": 126,
+              "nom": "ANTENNE 74",
+              "siret": "50904400400026",
+              "ville": "PERS JUSSY"
+            }
+          ],
+          "cp": "01150",
+          "id": 44,
+          "nom": "GEIQ ALPHEE RHONE-ALPES SANTE SOCIAL",
+          "siret": "50904400400018",
+          "ville": "LAGNIEU"
+        },
+        {
+          "antennes": [],
+          "cp": "97122",
+          "id": 45,
+          "nom": "GEIQ ARCHIPEL GUADELOUPE",
+          "siret": "51510123600013",
+          "ville": "BAIE-MAHAULT"
+        },
+        {
+          "antennes": [],
+          "cp": "66000",
+          "id": 46,
+          "nom": "GEIQ ATEP",
+          "siret": "47786737800036",
+          "ville": "PERPIGNAN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "28000",
+              "id": 145,
+              "nom": "ANTENNE 28",
+              "siret": "",
+              "ville": "chartres"
+            },
+            {
+              "cp": "45000",
+              "id": 74,
+              "nom": "Antenne 45",
+              "siret": "52128975100021",
+              "ville": "ORLEANS"
+            }
+          ],
+          "cp": "37550",
+          "id": 47,
+          "nom": "GEIQ AVENIR HANDICAP",
+          "siret": "52128975100062",
+          "ville": "SAINT AVERTIN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "68050",
+              "id": 62,
+              "nom": "Antenne de Mulhouse",
+              "siret": "48968776400030",
+              "ville": "MULHOUSE CEDEX"
+            }
+          ],
+          "cp": "67300",
+          "id": 48,
+          "nom": "GEIQ BATIMENT ALSACE",
+          "siret": "48968776400030",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "42300",
+              "id": 56,
+              "nom": "Antenne de Roanne",
+              "siret": "49902611000027",
+              "ville": "ROANNE"
+            }
+          ],
+          "cp": "42000",
+          "id": 49,
+          "nom": "GEIQ BTP 42",
+          "siret": "49902611000027",
+          "ville": "SAINT ETIENNE"
+        },
+        {
+          "antennes": [],
+          "cp": "12000",
+          "id": 50,
+          "nom": "GEIQ BTP 12",
+          "siret": "50163193100018",
+          "ville": "RODEZ"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "05000",
+              "id": 188,
+              "nom": "Antenne 04-05",
+              "siret": "",
+              "ville": "Gap"
+            }
+          ],
+          "cp": "13009",
+          "id": 51,
+          "nom": "GEIQ BTP 13 & MEDITERRANEE",
+          "siret": "40300456700018",
+          "ville": "MARSEILLE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "19200",
+              "id": 76,
+              "nom": "Antenne d'Ussel",
+              "siret": "",
+              "ville": "USSEL"
+            },
+            {
+              "cp": "19100",
+              "id": 77,
+              "nom": "Antenne de Brive la Gaillarde",
+              "siret": "",
+              "ville": "BRIVE LA GAILLARDE"
+            }
+          ],
+          "cp": "19000",
+          "id": 52,
+          "nom": "GEIQ BTP 19",
+          "siret": "41359673500014",
+          "ville": "TULLE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "23000",
+              "id": 111,
+              "nom": "GEIQ BTP 23",
+              "siret": "43270415300019",
+              "ville": "GUERET"
+            }
+          ],
+          "cp": "23000",
+          "id": 53,
+          "nom": "GEIQ BTP 23",
+          "siret": "43270415300019",
+          "ville": "GUERET"
+        },
+        {
+          "antennes": [],
+          "cp": "31200",
+          "id": 54,
+          "nom": "GEIQ BTP 31",
+          "siret": "39230436600058",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [],
+          "cp": "37550",
+          "id": 55,
+          "nom": "GEIQ BTP 37",
+          "siret": "50805213100044",
+          "ville": "SAINT-AVERTIN"
+        },
+        {
+          "antennes": [],
+          "cp": "43000",
+          "id": 56,
+          "nom": "GEIQ BTP 43",
+          "siret": "79428349900018",
+          "ville": "LE PUY EN VELAY"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "44600",
+              "id": 65,
+              "nom": "Antenne de SAINT-NAZAIRE",
+              "siret": "",
+              "ville": "SAINT-NAZAIRE"
+            }
+          ],
+          "cp": "44800",
+          "id": 57,
+          "nom": "GEIQ BTP 44",
+          "siret": "40181149200057",
+          "ville": "SAINT-HERBLAIN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "46130",
+              "id": 159,
+              "nom": "ANTENNE BRETENOUX",
+              "siret": "",
+              "ville": "BRETENOUX"
+            },
+            {
+              "cp": "46100",
+              "id": 113,
+              "nom": "ANTENNE FIGEAC",
+              "siret": "",
+              "ville": "FIGEAC"
+            },
+            {
+              "cp": "46500",
+              "id": 112,
+              "nom": "ANTENNE GRAMAT",
+              "siret": "",
+              "ville": "GRAMAT"
+            }
+          ],
+          "cp": "46000",
+          "id": 58,
+          "nom": "GEIQ BTP 46",
+          "siret": "40524380900028",
+          "ville": "CAHORS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "",
+              "id": 177,
+              "nom": "test antenne",
+              "siret": "",
+              "ville": ""
+            }
+          ],
+          "cp": "53000",
+          "id": 59,
+          "nom": "GEIQ BTP 53",
+          "siret": "40307674800025",
+          "ville": "LAVAL"
+        },
+        {
+          "antennes": [],
+          "cp": "63800",
+          "id": 60,
+          "nom": "GEIQ BTP 63",
+          "siret": "42073014500018",
+          "ville": "COURNON D'AUVERGNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "11000",
+              "id": 66,
+              "nom": "Antenne de l'Aude",
+              "siret": "",
+              "ville": "CARCASSONNE"
+            }
+          ],
+          "cp": "66000",
+          "id": 61,
+          "nom": "GEIQ BTP 66 ET 11",
+          "siret": "49375493100019",
+          "ville": "PERPIGNAN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "81500",
+              "id": 156,
+              "nom": "Antenne LAVAUR",
+              "siret": "",
+              "ville": "LAVAUR"
+            }
+          ],
+          "cp": "81020",
+          "id": 62,
+          "nom": "GEIQ BTP 81",
+          "siret": "52433307700021",
+          "ville": "ALBI"
+        },
+        {
+          "antennes": [],
+          "cp": "82000",
+          "id": 63,
+          "nom": "GEIQ BTP 82",
+          "siret": "41013939800045",
+          "ville": "MONTAUBAN"
+        },
+        {
+          "antennes": [],
+          "cp": "85000",
+          "id": 64,
+          "nom": "GEIQ BTP 85",
+          "siret": "49473970900025",
+          "ville": "LA ROCHE SUR YON"
+        },
+        {
+          "antennes": [],
+          "cp": "33700",
+          "id": 65,
+          "nom": "GEIQ BTP BORDEAUX OCEAN",
+          "siret": "40037239700069",
+          "ville": "MERIGNAC"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "89000",
+              "id": 38,
+              "nom": "Antenne d'Auxerre",
+              "siret": "",
+              "ville": "AUXERRE"
+            },
+            {
+              "cp": "90400",
+              "id": 168,
+              "nom": "Antenne de Belfort",
+              "siret": "",
+              "ville": "MEROUX-MOVAL "
+            },
+            {
+              "cp": "21000",
+              "id": 166,
+              "nom": "Antenne de Dijon",
+              "siret": "",
+              "ville": "DIJON"
+            },
+            {
+              "cp": "71000",
+              "id": 167,
+              "nom": "Antenne de Macon",
+              "siret": "",
+              "ville": "MACON"
+            },
+            {
+              "cp": "58000",
+              "id": 186,
+              "nom": "Antenne de Nevers",
+              "siret": "",
+              "ville": "Nevers"
+            }
+          ],
+          "cp": "21000",
+          "id": 66,
+          "nom": "GEIQ BTP BOURGOGNE-FRANCHE-COMTE",
+          "siret": "48810915800037",
+          "ville": "DIJON"
+        },
+        {
+          "antennes": [],
+          "cp": "10000",
+          "id": 67,
+          "nom": "GEIQ BTP CHAMPAGNE-ARDENNE",
+          "siret": "49207641900026",
+          "ville": "TROYES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "21000",
+              "id": 227,
+              "nom": "Antenne de Dijon",
+              "siret": "",
+              "ville": "DIJON"
+            },
+            {
+              "cp": "90000",
+              "id": 39,
+              "nom": "Antenne de Belfort",
+              "siret": "",
+              "ville": "BELFORT"
+            },
+            {
+              "cp": "25000",
+              "id": 40,
+              "nom": "Antenne de Besançon",
+              "siret": "",
+              "ville": "BESANCON"
+            },
+            {
+              "cp": "39100",
+              "id": 49,
+              "nom": "Antenne de Dole",
+              "siret": "",
+              "ville": "DOLE"
+            },
+            {
+              "cp": "39000",
+              "id": 53,
+              "nom": "Antenne de Lons-le-Saunier",
+              "siret": "",
+              "ville": "LONS LE SAUNIER"
+            },
+            {
+              "cp": "25200",
+              "id": 54,
+              "nom": "Antenne de Montbéliard",
+              "siret": "",
+              "ville": "MONTBELIARD"
+            },
+            {
+              "cp": "70000",
+              "id": 60,
+              "nom": "Antenne de Vesoul",
+              "siret": "",
+              "ville": "VESOUL"
+            }
+          ],
+          "cp": "25480",
+          "id": 68,
+          "nom": "GEIQ INDIBAT",
+          "siret": "40014944900318",
+          "ville": "ECOLE VALENTIN"
+        },
+        {
+          "antennes": [],
+          "cp": "29000",
+          "id": 69,
+          "nom": "GEIQ BTP DE QUIMPER CORNOUAILLE",
+          "siret": "44863350300025",
+          "ville": "QUIMPER"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "22100",
+              "id": 78,
+              "nom": "Antenne de Dinan",
+              "siret": "",
+              "ville": "DINAN"
+            }
+          ],
+          "cp": "35400",
+          "id": 70,
+          "nom": "GEIQ BTP DE SAINT-MALO ET DINAN",
+          "siret": "45330458600051",
+          "ville": "SAINT MALO CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "56100",
+          "id": 71,
+          "nom": "GEIQ BTP DU BASSIN LORIENTAIS",
+          "siret": "41117670400038",
+          "ville": "LORIENT"
+        },
+        {
+          "antennes": [],
+          "cp": "29200",
+          "id": 72,
+          "nom": "GEIQ BTP 29 NORD",
+          "siret": "42286173200044",
+          "ville": "BREST"
+        },
+        {
+          "antennes": [],
+          "cp": "35000",
+          "id": 73,
+          "nom": "GEIQ BTP PAYS DE RENNES",
+          "siret": "44854087200026",
+          "ville": "RENNES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "50100",
+              "id": 174,
+              "nom": "Antenne de Cherbourg",
+              "siret": "",
+              "ville": "CHERBOURG EN COTENTIN"
+            },
+            {
+              "cp": "76130",
+              "id": 55,
+              "nom": "ANTENNE DE MONT SAINT AIGNAN",
+              "siret": "39969770500032",
+              "ville": "MONT-SAINT-AIGNAN"
+            },
+            {
+              "cp": "61000",
+              "id": 199,
+              "nom": "ANTENNE D'ALENCON",
+              "siret": "",
+              "ville": "ALENCON"
+            },
+            {
+              "cp": "14000",
+              "id": 146,
+              "nom": "ANTENNE DE CAEN",
+              "siret": "",
+              "ville": "CAEN"
+            },
+            {
+              "cp": "27930",
+              "id": 61,
+              "nom": "ANTENNE EVREUX",
+              "siret": "39969770500032",
+              "ville": "LE VIEIL EVREUX"
+            }
+          ],
+          "cp": "76600",
+          "id": 74,
+          "nom": "GEIQ BTP NORMANDIE",
+          "siret": "39969770500032",
+          "ville": "LE HAVRE"
+        },
+        {
+          "antennes": [],
+          "cp": "30900",
+          "id": 75,
+          "nom": "GEIQ BTP GARD",
+          "siret": "48992871300044",
+          "ville": "NIMES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "97310",
+              "id": 52,
+              "nom": "Antenne de Kourou",
+              "siret": "",
+              "ville": "KOUROU"
+            },
+            {
+              "cp": "97320",
+              "id": 57,
+              "nom": "Antenne de Saint-Laurent",
+              "siret": "",
+              "ville": "SAINT-LAURENT-DU-MARONI"
+            }
+          ],
+          "cp": "97300",
+          "id": 76,
+          "nom": "GEIQ BTP GUYANE",
+          "siret": "53404531500015",
+          "ville": "CAYENNE"
+        },
+        {
+          "antennes": [],
+          "cp": "34080",
+          "id": 77,
+          "nom": "GEIQ BTP HERAULT",
+          "siret": "41066521000044",
+          "ville": "MONTPELLIER"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "38000",
+              "id": 51,
+              "nom": "Antenne de Grenoble",
+              "siret": "40276609100043",
+              "ville": "GRENOBLE"
+            },
+            {
+              "cp": "26000",
+              "id": 59,
+              "nom": "Antenne de Valence",
+              "siret": "40276609100050",
+              "ville": "VALENCE"
+            }
+          ],
+          "cp": "38150",
+          "id": 78,
+          "nom": "GEIQ BTP ISERE DROME ARDECHE",
+          "siret": "40276609100084",
+          "ville": "SALAISE SUR SANNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "40000",
+              "id": 130,
+              "nom": "Antenne Mont-de-Marsan",
+              "siret": "43402613400073",
+              "ville": "MONT-DE-MARSAN"
+            }
+          ],
+          "cp": "40220",
+          "id": 79,
+          "nom": "GEIQ BTP LANDES ET COTE BASQUE",
+          "siret": "43402613400065",
+          "ville": "TARNOS"
+        },
+        {
+          "antennes": [],
+          "cp": "33500",
+          "id": 80,
+          "nom": "GEIQ BTP LIBOURNAIS - HAUTE GIRONDE",
+          "siret": "41412644100032",
+          "ville": "LIBOURNE"
+        },
+        {
+          "antennes": [],
+          "cp": "45160",
+          "id": 81,
+          "nom": "GEIQ BTP LOIRET",
+          "siret": "51020987700040",
+          "ville": "OLIVET"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "88000",
+              "id": 189,
+              "nom": "Antenne Vosges",
+              "siret": "",
+              "ville": "EPINAL"
+            },
+            {
+              "cp": "54000",
+              "id": 79,
+              "nom": "Antenne de Nancy",
+              "siret": "",
+              "ville": "NANCY"
+            }
+          ],
+          "cp": "57078",
+          "id": 82,
+          "nom": "GEIQ BTP LORRAINE",
+          "siret": "79245742600015",
+          "ville": "METZ CEDEX"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "62000",
+              "id": 127,
+              "nom": "GEIQ BTP NPDC",
+              "siret": "40158320800079",
+              "ville": "ARRAS"
+            }
+          ],
+          "cp": "62000",
+          "id": 83,
+          "nom": "GEIQ BTP HAUTS-DE-FRANCE",
+          "siret": "40158320800087",
+          "ville": "ARRAS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "50180",
+              "id": 47,
+              "nom": "Antenne d'Agneaux",
+              "siret": "50987427700015",
+              "ville": "AGNEAUX"
+            },
+            {
+              "cp": "61200",
+              "id": 141,
+              "nom": "ANTENNE D'ARGENTAN",
+              "siret": "50987427700015",
+              "ville": "SARCEAUX"
+            }
+          ],
+          "cp": "61002",
+          "id": 84,
+          "nom": "GEIQ BTP ORNE",
+          "siret": "50987427700015",
+          "ville": "ALENCON"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "74130",
+              "id": 219,
+              "nom": "Antenne de Bonneville",
+              "siret": "",
+              "ville": "BONNEVILLE"
+            },
+            {
+              "cp": "73000",
+              "id": 44,
+              "nom": "Antenne de Savoie",
+              "siret": "",
+              "ville": "CHAMBERY"
+            },
+            {
+              "cp": "01000",
+              "id": 42,
+              "nom": "Antenne de l'Ain",
+              "siret": "",
+              "ville": "BOURG-EN-BRESSE"
+            }
+          ],
+          "cp": "74650",
+          "id": 85,
+          "nom": "GEIQ BTP PAYS DE SAVOIE - AIN",
+          "siret": "41987042300029",
+          "ville": "CHAVANOD"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "60000",
+              "id": 80,
+              "nom": "Antenne de Beauvais",
+              "siret": "",
+              "ville": "BEAUVAIS"
+            }
+          ],
+          "cp": "80001",
+          "id": 86,
+          "nom": "GEIQ CONSTRUCTION HDF",
+          "siret": "50778579800038",
+          "ville": "AMIENS CEDEX 1"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "79000",
+              "id": 81,
+              "nom": "ANTENNE DEUX-SEVRES",
+              "siret": "40305794600010",
+              "ville": "NIORT"
+            },
+            {
+              "cp": "16000",
+              "id": 173,
+              "nom": "ANTENNE ANGOULEME",
+              "siret": "40305794600044",
+              "ville": "ANGOULEME"
+            },
+            {
+              "cp": "17430",
+              "id": 83,
+              "nom": "ANTENNE CHARENTE-MARITIME",
+              "siret": "40305794600036",
+              "ville": "TONNAY CHARENTE"
+            },
+            {
+              "cp": "86000",
+              "id": 82,
+              "nom": "ANTENNE VIENNE",
+              "siret": "40305794600010",
+              "ville": "POITIERS"
+            }
+          ],
+          "cp": "79000",
+          "id": 87,
+          "nom": "GEIQ BTP POITOU-CHARENTES",
+          "siret": "40305794600010",
+          "ville": "NIORT"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "84953",
+              "id": 68,
+              "nom": "Antenne de Cavaillon",
+              "siret": "",
+              "ville": "CAVAILLON CEDEX"
+            },
+            {
+              "cp": "84500",
+              "id": 164,
+              "nom": "Antenne de Bollène",
+              "siret": "",
+              "ville": "BOLLENE"
+            },
+            {
+              "cp": "84850",
+              "id": 67,
+              "nom": "Antenne de Camaret",
+              "siret": "",
+              "ville": "CAMARET SUR AIGUES"
+            }
+          ],
+          "cp": "84916",
+          "id": 88,
+          "nom": "GEIQ BTP VAUCLUSE",
+          "siret": "40246804500065",
+          "ville": "AVIGNON CEDEX 9"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "69600",
+              "id": 212,
+              "nom": "Antenne du 69",
+              "siret": "47851643800098",
+              "ville": "OULLINS-PIERRE-BENITE"
+            }
+          ],
+          "cp": "38090",
+          "id": 89,
+          "nom": "GEIQ GENIPLURI TRANSPORT",
+          "siret": "47851643800080",
+          "ville": "VILLEFONTAINE"
+        },
+        {
+          "antennes": [],
+          "cp": "38690",
+          "id": 90,
+          "nom": "GEIQ ISERE LOGISTIQUE",
+          "siret": "52214448400048",
+          "ville": "COLOMBE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "20137",
+              "id": 85,
+              "nom": "Antenne Porto Vecchio",
+              "siret": "",
+              "ville": "PORTO VECCHIO"
+            },
+            {
+              "cp": "20090",
+              "id": 84,
+              "nom": "Antenne d'Ajaccio",
+              "siret": "41463847800076",
+              "ville": "AJACCIO"
+            }
+          ],
+          "cp": "20200",
+          "id": 91,
+          "nom": "GEIQ VISALTIS'BTP",
+          "siret": "41463847800050",
+          "ville": "BASTIA"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "08000",
+              "id": 46,
+              "nom": "Antenne de Charleville",
+              "siret": "",
+              "ville": "CHARLEVILLE-MEZIERE"
+            },
+            {
+              "cp": "08300",
+              "id": 131,
+              "nom": "Antenne de Rethel",
+              "siret": "",
+              "ville": "RETHEL"
+            },
+            {
+              "cp": "08320",
+              "id": 200,
+              "nom": "Antenne de Vireux Molhain",
+              "siret": "",
+              "ville": "VIREUX MOLHAIN"
+            }
+          ],
+          "cp": "08200",
+          "id": 92,
+          "nom": "GEIQ DES ARDENNES",
+          "siret": "41965264900023",
+          "ville": "SEDAN"
+        },
+        {
+          "antennes": [],
+          "cp": "58640",
+          "id": 93,
+          "nom": "GEIQ GETL - BFC",
+          "siret": "53277754700029",
+          "ville": "VARENNES-VAUZELLES"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "93270",
+              "id": 225,
+              "nom": "Antenne IDF",
+              "siret": "",
+              "ville": "Sevran"
+            }
+          ],
+          "cp": "59815",
+          "id": 94,
+          "nom": "GEIQ ECO-ACTIVITES",
+          "siret": "79150252900013",
+          "ville": "LESQUIN Cedex"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "59708",
+              "id": 87,
+              "nom": "Antenne de Marcq-en-Baroeul",
+              "siret": "43228702700010",
+              "ville": "MARCQ-EN-BAROEUL"
+            },
+            {
+              "cp": "62219",
+              "id": 143,
+              "nom": "Antenne Littoral / Audomarois ",
+              "siret": "",
+              "ville": "Longuenesse"
+            },
+            {
+              "cp": "62000",
+              "id": 86,
+              "nom": "Antenne Artois",
+              "siret": "43228702700010",
+              "ville": "ARRAS"
+            },
+            {
+              "cp": "14000",
+              "id": 210,
+              "nom": "Antenne Normandie",
+              "siret": "",
+              "ville": "Caen"
+            },
+            {
+              "cp": "80000",
+              "id": 211,
+              "nom": "Antenne Picardie",
+              "siret": "",
+              "ville": "Amiens"
+            }
+          ],
+          "cp": "59700",
+          "id": 95,
+          "nom": "GEIQ EMPLOI ET HANDICAP",
+          "siret": "43228702700010",
+          "ville": "MARCQ-EN-BAROEUL"
+        },
+        {
+          "antennes": [],
+          "cp": "02000",
+          "id": 96,
+          "nom": "GEIQ ENTREPRISES PORTEUSES D'EMPLOIS",
+          "siret": "40121329300053",
+          "ville": "BARENTON-BUGNY"
+        },
+        {
+          "antennes": [],
+          "cp": "63800",
+          "id": 97,
+          "nom": "GEIQ EPI",
+          "siret": "41238586600048",
+          "ville": "COURNON D'AUVERGNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "84953",
+              "id": 43,
+              "nom": "Antenne de Cavaillon",
+              "siret": "",
+              "ville": "CAVAILLON"
+            }
+          ],
+          "cp": "13160",
+          "id": 98,
+          "nom": "GEIQ FRUITS ET LEGUMES PROVENCE",
+          "siret": "41924612900037",
+          "ville": "CHATEAURENARD CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "33326",
+          "id": 99,
+          "nom": "GEIQ SANTE SOCIAL MEDICO-SOCIAL NOUVELLE-AQUITAINE (2SMS-NA)",
+          "siret": "78849168600036",
+          "ville": "EYSINES CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "26000",
+          "id": 100,
+          "nom": "GEIQ GEDALI",
+          "siret": "81255940900022",
+          "ville": "VALENCE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "13140",
+              "id": 123,
+              "nom": "ANTENNE MIRAMAS",
+              "siret": "",
+              "ville": "MIRAMAS"
+            },
+            {
+              "cp": "30800",
+              "id": 124,
+              "nom": "ANTENNE NIMES",
+              "siret": "",
+              "ville": "SAINT-GILLES"
+            }
+          ],
+          "cp": "13140",
+          "id": 101,
+          "nom": "GEIQ GELIT",
+          "siret": "50759287100051",
+          "ville": "MIRAMAS"
+        },
+        {
+          "antennes": [],
+          "cp": "69960",
+          "id": 102,
+          "nom": "GEIQ GEMLOG 69",
+          "siret": "44107723700028",
+          "ville": "CORBAS"
+        },
+        {
+          "antennes": [],
+          "cp": "31300",
+          "id": 103,
+          "nom": "GEIQ GEMLOG SUD-OUEST",
+          "siret": "44120407000052",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [],
+          "cp": "33200",
+          "id": 104,
+          "nom": "GEIQ GENESEMS 33",
+          "siret": "50275293400039",
+          "ville": "BORDEAUX CAUDERAN"
+        },
+        {
+          "antennes": [],
+          "cp": "38070",
+          "id": 105,
+          "nom": "GEIQ GENILOG",
+          "siret": "43782411300033",
+          "ville": "SAINT-QUENTIN-FALLAVIER"
+        },
+        {
+          "antennes": [],
+          "cp": "21070",
+          "id": 106,
+          "nom": "GEIQ GE.NOV QUALIFICATION",
+          "siret": "49377586000015",
+          "ville": "DIJON CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "01100",
+          "id": 107,
+          "nom": "GEIQ GEP CENTRE EST",
+          "siret": "45053310400045",
+          "ville": "BELLIGNAT"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "69310",
+              "id": 226,
+              "nom": "Antenne d'Oullins",
+              "siret": "",
+              "ville": "OULLINS-PIERRE-BENITE"
+            },
+            {
+              "cp": "38090",
+              "id": 172,
+              "nom": "ANTENNE VILLEFONTAINE ",
+              "siret": "",
+              "ville": "VILLEFONTAINE"
+            }
+          ],
+          "cp": "38090",
+          "id": 108,
+          "nom": "GEIQ GENIPLURI PRODUCTION",
+          "siret": "81028206100037",
+          "ville": "VILLEFONTAINE"
+        },
+        {
+          "antennes": [],
+          "cp": "03500",
+          "id": 109,
+          "nom": "GEIQ GESA",
+          "siret": "42482616200051",
+          "ville": "ST POURCAIN SUR SIOULE"
+        },
+        {
+          "antennes": [],
+          "cp": "84000",
+          "id": 110,
+          "nom": "GEIQ GESTE VAUCLUSE",
+          "siret": "39857098600057",
+          "ville": "AVIGNON"
+        },
+        {
+          "antennes": [],
+          "cp": "01150",
+          "id": 111,
+          "nom": "GEIQ GILA",
+          "siret": "80871321800028",
+          "ville": "SAINT VULBAS"
+        },
+        {
+          "antennes": [],
+          "cp": "71100",
+          "id": 112,
+          "nom": "GEIQ EMPLOI BOURGOGNE",
+          "siret": "75121328100015",
+          "ville": "CHALON-SUR-SAONE"
+        },
+        {
+          "antennes": [],
+          "cp": "33260",
+          "id": 113,
+          "nom": "GEIQ HPAA",
+          "siret": "40876100500037",
+          "ville": "LA TESTE DE BUCH"
+        },
+        {
+          "antennes": [],
+          "cp": "34300",
+          "id": 114,
+          "nom": "GEIQ HPA LR MULTISECTORIEL",
+          "siret": "44417629100011",
+          "ville": "AGDE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "92000",
+              "id": 88,
+              "nom": "Antenne de Nanterre",
+              "siret": "",
+              "ville": "NANTERRE"
+            },
+            {
+              "cp": "94150",
+              "id": 89,
+              "nom": "Antenne de Rungis",
+              "siret": "",
+              "ville": "RUNGIS"
+            },
+            {
+              "cp": "78457",
+              "id": 90,
+              "nom": "Antenne de Vélizy",
+              "siret": "",
+              "ville": "VELIZY VILLACOUBLAY"
+            }
+          ],
+          "cp": "93200",
+          "id": 115,
+          "nom": "GEIQ ILE-DE-FRANCE",
+          "siret": "49271220300040",
+          "ville": "SAINT-DENIS"
+        },
+        {
+          "antennes": [],
+          "cp": "42000",
+          "id": 116,
+          "nom": "GEIQ INDISLOIRE",
+          "siret": "52333760800021",
+          "ville": "SAINT-ETIENNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "88000",
+              "id": 190,
+              "nom": "Antenne Vosges",
+              "siret": "",
+              "ville": "EPINAL"
+            },
+            {
+              "cp": "54320",
+              "id": 158,
+              "nom": "ANTENNE DE MAXEVILLE",
+              "siret": "",
+              "ville": "MAXEVILLE"
+            },
+            {
+              "cp": "57070",
+              "id": 142,
+              "nom": "ANTENNE METZ",
+              "siret": "",
+              "ville": "METZ"
+            },
+            {
+              "cp": "68050",
+              "id": 91,
+              "nom": "ANTENNE DE MULHOUSE",
+              "siret": "",
+              "ville": "MULHOUSE"
+            }
+          ],
+          "cp": "67300",
+          "id": 117,
+          "nom": "GEIQ INDUS ALSACE-LORRAINE",
+          "siret": "43897603700046",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "29000",
+              "id": 148,
+              "nom": "Antenne de Quimper",
+              "siret": "",
+              "ville": "Quimper"
+            }
+          ],
+          "cp": "29804",
+          "id": 118,
+          "nom": "GEIQ INDUSTRIE 29",
+          "siret": "79499625600010",
+          "ville": "BREST CEDEX 09"
+        },
+        {
+          "antennes": [],
+          "cp": "44800",
+          "id": 119,
+          "nom": "GEIQ INDUSTRIE 44",
+          "siret": "79338212800015",
+          "ville": "SAINT-HERBLAIN"
+        },
+        {
+          "antennes": [],
+          "cp": "71104",
+          "id": 120,
+          "nom": "GEIQ INDUSTRIE 71",
+          "siret": "51833033700016",
+          "ville": "CHALON SUR SAONE CEDEX"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "13006",
+              "id": 92,
+              "nom": "Antenne de Marseille",
+              "siret": "50511654100028",
+              "ville": "MARSEILLE"
+            }
+          ],
+          "cp": "30200",
+          "id": 121,
+          "nom": "GEIQ INDUSTRIE GARD, VALLEE ET DELTA DU RHONE",
+          "siret": "50511654100044",
+          "ville": "BAGNOLS SUR CEZE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "38430",
+              "id": 184,
+              "nom": "Antenne de Moirans",
+              "siret": "",
+              "ville": "MOIRANS"
+            }
+          ],
+          "cp": "69008",
+          "id": 123,
+          "nom": "GEIQ INDUSTRIE ISERE RHONE",
+          "siret": "81272327800014",
+          "ville": "LYON"
+        },
+        {
+          "antennes": [],
+          "cp": "73290",
+          "id": 124,
+          "nom": "GEIQ INDUSTRIE SAVOIE",
+          "siret": "81774058200017",
+          "ville": "LA MOTTE SERVOLEX"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "25400",
+              "id": 73,
+              "nom": "Antenne d'Exincourt",
+              "siret": "42820205500052",
+              "ville": "EXINCOURT"
+            },
+            {
+              "cp": "39107",
+              "id": 72,
+              "nom": "Antenne de Dole",
+              "siret": "42820205500045",
+              "ville": "DOLE Cedex"
+            }
+          ],
+          "cp": "25043",
+          "id": 125,
+          "nom": "GEIQ INDUSTRIES FRANCHE-COMTE",
+          "siret": "42820205500037",
+          "ville": "BESANCON"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "88000",
+              "id": 191,
+              "nom": "Antenne Vosges",
+              "siret": "",
+              "ville": "EPINAL"
+            },
+            {
+              "cp": "68050",
+              "id": 93,
+              "nom": "ANTENNE DE MULHOUSE",
+              "siret": "",
+              "ville": "MULHOUSE Cedex"
+            }
+          ],
+          "cp": "67300",
+          "id": 126,
+          "nom": "GEIQ INTERPRO ALSACE",
+          "siret": "51102692400023",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [],
+          "cp": "73290",
+          "id": 127,
+          "nom": "GEIQ INTERPRO DES DEUX SAVOIE",
+          "siret": "52935445800018",
+          "ville": "LA MOTTE SERVOLEX"
+        },
+        {
+          "antennes": [],
+          "cp": "33500",
+          "id": 128,
+          "nom": "GEIQ INTERPRO LIBOURNAIS/HAUTE-GIRONDE",
+          "siret": "82129445100017",
+          "ville": "LIBOURNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "64075",
+              "id": 63,
+              "nom": "Antenne de Pau",
+              "siret": "53050708600029",
+              "ville": "PAU CEDEX"
+            }
+          ],
+          "cp": "40220",
+          "id": 129,
+          "nom": "GEIQ INTERPRO SUD AQUITAINE",
+          "siret": "53050708600045",
+          "ville": "TARNOS"
+        },
+        {
+          "antennes": [],
+          "cp": "39006",
+          "id": 130,
+          "nom": "GEIQ JURA QUALIF",
+          "siret": "82062963200010",
+          "ville": "LONS LE SAUNIER CEDEX"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "62500",
+              "id": 220,
+              "nom": "Antenne Saint-Omer",
+              "siret": "",
+              "ville": "SAINT-OMER"
+            }
+          ],
+          "cp": "59380",
+          "id": 131,
+          "nom": "GEIQ METALLURGIE INDUSTRIE HAUTS-DE-FRANCE",
+          "siret": "51812303900019",
+          "ville": "SOCX"
+        },
+        {
+          "antennes": [],
+          "cp": "62200",
+          "id": 132,
+          "nom": "GEIQ METIERS DE L'AUTOMOBILE ET DU POIDS LOURD",
+          "siret": "44312510900035",
+          "ville": "BOULOGNE SUR MER"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "06600",
+              "id": 69,
+              "nom": "Antenne Antibes",
+              "siret": "",
+              "ville": "ANTIBES"
+            }
+          ],
+          "cp": "73210",
+          "id": 133,
+          "nom": "GEIQ METIERS DU TOURISME PAYS DE SAVOIE",
+          "siret": "80784132500010",
+          "ville": "AIME"
+        },
+        {
+          "antennes": [],
+          "cp": "60400",
+          "id": 134,
+          "nom": "GEIQ MRH",
+          "siret": "42160280600059",
+          "ville": "NOYON"
+        },
+        {
+          "antennes": [],
+          "cp": "33130",
+          "id": 135,
+          "nom": "GEIQ MULTI AGRI 33",
+          "siret": "81061689600025",
+          "ville": "BEGLES"
+        },
+        {
+          "antennes": [],
+          "cp": "62110",
+          "id": 136,
+          "nom": "GEIQ MULTIPRO 59-62",
+          "siret": "75155909700017",
+          "ville": "HENIN-BEAUMONT"
+        },
+        {
+          "antennes": [],
+          "cp": "22000",
+          "id": 137,
+          "nom": "GEIQ 22 MULTI SECTEURS",
+          "siret": "79914163500018",
+          "ville": "SAINT-BRIEUC"
+        },
+        {
+          "antennes": [],
+          "cp": "56100",
+          "id": 138,
+          "nom": "GEIQ MULTISECTORIEL 56",
+          "siret": "81474176500014",
+          "ville": "LORIENT"
+        },
+        {
+          "antennes": [],
+          "cp": "97354",
+          "id": 139,
+          "nom": "GEIQ MULTISECTORIEL DE GUYANE",
+          "siret": "81764194700012",
+          "ville": "REMIRE-MONTJOLY"
+        },
+        {
+          "antennes": [],
+          "cp": "30900",
+          "id": 140,
+          "nom": "GEIQ MULTISECTORIEL GARD",
+          "siret": "78968304200020",
+          "ville": "NIMES"
+        },
+        {
+          "antennes": [],
+          "cp": "97441",
+          "id": 141,
+          "nom": "GEIQ MULTISECTORIEL REUNION",
+          "siret": "52771590800036",
+          "ville": "SAINTE-SUZANNE"
+        },
+        {
+          "antennes": [],
+          "cp": "34290",
+          "id": 142,
+          "nom": "GEIQ OC AGRI",
+          "siret": "53012370200033",
+          "ville": "MONTBLANC"
+        },
+        {
+          "antennes": [],
+          "cp": "73210",
+          "id": 143,
+          "nom": "GEIQ PAF PAYS DE SAVOIE",
+          "siret": "40104996000040",
+          "ville": "AIME"
+        },
+        {
+          "antennes": [],
+          "cp": "79000",
+          "id": 144,
+          "nom": "GEIQ PARCOURS TRANSPORTS",
+          "siret": "",
+          "ville": "NIORT"
+        },
+        {
+          "antennes": [],
+          "cp": "06296",
+          "id": 145,
+          "nom": "GEIQ PASTORALISME",
+          "siret": "48908681900013",
+          "ville": "NICE CEDEX 3"
+        },
+        {
+          "antennes": [],
+          "cp": "13015",
+          "id": 146,
+          "nom": "GEIQ PAYSAGES",
+          "siret": "42495996300051",
+          "ville": "MARSEILLE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "49400",
+              "id": 94,
+              "nom": "Antenne de Saumur",
+              "siret": "",
+              "ville": "SAUMUR"
+            },
+            {
+              "cp": "49000",
+              "id": 154,
+              "nom": "Antenne Cholet",
+              "siret": "",
+              "ville": "ANGERS"
+            }
+          ],
+          "cp": "49000",
+          "id": 147,
+          "nom": "GEIQ PRO 49",
+          "siret": "41948056100028",
+          "ville": "ANGERS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "34000",
+              "id": 222,
+              "nom": "Antenne de Montpellier",
+              "siret": "",
+              "ville": "MONTPELLIER"
+            },
+            {
+              "cp": "83000",
+              "id": 178,
+              "nom": "Antenne Toulon",
+              "siret": "",
+              "ville": "Toulon"
+            },
+            {
+              "cp": "83000",
+              "id": 179,
+              "nom": "Antenne Toulon",
+              "siret": "",
+              "ville": "Toulon"
+            }
+          ],
+          "cp": "13013",
+          "id": 148,
+          "nom": "GEIQ PROPRETE PACA",
+          "siret": "45086899700013",
+          "ville": "MARSEILLE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "44800",
+              "id": 96,
+              "nom": "Antenne Saint-Nazaire",
+              "siret": "45177794000029",
+              "ville": "Saint Herblain"
+            },
+            {
+              "cp": "35170",
+              "id": 176,
+              "nom": "Antenne de Rennes",
+              "siret": "45177794000037",
+              "ville": "BRUZ"
+            }
+          ],
+          "cp": "44800",
+          "id": 149,
+          "nom": "GEIQ PROPRETE LOIRE BRETAGNE",
+          "siret": "45177794000029",
+          "ville": "SAINT HERBLAIN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "49309",
+              "id": 169,
+              "nom": "Antenne de Cholet",
+              "siret": "",
+              "ville": "Cholet"
+            }
+          ],
+          "cp": "49100",
+          "id": 150,
+          "nom": "GEIQ PROPRETE MAINE-ET-LOIRE",
+          "siret": "78859631000029",
+          "ville": "ANGERS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "72000",
+              "id": 97,
+              "nom": "Antenne de Laval",
+              "siret": "44041441500040",
+              "ville": "LE MANS"
+            },
+            {
+              "cp": "37000",
+              "id": 193,
+              "nom": "Antenne de Tours",
+              "siret": "",
+              "ville": "Tours"
+            }
+          ],
+          "cp": "72000",
+          "id": 151,
+          "nom": "GEIQ PROPRETE CENTRE & MAINE",
+          "siret": "44041441500040",
+          "ville": "LE MANS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "61000",
+              "id": 147,
+              "nom": "Antenne d'Alençon",
+              "siret": "43356093500143",
+              "ville": "ALENÇON"
+            },
+            {
+              "cp": "27000",
+              "id": 100,
+              "nom": "Antenne d'Evreux",
+              "siret": "43356093500077",
+              "ville": "EVREUX"
+            },
+            {
+              "cp": "14000",
+              "id": 98,
+              "nom": "Antenne de Caen",
+              "siret": "43356093500051",
+              "ville": "CAEN"
+            },
+            {
+              "cp": "50100",
+              "id": 99,
+              "nom": "Antenne de Cherbourg",
+              "siret": "43356093500093",
+              "ville": "CHERBOURG"
+            },
+            {
+              "cp": "28300",
+              "id": 140,
+              "nom": "Antenne de Chartres",
+              "siret": "",
+              "ville": "MAINVILLIERS"
+            },
+            {
+              "cp": "76600",
+              "id": 101,
+              "nom": "Antenne du Havre",
+              "siret": "43356093500085",
+              "ville": "LE HAVRE"
+            }
+          ],
+          "cp": "76140",
+          "id": 152,
+          "nom": "GEIQ PEP'S",
+          "siret": "43356093500101",
+          "ville": "LE PETIT QUEVILLY"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "80000",
+              "id": 102,
+              "nom": "Antenne d'Amiens",
+              "siret": "80263673800022",
+              "ville": "AMIENS"
+            },
+            {
+              "cp": "59430",
+              "id": 221,
+              "nom": "Antenne de Dunkerque/Calais",
+              "siret": "",
+              "ville": "DUNKERQUE"
+            },
+            {
+              "cp": "60160",
+              "id": 153,
+              "nom": "Antenne de l'Oise",
+              "siret": "",
+              "ville": "MONTATAIRE"
+            },
+            {
+              "cp": "62000",
+              "id": 170,
+              "nom": "Antenne du Pas-de-Calais",
+              "siret": "",
+              "ville": "ARRAS"
+            }
+          ],
+          "cp": "59650",
+          "id": 153,
+          "nom": "GEIQ PROPRETE HAUTS-DE-FRANCE",
+          "siret": "80263673800014",
+          "ville": "VILLENEUVE D'ASCQ"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "64000",
+              "id": 103,
+              "nom": "Antenne de Pau",
+              "siret": "",
+              "ville": "PAU"
+            },
+            {
+              "cp": "33600",
+              "id": 155,
+              "nom": "Antenne de Pessac",
+              "siret": "",
+              "ville": "PESSAC"
+            }
+          ],
+          "cp": "64600",
+          "id": 154,
+          "nom": "GEIQ POP",
+          "siret": "44277589600024",
+          "ville": "ANGLET"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "69200",
+              "id": 107,
+              "nom": "Antenne de Vénissieux",
+              "siret": "43532668100010",
+              "ville": "VENISSIEUX"
+            },
+            {
+              "cp": "74000",
+              "id": 104,
+              "nom": "Antenne d'Annecy - Chambéry",
+              "siret": "43532668100069",
+              "ville": "ANNECY"
+            },
+            {
+              "cp": "38100",
+              "id": 105,
+              "nom": "Antenne de Grenoble",
+              "siret": "43532668100044",
+              "ville": "GRENOBLE"
+            },
+            {
+              "cp": "42000",
+              "id": 106,
+              "nom": "Antenne de Saint-Etienne - Roanne",
+              "siret": "43532668100036",
+              "ville": "SAINT ETIENNE"
+            }
+          ],
+          "cp": "69007",
+          "id": 155,
+          "nom": "GEIQ PROPRETE RHONE-ALPES",
+          "siret": "43532668100077",
+          "ville": "LYON"
+        },
+        {
+          "antennes": [],
+          "cp": "31400",
+          "id": 156,
+          "nom": "GEIQ PROPRETE OCCITANIE",
+          "siret": "43388796500039",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [],
+          "cp": "59300",
+          "id": 157,
+          "nom": "GEIQ PRO TP",
+          "siret": "40349467700038",
+          "ville": "AULNOY-LEZ-VALENCIENNES"
+        },
+        {
+          "antennes": [],
+          "cp": "13015",
+          "id": 158,
+          "nom": "GEIQ PROVENCE",
+          "siret": "49323107000035",
+          "ville": "MARSEILLE"
+        },
+        {
+          "antennes": [],
+          "cp": "59650",
+          "id": 159,
+          "nom": "GEIQ PSAL 59",
+          "siret": "51414568900014",
+          "ville": "VILLENEUVE D'ASCQ"
+        },
+        {
+          "antennes": [],
+          "cp": "92400",
+          "id": 160,
+          "nom": "GEIQ RELATION CLIENT IDF",
+          "siret": "53974090200017",
+          "ville": "COURBEVOIE"
+        },
+        {
+          "antennes": [],
+          "cp": "64000",
+          "id": 161,
+          "nom": "GEIQ SAD PAYS DE L'ADOUR",
+          "siret": "81352812200019",
+          "ville": "PAU"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "87000",
+              "id": 206,
+              "nom": "Antenne de Haute-Vienne",
+              "siret": "",
+              "ville": "LIMOGES"
+            }
+          ],
+          "cp": "33700",
+          "id": 162,
+          "nom": "GEIQ SAGE",
+          "siret": "79208140800025",
+          "ville": "MERIGNAC"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "06200",
+              "id": 207,
+              "nom": "Antenne de Nice",
+              "siret": "41812222200049",
+              "ville": "Nice"
+            }
+          ],
+          "cp": "69500",
+          "id": 163,
+          "nom": "GEIQ SERVICE EMPLOI PAYSAGE",
+          "siret": "41812222200031",
+          "ville": "BRON"
+        },
+        {
+          "antennes": [],
+          "cp": "69600",
+          "id": 164,
+          "nom": "GEIQ THEATRE",
+          "siret": "43273886200049",
+          "ville": "OULLINS-PIERRE-BENITE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "68050",
+              "id": 108,
+              "nom": "ANTENNE DE MULHOUSE",
+              "siret": "",
+              "ville": "MULHOUSE CEDEX"
+            }
+          ],
+          "cp": "67300",
+          "id": 165,
+          "nom": "GEIQ TP ALSACE",
+          "siret": "48968783000039",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [],
+          "cp": "69100",
+          "id": 166,
+          "nom": "GEIQ TP RHONE",
+          "siret": "39832280000028",
+          "ville": "VILLEURBANNE"
+        },
+        {
+          "antennes": [],
+          "cp": "42000",
+          "id": 167,
+          "nom": "GEIQ TRANSPORT 42",
+          "siret": "44080716200019",
+          "ville": "SAINT-ETIENNE"
+        },
+        {
+          "antennes": [],
+          "cp": "69800",
+          "id": 168,
+          "nom": "GEIQ TRANSPORT AVENIR EMPLOI RHONE-ALPES",
+          "siret": "49166880200037",
+          "ville": "SAINT PRIEST"
+        },
+        {
+          "antennes": [],
+          "cp": "62110",
+          "id": 169,
+          "nom": "GEIQ TRANSPORT ET LOGISTIQUE DES HAUTS-DE-FRANCE",
+          "siret": "43998437800018",
+          "ville": "HENIN BEAUMONT"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "33049",
+              "id": 181,
+              "nom": "Antenne de Bordeaux",
+              "siret": "",
+              "ville": "Bordeaux Cedex"
+            },
+            {
+              "cp": "33049",
+              "id": 117,
+              "nom": "ANTENNE DE BORDEAUX",
+              "siret": "",
+              "ville": "BORDEAUX CEDEX"
+            },
+            {
+              "cp": "86180",
+              "id": 182,
+              "nom": "ANTENNE DE POITIERS",
+              "siret": "",
+              "ville": "BRUXEROLLES"
+            }
+          ],
+          "cp": "87380",
+          "id": 170,
+          "nom": "GEIQ TRANSPORT NOUVELLE-AQUITAINE",
+          "siret": "53902799500049",
+          "ville": "SAINT-GERMAIN-LES-BELLES"
+        },
+        {
+          "antennes": [],
+          "cp": "44190",
+          "id": 171,
+          "nom": "GEIQ TRANSPORT PAYS DE LA LOIRE",
+          "siret": "42980501300027",
+          "ville": "CLISSON"
+        },
+        {
+          "antennes": [],
+          "cp": "33191",
+          "id": 172,
+          "nom": "GEIQ VAL DE GARONNE",
+          "siret": "40933840700011",
+          "ville": "LA REOLE"
+        },
+        {
+          "antennes": [],
+          "cp": "31200",
+          "id": 173,
+          "nom": "GEIQ VERT",
+          "siret": "41368291500033",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "95032",
+              "id": 215,
+              "nom": "Antenne du Val d'Oise",
+              "siret": "",
+              "ville": "Cergy-Pontoise"
+            }
+          ],
+          "cp": "28008",
+          "id": 174,
+          "nom": "GEIQ INDUSTRIE CENTRE-IDF",
+          "siret": "82228469100018",
+          "ville": "CHARTRES CEDEX"
+        },
+        {
+          "antennes": [],
+          "cp": "80560",
+          "id": 175,
+          "nom": "GEIQ A DOMICILE HAUTS-DE-FRANCE",
+          "siret": "82088631500010",
+          "ville": "ACHEUX EN AMIENOIS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "33700",
+              "id": 139,
+              "nom": "ANTENNE GIRONDE",
+              "siret": "",
+              "ville": "Merignac"
+            },
+            {
+              "cp": "64075",
+              "id": 138,
+              "nom": "ANTENNE DE PAU",
+              "siret": "",
+              "ville": "PAU CEDEX"
+            }
+          ],
+          "cp": "33700",
+          "id": 176,
+          "nom": "GEIQ DES INDUSTRIES TECHNOLOGIQUES D'AQUITAINE",
+          "siret": "82293150700013",
+          "ville": "MERIGNAC"
+        },
+        {
+          "antennes": [],
+          "cp": "59190",
+          "id": 177,
+          "nom": "GEIQ RURAL DES FLANDRES",
+          "siret": "82281431500013",
+          "ville": "HAZEBROUCK"
+        },
+        {
+          "antennes": [],
+          "cp": "01960",
+          "id": 181,
+          "nom": "GEIQ INDUSTRIE DE L'AIN",
+          "siret": "82381084100010",
+          "ville": "PERONNAS"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 182,
+          "nom": "TEST POUR IMPORT",
+          "siret": "",
+          "ville": "Paris"
+        },
+        {
+          "antennes": [],
+          "cp": "83100",
+          "id": 183,
+          "nom": "GEIQ A DOMICILE PROVENCE",
+          "siret": "82848815500015",
+          "ville": "TOULON"
+        },
+        {
+          "antennes": [],
+          "cp": "61002",
+          "id": 184,
+          "nom": "GEIQ MULTISECTORIEL ORNE-MANCHE",
+          "siret": "82906477300015",
+          "ville": "ALENCON"
+        },
+        {
+          "antennes": [],
+          "cp": "78103",
+          "id": 185,
+          "nom": "GEIQ SAP 78",
+          "siret": "83071831800017",
+          "ville": "LES MUREAUX"
+        },
+        {
+          "antennes": [],
+          "cp": "13140",
+          "id": 186,
+          "nom": "GEIQ GILAC",
+          "siret": "81178600300012",
+          "ville": "MIRAMAS"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "52100",
+              "id": 149,
+              "nom": "Antenne de Saint-Dizier",
+              "siret": "",
+              "ville": "Saint-Dizier"
+            },
+            {
+              "cp": "10430",
+              "id": 150,
+              "nom": "Antenne de Troyes",
+              "siret": "",
+              "ville": "ROSIERE-PRES-TROYES"
+            }
+          ],
+          "cp": "51100",
+          "id": 187,
+          "nom": "GEIQ INDUSTRIE DE LA CHAMPAGNE",
+          "siret": "83179083700015",
+          "ville": "REIMS"
+        },
+        {
+          "antennes": [],
+          "cp": "87200",
+          "id": 188,
+          "nom": "GEIQ PAPIER CARTON EMBALLAGES",
+          "siret": "83168745400015",
+          "ville": "SAINT-JUNIEN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "63360",
+              "id": 223,
+              "nom": "Antenne du Puy-de-Dôme",
+              "siret": "",
+              "ville": "GERZAT"
+            }
+          ],
+          "cp": "03400",
+          "id": 189,
+          "nom": "GEIQ TRANSPORT ET LOGISTIQUE D'AUVERGNE",
+          "siret": "83290411400010",
+          "ville": "YZEURE"
+        },
+        {
+          "antennes": [],
+          "cp": "72100",
+          "id": 190,
+          "nom": "JOUBERT",
+          "siret": "44041441500040",
+          "ville": "LE MANS"
+        },
+        {
+          "antennes": [],
+          "cp": "",
+          "id": 191,
+          "nom": "POURRET ",
+          "siret": "75121328100015",
+          "ville": ""
+        },
+        {
+          "antennes": [
+            {
+              "cp": "02200",
+              "id": 224,
+              "nom": "Antenne Soissons",
+              "siret": "",
+              "ville": "SOISSONS"
+            }
+          ],
+          "cp": "02400",
+          "id": 192,
+          "nom": "GEIQ DYNAMIC SUD AISNE",
+          "siret": "83483608200018",
+          "ville": "ETAMPES-SUR-MARNE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "88000",
+              "id": 192,
+              "nom": "Antenne Vosges",
+              "siret": "",
+              "ville": "EPINAL"
+            },
+            {
+              "cp": "68100",
+              "id": 171,
+              "nom": "Antenne de Mulhouse",
+              "siret": "",
+              "ville": " MULHOUSE"
+            },
+            {
+              "cp": "54320",
+              "id": 183,
+              "nom": "Antenne de Nancy",
+              "siret": "",
+              "ville": "MAXEVILLE"
+            },
+            {
+              "cp": "51100",
+              "id": 187,
+              "nom": "Antenne de Reims",
+              "siret": "84079383000067",
+              "ville": "REIMS"
+            },
+            {
+              "cp": "21000",
+              "id": 213,
+              "nom": "Antenne de Dijon",
+              "siret": "84079383000083",
+              "ville": "DIJON"
+            },
+            {
+              "cp": "57070",
+              "id": 151,
+              "nom": "ANTENNE DE Metz",
+              "siret": "",
+              "ville": "METZ"
+            }
+          ],
+          "cp": "67300",
+          "id": 193,
+          "nom": "GEIQ PROPRETE GRAND EST",
+          "siret": "84079383000026",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [],
+          "cp": "47500",
+          "id": 194,
+          "nom": "GEIQ 47",
+          "siret": "49463000700016",
+          "ville": "FUMEL"
+        },
+        {
+          "antennes": [],
+          "cp": "95500",
+          "id": 195,
+          "nom": "GEIQ RESSOURCES SCENIQUES ET EVENEMENTIELLES",
+          "siret": "83999221100012",
+          "ville": "GONESSE"
+        },
+        {
+          "antennes": [],
+          "cp": "21121",
+          "id": 196,
+          "nom": "GEIQ TRANSPORT BFC",
+          "siret": "84064579000014",
+          "ville": "AHUY"
+        },
+        {
+          "antennes": [],
+          "cp": "31240",
+          "id": 197,
+          "nom": "GEIQ TRANSPORTS OCCITANIE",
+          "siret": "84083476600015",
+          "ville": "L'UNION"
+        },
+        {
+          "antennes": [],
+          "cp": "76175",
+          "id": 198,
+          "nom": "GEIQ TRANSPORT NORMANDIE",
+          "siret": "84161662600013",
+          "ville": "ROUEN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "21500",
+              "id": 157,
+              "nom": "Antenne de Montbard",
+              "siret": "",
+              "ville": "MONTBARD"
+            }
+          ],
+          "cp": "21000",
+          "id": 199,
+          "nom": "GEIQ INDUSTRIE 21",
+          "siret": "84465272700018",
+          "ville": "DIJON"
+        },
+        {
+          "antennes": [],
+          "cp": "63800",
+          "id": 200,
+          "nom": "GEIQ INDUSTRIE AUVERGNE",
+          "siret": "84302481100013",
+          "ville": "COURNON D'AUVERGNE"
+        },
+        {
+          "antennes": [],
+          "cp": "76100",
+          "id": 201,
+          "nom": "GEIQ PLUSS",
+          "siret": "84219735200029",
+          "ville": "ROUEN"
+        },
+        {
+          "antennes": [],
+          "cp": "10510",
+          "id": 202,
+          "nom": "GEIQ SUD CHAMPAGNE",
+          "siret": "83412416600028",
+          "ville": "MAIZIERES-LA-GRANDE-PAROISSE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "84916",
+              "id": 180,
+              "nom": "Antenne Avignon",
+              "siret": "",
+              "ville": "Avignon Cedex 9"
+            }
+          ],
+          "cp": "13100",
+          "id": 203,
+          "nom": "GEIQ AVENIR CHR",
+          "siret": "84420613600013",
+          "ville": "AIX-EN-PROVENCE"
+        },
+        {
+          "antennes": [],
+          "cp": "35135",
+          "id": 204,
+          "nom": "GEIQ TRANSPORT LOGISTIQUE BRETAGNE",
+          "siret": "85029917300011",
+          "ville": "CHANTEPIE"
+        },
+        {
+          "antennes": [],
+          "cp": "77500",
+          "id": 208,
+          "nom": "GEIQ SAP 77 ",
+          "siret": "85220052600014",
+          "ville": "CHELLES"
+        },
+        {
+          "antennes": [],
+          "cp": "31100",
+          "id": 210,
+          "nom": "GEIQ NUMERIQUE OCCITANIE",
+          "siret": "85196766100014",
+          "ville": "TOULOUSE"
+        },
+        {
+          "antennes": [],
+          "cp": "91220",
+          "id": 211,
+          "nom": "GEIQ GELIES",
+          "siret": "85315702200015",
+          "ville": "BRETIGNY-SUR-ORGE"
+        },
+        {
+          "antennes": [],
+          "cp": "80700",
+          "id": 213,
+          "nom": "GEIQ DYNAMIC SOMME",
+          "siret": "84490596800013",
+          "ville": "ROYE"
+        },
+        {
+          "antennes": [],
+          "cp": "31600",
+          "id": 214,
+          "nom": "GEIQ DES INDUSTRIES D'OC TOULOUSE",
+          "siret": "85204997200015",
+          "ville": "MURET"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "08000",
+              "id": 201,
+              "nom": "Antenne de Charleville",
+              "siret": "",
+              "ville": ""
+            },
+            {
+              "cp": "08300",
+              "id": 202,
+              "nom": "Antenne de Rethel",
+              "siret": "",
+              "ville": ""
+            },
+            {
+              "cp": "08320",
+              "id": 203,
+              "nom": "Antenne de Vireux Molhain",
+              "siret": "",
+              "ville": ""
+            }
+          ],
+          "cp": "08200",
+          "id": 215,
+          "nom": "GEIQ DES ARDENNES INTERPRO",
+          "siret": "88020447400014",
+          "ville": "SEDAN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "06600",
+              "id": 163,
+              "nom": "Antenne d'Antibes",
+              "siret": "",
+              "ville": "ANTIBES"
+            }
+          ],
+          "cp": "73210",
+          "id": 216,
+          "nom": "GEIQ MER ET MONTAGNE",
+          "siret": "80784132500010",
+          "ville": "AIME"
+        },
+        {
+          "antennes": [],
+          "cp": "97400",
+          "id": 217,
+          "nom": "GEIQ AGRI 974",
+          "siret": "87978891700018",
+          "ville": "Saint-Denis"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 218,
+          "nom": "TEST IMPORT 1 ",
+          "siret": null,
+          "ville": "Paris"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 219,
+          "nom": "TEST IMPORT 2",
+          "siret": null,
+          "ville": "Paris"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 220,
+          "nom": "TEST IMPORT 3",
+          "siret": null,
+          "ville": "Paris"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 221,
+          "nom": "TEST IMPORT 4",
+          "siret": null,
+          "ville": "Paris"
+        },
+        {
+          "antennes": [],
+          "cp": "75010",
+          "id": 222,
+          "nom": "TEST IMPORT 5",
+          "siret": null,
+          "ville": "Paris"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "22600",
+              "id": 165,
+              "nom": "Antenne de Loudéac",
+              "siret": "",
+              "ville": "LOUDEAC"
+            }
+          ],
+          "cp": "22120",
+          "id": 223,
+          "nom": "GEIQ BREIZ'H",
+          "siret": "88131202900013",
+          "ville": "POMMERET"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "63800",
+              "id": 205,
+              "nom": "Antenne du Puy-de-Dôme",
+              "siret": "",
+              "ville": "COURNON"
+            }
+          ],
+          "cp": "03400",
+          "id": 224,
+          "nom": "GEIQ SPORT ET LOISIRS AUVERGNE",
+          "siret": "88916329100012",
+          "ville": "YZEURE"
+        },
+        {
+          "antennes": [],
+          "cp": "30900",
+          "id": 225,
+          "nom": "GEIQ PROFIL 30",
+          "siret": "88763753600020",
+          "ville": "NIMES"
+        },
+        {
+          "antennes": [],
+          "cp": "59000",
+          "id": 226,
+          "nom": "GEIQ PETITE ENFANCE - ANIMATION",
+          "siret": "88497043500019",
+          "ville": "LILLE"
+        },
+        {
+          "antennes": [],
+          "cp": "13480",
+          "id": 227,
+          "nom": "GEIQ SPORT PACA",
+          "siret": "88786866900011",
+          "ville": "CABRIES"
+        },
+        {
+          "antennes": [],
+          "cp": "75018",
+          "id": 228,
+          "nom": "GEIQ SPORT SOLUTIONS",
+          "siret": "84772127100025",
+          "ville": "PARIS"
+        },
+        {
+          "antennes": [],
+          "cp": "97680",
+          "id": 229,
+          "nom": "GEIQ MULTISECTORIEL HAZI MISOMO",
+          "siret": "88966746500013",
+          "ville": "TSINGONI"
+        },
+        {
+          "antennes": [],
+          "cp": "13090",
+          "id": 230,
+          "nom": "GEIQ ANIMATION LOISIRS RECREATIFS PACA",
+          "siret": "89306852800015",
+          "ville": "AIX EN PROVENCE"
+        },
+        {
+          "antennes": [],
+          "cp": "73290",
+          "id": 231,
+          "nom": "GEIQ DES TRANSPORTS ALPINS",
+          "siret": "89220622800017",
+          "ville": "LA MOTTE SERVOLEX"
+        },
+        {
+          "antennes": [],
+          "cp": "25000",
+          "id": 232,
+          "nom": "GEIQ PROFESSION SPORT ET LOISIRS FRANCHE-COMTE",
+          "siret": "89337401700018",
+          "ville": "BESANCON"
+        },
+        {
+          "antennes": [],
+          "cp": "90000",
+          "id": 233,
+          "nom": "GEIQ STAFF EMPLOI",
+          "siret": "89439058200019",
+          "ville": "BELFORT"
+        },
+        {
+          "antennes": [],
+          "cp": "13400",
+          "id": 234,
+          "nom": "GEIQ SILVER PACA",
+          "siret": "89352877800028",
+          "ville": "AUBAGNE"
+        },
+        {
+          "antennes": [],
+          "cp": "92000",
+          "id": 235,
+          "nom": "GEIQ HANDI'EMPLOI",
+          "siret": "89401763100017",
+          "ville": "NANTERRE"
+        },
+        {
+          "antennes": [],
+          "cp": "67300",
+          "id": 236,
+          "nom": "GEIQ TERRAJOB",
+          "siret": "88873612100011",
+          "ville": "SCHILTIGHEIM"
+        },
+        {
+          "antennes": [],
+          "cp": "",
+          "id": 237,
+          "nom": "GEIQ MULTI ASSOCIATIF AUSTRAL",
+          "siret": "",
+          "ville": ""
+        },
+        {
+          "antennes": [],
+          "cp": "64000",
+          "id": 238,
+          "nom": "GEIQ MOBILITE NOUVELLE AQUITAINE",
+          "siret": "90140551400026",
+          "ville": "PAU"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "58000",
+              "id": 162,
+              "nom": "Antenne de Nevers",
+              "siret": "",
+              "ville": "NEVERS"
+            }
+          ],
+          "cp": "18300",
+          "id": 239,
+          "nom": "GEIQ VITI NIEVRE ET CHER",
+          "siret": "89914355600020",
+          "ville": "VEAUGUES"
+        },
+        {
+          "antennes": [],
+          "cp": "21121",
+          "id": 240,
+          "nom": "GEIQ SALTO",
+          "siret": "89977406100035",
+          "ville": "Fontaine-lès-Dijon"
+        },
+        {
+          "antennes": [],
+          "cp": "97460",
+          "id": 241,
+          "nom": "GEIQ ASSOCIATIF MULTISECTORIEL AUSTRAL",
+          "siret": "89953432500019",
+          "ville": "SAINT-PAUL"
+        },
+        {
+          "antennes": [],
+          "cp": "85270",
+          "id": 242,
+          "nom": "GEIQ HPA VENDEE",
+          "siret": "90336174900018",
+          "ville": "SAINT-HILAIRE-DE-RIEZ"
+        },
+        {
+          "antennes": [],
+          "cp": "47901",
+          "id": 243,
+          "nom": "GEIQ BTP 47",
+          "siret": "89768702600012",
+          "ville": "AGEN CEDEX 9"
+        },
+        {
+          "antennes": [],
+          "cp": "49700",
+          "id": 244,
+          "nom": "GEIQ SANTE SOCIAL 49",
+          "siret": "90225722900010",
+          "ville": "DOUE-EN-ANJOU"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "46130",
+              "id": 194,
+              "nom": "ANTENNE DE BRETENOUX",
+              "siret": "",
+              "ville": "BRETENOUX"
+            },
+            {
+              "cp": "46100",
+              "id": 195,
+              "nom": "ANTENNE DE FIGEAC",
+              "siret": "",
+              "ville": "FIGEAC"
+            }
+          ],
+          "cp": "46000",
+          "id": 245,
+          "nom": "GEIQ MULTISECTORIEL 46",
+          "siret": "90167503300012",
+          "ville": "CAHORS"
+        },
+        {
+          "antennes": [],
+          "cp": "75012",
+          "id": 246,
+          "nom": "GEIQ IMPACT",
+          "siret": "90381277400011",
+          "ville": "PARIS"
+        },
+        {
+          "antennes": [],
+          "cp": "97460",
+          "id": 247,
+          "nom": "GEIQ BTP REUNION",
+          "siret": "90539682600018",
+          "ville": "SAINT-PAUL"
+        },
+        {
+          "antennes": [],
+          "cp": "49130",
+          "id": 248,
+          "nom": "GEIQ SPORT ET LOISIRS PAYS DE LA LOIRE",
+          "siret": "90906589800019",
+          "ville": "LES PONTS DE CE"
+        },
+        {
+          "antennes": [],
+          "cp": "33000",
+          "id": 249,
+          "nom": "GEIQ SPORT ET ANIMATION NOUVELLE-AQUITAINE",
+          "siret": "91089472400020",
+          "ville": "Bordeaux"
+        },
+        {
+          "antennes": [],
+          "cp": "95570",
+          "id": 250,
+          "nom": "GEIQ AIDE A DOMICILE 95",
+          "siret": "90830779600015",
+          "ville": "BOUFFEMONT"
+        },
+        {
+          "antennes": [],
+          "cp": "73290",
+          "id": 251,
+          "nom": "GEIQ NUMERIQUE DES ALPES",
+          "siret": "91145858600011",
+          "ville": "LA MOTTE SERVOLEX"
+        },
+        {
+          "antennes": [],
+          "cp": "81600",
+          "id": 252,
+          "nom": "GEIQ SAAD 81",
+          "siret": "90924473300012",
+          "ville": "GAILLAC"
+        },
+        {
+          "antennes": [],
+          "cp": "74960",
+          "id": 253,
+          "nom": "GEIQ AD 74",
+          "siret": "91457893500019",
+          "ville": "ANNECY"
+        },
+        {
+          "antennes": [],
+          "cp": "58000",
+          "id": 254,
+          "nom": "GEIQ SALSA 58",
+          "siret": "91107869900012",
+          "ville": "NEVERS"
+        },
+        {
+          "antennes": [],
+          "cp": "84000",
+          "id": 255,
+          "nom": "GEIQ AGRICOLE PROVENCE VAUCLUSE",
+          "siret": "91900620500018",
+          "ville": "AVIGNON"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "95880",
+              "id": 185,
+              "nom": "Antenne du Geiq SILVER Île-de-France",
+              "siret": "",
+              "ville": "Enghiens les bains"
+            }
+          ],
+          "cp": "78700",
+          "id": 256,
+          "nom": "GEIQ SILVER ILE-DE-FRANCE",
+          "siret": "92010661400018",
+          "ville": "CONFLANS SAINTE-HONORINE"
+        },
+        {
+          "antennes": [],
+          "cp": "35510",
+          "id": 257,
+          "nom": "GEIQ SPORT ET LOISIRS BRETAGNE",
+          "siret": "92262500900019",
+          "ville": "CESSON SEVIGNE"
+        },
+        {
+          "antennes": [],
+          "cp": "13007",
+          "id": 259,
+          "nom": "GEIQ METIERS DE LA MER",
+          "siret": "91387261000013",
+          "ville": "MARSEILLE"
+        },
+        {
+          "antennes": [],
+          "cp": "02140",
+          "id": 260,
+          "nom": "GEIQ AGRI 02",
+          "siret": "92377295800016",
+          "ville": "VERVINS"
+        },
+        {
+          "antennes": [],
+          "cp": "97600",
+          "id": 261,
+          "nom": "GEIQ SPORT ET LOISIRS MAYOTTE",
+          "siret": "92207620300012",
+          "ville": "MAMOUDZOU"
+        },
+        {
+          "antennes": [],
+          "cp": "33300",
+          "id": 262,
+          "nom": "GEIQ GESAAD 33",
+          "siret": "89375623900016",
+          "ville": "BORDEAUX"
+        },
+        {
+          "antennes": [],
+          "cp": "20250",
+          "id": 263,
+          "nom": "GEIQ CORSE INSERTION ALTERNANCE",
+          "siret": "92306785400011",
+          "ville": "CORTE"
+        },
+        {
+          "antennes": [],
+          "cp": "62150",
+          "id": 265,
+          "nom": "GEIQ MULTISECTORIEL ARTOIS",
+          "siret": "89400774900019",
+          "ville": "HOUDAIN"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "89000",
+              "id": 204,
+              "nom": "Antenne d'Auxerre",
+              "siret": "",
+              "ville": ""
+            }
+          ],
+          "cp": "21000",
+          "id": 266,
+          "nom": "GEIQ SAP BFC",
+          "siret": "92344463200015",
+          "ville": "DIJON"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "51000",
+              "id": 197,
+              "nom": "Antenne de Châlons en Champagne",
+              "siret": "",
+              "ville": "Châlons en Champagne"
+            },
+            {
+              "cp": "68000",
+              "id": 198,
+              "nom": "Antenne de Colmar",
+              "siret": "",
+              "ville": "COLMAR"
+            },
+            {
+              "cp": "67000",
+              "id": 196,
+              "nom": "Antenne de Strasbourg",
+              "siret": "",
+              "ville": "STRASBOURG"
+            }
+          ],
+          "cp": "54600",
+          "id": 267,
+          "nom": "GEIQ SPORT ET LOISIRS GRAND EST",
+          "siret": "92346400200016",
+          "ville": "VILLERS LES NANCY"
+        },
+        {
+          "antennes": [],
+          "cp": "35600",
+          "id": 268,
+          "nom": "GEIQ ANIME SPORTS ET LOISIRS",
+          "siret": "92326090500016",
+          "ville": "REDON"
+        },
+        {
+          "antennes": [],
+          "cp": "63800",
+          "id": 269,
+          "nom": "GEIQ EPI 2A",
+          "siret": "92385050700016",
+          "ville": "COURNON D'AUVERGNE"
+        },
+        {
+          "antennes": [],
+          "cp": "97300",
+          "id": 270,
+          "nom": "GEIQ JEUN'ESS",
+          "siret": "92374499900015",
+          "ville": "CAYENNE"
+        },
+        {
+          "antennes": [],
+          "cp": "62950",
+          "id": 271,
+          "nom": "GEIQ HRT",
+          "siret": "92417262000016",
+          "ville": "NOYELLES GODAULT"
+        },
+        {
+          "antennes": [],
+          "cp": "62128",
+          "id": 272,
+          "nom": "GEIQ TRM H2F",
+          "siret": "92459171200014",
+          "ville": "WANCOURT"
+        },
+        {
+          "antennes": [],
+          "cp": "14200",
+          "id": 273,
+          "nom": "GEIQ AD NORMANDIE",
+          "siret": "92429262600018",
+          "ville": "Hérouville-Saint-Clair"
+        },
+        {
+          "antennes": [],
+          "cp": "43000",
+          "id": 274,
+          "nom": "GEIQ HCRT 43",
+          "siret": "98532616400011",
+          "ville": "LE PUY EN VELAY"
+        },
+        {
+          "antennes": [],
+          "cp": null,
+          "id": 275,
+          "nom": "",
+          "siret": "",
+          "ville": ""
+        },
+        {
+          "antennes": [],
+          "cp": "97460",
+          "id": 276,
+          "nom": "GEIQ TERRITOIRE 974",
+          "siret": "92913272800015",
+          "ville": "Saint-Paul"
+        },
+        {
+          "antennes": [],
+          "cp": "84000",
+          "id": 277,
+          "nom": "GEIQ AUTO CAMION 2 ROUES SUD (AC2R)",
+          "siret": "92956087800019",
+          "ville": "AVIGNON"
+        },
+        {
+          "antennes": [],
+          "cp": "23000",
+          "id": 278,
+          "nom": "GEIQ SAD 23",
+          "siret": "93089185800019",
+          "ville": "GUERET"
+        },
+        {
+          "antennes": [],
+          "cp": "21240",
+          "id": 279,
+          "nom": "GEIQ SMS BFC",
+          "siret": "92461981000014",
+          "ville": "TALANT"
+        },
+        {
+          "antennes": [],
+          "cp": "67300",
+          "id": 280,
+          "nom": "GEIQ MOBILITES ALSACE-LORRAINE",
+          "siret": "",
+          "ville": "Schiltigheim"
+        },
+        {
+          "antennes": [],
+          "cp": "45400",
+          "id": 281,
+          "nom": "GEIQ TL VAL DE LOIRE",
+          "siret": "939301412*****",
+          "ville": "Fleury les Aubrais"
+        },
+        {
+          "antennes": [],
+          "cp": "76710",
+          "id": 282,
+          "nom": "GEIQ AIDE A DOMICILE ASSOCIATIF 76",
+          "siret": "93907175900012",
+          "ville": "MONTVILLE"
+        },
+        {
+          "antennes": [],
+          "cp": "20250",
+          "id": 283,
+          "nom": "GEIQ PRO SOLIDAIRE",
+          "siret": "",
+          "ville": "CORTE"
+        },
+        {
+          "antennes": [
+            {
+              "cp": "28300",
+              "id": 228,
+              "nom": "Antenne 28",
+              "siret": "",
+              "ville": "LEVES"
+            }
+          ],
+          "cp": "18000",
+          "id": 284,
+          "nom": "GEIQ SPORT ET LOISIRS CENTRE-VAL DE LOIRE",
+          "siret": "",
+          "ville": "BOURGES"
+        },
+        {
+          "antennes": [],
+          "cp": "30600",
+          "id": 285,
+          "nom": "GEIQ PROGRESS",
+          "siret": "83037684400023",
+          "ville": "VAUVERT"
+        },
+        {
+          "antennes": [],
+          "cp": "13127",
+          "id": 286,
+          "nom": "GEIQ TL PACA",
+          "siret": "",
+          "ville": "VITROLLES"
+        }
+      ]
+    },
+    "model": "geiq_assessments.labelinfos",
+    "pk": 1
+  }
+]
