@@ -1,11 +1,13 @@
 from urllib.parse import urlencode
 
 from allauth.account.views import LoginView
+from allauth.decorators import rate_limit
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
 from django_otp import login as otp_login
 
@@ -122,6 +124,10 @@ class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView)
     template_name = "account/login_job_seeker.html"
     user_kind = UserKind.JOB_SEEKER
     form_class = FindExistingUserViaEmailForm
+
+    @method_decorator(rate_limit(action="login"))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
