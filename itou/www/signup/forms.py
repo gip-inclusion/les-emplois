@@ -46,7 +46,6 @@ def _get_organization_data_from_api(siret):
 
     return {
         "siret": siret,
-        "is_head_office": establishment.is_head_office,
         "name": establishment.name,
         "address_line_1": establishment.address_line_1,
         "address_line_2": establishment.address_line_2,

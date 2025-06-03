@@ -119,9 +119,6 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     # prior to the mandatory siret).
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
     siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], null=True, blank=True)
-    is_head_office = models.BooleanField(
-        verbose_name="siège de l'entreprise", default=False, help_text="Information obtenue via API Entreprise."
-    )
     kind = models.CharField(
         verbose_name="type",
         max_length=20,
