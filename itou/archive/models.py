@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 
 
-class ArchivedJobSeeker(models.Model):
+class AnonymizedJobSeeker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # from User model
@@ -42,7 +42,7 @@ class ArchivedJobSeeker(models.Model):
         ordering = ["-archived_at"]
 
 
-class ArchivedApplication(models.Model):
+class AnonymizedApplication(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # job_seeker

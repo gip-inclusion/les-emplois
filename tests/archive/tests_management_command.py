@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
@@ -69,8 +69,8 @@ class TestNotifyArchiveUsersManagementCommand:
         unmodified_user = User.objects.get()
         assert user == unmodified_user
         assert not mailoutbox
-        assert not ArchivedJobSeeker.objects.exists()
-        assert not ArchivedApplication.objects.exists()
+        assert not AnonymizedJobSeeker.objects.exists()
+        assert not AnonymizedApplication.objects.exists()
 
     @pytest.mark.parametrize(
         "factory,kwargs",
@@ -103,7 +103,7 @@ class TestNotifyArchiveUsersManagementCommand:
         factory.create_batch(3, **kwargs)
         call_command("notify_archive_users", batch_size=2, wet_run=True)
 
-        assert ArchivedJobSeeker.objects.count() == 2
+        assert AnonymizedJobSeeker.objects.count() == 2
         assert User.objects.count() == 1
 
     @pytest.mark.parametrize(
@@ -393,7 +393,7 @@ class TestNotifyArchiveUsersManagementCommand:
 
         expected_user = User.objects.get()
         assert user == expected_user
-        assert not ArchivedJobSeeker.objects.exists()
+        assert not AnonymizedJobSeeker.objects.exists()
 
     @pytest.mark.parametrize(
         "kwargs,jobapplication_kwargs_list",
@@ -508,7 +508,7 @@ class TestNotifyArchiveUsersManagementCommand:
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
 
-        archived_jobseeker = ArchivedJobSeeker.objects.all().values(
+        archived_jobseeker = AnonymizedJobSeeker.objects.all().values(
             "date_joined",
             "first_login",
             "last_login",
@@ -557,7 +557,7 @@ class TestNotifyArchiveUsersManagementCommand:
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
-        assert ArchivedJobSeeker.objects.exists()
+        assert AnonymizedJobSeeker.objects.exists()
 
     @freeze_time("2025-02-15")
     @pytest.mark.parametrize(
@@ -682,7 +682,7 @@ class TestNotifyArchiveUsersManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_archive_users", wet_run=True)
 
-        archived_application = ArchivedApplication.objects.all().values(
+        archived_application = AnonymizedApplication.objects.all().values(
             "job_seeker_birth_year",
             "job_seeker_department_same_as_company_department",
             "sender_kind",

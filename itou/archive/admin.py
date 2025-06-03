@@ -4,7 +4,7 @@ from itou.archive import models
 from itou.utils.admin import ItouModelAdmin
 
 
-@admin.register(models.ArchivedJobSeeker)
+@admin.register(models.AnonymizedJobSeeker)
 class ArchiveJobSeekerAdmin(ItouModelAdmin):
     fields = (
         "date_joined",
@@ -29,7 +29,7 @@ class ArchiveJobSeekerAdmin(ItouModelAdmin):
     readonly_fields = fields
 
 
-@admin.register(models.ArchivedApplication)
+@admin.register(models.AnonymizedApplication)
 class ArchiveApplicationAdmin(ItouModelAdmin):
     fields = (
         "job_seeker_birth_year",
