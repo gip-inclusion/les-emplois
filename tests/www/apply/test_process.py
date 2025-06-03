@@ -210,6 +210,14 @@ class TestProcessViews:
         assertContains(response, job_application.resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
+        # Has a button to copy-paste job_seeker public_id
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert pretty_indented(content) == snapshot(name="copy_public_id")
+
     def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 
@@ -458,7 +466,7 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_details_for_prescriber(self, client):
+    def test_details_for_prescriber(self, client, snapshot):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         appelation = Appellation.objects.first()
@@ -506,6 +514,14 @@ class TestProcessViews:
 
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+
+        # Has a button to copy-paste job_seeker public_id
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert pretty_indented(content) == snapshot(name="copy_public_id")
 
     def test_details_for_prescriber_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
