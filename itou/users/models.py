@@ -431,6 +431,10 @@ class User(AbstractUser, AddressMixin):
     def __str__(self):
         return f"{self.kind} — pk={self.pk}"
 
+    @property
+    def pretty_display(self):
+        return f"{self.get_full_name()} — {self.email}"
+
     def set_old_values(self):
         self._old_values = self.__dict__.copy()
 
