@@ -27,12 +27,12 @@ class TestUserHijack:
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/foo/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has started impersonation of user={hijacked.pk}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assertRedirects(response, "/bar/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
     def test_disallowed_hijackers(self, client):
         hijacked = PrescriberFactory()
@@ -64,12 +64,12 @@ class TestUserHijack:
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/foo/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has started impersonation of user={hijacked.pk}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assertRedirects(response, "/bar/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
     def test_allowed_django_prescriber(self, client, caplog, settings):
         hijacked = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
@@ -78,12 +78,12 @@ class TestUserHijack:
 
         response = client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assertRedirects(response, "/foo/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has started impersonation of user={hijacked.pk}"
         caplog.clear()
 
         response = client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
         assertRedirects(response, "/bar/", fetch_redirect_response=False)
-        assert caplog.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+        assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
     def test_release_redirects_to_admin(self, client):
         hijacked = JobSeekerFactory()

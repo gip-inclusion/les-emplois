@@ -26,11 +26,11 @@ def has_hijack_perm(*, hijacker, hijacked):
 
 
 def hijack_started_signal(sender, hijacker, hijacked, request, **kwargs):
-    logger.info("admin=%s has started impersonation of user=%s", hijacker, hijacked)
+    logger.info("admin=%s has started impersonation of user=%s", hijacker.pk, hijacked.pk)
 
 
 def hijack_ended_signal(sender, hijacker, hijacked, request, **kwargs):
-    logger.info("admin=%s has ended impersonation of user=%s", hijacker, hijacked)
+    logger.info("admin=%s has ended impersonation of user=%s", hijacker.pk, hijacked.pk)
 
 
 signals.hijack_started.connect(hijack_started_signal)
