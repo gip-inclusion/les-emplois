@@ -1,0 +1,11 @@
+[
+  {
+    "fields": {
+      "review_deadline": "2025-08-01",
+      "submission_deadline": "2025-07-01",
+      "year": 2024
+    },
+    "model": "geiq_assessments.assessmentcampaign",
+    "pk": 1
+  }
+]
