@@ -8,7 +8,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
-from itou.archive.models import ArchivedApplication, ArchivedJobSeeker
+from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
@@ -61,7 +61,7 @@ def get_year_month_or_none(date=None):
 
 
 def anonymized_jobseeker(user):
-    return ArchivedJobSeeker(
+    return AnonymizedJobSeeker(
         date_joined=get_year_month_or_none(user.date_joined),
         first_login=get_year_month_or_none(user.first_login),
         last_login=get_year_month_or_none(user.last_login),
@@ -82,7 +82,7 @@ def anonymized_jobseeker(user):
 
 
 def anonymized_jobapplication(obj):
-    return ArchivedApplication(
+    return AnonymizedApplication(
         job_seeker_birth_year=(
             obj.job_seeker.jobseeker_profile.birthdate.year if obj.job_seeker.jobseeker_profile.birthdate else None
         ),
@@ -234,8 +234,8 @@ class Command(BaseCommand):
                     user,
                 ).send()
 
-            ArchivedJobSeeker.objects.bulk_create(archived_jobseekers)
-            ArchivedApplication.objects.bulk_create(archived_jobapplications)
+            AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
+            AnonymizedApplication.objects.bulk_create(archived_jobapplications)
             self._delete_jobseekers_with_related_objects(users_to_archive)
 
         self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
