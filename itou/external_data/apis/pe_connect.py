@@ -286,13 +286,13 @@ def import_user_pe_data(
                 pe_data_import.save()
 
             if status == ExternalDataImport.STATUS_OK:
-                logger.info("Stored external data for user %s", user)
+                logger.info("Stored external data for user=%s", user.pk)
             elif status == ExternalDataImport.STATUS_PARTIAL:
-                logger.warning("Could only fetch partial results for %s", user)
+                logger.warning("Could only fetch partial results for user=%s", user.pk)
             else:
-                logger.warning("Could not fetch any data for %s: not data stored", user)
+                logger.warning("Could not fetch any data for user=%s: not data stored", user.pk)
         except Exception as e:
-            logger.warning("Data import for %s failed: %s", user, e)
+            logger.warning("Data import for user=%s failed: %s", user.pk, e)
             pe_data_import.status = ExternalDataImport.STATUS_FAILED
             pe_data_import.save()
 
