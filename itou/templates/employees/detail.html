@@ -12,6 +12,9 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>Salarié : {{ job_seeker.get_full_name }}</h1>
+            <p id="copy_public_id">
+                {% include "includes/job_seekers/copy_public_id.html" with public_id=job_seeker.public_id small=True only %}
+            </p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
