@@ -605,7 +605,6 @@
                  "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
                  "prescribers_prescriberorganization"."automatic_geocoding_update",
                  "prescribers_prescriberorganization"."siret",
-                 "prescribers_prescriberorganization"."is_head_office",
                  "prescribers_prescriberorganization"."kind",
                  "prescribers_prescriberorganization"."is_brsa",
                  "prescribers_prescriberorganization"."phone",

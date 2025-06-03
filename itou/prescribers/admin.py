@@ -110,7 +110,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
                 "fields": (
                     "pk",
                     "siret",
-                    "is_head_office",
                     "kind",
                     "is_brsa",
                     "name",
@@ -161,7 +160,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
     list_display_links = ("pk", "name")
     list_filter = (
         AuthorizationValidationRequired,
-        "is_head_office",
         TmpMissingSiretFilter,
         TmpCanBeDeletedFilter,
         HasMembersFilter,
