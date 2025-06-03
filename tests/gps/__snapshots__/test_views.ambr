@@ -63,37 +63,37 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="row mb-3">
-                  <div class="col-12 col-sm">
-                      <h2>
-                          Informations
-                      </h2>
-                  </div>
-              </div>
-              <div class="c-box mb-5">
-                  <h3>
-                      Informations de contact
-                  </h3>
-                  <div class="row">
-                      <div class="col-12 col-md-6 mb-3 mb-md-0">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Nom
-                                  </small>
-                                  <strong>
-                                      D…
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Prénom
-                                  </small>
-                                  <strong>
-                                      J…
-                                  </strong>
-                              </li>
-                          </ul>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Informations
+                          </h2>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Informations de contact
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Nom
+                                      </small>
+                                      <strong>
+                                          D…
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Prénom
+                                      </small>
+                                      <strong>
+                                          J…
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -158,96 +158,87 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="row mb-3">
-                  <div class="col-12 col-sm">
-                      <h2>
-                          Informations
-                      </h2>
-                  </div>
-              </div>
-              <div class="c-box mb-5">
-                  <h3>
-                      Informations de contact
-                  </h3>
-                  <div class="row">
-                      <div class="col-12 col-md-6 mb-3 mb-md-0">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Nom
-                                  </small>
-                                  <strong>
-                                      DOE
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Prénom
-                                  </small>
-                                  <strong>
-                                      Jane
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Date de naissance
-                                  </small>
-                                  <strong>
-                                      01/01/1990
-                                  </strong>
-                              </li>
-                          </ul>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Informations
+                          </h2>
                       </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Téléphone
-                                  </small>
-                                  <strong>
-                                      06 12 34 56 78
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse e-mail
-                                  </small>
-                                  <strong>
-                                      jane.doe@test.local
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse
-                                  </small>
-                                  <ul class="list-unstyled mb-0">
-                                      <li>
-                                          <strong>
-                                              12 rue Georges Bizet
-                                          </strong>
-                                      </li>
-                                      <li>
-                                          <strong>
-                                              35000 Rennes
-                                          </strong>
-                                      </li>
-                                  </ul>
-                              </li>
-                          </ul>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Informations de contact
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Nom
+                                      </small>
+                                      <strong>
+                                          DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Prénom
+                                      </small>
+                                      <strong>
+                                          Jane
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Date de naissance
+                                      </small>
+                                      <strong>
+                                          01/01/1990
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Téléphone
+                                      </small>
+                                      <strong>
+                                          06 12 34 56 78
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse e-mail
+                                      </small>
+                                      <strong>
+                                          jane.doe@test.local
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <address>
+                                          12 rue Georges Bizet
+                                          <br/>
+                                          35000 Rennes
+                                      </address>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -312,105 +303,94 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="row mb-3">
-                  <div class="col-12 col-sm">
-                      <h2>
-                          Informations
-                      </h2>
-                  </div>
-                  <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                      <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
-                          <i aria-hidden="true" class="ri-pencil-line fw-medium">
-                          </i>
-                          <span>
-                              Modifier
-                          </span>
-                      </a>
-                  </div>
-              </div>
-              <div class="c-box mb-5">
-                  <h3>
-                      Informations de contact
-                  </h3>
-                  <div class="row">
-                      <div class="col-12 col-md-6 mb-3 mb-md-0">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Nom
-                                  </small>
-                                  <strong>
-                                      DOE
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Prénom
-                                  </small>
-                                  <strong>
-                                      Jane
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Date de naissance
-                                  </small>
-                                  <strong>
-                                      01/01/1990
-                                  </strong>
-                              </li>
-                          </ul>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Informations
+                          </h2>
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                              <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                              </i>
+                              <span>
+                                  Modifier
+                              </span>
+                          </a>
                       </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Téléphone
-                                  </small>
-                                  <strong>
-                                      06 12 34 56 78
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse e-mail
-                                  </small>
-                                  <strong>
-                                      jane.doe@test.local
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse
-                                  </small>
-                                  <ul class="list-unstyled mb-0">
-                                      <li>
-                                          <strong>
-                                              12 rue Georges Bizet
-                                          </strong>
-                                      </li>
-                                      <li>
-                                          <strong>
-                                              35000 Rennes
-                                          </strong>
-                                      </li>
-                                  </ul>
-                              </li>
-                          </ul>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Informations de contact
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Nom
+                                      </small>
+                                      <strong>
+                                          DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Prénom
+                                      </small>
+                                      <strong>
+                                          Jane
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Date de naissance
+                                      </small>
+                                      <strong>
+                                          01/01/1990
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Téléphone
+                                      </small>
+                                      <strong>
+                                          06 12 34 56 78
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse e-mail
+                                      </small>
+                                      <strong>
+                                          jane.doe@test.local
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <address>
+                                          12 rue Georges Bizet
+                                          <br/>
+                                          35000 Rennes
+                                      </address>
+                                  </li>
+                              </ul>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -475,121 +455,116 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="row mb-3">
-                  <div class="col-12 col-sm">
-                      <h2>
-                          Informations
-                      </h2>
-                  </div>
-              </div>
-              <div class="c-box mb-5">
-                  <h3>
-                      Informations de contact
-                  </h3>
-                  <div class="row">
-                      <div class="col-12 col-md-6 mb-3 mb-md-0">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Nom
-                                  </small>
-                                  <strong>
-                                      DOE
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Prénom
-                                  </small>
-                                  <strong>
-                                      Jane
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Date de naissance
-                                  </small>
-                                  <strong>
-                                      01/01/1990
-                                  </strong>
-                              </li>
-                          </ul>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Informations
+                          </h2>
                       </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Téléphone
-                                  </small>
-                                  <strong>
-                                      06 12 34 56 78
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Informations de contact
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Nom
+                                      </small>
+                                      <strong>
+                                          DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Prénom
+                                      </small>
+                                      <strong>
+                                          Jane
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Date de naissance
+                                      </small>
+                                      <strong>
+                                          01/01/1990
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Téléphone
+                                      </small>
+                                      <strong>
+                                          06 12 34 56 78
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse e-mail
+                                      </small>
+                                      <strong>
+                                          jane.doe@test.local
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <address>
+                                          12 rue Georges Bizet
+                                          <br/>
+                                          35000 Rennes
+                                      </address>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Diagnostic
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Niveau de formation
+                                      </small>
+                                      <strong>
+                                          Formation de niveau BAC
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Identifiant France Travail
+                                      </small>
+                                      <i class="text-disabled">
+                                          Non renseigné
                                       </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse e-mail
-                                  </small>
-                                  <strong>
-                                      jane.doe@test.local
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse
-                                  </small>
-                                  <ul class="list-unstyled mb-0">
-                                      <li>
-                                          <strong>
-                                              12 rue Georges Bizet
-                                          </strong>
-                                      </li>
-                                      <li>
-                                          <strong>
-                                              35000 Rennes
-                                          </strong>
-                                      </li>
-                                  </ul>
-                              </li>
-                          </ul>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                              </ul>
+                          </div>
                       </div>
                   </div>
-              </div>
-              <div class="c-box">
-                  <h3>
-                      Diagnostic
-                  </h3>
-                  <ul class="list-data list-data__two-column-lg">
-                      <li>
-                          <small>
-                              Niveau de formation
-                          </small>
-                          <strong>
-                              Formation de niveau BAC
-                          </strong>
-                      </li>
-                      <li>
-                          <small>
-                              Identifiant France Travail
-                          </small>
-                          <i class="text-disabled">
-                              Non renseigné
-                          </i>
-                      </li>
-                  </ul>
               </div>
           </div>
       </section>
@@ -652,130 +627,123 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="row mb-3">
-                  <div class="col-12 col-sm">
-                      <h2>
-                          Informations
-                      </h2>
-                  </div>
-                  <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                      <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/[PublicID of Beneficiary]?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
-                          <i aria-hidden="true" class="ri-pencil-line fw-medium">
-                          </i>
-                          <span>
-                              Modifier
-                          </span>
-                      </a>
-                  </div>
-              </div>
-              <div class="c-box mb-5">
-                  <h3>
-                      Informations de contact
-                  </h3>
-                  <div class="row">
-                      <div class="col-12 col-md-6 mb-3 mb-md-0">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Nom
-                                  </small>
-                                  <strong>
-                                      DOE
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Prénom
-                                  </small>
-                                  <strong>
-                                      Jane
-                                  </strong>
-                              </li>
-                              <li>
-                                  <small>
-                                      Date de naissance
-                                  </small>
-                                  <strong>
-                                      01/01/1990
-                                  </strong>
-                              </li>
-                          </ul>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Informations
+                          </h2>
+                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-primary" href="/dashboard/edit_job_seeker_info/[PublicID of Beneficiary]?back_url=/gps/groups/[PK of FollowUpGroup]/beneficiary">
+                              <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                              </i>
+                              <span>
+                                  Modifier
+                              </span>
+                          </a>
                       </div>
-                      <div class="col-12 col-md-6">
-                          <ul class="list-data">
-                              <li>
-                                  <small>
-                                      Téléphone
-                                  </small>
-                                  <strong>
-                                      06 12 34 56 78
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Informations de contact
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Nom
+                                      </small>
+                                      <strong>
+                                          DOE
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Prénom
+                                      </small>
+                                      <strong>
+                                          Jane
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Date de naissance
+                                      </small>
+                                      <strong>
+                                          01/01/1990
+                                      </strong>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Téléphone
+                                      </small>
+                                      <strong>
+                                          06 12 34 56 78
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse e-mail
+                                      </small>
+                                      <strong>
+                                          jane.doe@test.local
+                                      </strong>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span class="visually-hidden">
+                                              Copier
+                                          </span>
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Adresse
+                                      </small>
+                                      <address>
+                                          12 rue Georges Bizet
+                                          <br/>
+                                          35000 Rennes
+                                      </address>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <h3>
+                              Diagnostic
+                          </h3>
+                          <div class="list-data-group">
+                              <ul class="list-data">
+                                  <li>
+                                      <small>
+                                          Niveau de formation
+                                      </small>
+                                      <strong>
+                                          Formation de niveau BAC
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <small>
+                                          Identifiant France Travail
+                                      </small>
+                                      <i class="text-disabled">
+                                          Non renseigné
                                       </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse e-mail
-                                  </small>
-                                  <strong>
-                                      jane.doe@test.local
-                                  </strong>
-                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email" type="button">
-                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                      </i>
-                                      <span class="visually-hidden">
-                                          Copier
-                                      </span>
-                                  </button>
-                              </li>
-                              <li>
-                                  <small>
-                                      Adresse
-                                  </small>
-                                  <ul class="list-unstyled mb-0">
-                                      <li>
-                                          <strong>
-                                              12 rue Georges Bizet
-                                          </strong>
-                                      </li>
-                                      <li>
-                                          <strong>
-                                              35000 Rennes
-                                          </strong>
-                                      </li>
-                                  </ul>
-                              </li>
-                          </ul>
+                                  </li>
+                              </ul>
+                              <ul class="list-data">
+                              </ul>
+                          </div>
                       </div>
                   </div>
-              </div>
-              <div class="c-box">
-                  <h3>
-                      Diagnostic
-                  </h3>
-                  <ul class="list-data list-data__two-column-lg">
-                      <li>
-                          <small>
-                              Niveau de formation
-                          </small>
-                          <strong>
-                              Formation de niveau BAC
-                          </strong>
-                      </li>
-                      <li>
-                          <small>
-                              Identifiant France Travail
-                          </small>
-                          <i class="text-disabled">
-                              Non renseigné
-                          </i>
-                      </li>
-                  </ul>
               </div>
           </div>
       </section>
@@ -847,66 +815,70 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
-                  <h2 class="mb-0">
-                      Mon intervention
-                  </h2>
-                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
-                      <i aria-hidden="true" class="ri-pencil-line">
-                      </i>
-                      <span>
-                          Modifier
-                      </span>
-                  </a>
-              </div>
-              <div class="c-box mb-4">
-                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h3 class="mb-0">
-                          Période de l’accompagnement
-                      </h3>
-                      <div>
-                          <span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
-                              <i aria-hidden="true" class="ri-eye-close-line">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Mon intervention
+                          </h2>
+                          <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
+                              <i aria-hidden="true" class="ri-pencil-line">
                               </i>
-                              Accompagnement terminé
-                          </span>
+                              <span>
+                                  Modifier
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                              <h3 class="mb-0">
+                                  Période de l’accompagnement
+                              </h3>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-emploi-light text-primary">
+                                      <i aria-hidden="true" class="ri-eye-close-line">
+                                      </i>
+                                      Accompagnement terminé
+                                  </span>
+                              </div>
+                          </div>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Date de début
+                                  </small>
+                                  <strong>
+                                      juin 2024
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Date de fin
+                                  </small>
+                                  <strong>
+                                      juin 2024
+                                  </strong>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                              <h3 class="mb-0">
+                                  Motif de l’intervention
+                              </h3>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                      <i aria-hidden="true" class="ri-map-pin-user-line">
+                                      </i>
+                                      Référent⸱e
+                                  </span>
+                              </div>
+                          </div>
+                          <strong>
+                              parce que
+                          </strong>
                       </div>
                   </div>
-                  <ul class="list-data list-data__two-column-lg">
-                      <li>
-                          <small>
-                              Date de début
-                          </small>
-                          <strong>
-                              juin 2024
-                          </strong>
-                      </li>
-                      <li>
-                          <small>
-                              Date de fin
-                          </small>
-                          <strong>
-                              juin 2024
-                          </strong>
-                      </li>
-                  </ul>
-              </div>
-              <div class="c-box mb-4">
-                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h3 class="mb-0">
-                          Motif de l’intervention
-                      </h3>
-                      <div>
-                          <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                              <i aria-hidden="true" class="ri-map-pin-user-line">
-                              </i>
-                              Référent⸱e
-                          </span>
-                      </div>
-                  </div>
-                  <strong>
-                      parce que
-                  </strong>
               </div>
           </div>
       </section>
@@ -978,66 +950,70 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
-              <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
-                  <h2 class="mb-0">
-                      Mon intervention
-                  </h2>
-                  <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
-                      <i aria-hidden="true" class="ri-pencil-line">
-                      </i>
-                      <span>
-                          Modifier
-                      </span>
-                  </a>
-              </div>
-              <div class="c-box mb-4">
-                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h3 class="mb-0">
-                          Période de l’accompagnement
-                      </h3>
-                      <div>
-                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-eye-line">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                          <h2 class="mb-0">
+                              Mon intervention
+                          </h2>
+                          <a class="btn btn-ico btn-primary" href="/gps/groups/[PK of FollowUpGroup]/edition?back_url=/gps/groups/list">
+                              <i aria-hidden="true" class="ri-pencil-line">
                               </i>
-                              Accompagnement en cours
-                          </span>
+                              <span>
+                                  Modifier
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                              <h3 class="mb-0">
+                                  Période de l’accompagnement
+                              </h3>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-eye-line">
+                                      </i>
+                                      Accompagnement en cours
+                                  </span>
+                              </div>
+                          </div>
+                          <ul class="list-data">
+                              <li>
+                                  <small>
+                                      Date de début
+                                  </small>
+                                  <strong>
+                                      juin 2024
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Date de fin
+                                  </small>
+                                  <span class="text-disabled">
+                                      (accompagnement en cours)
+                                  </span>
+                              </li>
+                          </ul>
+                      </div>
+                      <div class="c-box mb-3 mb-md-4">
+                          <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
+                              <h3 class="mb-0">
+                                  Motif de l’intervention
+                              </h3>
+                              <div>
+                                  <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                                      <i aria-hidden="true" class="ri-map-pin-user-line">
+                                      </i>
+                                      Référent⸱e
+                                  </span>
+                              </div>
+                          </div>
+                          <i class="text-disabled">
+                              Non renseigné
+                          </i>
                       </div>
                   </div>
-                  <ul class="list-data list-data__two-column-lg">
-                      <li>
-                          <small>
-                              Date de début
-                          </small>
-                          <strong>
-                              juin 2024
-                          </strong>
-                      </li>
-                      <li>
-                          <small>
-                              Date de fin
-                          </small>
-                          <span class="text-disabled">
-                              (accompagnement en cours)
-                          </span>
-                      </li>
-                  </ul>
-              </div>
-              <div class="c-box mb-4">
-                  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                      <h3 class="mb-0">
-                          Motif de l’intervention
-                      </h3>
-                      <div>
-                          <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                              <i aria-hidden="true" class="ri-map-pin-user-line">
-                              </i>
-                              Référent⸱e
-                          </span>
-                      </div>
-                  </div>
-                  <i class="text-disabled">
-                      Non renseigné
-                  </i>
               </div>
           </div>
       </section>
@@ -1305,7 +1281,7 @@
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
-          <ul class="list-data mb-3">
+          <ul class="list-data">
               <li>
                   <small>
                       Motif de l’accompagnement
@@ -1314,8 +1290,6 @@
                       Non renseigné
                   </i>
               </li>
-          </ul>
-          <ul class="list-data list-data__two-column-md">
               <li>
                   <small>
                       Adresse e-mail
@@ -1384,7 +1358,7 @@
       </div>
       <hr class="m-0"/>
       <div class="c-box--results__body">
-          <ul class="list-data mb-3">
+          <ul class="list-data">
               <li>
                   <small>
                       Motif de l’accompagnement
@@ -1393,8 +1367,6 @@
                       Non renseigné
                   </i>
               </li>
-          </ul>
-          <ul class="list-data list-data__two-column-md">
               <li>
                   <small>
                       Adresse e-mail
@@ -1488,7 +1460,7 @@
           <div class="s-section__container container">
               <div class="row">
                   <div class="col-12" id="gps_intervenants">
-                      <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                      <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
                           <h2 class="mb-0">
                               Intervenants
                           </h2>
@@ -1552,7 +1524,7 @@
                               </div>
                               <hr class="m-0"/>
                               <div class="c-box--results__body">
-                                  <ul class="list-data mb-3">
+                                  <ul class="list-data">
                                       <li>
                                           <small>
                                               Motif de l’accompagnement
@@ -1561,8 +1533,6 @@
                                               iae
                                           </strong>
                                       </li>
-                                  </ul>
-                                  <ul class="list-data list-data__two-column-md">
                                       <li>
                                           <small>
                                               Adresse e-mail
@@ -1626,7 +1596,7 @@
                               </div>
                               <hr class="m-0"/>
                               <div class="c-box--results__body">
-                                  <ul class="list-data mb-3">
+                                  <ul class="list-data">
                                       <li>
                                           <small>
                                               Motif de l’accompagnement
@@ -1635,8 +1605,6 @@
                                               Non renseigné
                                           </i>
                                       </li>
-                                  </ul>
-                                  <ul class="list-data list-data__two-column-md">
                                       <li>
                                           <small>
                                               Adresse e-mail

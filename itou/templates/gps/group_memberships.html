@@ -8,7 +8,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12" id="gps_intervenants">
-                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between mb-3 mb-md-4">
+                    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
                         <h2 class="mb-0">Intervenants</h2>
                         <a href="{{ request_new_participant_form_url }}" id="request-new-participant-link" class="btn btn-ico btn-primary">
                             <i class="ri-user-add-line" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
                                 </div>
                                 <hr class="m-0">
                                 <div class="c-box--results__body">
-                                    <ul class="list-data mb-3">
+                                    <ul class="list-data">
                                         <li>
                                             <small>Motif de l’accompagnement</small>
                                             {% if membership.reason %}
@@ -82,8 +82,6 @@
                                                 <i class="text-disabled">Non renseigné</i>
                                             {% endif %}
                                         </li>
-                                    </ul>
-                                    <ul class="list-data list-data__two-column-md">
                                         <li>
                                             <small>Adresse e-mail</small>
                                             {% if membership.member_id != request.user.pk %}
