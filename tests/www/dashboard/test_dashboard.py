@@ -748,9 +748,8 @@ class TestDashboardView:
             "diagnostic d’éligibilité IAE."
         )
         WAITING_PERIOD_WITHOUT_DIAGNOSIS = (
-            "Pour en avoir un nouveau et pouvoir retravailler dans une structure d’insertion un prescripteur habilité "
-            "doit réaliser un nouveau diagnostic d’éligibilité IAE : France Travail, Mission Locale, Cap emploi par "
-            "exemple."
+            "Pour en obtenir un nouveau et retravailler dans une structure d’insertion, un prescripteur habilité doit "
+            "réaliser un nouveau diagnostic d’éligibilité (France Travail, Mission Locale, Cap Emploi…)."
         )
         HOW_TO_GET_PASS = (
             "Pour obtenir un PASS IAE, vous devez avoir un diagnostic d’éligibilité à l’IAE valide et avoir une "
