@@ -40,6 +40,9 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
                         logger.warning(
                             "Request using token (%r) without datadog_info() method: please define one", token
                         )
+            if session := getattr(wsgi_request, "session", None):
+                if hijack_history := session.get("hijack_history", []):
+                    log_entry_dict["usr.hijack_history"] = hijack_history
         if (command_info := get_current_command_info()) is not None:
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
