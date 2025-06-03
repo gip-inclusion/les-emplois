@@ -400,6 +400,10 @@ class User(AbstractUser, AddressMixin):
         self.set_old_values()
 
     def __str__(self):
+        return f"{self.kind} — pk={self.pk}"
+
+    @property
+    def display_with_pii(self):
         return f"{self.get_full_name()} — {self.email}"
 
     def set_old_values(self):
@@ -1192,7 +1196,7 @@ class JobSeekerProfile(models.Model):
         ]
 
     def __str__(self):
-        return str(self.user)
+        return f"JobSeekerProfile — pk={self.pk}"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
