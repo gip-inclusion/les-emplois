@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.users import admin
 from itou.users.enums import IdentityCertificationAuthorities
@@ -241,3 +241,76 @@ def test_admin_membership(admin_client, membership_factory):
         "is_active=True is_admin=False" in user_remark.remark
     )
     assert f"Désactivation de {inactive_membership}" not in user_remark.remark
+
+
+def test_change_email(admin_client, caplog):
+    user = JobSeekerFactory(with_verified_email=True)
+    response = admin_client.post(
+        reverse("admin:users_user_change", kwargs={"object_id": user.pk}),
+        {
+            "username": user.username,
+            "email": "new@mailinator.com",
+            "last_login_0": "21/02/2025",
+            "last_login_1": "09:46:54",
+            "date_joined_0": "19/02/2025",
+            "date_joined_1": "18:00:47",
+            "initial-date_joined_0": "19/02/2025",
+            "initial-date_joined_1": "18:00:47",
+            "last_checked_at_0": "19/02/2025",
+            "last_checked_at_1": "18:00:47",
+            "initial-last_checked_at_0": "19/02/2025",
+            "initial-last_checked_at_1": "18:00:47",
+            "title": "",
+            "phone": "",
+            "address_line_1": "",
+            "address_line_2": "",
+            "post_code": "",
+            "department": "",
+            "city": "",
+            "created_by": "",
+            "approvals-TOTAL_FORMS": "0",
+            "approvals-INITIAL_FORMS": "0",
+            "approvals-MIN_NUM_FORMS": "0",
+            "approvals-MAX_NUM_FORMS": "0",
+            "emailaddress_set-TOTAL_FORMS": "0",
+            "emailaddress_set-INITIAL_FORMS": "0",
+            "emailaddress_set-MIN_NUM_FORMS": "0",
+            "emailaddress_set-MAX_NUM_FORMS": "0",
+            "eligibility_diagnoses-TOTAL_FORMS": "0",
+            "eligibility_diagnoses-INITIAL_FORMS": "0",
+            "eligibility_diagnoses-MIN_NUM_FORMS": "0",
+            "eligibility_diagnoses-MAX_NUM_FORMS": "0",
+            "geiq_eligibility_diagnoses-TOTAL_FORMS": "0",
+            "geiq_eligibility_diagnoses-INITIAL_FORMS": "0",
+            "geiq_eligibility_diagnoses-MIN_NUM_FORMS": "0",
+            "geiq_eligibility_diagnoses-MAX_NUM_FORMS": "0",
+            "job_applications-TOTAL_FORMS": "0",
+            "job_applications-INITIAL_FORMS": "0",
+            "job_applications-MIN_NUM_FORMS": "0",
+            "job_applications-MAX_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": "",
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            "_save": "Enregistrer",
+        },
+    )
+    assertRedirects(response, reverse("admin:users_user_changelist"))
+    assert f"Deleted 1 EmailAddress for user pk={user.pk}." in caplog.messages
+    assert f"Created primary, verified EmailAddress for user pk={user.pk}." in caplog.messages
+    user.refresh_from_db()
+    assert user.email == "new@mailinator.com"
+    assertQuerySetEqual(
+        user.emailaddress_set.all(),
+        [(user.pk, "new@mailinator.com", True, True)],
+        transform=lambda emailaddress: (
+            emailaddress.user_id,
+            emailaddress.email,
+            emailaddress.primary,
+            emailaddress.verified,
+        ),
+    )
