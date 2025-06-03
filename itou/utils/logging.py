@@ -1,3 +1,4 @@
+import contextlib
 import logging
 
 from django_datadog_logger.formatters import datadog
@@ -9,6 +10,24 @@ logger = logging.getLogger(__name__)
 
 
 NO_RECURSIVE_LOG_FLAG = "_no_recursive_log_flag"
+
+
+@contextlib.contextmanager
+def suppress_logs(logger: logging.Logger):
+    """Context manager to temporarily disable logs.
+    # Inspired by https://gist.github.com/iansan5653/28ce8ec2c50d507f0543b0b17cdc2637
+    # Arguments
+        logger (logging.Logger): #logging.Logger object to disable.
+
+    # Usage
+        ```python
+           with suppress_logs(some_logger):
+               pass
+        ```
+    """
+    logger.disabled = True
+    yield
+    logger.disabled = False
 
 
 class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
