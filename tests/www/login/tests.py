@@ -328,6 +328,21 @@ class TestJobSeekerPreLogin:
             ],
         )
 
+    def test_rate_limits(self, client):
+        user = JobSeekerFactory()
+        url = reverse("login:job_seeker")
+        form_data = {
+            "login": user.email,
+            "password": "wrong_password",
+        }
+        with freeze_time("2024-09-12T00:00:00Z"):
+            # Default rate limit is 30 requests per minute
+            for i in range(30):
+                response = client.post(url, data=form_data)
+                assert response.status_code == 200
+            response = client.post(url, data=form_data)
+            assertContains(response, "trop de requêtes", status_code=429)
+
 
 class TestExistingUserLogin:
     UNSUPPORTED_IDENTITY_PROVIDER_TEXT = "Le mode de connexion associé à ce compte est désactivé"
