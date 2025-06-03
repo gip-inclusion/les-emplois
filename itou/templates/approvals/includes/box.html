@@ -105,13 +105,14 @@ Arguments:
                         <a href="{% url 'search:employers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">Vous pouvez désormais travailler dans une structure d’insertion.</a>
                     </p>
                 {% else %}
-                    <p class="fs-sm mb-0">Votre PASS IAE a expiré depuis moins de 2 ans.</p>
-                    <p class="fs-sm my-0">
-                        Pour en avoir un nouveau et pouvoir retravailler dans une structure d’insertion un prescripteur habilité doit réaliser un nouveau diagnostic d’éligibilité IAE :
-                        France Travail, Mission Locale, Cap emploi par exemple.
+                    <p class="fs-sm mb-0">
+                        <b>Votre PASS IAE a expiré depuis moins de 2 ans.</b>
                     </p>
                     <p class="fs-sm my-0">
-                        <a href="{% url 'search:prescribers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}">Trouvez-en à côté de chez vous en faisant une recherche.</a>
+                        Pour en obtenir un nouveau et retravailler dans une structure d’insertion, un prescripteur habilité doit réaliser un nouveau diagnostic d’éligibilité (France Travail, Mission Locale, Cap Emploi…).
+                    </p>
+                    <p class="fs-sm my-0">
+                        <a href="{% url 'search:prescribers_results' %}{% if approval.user.jobseeker_profile.hexa_commune.city %}?city={{ approval.user.jobseeker_profile.hexa_commune.city.slug }}{% endif %}"><b>Cliquez ici pour trouver un prescripteur près de chez vous.</b></a>
                     </p>
                 {% endif %}
             {% endif %}
