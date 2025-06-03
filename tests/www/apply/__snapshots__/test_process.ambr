@@ -1035,6 +1035,20 @@
 # name: TestProcessTransferJobApplication.test_job_application_transfer_redirection[job application transfer message]
   'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
+# name: TestProcessViews.test_details_for_company_from_approval[copy_public_id]
+  '''
+  <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
+      <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="PUBLIC_ID" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+          </i>
+          <span>
+              Copier l'ID du candidat
+          </span>
+      </button>
+  </div>
+  
+  '''
+# ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
     'num_queries': 23,
@@ -4420,6 +4434,20 @@
           </span>
       </li>
   </ul>
+  
+  '''
+# ---
+# name: TestProcessViews.test_details_for_prescriber[copy_public_id]
+  '''
+  <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
+      <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="PUBLIC_ID" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+          </i>
+          <span>
+              Copier l'ID du candidat
+          </span>
+      </button>
+  </div>
   
   '''
 # ---

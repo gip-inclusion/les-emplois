@@ -70,8 +70,15 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
                     <div class="s-section__row row">
-                        <div class="col-12 col-lg-8 order-2 order-lg-1">
-                            <h2>Informations générales</h2>
+                        <div class="col-12 col-lg-12 order-2 order-lg-1">
+                            <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                                <h2 class="mb-0">Informations générales</h2>
+                                <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
+                                    {% include "includes/job_seekers/copy_public_id.html" with public_id=job_application.job_seeker.public_id only %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-8 order-3 order-lg-2">
                             {# Job seeker info ------------------------------------------------------------------------- #}
                             <div class="c-box mb-3 mb-md-4">
                                 {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request with_matomo_event=True csrf_token=csrf_token SenderKind=SenderKind only %}
@@ -114,7 +121,7 @@
                             {# Negative answers ------------------------------------------------------------------------- #}
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
-                        <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                        <div class="col-12 col-lg-4 order-1 order-lg-2">
                             {% block sidebar %}{{ block.super }}{% endblock %}
                         </div>
                     </div>
