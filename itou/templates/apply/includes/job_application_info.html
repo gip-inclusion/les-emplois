@@ -2,7 +2,7 @@
 
 {% if job_application.message %}
     <ul class="list-data mb-3">
-        <li>
+        <li class="has-forced-line-break">
             <small>Message de candidature</small>
             <blockquote class="blockquote mt-2 mb-0">
                 {{ job_application.message|linebreaks }}
@@ -13,7 +13,7 @@
 
 {% if job_application.to_company != request.current_organization %}
     <hr class="my-4">
-    <ul class="list-data list-data__two-column-md mb-3">
+    <ul class="list-data mb-3">
         <li>
             <small>Employeur destinataire</small>
             <a class="btn btn-link" href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}"><strong>{{ job_application.to_company.display_name }}</strong></a>
@@ -25,7 +25,7 @@
     <span class="d-block fs-sm">
         {% if jobs %}{{ jobs|length }}{% endif %}
     {{ jobs|pluralizefr:"Poste recherché,Postes recherchés" }}</span>
-    <ul class="list-group list-group-flush">
+    <ul class="list-group list-group-flush mt-2">
         {% for job in jobs %}
             <li class="list-group-item list-group-item-action py-2">
                 <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">

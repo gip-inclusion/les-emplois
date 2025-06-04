@@ -54,7 +54,7 @@
 
         {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis %}
 
-        <p>
+        <p class="mb-0">
             <i>
                 {% if is_sent_by_authorized_prescriber %}
                     Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au

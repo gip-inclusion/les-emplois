@@ -60,7 +60,7 @@
                         <div class="col-12 col-lg-8 order-2 order-lg-1">
                             <h2>Informations générales</h2>
                             {# Job seeker info ------------------------------------------------------------------------- #}
-                            <div class="c-box mb-4">
+                            <div class="c-box mb-3 mb-md-4">
                                 {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
                                 {% if job_application.to_company.kind == CompanyKind.GEIQ %}
                                     {# GEIQ eligibility details #}
@@ -72,7 +72,7 @@
                             </div>
 
                             {# Job application info ------------------------------------------------------------------------- #}
-                            <div class="c-box mb-4">
+                            <div class="c-box mb-3 mb-md-4">
                                 <h2>Candidature</h2>
                                 {# Sender info ------------------------------------------------------------------------- #}
                                 {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
