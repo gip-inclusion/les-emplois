@@ -1,5 +1,5 @@
 {% load badges %}
-<div class="c-box mb-3 mb-lg-5">
+<div class="c-box mb-3 mb-md-4">
     <div class="row mb-3">
         <div class="col-12 col-sm">
             {% if kind == "IAE" %}
@@ -21,7 +21,7 @@
             {% endif %}
         </div>
     </div>
-    <ul class="list-data list-data__two-column-md mb-3">
+    <ul class="list-data mb-3">
         <li>
             <small>Confirmé par</small>
             <strong>{{ eligibility_diagnosis.author.get_full_name }}

@@ -51,7 +51,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -180,7 +180,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -198,7 +198,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -313,7 +313,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -442,7 +442,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -460,7 +460,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -559,7 +559,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -759,7 +759,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -888,7 +888,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -906,7 +906,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -936,7 +936,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -954,7 +954,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -1973,7 +1973,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2102,7 +2102,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2120,7 +2120,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -2245,7 +2245,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2374,7 +2374,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2392,7 +2392,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -2486,7 +2486,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2679,7 +2679,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2808,7 +2808,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -2826,7 +2826,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -2927,7 +2927,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -3056,7 +3056,7 @@
                                               </li>
                                           </ul>
                                       </div>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -3074,7 +3074,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data list-data__two-column-md mb-3">
+                                          <ul class="list-data mb-3">
                                               <li>
                                                   <small>
                                                       Confirmé par
@@ -3168,7 +3168,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
@@ -3361,7 +3361,7 @@
                                       <h2>
                                           Informations
                                       </h2>
-                                      <div class="c-box mb-3 mb-lg-5">
+                                      <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">

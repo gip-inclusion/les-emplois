@@ -63,7 +63,7 @@
                             <div class="row">
                                 <div class="col-12 {% if approval %}col-lg-8 order-2 order-lg-1{% endif %}">
                                     <h2>Informations</h2>
-                                    <div class="c-box mb-3 mb-lg-5">
+                                    <div class="c-box mb-3 mb-md-4">
                                         {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
                                     </div>
                                     {% if iae_eligibility_diagnosis %}
