@@ -42,8 +42,8 @@
                 <div class="col-12 col-lg-8">
                     <h2>{{ active_tab.label }}</h2>
                     {% if active_tab == AssessmentContractDetailsTab.EMPLOYEE %}
-                        <div class="c-box mb-3">
-                            <ul class="list-data list-data__two-column-md mb-3">
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
                                 <li>
                                     <small>Prénom</small>
                                     <strong>{{ contract.employee.first_name|title }}</strong>
@@ -68,8 +68,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="c-box">
-                            <ul class="list-data list-data__two-column-md mb-3">
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
                                 <li>
                                     <small>Prescripteur</small>
                                     <strong>{{ contract.employee.other_data.prescripteur.libelle|default:"-" }}</strong>
@@ -106,8 +106,8 @@
                             </ul>
                         </div>
                     {% elif active_tab == AssessmentContractDetailsTab.CONTRACT %}
-                        <div class="c-box mb-3">
-                            <ul class="list-data list-data__two-column-md mb-3">
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
                                 <li>
                                     <small>Type de contrat</small>
                                     <strong>{{ contract.other_data.nature_contrat.libelle|default:"-" }}</strong>
@@ -147,8 +147,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="c-box">
-                            <ul class="list-data list-data__two-column-md mb-3">
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
                                 <li>
                                     <small>Poste occupé</small>
                                     <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
@@ -200,168 +200,156 @@
                             </ul>
                         </div>
                     {% elif active_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING %}
-                        <div class="c-box mb-3">
-                            <div class="d-flex flex-column flex-md-row gap-3">
-                                <ul class="list-data w-md-50">
-                                    <li>
-                                        <small>Accompagnement avant contrat</small>
-                                        <strong>{{ contract.other_data.accompagnement_avant_contrat|default:0 }} {{ contract.other_data.accompagnement_avant_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Accompagnement après contrat</small>
-                                        <strong>{{ contract.other_data.accompagnement_apres_contrat|default:0 }} {{ contract.other_data.accompagnement_apres_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Métier préparé</small>
-                                        <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Heures de suivi de l’évaluation des compétences prévues</small>
-                                        <strong>{{ contract.other_data.heures_suivi_evaluation_competences_geiq_prevues|formatfloat_with_unit:"h"|default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                                <ul class="list-data">
-                                    <li>
-                                        <small>Mise en situation professionnelle</small>
-                                        <strong>{{ contract.other_data.mise_en_situation_professionnelle_bool|yesno:"Oui,Non,-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Détail sur la mise en situation professionnelle</small>
-                                        <strong>{{ contract.other_data.mise_en_situation_professionnelle_precision|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Type de mise en situation professionnelle</small>
-                                        <strong>{{ contract.other_data.mise_en_situation_professionnelle.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>
-                                            Préqualifications
-                                            <i class="ri-error-warning-line text-info"
-                                               aria-label="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"
-                                               data-bs-toggle="tooltip"
-                                               data-bs-title="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"></i>
-                                        </small>
-                                        <strong>
-                                            {% with prior_actions=contract.employee.get_prior_actions %}
-                                                {% if prior_actions %}
-                                                    <ul>
-                                                        {% for prior_action in prior_actions %}<li>{{ prior_action }}</li>{% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            {% endwith %}
-                                        </strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="c-box">
-                            <div class="d-flex flex-column flex-md-row gap-3">
-                                <ul class="list-data w-md-50">
-                                    <li>
-                                        <small>Niveau de qualification</small>
-                                        <strong>{{ contract.employee.other_data.qualification.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Titulaire d’un bac général</small>
-                                        <strong>{{ contract.employee.other_data.is_bac_general|yesno:"Oui,Non" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Qualification visée</small>
-                                        <strong>{{ contract.other_data.qualification_visee.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Type de qualification visé</small>
-                                        <strong>{{ contract.other_data.type_qualification_visee.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Qualification obtenue</small>
-                                        <strong>{{ contract.other_data.is_qualification_obtenue|yesno:"Oui,Non,-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Niveau de qualification obtenue</small>
-                                        <strong>{{ contract.other_data.qualification_obtenu.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Type de qualification obtenu</small>
-                                        <strong>{{ contract.other_data.type_qualification_obtenu.libelle|default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                                <ul class="list-data">
-                                    <li>
-                                        <small>Formation complémentaire</small>
-                                        <strong>{{ contract.other_data.formation_complementaire|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Formation complémentaire prévue</small>
-                                        <strong>{{ contract.other_data.formation_complementaire_prevue|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Heures de formation prévues</small>
-                                        <strong>{{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Heures de formation réalisées</small>
-                                        <strong>{{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Nom de l’organisme de formation</small>
-                                        <strong>{{ contract.other_data.organisme_formation|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Modalité de formation</small>
-                                        <strong>{{ contract.other_data.modalite_formation.libelle|default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    {% elif active_tab == AssessmentContractDetailsTab.EXIT %}
-                        <div class="c-box">
-                            <div class="d-flex flex-column flex-md-row gap-3">
-                                <ul class="list-data w-md-50">
-                                    <li>
-                                        <small>Emploi de sortie</small>
-                                        <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Détail sur l’emploi de sortie</small>
-                                        <strong>{{ contract.other_data.emploi_sorti_precision_text|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Précision sur l’emploi de sortie</small>
-                                        <strong>{{ contract.other_data.emploi_sorti_precision.libelle|default:"-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Métier correspondant</small>
-                                        <strong>{{ contract.other_data.metier_correspondant|default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                                <ul class="list-data">
-                                    <li>
-                                        <small>CDD/CDI refusé</small>
-                                        <strong>{{ contract.other_data.is_refus_cdd_cdi|yesno:"Oui,Non" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Date de rupture anticipée</small>
-                                        <strong>
-                                            {% if contract.end_at and contract.end_at != contract.planned_end_at %}
-                                                {{ contract.end_at|date:"d/m/Y" }}
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
+                                <li>
+                                    <small>Accompagnement avant contrat</small>
+                                    <strong>{{ contract.other_data.accompagnement_avant_contrat|default:0 }} {{ contract.other_data.accompagnement_avant_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Accompagnement après contrat</small>
+                                    <strong>{{ contract.other_data.accompagnement_apres_contrat|default:0 }} {{ contract.other_data.accompagnement_apres_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Métier préparé</small>
+                                    <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de suivi de l’évaluation des compétences prévues</small>
+                                    <strong>{{ contract.other_data.heures_suivi_evaluation_competences_geiq_prevues|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_bool|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur la mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_precision|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>
+                                        Préqualifications
+                                        <i class="ri-error-warning-line text-info"
+                                           aria-label="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-title="Il s’agit de toutes les actions de pré-qualifications réalisées ces 2 dernières années"></i>
+                                    </small>
+                                    <strong>
+                                        {% with prior_actions=contract.employee.get_prior_actions %}
+                                            {% if prior_actions %}
+                                                <ul class="mb-0">
+                                                    {% for prior_action in prior_actions %}<li>{{ prior_action }}</li>{% endfor %}
+                                                </ul>
                                             {% else %}
                                                 -
                                             {% endif %}
-                                        </strong>
-                                    </li>
-                                    <li>
-                                        <small>Type de rupture anticipée</small>
-                                        <strong>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</strong>
-                                    </li>
-                                    <li>
-                                        <small>Situation post-contrat</small>
-                                        <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
+                                        {% endwith %}
+                                    </strong>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
+                                <li>
+                                    <small>Niveau de qualification</small>
+                                    <strong>{{ contract.employee.other_data.qualification.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Titulaire d’un bac général</small>
+                                    <strong>{{ contract.employee.other_data.is_bac_general|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Qualification visée</small>
+                                    <strong>{{ contract.other_data.qualification_visee.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de qualification visé</small>
+                                    <strong>{{ contract.other_data.type_qualification_visee.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Qualification obtenue</small>
+                                    <strong>{{ contract.other_data.is_qualification_obtenue|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Niveau de qualification obtenue</small>
+                                    <strong>{{ contract.other_data.qualification_obtenu.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de qualification obtenu</small>
+                                    <strong>{{ contract.other_data.type_qualification_obtenu.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Formation complémentaire</small>
+                                    <strong>{{ contract.other_data.formation_complementaire|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Formation complémentaire prévue</small>
+                                    <strong>{{ contract.other_data.formation_complementaire_prevue|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de formation prévues</small>
+                                    <strong>{{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de formation réalisées</small>
+                                    <strong>{{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nom de l’organisme de formation</small>
+                                    <strong>{{ contract.other_data.organisme_formation|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Modalité de formation</small>
+                                    <strong>{{ contract.other_data.modalite_formation.libelle|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    {% elif active_tab == AssessmentContractDetailsTab.EXIT %}
+                        <div class="c-box mb-3 mb-md-4">
+                            <ul class="list-data">
+                                <li>
+                                    <small>Emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision_text|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Précision sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision.libelle|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Métier correspondant</small>
+                                    <strong>{{ contract.other_data.metier_correspondant|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>CDD/CDI refusé</small>
+                                    <strong>{{ contract.other_data.is_refus_cdd_cdi|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Date de rupture anticipée</small>
+                                    <strong>
+                                        {% if contract.end_at and contract.end_at != contract.planned_end_at %}
+                                            {{ contract.end_at|date:"d/m/Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </strong>
+                                </li>
+                                <li>
+                                    <small>Type de rupture anticipée</small>
+                                    <strong>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Situation post-contrat</small>
+                                    <strong>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</strong>
+                                </li>
+                            </ul>
                         </div>
                     {% endif %}
                 </div>
