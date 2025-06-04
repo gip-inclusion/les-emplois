@@ -3,7 +3,7 @@
 
 {# Job application accepted: details -------------------------------------------------------------------- #}
 {% if job_application.state.is_accepted %}
-    <div class="c-box mb-4">
+    <div class="c-box mb-3 mb-md-4">
         <h3>Détails du contrat de travail</h3>
 
         {# GEIQ only #}
@@ -14,7 +14,7 @@
             </p>
         {% endif %}
 
-        <ul class="list-data mb-3">
+        <ul class="list-data">
             <li>
                 <small>Poste retenu</small>
                 {% if job_application.hired_job %}
@@ -23,9 +23,6 @@
                     <i class="text-disabled">Non renseigné</i>
                 {% endif %}
             </li>
-        </ul>
-
-        <ul class="list-data list-data__two-column-md mb-3">
             <li>
                 <small>Début</small>
                 {% if job_application.hiring_start_at %}

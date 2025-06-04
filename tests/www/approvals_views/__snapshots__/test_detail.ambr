@@ -9,8 +9,8 @@
               PASS IAE expiré
           </span>
       </div>
-      <ul class="list-data list-data__two-column-lg">
-          <li class="order-1">
+      <ul class="list-data">
+          <li>
               <small>
                   Numéro de PASS IAE
               </small>
@@ -26,7 +26,7 @@
                   </span>
               </strong>
           </li>
-          <li class="order-2">
+          <li>
               <small>
                   Date de début
               </small>
@@ -34,15 +34,13 @@
                   01/01/2000
               </strong>
           </li>
-          <li class="order-3 order-lg-4">
+          <li>
               <small>
                   A expiré le
               </small>
               <strong class="text-danger">
                   02/01/2000
               </strong>
-          </li>
-          <li class="order-4 order-lg-3">
           </li>
       </ul>
       <p class="fs-sm fst-italic mt-3">
@@ -62,8 +60,8 @@
               PASS IAE valide (non démarré)
           </span>
       </div>
-      <ul class="list-data list-data__two-column-lg">
-          <li class="order-1">
+      <ul class="list-data">
+          <li>
               <small>
                   Numéro de PASS IAE
               </small>
@@ -79,7 +77,7 @@
                   </span>
               </strong>
           </li>
-          <li class="order-2">
+          <li>
               <small>
                   Date de début
               </small>
@@ -87,7 +85,7 @@
                   01/01/2025
               </strong>
           </li>
-          <li class="order-3 order-lg-4">
+          <li>
               <small>
                   Date de fin prévisionnelle
                   <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -97,7 +95,7 @@
                   02/01/2025
               </strong>
           </li>
-          <li class="order-4 order-lg-3">
+          <li>
               <small>
                   Durée de validité
                   <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -105,11 +103,11 @@
               </small>
               <strong class="text-success">
                   2 jours
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                      Comment est calculée cette durée ?
+                  </a>
               </strong>
-              <br/>
-              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                  Comment est calculée cette durée ?
-              </a>
           </li>
       </ul>
       <p class="fs-sm fst-italic mt-3">
@@ -129,8 +127,8 @@
               PASS IAE valide
           </span>
       </div>
-      <ul class="list-data list-data__two-column-lg">
-          <li class="order-1">
+      <ul class="list-data">
+          <li>
               <small>
                   Numéro de PASS IAE
               </small>
@@ -146,7 +144,7 @@
                   </span>
               </strong>
           </li>
-          <li class="order-2">
+          <li>
               <small>
                   Date de début
               </small>
@@ -154,7 +152,7 @@
                   01/01/2000
               </strong>
           </li>
-          <li class="order-3 order-lg-4">
+          <li>
               <small>
                   Date de fin prévisionnelle
                   <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -164,7 +162,7 @@
                   01/01/3000
               </strong>
           </li>
-          <li class="order-4 order-lg-3">
+          <li>
               <small>
                   Durée de validité
                   <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -172,11 +170,11 @@
               </small>
               <strong class="text-success">
                   356210 jours (Environ 975 ans et 3 mois)
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                      Comment est calculée cette durée ?
+                  </a>
               </strong>
-              <br/>
-              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                  Comment est calculée cette durée ?
-              </a>
           </li>
       </ul>
       <p class="fs-sm fst-italic mt-3">
@@ -196,8 +194,8 @@
               PASS IAE valide (suspendu)
           </span>
       </div>
-      <ul class="list-data list-data__two-column-lg">
-          <li class="order-1">
+      <ul class="list-data">
+          <li>
               <small>
                   Numéro de PASS IAE
               </small>
@@ -213,7 +211,7 @@
                   </span>
               </strong>
           </li>
-          <li class="order-2">
+          <li>
               <small>
                   Date de début
               </small>
@@ -221,7 +219,7 @@
                   01/01/2000
               </strong>
           </li>
-          <li class="order-4 order-lg-3">
+          <li>
               <small>
                   Durée de validité
                   <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
@@ -229,11 +227,11 @@
               </small>
               <strong>
                   356216 jours (Environ 975 ans et 3 mois)
+                  <br/>
+                  <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                      Comment est calculée cette durée ?
+                  </a>
               </strong>
-              <br/>
-              <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
-                  Comment est calculée cette durée ?
-              </a>
           </li>
       </ul>
       <p class="fs-sm fst-italic mt-3">

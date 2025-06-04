@@ -22,11 +22,14 @@
     </div>
 </div>
 
-
-<ul class="list-data list-data__two-column-md mb-3">
+<ul class="list-data mb-3">
     <li>
         <small>Prénom</small>
         <strong>{{ job_seeker.first_name|title|mask_unless:can_view_personal_information }}</strong>
+    </li>
+    <li>
+        <small>Nom</small>
+        <strong>{{ job_seeker.last_name|upper|mask_unless:can_view_personal_information }}</strong>
     </li>
     {% if can_view_personal_information %}
         <li>
@@ -40,10 +43,6 @@
             {% endif %}
         </li>
     {% endif %}
-    <li>
-        <small>Nom</small>
-        <strong>{{ job_seeker.last_name|upper|mask_unless:can_view_personal_information }}</strong>
-    </li>
     {% if can_view_personal_information %}
         <li>
             <small>Adresse e-mail</small>

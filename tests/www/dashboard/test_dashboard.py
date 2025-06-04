@@ -773,7 +773,16 @@ class TestDashboardView:
         assertContains(response, format_approval_number(approval))
         assertContains(response, "<small>Date de début</small><strong>21/06/2022</strong>", html=True)
         assertContains(response, "<strong>06/12/2022</strong>")  # Date de fin prévisionnelle
-        assertContains(response, '<strong class="text-success">83 jours')  # Durée de validité
+        assertContains(
+            response,
+            """
+            <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche"
+                class="btn-link has-external-link"
+                target="_blank">
+                Comment est calculée cette durée ?</a>
+            """,
+            html=True,
+        )  # Durée de validité
         assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS, html=True)
         assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
 
