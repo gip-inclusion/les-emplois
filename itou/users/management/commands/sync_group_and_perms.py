@@ -26,6 +26,7 @@ def get_permissions_dict():
     import itou.eligibility.models as eligibility_models
     import itou.emails.models as emails_models
     import itou.employee_record.models as employee_record_models
+    import itou.geiq_assessments.models as geiq_assessments_models
     import itou.gps.models as gps_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
@@ -65,6 +66,11 @@ def get_permissions_dict():
         employee_record_models.EmployeeRecord: PERMS_DELETE,
         employee_record_models.EmployeeRecordUpdateNotification: PERMS_READ,
         employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
+        geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
+        geiq_assessments_models.Assessment: PERMS_READ,
+        geiq_assessments_models.Employee: PERMS_READ,
+        geiq_assessments_models.EmployeeContract: PERMS_READ,
+        geiq_assessments_models.EmployeePrequalification: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
         institution_models.InstitutionMembership: PERMS_ADD,
         invitation_models.EmployerInvitation: PERMS_DELETE,
