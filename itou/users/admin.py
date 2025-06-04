@@ -717,7 +717,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                     membership.is_active = False
                     membership.is_admin = False
                     membership.save()
-        return super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 class CertifierFilter(admin.SimpleListFilter):
