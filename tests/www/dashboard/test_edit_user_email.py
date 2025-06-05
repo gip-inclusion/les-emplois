@@ -1,10 +1,11 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from django.contrib import messages
 from django.urls import reverse
+from pytest_django.asserts import assertMessages, assertRedirects
 
 from itou.users.enums import IdentityProvider
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.users.factories import (
-    DEFAULT_PASSWORD,
     JobSeekerFactory,
     PrescriberFactory,
 )
@@ -12,7 +13,7 @@ from tests.users.factories import (
 
 class TestChangeEmailView:
     def test_update_email(self, client, mailoutbox):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(email="ancien@email.fr")
         old_email = user.email
         new_email = "jean@gabin.fr"
 
@@ -26,26 +27,22 @@ class TestChangeEmailView:
 
         post_data = {"email": new_email, "email_confirmation": new_email}
         response = client.post(url, data=post_data)
-        assert response.status_code == 302
-
-        # User is logged out
+        assertRedirects(
+            response,
+            reverse("dashboard:index"),
+            # The user is then redirected to edit_user_info but we don't care about that
+            fetch_redirect_response=False,
+        )
+        assertMessages(
+            response,
+            [messages.Message(messages.INFO, "E-mail de confirmation envoyé à jean@gabin.fr")],
+        )
         user.refresh_from_db()
-        assert response.request.get("user") is None
-        assert user.email == new_email
-        assert user.emailaddress_set.count() == 0
-
-        # User cannot log in with his old address
-        post_data = {"login": old_email, "password": DEFAULT_PASSWORD}
-        url = reverse("login:existing_user", args=(user.public_id,))
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assert not response.context_data["form"].is_valid()
-
-        # User cannot log in until confirmation
-        post_data = {"login": new_email, "password": DEFAULT_PASSWORD}
-        response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assert response.url == reverse("account_email_verification_sent")
+        assert user.email == old_email
+        assert sorted(EmailAddress.objects.values_list("email", "verified", "primary", "user")) == [
+            (old_email, True, True, user.pk),
+            (new_email, False, False, user.pk),
+        ]
 
         # User receives an email to confirm his new address.
         email = mailoutbox[0]
@@ -53,8 +50,8 @@ class TestChangeEmailView:
         assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
         assert email.to[0] == new_email
 
-        # Confirm email + auto login.
-        confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.first()).key
+        # Confirm email : email is changed
+        confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.get(email=new_email)).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = client.post(confirm_email_url)
         assert response.status_code == 302
