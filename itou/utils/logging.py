@@ -1,5 +1,7 @@
 import logging
 
+import httpx
+from django.conf import settings
 from django_datadog_logger.formatters import datadog
 
 from itou.utils.command import get_current_command_info
@@ -42,3 +44,20 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
         return log_entry_dict
+
+
+class HTTPXFilter(logging.Filter):
+    def filter(self, record):
+        new_args = []
+        for arg in record.args:
+            # We could add more sensitive urls to redact: add them here
+            # In the future, we might want to parametrize this filter but YAGNI
+
+            if isinstance(arg, httpx.URL) and str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
+                redacted_params = [(key, "_REDACTED_") for key, _value in arg.params.multi_items()]
+                redacted_arg = arg.copy_with(params=redacted_params)
+                new_args.append(redacted_arg)
+            else:
+                new_args.append(arg)
+        record.args = tuple(new_args)
+        return super().filter(record)

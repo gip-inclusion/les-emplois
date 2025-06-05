@@ -293,6 +293,9 @@ X_FRAME_OPTIONS = "DENY"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "httpx_filter": {"()": "itou.utils.logging.HTTPXFilter"},
+    },
     "formatters": {
         "json": {"()": "itou.utils.logging.ItouDataDogJSONFormatter"},
     },
@@ -327,6 +330,9 @@ LOGGING = {
             # https://github.com/coleifer/huey/blob/2.5.2/huey/contrib/djhuey/management/commands/run_huey.py#L87-L88
             # We'll still get the logs since they will propagate to root handlers
             "handlers": ["null"],
+        },
+        "httpx": {
+            "filters": ["httpx_filter"],
         },
     },
 }
