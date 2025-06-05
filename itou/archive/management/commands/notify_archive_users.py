@@ -12,6 +12,7 @@ from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
+from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
@@ -237,14 +238,20 @@ class Command(BaseCommand):
             AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
             AnonymizedApplication.objects.bulk_create(archived_jobapplications)
             self._delete_jobseekers_with_related_objects(users_to_archive)
+            self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
 
         self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
         self.logger.info("Archived job applications after grace period, count: %d", len(archived_jobapplications))
 
     def _delete_jobseekers_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
-        JobApplication.objects.filter(job_seeker__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
+
+    def _delete_jobapplications_with_related_objects(jobapplications):
+        File.objects.filter(jobapplication__isnull=False, jobapplication__in=jobapplications).update(
+            deleted_at=timezone.now()
+        )
+        JobApplication.objects.filter(id__in=[jobapplication.id for jobapplication in jobapplications]).delete()
 
     @monitor(
         monitor_slug="notify_archive_users",
