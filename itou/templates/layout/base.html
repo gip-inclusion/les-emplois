@@ -64,6 +64,13 @@
         <div class="global-messages-container">
             {% block global_messages %}
                 {% include "includes/demo_accounts.html" %}
+                {% if request.user.is_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
+                    <div class="alert alert-info fade show" role="status" id="deactivation-job-banner">
+                        <p class="mb-0">
+                            <strong>Attention</strong> : Très prochainement, vos fiches de poste qui n’ont pas été actualisées depuis plus de 3 mois seront automatiquement dépubliées. <a href="{% url "companies_views:job_description_list" %}">Pensez à les mettre à jour pour maintenir leur visibilité</a>.
+                        </p>
+                    </div>
+                {% endif %}
             {% endblock %}
         </div>
 

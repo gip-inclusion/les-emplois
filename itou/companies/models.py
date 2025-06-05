@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
@@ -558,6 +560,23 @@ class Company(AddressMixin, OrganizationAbstract):
         if self.canonical_company.source == Company.SOURCE_ASP:
             return self.canonical_company.siret
         raise ValidationError("Could not find authoritative SIAE from ASP source")
+
+    def has_job_descriptions_not_updated_recently(self):
+        """
+        Returns True if the company has at least one job description (or is open to spontaneous applications)
+        not updated for at least 60 days.
+        """
+        DAYS = 60
+        if self.is_open_to_spontaneous_applications:
+            spontaneous_applications_time_since_last_update = timezone.now() - self.spontaneous_applications_open_since
+            if spontaneous_applications_time_since_last_update.days >= DAYS:
+                return True
+
+        date_n_days_ago = timezone.now() - timedelta(days=DAYS)
+        has_job_descriptions_considered_old = JobDescription.objects.filter(
+            is_active=True, company=self, last_employer_update_at__lt=date_n_days_ago
+        ).exists()
+        return has_job_descriptions_considered_old
 
 
 class CompanyMembership(MembershipAbstract):
