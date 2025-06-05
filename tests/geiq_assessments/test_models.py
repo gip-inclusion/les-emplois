@@ -7,7 +7,12 @@ from django.utils import timezone
 from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from tests.files.factories import FileFactory
-from tests.geiq_assessments.factories import AssessmentFactory, EmployeeFactory, EmployeePrequalificationFactory
+from tests.geiq_assessments.factories import (
+    AssessmentFactory,
+    EmployeeContractFactory,
+    EmployeeFactory,
+    EmployeePrequalificationFactory,
+)
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory
 
@@ -166,3 +171,16 @@ def test_employee_get_prior_actions():
         "PMSMP (12 heures du 01/01/2022 au 31/03/2024)",
         "POE (1 heure du 01/01/2023 au 31/03/2023)",
     ]
+
+
+@pytest.mark.parametrize(
+    "start,planned_end,end,expected",
+    [
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), None, 31),
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 31), 31),
+        (datetime.date(2024, 1, 1), datetime.date(2024, 1, 31), datetime.date(2024, 1, 10), 10),
+    ],
+)
+def test_employee_contract_duration(start, planned_end, end, expected):
+    contract = EmployeeContractFactory(start_at=start, planned_end_at=planned_end, end_at=end)
+    assert contract.duration().days == expected

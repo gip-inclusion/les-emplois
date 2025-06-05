@@ -442,7 +442,7 @@ class EmployeeContract(models.Model):
 
     def duration(self):
         end = self.end_at or self.planned_end_at
-        return end - self.start_at
+        return end - self.start_at + timezone.timedelta(days=1)
 
 
 class EmployeePrequalification(models.Model):
