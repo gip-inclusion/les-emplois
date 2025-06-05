@@ -193,26 +193,24 @@
                                     </ul>
                                 </div>
                             </div>
-                            {% if not assessment.reviewed_at %}
-                                <div class="c-box--summary__footer">
-                                    <div class="d-flex justify-content-end">
-                                        {% if assessment.decision_validated_at %}
-                                            <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
-                                                <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
-                                                <span>Consulter ma décision</span>
-                                            </a>
-                                        {% elif assessment.grants_selection_validated_at %}
-                                            <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
-                                                Saisir la décision
-                                            </a>
-                                        {% else %}
-                                            <button class="btn btn-primary btn-block w-100 w-md-auto" type="button" disabled data-bs-toggle="tooltip" data-bs-title="Vous devez d’abord contrôler la sélection">
-                                                Saisir la décision
-                                            </button>
-                                        {% endif %}
-                                    </div>
+                            <div class="c-box--summary__footer">
+                                <div class="d-flex justify-content-end">
+                                    {% if assessment.decision_validated_at %}
+                                        <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                            <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                                            <span>Consulter la décision</span>
+                                        </a>
+                                    {% elif assessment.grants_selection_validated_at %}
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "geiq_assessments_views:assessment_review" pk=assessment.pk %}">
+                                            Saisir la décision
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-primary btn-block w-100 w-md-auto" type="button" disabled data-bs-toggle="tooltip" data-bs-title="Vous devez d’abord contrôler la sélection">
+                                            Saisir la décision
+                                        </button>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
                     {% endif %}
                 </div>
