@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.utils.logging import suppress_logs
 
 
 logger = logging.getLogger("APIParticulierClient")
@@ -35,7 +36,11 @@ def _build_params_from(job_seeker):
 
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
-    return client.get(endpoint, params=params).raise_for_status().json()
+    # HTTPX logs query params but, in this case, it contains personal data
+    # that cannot end up in Datadog.
+    with suppress_logs(logger=logging.getLogger("httpx")):
+        response = client.get(endpoint, params=params).raise_for_status().json()
+    return response
 
 
 USER_REQUIRED_FIELDS = ["first_name", "last_name", "title"]
