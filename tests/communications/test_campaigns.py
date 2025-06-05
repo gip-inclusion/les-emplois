@@ -6,8 +6,9 @@ from django.forms.models import model_to_dict
 from django.urls import reverse
 
 from itou.communications.models import AnnouncementCampaign
+from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import ItouStaffFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
@@ -104,3 +105,32 @@ class TestRenderAnnouncementCampaign:
         assert response.status_code == 200
         content = parse_response_to_soup(response)
         assert len(content.select("#news-modal")) == 0
+
+    def test_campaign_rendered_dashboard_for_job_seeker(self, client, snapshot):
+        campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
+        AnnouncementItemFactory(
+            campaign=campaign, title="Item A", description="Item A", priority=0, user_kind_tags=[UserKind.JOB_SEEKER]
+        )
+        AnnouncementItemFactory(
+            campaign=campaign,
+            title="Item B",
+            description="Item B",
+            priority=1,
+            user_kind_tags=[UserKind.JOB_SEEKER, UserKind.PRESCRIBER],
+        )
+        AnnouncementItemFactory(campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=[])
+        AnnouncementItemFactory(
+            campaign=campaign,
+            title="Item C",
+            description="Item C",
+            priority=2,
+            user_kind_tags=[UserKind.PRESCRIBER, UserKind.EMPLOYER],
+        )
+
+        client.force_login(JobSeekerFactory())
+        response = client.get(reverse("search:employers_home"))
+        assert response.status_code == 200
+        content = parse_response_to_soup(response, "#news-modal")
+        assert pretty_indented(content) == snapshot
+        assert len(content.select("p")) == 3
+        assert "Item C" not in str(content)

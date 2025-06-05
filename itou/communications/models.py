@@ -182,8 +182,13 @@ class AnnouncementCampaign(models.Model):
         super().delete(*args, **kwargs)
         self._update_cached_active_announcement()
 
-    def items_for_template(self):
-        return self.items.all()[: self.max_items]
+    def items_for_template(self, user_kind):
+        return [
+            item
+            for item in self.items.all()
+            # Only filter items for job seekers
+            if not item.user_kind_tags or user_kind != UserKind.JOB_SEEKER or user_kind in item.user_kind_tags
+        ][: self.max_items]
 
 
 class AnnouncementItemQuerySet(models.QuerySet):
