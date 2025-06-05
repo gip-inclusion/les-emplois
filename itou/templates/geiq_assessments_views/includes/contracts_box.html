@@ -26,7 +26,7 @@
             {% if assessment.contracts_selection_validated_at %}
                 <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto">
                     <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
-                    <span>Consulter ma sélection</span>
+                    <span>Consulter la sélection</span>
                 </a>
             {% elif assessment.contracts_synced_at %}
                 <a href="{% url "geiq_assessments_views:assessment_contracts_list" pk=assessment.pk %}" class="btn btn-primary btn-block w-100 w-md-auto">
