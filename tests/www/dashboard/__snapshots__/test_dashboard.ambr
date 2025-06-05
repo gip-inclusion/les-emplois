@@ -754,6 +754,7 @@
       }),
       dict({
         'origin': list([
+          'Approval.<genexpr>[approvals/models.py]',
           'Approval.remainder[approvals/models.py]',
           'Approval.remainder_as_date[approvals/models.py]',
           'VariableNode[approvals/includes/box.html]',
