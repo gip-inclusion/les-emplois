@@ -85,6 +85,14 @@ class TestEmployeeDetailView:
 
         assert_previous_step(response, reverse("approvals:list"), back_to_list=True)
 
+        # Has a button to copy-paste job_seeker public_id
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert pretty_indented(content) == snapshot(name="copy_public_id")
+
     def test_detail_view_no_job_application(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()

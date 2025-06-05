@@ -210,6 +210,14 @@ class TestProcessViews:
         assertContains(response, job_application.resume_link)
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
+        # Has a button to copy-paste job_seeker public_id
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert pretty_indented(content) == snapshot(name="copy_public_id")
+
     def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 
@@ -457,7 +465,7 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 403
 
-    def test_details_for_prescriber(self, client):
+    def test_details_for_prescriber(self, client, snapshot):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         appelation = Appellation.objects.first()
@@ -505,6 +513,14 @@ class TestProcessViews:
 
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+
+        # Has a button to copy-paste job_seeker public_id
+        content = parse_response_to_soup(
+            response,
+            selector="#copy_public_id",
+            replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
+        )
+        assert pretty_indented(content) == snapshot(name="copy_public_id")
 
     def test_details_for_prescriber_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -653,7 +669,6 @@ class TestProcessViews:
         assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_job_seeker_with_transition_logs(self, client, snapshot):
-        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
@@ -676,7 +691,6 @@ class TestProcessViews:
         assert pretty_indented(html_fragment) == snapshot
 
     def test_details_for_company_with_transition_logs(self, client, snapshot):
-        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
             job_application = JobApplicationFactory(
                 for_snapshot=True,
@@ -696,7 +710,7 @@ class TestProcessViews:
         response = client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        assert pretty_indented(html_fragment) == snapshot
+        assert pretty_indented(html_fragment) == snapshot(name="transition_logs")
 
     def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
