@@ -44,8 +44,13 @@ def test_build_params_from(snapshot):
 )
 @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
 @freeze_time("2025-01-06")
-def test_not_certified(criteria_kind, factory, respx_mock):
-    eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
+def test_not_certified(criteria_kind, factory, respx_mock, caplog):
+    eligibility_diagnosis = factory(
+        certifiable=True,
+        criteria_kinds=[criteria_kind],
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+    )
     respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
 
     eligibility_diagnosis.certify_criteria()
@@ -60,13 +65,20 @@ def test_not_certified(criteria_kind, factory, respx_mock):
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     assert criterion.certification_period is None
+    assert f"{settings.API_PARTICULIER_BASE_URL}v2" in caplog.text
+    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
 
 
 def test_not_found(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         404, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     )
-    diag = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+    diag = IAEEligibilityDiagnosisFactory(
+        certifiable=True,
+        criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+    )
     certify_criteria(diag)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
@@ -74,13 +86,19 @@ def test_not_found(respx_mock, caplog):
     assert crit.certification_period is None
     assert "Dossier allocataire inexistant. Le document ne peut être édité." in caplog.text
     assert f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active" in caplog.text
+    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
 
 
 def test_service_unavailable(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         503, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     )
-    diag = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+    diag = IAEEligibilityDiagnosisFactory(
+        certifiable=True,
+        criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+    )
     certify_criteria(diag)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
@@ -90,3 +108,4 @@ def test_service_unavailable(respx_mock, caplog):
         "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service." in caplog.text
     )
     assert f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active" in caplog.text
+    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
