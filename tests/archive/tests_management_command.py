@@ -9,6 +9,7 @@ from freezegun import freeze_time
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
+from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
@@ -23,6 +24,7 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
+from tests.files.factories import FileFactory
 from tests.gps.factories import FollowUpGroupFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import (
@@ -565,6 +567,32 @@ class TestNotifyArchiveUsersManagementCommand:
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
         assert AnonymizedJobSeeker.objects.exists()
+
+    @pytest.mark.parametrize("deleted_at", [None, timezone.make_aware(datetime.datetime(2025, 3, 3, 0, 0))])
+    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, deleted_at):
+        resume_file = FileFactory(deleted_at=deleted_at)
+        JobApplicationFactory(
+            job_seeker__notified_days_ago=31,
+            job_seeker__date_joined=timezone.make_aware(datetime.datetime(2023, 10, 30, 0, 0)),
+            approval=None,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=None,
+            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            resume=resume_file,
+        )
+        undesired_file_keys = [FileFactory().key, JobApplicationFactory().resume.key]
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_archive_users", wet_run=True)
+
+        assert File.objects.filter(key__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
+
+        file = File.objects.get(key=resume_file.key, jobapplication__isnull=True, deleted_at__isnull=False)
+
+        if deleted_at is None:
+            assert file.deleted_at.date() == timezone.now().date()
+        else:
+            assert file.deleted_at == deleted_at
 
     @freeze_time("2025-02-15")
     @pytest.mark.parametrize(
