@@ -629,7 +629,7 @@
                                   <i aria-hidden="true" class="ri-eye-line fw-medium">
                                   </i>
                                   <span>
-                                      Consulter ma décision
+                                      Consulter la décision
                                   </span>
                               </a>
                           </div>
@@ -938,6 +938,17 @@
                                       </strong>
                                   </li>
                               </ul>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter la décision
+                                  </span>
+                              </a>
                           </div>
                       </div>
                   </div>
@@ -1557,6 +1568,17 @@
                                       </strong>
                                   </li>
                               </ul>
+                          </div>
+                      </div>
+                      <div class="c-box--summary__footer">
+                          <div class="d-flex justify-content-end">
+                              <a class="btn btn-ico btn-outline-primary btn-block w-100 w-md-auto" href="/geiq-assessments/institution/00000000-1111-2222-3333-444444444444/review">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Consulter la décision
+                                  </span>
+                              </a>
                           </div>
                       </div>
                   </div>
