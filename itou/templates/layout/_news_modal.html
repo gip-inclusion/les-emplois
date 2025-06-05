@@ -16,7 +16,7 @@
                 <div class="text-center mb-5" aria-hidden="true">
                     <img class="img-fluid color-filter-primary" src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="Dessin d'étoiles" />
                 </div>
-                {% for item in active_campaign_announce.items_for_template %}
+                {% for item in active_campaign_announce_items %}
                     <h6>{{ forloop.counter }}. {{ item.title }}</h6>
                     <p>{{ item.description }}</p>
                 {% endfor %}

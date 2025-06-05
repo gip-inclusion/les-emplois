@@ -46,4 +46,9 @@ def active_announcement_campaign(request):
 
     return {
         "active_campaign_announce": (campaign if campaign is not None and campaign.items.count() else None),
+        "active_campaign_announce_items": campaign.items_for_template(
+            request.user.kind if request.user.is_authenticated else None
+        )
+        if campaign is not None
+        else [],
     }
