@@ -10,7 +10,6 @@ class MemberInline(ReadonlyMixin, admin.TabularInline):
     readonly_fields = [
         "is_active",
         "is_referent_certified",
-        "is_referent",
         "member",
         "created_at",
         "last_contact_at",
@@ -51,18 +50,15 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
         "follow_up_group",
         "reason_truncated",
         "is_referent_certified",
-        "is_referent",
     )
     list_filter = (
         "is_referent_certified",
-        "is_referent",
         "created_in_bulk",
         ReasonStatusFilter,
     )
     raw_id_fields = ("follow_up_group", "member")
     fields = (
         "is_referent_certified",
-        "is_referent",
         "is_active",
         "follow_up_group",
         "member",

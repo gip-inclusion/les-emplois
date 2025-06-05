@@ -27,7 +27,6 @@ MembershipsTable.add_columns(
         get_column_from_field(get_model_field(FollowUpGroupMembership, "created_at"), "created_at"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "updated_at"), "updated_at"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "ended_at"), "ended_at"),
-        get_column_from_field(get_model_field(FollowUpGroupMembership, "is_referent"), "is_referent"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "member_id"), "member_id"),
         {
             "name": "org_departments",

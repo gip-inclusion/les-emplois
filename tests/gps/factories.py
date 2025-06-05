@@ -45,7 +45,6 @@ class FollowUpGroupFactory(AutoNowOverrideMixin, factory.django.DjangoModelFacto
                     member=kwargs["member"] if i == 0 and "member" in kwargs else PrescriberFactory(),
                     creator=PrescriberFactory(),
                     follow_up_group=self,
-                    is_referent=True if i == 0 else False,
                     created_at=self.created_at,
                     created_in_bulk=self.created_in_bulk,
                 )

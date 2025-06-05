@@ -66,7 +66,9 @@ def group_list(request, current, template_name="gps/group_list.html"):
         .prefetch_related(
             Prefetch(
                 "follow_up_group__memberships",
-                queryset=FollowUpGroupMembership.objects.filter(is_referent=True).select_related("member")[:1],
+                queryset=FollowUpGroupMembership.objects.filter(is_referent_certified=True).select_related("member")[
+                    :1
+                ],
                 to_attr="referent",
             ),
         )
@@ -161,7 +163,6 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
 
         context = context | {
             "gps_memberships": memberships,
-            "is_referent": self.membership.is_referent,
             "matomo_custom_title": "Profil GPS - participants",
             "request_new_participant_form_url": request_new_participant_form_url,
             "active_tab": "memberships",
@@ -254,11 +255,6 @@ class GroupEditionView(GroupDetailsMixin, UpdateView):
             logger.info(
                 "GPS changed_end_date",
                 extra=base_extra | {"is_ongoing": not (form.cleaned_data["ended_at"])},
-            )
-        if "is_referent" in changed_data:
-            logger.info(
-                "GPS changed_referent",
-                extra=base_extra | {"state": form.cleaned_data["is_referent"]},
             )
         return res
 

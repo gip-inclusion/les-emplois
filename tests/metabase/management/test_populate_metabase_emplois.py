@@ -1408,7 +1408,6 @@ def test_populate_gps_memberships():
                 membership.created_at,
                 membership.updated_at,
                 membership.ended_at,
-                int(membership.is_referent),
                 membership.member.pk,
                 ["13", "63", "75"],
                 int(membership.created_in_bulk),

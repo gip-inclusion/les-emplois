@@ -43,12 +43,6 @@
                                 <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
                             </div>
                             {% bootstrap_field form.reason show_label=False %}
-                            {% bootstrap_field form.is_referent %}
-                            <p>
-                                Les autres intervenants verront une pastille
-                                {% include "gps/includes/badge_is_referent_membership.html" %}
-                                à côté de votre nom.
-                            </p>
                         </div>
                     </form>
                 </div>

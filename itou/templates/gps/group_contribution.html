@@ -37,12 +37,7 @@
                         </ul>
                     </div>
                     <div class="c-box mb-3 mb-md-4">
-                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-between mb-3 mb-md-4">
-                            <h3 class="mb-0">Motif de l’intervention</h3>
-                            {% if membership.is_referent %}
-                                <div>{% include "gps/includes/badge_is_referent_membership.html" %}</div>
-                            {% endif %}
-                        </div>
+                        <h3 class="mb-0">Motif de l’intervention</h3>
                         {% if membership.reason %}
                             <strong>{{ membership.reason }}</strong>
                         {% else %}

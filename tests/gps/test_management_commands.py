@@ -142,7 +142,6 @@ class TestSyncGroupsManagementCommand:
         membership_2_1 = FollowUpGroupMembershipFactory(
             follow_up_group=group_2,
             member=follower_1,
-            is_referent=True,
             created_in_bulk=False,
             creator=follower_2,
         )
@@ -197,7 +196,6 @@ class TestSyncGroupsManagementCommand:
         assert group_1.created_in_bulk
         membership_1_1 = FollowUpGroupMembership.objects.get(follow_up_group=group_1)
         assert membership_1_1.member == follower_1
-        assert not membership_1_1.is_referent
         assert membership_1_1.created_in_bulk
         assert membership_1_1.creator == batch_group_creator
         assert membership_1_1.last_contact_at == contacts_data[beneficiary_1.pk][follower_1.pk][1]
@@ -206,7 +204,6 @@ class TestSyncGroupsManagementCommand:
         # group already existed for beneficiary_2
         membership_2_1.refresh_from_db()
         # Update membership for follower_1
-        assert membership_2_1.is_referent  # didn't change
         assert not membership_2_1.created_in_bulk  # didn't change
         assert membership_2_1.creator == follower_2  # didin't change
         assert membership_2_1.created_at == membership_2_1_created_at
@@ -214,7 +211,6 @@ class TestSyncGroupsManagementCommand:
         # create the one for follower_2
         membership_2_2 = FollowUpGroupMembership.objects.get(follow_up_group=group_2, member=follower_2)
         assert membership_2_2.member == follower_2
-        assert not membership_2_2.is_referent
         assert membership_2_2.created_in_bulk
         assert membership_2_2.creator == batch_group_creator
         assert membership_2_2.last_contact_at == contacts_data[beneficiary_2.pk][follower_2.pk][1]
@@ -225,7 +221,6 @@ class TestSyncGroupsManagementCommand:
         assert group_3.created_in_bulk
         membership_3_1 = FollowUpGroupMembership.objects.get(follow_up_group=group_3)
         assert membership_3_1.member == follower_1
-        assert not membership_3_1.is_referent
         assert membership_3_1.created_in_bulk
         assert membership_3_1.creator == batch_group_creator
         assert membership_3_1.last_contact_at == beneficiary_3.date_joined
