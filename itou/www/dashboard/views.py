@@ -1,9 +1,10 @@
 import enum
 import uuid
 
+from allauth.account.utils import send_email_confirmation
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
-from django.contrib import auth, messages
+from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
@@ -258,11 +259,9 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         return HttpResponseForbidden()
     form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
     if request.method == "POST" and form.is_valid():
-        request.user.email = form.cleaned_data["email"]
-        request.user.save()
-        request.user.emailaddress_set.all().delete()
-        auth.logout(request)
-        return HttpResponseRedirect(reverse("account_logout"))
+        # Do no update the user email : django allauth will do it when confirming the email.
+        send_email_confirmation(request, request.user, email=form.cleaned_data["email"])
+        return HttpResponseRedirect(reverse("dashboard:index"))
 
     context = {
         "form": form,
