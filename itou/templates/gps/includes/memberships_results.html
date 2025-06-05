@@ -43,7 +43,7 @@
                                 <td>{{ membership.ended_at|date:"F Y" }}</td>
                             {% endif %}
                             <td>
-                                {% if membership.is_referent %}
+                                {% if membership.is_referent_certified %}
                                     <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
                                 {% elif membership.follow_up_group.referent %}
                                     {{ membership.follow_up_group.referent.0.member.get_full_name }}

@@ -122,7 +122,6 @@ class TestGroupLists:
         group_1 = FollowUpGroupFactory(for_snapshot=True)
         FollowUpGroupMembershipFactory(
             follow_up_group=group_1,
-            is_referent=True,
             member__first_name="John",
             member__last_name="Doe",
         )
@@ -132,15 +131,7 @@ class TestGroupLists:
         group_2 = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary__first_name="François",
             follow_up_group__beneficiary__last_name="Le Français",
-            is_referent=True,
-            member=user,
-        ).follow_up_group
-
-        # No referent
-        group_3 = FollowUpGroupMembershipFactory(
-            follow_up_group__beneficiary__first_name="Jean",
-            follow_up_group__beneficiary__last_name="Bon",
-            is_referent=False,
+            is_referent_certified=True,
             member=user,
         ).follow_up_group
 
@@ -165,7 +156,7 @@ class TestGroupLists:
                             "[PK of JobSeeker]",
                         ),
                     ]
-                    for group in [group_1, group_2, group_3]
+                    for group in [group_1, group_2]
                 ),
             ),
         )
@@ -174,12 +165,6 @@ class TestGroupLists:
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
         assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
-
-        # Test `is_referent` display.
-        group_1 = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
-        FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user, is_referent=True)
-        response = client.get(reverse("gps:group_list"))
-        assertContains(response, "vous êtes référent")
 
     @freezegun.freeze_time("2024-06-21", tick=True)
     def test_old_group_list(self, snapshot, client, caplog):
@@ -192,7 +177,6 @@ class TestGroupLists:
         membership = FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary__first_name="Jean",
             follow_up_group__beneficiary__last_name="Bon",
-            is_referent=False,
             ended_at=timezone.localdate(),
             end_reason=EndReason.MANUAL,
             member=user,
@@ -900,7 +884,6 @@ class TestGroupDetailsEditionTab:
         group = FollowUpGroupFactory(beneficiary=beneficiary)
         membership = FollowUpGroupMembershipFactory(
             member=prescriber,
-            is_referent=True,
             follow_up_group=group,
             started_at="2024-01-03",
         )
@@ -923,14 +906,12 @@ class TestGroupDetailsEditionTab:
             "started_at": "2024-01-03",
             "is_ongoing": "False",
             "ended_at": "",
-            "is_referent": "on",
             "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
         assert gps_logs(caplog) == [
             {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": False},
-            {"message": "GPS changed_referent", "group": group.pk, "state": False, "membership": membership.pk},
             {"message": "GPS visit_group_contribution", "group": group.pk},
         ]
 
@@ -938,7 +919,6 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at == date(2024, 6, 21)  # today
         assert membership.end_reason == EndReason.MANUAL
-        assert membership.is_referent is False
 
         # The user just clics on "Accompagnement en cours"
         post_data = {
@@ -958,7 +938,6 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at is None
         assert membership.end_reason is None
-        assert membership.is_referent is False
 
         # The user ends again the membership and sets a date
         post_data = {
@@ -978,7 +957,6 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at == date(2024, 6, 20)
         assert membership.end_reason == EndReason.MANUAL
-        assert membership.is_referent is False
 
         # If the membership was archived, saving the contribution without changing anything won't change the end reason
         membership.end_reason = EndReason.AUTOMATIC
@@ -999,21 +977,18 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at == date(2024, 6, 20)
         assert membership.end_reason == EndReason.AUTOMATIC
-        assert membership.is_referent is False
 
-        # The user follows again the beneficiary as referent
+        # The user follows again the beneficiary
         post_data = {
             "started_at": "2024-01-03",
             "is_ongoing": "True",
             "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
-            "is_referent": "on",
             "reason": "",
         }
         response = client.post(url, data=post_data)
         assertRedirects(response, reverse("gps:group_contribution", kwargs={"group_id": group.pk}))
         assert gps_logs(caplog) == [
             {"message": "GPS changed_end_date", "group": group.pk, "membership": membership.pk, "is_ongoing": True},
-            {"message": "GPS changed_referent", "group": group.pk, "state": True, "membership": membership.pk},
             {"message": "GPS visit_group_contribution", "group": group.pk},
         ]
 
@@ -1021,14 +996,12 @@ class TestGroupDetailsEditionTab:
         assert membership.started_at == date(2024, 1, 3)
         assert membership.ended_at is None
         assert membership.end_reason is None
-        assert membership.is_referent is True
 
         # The user sets a reason and changes the start_date
         post_data = {
             "started_at": "2024-01-02",
             "is_ongoing": "True",
             "ended_at": "2024-06-20",  # The field is set but will be ignored because of is_ongoing
-            "is_referent": "on",
             "reason": "iae",
         }
         response = client.post(url, data=post_data)
@@ -1047,7 +1020,7 @@ class TestGroupDetailsEditionTab:
         prescriber = PrescriberFactory(membership=True)
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary)
-        FollowUpGroupMembershipFactory(member=prescriber, is_referent=True, follow_up_group=group)
+        FollowUpGroupMembershipFactory(member=prescriber, follow_up_group=group)
 
         client.force_login(prescriber)
         url = reverse("gps:group_edition", kwargs={"group_id": group.pk})

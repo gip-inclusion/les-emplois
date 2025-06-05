@@ -126,7 +126,6 @@ class Command(BaseCommand):
                             else:
                                 memberships_to_create.append(
                                     FollowUpGroupMembership(
-                                        is_referent=False,
                                         member_id=participant_id,
                                         creator_id=objects_created_by.id,
                                         follow_up_group=group,
@@ -144,7 +143,6 @@ class Command(BaseCommand):
                         for participant_id, timestamps in contacts.items():
                             memberships_to_create.append(
                                 FollowUpGroupMembership(
-                                    is_referent=False,
                                     member_id=participant_id,
                                     creator_id=objects_created_by.id,
                                     follow_up_group=group,

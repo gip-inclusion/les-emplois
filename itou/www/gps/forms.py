@@ -1,7 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django_select2.forms import Select2Widget
 
 from itou.gps.models import FollowUpGroupMembership
@@ -68,9 +67,8 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
 
     class Meta:
         model = FollowUpGroupMembership
-        fields = ["started_at", "ended_at", "end_reason", "is_referent", "reason"]
+        fields = ["started_at", "ended_at", "end_reason", "reason"]
         labels = {
-            "is_referent": mark_safe("<strong>Me signaler comme référent</strong>"),
             "started_at": "Date de début",
             "ended_at": "Date de fin",
         }
@@ -121,7 +119,6 @@ class FollowUpGroupMembershipForm(forms.ModelForm):
             cleaned_data["ended_at"] = None
             cleaned_data["end_reason"] = None
         else:
-            cleaned_data["is_referent"] = False
             # Keep existing end_reason if there is one
             cleaned_data["end_reason"] = self.instance.end_reason or EndReason.MANUAL
             if cleaned_data["ended_at"] is None:

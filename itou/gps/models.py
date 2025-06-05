@@ -22,7 +22,7 @@ class BulkCreatedAtQuerysetProxy:
 
 
 class FollowUpGroupManager(models.Manager):
-    def follow_beneficiary(self, beneficiary, user, is_referent=None, is_active=True):
+    def follow_beneficiary(self, beneficiary, user, is_active=True):
         assert beneficiary.is_job_seeker
         if user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
             # This should not happen but we don't want to block everything
@@ -38,8 +38,6 @@ class FollowUpGroupManager(models.Manager):
                 "last_contact_at": now,
                 "is_active": is_active,
             }
-            if is_referent is not None:
-                update_args["is_referent"] = is_referent
 
             create_args = update_args | {
                 "creator": user,
@@ -128,7 +126,6 @@ class FollowUpGroupMembership(models.Model):
         ]
         unique_together = ["follow_up_group", "member"]
 
-    is_referent = models.BooleanField(default=False, verbose_name="référent")
     is_referent_certified = models.BooleanField(db_default=False, verbose_name="référent certifié")
 
     # Is this user still an active member of the group?
