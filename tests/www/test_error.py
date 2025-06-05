@@ -47,7 +47,7 @@ def make_employer():
     ],
 )
 def test_error_handling_ignores_nav_error(client, exc_count, mocker, user_factory):
-    sentry_mock = mocker.patch("itou.utils.templatetags.nav.sentry_sdk")
+    sentry_mock = mocker.patch("itou.utils.errors.sentry_sdk")
     exc = Exception()
     mocker.patch("itou.utils.templatetags.nav.is_active", side_effect=exc)
 
