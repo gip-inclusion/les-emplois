@@ -66,7 +66,7 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     assert criterion.certification_period is None
     assert f"{settings.API_PARTICULIER_BASE_URL}v2" in caplog.text
-    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 
 
 def test_not_found(respx_mock, caplog):
@@ -86,7 +86,7 @@ def test_not_found(respx_mock, caplog):
     assert crit.certification_period is None
     assert "Dossier allocataire inexistant. Le document ne peut être édité." in caplog.text
     assert f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active" in caplog.text
-    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 
 
 def test_service_unavailable(respx_mock, caplog):
@@ -108,4 +108,4 @@ def test_service_unavailable(respx_mock, caplog):
         "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service." in caplog.text
     )
     assert f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active" in caplog.text
-    assert "nomNaissance=DUPONT&prenoms%5B%5D=JEAN" in caplog.text
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
