@@ -2,29 +2,44 @@
 
 {% with profile=employee_record.job_application.job_seeker.jobseeker_profile employee=employee_record.job_application.job_seeker %}
     <div>
-        <p>
-            <strong>Etat civil</strong>
-        </p>
-        <ul class="list-unstyled">
-            <li>{{ employee.get_title_display }} {{ employee.get_full_name }}</li>
-            <li>Né(e) le : {{ profile.birthdate }}</li>
+        <h2 class="h3">Etat civil</h2>
+        <ul class="list-data">
+            <li>
+                <small>Prénom</small>
+                <strong>{{ employee.first_name }}</strong>
+            </li>
+            <li>
+                <small>Nom</small>
+                <strong>{{ employee.last_name }}</strong>
+            </li>
+            <li>
+                <small>Date de naissance</small>
+                <strong>{{ profile.birthdate }}</strong>
+            </li>
             {% if profile.birth_place %}
-                <li>À : {{ profile.birth_place }} ({{ profile.birth_place.department_code }})</li>
+                <li>
+                    <small>Lieu de naissance</small>
+                    <strong>{{ profile.birth_place }} ({{ profile.birth_place.department_code }})</strong>
+                </li>
             {% endif %}
-            <li>Pays de naissance : {{ profile.birth_country }}</li>
+            <li>
+                <small>Pays de naissance</small>
+                <strong>{{ profile.birth_country }}</strong>
+            </li>
         </ul>
 
-        <hr class="my-3 my-md-5">
-        <p>
-            <strong>Domiciliation</strong>
-        </p>
-        <address>{{ profile.hexa_address_display }}</address>
+        <hr class="my-4">
+        <h2 class="h3">Domiciliation</h2>
+        <ul class="list-data">
+            <li>
+                <small>Adresse</small>
+                <address>{{ profile.hexa_address_display }}</address>
+            </li>
+        </ul>
 
-        <hr class="my-3 my-md-5">
-        <p>
-            <strong>Situation du {{ request.current_organization|worker_denomination }}</strong>
-        </p>
-        <ul class="list-unstyled">
+        <hr class="my-4">
+        <h2 class="h3">Situation du {{ request.current_organization|worker_denomination }}</h2>
+        <ul class="mb-0">
             <li>{{ profile.get_education_level_display }}</li>
             {% if profile.pole_emploi_since %}
                 <li>
@@ -71,10 +86,8 @@
             {% endif %}
         </ul>
 
-        <hr class="my-3 my-md-5">
-        <p>
-            <strong>Annexe financière</strong>
-        </p>
+        <hr class="my-4">
+        <h2 class="h3">Annexe financière</h2>
         <p>
             {% if employee_record.financial_annex %}
                 {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})

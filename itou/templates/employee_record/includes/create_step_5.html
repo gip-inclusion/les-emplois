@@ -7,10 +7,10 @@
 
 <div class="row">
     <div class="col-12 col-lg-8 order-2 order-lg-1">
-        <div class="c-form">
+        <div class="c-form mb-3 mb-md-4">
             <legend class="h3">Récapitulatif et validation de la fiche salarié</legend>
 
-            <div class="mb-3 mb-md-5">
+            <div class="mb-3 mb-md-4">
                 <p>
                     Si ce récapitulatif est conforme et complet, <strong>la fiche salarié sera envoyée pour validation à l'ASP</strong>.
                 </p>
@@ -22,11 +22,12 @@
                     <i class="ri-error-warning-line ri-lg me-1" aria-hidden="true"></i><strong>Après validation de la fiche salarié, la modification de la date de début du PASS IAE n'est plus possible.</strong>
                 </p>
             </div>
+            <hr class="my-4">
 
             {% include "employee_record/includes/employee_record_summary.html" %}
 
             {% if job_application.hiring_starts_in_future %}
-                <hr class="my-3 my-md-5">
+                <hr class="my-4">
                 <div class="alert alert-warning mb-4" role="status">
                     <div class="row">
                         <div class="col-auto pe-0">
@@ -65,19 +66,22 @@
             </form>
         </div>
     </div>
-    <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
-        <div class="c-box">
+    <div class="col-12 col-lg-4 order-1 order-lg-2">
+        <div class="c-box bg-info-lightest border-info mb-3 md-md-4">
             {% with job_application=employee_record.job_application %}
-                <p>
-                    <b>PASS IAE :</b>
-                    <br>
-                    {{ job_application.approval.number|format_approval_number }}
-                </p>
-                <hr class="my-3">
-                <a class="btn btn-outline-primary btn-block"
+                <ul class="list-data">
+                    <li>
+                        <small>PASS IAE</small>
+                        <strong>{{ job_application.approval.number|format_approval_number }}</strong>
+                    </li>
+                </ul>
+                <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3"
                    {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
                    href="{% url 'approvals:display_printable_approval' public_id=job_application.approval.public_id %}"
-                   target="_blank">Afficher le PASS IAE</a>
+                   target="_blank">
+                    <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                    <span>Afficher le PASS&nbsp;IAE</span>
+                </a>
             {% endwith %}
         </div>
     </div>
