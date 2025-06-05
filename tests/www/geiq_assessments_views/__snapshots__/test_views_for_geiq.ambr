@@ -3059,7 +3059,8 @@
           INNER JOIN "users_user" ON ("geiq_assessments_assessment"."created_by_id" = "users_user"."id")
           INNER JOIN "geiq_assessments_assessmentcampaign" ON ("geiq_assessments_assessment"."campaign_id" = "geiq_assessments_assessmentcampaign"."id")
           WHERE "geiq_assessments_assessment_companies"."company_id" = %s
-          ORDER BY "geiq_assessments_assessment"."created_at" ASC
+          ORDER BY "geiq_assessments_assessment"."created_at" ASC,
+                   "geiq_assessments_assessment"."id" ASC
         ''',
       }),
       dict({
