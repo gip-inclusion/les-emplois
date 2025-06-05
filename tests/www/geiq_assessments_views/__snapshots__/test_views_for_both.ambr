@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAssessmentContractsListAndToggle.test_access_as_geiq[SQL queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -258,6 +258,24 @@
           FROM "geiq_assessments_employeecontract"
           INNER JOIN "geiq_assessments_employee" ON ("geiq_assessments_employeecontract"."employee_id" = "geiq_assessments_employee"."id")
           WHERE "geiq_assessments_employee"."assessment_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'assessment_contracts_list[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
         ''',
       }),
       dict({

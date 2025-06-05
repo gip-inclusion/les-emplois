@@ -368,7 +368,7 @@
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_details_for_geiq[SQL queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -619,6 +619,25 @@
           INNER JOIN "institutions_institution" ON ("geiq_assessments_assessmentinstitutionlink"."institution_id" = "institutions_institution"."id")
           WHERE "geiq_assessments_assessmentinstitutionlink"."assessment_id" IN (%s)
           ORDER BY "institutions_institution"."kind" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
+          'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
+          'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
         ''',
       }),
       dict({
@@ -2763,7 +2782,7 @@
 # ---
 # name: TestListAssessmentsView.test_complex_list[SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2933,6 +2952,24 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
+          'list_for_geiq[www/geiq_assessments_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
       }),
       dict({
         'origin': list([

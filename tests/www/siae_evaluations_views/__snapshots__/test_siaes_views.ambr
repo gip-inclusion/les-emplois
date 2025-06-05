@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestSiaeJobApplicationListView.test_access[view queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -240,6 +240,23 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/siae_job_applications_list.html]',
+          'siae_job_applications_list[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
         ''',
       }),
       dict({

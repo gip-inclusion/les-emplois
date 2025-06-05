@@ -13,18 +13,28 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription
-from itou.jobs.models import Appellation
+from itou.jobs.models import Appellation, Rome
 from itou.utils.session import SessionNamespace
 from itou.www.companies_views.views import JOB_DESCRIPTION_EDIT_SESSION_KIND
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import (
+    CompanyFactory,
+    CompanyWith2MembershipsFactory,
+    JobDescriptionFactory,
+)
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 POSTULER = "Postuler"
+REMINDER_BANNER = (
+    '<p class="mb-0"><strong>Attention</strong> : Très prochainement, vos fiches de poste qui n’ont pas été '
+    "actualisées depuis plus de 3 mois seront automatiquement dépubliées. "
+    f'<a href="{reverse("companies_views:job_description_list")}">Pensez à les mettre à jour pour maintenir '
+    "leur visibilité</a>.</p>"
+)
 
 
 class JobDescriptionAbstract:
@@ -832,3 +842,80 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         response = client.get(self.url)
         fresh_page = parse_response_to_soup(response, selector=".c-navinfo__info")
         assertSoupEqual(page, fresh_page)
+
+
+@pytest.mark.parametrize(
+    "user_factory",
+    [
+        pytest.param(lambda: JobSeekerFactory(for_snapshot=True), id="job_seeker"),
+        pytest.param(lambda: PrescriberFactory(), id="prescriber"),
+        pytest.param(
+            lambda: EmployerFactory(
+                with_company=True, with_company__company__spontaneous_applications_open_since=None
+            ),
+            id="employer_without_jobs",
+        ),
+    ],
+)
+def test_dont_display_reminder_banner_not_updated_jobs(client, user_factory):
+    user = user_factory()
+    client.force_login(user)
+
+    response = client.get(reverse("dashboard:index"))
+    assertNotContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )
+
+
+@freeze_time("2025-06-06")
+def test_display_reminder_banner_not_updated_jobs_for_employer(client):
+    OLD_DATE = timezone.now() - datetime.timedelta(days=61)
+    RECENT_DATE = timezone.now() - datetime.timedelta(days=59)
+
+    rome = Rome.objects.create(code="I1304", name="Rome 1304")
+    Appellation.objects.create(code="I13042", name="Doer", rome=rome)
+
+    # Spontaneous application recently updated
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=RECENT_DATE)
+    client.force_login(company.members.first())
+    response = client.get(reverse("dashboard:index"))
+    assertNotContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )
+
+    # Spontaneous application updated a long time ago (>= 60 days)
+    company.spontaneous_applications_open_since = OLD_DATE
+    company.save()
+    response = client.get(reverse("dashboard:index"))
+    assertContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )
+
+    # Recently updated job application
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=None)
+    job_description = JobDescriptionFactory(
+        company=company, created_at=RECENT_DATE, last_employer_update_at=RECENT_DATE
+    )
+    client.force_login(company.members.first())
+    response = client.get(reverse("dashboard:index"))
+    assertNotContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )
+
+    # Job application updated a long time ago (>= 60 days)
+    job_description.last_employer_update_at = OLD_DATE
+    job_description.save()
+    response = client.get(reverse("dashboard:index"))
+    assertContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )

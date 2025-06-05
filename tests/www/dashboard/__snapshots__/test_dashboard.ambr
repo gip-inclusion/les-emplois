@@ -32,7 +32,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -291,6 +291,23 @@
           WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
                  AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
           ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
           LIMIT 1
         ''',
       }),

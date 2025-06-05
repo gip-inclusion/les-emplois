@@ -332,6 +332,36 @@ class TestCompanyModel:
         assert company.siret != antenna.siret
         assert antenna.siret_from_asp_source() == company.siret
 
+    @freeze_time("2025-06-06")
+    def test_has_job_descriptions_not_updated_recently(self):
+        OLD_DATE = timezone.now() - timedelta(days=61)
+        RECENT_DATE = timezone.now() - timedelta(days=59)
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+
+        # No job description nor open spontaneous application
+        company = CompanyFactory(spontaneous_applications_open_since=None)
+        assert company.has_job_descriptions_not_updated_recently() is False
+
+        # Spontaneous application recently updated
+        company.spontaneous_applications_open_since = RECENT_DATE
+        company.save()
+        assert company.has_job_descriptions_not_updated_recently() is False
+
+        # Spontaneous application updated a long time ago (>= 60 days)
+        company.spontaneous_applications_open_since = OLD_DATE
+        company.save()
+        assert company.has_job_descriptions_not_updated_recently() is True
+
+        # Recently updated job application
+        company = CompanyFactory(spontaneous_applications_open_since=None)
+        JobDescriptionFactory(company=company, created_at=RECENT_DATE, last_employer_update_at=RECENT_DATE)
+        assert company.has_job_descriptions_not_updated_recently() is False
+
+        # Job application updated a long time ago (>= 60 days)
+        company = CompanyFactory(spontaneous_applications_open_since=None)
+        JobDescriptionFactory(company=company, created_at=OLD_DATE, last_employer_update_at=OLD_DATE)
+        assert company.has_job_descriptions_not_updated_recently() is True
+
 
 class TestCompanyQuerySet:
     def test_with_count_recent_received_job_applications(self):
