@@ -1,5 +1,4 @@
-import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
@@ -611,8 +610,8 @@ def test_company_siret_field_history():
         {k: v for k, v in operation.items() if k != "_timestamp"} for operation in company.fields_history
     ]
     assert fields_history == [{"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}}]
-    assert datetime.datetime.fromisoformat(company.fields_history[0]["_timestamp"]).timestamp() == pytest.approx(
-        datetime.datetime.now().timestamp()
+    assert datetime.fromisoformat(company.fields_history[0]["_timestamp"]).timestamp() == pytest.approx(
+        datetime.now().timestamp()
     )
 
     company.siret = "00000000000002"
@@ -625,8 +624,8 @@ def test_company_siret_field_history():
         {"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}},
         {"before": {"siret": "00000000000001"}, "after": {"siret": "00000000000002"}},
     ]
-    assert datetime.datetime.fromisoformat(company.fields_history[1]["_timestamp"]).timestamp() == pytest.approx(
-        datetime.datetime.now().timestamp()
+    assert datetime.fromisoformat(company.fields_history[1]["_timestamp"]).timestamp() == pytest.approx(
+        datetime.now().timestamp()
     )
 
 
