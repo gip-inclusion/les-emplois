@@ -71,7 +71,7 @@ class TestListAssessmentsView:
         assertContains(response, reverse("geiq_assessments_views:create"))
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="assessments empty list")
 
-    @freeze_time("2025-05-21 12:00")
+    @freeze_time("2025-05-21 12:00", tick=True)
     def test_complex_list(self, client, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
