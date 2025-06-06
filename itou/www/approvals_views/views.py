@@ -359,7 +359,9 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                             f"prolongation_report/{filename}", prolongation_report
                         )
                     default_storage.delete(tmpfile_key)
-                    prolongation.report_file = File.objects.create(id=prolongation_report_key)
+                    prolongation.report_file = File.objects.create(
+                        id=prolongation_report_key, key=prolongation_report_key
+                    )
             prolongation.save()
             prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")

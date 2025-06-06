@@ -41,6 +41,6 @@ class AnnouncementItemForm(forms.ModelForm):
                 File.objects.filter(id=image.name).update(deleted_at=timezone.now())
         instance = super().save(commit=commit)
         if "image" in self.changed_data:
-            instance.image_storage = File.objects.create(id=instance.image.name)
+            instance.image_storage = File.objects.create(id=instance.image.name, key=instance.image.name)
             instance.save()
         return instance
