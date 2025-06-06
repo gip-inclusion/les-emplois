@@ -261,12 +261,92 @@
   },
   {
     "fields": {
-      "email": "test+degeiq@inclusion.gouv.fr",
+      "email": "test01@inclusion.gouv.fr",
       "primary": false,
       "user": 89,
       "verified": false
     },
     "model": "account.emailaddress",
     "pk": 27
+  },
+  {
+    "fields": {
+      "email": "test02@inclusion.gouv.fr",
+      "primary": false,
+      "user": 90,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "email": "test03@inclusion.gouv.fr",
+      "primary": false,
+      "user": 91,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "email": "test04@inclusion.gouv.fr",
+      "primary": false,
+      "user": 92,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "email": "test05@inclusion.gouv.fr",
+      "primary": false,
+      "user": 93,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "email": "test06@inclusion.gouv.fr",
+      "primary": false,
+      "user": 94,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "email": "test07@inclusion.gouv.fr",
+      "primary": false,
+      "user": 95,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "email": "test08@inclusion.gouv.fr",
+      "primary": false,
+      "user": 96,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "email": "test09@inclusion.gouv.fr",
+      "primary": false,
+      "user": 114,
+      "verified": false
+    },
+    "model": "account.emailaddress",
+    "pk": 35
   }
 ]

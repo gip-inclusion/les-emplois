@@ -1,54 +1,80 @@
 [
   {
     "fields": {
-      "administrative_criteria": 24,
+      "administrative_criteria": 3,
       "certification_period": null,
       "certified": null,
       "certified_at": null,
-      "created_at": "2025-05-27T12:59:25.239Z",
+      "created_at": "2025-05-27T12:44:10.195Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 2
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 1
   },
   {
     "fields": {
-      "administrative_criteria": 1,
+      "administrative_criteria": 7,
       "certification_period": null,
       "certified": null,
       "certified_at": null,
-      "created_at": "2025-05-27T12:59:25.239Z",
+      "created_at": "2025-05-27T12:44:10.195Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 2
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 2
   },
   {
     "fields": {
-      "administrative_criteria": 20,
+      "administrative_criteria": 23,
       "certification_period": null,
       "certified": null,
       "certified_at": null,
-      "created_at": "2025-05-27T12:59:25.239Z",
+      "created_at": "2025-05-27T12:44:10.195Z",
       "data_returned_by_api": null,
-      "eligibility_diagnosis": 1
+      "eligibility_diagnosis": 2
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 3
   },
   {
     "fields": {
-      "administrative_criteria": 5,
+      "administrative_criteria": 6,
       "certification_period": null,
       "certified": null,
       "certified_at": null,
-      "created_at": "2025-05-27T12:59:25.239Z",
+      "created_at": "2025-05-27T12:44:30.064Z",
       "data_returned_by_api": null,
       "eligibility_diagnosis": 1
     },
     "model": "eligibility.geiqselectedadministrativecriteria",
     "pk": 4
+  },
+  {
+    "fields": {
+      "administrative_criteria": 3,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-27T12:44:30.064Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 1
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "administrative_criteria": 18,
+      "certification_period": null,
+      "certified": null,
+      "certified_at": null,
+      "created_at": "2025-05-30T09:01:28.453Z",
+      "data_returned_by_api": null,
+      "eligibility_diagnosis": 3
+    },
+    "model": "eligibility.geiqselectedadministrativecriteria",
+    "pk": 6
   }
 ]

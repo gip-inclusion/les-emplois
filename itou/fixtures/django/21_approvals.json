@@ -113,5 +113,74 @@
     },
     "model": "approvals.approval",
     "pk": 5
+  },
+  {
+    "fields": {
+      "created_at": "2025-05-27T08:36:20.069Z",
+      "created_by": null,
+      "eligibility_diagnosis": 42,
+      "end_at": "2027-05-26",
+      "number": "XXXXX8273747",
+      "origin": "default",
+      "origin_prescriber_organization_kind": "",
+      "origin_sender_kind": "employer",
+      "origin_siae_kind": "ETTI",
+      "origin_siae_siret": "50010961600027",
+      "pe_notification_endpoint": null,
+      "pe_notification_exit_code": null,
+      "pe_notification_status": "notification_pending",
+      "pe_notification_time": null,
+      "public_id": "5adf7d37-c929-461a-8aa1-b58d06785686",
+      "start_at": "2025-05-27",
+      "user": 91
+    },
+    "model": "approvals.approval",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "created_at": "2025-05-27T08:38:18.977Z",
+      "created_by": null,
+      "eligibility_diagnosis": 43,
+      "end_at": "2027-05-26",
+      "number": "XXXXX8273748",
+      "origin": "default",
+      "origin_prescriber_organization_kind": "",
+      "origin_sender_kind": "employer",
+      "origin_siae_kind": "ETTI",
+      "origin_siae_siret": "50010961600027",
+      "pe_notification_endpoint": null,
+      "pe_notification_exit_code": null,
+      "pe_notification_status": "notification_pending",
+      "pe_notification_time": null,
+      "public_id": "ebcf30b4-98bd-4970-bd65-d3a052c8f6e3",
+      "start_at": "2025-05-27",
+      "user": 92
+    },
+    "model": "approvals.approval",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "created_at": "2025-05-27T08:45:03.219Z",
+      "created_by": null,
+      "eligibility_diagnosis": 44,
+      "end_at": "2024-05-23",
+      "number": "XXXXX8273749",
+      "origin": "default",
+      "origin_prescriber_organization_kind": "",
+      "origin_sender_kind": "employer",
+      "origin_siae_kind": "ETTI",
+      "origin_siae_siret": "50010961600027",
+      "pe_notification_endpoint": null,
+      "pe_notification_exit_code": null,
+      "pe_notification_status": "notification_pending",
+      "pe_notification_time": null,
+      "public_id": "ba59947a-f0d9-449c-b930-d0b3e021a357",
+      "start_at": "2024-02-23",
+      "user": 93
+    },
+    "model": "approvals.approval",
+    "pk": 25
   }
 ]

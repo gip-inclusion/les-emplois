@@ -76,5 +76,83 @@
     },
     "model": "eligibility.eligibilitydiagnosis",
     "pk": 23
+  },
+  {
+    "fields": {
+      "author": 4,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 2653,
+      "created_at": "2025-05-27T08:34:12.297Z",
+      "expires_at": "2025-08-27",
+      "job_seeker": 90
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 41
+  },
+  {
+    "fields": {
+      "author": 4,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 2653,
+      "created_at": "2025-05-27T08:35:55.357Z",
+      "expires_at": "2025-08-27",
+      "job_seeker": 91
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 42
+  },
+  {
+    "fields": {
+      "author": 4,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 2653,
+      "created_at": "2024-01-27T08:38:03.863Z",
+      "expires_at": "2024-05-23",
+      "job_seeker": 92
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 43
+  },
+  {
+    "fields": {
+      "author": 4,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 2653,
+      "created_at": "2025-05-27T08:44:53.092Z",
+      "expires_at": "2024-05-23",
+      "job_seeker": 93
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 44
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-05-27T08:48:58.011Z",
+      "expires_at": "2025-11-27",
+      "job_seeker": 94
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 45
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-05-27T09:16:03.065Z",
+      "expires_at": "2025-11-27",
+      "job_seeker": 96
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 46
   }
 ]
