@@ -11,9 +11,16 @@ from django.core.files.storage import default_storage
 from django.core.management import call_command
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.antivirus.models import Scan
+from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
 from itou.utils.storage.s3 import s3_client
+from tests.approvals.factories import ProlongationFactory, ProlongationRequestFactory
+from tests.communications.factories import AnnouncementItemFactory
 from tests.files.factories import FileFactory
+from tests.geiq_assessments.factories import AssessmentFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
 
 
 def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
@@ -133,3 +140,52 @@ def test_copy(pdf_file):
 
     with default_storage.open(key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
+
+
+def test_update_ids():
+    file = FileFactory()
+    job_application = JobApplicationFactory(resume=file)
+    prolongation_request = ProlongationRequestFactory(report_file=file, reason=ProlongationReason.SENIOR)
+    prolongation = ProlongationFactory(report_file=file, reason=ProlongationReason.SENIOR)
+    scan = Scan.objects.create(file=file, clamav_signature="toto")
+    announcement_item = AnnouncementItemFactory()
+    announcement_item.image_storage = file
+    announcement_item.save()
+    assessment = AssessmentFactory(
+        summary_document_file=file, structure_financial_assessment_file=file, action_financial_assessment_file=file
+    )
+    # Not a OntToOneField
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application  # Don't create a new resume
+    )
+    evaluated_administrative_criteria_1 = EvaluatedAdministrativeCriteriaFactory(
+        proof=file, evaluated_job_application=evaluated_job_application
+    )
+    evaluated_administrative_criteria_2 = EvaluatedAdministrativeCriteriaFactory(
+        proof=file, evaluated_job_application=evaluated_job_application
+    )
+
+    call_command("update_ids")
+
+    new_file = File.objects.get()
+    assert new_file.key == file.key
+    assert new_file.id != file.id
+
+    job_application.refresh_from_db()
+    assert job_application.resume_id == new_file.id
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.report_file_id == new_file.id
+    prolongation.refresh_from_db()
+    assert prolongation.report_file_id == new_file.id
+    scan.refresh_from_db()
+    assert scan.file_id == new_file.id
+    announcement_item.refresh_from_db()
+    assert announcement_item.image_storage_id == new_file.id
+    assessment.refresh_from_db()
+    assert assessment.summary_document_file_id == new_file.id
+    assert assessment.structure_financial_assessment_file_id == new_file.id
+    assert assessment.action_financial_assessment_file_id == new_file.id
+    evaluated_administrative_criteria_1.refresh_from_db()
+    assert evaluated_administrative_criteria_1.proof_id == new_file.id
+    evaluated_administrative_criteria_2.refresh_from_db()
+    assert evaluated_administrative_criteria_2.proof_id == new_file.id
