@@ -21,7 +21,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-md-9">
+                <div class="col-12 col-md-8">
                     <div class="c-stepper mb-3 mb-lg-5">
                         <div class="progress">
                             <div class="progress-bar progress-bar-{{ wizard_steps|stepper_progress }}" role="progressbar" aria-valuenow="{{ wizard_steps|stepper_progress }}" aria-valuemin="0" aria-valuemax="100">
@@ -53,7 +53,7 @@
                             {% endif %}
                             {% bootstrap_form form alert_error_type="non_fields" %}
 
-                            <div class="c-info">
+                            <div class="c-info mb-3">
                                 <span class="c-info__summary">
                                     {% if wizard_steps.current == "choose-employee" %}
                                         Vous ne trouvez pas votre salarié ?
@@ -67,7 +67,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <hr>
                             {% if wizard_steps.prev %}
                                 {% itou_buttons_form primary_label=wizard_steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url secondary_url=wizard_steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_name="création" %}
                             {% else %}
