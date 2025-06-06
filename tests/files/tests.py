@@ -78,7 +78,7 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
     existing_file = FileFactory()
     call_command("sync_s3_files")
     assertQuerySetEqual(
-        File.objects.values_list("id", flat=True),
+        File.objects.values_list("key", flat=True),
         [
             "resume/11111111-1111-1111-1111-111111111111.pdf",
             "evaluations/test.xlsx",
@@ -100,7 +100,7 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
         "Checking existing files: 1 files in database before sync",
         "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
         "permanent=0 files already in database before sync",
-        f"1 database files do not exist in the bucket: [{existing_file.id!r}]",
+        f"1 database files do not exist in the bucket: [{existing_file.pk!r}]",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.sync_s3_files succeeded in"
@@ -118,7 +118,7 @@ def test_cellar_does_not_support_checksum_validation():
 def test_copy(pdf_file):
     key = "resume/11111111-1111-1111-1111-111111111111.pdf"
     default_storage.save(key, pdf_file)
-    existing_file = FileFactory(id=key)
+    existing_file = FileFactory(key=key)
 
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
@@ -179,7 +179,8 @@ def test_purge_files(caplog):
 
 
 def test_update_ids():
-    file = FileFactory()
+    key = "file/path.ext"
+    file = FileFactory(id=key, key=key)
     job_application = JobApplicationFactory(resume=file)
     prolongation_request = ProlongationRequestFactory(report_file=file, reason=ProlongationReason.SENIOR)
     prolongation = ProlongationFactory(report_file=file, reason=ProlongationReason.SENIOR)
