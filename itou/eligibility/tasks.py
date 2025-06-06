@@ -49,6 +49,13 @@ def certify_criteria(eligibility_diagnosis):
                     case 400 | 404:
                         # Job seeker not found or missing profile information.
                         criterion.certified_at = timezone.now()
+                    case 409:
+                        # We sometimes get a 409 for some reason and the returned error message is not very helpful:
+                        # "Une requête associé à votre jeton est déjà en cours de traitement
+                        #  pour ces paramètres. Veuillez attendr..."
+                        # Since we don't want the request URL with personal data to be logged
+                        # we simply retry later
+                        raise RetryTask(delay=5) from exc
                     case 429:
                         # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                         raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc

@@ -112,6 +112,7 @@ class TestCertifyCriteria:
         "status_code,json_data,headers,retry_task_exception",
         [
             (400, {}, None, None),
+            (409, {}, None, True),
             (429, {}, None, False),
             (429, {}, {"Retry-After": "123"}, True),
             (503, {}, None, False),
