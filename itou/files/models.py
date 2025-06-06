@@ -7,7 +7,7 @@ from django.utils import timezone
 
 
 class File(models.Model):
-    id = models.CharField(primary_key=True, max_length=1024, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     # S3 fields
     # https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
