@@ -12,7 +12,7 @@
                 <p>
                     Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_seeker.get_full_name }}</strong> dans la structure suivante ?
                 </p>
-                {% include "includes/structures/_structure_info.html" with structure=company show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
+                {% include "includes/structures/_structure_info.html" with structure=company company_show_cta=True extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
             </div>
             <div class="modal-footer">
                 <form hx-post="{{ request.path }}"
