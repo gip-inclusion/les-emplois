@@ -53,7 +53,7 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
             image_alt_text=factory.Faker("sentence", locale="fr_FR"),
             image_storage=factory.SubFactory(
                 FileFactory,
-                id=factory.LazyAttribute(lambda obj: f"news-images/{obj.factory_parent.image.name}"),
+                key=factory.LazyAttribute(lambda obj: f"news-images/{obj.factory_parent.image.name}"),
             ),
         )
         for_snapshot = factory.Trait(

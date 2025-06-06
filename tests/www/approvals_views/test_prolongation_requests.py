@@ -366,7 +366,7 @@ class TestProlongationReportFileView:
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)
         key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
-        file = FileFactory(id=key)
+        file = FileFactory(key=key)
         request = approvals_factories.ProlongationRequestFactory(
             prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=file
         )
@@ -381,6 +381,6 @@ class TestProlongationReportFileView:
                     kwargs={"prolongation_request_id": request.pk},
                 )
             )
-            assertRedirects(response, default_storage.url(file.pk), fetch_redirect_response=False)
+            assertRedirects(response, default_storage.url(file.key), fetch_redirect_response=False)
         xlsx_file.seek(0)
         assert httpx.get(response.url).content == xlsx_file.read()
