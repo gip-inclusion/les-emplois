@@ -127,7 +127,7 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
                     {% if can_update_job_description != True %}
-                        {% include "includes/structures/_structure_info.html" with structure=siae show_cta=True extra_box_class="" back_url=back_url|default:request.get_full_path show=True job_app_to_transfer=job_app_to_transfer job_seeker=job_seeker|default:None only %}
+                        {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class="" back_url=back_url|default:request.get_full_path show=True job_app_to_transfer=job_app_to_transfer job_seeker=job_seeker|default:None only %}
                     {% endif %}
                 </div>
             </div>
