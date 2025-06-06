@@ -6,6 +6,7 @@ from pytest_django.asserts import assertMessages, assertRedirects
 from itou.users.enums import IdentityProvider
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.users.factories import (
+    DEFAULT_PASSWORD,
     JobSeekerFactory,
     PrescriberFactory,
 )
@@ -25,7 +26,7 @@ class TestChangeEmailView:
         email_address.user = user
         email_address.save()
 
-        post_data = {"email": new_email, "email_confirmation": new_email}
+        post_data = {"email": new_email, "email_confirmation": new_email, "password": DEFAULT_PASSWORD}
         response = client.post(url, data=post_data)
         assertRedirects(
             response,
@@ -83,29 +84,34 @@ class TestChangeEmailView:
 
 class TestEditUserEmailForm:
     def test_invalid_form(self):
-        old_email = "bernard@blier.fr"
+        user = JobSeekerFactory()
 
         # Email and confirmation email do not match
         email = "jean@gabin.fr"
         email_confirmation = "oscar@gabin.fr"
-        data = {"email": email, "email_confirmation": email_confirmation}
-        form = EditUserEmailForm(data=data, user_email=old_email)
+        data = {"email": email, "email_confirmation": email_confirmation, "password": DEFAULT_PASSWORD}
+        form = EditUserEmailForm(user, data=data)
         assert not form.is_valid()
 
         # Email already taken by another user. Bad luck!
-        user = JobSeekerFactory()
-        data = {"email": user.email, "email_confirmation": user.email}
-        form = EditUserEmailForm(data=data, user_email=old_email)
+        other_user = JobSeekerFactory()
+        data = {"email": other_user.email, "email_confirmation": other_user.email, "password": DEFAULT_PASSWORD}
+        form = EditUserEmailForm(user, data=data)
         assert not form.is_valid()
 
         # New address is the same as the old one.
-        data = {"email": old_email, "email_confirmation": old_email}
-        form = EditUserEmailForm(data=data, user_email=old_email)
+        data = {"email": user.email, "email_confirmation": user.email, "password": DEFAULT_PASSWORD}
+        form = EditUserEmailForm(user, data=data)
+        assert not form.is_valid()
+
+        # password is wrong
+        data = {"email": email, "email_confirmation": email, "password": "bad_password"}
+        form = EditUserEmailForm(user, data=data)
         assert not form.is_valid()
 
     def test_valid_form(self):
-        old_email = "bernard@blier.fr"
+        user = JobSeekerFactory()
         new_email = "jean@gabin.fr"
-        data = {"email": new_email, "email_confirmation": new_email}
-        form = EditUserEmailForm(data=data, user_email=old_email)
+        data = {"email": new_email, "email_confirmation": new_email, "password": DEFAULT_PASSWORD}
+        form = EditUserEmailForm(user, data=data)
         assert form.is_valid()
