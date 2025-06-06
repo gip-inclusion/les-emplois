@@ -901,7 +901,7 @@ class TestSiaeUploadDocsView:
             == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
         pdf_file.seek(0)
-        with default_storage.open(evaluated_administrative_criteria.proof_id) as saved_file:
+        with default_storage.open(evaluated_administrative_criteria.proof.key) as saved_file:
             assert saved_file.read() == pdf_file.read()
 
     def test_post_with_submission_freezed_at(self, client, pdf_file):
