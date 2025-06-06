@@ -7,7 +7,7 @@ from django.utils import timezone
 
 
 class File(models.Model):
-    id = models.CharField(primary_key=True, max_length=1024)
+    id = models.CharField(primary_key=True, max_length=1024, default=uuid.uuid4)
 
     # S3 fields
     # https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
@@ -29,4 +29,4 @@ class File(models.Model):
         new_key = str(pathlib.Path(self.key).with_stem(str(uuid.uuid4())))
         with default_storage.open(self.key) as file:
             default_storage.save(new_key, file)
-        return self.__class__.objects.create(id=new_key, key=new_key)
+        return self.__class__.objects.create(key=new_key)

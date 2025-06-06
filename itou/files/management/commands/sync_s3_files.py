@@ -38,7 +38,7 @@ class Command(BaseCommand):
             for obj_summary in obj_summaries:
                 key = obj_summary["Key"]
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
-                    batch.append(File(id=key, key=key, last_modified=obj_summary["LastModified"]))
+                    batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
                     permanent_files_nb += 1
                     if check_existing and key in known_keys:
                         known_permanent_files_nb += 1
