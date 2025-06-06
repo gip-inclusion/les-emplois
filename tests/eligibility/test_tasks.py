@@ -9,7 +9,7 @@ from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import async_certify_criteria
+from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
@@ -106,4 +106,45 @@ class TestCertifyCriteria:
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
         assert "TypeError: Programming error" in caplog.text
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
+
+    @pytest.mark.parametrize(
+        "status_code,json_data,headers,retry_task_exception",
+        [
+            (400, {}, None, None),
+            (429, {}, None, False),
+            (429, {}, {"Retry-After": "123"}, True),
+            (503, {}, None, False),
+            (
+                503,
+                {
+                    "message": (
+                        "Erreur de fournisseur de donnée : Trop de requêtes effectuées, veuillez réessayer plus tard."
+                    ),
+                },
+                None,
+                True,
+            ),
+            (503, {"message": "Déso"}, None, None),
+        ],
+    )
+    def test_retry_task_on_http_error_status_codes(
+        self, status_code, json_data, headers, retry_task_exception, factory, respx_mock
+    ):
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+            status_code, json=json_data, headers=headers
+        )
+        try:
+            certify_criteria(eligibility_diagnosis)
+        except RetryTask:
+            retry_task = True
+        except Exception:
+            retry_task = False
+        else:
+            retry_task = None
+        assert retry_task == retry_task_exception
+        # Huey catches the exception and retries the task.
+        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
+
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
