@@ -1,7 +1,7 @@
 {% autoescape off %}
-Nous avons bien enregistré votre demande de modification d'adresse e-mail.
+Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
-Afin de finaliser ce changement, cliquez sur le lien suivant :
+Afin de finaliser votre inscription, cliquez sur le lien suivant :
 
 {{ activate_url }}
 
