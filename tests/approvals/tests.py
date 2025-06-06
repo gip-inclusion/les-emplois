@@ -1,7 +1,6 @@
 import datetime
 import threading
 import time
-import uuid
 
 import factory
 import pytest
@@ -26,7 +25,6 @@ from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApprova
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
-from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberAuthorizationStatus
@@ -42,6 +40,7 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
+from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory
 
@@ -1801,16 +1800,13 @@ def test_prolongation_report_file_constraint_ok():
         ProlongationReason.SENIOR,
         ProlongationReason.RQTH,
     ):
-        report_file = File(key="random/" + str(uuid.uuid4()), last_modified=timezone.now())
-        report_file.save()
-        ProlongationFactory(reason=reason)
+        ProlongationFactory(reason=reason, report_file=FileFactory())
 
 
 @pytest.mark.django_db(transaction=True)
 def test_prolongation_report_file_constraint_invalid_reasons_ko():
     # FAIL: invalid reasons + report file
-    report_file = File(key="random/" + str(uuid.uuid4()), last_modified=timezone.now())
-    report_file.save()
+    report_file = FileFactory()
 
     for reason in (
         ProlongationReason.COMPLETE_TRAINING,
@@ -1820,9 +1816,11 @@ def test_prolongation_report_file_constraint_invalid_reasons_ko():
         with pytest.raises(IntegrityError):
             ProlongationFactory(reason=reason, report_file=report_file)
 
-    # Check message on clean() / validate_constraints()
-    with pytest.raises(ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"):
-        Prolongation(report_file=File()).validate_constraints()
+        # Check message on clean() / validate_constraints()
+        with pytest.raises(
+            ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"
+        ):
+            Prolongation(reason=reason, report_file=report_file).validate_constraints()
 
 
 @pytest.mark.parametrize("reason", PROLONGATION_REPORT_FILE_REASONS)
