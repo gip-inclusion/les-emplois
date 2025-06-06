@@ -47,7 +47,8 @@ class TestChangeEmailView:
         # User receives an email to confirm his new address.
         email = mailoutbox[0]
         assert "Confirmez votre adresse e-mail" in email.subject
-        assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
+        assert "Nous avons bien enregistré votre demande de modification d'adresse e-mail." in email.body
+        assert "Afin de finaliser ce changement, cliquez sur le lien suivant" in email.body
         assert email.to[0] == new_email
 
         # Confirm email : email is changed
