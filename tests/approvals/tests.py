@@ -1807,7 +1807,6 @@ def test_prolongation_report_file_constraint_ok():
 def test_prolongation_report_file_constraint_invalid_reasons_ko():
     # FAIL: invalid reasons + report file
     report_file = FileFactory()
-
     for reason in (
         ProlongationReason.COMPLETE_TRAINING,
         ProlongationReason.SENIOR_CDI,

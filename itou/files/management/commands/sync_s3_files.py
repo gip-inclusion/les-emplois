@@ -29,7 +29,7 @@ class Command(BaseCommand):
         temporary_files_nb = 0
         known_permanent_files_nb = 0
         if check_existing:
-            known_keys = set(File.objects.values_list("key", flat=True))
+            known_keys = set(File.objects.values_list("id", flat=True))
             self.logger.info("Checking existing files: %d files in database before sync", len(known_keys))
         else:
             known_keys = set()
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             for obj_summary in obj_summaries:
                 key = obj_summary["Key"]
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
-                    batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
+                    batch.append(File(id=key, last_modified=obj_summary["LastModified"]))
                     permanent_files_nb += 1
                     if check_existing and key in known_keys:
                         known_permanent_files_nb += 1

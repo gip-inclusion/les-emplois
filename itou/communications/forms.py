@@ -38,9 +38,9 @@ class AnnouncementItemForm(forms.ModelForm):
             extension = pathlib.Path(self.instance.image.name).suffix
             self.instance.image.name = f"{uuid.uuid4()}{extension}"
             if image := self.initial.get("image"):
-                File.objects.filter(key=image.name).update(deleted_at=timezone.now())
+                File.objects.filter(id=image.name).update(deleted_at=timezone.now())
         instance = super().save(commit=commit)
         if "image" in self.changed_data:
-            instance.image_storage = File.objects.create(key=instance.image.name)
+            instance.image_storage = File.objects.create(id=instance.image.name)
             instance.save()
         return instance
