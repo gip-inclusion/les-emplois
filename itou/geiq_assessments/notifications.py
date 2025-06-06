@@ -1,5 +1,9 @@
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification
+from itou.geiq_assessments.models import (
+    AssessmentInstitutionLink,
+)
+from itou.institutions.models import InstitutionMembership
 from itou.utils.urls import get_absolute_url
 
 
@@ -50,3 +54,20 @@ class AssessmentReviewedForGeiqNotification(EmailNotification):
         assessment = context["assessment"]
         context["abs_balance_amount"] = abs(assessment.granted_amount - assessment.advance_amount)
         return context
+
+    def build(self):
+        email_message = super().build()
+        assessment = self.context["assessment"]
+        cc_users = {
+            membership.user
+            for membership in InstitutionMembership.objects.active()
+            .filter(
+                institution__in=AssessmentInstitutionLink.objects.filter(
+                    assessment=assessment, with_convention=True
+                ).values_list("institution", flat=True),
+            )
+            .select_related("user")
+        }
+        # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
+        email_message.cc = sorted(cc_user.email for cc_user in cc_users)
+        return email_message
