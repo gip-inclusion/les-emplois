@@ -1,6 +1,4 @@
 [
-  "* * * * * $ROOT/clevercloud/run_management_command.sh update_ids",
-
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
   "*/5 0-22 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
