@@ -257,17 +257,13 @@ class ItouPasswordChangeView(PasswordChangeView):
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()
-    form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
+    form = EditUserEmailForm(request.user, data=request.POST or None)
     if request.method == "POST" and form.is_valid():
         # Do no update the user email : django allauth will do it when confirming the email.
         send_email_confirmation(request, request.user, email=form.cleaned_data["email"])
         return HttpResponseRedirect(reverse("dashboard:index"))
 
-    context = {
-        "form": form,
-    }
-
-    return render(request, template_name, context)
+    return render(request, template_name, {"form": form})
 
 
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
