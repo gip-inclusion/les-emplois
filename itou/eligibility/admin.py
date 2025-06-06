@@ -176,7 +176,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         # We cannot make this message in the admin form
         if obj.author_prescriber_organization_id and not obj.author_prescriber_organization.is_authorized:
             messages.warning(request, "L'organisation prescriptrice n'est actuellement pas habilitée.")
-        return super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.EligibilityDiagnosis)
