@@ -1,3 +1,4 @@
+import logging
 import uuid
 from pprint import pformat
 
@@ -45,6 +46,9 @@ from itou.utils.admin import (
     get_structure_view_link,
 )
 from itou.utils.urls import add_url_params
+
+
+logger = logging.getLogger(__name__)
 
 
 class EmailAddressInline(ReadonlyMixin, ItouTabularInline):
@@ -718,6 +722,11 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                     membership.is_active = False
                     membership.is_admin = False
                     membership.save()
+        if obj.identity_provider == IdentityProvider.DJANGO and "email" in form.changed_data:
+            deleted, _details = EmailAddress.objects.filter(user=obj).delete()
+            logger.info("Deleted %d EmailAddress for user pk=%d.", deleted, obj.pk)
+            EmailAddress.objects.create(user=obj, email=obj.email, primary=True, verified=True)
+            logger.info("Created primary, verified EmailAddress for user pk=%d.", obj.pk)
         return super().save_model(request, obj, form, change)
 
 
