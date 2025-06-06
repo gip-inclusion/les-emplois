@@ -14,8 +14,8 @@ from itou.approvals.enums import (
     ProlongationRequestDenyReason,
     ProlongationRequestStatus,
 )
-from itou.files.models import File
 from tests.approvals import factories as approvals_factories
+from tests.files.factories import FileFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
@@ -366,7 +366,7 @@ class TestProlongationReportFileView:
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)
         key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
-        file = File.objects.create(key=key)
+        file = FileFactory(key=key)
         request = approvals_factories.ProlongationRequestFactory(
             prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=file
         )
