@@ -7,7 +7,6 @@ from itou.files.models import File
 
 
 class FileFactory(factory.django.DjangoModelFactory):
-    id = factory.Faker("uuid4")
     key = factory.Faker("file_path", absolute=False, depth=2)
     last_modified = factory.LazyFunction(timezone.now)
 
@@ -16,6 +15,6 @@ class FileFactory(factory.django.DjangoModelFactory):
 
     class Params:
         for_snapshot = factory.Trait(
-            id="f0r_5n4p5h07",
+            id="e683e4dc-34b5-44c1-ad6d-2fd77835d743",
             last_modified=datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC),
         )
