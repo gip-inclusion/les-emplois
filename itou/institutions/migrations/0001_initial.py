@@ -266,6 +266,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 through="institutions.InstitutionMembership",
                 to=settings.AUTH_USER_MODEL,
+                through_fields=("institution", "user"),
                 verbose_name="membres",
             ),
         ),

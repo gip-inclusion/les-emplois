@@ -675,7 +675,11 @@ class Migration(migrations.Migration):
             model_name="company",
             name="members",
             field=models.ManyToManyField(
-                blank=True, through="companies.CompanyMembership", to=settings.AUTH_USER_MODEL, verbose_name="membres"
+                blank=True,
+                through="companies.CompanyMembership",
+                through_fields=("company", "user"),
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="membres",
             ),
         ),
         migrations.AlterField(

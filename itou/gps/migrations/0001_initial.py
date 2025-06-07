@@ -86,6 +86,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 related_name="follow_up_groups_member",
                 through="gps.FollowUpGroupMembership",
+                through_fields=("follow_up_group", "member"),
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
