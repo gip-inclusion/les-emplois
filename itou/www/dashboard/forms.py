@@ -1,3 +1,4 @@
+from allauth.account.fields import PasswordField
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -131,9 +132,10 @@ class EditUserEmailForm(forms.Form):
         widget=forms.EmailInput(attrs={"placeholder": "prenom.nom@example.com"}),
         required=True,
     )
+    password = PasswordField(label="Mot de passe", autocomplete="current-password")
 
-    def __init__(self, *args, **kwargs):
-        self.user_email = kwargs.pop("user_email")
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -146,11 +148,17 @@ class EditUserEmailForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if email == self.user_email:
+        if email == self.user.email:
             raise ValidationError("Veuillez indiquer une adresse différente de l'actuelle.")
         if User.objects.filter(email=email):
             raise ValidationError("Cette adresse est déjà utilisée par un autre utilisateur.")
         return email
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if self.user.check_password(password) is False:
+            raise ValidationError("Le mot de passe est incorrect.")
+        return password
 
 
 class EditUserNotificationForm(forms.Form):
