@@ -329,18 +329,18 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
+                                                                                         (SELECT U0."timestamp" AS "timestamp"
                                                                                           FROM "job_applications_jobapplicationtransitionlog" U0
                                                                                           WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                                                                                  AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
+                                                                                          ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp"
+                            (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
                              WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                     AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
+                             ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
           FROM "job_applications_jobapplication"
@@ -767,18 +767,18 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
+                                                                                         (SELECT U0."timestamp" AS "timestamp"
                                                                                           FROM "job_applications_jobapplicationtransitionlog" U0
                                                                                           WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                                                                                  AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
+                                                                                          ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp"
+                            (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
                              WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                     AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
+                             ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
           FROM "job_applications_jobapplication"
@@ -1303,18 +1303,18 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
+                                                                                         (SELECT U0."timestamp" AS "timestamp"
                                                                                           FROM "job_applications_jobapplicationtransitionlog" U0
                                                                                           WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                                                                                  AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
+                                                                                          ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp"
+                            (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
                              WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                     AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
+                             ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
           FROM "job_applications_jobapplication"
@@ -1741,18 +1741,18 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
+                                                                                         (SELECT U0."timestamp" AS "timestamp"
                                                                                           FROM "job_applications_jobapplicationtransitionlog" U0
                                                                                           WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                                                                                  AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
+                                                                                          ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp"
+                            (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
                              WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                     AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
+                             ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
           FROM "job_applications_jobapplication"
@@ -1828,18 +1828,18 @@
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
                      WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
+                                                                                         (SELECT U0."timestamp" AS "timestamp"
                                                                                           FROM "job_applications_jobapplicationtransitionlog" U0
                                                                                           WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                                                                                  AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
+                                                                                          ORDER BY 1 DESC
                                                                                           LIMIT 1), "job_applications_jobapplication"."created_at")
                      ELSE
-                            (SELECT U0."timestamp"
+                            (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
                              WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
                                     AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
+                             ORDER BY 1 DESC
                              LIMIT 1)
                  END AS "accepted_at"
           FROM "job_applications_jobapplication"

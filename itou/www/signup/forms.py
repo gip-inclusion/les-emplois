@@ -109,6 +109,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["email"].label = "E-mail"
         self.fields["email"].widget.attrs["placeholder"] = ""
         self.fields["last_name"].label = "Nom de famille"
         self.fields["birth_place"].help_text = (

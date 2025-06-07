@@ -2271,7 +2271,7 @@
                  "prescribers_prescriberorganization"."authorization_updated_by_id",
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescriberorganization"
-          WHERE "prescribers_prescriberorganization"."id" IN (%s)
+          WHERE ("prescribers_prescriberorganization"."id") IN ((%s))
         ''',
       }),
       dict({

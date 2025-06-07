@@ -15,7 +15,7 @@ tenacity  # https://github.com/jd/tenacity
 # Django
 # ------------------------------------------------------------------------------
 
-django==5.1.*  # https://www.djangoproject.com/
+django==5.2.*  # https://www.djangoproject.com/
 
 # django-allauth
 django-allauth  # https://codeberg.org/allauth/django-allauth/

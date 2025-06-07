@@ -995,10 +995,7 @@
                  "jobs_appellation"."rome_id",
                  "jobs_appellation"."full_text"
           FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" IN (%s,
-                                              %s,
-                                              %s,
-                                              %s)
+          WHERE ("jobs_appellation"."code") IN ((%s), (%s), (%s), (%s))
         ''',
       }),
       dict({
@@ -1013,10 +1010,7 @@
                  "jobs_rome"."code",
                  "jobs_rome"."name"
           FROM "jobs_rome"
-          WHERE "jobs_rome"."code" IN (%s,
-                                       %s,
-                                       %s,
-                                       %s)
+          WHERE ("jobs_rome"."code") IN ((%s), (%s), (%s), (%s))
         ''',
       }),
       dict({

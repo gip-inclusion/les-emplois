@@ -62,7 +62,7 @@ class ApplicantsView(LoginNotRequiredMixin, generics.ListAPIView):
                     "job_applications__to_company_id__uid",
                     filter=Q(job_applications__to_company_id__in=companies_ids),
                     distinct=True,
-                    ordering="job_applications__to_company_id__uid",
+                    order_by="job_applications__to_company_id__uid",
                 )
             )
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")

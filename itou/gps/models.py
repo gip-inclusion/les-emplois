@@ -99,12 +99,12 @@ class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySe
         qs = self.annotate(
             prescriber_org_names=ArrayAgg(
                 "member__prescribermembership__organization__name",
-                ordering=("-member__prescribermembership__is_admin", "member__prescribermembership__joined_at"),
+                order_by=("-member__prescribermembership__is_admin", "member__prescribermembership__joined_at"),
             )
         ).annotate(
             companies_names=ArrayAgg(
                 "member__companymembership__company__name",
-                ordering=("-member__companymembership__is_admin", "member__companymembership__joined_at"),
+                order_by=("-member__companymembership__is_admin", "member__companymembership__joined_at"),
             )
         )
 

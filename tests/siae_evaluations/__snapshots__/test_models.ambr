@@ -121,7 +121,7 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT "job_applications_jobapplication"."to_company_id" AS "col1"
+            (SELECT "job_applications_jobapplication"."to_company_id" AS "to_company"
              FROM "job_applications_jobapplication"
              INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
              INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
@@ -148,7 +148,7 @@
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
-          SELECT "job_applications_jobapplication"."to_company_id"
+          SELECT "job_applications_jobapplication"."to_company_id" AS "to_company"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           INNER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
@@ -166,7 +166,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          GROUP BY "job_applications_jobapplication"."to_company_id"
+          GROUP BY 1
           HAVING COUNT("job_applications_jobapplication"."to_company_id") >= %s
           ORDER BY RANDOM() ASC
           LIMIT 1
@@ -486,7 +486,7 @@
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
-          SELECT "users_user"."email"
+          SELECT "users_user"."email" AS "email"
           FROM "users_user"
           INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
           WHERE "companies_companymembership"."id" IN
@@ -508,7 +508,7 @@
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
-          SELECT "users_user"."email"
+          SELECT "users_user"."email" AS "email"
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN

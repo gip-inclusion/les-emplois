@@ -547,18 +547,9 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
-                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                               (SELECT U0."id"
-                                FROM "eligibility_eligibilitydiagnosis" U0
-                                WHERE (U0."expires_at" > %s
-                                       AND (U0."author_kind" = %s
-                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
-                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
-                                ORDER BY U0."created_at" DESC
-                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+            (SELECT GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-               (SELECT U0."id"
+               (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
                        AND (U0."author_kind" = %s
@@ -566,26 +557,26 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                               (SELECT U0."id" AS "id"
+                                FROM "eligibility_eligibilitydiagnosis" U0
+                                WHERE (U0."expires_at" > %s
+                                       AND (U0."author_kind" = %s
+                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                ORDER BY U0."created_at" DESC
+                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                    (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
-               (SELECT U1."start_at"
+               (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
                 INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
                 WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
                        AND U1."start_at" > %s
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                        AND U0."status" = %s)
-                ORDER BY U1."start_at" ASC
+                ORDER BY 1 ASC
                 LIMIT 1) AS "next_appointment_start_at",
-                    (
-                       (SELECT COUNT(U0."id") AS "count"
-                        FROM "rdv_insertion_participation" U0
-                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
-                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
-                               AND U1."start_at" > %s
-                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
-                               AND U0."status" = %s)
-                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
           
                (SELECT COUNT(U0."id") AS "count"
                 FROM "rdv_insertion_participation" U0
@@ -594,16 +585,25 @@
                        AND U1."start_at" > %s
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                        AND U0."status" = %s)
-                ORDER BY RANDOM() ASC) AS "upcoming_participations_count"
+                ORDER BY RANDOM() ASC) AS "upcoming_participations_count",
+                    (
+                       (SELECT COUNT(U0."id") AS "count"
+                        FROM "rdv_insertion_participation" U0
+                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                               AND U1."start_at" > %s
+                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                               AND U0."status" = %s)
+                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T5 ON ("job_applications_jobapplication"."job_seeker_id" = T5."id")
              WHERE ("job_applications_jobapplication"."sender_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1,
-                      2,
-                      6) subquery
+                      3,
+                      4,
+                      7) subquery
         ''',
       }),
       dict({
@@ -661,7 +661,7 @@
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND (U0."author_kind" = %s
@@ -670,7 +670,7 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
                  COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                            (SELECT U0."id"
+                            (SELECT U0."id" AS "id"
                              FROM "eligibility_eligibilitydiagnosis" U0
                              WHERE (U0."expires_at" > %s
                                     AND (U0."author_kind" = %s
@@ -680,14 +680,14 @@
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
-            (SELECT U1."start_at"
+            (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
              INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
              WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
                     AND U1."start_at" > %s
                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                     AND U0."status" = %s)
-             ORDER BY U1."start_at" ASC
+             ORDER BY 1 ASC
              LIMIT 1) AS "next_appointment_start_at",
           
             (SELECT COUNT(U0."id") AS "count"
@@ -1326,7 +1326,7 @@
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND (U0."author_kind" = %s
@@ -1335,7 +1335,7 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
                  COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                            (SELECT U0."id"
+                            (SELECT U0."id" AS "id"
                              FROM "eligibility_eligibilitydiagnosis" U0
                              WHERE (U0."expires_at" > %s
                                     AND (U0."author_kind" = %s
@@ -1713,7 +1713,7 @@
           FROM "approvals_poleemploiapproval"
           WHERE ("approvals_poleemploiapproval"."nir" = %s
                  AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
+                            (SELECT U0."number" AS "number"
                              FROM "approvals_approval" U0
                              WHERE U0."user_id" = %s)))
           ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
@@ -1893,7 +1893,7 @@
           FROM "approvals_poleemploiapproval"
           WHERE ("approvals_poleemploiapproval"."nir" = %s
                  AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
+                            (SELECT U0."number" AS "number"
                              FROM "approvals_approval" U0
                              WHERE U0."user_id" = %s)))
           ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
@@ -3426,18 +3426,9 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
-                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                               (SELECT U0."id"
-                                FROM "eligibility_eligibilitydiagnosis" U0
-                                WHERE (U0."expires_at" > %s
-                                       AND (U0."author_kind" = %s
-                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
-                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
-                                ORDER BY U0."created_at" DESC
-                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+            (SELECT GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-               (SELECT U0."id"
+               (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
                        AND (U0."author_kind" = %s
@@ -3445,26 +3436,26 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                               (SELECT U0."id" AS "id"
+                                FROM "eligibility_eligibilitydiagnosis" U0
+                                WHERE (U0."expires_at" > %s
+                                       AND (U0."author_kind" = %s
+                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                ORDER BY U0."created_at" DESC
+                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                    (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
-               (SELECT U1."start_at"
+               (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
                 INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
                 WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
                        AND U1."start_at" > %s
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                        AND U0."status" = %s)
-                ORDER BY U1."start_at" ASC
+                ORDER BY 1 ASC
                 LIMIT 1) AS "next_appointment_start_at",
-                    (
-                       (SELECT COUNT(U0."id") AS "count"
-                        FROM "rdv_insertion_participation" U0
-                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
-                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
-                               AND U1."start_at" > %s
-                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
-                               AND U0."status" = %s)
-                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count",
           
                (SELECT COUNT(U0."id") AS "count"
                 FROM "rdv_insertion_participation" U0
@@ -3473,7 +3464,16 @@
                        AND U1."start_at" > %s
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                        AND U0."status" = %s)
-                ORDER BY RANDOM() ASC) AS "upcoming_participations_count"
+                ORDER BY RANDOM() ASC) AS "upcoming_participations_count",
+                    (
+                       (SELECT COUNT(U0."id") AS "count"
+                        FROM "rdv_insertion_participation" U0
+                        INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+                        WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                               AND U1."start_at" > %s
+                               AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                               AND U0."status" = %s)
+                        ORDER BY RANDOM() ASC) - %s) AS "other_participations_count"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
@@ -3482,9 +3482,9 @@
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1,
-                      2,
-                      6) subquery
+                      3,
+                      4,
+                      7) subquery
         ''',
       }),
       dict({
@@ -3542,7 +3542,7 @@
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND (U0."author_kind" = %s
@@ -3551,7 +3551,7 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
                  COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                            (SELECT U0."id"
+                            (SELECT U0."id" AS "id"
                              FROM "eligibility_eligibilitydiagnosis" U0
                              WHERE (U0."expires_at" > %s
                                     AND (U0."author_kind" = %s
@@ -3561,14 +3561,14 @@
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
                  (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
-            (SELECT U1."start_at"
+            (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
              INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
              WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
                     AND U1."start_at" > %s
                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
                     AND U0."status" = %s)
-             ORDER BY U1."start_at" ASC
+             ORDER BY 1 ASC
              LIMIT 1) AS "next_appointment_start_at",
           
             (SELECT COUNT(U0."id") AS "count"
@@ -4575,18 +4575,9 @@
         'sql': '''
           SELECT COUNT(*)
           FROM
-            (SELECT (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
-                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                               (SELECT U0."id"
-                                FROM "eligibility_eligibilitydiagnosis" U0
-                                WHERE (U0."expires_at" > %s
-                                       AND (U0."author_kind" = %s
-                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
-                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
-                                ORDER BY U0."created_at" DESC
-                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+            (SELECT GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-               (SELECT U0."id"
+               (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
                        AND (U0."author_kind" = %s
@@ -4594,7 +4585,16 @@
                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                 ORDER BY U0."created_at" DESC
                 LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
-                    GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change"
+                    COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                               (SELECT U0."id" AS "id"
+                                FROM "eligibility_eligibilitydiagnosis" U0
+                                WHERE (U0."expires_at" > %s
+                                       AND (U0."author_kind" = %s
+                                            OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                ORDER BY U0."created_at" DESC
+                                LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+                    (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
              INNER JOIN "users_user" T6 ON ("job_applications_jobapplication"."job_seeker_id" = T6."id")
@@ -4603,8 +4603,8 @@
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
-                      1,
-                      2) subquery
+                      3,
+                      4) subquery
         ''',
       }),
       dict({
@@ -4662,7 +4662,7 @@
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND (U0."author_kind" = %s
@@ -4671,7 +4671,7 @@
              ORDER BY U0."created_at" DESC
              LIMIT 1) AS "jobseeker_valid_eligibility_diagnosis",
                  COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
-                            (SELECT U0."id"
+                            (SELECT U0."id" AS "id"
                              FROM "eligibility_eligibilitydiagnosis" U0
                              WHERE (U0."expires_at" > %s
                                     AND (U0."author_kind" = %s

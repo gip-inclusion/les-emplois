@@ -689,7 +689,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -704,7 +704,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_disablednotification"."notification_record_id"
+          SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
                                                                                     %s,
@@ -998,7 +998,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -1407,7 +1407,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -1422,7 +1422,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_disablednotification"."notification_record_id"
+          SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
                                                                                     %s,
@@ -1604,7 +1604,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -2104,7 +2104,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -2119,7 +2119,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_disablednotification"."notification_record_id"
+          SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
                                                                                     %s,
@@ -2352,7 +2352,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -2845,7 +2845,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
@@ -2860,7 +2860,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_disablednotification"."notification_record_id"
+          SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
                                                                                     %s,
@@ -3091,7 +3091,7 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "communications_notificationrecord"."id"
+          SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")

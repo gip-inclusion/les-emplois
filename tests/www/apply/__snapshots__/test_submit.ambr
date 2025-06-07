@@ -1006,7 +1006,7 @@
                   OR ("approvals_poleemploiapproval"."birthdate" = %s
                       AND "approvals_poleemploiapproval"."pole_emploi_id" = %s))
                  AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
+                            (SELECT U0."number" AS "number"
                              FROM "approvals_approval" U0
                              WHERE U0."user_id" = %s)))
           ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
@@ -1177,7 +1177,7 @@
           'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates"
+          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s

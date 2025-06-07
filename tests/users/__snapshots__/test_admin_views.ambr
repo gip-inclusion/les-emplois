@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_num_queries
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -61,12 +61,6 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -266,8 +260,8 @@
       }),
       dict({
         'origin': list([
-          'EmailAddressFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
-          'EmailAddressFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'EmailAddressFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'EmailAddressFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
         ]),
         'sql': '''
           SELECT "account_emailaddress"."id",
@@ -318,8 +312,8 @@
       }),
       dict({
         'origin': list([
-          'PrescriberMembershipFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
-          'PrescriberMembershipFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'PrescriberMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'PrescriberMembershipFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -374,8 +368,8 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
-          'JobApplicationFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'JobApplicationFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'JobApplicationFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -505,7 +499,7 @@
       }),
       dict({
         'origin': list([
-          'PkSupportRemarkFormFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
+          'PkSupportRemarkFormSet.initial_form_count[<site-packages>/django/forms/models.py]',
         ]),
         'sql': '''
           SELECT "utils_pksupportremark"."id",
@@ -517,12 +511,6 @@
                  AND "utils_pksupportremark"."object_id" = %s)
           ORDER BY "utils_pksupportremark"."id" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
