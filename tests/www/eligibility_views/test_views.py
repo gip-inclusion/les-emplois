@@ -8,7 +8,6 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertRedirects
 
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.utils.urls import add_url_params
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
@@ -39,9 +38,10 @@ class TestUpdateEligibilityView:
         user = factory()
         job_seeker = user if user.is_job_seeker else JobSeekerFactory()
         client.force_login(user)
-        url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            {"back_url": reverse("job_seekers_views:list")},
+        url = reverse(
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+            query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
         assert response.status_code == status_code
@@ -53,9 +53,10 @@ class TestUpdateEligibilityView:
         client.force_login(prescriber)
 
         # Without a eligibility diagnosis
-        url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            {"back_url": reverse("job_seekers_views:list")},
+        url = reverse(
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+            query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="0")
@@ -81,9 +82,10 @@ class TestUpdateEligibilityView:
         )
 
         client.force_login(prescriber)
-        url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            {"back_url": reverse("job_seekers_views:list")},
+        url = reverse(
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+            query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
@@ -112,9 +114,10 @@ class TestUpdateEligibilityView:
         ApprovalFactory(user=job_seeker)
 
         client.force_login(prescriber)
-        url = add_url_params(
-            reverse("eligibility_views:update", kwargs={"job_seeker_public_id": job_seeker.public_id}),
-            {"back_url": reverse("job_seekers_views:list")},
+        url = reverse(
+            "eligibility_views:update",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+            query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
         assertRedirects(response, reverse("job_seekers_views:list"))

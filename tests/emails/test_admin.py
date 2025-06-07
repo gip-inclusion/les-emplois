@@ -6,7 +6,6 @@ from httpx import Response
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.emails.models import Email
-from itou.utils.urls import add_url_params
 
 
 class TestEmailAdmin:
@@ -84,21 +83,24 @@ class TestEmailAdmin:
         search_success = {"sent_to_esp": "1"}
         success_urlencoded = urlencode(search_success)
         waiting_email_url = escape(
-            add_url_params(
-                reverse("admin:emails_email_change", kwargs={"object_id": waiting_email.pk}),
-                {"_changelist_filters": errors_urlencoded},
+            reverse(
+                "admin:emails_email_change",
+                kwargs={"object_id": waiting_email.pk},
+                query={"_changelist_filters": errors_urlencoded},
             )
         )
         error_email_url = escape(
-            add_url_params(
-                reverse("admin:emails_email_change", kwargs={"object_id": error_email.pk}),
-                {"_changelist_filters": errors_urlencoded},
+            reverse(
+                "admin:emails_email_change",
+                kwargs={"object_id": error_email.pk},
+                query={"_changelist_filters": errors_urlencoded},
             )
         )
         success_email_url = escape(
-            add_url_params(
-                reverse("admin:emails_email_change", kwargs={"object_id": success_email.pk}),
-                {"_changelist_filters": success_urlencoded},
+            reverse(
+                "admin:emails_email_change",
+                kwargs={"object_id": success_email.pk},
+                query={"_changelist_filters": success_urlencoded},
             )
         )
 

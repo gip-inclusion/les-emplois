@@ -15,7 +15,6 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -67,15 +66,16 @@ class TestProcessListSiae:
 
         # Has link to export with back_url set
         export_url = unquote(
-            add_url_params(reverse("apply:list_for_siae_exports"), {"back_url": reverse("apply:list_for_siae")})
+            reverse("apply:list_for_siae_exports", query={"back_url": reverse("apply:list_for_siae")})
         )
         assertContains(response, export_url)
 
         # Has job application card link with back_url set
         job_application_link = unquote(
-            add_url_params(
-                reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk}),
-                {"back_url": reverse("apply:list_for_siae")},
+            reverse(
+                "apply:details_for_company",
+                kwargs={"job_application_id": job_app.pk},
+                query={"back_url": reverse("apply:list_for_siae")},
             )
         )
         assertContains(response, job_application_link)
@@ -310,7 +310,7 @@ class TestProcessListSiae:
         job_app = JobApplicationFactory(to_company=company)
 
         client.force_login(employer)
-        response = client.get(add_url_params(reverse("apply:list_for_siae"), {"start_date": "", "end_date": ""}))
+        response = client.get(reverse("apply:list_for_siae", query={"start_date": "", "end_date": ""}))
         assert response.context["job_applications_page"].object_list == [job_app]
 
     def test_list_for_siae_filtered_by_sender_organization_name(self, client):
@@ -1080,7 +1080,7 @@ def test_list_for_siae_select_applications_htmx(client):
 
     job_apps = JobApplicationFactory.create_batch(3, to_company=company, state=JobApplicationState.NEW)
     client.force_login(employer)
-    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table"})
+    table_url = reverse("apply:list_for_siae", query={"display": "table"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
@@ -1149,7 +1149,7 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     assert not unarchivable_app.can_be_archived
 
     client.force_login(employer)
-    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1243,7 +1243,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     assert not untransferable_app.transfer.is_available()
 
     client.force_login(employer)
-    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1356,7 +1356,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     assert not unpostponable_app.postpone.is_available()
 
     client.force_login(employer)
-    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(
@@ -1465,7 +1465,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     assert not unrefusable_app.refuse.is_available()
 
     client.force_login(employer)
-    table_url = add_url_params(reverse("apply:list_for_siae"), {"display": "table", "start_date": "2015-01-01"})
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
 
     response = client.get(table_url)
     simulated_page = parse_response_to_soup(

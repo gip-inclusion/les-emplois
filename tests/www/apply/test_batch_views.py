@@ -8,7 +8,6 @@ from pytest_django.asserts import assertContains, assertMessages, assertRedirect
 
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, SenderKind
-from itou.utils.urls import add_url_params
 from itou.www.apply.views.batch_views import RefuseWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import (
@@ -43,13 +42,13 @@ class TestBatchArchive:
     def test_single_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
         client.force_login(employer)
 
         archivable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [archivable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -67,10 +66,10 @@ class TestBatchArchive:
 
         archivable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.REFUSED)
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [archivable_app.pk for archivable_app in archivable_apps]},
         )
         assertRedirects(response, next_url)
@@ -85,11 +84,11 @@ class TestBatchArchive:
     def test_sent_application(self, client):
         archivable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.REFUSED)
         assert archivable_app.can_be_archived
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
 
         client.force_login(archivable_app.sender)
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [archivable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -108,11 +107,11 @@ class TestBatchArchive:
     def test_unexisting_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
         client.force_login(employer)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [uuid.uuid4()]},
         )
         assertRedirects(response, next_url)
@@ -129,7 +128,7 @@ class TestBatchArchive:
     def test_unarchivable(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         unarchivable_app = JobApplicationFactory(
@@ -141,7 +140,7 @@ class TestBatchArchive:
         assert unarchivable_app.archived_at is None
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [unarchivable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -164,7 +163,7 @@ class TestBatchArchive:
     def test_already_archived(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
         client.force_login(employer)
 
         archived_app = JobApplicationFactory(
@@ -177,7 +176,7 @@ class TestBatchArchive:
         assert archived_app.archived_at is not None
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [archived_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -219,10 +218,10 @@ class TestBatchArchive:
                 archived_at=timezone.now(),
             ),
         ]
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"start_date": "1970-01-01"})
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_archive"), {"next_url": next_url}),
+            reverse("apply:batch_archive", query={"next_url": next_url}),
             data={"application_ids": [app.pk for app in apps] + [uuid.uuid4(), uuid.uuid4()]},
         )
         assertRedirects(response, next_url)
@@ -286,13 +285,13 @@ class TestBatchPostpone:
     def test_single_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         postponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={
                 "answer": self.FAKE_ANSWER,
                 "application_ids": [postponable_app.pk],
@@ -316,10 +315,10 @@ class TestBatchPostpone:
             2, to_company=company, state=JobApplicationState.PROCESSING
         )
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={
                 "answer": self.FAKE_ANSWER,
                 "application_ids": [postponable_app.pk for postponable_app in postponable_apps],
@@ -339,10 +338,10 @@ class TestBatchPostpone:
     def test_sent_application(self, client):
         postponable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.PROCESSING)
         assert postponable_app.postpone.is_available()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(postponable_app.sender)
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={"answer": self.FAKE_ANSWER, "application_ids": [postponable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -361,11 +360,11 @@ class TestBatchPostpone:
     def test_unexisting_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={"answer": self.FAKE_ANSWER, "application_ids": [uuid.uuid4()]},
         )
         assertRedirects(response, next_url)
@@ -382,13 +381,13 @@ class TestBatchPostpone:
     def test_missing_answer(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         postponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING, answer="")
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={"answer": "", "application_ids": [postponable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -403,7 +402,7 @@ class TestBatchPostpone:
     def test_unpostponable(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         unpostponable_app = JobApplicationFactory(
@@ -415,7 +414,7 @@ class TestBatchPostpone:
         assert not unpostponable_app.postpone.is_available()
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={"answer": self.FAKE_ANSWER, "application_ids": [unpostponable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -438,7 +437,7 @@ class TestBatchPostpone:
     def test_already_postponed(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         postponed_app = JobApplicationFactory(
@@ -452,7 +451,7 @@ class TestBatchPostpone:
         assert not postponed_app.postpone.is_available()
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={"answer": self.FAKE_ANSWER, "application_ids": [postponed_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -495,10 +494,10 @@ class TestBatchPostpone:
                 archived_at=timezone.now(),
             ),
         ]
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"start_date": "1970-01-01"})
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_postpone"), {"next_url": next_url}),
+            reverse("apply:batch_postpone", query={"next_url": next_url}),
             data={
                 "answer": self.FAKE_ANSWER,
                 "application_ids": [app.pk for app in apps] + [uuid.uuid4(), uuid.uuid4()],
@@ -565,12 +564,12 @@ class TestBatchRefuse:
 
     def test_sent_application(self, client):
         refusable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         assert refusable_app.refuse.is_available()
 
         client.force_login(refusable_app.sender)
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -589,11 +588,11 @@ class TestBatchRefuse:
     def test_unexisting_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [uuid.uuid4()]},
         )
         assertRedirects(response, next_url)
@@ -610,7 +609,7 @@ class TestBatchRefuse:
     def test_unrefusable_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         unrefusable_app = JobApplicationFactory(
@@ -620,7 +619,7 @@ class TestBatchRefuse:
             state=JobApplicationState.ACCEPTED,
         )
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [unrefusable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -641,7 +640,7 @@ class TestBatchRefuse:
     def test_single_app_from_orienter(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
@@ -654,7 +653,7 @@ class TestBatchRefuse:
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -748,11 +747,11 @@ class TestBatchRefuse:
             ),
         ]
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -840,11 +839,11 @@ class TestBatchRefuse:
             sender_kind=SenderKind.JOB_SEEKER,
         )
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -907,7 +906,7 @@ class TestBatchRefuse:
     def test_refuse_step_bypass(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
@@ -920,7 +919,7 @@ class TestBatchRefuse:
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -965,7 +964,7 @@ class TestBatchRefuse:
     def test_single_app_transferred_concurrently(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
         reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
@@ -978,7 +977,7 @@ class TestBatchRefuse:
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -1041,11 +1040,11 @@ class TestBatchRefuse:
             ),
         ]
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "PROCESSING"})
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
 
         # Start view
         response = client.post(
-            add_url_params(reverse("apply:batch_refuse"), {"next_url": next_url}),
+            reverse("apply:batch_refuse", query={"next_url": next_url}),
             data={"application_ids": [refusable_app.pk for refusable_app in refusable_apps]},
         )
         refuse_session_name = get_session_name(client.session, RefuseWizardView.expected_session_kind)
@@ -1160,13 +1159,13 @@ class TestBatchTransfer:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         other_company = CompanyMembershipFactory(user=employer).company
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         transferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={"target_company_id": other_company.pk, "application_ids": [transferable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -1185,10 +1184,10 @@ class TestBatchTransfer:
 
         transferable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.NEW)
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "REFUSED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
                 "target_company_id": other_company.pk,
                 "application_ids": [transferable_app.pk for transferable_app in transferable_apps],
@@ -1206,12 +1205,12 @@ class TestBatchTransfer:
     def test_sent_application(self, client):
         transferable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
         to_company = transferable_app.to_company
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         assert transferable_app.transfer.is_available()
 
         client.force_login(transferable_app.sender)
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
                 "target_company_id": transferable_app.sender_company.pk,
                 "application_ids": [transferable_app.pk],
@@ -1233,11 +1232,11 @@ class TestBatchTransfer:
     def test_unexisting_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
                 "target_company_id": company.pk,
                 "application_ids": [uuid.uuid4()],
@@ -1258,7 +1257,7 @@ class TestBatchTransfer:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         other_company = CompanyMembershipFactory(user=employer).company
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "ACCEPTED"})
+        next_url = reverse("apply:list_for_siae", query={"state": "ACCEPTED"})
         client.force_login(employer)
 
         untransferable_app = JobApplicationFactory(
@@ -1270,7 +1269,7 @@ class TestBatchTransfer:
         assert not untransferable_app.transfer.is_available()
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={"target_company_id": other_company.pk, "application_ids": [untransferable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -1294,13 +1293,13 @@ class TestBatchTransfer:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         other_company = CompanyMembershipFactory(user=employer).company
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         transferable_app = JobApplicationFactory(to_company=other_company, state=JobApplicationState.NEW)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={"target_company_id": other_company.pk, "application_ids": [transferable_app.pk]},
         )
         assertRedirects(response, next_url)
@@ -1320,13 +1319,13 @@ class TestBatchTransfer:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         other_company = CompanyFactory(with_membership=True)
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"state": "NEW"})
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         transferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={"target_company_id": other_company.pk, "application_ids": [transferable_app.pk]},
         )
         assert response.status_code == 404
@@ -1358,10 +1357,10 @@ class TestBatchTransfer:
             ),
         ]
 
-        next_url = add_url_params(reverse("apply:list_for_siae"), {"start_date": "1970-01-01"})
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})
 
         response = client.post(
-            add_url_params(reverse("apply:batch_transfer"), {"next_url": next_url}),
+            reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
                 "target_company_id": other_company.pk,
                 "application_ids": ([transferable_app.pk for transferable_app in apps] + [uuid.uuid4(), uuid.uuid4()]),

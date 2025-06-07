@@ -25,7 +25,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -198,9 +198,10 @@ class StartView(ApplicationPermissionMixin, View):
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
         if tunnel == "sender" and job_seeker:
             return HttpResponseRedirect(
-                add_url_params(
-                    reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name}),
-                    {"job_description_id": job_description_id},
+                reverse(
+                    "apply:application_jobs",
+                    kwargs={"session_uuid": self.apply_session.name},
+                    query={"job_description_id": job_description_id} if job_description_id else {},
                 )
             )
 
@@ -229,7 +230,7 @@ class StartView(ApplicationPermissionMixin, View):
             "from_url": self.get_reset_url(),
         }
 
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         return HttpResponseRedirect(next_url)
 
 
@@ -397,7 +398,7 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
             "from_url": self.get_reset_url(),
             "apply_session_uuid": self.apply_session.name,
         }
-        self.next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        self.next_url = reverse("job_seekers_views:get_or_create_start", query=params)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
