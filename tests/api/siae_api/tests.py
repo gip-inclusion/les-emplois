@@ -74,7 +74,7 @@ class TestSiaeAPIFetchList:
         query_params = {"code_insee": 12345, "distance_max_km": 10}
         response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
-        assert response.content == b'{"detail":"Pas de ville avec pour code_insee 12345"}'
+        assert response.text == '{"detail":"Pas de ville avec pour code_insee 12345"}'
         assert response.status_code == 404
 
     def test_fetch_results(self, api_client):

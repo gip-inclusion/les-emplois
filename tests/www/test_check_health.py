@@ -5,7 +5,7 @@ class TestCheckHealth:
         assert response.charset == "utf-8"
         assert response["Content-Type"] == "text/plain"
         assert response["Content-Length"] == "8"
-        assert response.content.decode() == "Healthy\n"
+        assert response.text == "Healthy\n"
 
     def test_get_as_clever(self, client):
         response = client.get(

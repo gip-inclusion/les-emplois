@@ -4080,7 +4080,7 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
             "answer": "",
         },
     )
-    assert response.content.decode() == snapshot()
+    assert response.text == snapshot()
 
 
 @pytest.mark.parametrize("missing_field", [("company_pk", 0), ("job_seeker_public_id", str(uuid.uuid4()))])
@@ -4138,7 +4138,7 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
             "answer": "",
         },
     )
-    assert response.content.decode() == snapshot()
+    assert response.text == snapshot()
 
 
 @pytest.mark.parametrize("missing_field", [("company_pk", 0), ("job_seeker_public_id", str(uuid.uuid4()))])
