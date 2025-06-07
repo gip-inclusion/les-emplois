@@ -9,7 +9,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import SuspensionFactory
@@ -325,9 +324,12 @@ class TestApprovalSuspendActionChoiceView:
         response = client.post(self.url, data={"action": "delete"})
         assertRedirects(
             response,
-            add_url_params(
-                reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk}),
-                {"back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})},
+            reverse(
+                "approvals:suspension_delete",
+                kwargs={"suspension_id": self.suspension.pk},
+                query={
+                    "back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})
+                },
             ),
         )
 
@@ -337,9 +339,12 @@ class TestApprovalSuspendActionChoiceView:
         response = client.post(self.url, data={"action": "update_enddate"})
         assertRedirects(
             response,
-            add_url_params(
-                reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk}),
-                {"back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})},
+            reverse(
+                "approvals:suspension_update_enddate",
+                kwargs={"suspension_id": self.suspension.pk},
+                query={
+                    "back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})
+                },
             ),
         )
 
@@ -396,9 +401,10 @@ class TestApprovalSuspendUpdateEndDateView:
             response = client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
-        assert response.context["secondary_url"] == add_url_params(
-            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}),
-            {"back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})},
+        assert response.context["secondary_url"] == reverse(
+            "approvals:suspension_action_choice",
+            kwargs={"suspension_id": self.suspension.id},
+            query={"back_url": reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})},
         )
 
         assert response.context["reset_url"] == reverse(

@@ -211,7 +211,7 @@
           'EmployeeRecordViewSet.list[<site-packages>/rest_framework/mixins.py]',
         ]),
         'sql': '''
-          SELECT "companies_company"."id"
+          SELECT "companies_company"."id" AS "pk"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
           WHERE (NOT ("companies_company"."siret" = %s)

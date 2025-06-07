@@ -5,7 +5,6 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.utils.urls import add_url_params
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -49,9 +48,9 @@ def test_list_accredited_organizations(client):
     )
 
     response = client.get(
-        add_url_params(
-            reverse("prescribers_views:list_accredited_organizations"),
-            {"back_url": "back_url"},
+        reverse(
+            "prescribers_views:list_accredited_organizations",
+            query={"back_url": "back_url"},
         ),
     )
     assertContains(response, accredited_org.display_name)

@@ -9,7 +9,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.immersion_facile import immersion_search_url
 from itou.utils.templatetags import format_filters
-from itou.utils.urls import add_url_params
 from tests.approvals.factories import (
     ApprovalFactory,
 )
@@ -57,9 +56,10 @@ class TestEmployeeDetailView:
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
-        url = add_url_params(
-            reverse("employees:detail", kwargs={"public_id": approval.user.public_id}),
-            {"back_url": reverse("approvals:list")},
+        url = reverse(
+            "employees:detail",
+            kwargs={"public_id": approval.user.public_id},
+            query={"back_url": reverse("approvals:list")},
         )
         with assertSnapshotQueries(snapshot(name="employee detail view")):
             response = client.get(url)

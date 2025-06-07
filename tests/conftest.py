@@ -5,11 +5,8 @@ import io
 import json
 import os
 import socket
-import sys
 import threading
 import uuid
-
-import django
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -25,7 +22,7 @@ from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import caches
 from django.core.files.storage import default_storage, storages
-from django.core.management import base, call_command
+from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
@@ -43,29 +40,6 @@ from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
 from tests.utils.test import ItouClient  # noqa: E402
-
-
-# Silence “Exception ignored in ... OutputWrapper”:
-# ValueError: I/O operation on closed file.
-# https://adamj.eu/tech/2025/01/08/django-silence-exception-ignored-outputwrapper/
-# https://code.djangoproject.com/ticket/36056
-if django.VERSION < (5, 2):
-    orig_unraisablehook = sys.unraisablehook
-
-    def unraisablehook(unraisable):
-        if (
-            unraisable.exc_type is ValueError
-            and unraisable.exc_value is not None
-            and unraisable.exc_value.args == ("I/O operation on closed file.",)
-            and isinstance(unraisable.object, base.OutputWrapper)
-        ):
-            return
-        orig_unraisablehook(unraisable)
-
-    sys.unraisablehook = unraisablehook
-else:
-    # Raise an exception for the developer who will install the 5.2 version.
-    raise RuntimeError("Remove me when moving to Django's 5.2 version.")
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -160,27 +134,6 @@ def preload_country_france(django_db_setup, django_db_blocker):
 
     with django_db_blocker.unblock():
         Country.france_id
-
-
-@pytest.fixture(autouse=True, scope="session")
-def test_bucket():
-    # TODO: Remove this code block once we stop using a models.URLField() to store a S3 link (ie. `resume_link`)
-    from django.core.validators import URLValidator
-
-    patchy.patch(
-        URLValidator.__call__,
-        '''\
-        @@ -16,3 +16,5 @@ def __call__(self, value):
-             try:
-        +        if value.startswith("''' + settings.AWS_S3_ENDPOINT_URL + '''"):
-        +           return
-                 super().__call__(value)
-             except ValidationError as e:
-        ''',
-    )  # fmt: skip
-
-    call_command("configure_bucket", autoexpire=True)
-    yield
 
 
 @pytest.fixture(autouse=True)
@@ -429,35 +382,6 @@ def make_unordered_queries_randomly_ordered():
                  default_order, _ = ORDER_DIR["ASC"]
              else:
         """,
-    )
-
-
-@pytest.fixture(scope="session", autouse=True)
-def fix_unstable_annotation_order():
-    """
-    Patch Django’s ORM to have the annotation stable in the SQL produced by .count() calls.
-
-    The annotation_mask order is then used in annotation_select property
-    cf https://github.com/django/django/blob/stable/5.0.x/django/db/models/sql/query.py#L2519
-
-    This patch however will stop working with https://github.com/django/django/commit/65ad4ade74d
-
-    """
-    from django.db.models.sql.query import Query
-
-    patchy.patch(
-        Query.get_aggregation,
-        """\
-        @@ -104,7 +104,7 @@
-                         for annotation_alias, annotation in self.annotation_select.items():
-                             if annotation.get_group_by_cols():
-                                 annotation_mask.add(annotation_alias)
-        -                inner_query.set_annotation_mask(annotation_mask)
-        +                inner_query.set_annotation_mask(sorted(annotation_mask))
-
-                 # Add aggregates to the outer AggregateQuery. This requires making
-                 # sure all columns referenced by the aggregates are selected in the
-                """,
     )
 
 

@@ -16,7 +16,6 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -932,6 +931,6 @@ class TestResendProcessedEmployeeRecord(CreateEmployeeRecordTestMixin):
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.READY
-        assertRedirects(response, add_url_params(reverse("employee_record_views:list"), {"status": "PROCESSED"}))
+        assertRedirects(response, reverse("employee_record_views:list", query={"status": "PROCESSED"}))
         [message] = list(get_messages(response.wsgi_request))
         assert message == snapshot

@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestCompanyAdmin.test_display_for_new_company[SQL queries]
   dict({
-    'num_queries': 9,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
@@ -67,18 +67,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

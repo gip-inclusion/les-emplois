@@ -433,7 +433,7 @@
                  AND "employee_record_employeerecord"."id" IS NULL
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
-                            (SELECT V0."approval_number"
+                            (SELECT V0."approval_number" AS "approval_number"
                              FROM "employee_record_employeerecord" V0
                              INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
                              WHERE V1."to_company_id" IN
@@ -892,7 +892,7 @@
                  AND "employee_record_employeerecord"."id" IS NULL
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
-                            (SELECT V0."approval_number"
+                            (SELECT V0."approval_number" AS "approval_number"
                              FROM "employee_record_employeerecord" V0
                              INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
                              WHERE V1."to_company_id" IN

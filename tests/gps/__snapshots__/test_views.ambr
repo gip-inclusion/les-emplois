@@ -1750,8 +1750,8 @@
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT "gps_followupgroup"."beneficiary_id",
-                 "gps_followupgroupmembership"."can_view_personal_information"
+          SELECT "gps_followupgroup"."beneficiary_id" AS "follow_up_group__beneficiary_id",
+                 "gps_followupgroupmembership"."can_view_personal_information" AS "can_view_personal_information"
           FROM "gps_followupgroupmembership"
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
@@ -1759,7 +1759,7 @@
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND "gps_followupgroupmembership"."ended_at" IS NULL)
           GROUP BY "gps_followupgroupmembership"."id",
-                   "gps_followupgroup"."beneficiary_id"
+                   1
           ORDER BY "gps_followupgroupmembership"."created_at" DESC
         ''',
       }),
@@ -2397,8 +2397,8 @@
           '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT "gps_followupgroup"."beneficiary_id",
-                 "gps_followupgroupmembership"."can_view_personal_information"
+          SELECT "gps_followupgroup"."beneficiary_id" AS "follow_up_group__beneficiary_id",
+                 "gps_followupgroupmembership"."can_view_personal_information" AS "can_view_personal_information"
           FROM "gps_followupgroupmembership"
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
@@ -2406,7 +2406,7 @@
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
           GROUP BY "gps_followupgroupmembership"."id",
-                   "gps_followupgroup"."beneficiary_id"
+                   1
           ORDER BY "gps_followupgroupmembership"."created_at" DESC
         ''',
       }),

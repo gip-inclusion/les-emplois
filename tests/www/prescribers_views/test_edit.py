@@ -9,7 +9,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.urls import add_url_params
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.test import assert_previous_step, parse_response_to_soup, pretty_indented
 
@@ -23,17 +22,19 @@ class TestCardView:
         assert response.context["prescriber_org"] == prescriber_org
 
         # When coming from prescribers search results page
-        url = add_url_params(
-            reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk}),
-            {"back_url": reverse("search:prescribers_results")},
+        url = reverse(
+            "prescribers_views:card",
+            kwargs={"org_id": prescriber_org.pk},
+            query={"back_url": reverse("search:prescribers_results")},
         )
         response = client.get(url)
         assert_previous_step(response, reverse("search:prescribers_results"), back_to_list=True)
 
         # When coming from dashboard
-        url = add_url_params(
-            reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk}),
-            {"back_url": reverse("dashboard:index")},
+        url = reverse(
+            "prescribers_views:card",
+            kwargs={"org_id": prescriber_org.pk},
+            query={"back_url": reverse("dashboard:index")},
         )
         response = client.get(url)
         assert_previous_step(response, reverse("dashboard:index"))

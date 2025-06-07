@@ -50,7 +50,7 @@ class TestGetOrCreateAsOther:
                 "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
-            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
 
@@ -68,7 +68,7 @@ class TestGetOrCreateAsOther:
                 "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
-            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
 
@@ -81,7 +81,7 @@ class TestGetOrCreateAsOther:
                 "company": company.pk,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
-            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assertRedirects(response, reverse("account_login") + f"?next={urlencode(start_url)}")
 
@@ -102,7 +102,7 @@ class TestGetOrCreateForJobSeeker:
                 "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
             }
-            start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+            start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
 
@@ -186,9 +186,10 @@ class TestGetOrCreateForJobSeeker:
         response = client.get(next_url)
         assertRedirects(
             response,
-            add_url_params(
-                reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-                {"job_seeker_public_id": user.public_id},
+            reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"session_uuid": apply_session_name},
+                query={"job_seeker_public_id": user.public_id},
             ),
         )
 
@@ -471,29 +472,32 @@ class TestStandaloneCreateAsPrescriber:
         match case:
             case "in_list_user":
                 existing_job_seeker.created_by = user
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
                 JobApplicationFactory(
                     job_seeker=existing_job_seeker,
@@ -516,7 +520,7 @@ class TestStandaloneCreateAsPrescriber:
         # ----------------------------------------------------------------------
 
         params = {"tunnel": "standalone", "from_url": from_url}
-        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        start_url = reverse("job_seekers_views:get_or_create_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         check_nir_url = reverse(
@@ -549,29 +553,32 @@ class TestStandaloneCreateAsPrescriber:
         match case:
             case "in_list_user":
                 existing_job_seeker.created_by = user
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
             case "in_list_organization":
                 existing_job_seeker.created_by = other_user
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = prescriber_organization
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
             case "in_list_application":
                 existing_job_seeker.created_by = other_user_in_other_organization
                 existing_job_seeker.jobseeker_profile.created_by_prescriber_organization = None
-                next_url = add_url_params(
-                    reverse(
-                        "search:employers_results",
-                    ),
-                    {"job_seeker_public_id": existing_job_seeker.public_id, "city": existing_job_seeker.city_slug},
+                next_url = reverse(
+                    "search:employers_results",
+                    query={
+                        "job_seeker_public_id": existing_job_seeker.public_id,
+                        "city": existing_job_seeker.city_slug,
+                    },
                 )
                 JobApplicationFactory(
                     job_seeker=existing_job_seeker,
@@ -594,7 +601,7 @@ class TestStandaloneCreateAsPrescriber:
         # ----------------------------------------------------------------------
 
         params = {"tunnel": "standalone", "from_url": from_url}
-        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        start_url = reverse("job_seekers_views:get_or_create_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         search_by_email_url = reverse(
@@ -629,7 +636,7 @@ class TestStandaloneCreateAsPrescriber:
         # ----------------------------------------------------------------------
 
         params = {"tunnel": "standalone", "from_url": from_url}
-        start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        start_url = reverse("job_seekers_views:get_or_create_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
         next_url = reverse("job_seekers_views:check_nir_for_sender", kwargs={"session_uuid": job_seeker_session_name})
@@ -848,7 +855,7 @@ class TestUpdateAsOther:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         response = client.get(start_url)
         assert response.status_code == 403
 
@@ -862,7 +869,7 @@ class TestUpdateAsOther:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         response = client.get(start_url)
         assert response.status_code == 403
 
@@ -873,7 +880,7 @@ class TestUpdateAsOther:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("dashboard:index"),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         response = client.get(start_url)
         assertRedirects(response, reverse("account_login") + f"?next={urlencode(start_url)}")
 
@@ -893,7 +900,7 @@ class TestUpdateForJobSeeker:
             "company": company_pk,
             "from_url": from_url,
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
 
         response = client.get(start_url)
         assert response.status_code == 403
@@ -1006,7 +1013,7 @@ class TestUpdateForSender:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
@@ -1051,7 +1058,7 @@ class TestUpdateForSender:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
@@ -1097,7 +1104,7 @@ class TestUpdateForSender:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
-        start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 

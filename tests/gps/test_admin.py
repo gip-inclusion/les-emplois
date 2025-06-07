@@ -5,7 +5,6 @@ from django.contrib.auth import get_user
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.utils.urls import add_url_params
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
@@ -30,7 +29,7 @@ def test_participant_admin_link(admin_client, user_factory):
     participant = user_factory()
 
     response = admin_client.get(reverse("admin:users_user_change", args=(participant.pk,)))
-    expected_url = add_url_params(reverse("admin:gps_followupgroupmembership_changelist"), {"member": participant.pk})
+    expected_url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": participant.pk})
     assertContains(response, expected_url)
     assertContains(response, "Liste des relations de cet utilisateur (0)")
 

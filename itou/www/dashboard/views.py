@@ -31,7 +31,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditUserEmailForm,
@@ -432,9 +432,7 @@ class AccountMigrationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         params = self._get_params()
-        pro_connect_url = (
-            add_url_params(reverse("pro_connect:authorize"), params) if settings.PRO_CONNECT_BASE_URL else None
-        )
+        pro_connect_url = reverse("pro_connect:authorize", query=params) if settings.PRO_CONNECT_BASE_URL else None
 
         extra_context = {
             "pro_connect_url": pro_connect_url,

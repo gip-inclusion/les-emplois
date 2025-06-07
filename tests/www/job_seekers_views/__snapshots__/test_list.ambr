@@ -730,7 +730,7 @@
         ]),
         'sql': '''
           
-            (SELECT "users_user"."id" AS "col1"
+            (SELECT "users_user"."id" AS "id"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              WHERE (("users_user"."created_by_id" = %s
@@ -739,7 +739,7 @@
                         AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s))
              ORDER BY RANDOM() ASC)
           UNION
-            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
+            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "job_seeker_id"
              FROM "job_applications_jobapplication"
              WHERE (("job_applications_jobapplication"."sender_id" = %s
                      AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
@@ -747,7 +747,7 @@
                         AND "job_applications_jobapplication"."sender_prescriber_organization_id" = %s))
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
           UNION
-            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "col1"
+            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "job_seeker_id"
              FROM "eligibility_eligibilitydiagnosis"
              WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
                      AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
@@ -817,7 +817,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s
@@ -977,7 +977,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s
@@ -1153,7 +1153,7 @@
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-               (SELECT U0."id"
+               (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
                        AND U0."author_kind" = %s
@@ -1231,7 +1231,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s
@@ -1730,7 +1730,7 @@
         ]),
         'sql': '''
           
-            (SELECT "users_user"."id" AS "col1"
+            (SELECT "users_user"."id" AS "id"
              FROM "users_user"
              LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
              WHERE (("users_user"."created_by_id" = %s
@@ -1738,14 +1738,14 @@
                     OR "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)
              ORDER BY RANDOM() ASC)
           UNION
-            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "col1"
+            (SELECT "job_applications_jobapplication"."job_seeker_id" AS "job_seeker_id"
              FROM "job_applications_jobapplication"
              WHERE (("job_applications_jobapplication"."sender_id" = %s
                      AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
                     OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
              ORDER BY "job_applications_jobapplication"."created_at" DESC)
           UNION
-            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "col1"
+            (SELECT "eligibility_eligibilitydiagnosis"."job_seeker_id" AS "job_seeker_id"
              FROM "eligibility_eligibilitydiagnosis"
              WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
                      AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
@@ -1814,7 +1814,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s
@@ -1972,7 +1972,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s
@@ -2148,7 +2148,7 @@
                        AND U0."job_seeker_id" = ("users_user"."id"))
                 GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-               (SELECT U0."id"
+               (SELECT U0."id" AS "id"
                 FROM "eligibility_eligibilitydiagnosis" U0
                 WHERE (U0."expires_at" > %s
                        AND U0."author_kind" = %s
@@ -2225,7 +2225,7 @@
                     AND U0."job_seeker_id" = ("users_user"."id"))
              GROUP BY U0."job_seeker_id") AS "last_updated_at",
           
-            (SELECT U0."id"
+            (SELECT U0."id" AS "id"
              FROM "eligibility_eligibilitydiagnosis" U0
              WHERE (U0."expires_at" > %s
                     AND U0."author_kind" = %s

@@ -3,7 +3,6 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
-from itou.utils.urls import add_url_params
 from itou.www.employee_record_views.views import AddView
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -27,7 +26,7 @@ def test_wizard(snapshot, client):
     # Start view
     # ----------------------------------------------------------------
     with assertSnapshotQueries(snapshot(name="start-queries")):
-        response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
+        response = client.get(reverse("employee_record_views:add", query={"reset_url": reset_url}))
 
     wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     expected_session = {"config": {"reset_url": reset_url}}
@@ -136,7 +135,7 @@ def test_employee_list(client):
     client.force_login(company.members.first())
 
     reset_url = reverse("employee_record_views:list")
-    response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
+    response = client.get(reverse("employee_record_views:add", query={"reset_url": reset_url}))
 
     wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     choose_employee_url = reverse(
@@ -164,7 +163,7 @@ def test_choose_employee_step_with_a_bad_choice(client):
     client.force_login(company.members.first())
 
     reset_url = reverse("employee_record_views:list")
-    response = client.get(add_url_params(reverse("employee_record_views:add"), {"reset_url": reset_url}))
+    response = client.get(reverse("employee_record_views:add", query={"reset_url": reset_url}))
 
     wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
     choose_employee_url = reverse(

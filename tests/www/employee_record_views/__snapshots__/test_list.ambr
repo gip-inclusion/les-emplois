@@ -299,7 +299,7 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN
-              (SELECT U1."job_seeker_id"
+              (SELECT U1."job_seeker_id" AS "job_application__job_seeker"
                FROM "employee_record_employeerecord" U0
                INNER JOIN "job_applications_jobapplication" U1 ON (U0."job_application_id" = U1."id")
                WHERE (U1."to_company_id" = %s
@@ -312,12 +312,12 @@
           'list_employee_records[www/employee_record_views/views.py]',
         ]),
         'sql': '''
-          SELECT "employee_record_employeerecord"."status",
+          SELECT "employee_record_employeerecord"."status" AS "status",
                  COUNT("employee_record_employeerecord"."status") AS "cnt"
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
-          GROUP BY "employee_record_employeerecord"."status"
+          GROUP BY 1
         ''',
       }),
       dict({
@@ -332,7 +332,7 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "employee_record_employeerecord"."status" = %s
                  AND NOT ("employee_record_employeerecord"."siret" =
-                            (SELECT U0."siret"
+                            (SELECT U0."siret" AS "siret"
                              FROM "companies_company" U0
                              WHERE (NOT (U0."siret" = %s)
                                     AND U0."convention_id" = ("companies_company"."convention_id")
@@ -346,7 +346,7 @@
           'list_employee_records[www/employee_record_views/views.py]',
         ]),
         'sql': '''
-          SELECT "job_applications_jobapplication"."job_seeker_id"
+          SELECT "job_applications_jobapplication"."job_seeker_id" AS "job_seeker_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "employee_record_employeerecord" ON ("job_applications_jobapplication"."id" = "employee_record_employeerecord"."job_application_id")
@@ -356,7 +356,7 @@
                  AND "employee_record_employeerecord"."id" IS NULL
                  AND "job_applications_jobapplication"."to_company_id" = %s
                  AND NOT ("approvals_approval"."number" IN
-                            (SELECT V0."approval_number"
+                            (SELECT V0."approval_number" AS "approval_number"
                              FROM "employee_record_employeerecord" V0
                              INNER JOIN "job_applications_jobapplication" V1 ON (V0."job_application_id" = V1."id")
                              WHERE V1."to_company_id" IN
@@ -455,7 +455,7 @@
                  "employee_record_employeerecord"."siret",
                  "employee_record_employeerecord"."processed_as_duplicate",
           
-            (SELECT U0."siret"
+            (SELECT U0."siret" AS "siret"
              FROM "companies_company" U0
              WHERE (NOT (U0."siret" = %s)
                     AND U0."convention_id" = ("companies_company"."convention_id")

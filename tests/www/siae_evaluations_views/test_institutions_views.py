@@ -2157,6 +2157,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
                     placeholder="{placeholder}"
                     class="form-control is-invalid"
                     required aria-invalid="true"
+                    aria-describedby="id_notification_text_error"
                     id="id_notification_text">
                 </textarea>
                 <div class="invalid-feedback">Ce champ est obligatoire.</div>
@@ -2529,6 +2530,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_from_error"
                                ></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
@@ -2575,6 +2577,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_to_error"
                                ></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
@@ -2629,6 +2632,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_from_error"
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2651,6 +2655,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_to_error"
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2700,6 +2705,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_from_error"
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
@@ -2722,6 +2728,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required aria-invalid="true"
+                               aria-describedby="id_temporary_suspension_to_error"
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
@@ -2829,6 +2836,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="permanent_suspension"
                                required aria-invalid="true"
+                               aria-describedby="id_permanent_suspension_error"
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2948,6 +2956,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                     required aria-invalid="true"
                     step="1"
                     type="number"
+                    aria-describedby="id_subsidy_cut_percent_error"
                     value="110" />
              <div class="invalid-feedback">
               Assurez-vous que cette valeur est inférieure ou égale à 100.
@@ -2962,6 +2971,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                identifier="id_subsidy_cut_from"
                                name="subsidy_cut_from"
                                required aria-invalid="true"
+                               aria-describedby="id_subsidy_cut_from_error"
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2976,6 +2986,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                                identifier="id_subsidy_cut_to"
                                name="subsidy_cut_to"
                                required aria-invalid="true"
+                               aria-describedby="id_subsidy_cut_to_error"
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.

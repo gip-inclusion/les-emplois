@@ -12,7 +12,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
 from itou.companies.enums import CompanyKind
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -264,9 +263,10 @@ class TestApprovalProlongation:
     def test_htmx_on_reason_with_back_url(self, client, snapshot):
         client.force_login(self.employer)
         back_url = "/somewhere/over/the/rainbow"
-        page_url = add_url_params(
-            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
-            params={"back_url": back_url},
+        page_url = reverse(
+            "approvals:declare_prolongation",
+            kwargs={"approval_id": self.approval.pk},
+            query={"back_url": back_url},
         )
         response = client.get(page_url)
         assert response.status_code == 200
@@ -275,9 +275,10 @@ class TestApprovalProlongation:
         assert pretty_indented(reset_button) == snapshot(name="reset button with correct back_url")
 
         [reason] = page.select("#id_reason")
-        expected_hx_post = add_url_params(
-            reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
-            params={"back_url": back_url},
+        expected_hx_post = reverse(
+            "approvals:prolongation_form_for_reason",
+            kwargs={"approval_id": self.approval.pk},
+            query={"back_url": back_url},
         )
         assert reason["hx-post"] == expected_hx_post
         data = {

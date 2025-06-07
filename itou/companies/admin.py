@@ -26,7 +26,6 @@ from itou.utils.admin import (
 )
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.export import to_streaming_response
-from itou.utils.urls import add_url_params
 
 
 class CompanyMembersInline(MembersInline):
@@ -259,7 +258,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
     def approvals_list(self, obj):
         if obj.pk is None:
             return self.get_empty_value_display()
-        url = add_url_params(reverse("admin:approvals_approval_changelist"), {"assigned_company": obj.id, "o": -6})
+        url = reverse("admin:approvals_approval_changelist", query={"assigned_company": obj.id, "o": -6})
         count = Approval.objects.is_assigned_to(obj.id).count()
         valid_count = Approval.objects.is_assigned_to(obj.id).valid().count()
         return format_html('<a href="{}">Liste des {} Pass IAE (dont {} valides)</a>', url, count, valid_count)
