@@ -210,7 +210,7 @@ class TestGroupLists:
         my_groups_url = reverse("gps:group_list")
         response = client.get(my_groups_url)
         assert len(response.context["memberships_page"].object_list) == 50
-        assert f"{my_groups_url}?page=2" in response.content.decode()
+        assert f"{my_groups_url}?page=2" in response.text
 
         # Filter by beneficiary name.
         beneficiary = created_groups[0].beneficiary

@@ -401,7 +401,7 @@ class TestListEmployeeRecords:
 
     def _check_employee_record_order(self, client, url, first_job_application, second_job_application):
         response = client.get(url)
-        response_text = response.content.decode(response.charset)
+        response_text = response.text
         # The index method raises ValueError if the value isn't found
         first_job_seeker_position = response_text.index(
             format_filters.format_approval_number(first_job_application.approval.number)

@@ -92,7 +92,7 @@ class BrevoClient:
             logger.error(
                 "Brevo API: Some emails were not imported, status_code=%d, content=%s",
                 response.status_code,
-                response.content.decode(),
+                response.text,
             )
 
     def import_users(self, users, list_id, serializer):

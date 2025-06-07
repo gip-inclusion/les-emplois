@@ -143,7 +143,7 @@ class ItouClient(Client):
             response = super().request(**request)
         content_type = response["Content-Type"].split(";")[0]
         if content_type == "text/html" and response.content:
-            content = response.content.decode(response.charset)
+            content = response.text
             # Detect unwanted inline JS
             assert " onclick=" not in content
             assert " onbeforeinput=" not in content
