@@ -245,6 +245,7 @@ class Migration(migrations.Migration):
                 limit_choices_to={"kind__in": ["DDETS GEIQ", "DREETS GEIQ"]},
                 related_name="implementation_assessments",
                 through="geiq_assessments.AssessmentInstitutionLink",
+                through_fields=("assessment", "institution"),
                 to="institutions.institution",
                 verbose_name="institutions",
             ),
