@@ -411,7 +411,7 @@ def test_step_3(client, snapshot, pdf_file):
     job_application = JobApplicationFactory(
         state=JobApplicationState.REFUSED,
         for_snapshot=True,
-        resume__id="resume/old_file.pdf",
+        resume__key="resume/old_file.pdf",
         with_file=pdf_file,
     )
     employer = job_application.to_company.members.get()
@@ -608,7 +608,7 @@ def test_full_process(client, pdf_file):
         to_company__post_code="56760",
         to_company__coords=vannes.coords,
         to_company__city=vannes.name,
-        resume__id="resume/old_file.pdf",
+        resume__key="resume/old_file.pdf",
         with_file=pdf_file,
     )
     employer = job_application.to_company.members.get()

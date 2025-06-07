@@ -7,8 +7,8 @@ from itou.files.models import File
 
 
 class FileFactory(factory.django.DjangoModelFactory):
-    id = factory.Faker("file_path", absolute=False, depth=2)
-    key = factory.SelfAttribute("id")
+    id = factory.Faker("uuid4")
+    key = factory.Faker("file_path", absolute=False, depth=2)
     last_modified = factory.LazyFunction(timezone.now)
 
     class Meta:

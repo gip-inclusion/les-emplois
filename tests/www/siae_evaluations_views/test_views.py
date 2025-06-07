@@ -453,7 +453,7 @@ class TestViewProof:
     def test_access_siae(self, client, pdf_file):
         job_app = EvaluatedJobApplicationFactory()
         key = default_storage.save("evaluations/test.pdf", pdf_file)
-        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(id=key))
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
         membership = CompanyMembershipFactory(company_id=job_app.evaluated_siae.siae_id)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)
@@ -483,7 +483,7 @@ class TestViewProof:
             evaluated_siae__evaluation_campaign__institution=membership.institution
         )
         key = default_storage.save("evaluations/test.pdf", pdf_file)
-        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(id=key))
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
         EvaluationCampaignFactory(institution=membership.institution)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)
