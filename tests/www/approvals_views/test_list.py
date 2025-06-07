@@ -174,7 +174,6 @@ class TestApprovalsListView:
 
         url = f"{list_url}?status_valid=on&expiry="
         response = client.get(url)
-        print(response.content.decode())
         assertContains(response, "1 résultat")
         assertContains(response, reverse("employees:detail", kwargs={"public_id": valid_approval.user.public_id}))
 
