@@ -166,7 +166,7 @@ class ItouCurrentOrganizationMiddleware:
         # Log staff users in dedicated login page
         if not user.is_authenticated and request.path.startswith("/admin"):
             return HttpResponseRedirect(
-                add_url_params(reverse("login:itou_staff"), {REDIRECT_FIELD_NAME: request.get_full_path()})
+                reverse("login:itou_staff", query={REDIRECT_FIELD_NAME: request.get_full_path()})
             )
 
         # Force OTP for staff users

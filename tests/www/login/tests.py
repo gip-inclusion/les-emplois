@@ -89,7 +89,7 @@ class TestPrescriberLogin:
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
 
-        url_with_next = add_url_params(reverse("login:prescriber"), {"next": "/next_url"})
+        url_with_next = reverse("login:prescriber", query={"next": "/next_url"})
         response = client.get(url_with_next)
         params = {
             "user_kind": UserKind.PRESCRIBER,
@@ -158,19 +158,19 @@ class TestEmployerLogin:
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url,
         }
-        pro_connect_url = escape(add_url_params(reverse("pro_connect:authorize"), params))
+        pro_connect_url = escape(reverse("pro_connect:authorize", query=params))
         assertContains(response, pro_connect_url + '"')
         assertContains(response, "Adresse e-mail")
         assertContains(response, "Mot de passe")
 
-        url_with_next = add_url_params(reverse("login:employer"), {"next": "/next_url"})
+        url_with_next = reverse("login:employer", query={"next": "/next_url"})
         response = client.get(url_with_next)
         params = {
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
-        pro_connect_url = escape(add_url_params(reverse("pro_connect:authorize"), params))
+        pro_connect_url = escape(reverse("pro_connect:authorize", query=params))
         assertContains(response, pro_connect_url + '"')
 
     def test_login_using_django(self, client, pro_connect):

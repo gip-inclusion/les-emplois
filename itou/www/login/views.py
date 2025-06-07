@@ -15,7 +15,7 @@ from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.auth import LoginNotRequiredMixin
-from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
+from itou.utils.urls import get_safe_url, get_url_param_value
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import FindExistingUserViaEmailForm, ItouLoginForm, VerifyOTPForm
 
@@ -47,7 +47,7 @@ class UserKindLoginMixin:
         if context["redirect_field_value"]:
             params["next_url"] = context["redirect_field_value"]
 
-        return add_url_params(reverse("pro_connect:authorize"), params)
+        return reverse("pro_connect:authorize", query=params)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

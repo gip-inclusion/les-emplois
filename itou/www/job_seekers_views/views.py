@@ -32,7 +32,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
@@ -311,9 +311,10 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         )
 
     def get_apply_url(self, view_name, job_seeker):
-        return add_url_params(
-            reverse(view_name, kwargs={"session_uuid": self.job_seeker_session.get("apply")["session_uuid"]}),
-            {"job_seeker_public_id": job_seeker.public_id},
+        return reverse(
+            view_name,
+            kwargs={"session_uuid": self.job_seeker_session.get("apply")["session_uuid"]},
+            query={"job_seeker_public_id": job_seeker.public_id},
         )
 
     def get_exit_url(self, job_seeker, created=False):
@@ -324,7 +325,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
                 "job_seeker_public_id": job_seeker.public_id,
                 "city": job_seeker.city_slug if can_view_personal_information(self.request, job_seeker) else "",
             }
-            return add_url_params(reverse("search:employers_results"), params)
+            return reverse("search:employers_results", query=params)
         if self.standalone_creation:
             return reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 

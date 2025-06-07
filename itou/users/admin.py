@@ -44,7 +44,6 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_structure_view_link,
 )
-from itou.utils.urls import add_url_params
 
 
 class EmailAddressInline(ReadonlyMixin, ItouTabularInline):
@@ -381,7 +380,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
                 return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
             return "Pas de groupe de suivi"
         if obj.is_prescriber or obj.is_employer:
-            url = add_url_params(reverse("admin:gps_followupgroupmembership_changelist"), {"member": obj.id})
+            url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": obj.id})
             count = FollowUpGroupMembership.objects.filter(member=obj).count()
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
         return ""
