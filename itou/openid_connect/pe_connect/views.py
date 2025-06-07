@@ -114,7 +114,7 @@ def pe_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
-        user_data = json.loads(response.content.decode("utf-8"))
+        user_data = json.loads(response.content)
     except json.decoder.JSONDecodeError:
         error_msg = "Impossible de décoder les informations utilisateur."
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
