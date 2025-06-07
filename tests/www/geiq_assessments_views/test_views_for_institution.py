@@ -282,6 +282,18 @@ class TestAssessmentDetailsForInstitutionView:
             user__first_name="Julia",
             user__last_name="Martin",
         )
+        other_ddets_membership = InstitutionMembershipFactory(
+            institution=ddets_membership.institution,
+        )
+        # Inactive memberships
+        InstitutionMembershipFactory(
+            institution=ddets_membership.institution,
+            is_active=False,
+        )
+        InstitutionMembershipFactory(
+            institution=ddets_membership.institution,
+            user__is_active=False,
+        )
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         geiq_membership = CompanyMembershipFactory(
             company__kind=CompanyKind.GEIQ,
@@ -362,6 +374,7 @@ class TestAssessmentDetailsForInstitutionView:
             )
             assert email.to[0] == geiq_membership.user.email
             assert email.body == snapshot(name="body of mail sent to GEIQ members")
+            assert email.cc == sorted([ddets_membership.user.email, other_ddets_membership.user.email])
 
     def test_ddets_review_dreets_fix_and_dreets_review(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
