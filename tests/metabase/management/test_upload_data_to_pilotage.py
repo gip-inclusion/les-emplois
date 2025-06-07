@@ -17,7 +17,6 @@ def test_command_call(tmp_path, snapshot, caplog):
 
 @pytest.mark.usefixtures("temporary_bucket")
 def test_command_idempotence(tmp_path, settings):
-    print("BUCKET", settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME)
     filename = f"fluxIAE_ITOU_{timezone.now():%Y%m%d_%H%M%S}.tar.gz"
     tmp_path.joinpath(filename).touch()
 

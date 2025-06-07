@@ -152,7 +152,6 @@ class TestExportJobApplications:
                     "departments": DEPARTMENTS_CHOICES,
                 },
             )
-        print(response.content.decode())
         assertContains(
             response,
             '<div class="invalid-feedback">Assurez-vous que cette valeur est inférieure ou égale à 2024-05-21.</div>',
