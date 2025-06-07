@@ -1101,7 +1101,7 @@
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
-          SELECT "users_user"."email"
+          SELECT "users_user"."email" AS "email"
           FROM "users_user"
           INNER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."user_id")
           WHERE "institutions_institutionmembership"."id" IN

@@ -515,7 +515,7 @@ class Command(BaseCommand):
                     "member__companymembership__company__department",
                     filter=Q(member__companymembership__is_active=True),
                     distinct=True,
-                    ordering="member__companymembership__company__department",
+                    order_by="member__companymembership__company__department",
                 )
             )
             .annotate(
@@ -523,7 +523,7 @@ class Command(BaseCommand):
                     "member__prescribermembership__organization__department",
                     filter=Q(member__prescribermembership__is_active=True),
                     distinct=True,
-                    ordering="member__prescribermembership__organization__department",
+                    order_by="member__prescribermembership__organization__department",
                 )
             )
         )

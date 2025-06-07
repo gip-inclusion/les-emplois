@@ -368,6 +368,7 @@ class TestEditJobSeekerInfo:
             <div class="form-group is-invalid form-group-required">
             <label class="form-label" for="id_first_name">Prénom</label>
             <input type="text" name="first_name" maxlength="150" class="form-control is-invalid"
+                   aria-describedby="id_first_name_error"
                    required aria-invalid="true" id="id_first_name">
             <div class="invalid-feedback">Ce champ est obligatoire.</div>
             </div>
@@ -381,6 +382,7 @@ class TestEditJobSeekerInfo:
             <div class="form-group is-invalid form-group-required">
             <label class="form-label" for="id_last_name">Nom</label>
             <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
+                   aria-describedby="id_last_name_error"
                     required aria-invalid="true" id="id_last_name">
             <div class="invalid-feedback">Ce champ est obligatoire.</div>
             </div>

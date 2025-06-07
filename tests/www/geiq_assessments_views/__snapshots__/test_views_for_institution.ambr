@@ -2379,7 +2379,7 @@
                  "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institution"
-          WHERE "institutions_institution"."id" IN (%s)
+          WHERE ("institutions_institution"."id") IN ((%s))
         ''',
       }),
       dict({
