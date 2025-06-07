@@ -38,7 +38,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.approvals_views.forms import (
     ApprovalForm,
     ProlongationRequestDenyInformationProposedActionsForm,
@@ -508,7 +508,7 @@ class ProlongationRequestViewMixin:
         return super().get_context_data(**kwargs) | {
             "prolongation_request": self.prolongation_request,
             "matomo_custom_title": "Demande de prolongation",
-            "back_url": add_url_params(reverse("approvals:prolongation_requests_list"), {"only_pending": "on"}),
+            "back_url": reverse("approvals:prolongation_requests_list", query={"only_pending": "on"}),
         }
 
 
@@ -638,17 +638,19 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     if request.method == "POST":
         if request.POST.get("action") == "delete":
             return HttpResponseRedirect(
-                add_url_params(
-                    reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.id}),
-                    {"back_url": back_url},
+                reverse(
+                    "approvals:suspension_delete",
+                    kwargs={"suspension_id": suspension.id},
+                    query={"back_url": back_url},
                 )
             )
 
         if request.POST.get("action") == "update_enddate":
             return HttpResponseRedirect(
-                add_url_params(
-                    reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.id}),
-                    {"back_url": back_url},
+                reverse(
+                    "approvals:suspension_update_enddate",
+                    kwargs={"suspension_id": suspension.id},
+                    query={"back_url": back_url},
                 )
             )
 
@@ -731,9 +733,10 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
 
     context = {
         "suspension": suspension,
-        "secondary_url": add_url_params(
-            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
-            {"back_url": back_url},
+        "secondary_url": reverse(
+            "approvals:suspension_action_choice",
+            kwargs={"suspension_id": suspension_id},
+            query={"back_url": back_url},
         ),
         "reset_url": back_url,
         "form": form,
@@ -772,9 +775,10 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
     context = {
         "suspension": suspension,
-        "secondary_url": add_url_params(
-            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
-            {"back_url": back_url},
+        "secondary_url": reverse(
+            "approvals:suspension_action_choice",
+            kwargs={"suspension_id": suspension_id},
+            query={"back_url": back_url},
         ),
         "reset_url": back_url,
         "lost_days": (timezone.localdate() - suspension.start_at).days + 1,

@@ -337,8 +337,8 @@ class TestCardView:
         assertContains(response, job_description_url_with_job_seeker_id)
 
         # Has link to apply with job_seeker public_id
-        apply_url_with_job_seeker_id = add_url_params(
-            reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_seeker_public_id": job_seeker_public_id}
+        apply_url_with_job_seeker_id = reverse(
+            "apply:start", kwargs={"company_pk": company.pk}, query={"job_seeker_public_id": job_seeker_public_id}
         )
         assertContains(response, apply_url_with_job_seeker_id, count=2)
 

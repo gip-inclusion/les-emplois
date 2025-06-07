@@ -388,8 +388,8 @@ class TestProConnectCallbackView:
         response = pro_connect.mock_oauth_dance(
             client,
             UserKind.PRESCRIBER,
-            expected_redirect_url=add_url_params(
-                reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            expected_redirect_url=reverse(
+                "pro_connect:logout", query={"redirect_url": reverse("search:employers_home")}
             ),
         )
         response = client.get(reverse("search:employers_home"))
@@ -410,8 +410,8 @@ class TestProConnectCallbackView:
         response = pro_connect.mock_oauth_dance(
             client,
             UserKind.EMPLOYER,
-            expected_redirect_url=add_url_params(
-                reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            expected_redirect_url=reverse(
+                "pro_connect:logout", query={"redirect_url": reverse("search:employers_home")}
             ),
         )
         response = client.get(reverse("search:employers_home"))
@@ -429,9 +429,7 @@ class TestProConnectCallbackView:
         pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.JOB_SEEKER)
 
-        expected_redirect_url = add_url_params(
-            reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
-        )
+        expected_redirect_url = reverse("pro_connect:logout", query={"redirect_url": reverse("search:employers_home")})
 
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
@@ -466,8 +464,8 @@ class TestProConnectCallbackView:
             response = pro_connect.mock_oauth_dance(
                 client,
                 UserKind.PRESCRIBER,
-                expected_redirect_url=add_url_params(
-                    reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+                expected_redirect_url=reverse(
+                    "pro_connect:logout", query={"redirect_url": reverse("search:employers_home")}
                 ),
             )
             response = client.get(reverse("search:employers_home"))
@@ -485,8 +483,8 @@ class TestProConnectCallbackView:
             response = pro_connect.mock_oauth_dance(
                 client,
                 UserKind.EMPLOYER,
-                expected_redirect_url=add_url_params(
-                    reverse("pro_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+                expected_redirect_url=reverse(
+                    "pro_connect:logout", query={"redirect_url": reverse("search:employers_home")}
                 ),
             )
             response = client.get(reverse("search:employers_home"))

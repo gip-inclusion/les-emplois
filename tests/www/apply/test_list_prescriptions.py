@@ -48,15 +48,16 @@ def test_get(client):
     response = client.get(reverse("apply:list_prescriptions"))
     # Has link to export with back_url set
     exports_link = unquote(
-        add_url_params(reverse("apply:list_prescriptions_exports"), {"back_url": reverse("apply:list_prescriptions")})
+        reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
     )
     assertContains(response, exports_link)
 
     # Has job application link with back_url set
     job_application_link = unquote(
-        add_url_params(
-            reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
-            {"back_url": reverse("apply:list_prescriptions")},
+        reverse(
+            "apply:details_for_prescriber",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": reverse("apply:list_prescriptions")},
         )
     )
     assertContains(response, job_application_link)
@@ -494,7 +495,7 @@ def test_exports_back_to_list(client):
     client.force_login(PrescriberFactory())
 
     response = client.get(
-        add_url_params(reverse("apply:list_prescriptions_exports"), {"back_url": reverse("apply:list_prescriptions")})
+        reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
     )
     assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
     assertNotContains(response, BESOIN_DUN_CHIFFRE)

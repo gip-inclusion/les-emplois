@@ -47,7 +47,6 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from itou.www.apply.views.batch_views import RefuseWizardView
@@ -156,9 +155,10 @@ class TestProcessViews:
         client.force_login(employer)
 
         back_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        url = add_url_params(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            {"back_url": back_url},
+        url = reverse(
+            "apply:details_for_company",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": back_url},
         )
         approval_url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
@@ -221,9 +221,10 @@ class TestProcessViews:
         client.force_login(employer)
 
         back_url = f"{reverse('apply:list_for_siae')}?job_seeker_public_id={job_application.job_seeker.id}"
-        url = add_url_params(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            {"back_url": back_url},
+        url = reverse(
+            "apply:details_for_company",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": back_url},
         )
         with assertSnapshotQueries(snapshot(name="job application detail for company")):
             response = client.get(url)

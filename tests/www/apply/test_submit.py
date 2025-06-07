@@ -432,7 +432,7 @@ class TestHire:
             "job_seeker_public_id": prescriber.public_id,
             "from_url": reverse("dashboard:index"),
         }
-        url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         response = client.get(url)
         assert response.status_code == 404
 
@@ -581,9 +581,10 @@ class TestApplyAsJobSeeker:
         user = User.objects.get(pk=user.pk)
         assert user.jobseeker_profile.nir == nir
 
-        next_url = add_url_params(
-            reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": user.public_id},
+        next_url = reverse(
+            "job_seekers_views:check_job_seeker_info",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": user.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -705,9 +706,10 @@ class TestApplyAsJobSeeker:
         assert not response.context["form"].is_valid()
         user.jobseeker_profile.refresh_from_db()
         assert not user.jobseeker_profile.nir
-        check_job_seeker_info_url = add_url_params(
-            reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": user.public_id},
+        check_job_seeker_info_url = reverse(
+            "job_seekers_views:check_job_seeker_info",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": user.public_id},
         )
         assertContains(
             response,
@@ -751,9 +753,10 @@ class TestApplyAsJobSeeker:
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
         response = client.get(next_url)
 
-        next_url = add_url_params(
-            reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": job_seeker.public_id},
+        next_url = reverse(
+            "job_seekers_views:check_job_seeker_info",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": job_seeker.public_id},
         )
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
         response = client.get(next_url)
@@ -951,7 +954,7 @@ class TestApplyAsAuthorizedPrescriber:
             "from_url": from_url,
             "apply_session_uuid": apply_session_name,
         }
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertContains(response, "Statut de prescripteur habilité non vérifié")
         assertContains(
             response,
@@ -1141,9 +1144,10 @@ class TestApplyAsAuthorizedPrescriber:
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
-        next_url = add_url_params(
-            reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": new_job_seeker.public_id},
+        next_url = reverse(
+            "apply:application_jobs",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -1240,7 +1244,7 @@ class TestApplyAsAuthorizedPrescriber:
             "company": company.pk,
             "from_url": reset_url_company,
         }
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
@@ -1429,9 +1433,10 @@ class TestApplyAsAuthorizedPrescriber:
 
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
-        next_url = add_url_params(
-            reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": new_job_seeker.public_id},
+        next_url = reverse(
+            "apply:application_jobs",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -1605,7 +1610,7 @@ class TestApplyAsAuthorizedPrescriber:
             "company": company.pk,
             "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
         }
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
@@ -1700,7 +1705,7 @@ class TestApplyAsPrescriber:
             "company": company.pk,
             "from_url": reset_url_company,
         }
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
@@ -1928,9 +1933,10 @@ class TestApplyAsPrescriber:
 
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization is None
 
-        next_url = add_url_params(
-            reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": new_job_seeker.public_id},
+        next_url = reverse(
+            "apply:application_jobs",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -2134,9 +2140,10 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(next_url, data=post_data)
         assertRedirects(
             response,
-            add_url_params(
-                reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-                {"job_seeker_public_id": job_seeker.public_id},
+            reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"session_uuid": apply_session_name},
+                query={"job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
         )
@@ -2211,9 +2218,10 @@ class TestApplyAsPrescriberNirExceptions:
         response = client.post(next_url, data=post_data)
         assertRedirects(
             response,
-            add_url_params(
-                reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session_name}),
-                {"job_seeker_public_id": job_seeker.public_id},
+            reverse(
+                "job_seekers_views:check_job_seeker_info",
+                kwargs={"session_uuid": apply_session_name},
+                query={"job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
         )
@@ -2296,7 +2304,7 @@ class TestApplyAsCompany:
             "company": company.pk,
             "from_url": reset_url,
         }
-        next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
         response = client.get(next_url)
@@ -2501,9 +2509,10 @@ class TestApplyAsCompany:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
 
-        next_url = add_url_params(
-            reverse("apply:application_jobs", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": new_job_seeker.public_id},
+        next_url = reverse(
+            "apply:application_jobs",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -2948,9 +2957,10 @@ class TestDirectHireFullProcess:
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nir
 
-        next_url = add_url_params(
-            reverse("apply:eligibility_for_hire", kwargs={"session_uuid": apply_session_name}),
-            {"job_seeker_public_id": new_job_seeker.public_id},
+        next_url = reverse(
+            "apply:eligibility_for_hire",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -3514,7 +3524,7 @@ class TestLastCheckedAtView:
             "job_seeker_public_id": self.job_seeker.public_id,
             "from_url": url,
         }
-        update_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        update_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         link_check = assertContains if sees_verify_link else assertNotContains
         link_check(response, f'<a class="btn-link ms-3" href="{update_url}">Vérifier le profil</a>', html=True)
         # Check last_checked_at is shown
@@ -3581,7 +3591,7 @@ class UpdateJobSeekerTestMixin:
             "job_seeker_public_id": self.job_seeker.public_id,
             "from_url": from_url,
         }
-        self.start_url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        self.start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
 
     def get_job_seeker_session_key(self, client):
         return get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
@@ -4165,7 +4175,7 @@ class TestUpdateJobSeekerStep3View:
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
         }
-        url = add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)
+        url = reverse("job_seekers_views:update_job_seeker_start", query=params)
         response = client.get(url)
         assert response.status_code == 302
 
@@ -4213,7 +4223,7 @@ def test_detect_existing_job_seeker(client):
         "company": company.pk,
         "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
     }
-    next_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
+    next_url = reverse("job_seekers_views:get_or_create_start", query=params)
     assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
 
     # Step determine the job seeker with a NIR.
@@ -4792,11 +4802,10 @@ class TestFindJobSeekerForHireView:
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         assertRedirects(
             response,
-            add_url_params(
-                reverse(
-                    "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
-                ),
-                {"job_seeker_public_id": job_seeker.public_id},
+            reverse(
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                kwargs={"session_uuid": apply_session_name},
+                query={"job_seeker_public_id": job_seeker.public_id},
             ),
         )
 
@@ -4847,11 +4856,10 @@ class TestFindJobSeekerForHireView:
         response = client.post(search_by_email_url, data={"email": job_seeker.email, "confirm": 1})
         assertRedirects(
             response,
-            add_url_params(
-                reverse(
-                    "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
-                ),
-                {"job_seeker_public_id": job_seeker.public_id},
+            reverse(
+                "job_seekers_views:check_job_seeker_info_for_hire",
+                kwargs={"session_uuid": apply_session_name},
+                query={"job_seeker_public_id": job_seeker.public_id},
             ),
         )
 
@@ -4935,7 +4943,7 @@ class TestCheckJobSeekerInformationsForHire:
         }
         url_update = f"""
         <a class="btn btn-outline-primary float-end"
-           href="{add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)}">Mettre à jour</a>
+           href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}">Mettre à jour</a>
         """
         assertContains(response, url_update, html=True)
         assertContains(
@@ -4971,7 +4979,7 @@ class TestCheckJobSeekerInformationsForHire:
         }
         url_update = f"""
         <a class="btn btn-outline-primary float-end"
-           href="{add_url_params(reverse("job_seekers_views:update_job_seeker_start"), params)}">Mettre à jour</a>
+           href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}">Mettre à jour</a>
         """
         assertContains(response, url_update, html=True)
         assertContains(
@@ -5142,9 +5150,10 @@ class TestGEIQEligibilityForHire:
             data={"choice": "True"},
             headers={"hx-request": "true"},
         )
-        criteria_url = add_url_params(
-            reverse("apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": apply_session.name}),
-            {
+        criteria_url = reverse(
+            "apply:geiq_eligibility_criteria_for_hire",
+            kwargs={"session_uuid": apply_session.name},
+            query={
                 "back_url": reverse(
                     "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}
                 ),
