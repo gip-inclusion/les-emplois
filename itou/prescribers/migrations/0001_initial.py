@@ -224,6 +224,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         through="prescribers.PrescriberMembership",
                         to=settings.AUTH_USER_MODEL,
+                        through_fields=("organization", "user"),
                         verbose_name="membres",
                     ),
                 ),
