@@ -359,7 +359,9 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                             f"prolongation_report/{filename}", prolongation_report
                         )
                     default_storage.delete(tmpfile_key)
-                    prolongation.report_file = File.objects.create(id=prolongation_report_key)
+                    prolongation.report_file = File.objects.create(
+                        id=prolongation_report_key, key=prolongation_report_key
+                    )
             prolongation.save()
             prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")
@@ -483,13 +485,13 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 @check_user(lambda user: user.is_prescriber)
 def prolongation_request_report_file(request, prolongation_request_id):
     prolongation_request = get_object_or_404(
-        ProlongationRequest,
+        ProlongationRequest.objects.select_related("report_file"),
         pk=prolongation_request_id,
         report_file__isnull=False,
     )
     if prolongation_request.prescriber_organization_id not in [org.pk for org in request.organizations]:
         raise Http404
-    return HttpResponseRedirect(default_storage.url(prolongation_request.report_file_id))
+    return HttpResponseRedirect(default_storage.url(prolongation_request.report_file.key))
 
 
 class ProlongationRequestViewMixin:

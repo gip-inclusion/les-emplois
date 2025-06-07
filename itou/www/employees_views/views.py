@@ -75,6 +75,7 @@ class EmployeeDetailView(DetailView):
                 "eligibility_diagnosis__author_prescriber_organization",
                 "eligibility_diagnosis__job_seeker",
                 "sender_prescriber_organization",
+                "resume",
             )
             .prefetch_related(
                 "approval__suspension_set",

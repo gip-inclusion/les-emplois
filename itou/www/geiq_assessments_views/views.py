@@ -339,12 +339,12 @@ def assessment_get_file(request, pk, *, file_field):
             filename = assessment.action_financial_assessment_filename()
         case _:
             raise Http404
-    file_key = getattr(assessment, Assessment._meta.get_field(file_field).attname)
-    if file_key is None:
+    file = getattr(assessment, file_field)
+    if file is None:
         raise Http404
     return HttpResponseRedirect(
         default_storage.url(
-            file_key,
+            file.key,
             parameters={
                 "ResponseContentDisposition": content_disposition_header("inline", filename),
             },
@@ -373,7 +373,7 @@ def assessment_sync_file(request, pk, *, file_field):
             client = geiq_label.get_client()
             pdf_content = getattr(client, api_method)(geiq_id=assessment.label_geiq_id)
             key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(pdf_content))
-            setattr(assessment, file_field, File.objects.create(id=key))
+            setattr(assessment, file_field, File.objects.create(id=key, key=key))
             assessment.save(update_fields=(file_field,))
         except Exception as e:
             # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
@@ -402,7 +402,7 @@ def upload_action_financial_assessment(
     if request.method == "POST" and form.is_valid():
         assessment_pdf = form.cleaned_data["assessment_file"]
         file_key = default_storage.save(str(uuid.uuid4()), assessment_pdf)
-        assessment.action_financial_assessment_file = File.objects.create(id=file_key)
+        assessment.action_financial_assessment_file = File.objects.create(id=file_key, key=file_key)
         assessment.save(update_fields=("action_financial_assessment_file",))
         return HttpResponseRedirect(back_url)
     return render(request, template_name, context)

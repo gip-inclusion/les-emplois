@@ -649,7 +649,7 @@ def siae_upload_doc(
     if request.method == "POST" and form.is_valid():
         proof_file = form.cleaned_data["proof"]
         proof_key = default_storage.save(f"evaluations/{proof_file.name}", proof_file)
-        evaluated_administrative_criteria.proof = File.objects.create(id=proof_key)
+        evaluated_administrative_criteria.proof = File.objects.create(id=proof_key, key=proof_key)
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
@@ -724,12 +724,12 @@ def view_proof(request, evaluated_administrative_criteria_id):
         raise Http404(request.user.kind)
     org_filter = {org_lookup: request.organizations}
     criteria = get_object_or_404(
-        EvaluatedAdministrativeCriteria,
+        EvaluatedAdministrativeCriteria.objects.select_related("proof"),
         pk=evaluated_administrative_criteria_id,
         proof__isnull=False,
         **org_filter,
     )
-    return HttpResponseRedirect(default_storage.url(criteria.proof_id))
+    return HttpResponseRedirect(default_storage.url(criteria.proof.key))
 
 
 @login_not_required
