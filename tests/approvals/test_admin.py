@@ -1,18 +1,15 @@
-from io import BytesIO
-
 import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
-from django.utils import timezone
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.approvals.enums import Origin, ProlongationReason
-from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
+from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup, pretty_indented
@@ -51,10 +48,7 @@ def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, 
 
 
 def test_prolongation_report_file_filter(admin_client):
-    with BytesIO(b"foo") as file:
-        report_file = File(file, last_modified=timezone.now())
-        report_file.save()
-    prolongation = ProlongationFactory(report_file=report_file, reason=ProlongationReason.SENIOR)
+    prolongation = ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist"), follow=True)
     assertContains(response, prolongation.approval.number)
