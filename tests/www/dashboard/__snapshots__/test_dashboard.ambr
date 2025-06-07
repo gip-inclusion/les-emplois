@@ -209,7 +209,7 @@
           'dashboard[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "job_applications_jobapplication"."state"
+          SELECT "job_applications_jobapplication"."state" AS "state"
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
@@ -285,7 +285,7 @@
           'dashboard[www/dashboard/views.py]',
         ]),
         'sql': '''
-          SELECT "siae_evaluations_sanctions"."suspension_dates"
+          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
           WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s

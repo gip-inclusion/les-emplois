@@ -560,7 +560,7 @@
                   OR ("approvals_poleemploiapproval"."birthdate" = %s
                       AND "approvals_poleemploiapproval"."pole_emploi_id" = %s))
                  AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number"
+                            (SELECT U0."number" AS "number"
                              FROM "approvals_approval" U0
                              WHERE U0."user_id" = %s)))
           ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
@@ -4679,10 +4679,10 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
+  <div id="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
@@ -4705,10 +4705,10 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
+  <div id="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
@@ -4735,10 +4735,10 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext" id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  <div id="id_prehiring_guidance_days_helptext" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
+  <div id="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
       <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/7614fc4b-aef9-4694-ab17-12324300180a/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>

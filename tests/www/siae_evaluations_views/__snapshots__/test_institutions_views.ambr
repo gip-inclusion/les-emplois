@@ -190,9 +190,7 @@
                  "eligibility_administrativecriteria"."ui_rank",
                  "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
-          WHERE "eligibility_administrativecriteria"."id" IN (%s,
-                                                              %s,
-                                                              %s)
+          WHERE ("eligibility_administrativecriteria"."id") IN ((%s), (%s), (%s))
         ''',
       }),
       dict({
@@ -247,7 +245,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at"
           FROM "job_applications_jobapplication"
-          WHERE "job_applications_jobapplication"."id" IN (%s)
+          WHERE ("job_applications_jobapplication"."id") IN ((%s))
         ''',
       }),
       dict({
@@ -275,7 +273,7 @@
                  "approvals_approval"."origin_prescriber_organization_kind",
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
-          WHERE "approvals_approval"."id" IN (%s)
+          WHERE ("approvals_approval"."id") IN ((%s))
         ''',
       }),
       dict({
@@ -319,7 +317,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          WHERE "users_user"."id" IN (%s)
+          WHERE ("users_user"."id") IN ((%s))
         ''',
       }),
       dict({
@@ -698,17 +696,7 @@
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at"
           FROM "job_applications_jobapplication"
-          WHERE "job_applications_jobapplication"."id" IN (%s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s,
-                                                           %s)
+          WHERE ("job_applications_jobapplication"."id") IN ((%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s))
         ''',
       }),
       dict({
@@ -737,17 +725,7 @@
                  "approvals_approval"."origin_prescriber_organization_kind",
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
-          WHERE "approvals_approval"."id" IN (%s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s,
-                                              %s)
+          WHERE ("approvals_approval"."id") IN ((%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s))
         ''',
       }),
       dict({
@@ -792,17 +770,7 @@
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
-          WHERE "users_user"."id" IN (%s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s,
-                                      %s)
+          WHERE ("users_user"."id") IN ((%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s), (%s))
         ''',
       }),
       dict({

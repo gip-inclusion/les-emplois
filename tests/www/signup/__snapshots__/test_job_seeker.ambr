@@ -343,7 +343,7 @@
               Mot de passe
           </label>
           <div class="input-group">
-              <input aria-describedby="id_password1_helptext" aria-invalid="true" autocomplete="new-password" class="form-control is-invalid" id="id_password1" name="password1" placeholder="" required="" type="password"/>
+              <input aria-describedby="id_password1_helptext id_password1_error" aria-invalid="true" autocomplete="new-password" class="form-control is-invalid" id="id_password1" name="password1" placeholder="" required="" type="password"/>
               <div class="input-group-text p-0">
                   <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
                       <i aria-hidden="true" class="ri-eye-line">
@@ -360,7 +360,7 @@
           <div class="invalid-feedback">
               Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
           </div>
-          <div class="form-text" id="id_password1_helptext">
+          <div class="form-text" id="id_password1_helptext id_password1_error">
               Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
           </div>
       </div>

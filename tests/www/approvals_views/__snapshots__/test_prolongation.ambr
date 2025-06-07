@@ -142,12 +142,12 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" aria-invalid="true" class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="">
+      <duet-date-picker aria-describedby="id_end_at_helptext id_end_at_error" aria-invalid="true" class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="">
       </duet-date-picker>
       <div class="invalid-feedback">
           Ce champ est obligatoire.
       </div>
-      <div class="form-text" id="id_end_at_helptext">
+      <div class="form-text" id="id_end_at_helptext id_end_at_error">
           12 mois (365 jours) maximum pour chaque demande.
           <br/>
           Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours)).
