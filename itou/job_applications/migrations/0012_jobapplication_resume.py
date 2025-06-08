@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             model_name="jobapplication",
             name="resume",
             field=models.OneToOneField(
-                blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, to="files.file", verbose_name="CV"
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="files.file", verbose_name="CV"
             ),
         ),
     ]

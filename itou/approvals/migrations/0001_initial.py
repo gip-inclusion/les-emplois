@@ -708,7 +708,7 @@ class Migration(migrations.Migration):
                     models.OneToOneField(
                         blank=True,
                         null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
+                        on_delete=django.db.models.deletion.PROTECT,
                         to="files.file",
                         verbose_name="fichier bilan",
                     ),
@@ -863,7 +863,7 @@ class Migration(migrations.Migration):
                     models.OneToOneField(
                         blank=True,
                         null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
+                        on_delete=django.db.models.deletion.PROTECT,
                         to="files.file",
                         verbose_name="fichier bilan",
                     ),

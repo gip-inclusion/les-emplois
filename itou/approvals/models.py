@@ -1483,7 +1483,7 @@ class CommonProlongation(models.Model):
         verbose_name="fichier bilan",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
     require_phone_interview = models.BooleanField(
         verbose_name="demande d'entretien téléphonique",

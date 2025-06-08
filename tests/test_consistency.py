@@ -8,10 +8,14 @@ import pathlib
 from crontab import CronTab
 from django.apps import apps
 from django.conf import settings
+from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.fields.related import RelatedField
 from django.template import loader, loader_tags
 from django.template.defaulttags import LoadNode
 
 import itou.job_applications.enums as job_applications_enums
+from itou.antivirus.models import Scan
+from itou.files.models import File
 
 
 def iter_template_names():
@@ -182,3 +186,18 @@ def test_check_templates_ordering():
             if loads != sorted(loads):
                 errors.append((template_name, f"Unsorted loads: {loads}"))
     assert sorted(errors) == []  # Group errors by template_name
+
+
+def test_files_foreign_keys():
+    models = apps.get_models()
+    for model in models:
+        file_related_fields = [
+            f for f in model._meta.get_fields() if isinstance(f, RelatedField) and f.related_model == File
+        ]
+        for field in file_related_fields:
+            expected_on_delete = CASCADE if model == Scan else PROTECT
+            assert field.remote_field.on_delete == expected_on_delete, (
+                f"{model.__module__}.{model.__name__}.{field.name} "
+                f"has on_delete={field.remote_field.on_delete.__name__} "
+                f"should be {expected_on_delete.__name__}"
+            )
