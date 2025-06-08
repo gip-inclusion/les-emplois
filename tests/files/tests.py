@@ -16,32 +16,6 @@ from itou.utils.storage.s3 import s3_client
 from tests.files.factories import FileFactory
 
 
-def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
-    client = s3_client()
-    for key in [
-        "resume/11111111-1111-1111-1111-111111111111.pdf",
-        "evaluations/test.xlsx",
-        "prolongation_report/test.xlsx",
-        "temporary_storage/test.xlsx",
-    ]:
-        with io.BytesIO() as content:
-            client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
-    call_command("sync_s3_files")
-    assertQuerySetEqual(
-        File.objects.values_list("key", flat=True),
-        [
-            "resume/11111111-1111-1111-1111-111111111111.pdf",
-            "evaluations/test.xlsx",
-            "prolongation_report/test.xlsx",
-        ],
-        ordered=False,
-    )
-    assert caplog.messages[:-1] == ["Completed bucket sync: found permanent=3 and temporary=1 files in the bucket"]
-    assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.sync_s3_files succeeded in"
-    )
-
-
 def test_bucket_policy_for_anonymous_user():
     base_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}"
     response = httpx.head(f"{base_url}/test_file.pdf")
@@ -83,7 +57,7 @@ def test_deletion(temporary_bucket):
     assert page_after_deletion["KeyCount"] == 0
 
 
-def test_sync_files_check_existing(temporary_bucket, caplog):
+def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
     client = s3_client()
     for key in [
         "resume/11111111-1111-1111-1111-111111111111.pdf",
@@ -93,7 +67,7 @@ def test_sync_files_check_existing(temporary_bucket, caplog):
         with io.BytesIO() as content:
             client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
     existing_file = FileFactory()
-    call_command("sync_s3_files", check_existing=True)
+    call_command("sync_s3_files")
     assertQuerySetEqual(
         File.objects.values_list("key", flat=True),
         [

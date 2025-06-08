@@ -17,14 +17,12 @@
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --upload",
 
-  "0 1,13,20 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
-
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
+  "0 1 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
-  "0 7 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files --check-existing",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
