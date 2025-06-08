@@ -236,7 +236,7 @@ class AnnouncementItem(models.Model):
         File,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
     link = models.URLField(
         blank=True,

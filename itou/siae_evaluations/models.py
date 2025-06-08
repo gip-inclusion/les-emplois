@@ -786,7 +786,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
         related_name="evaluated_administrative_criteria",
     )
 
-    proof = models.ForeignKey("files.File", on_delete=models.RESTRICT, blank=True, null=True)
+    proof = models.ForeignKey("files.File", on_delete=models.PROTECT, blank=True, null=True)
     uploaded_at = models.DateTimeField(verbose_name="téléversé le", blank=True, null=True)
     submitted_at = models.DateTimeField(verbose_name="transmis le", blank=True, null=True)
     review_state = models.CharField(

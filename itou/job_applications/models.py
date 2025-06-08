@@ -494,7 +494,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     create_employee_record = models.BooleanField(default=True, verbose_name="création d'une fiche salarié")
 
     # The job seeker's resume used for this job application.
-    resume = models.OneToOneField(File, null=True, blank=True, verbose_name="CV", on_delete=models.RESTRICT)
+    resume = models.OneToOneField(File, null=True, blank=True, verbose_name="CV", on_delete=models.PROTECT)
 
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(

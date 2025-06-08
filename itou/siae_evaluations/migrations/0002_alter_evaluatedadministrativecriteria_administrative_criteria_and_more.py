@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             model_name="evaluatedadministrativecriteria",
             name="proof",
             field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, to="files.file"
+                blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to="files.file"
             ),
         ),
         migrations.AlterField(
