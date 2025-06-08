@@ -139,7 +139,7 @@ TABLE.add_columns(
         {
             "name": "date_traitement",
             "type": "date",
-            "comment": "Date de dernière traitement de la candidature",
+            "comment": "Date de dernier traitement de la candidature",
             "fn": lambda o: o.processed_at,
         },
         {
