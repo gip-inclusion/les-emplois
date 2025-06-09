@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 
 from itou.files.models import File
 from itou.utils.command import BaseCommand
@@ -25,7 +26,7 @@ class Command(BaseCommand):
             for obj_summary in obj_summaries:
                 key = obj_summary["Key"]
                 if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
-                    batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
+                    batch.append(File(key=key, last_modified=obj_summary["LastModified"], deleted_at=timezone.now()))
                     permanent_files_nb += 1
                     if key in known_keys:
                         known_permanent_files_nb += 1
