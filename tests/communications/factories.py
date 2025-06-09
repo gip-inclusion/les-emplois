@@ -51,7 +51,7 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
                 format="JPEG",
             ),
             image_alt_text=factory.Faker("sentence", locale="fr_FR"),
-            image_storage=factory.RelatedFactory(
+            image_storage=factory.SubFactory(
                 FileFactory,
                 key=factory.LazyAttribute(lambda obj: f"news-images/{obj.factory_parent.image.name}"),
             ),
