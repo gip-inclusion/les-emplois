@@ -11,9 +11,16 @@ from django.core.files.storage import default_storage
 from django.core.management import call_command
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.antivirus.models import Scan
+from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
 from itou.utils.storage.s3 import s3_client
+from tests.approvals.factories import ProlongationFactory, ProlongationRequestFactory
+from tests.communications.factories import AnnouncementItemFactory
 from tests.files.factories import FileFactory
+from tests.geiq_assessments.factories import AssessmentFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
 
 
 def test_bucket_policy_for_anonymous_user():
@@ -107,3 +114,32 @@ def test_copy(pdf_file):
 
     with default_storage.open(key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
+
+
+def test_find_orphans(caplog):
+    old_orphan = FileFactory()
+    job_application = JobApplicationFactory()
+    ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    scan = Scan.objects.create(file=FileFactory(), clamav_signature="toto")
+    AnnouncementItemFactory(with_image=True)
+    AssessmentFactory(with_submission_requirements=True)
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application  # Don't create a new resume
+    )
+    EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
+    # Make all files at least one day old
+    File.objects.all().update(last_modified=timezone.now() - datetime.timedelta(days=1))
+
+    FileFactory()  # Too recent orphan file
+    assert File.objects.all().count() == 11
+
+    call_command("find_orphan_files")
+
+    orphan_pks = set(File.objects.filter(deleted_at__isnull=False).values_list("key", flat=True))
+    assert orphan_pks == {old_orphan.pk, scan.file_id}
+
+    assert caplog.messages[:-1] == ["Marked 2 orphans files for deletion"]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.find_orphan_files succeeded in"
+    )
