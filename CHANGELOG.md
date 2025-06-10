@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2025-06-02
+
+### Ajouté
+
+- [Interface: Intégrer les orientations et candidatures envoyées dans le menu latéral pour les employeurs](https://github.com/gip-inclusion/les-emplois/pull/6212) 🖼
+- [Pilotage : Ouverture du TB 545 "Suivi des bénéficiaires, taux d’encadrement et présence en emploi" aux prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/6209) 🖼
+
+### Modifié
+
+- [Admin: Permettre aux membres du groupe itou-admin de modifier les nouveautés](https://github.com/gip-inclusion/les-emplois/pull/6222)
+- [Admin: Tri par défaut selon nom-prénom dans le tableau des membres d'une organisation](https://github.com/gip-inclusion/les-emplois/pull/6213)
+- [Candidature : mettre à jour l'emetteur de la candidature d'un candidat lors de son transfert](https://github.com/gip-inclusion/les-emplois/pull/6185)
+- [Candidatures: Améliorer l'export pour permettre de filtrer par date dans Excel](https://github.com/gip-inclusion/les-emplois/pull/6187)
+- [Certification : Déclencher l’appel à l’API Particulier au moment de la création d’un diagnostic et pour les prescripteurs habilités](https://github.com/gip-inclusion/les-emplois/pull/6090)
+- [GPS: Ajout de logs plus précis](https://github.com/gip-inclusion/les-emplois/pull/6172)
+- [PASS IAE: Ne plus afficher la date de fin prévisionnelle de validité du PASS IAE suspendu](https://github.com/gip-inclusion/les-emplois/pull/6180) 🖼
+- [Tableau de bord : afficher au candidat le statut de son PASS IAE, même quand il n'en a pas](https://github.com/gip-inclusion/les-emplois/pull/6179) 🖼
+- [Vie privée : replanification du traitement de notification et d'archivage des utilisateurs non actifs](https://github.com/gip-inclusion/les-emplois/pull/6184)
+
+### Supprimé
+
+- [Candidature: Arrêt de l'éxpérimentation du parcours de refus dans le Rhône](https://github.com/gip-inclusion/les-emplois/pull/6191)
+
 ## 2025-05-26
 
 ### Ajouté
