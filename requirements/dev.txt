@@ -378,7 +378,6 @@ django==5.2.2 \
     #   django-csp
     #   django-datadog-logger
     #   django-debug-toolbar
-    #   django-extensions
     #   django-filter
     #   django-formtools
     #   django-hijack
@@ -425,10 +424,6 @@ django-datadog-logger==0.7.3 \
 django-debug-toolbar==5.2.0 \
     --hash=sha256:15627f4c2836a9099d795e271e38e8cf5204ccd79d5dbcd748f8a6c284dcd195 \
     --hash=sha256:9e7f0145e1a1b7d78fcc3b53798686170a5b472d9cf085d88121ff823e900821
-    # via -r requirements/dev.in
-django-extensions==4.1 \
-    --hash=sha256:0699a7af28f2523bf8db309a80278519362cd4b6e1fd0a8cd4bf063e1e023336 \
-    --hash=sha256:7b70a4d28e9b840f44694e3f7feb54f55d495f8b3fa6c5c0e5e12bcb2aa3cdeb
     # via -r requirements/dev.in
 django-filter==25.1 \
     --hash=sha256:1ec9eef48fa8da1c0ac9b411744b16c3f4c31176c867886e4c48da369c407153 \

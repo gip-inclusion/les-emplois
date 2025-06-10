@@ -28,7 +28,6 @@ AUTH_PASSWORD_VALIDATORS = []
 
 INSTALLED_APPS.extend(  # noqa: F405
     [
-        "django_extensions",
         "debug_toolbar",
     ]
 )

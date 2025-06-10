@@ -11,4 +11,3 @@ pre-commit  # https://github.com/pre-commit/pre-commit
 # Django
 # ------------------------------------------------------------------------------
 django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
-django-extensions  # https://github.com/django-extensions/django-extensions

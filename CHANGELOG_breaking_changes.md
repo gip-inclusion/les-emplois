@@ -1,5 +1,10 @@
 # Journal des changements techniques majeurs
 
+## 2025-06-10
+
+- Suppression de django-extensions et de sa commande `shell_plus` maintenant
+  que `shell` importe les modèles.
+
 ## 2025-04-07
 
 - Mise à jour vers Postgres 17: si vous utilisez docker il faudra supprimer
