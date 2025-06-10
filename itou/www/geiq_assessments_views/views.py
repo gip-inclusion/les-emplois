@@ -547,7 +547,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     contracts_page = pager(
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
         .select_related("employee__assessment")
-        .order_by("employee__first_name", "employee__last_name"),
+        .order_by("employee__last_name", "employee__first_name"),
         request.GET.get("page"),
         items_per_page=50,
     )
