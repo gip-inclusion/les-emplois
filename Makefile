@@ -55,6 +55,7 @@ quality: $(VIRTUAL_ENV)
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 	python manage.py makemigrations --check --dry-run --noinput || (echo "⚠ Missing migration ⚠"; exit 1)
 	python manage.py collectstatic --no-input
+	python manage.py findstatic favicon.ico vendor/theme-inclusion/stylesheets/app.css vendor/jquery/jquery.min.js
 	# Make sure pytest help is still accessible.
 	pytest --help >/dev/null
 

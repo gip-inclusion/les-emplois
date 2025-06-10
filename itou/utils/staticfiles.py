@@ -363,5 +363,5 @@ class DownloadAndVendorStaticFilesFinder(BaseFinder):
         update_all()
         return []
 
-    def find(self, path, all=False):
+    def find(self, path, find_all=False):
         return []
