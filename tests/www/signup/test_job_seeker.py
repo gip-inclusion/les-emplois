@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country
@@ -92,6 +93,7 @@ class TestJobSeekerSignup:
 
         return user
 
+    @freeze_time()  # the email confirmation token depends on the time
     def test_job_seeker_signup(self, client, snapshot, mailoutbox):
         url = reverse("signup:job_seeker")
         response = client.get(url)
@@ -119,8 +121,10 @@ class TestJobSeekerSignup:
         assert "Confirmez votre adresse e-mail" in email.subject
         assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
-        assert len(email.to) == 1
-        assert email.to[0] == user.email
+        assert email.to == [user.email]
+        confirmation_token = EmailConfirmationHMAC(user_email).key
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        assert confirm_email_url in email.body
 
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
@@ -130,9 +134,6 @@ class TestJobSeekerSignup:
         assert response.url == reverse("account_email_verification_sent")
 
         # Confirm email + auto login.
-        confirmation_token = EmailConfirmationHMAC(user_email).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        # User clicks on the confirm link in the email, that is a GET request.
         response = client.get(confirm_email_url)
         assertRedirects(response, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
