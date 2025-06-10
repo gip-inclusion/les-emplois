@@ -366,6 +366,9 @@ def _detect_origin(debug=False):
                 function = f"{class_name}.{frame_info.function}"
             else:
                 function = frame_info.function
+            if "<genexpr>" in function:
+                # These are not consistant between devs, even with the same env setup ¯\_(ツ)_/¯
+                continue
             parts.append(f"{function}[{normalized_filename}]")
             if debug:
                 parts.append(

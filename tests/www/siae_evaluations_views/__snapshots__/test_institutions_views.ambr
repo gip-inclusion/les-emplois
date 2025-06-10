@@ -346,7 +346,6 @@
         'origin': list([
           'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
           'state_from[siae_evaluations/models.py]',
-          '<genexpr>[siae_evaluations/models.py]',
           'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
           'EvaluatedSiae.state[siae_evaluations/models.py]',
           'IfNode[siae_evaluations/includes/criterion_validation.html]',
