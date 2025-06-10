@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
 logger = logging.getLogger(__name__)
@@ -45,10 +45,13 @@ class WizardView(TemplateView):
         )
 
     def load_session(self, session_uuid):
-        wizard_session = SessionNamespace(self.request.session, self.expected_session_kind, session_uuid)
-        # FIXME: It would be great to redirect to a given url (self.failure_redirect_url ?) when there's no session
-        # But we need such an url, and to be able to pass the test_func without failure to let dispatch redirect there
-        if not wizard_session.exists():
+        try:
+            wizard_session = SessionNamespace(self.request.session, self.expected_session_kind, session_uuid)
+        except SessionNamespaceException:
+            # FIXME: It would be great to redirect to a given url
+            # (self.failure_redirect_url ?) when there's no session.
+            # But we need such an url, and to be able to pass the test_func
+            # without failure to let dispatch redirect there.
             raise Http404
         # FIXME: Add current_organization.pk in the session and ensure it's still the current_organization
         self.wizard_session = wizard_session

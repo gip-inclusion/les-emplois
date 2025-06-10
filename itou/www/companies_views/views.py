@@ -28,7 +28,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
@@ -335,8 +335,9 @@ def edit_job_description(
     template_name="companies/edit_job_description.html",
 ):
     if edit_session_id:
-        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
-        if not session_namespace.exists():
+        try:
+            session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+        except SessionNamespaceException:
             raise Http404
         session_data = session_namespace.as_dict()
     else:
@@ -381,8 +382,9 @@ def edit_job_description_details(
     template_name="companies/edit_job_description_details.html",
     **kwargs,
 ):
-    session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
-    if not session_namespace.exists():
+    try:
+        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+    except SessionNamespaceException:
         raise Http404
     session_data = session_namespace.as_dict()
 
@@ -425,8 +427,9 @@ def edit_job_description_preview(
     template_name="companies/edit_job_description_preview.html",
     **kwargs,
 ):
-    session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
-    if not session_namespace.exists():
+    try:
+        session_namespace = SessionNamespace(request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, edit_session_id)
+    except SessionNamespaceException:
         raise Http404
     session_data = session_namespace.as_dict()
 
