@@ -1,5 +1,41 @@
 # Journal des modifications
 
+## 2025-06-09
+
+### Ajouté
+
+- [Employeur : ajout d'une bannière leur rappelant la future dépublication des fiches de poste non actualisées](https://github.com/gip-inclusion/les-emplois/pull/6267)
+- [GEIQ: ajout de la nouvelle version du bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/6021)
+- [Pilotage : Ouverture du TB 160 "Facilitation à l’embauche” aux organisations France Travail](https://github.com/gip-inclusion/les-emplois/pull/6208) 🖼
+- [Vie privée : ajout de contrôle de cohérence sur le déclarant d'une prolongation ou d'une demande de prolongation](https://github.com/gip-inclusion/les-emplois/pull/6221) 🖼
+
+### Modifié
+
+- [Admin: ajout de l'accès aux fichiers pour les utilisateurs du groupe admin](https://github.com/gip-inclusion/les-emplois/pull/6279)
+- [Contrôle a posteriori : Correction d’une régression dans la validation du formulaire de sélection des critères administratifs](https://github.com/gip-inclusion/les-emplois/pull/6238) 🖼
+- [Contrôle a posteriori : Fusionner le badge « Nouveaux justificatifs à traiter » avec « À traiter »](https://github.com/gip-inclusion/les-emplois/pull/6171)
+- [Demandeur d'emploi : ajouter un lien dans le mail de création de compte envoyé au candidat lui permettant de contester cette création de compte par un tiers](https://github.com/gip-inclusion/les-emplois/pull/6246)
+- [Fiches Salarié : Ignorer les communes historiques de Mayotte](https://github.com/gip-inclusion/les-emplois/pull/6245)
+- [GEIQ: correction de la durée d'un contrat affichée](https://github.com/gip-inclusion/les-emplois/pull/6271)
+- [GPS: Amélioration de la commande d'export de bénéficiaires pour France Travail](https://github.com/gip-inclusion/les-emplois/pull/6231)
+- [GPS: Autoriser un organisme de formation à accéder aux fonctionnalités avancées de GPS](https://github.com/gip-inclusion/les-emplois/pull/6215)
+- [Interface: Mise à jour des .list-data sur les pages détails des candidatures, candidats et salariés](https://github.com/gip-inclusion/les-emplois/pull/6229) 🖼
+- [Interface: Mise à jour des .list-data sur les pages GEIQ](https://github.com/gip-inclusion/les-emplois/pull/6261)
+- [Interface: Mise à jour des .list-data sur les pages GPS](https://github.com/gip-inclusion/les-emplois/pull/6257)
+- [Nouveautés: correction de la sélection des évènements mis en avant dans la modale pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/6275)
+- [Pilotage : Nouveau format éditorial pour les SD (DDETS/DREETS)](https://github.com/gip-inclusion/les-emplois/pull/6206) 🖼
+- [Vie privée : distinguer les candidatures archivées des candidatures et utilisateurs anonymisés](https://github.com/gip-inclusion/les-emplois/pull/6255)
+- [Vie privée : permettre la désactivation du traitement d'archivage en cas de données incohérentes](https://github.com/gip-inclusion/les-emplois/pull/6220)
+
+### Supprimé
+
+- [GPS: Suppression de la notion de referent](https://github.com/gip-inclusion/les-emplois/pull/6266)
+- [Interface : Suppression de la bannière temporaire pour prévenir que Zendesk était indisponible](https://github.com/gip-inclusion/les-emplois/pull/6263)
+
+### Tech
+
+- [Tableau de bord : Utiliser des permissions plutôt que l'appartenance à un groupe précis](https://github.com/gip-inclusion/les-emplois/pull/5774)
+
 ## 2025-06-02
 
 ### Ajouté
