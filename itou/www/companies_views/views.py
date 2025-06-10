@@ -360,7 +360,7 @@ def edit_job_description(
     if request.method == "POST" and form.is_valid():
         session_data.update(form.cleaned_data)
         if session_namespace is None:
-            session_namespace = SessionNamespace.create_uuid_namespace(
+            session_namespace = SessionNamespace.create(
                 request.session, JOB_DESCRIPTION_EDIT_SESSION_KIND, session_data
             )
         else:

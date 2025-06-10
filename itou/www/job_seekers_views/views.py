@@ -232,9 +232,7 @@ class GetOrCreateJobSeekerStartView(View):
                 raise Http404("Aucune entreprise n'a été trouvée")
             data["apply"] = apply_data
 
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
-        )
+        self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
@@ -884,7 +882,7 @@ class UpdateJobSeekerStartView(View):
         if request.user.is_job_seeker or not can_view_personal_information(request, job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
 
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
+        self.job_seeker_session = SessionNamespace.create(
             request.session,
             JobSeekerSessionKinds.UPDATE,
             data={
