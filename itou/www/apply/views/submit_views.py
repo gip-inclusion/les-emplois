@@ -81,7 +81,7 @@ def _get_job_seeker_to_apply_for(request):
 
 
 def initialize_apply_session(request, data):
-    return SessionNamespace.create_uuid_namespace(request.session, APPLY_SESSION_KIND, data)
+    return SessionNamespace.create(request.session, APPLY_SESSION_KIND, data)
 
 
 class ApplicationPermissionMixin:
@@ -155,7 +155,7 @@ class StartView(ApplicationPermissionMixin, View):
         return self.reset_url
 
     def init_job_seeker_session(self, request):
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
+        job_seeker_session = SessionNamespace.create(
             request.session,
             JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
             data={
