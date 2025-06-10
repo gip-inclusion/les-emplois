@@ -77,7 +77,7 @@ class SessionNamespace:
         return dict(self._session[self.name])
 
     @classmethod
-    def create_uuid_namespace(cls, session, session_kind: str, data):
+    def create(cls, session, session_kind: str, data):
         name = str(uuid.uuid4())
         session[name] = data
         session[cls.session_kind_key(name)] = session_kind

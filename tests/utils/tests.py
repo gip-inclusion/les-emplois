@@ -1168,20 +1168,20 @@ class TestSessionNamespace:
 
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
-            ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", value_to_test)
+            ns = itou.utils.session.SessionNamespace.create(session, "test_session", value_to_test)
             session[f"{ns_name}_session_kind"] = "test_session"
             assert "unknown" not in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
         for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:
-            ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", value_to_test)
+            ns = itou.utils.session.SessionNamespace.create(session, "test_session", value_to_test)
             session[f"{ns_name}_session_kind"] = "test_session"
             assert "value" in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
     def test_api_method(self):
         session = self._get_session_store()
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", {"key": "value"})
+        ns = itou.utils.session.SessionNamespace.create(session, "test_session", {"key": "value"})
         assert ns.name in session
         assert session[ns.name] == {"key": "value"}
 
@@ -1215,15 +1215,15 @@ class TestSessionNamespace:
     def test_class_method(self):
         session = self._get_session_store()
 
-        # .create_uuid_namespace()
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", {})
+        # .create_namespace()
+        ns = itou.utils.session.SessionNamespace.create(session, "test_session", {})
         assert isinstance(ns, itou.utils.session.SessionNamespace)
         assert str(uuid.UUID(ns.name)) == ns.name
         assert session[ns.name] == {}
         assert ns.name in session
 
-        # .create_uuid_namespace() with data
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(
+        # .create_namespace() with data
+        ns = itou.utils.session.SessionNamespace.create(
             session,
             "test_session",
             data={"content": "a nice content"},
@@ -1235,7 +1235,7 @@ class TestSessionNamespace:
 
     def test_load_polluted_session(self):
         session = self._get_session_store()
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session_kind", {})
+        ns = itou.utils.session.SessionNamespace.create(session, "test_session_kind", {})
         with pytest.raises(itou.utils.session.SessionNamespaceInvalidKind):
             itou.utils.session.SessionNamespace(session, "other_session_kind", ns.name)
 

@@ -690,7 +690,7 @@ class TestEditJobDescriptionView(JobDescriptionAbstract):
                 is_active=is_active,
                 last_employer_update_at=frozen_time().replace(tzinfo=datetime.UTC),
             )
-            session_namespace = SessionNamespace.create_uuid_namespace(
+            session_namespace = SessionNamespace.create(
                 client.session,
                 JOB_DESCRIPTION_EDIT_SESSION_KIND,
                 {
