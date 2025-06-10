@@ -1,8 +1,9 @@
 import datetime
+import functools
 import logging
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 
 from itou.eligibility.enums import (
@@ -101,7 +102,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             certify_criteria(self)
         except Exception:  # Do not fail the web request if the criteria could not be certified.
             logger.info("Could not certify criteria synchronously.", exc_info=True)
-            async_certify_criteria(self._meta.model_name, self.pk)
+            transaction.on_commit(functools.partial(async_certify_criteria, self._meta.model_name, self.pk))
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
