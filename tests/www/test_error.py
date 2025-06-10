@@ -57,7 +57,7 @@ def test_error_handling_ignores_nav_error(client, exc_count, mocker, user_factor
     # Any public page is fine.
     response = client.get(reverse("accessibility"))
     assertContains(response, '<li class="nav-item">')
-    sentry_mock.capture_exception.mock_calls == [call(exc)] * exc_count
+    assert sentry_mock.capture_exception.mock_calls == [call(exc)] * exc_count
 
 
 def test_handler500_view():
