@@ -17,7 +17,6 @@ from bs4.formatter import HTMLFormatter
 from django.conf import Path, settings
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.backends.utils import CursorDebugWrapper
-from django.http import Http404
 from django.template import Template
 from django.template.base import Node
 from django.template.loader import render_to_string
@@ -27,7 +26,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -53,10 +52,9 @@ def get_session_name(session, session_kind, ignore=()):
         if session_name in ignore:
             continue
         try:
-            named_session = SessionNamespace(session, session_kind, session_name)
-            named_session.verify_kind()
+            SessionNamespace(session, session_kind, session_name)
             found_names.append(session_name)
-        except Http404:
+        except SessionNamespaceException:
             pass
     if len(found_names) > 1:
         raise ValueError("Too many sessions with this kind")
