@@ -18,7 +18,11 @@ class EmailNotification(BaseNotification):
             self.get_context(),
             self.subject_template,
             self.body_template,
+            **self.get_build_extra(),
         )
+
+    def get_build_extra(self):
+        return {}
 
     def send(self):
         if (
