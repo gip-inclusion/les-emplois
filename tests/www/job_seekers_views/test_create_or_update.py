@@ -980,7 +980,7 @@ class TestUpdateForSender:
         client.force_login(prescriber)
 
         # Create a session with a wrong tunnel key
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
+        job_seeker_session = SessionNamespace.create(
             client.session,
             JobSeekerSessionKinds.GET_OR_CREATE,
             data={

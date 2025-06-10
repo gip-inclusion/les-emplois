@@ -35,7 +35,7 @@ class WizardView(TemplateView):
         if extra_session_data:
             session_data["config"].update(extra_session_data.pop("config", {}))
             session_data.update(extra_session_data)
-        session = SessionNamespace.create_uuid_namespace(
+        session = SessionNamespace.create(
             request.session,
             cls.expected_session_kind,
             data=session_data,
