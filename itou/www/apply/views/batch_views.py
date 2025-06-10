@@ -36,7 +36,7 @@ def _get_and_lock_received_applications(request, application_ids, lock=True):
     company = get_current_company_or_404(request)
     qs = company.job_applications_received.filter(pk__in=application_ids)
     if lock:
-        qs = qs.select_for_update()
+        qs = qs.select_for_update(of=("self",), no_key=True)
     applications = list(qs)
     if mismatch_nb := len(application_ids) - len(applications):
         if mismatch_nb > 1:

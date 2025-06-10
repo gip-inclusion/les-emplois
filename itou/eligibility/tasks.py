@@ -30,7 +30,7 @@ def certify_criteria(eligibility_diagnosis):
             administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
             eligibility_diagnosis=eligibility_diagnosis,
         )
-        .select_for_update(no_key=True)
+        .select_for_update(of=("self",), no_key=True)
         .select_related("administrative_criteria")
     )
     with api_particulier.client() as client:

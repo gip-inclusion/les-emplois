@@ -125,7 +125,7 @@ class Command(BaseCommand):
                     group.beneficiary_id: group
                     for group in FollowUpGroup.objects.filter(beneficiary_id__in=batch.keys())
                     .prefetch_related("memberships")
-                    .select_for_update()
+                    .select_for_update(of=("self",), no_key=True)
                 }
 
                 prescribers_dict = {

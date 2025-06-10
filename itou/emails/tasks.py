@@ -68,7 +68,7 @@ _NB_RETRIES = int(
 def _async_send_message(email_id, *, task=None):
     with transaction.atomic():
         try:
-            email = Email.objects.select_for_update(no_key=True).get(pk=email_id)
+            email = Email.objects.select_for_update(of=("self",), no_key=True).get(pk=email_id)
         except Email.DoesNotExist:
             # Email deleted from django admin, stop trying to send it.
             logger.warning("Not sending email_id=%d, it does not exist in the database.", email_id)
