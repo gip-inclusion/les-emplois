@@ -160,7 +160,11 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
     antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
     campaign_qs = AssessmentCampaign.objects.filter(pk=campaign_label_infos.campaign_id)
     # Take a lock on the campaign to prevent concurrent creation
-    campaign = campaign_qs.select_for_update().get() if request.method == "POST" else campaign_qs.get()
+    campaign = (
+        campaign_qs.select_for_update(of=("self",), no_key=True).get()
+        if request.method == "POST"
+        else campaign_qs.get()
+    )
     existing_antenna_ids = set()
     existing_main_geiq = False
     # Check existing assessments
@@ -633,7 +637,7 @@ def assessment_contracts_toggle(
     contract = get_object_or_404(
         EmployeeContract.objects.filter(**filter_kwargs)
         .select_related("employee__assessment")
-        .select_for_update(of=("self",)),
+        .select_for_update(of=("self",), no_key=True),
         pk=contract_pk,
     )
     assessment = contract.employee.assessment

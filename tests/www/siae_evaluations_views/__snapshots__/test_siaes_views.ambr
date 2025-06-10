@@ -1191,7 +1191,7 @@
           WHERE "emails_email"."id" = %s
           LIMIT 21
           FOR NO KEY
-          UPDATE
+          UPDATE OF "emails_email"
         ''',
       }),
       dict({

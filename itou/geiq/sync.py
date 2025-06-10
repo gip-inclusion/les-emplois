@@ -125,7 +125,9 @@ def sync_employee_and_contracts(assessment):
     assessment_antenna_ids = []
     assert not assessment.contracts_synced_at
     # Prevent concurrent sync on the same assessment
-    assessment = geiq_assessments_models.Assessment.objects.select_for_update().get(pk=assessment.pk)
+    assessment = geiq_assessments_models.Assessment.objects.select_for_update(of=("self",), no_key=True).get(
+        pk=assessment.pk
+    )
     if assessment.contracts_synced_at:
         logger.info(
             "Assessment pk=%s: contract already synced at %s - aborting",

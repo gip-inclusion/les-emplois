@@ -830,7 +830,7 @@ def send_diagoriente_invite(request, job_application_id):
     As a company member, I can send a Diagoriente invite to the prescriber or the job seeker.
     """
     queryset = JobApplication.objects.is_active_company_member(request.user)
-    job_application = get_object_or_404(queryset.select_for_update(), pk=job_application_id)
+    job_application = get_object_or_404(queryset.select_for_update(of=("self",), no_key=True), pk=job_application_id)
     if not job_application.resume_id and not job_application.diagoriente_invite_sent_at:
         if job_application.is_sent_by_proxy:
             job_application.email_diagoriente_invite_for_prescriber.send()

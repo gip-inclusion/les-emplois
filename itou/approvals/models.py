@@ -86,7 +86,7 @@ class CommonApprovalMixin(models.Model):
     def last_number(cls):
         # Lock the table's first row until the end of the transaction, effectively acting as a
         # poor man's semaphore.
-        cls.objects.order_by("pk").select_for_update().first()
+        cls.objects.order_by("pk").select_for_update(of=("self",), no_key=True).first()
         # Now we can do a whole new SELECT that will take into account eventual new rows.
         number = (
             cls.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX)

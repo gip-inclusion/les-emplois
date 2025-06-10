@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 job_seeker_applications = (
                     JobApplication.objects.filter(job_seeker_id=job_seeker["job_seeker"])
                     .automatically_rejectable_applications()
-                    .select_for_update()
+                    .select_for_update(of=("self",), no_key=True, skip_locked=True)
                 )
 
                 for job_seeker_job_application in job_seeker_applications:
