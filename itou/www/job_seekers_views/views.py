@@ -31,7 +31,7 @@ from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
@@ -220,8 +220,9 @@ class GetOrCreateJobSeekerStartView(View):
         # apply data
         if self.tunnel == "sender" or self.tunnel == "hire":
             apply_session_uuid = request.GET.get("apply_session_uuid")
-            apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
-            if not apply_session.exists():
+            try:
+                SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+            except SessionNamespaceException:
                 raise Http404("Session de candidature invalide")
             apply_data = {"session_uuid": apply_session_uuid}
             try:
@@ -257,8 +258,9 @@ class ExpectedJobSeekerSessionMixin:
         self.job_seeker_session = None
 
     def setup(self, request, *args, session_uuid, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, self.EXPECTED_SESSION_KIND, session_uuid)
-        if not self.job_seeker_session.exists():
+        try:
+            self.job_seeker_session = SessionNamespace(request.session, self.EXPECTED_SESSION_KIND, session_uuid)
+        except SessionNamespaceException:
             raise Http404
         super().setup(request, *args, **kwargs)
 

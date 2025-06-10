@@ -22,7 +22,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import management
 from django.core.exceptions import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import RequestFactory
@@ -1166,32 +1166,24 @@ class TestSessionNamespace:
         session = self._get_session_store()
         ns_name = faker.Faker().word()
 
-        ns = itou.utils.session.SessionNamespace(session, "test_session", ns_name)
-
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
-            session[ns_name] = value_to_test
+            ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", value_to_test)
             session[f"{ns_name}_session_kind"] = "test_session"
             assert "unknown" not in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
         for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:
-            session[ns_name] = value_to_test
+            ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", value_to_test)
             session[f"{ns_name}_session_kind"] = "test_session"
             assert "value" in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
     def test_api_method(self):
         session = self._get_session_store()
-        ns_name = faker.Faker().word()
-
-        ns = itou.utils.session.SessionNamespace(session, "test_session", ns_name)
-        assert ns_name not in session  # The namespace doesn't yet exist in the session
-
-        # .init()
-        ns.init("test_session", {"key": "value"})
-        assert ns_name in session
-        assert session[ns_name] == {"key": "value"}
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", {"key": "value"})
+        assert ns.name in session
+        assert session[ns.name] == {"key": "value"}
 
         # .get()
         assert ns.get("key") == "value"
@@ -1202,31 +1194,29 @@ class TestSessionNamespace:
         # .set()
         ns.set("key2", "value2")
         assert ns.get("key2") == "value2"
-        assert session[ns_name] == {"key": "value", "key2": "value2"}
+        assert session[ns.name] == {"key": "value", "key2": "value2"}
 
         # .update()
         ns.update({"key3": "value3"})
         assert ns.get("key3") == "value3"
-        assert session[ns_name] == {"key": "value", "key2": "value2", "key3": "value3"}
+        assert session[ns.name] == {"key": "value", "key2": "value2", "key3": "value3"}
 
         ns.update({"key": "other_value"})
         assert ns.get("key") == "other_value"
-        assert session[ns_name] == {"key": "other_value", "key2": "value2", "key3": "value3"}
+        assert session[ns.name] == {"key": "other_value", "key2": "value2", "key3": "value3"}
 
         # .as_dict()
         assert ns.as_dict() == {"key": "other_value", "key2": "value2", "key3": "value3"}
 
-        # .exists() + .delete()
-        assert ns.exists()
+        # .delete()
         ns.delete()
-        assert ns_name not in session
-        assert not ns.exists()
+        assert ns.name not in session
 
     def test_class_method(self):
         session = self._get_session_store()
 
         # .create_uuid_namespace()
-        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session")
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session", {})
         assert isinstance(ns, itou.utils.session.SessionNamespace)
         assert str(uuid.UUID(ns.name)) == ns.name
         assert session[ns.name] == {}
@@ -1245,23 +1235,9 @@ class TestSessionNamespace:
 
     def test_load_polluted_session(self):
         session = self._get_session_store()
-        ns = itou.utils.session.SessionNamespace(session, "other_session_kind", "namespace")
-        ns.init("test_session", "data")
-        ns.kind_verified = False
-        with pytest.raises(Http404):
-            assert ns.exists()
-        with pytest.raises(Http404):
-            assert "data" in ns
-        with pytest.raises(Http404):
-            assert ns.get("data")
-        with pytest.raises(Http404):
-            assert ns.set("foo", "bar")
-        with pytest.raises(Http404):
-            assert ns.update({"foo": "bar"})
-        with pytest.raises(Http404):
-            assert ns.as_dict()
-        with pytest.raises(Http404):
-            assert ns.delete()
+        ns = itou.utils.session.SessionNamespace.create_uuid_namespace(session, "test_session_kind", {})
+        with pytest.raises(itou.utils.session.SessionNamespaceInvalidKind):
+            itou.utils.session.SessionNamespace(session, "other_session_kind", ns.name)
 
 
 class TestJSON:
