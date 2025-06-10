@@ -388,9 +388,9 @@ class Employee(models.Model):
 
     def get_full_name(self):
         """
-        Return the first_name plus the last_name, with a space in between.
+        Return the last_name plus the first_name, with a space in between.
         """
-        full_name = f"{self.first_name.strip().title()} {self.last_name.upper().strip()}"
+        full_name = f"{self.last_name.strip().upper()} {self.first_name.title().strip()}"
         return full_name.strip()
 
     def __str__(self):

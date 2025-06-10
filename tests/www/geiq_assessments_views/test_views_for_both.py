@@ -477,7 +477,7 @@ class TestAssessmentContractsDetails:
                 )
                 response = client.get(tab_url)
                 if access:
-                    assertContains(response, "Jean DUPONT")
+                    assertContains(response, "DUPONT Jean")
                 else:
                     assert response.status_code == 404
 

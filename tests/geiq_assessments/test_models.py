@@ -141,7 +141,7 @@ def test_assessment_full_or_no_final_review_constraint():
 
 def test_employee_full_name():
     employee = EmployeeFactory(first_name="Pré nom ", last_name=" Nom de Famille")
-    assert employee.get_full_name() == "Pré Nom NOM DE FAMILLE"
+    assert employee.get_full_name() == "NOM DE FAMILLE Pré Nom"
 
 
 def test_employee_get_prior_actions():
