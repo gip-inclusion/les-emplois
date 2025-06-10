@@ -77,7 +77,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -172,7 +171,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -346,7 +344,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -983,7 +980,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1620,7 +1616,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2173,7 +2168,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -2213,7 +2207,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -2237,7 +2230,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -2277,7 +2269,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2307,7 +2298,6 @@
       dict({
         'origin': list([
           'content[www/itou_staff_views/views.py]',
-          '<genexpr>[www/itou_staff_views/views.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
