@@ -813,7 +813,10 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         try:
             with transaction.atomic():
                 user = User.create_job_seeker_by_proxy(
-                    self.sender, **self._get_user_data_from_session(), acting_organization=request.current_organization
+                    self.sender,
+                    **self._get_user_data_from_session(),
+                    acting_organization=request.current_organization,
+                    gps=self.is_gps,
                 )
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():

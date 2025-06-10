@@ -47,7 +47,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.notifications import JobSeekerCreatedByProxyNotification
+from itou.users.notifications import JobSeekerCreatedByProxyNotification, JobSeekerCreatedByProxyNotificationForGPS
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.templatetags.str_filters import mask_unless
@@ -780,7 +780,7 @@ class User(AbstractUser, AddressMixin):
         return has_performed_update
 
     @classmethod
-    def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, **fields):
+    def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, gps=False, **fields):
         """
         Used when a "prescriber" user creates another user of kind "job seeker".
 
@@ -797,7 +797,8 @@ class User(AbstractUser, AddressMixin):
         fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(username, email=fields.pop("email"), **fields)
-        JobSeekerCreatedByProxyNotification(
+        Notification = JobSeekerCreatedByProxyNotificationForGPS if gps else JobSeekerCreatedByProxyNotification
+        Notification(
             user,
             job_seeker=user,
             creator=proxy_user,

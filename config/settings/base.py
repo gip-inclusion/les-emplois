@@ -760,6 +760,7 @@ GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
 GPS_NAV_ENTRY_DEPARTMENTS = ["30"]
 GRIST_API_KEY = os.getenv("GRIST_API_KEY")
 GPS_SLACK_WEBHOOK_URL = os.getenv("GPS_SLACK_WEBHOOK_URL")
+GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
 
 # Mon récap
 # ------------------------------------------------------------------------------

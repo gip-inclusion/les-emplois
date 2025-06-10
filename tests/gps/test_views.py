@@ -1550,7 +1550,7 @@ class TestJoinGroupFromNir:
             {"message": "GPS visit_list_groups"},
         ]
 
-    def test_unknown_nir_and_unknown_email(self, client, settings, mocker, caplog):
+    def test_unknown_nir_and_unknown_email(self, client, settings, mocker, caplog, mailoutbox):
         user = EmployerFactory(with_company=True)
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
@@ -1706,6 +1706,12 @@ class TestJoinGroupFromNir:
         assert group.memberships.filter(member=user).exists()
         assert gps_logs(caplog) == [{"message": "GPS group_created", "group": group.pk}]
 
+        [mail] = mailoutbox
+        assert mail.to == [new_job_seeker.email]
+        assert mail.from_email == settings.GPS_CONTACT_EMAIL
+        assert mail.subject == "[DEV] Création de votre compte sur la Plateforme de l’inclusion"
+        assert "Un compte à votre nom vient d’être créé par" in mail.body
+
 
 class TestJoinGroupFromNameAndEmail:
     URL = reverse("gps:join_group_from_name_and_email")
@@ -1741,7 +1747,7 @@ class TestJoinGroupFromNameAndEmail:
             assert response.status_code == 403
 
     @pytest.mark.parametrize("known_name", [True, False])
-    def test_unknown_email(self, client, settings, mocker, known_name, caplog):
+    def test_unknown_email(self, client, settings, mocker, known_name, caplog, mailoutbox):
         # This process is the same with or without gps advanced features
         user = PrescriberFactory()
         slack_mock = mocker.patch("itou.www.gps.utils.send_slack_message_for_gps")  # mock the imported link
@@ -1914,6 +1920,12 @@ class TestJoinGroupFromNameAndEmail:
             ]
         assert slack_mock.mock_calls == expected_mock_calls
         assert gps_logs(caplog) == [{"group": group.pk, "message": "GPS group_created"}]
+
+        [mail] = mailoutbox
+        assert mail.to == [new_job_seeker.email]
+        assert mail.from_email == settings.GPS_CONTACT_EMAIL
+        assert mail.subject == "[DEV] Création de votre compte sur la Plateforme de l’inclusion"
+        assert "Un compte à votre nom vient d’être créé par" in mail.body
 
     def test_full_match_with_advanced_features(self, client, snapshot, caplog):
         user = PrescriberFactory(membership__organization__authorized=True)
