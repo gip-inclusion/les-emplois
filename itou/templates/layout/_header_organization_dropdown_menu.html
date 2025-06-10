@@ -4,9 +4,9 @@
         {% for org in request.organizations %}
             <li>
                 <button class="dropdown-item dropdown-item__summary{% if org.pk == request.current_organization.pk %} active{% endif %}" name="organization_id" value="{{ org.pk }}">
-                    {% if user.is_employer %}
+                    {% if request.user.is_employer %}
                         <i class="ri-community-line" aria-hidden="true"></i>
-                    {% elif user.is_prescriber %}
+                    {% elif request.user.is_prescriber %}
                         <i class="ri-home-smile-line" aria-hidden="true"></i>
                     {% endif %}
                     <span>{{ org.kind }}</span>
