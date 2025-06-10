@@ -1,6 +1,7 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.contrib import messages
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertMessages, assertRedirects
 
 from itou.users.enums import IdentityProvider
@@ -13,6 +14,7 @@ from tests.users.factories import (
 
 
 class TestChangeEmailView:
+    @freeze_time()  # the email confirmation token depends on the time
     def test_update_email(self, client, mailoutbox):
         user = JobSeekerFactory(email="ancien@email.fr")
         old_email = user.email
@@ -50,11 +52,12 @@ class TestChangeEmailView:
         assert "Confirmez votre adresse e-mail" in email.subject
         assert "Nous avons bien enregistré votre demande de modification d'adresse e-mail." in email.body
         assert "Afin de finaliser ce changement, cliquez sur le lien suivant" in email.body
-        assert email.to[0] == new_email
-
-        # Confirm email : email is changed
+        assert email.to == [new_email]
         confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.get(email=new_email)).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        assert confirm_email_url in email.body
+
+        # Confirm email : email is changed
         response = client.post(confirm_email_url)
         assert response.status_code == 302
         assert response.url == reverse("welcoming_tour:index")
