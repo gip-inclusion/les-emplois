@@ -490,6 +490,16 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "companies_company"."fields_history",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -526,6 +536,7 @@
           LEFT OUTER JOIN "asp_country" ON ("users_jobseekerprofile"."birth_country_id" = "asp_country"."id")
           LEFT OUTER JOIN "asp_commune" T8 ON ("users_jobseekerprofile"."hexa_commune_id" = T8."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")
           WHERE ("employee_record_employeerecord"."status" IN (%s,

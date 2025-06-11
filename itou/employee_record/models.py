@@ -144,6 +144,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
             "job_application",
             "job_application__approval",
             "job_application__to_company",
+            "job_application__to_company__convention",
             "job_application__job_seeker",
             "job_application__job_seeker__jobseeker_profile__birth_country",
             "job_application__job_seeker__jobseeker_profile__birth_place",
@@ -639,6 +640,20 @@ class EmployeeRecordUpdateNotificationWorkflow(xwf_models.Workflow):
 class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
     def find_by_batch(self, filename, line_number):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
+
+    def full_fetch(self):
+        return self.select_related(
+            "employee_record",
+            "employee_record__job_application",
+            "employee_record__job_application__approval",
+            "employee_record__job_application__to_company",
+            "employee_record__job_application__job_seeker",
+            "employee_record__job_application__job_seeker__jobseeker_profile__birth_country",
+            "employee_record__job_application__job_seeker__jobseeker_profile__birth_place",
+            "employee_record__job_application__job_seeker__jobseeker_profile",
+            "employee_record__job_application__job_seeker__jobseeker_profile__hexa_commune",
+            "employee_record__job_application__sender_prescriber_organization",
+        )
 
 
 class EmployeeRecordUpdateNotification(ASPExchangeInformation, xwf_models.WorkflowEnabled):
