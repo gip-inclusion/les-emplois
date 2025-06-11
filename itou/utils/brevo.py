@@ -4,7 +4,6 @@ from itertools import batched
 
 import httpx
 from django.conf import settings
-from huey.contrib.djhuey import task
 
 
 logger = logging.getLogger(__name__)
@@ -88,11 +87,3 @@ class BrevoClient:
         except httpx.HTTPStatusError as e:
             logger.error(f"Brevo API: HTTP error occurred: {str(e)}")
             raise
-
-
-@task(retries=24 * 6 * 90, retry_delay=10 * 60, context=True)  # Retry every 10 minutes during 90 days.
-def async_delete_contact(email, *, task=None):
-    with BrevoClient() as brevo_client:
-        if task.retries % 100 == 0:
-            logger.warning("Attempting to delete email %s, remaining %d retries", email, task.retries)
-        brevo_client.delete_contact(email)
