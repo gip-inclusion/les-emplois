@@ -9,6 +9,7 @@ from itou.employee_record.management.commands import transfer_employee_records_u
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
+from tests.utils.test import assertSnapshotQueries
 
 
 @pytest.fixture(name="command")
@@ -142,7 +143,8 @@ def test_dry_run_upload_and_download(command):
 def test_upload_and_download(snapshot, sftp_directory, command, caplog):
     notification = EmployeeRecordUpdateNotificationFactory(pk=1234, ready_for_transfer=True)
 
-    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    with assertSnapshotQueries(snapshot(name="upload")):
+        command.handle(upload=True, download=False, preflight=False, wet_run=True)
     notification.refresh_from_db()
     assert notification.status == NotificationStatus.SENT
     assert notification.asp_batch_line_number == 1
@@ -151,10 +153,11 @@ def test_upload_and_download(snapshot, sftp_directory, command, caplog):
     process_incoming_file(sftp_directory, "0000", "OK")
 
     caplog.clear()
-    command.handle(upload=False, download=True, preflight=False, wet_run=True)
+    with assertSnapshotQueries(snapshot(name="download")):
+        command.handle(upload=False, download=True, preflight=False, wet_run=True)
     notification.refresh_from_db()
     assert notification.status == NotificationStatus.PROCESSED
     assert notification.asp_processing_code == "0000"
     assert notification.archived_json.get("libelleTraitement") == "OK"
 
-    assert caplog.messages == snapshot
+    assert caplog.messages == snapshot(name="logs")

@@ -15,6 +15,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
+from tests.utils.test import assertSnapshotQueries
 
 
 @pytest.fixture(name="command")
@@ -179,7 +180,8 @@ def test_dry_run_upload_and_download(command):
 def test_upload_and_download(snapshot, sftp_directory, command, caplog):
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
 
-    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    with assertSnapshotQueries(snapshot(name="upload")):
+        command.handle(upload=True, download=False, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
     assert employee_record.status == Status.SENT
     assert employee_record.asp_batch_line_number == 1
@@ -187,13 +189,16 @@ def test_upload_and_download(snapshot, sftp_directory, command, caplog):
 
     process_incoming_file(sftp_directory, "0000", "OK")
 
-    command.handle(upload=False, download=True, preflight=False, wet_run=True)
+    with assertSnapshotQueries(snapshot(name="download")):
+        command.handle(upload=False, download=True, preflight=False, wet_run=True)
     employee_record.refresh_from_db()
     assert employee_record.status == Status.PROCESSED
     assert employee_record.asp_processing_code == "0000"
     assert employee_record.archived_json.get("libelleTraitement") == "OK"
 
-    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot()
+    assert [re.sub(r"<EmployeeRecord: .+?>", "[EMPLOYEE RECORD]", msg) for msg in caplog.messages] == snapshot(
+        name="logs"
+    )
 
 
 def test_duplicates_automatic_processing(sftp_directory, command):
