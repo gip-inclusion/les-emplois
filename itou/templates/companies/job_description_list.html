@@ -16,6 +16,29 @@
     {% endcomponent_title %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    <div id="interview-2025-06-jobs" class="alert alert-important alert-dismissible-once d-none my-5" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-2">
+                    <strong>Votre avis nous intéresse</strong>
+                </p>
+                <p class="mb-0">
+                    Aidez-nous à améliorer la gestion des métiers et recrutement en répondant à notre enquête (temps estimé : 5 min).
+                </p>
+            </div>
+            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                <a href="https://t.maze.co/384640678" target="_blank" rel="noreferrer" class="btn btn-sm btn-primary has-external-link">Répondre à l’enquête</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
         <li class="nav-item">
