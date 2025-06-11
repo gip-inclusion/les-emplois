@@ -138,6 +138,9 @@ MIDDLEWARE = [
     # Django stack
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # Maintenance: if enabled we will skip all the remaning middlewares
+    "itou.www.middleware.maintenance",
+    # Django stack again
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -828,3 +831,9 @@ REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 # Notify_archive_users
 # ------------------------------------------------------------------------------
 SUSPEND_NOTIFY_ARCHIVE_USERS = os.getenv("SUSPEND_NOTIFY_ARCHIVE_USERS", "False") == "True"
+
+
+# Mainenance mode
+# ------------------------------------------------------------------------------
+MAINTENANCE_MODE = os.getenv("MAINTENANCE_MODE", "False") == "True"
+MAINTENANCE_DESCRIPTION = os.getenv("MAINTENANCE_DESCRIPTION", None)
