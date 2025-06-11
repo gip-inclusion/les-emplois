@@ -83,7 +83,7 @@ class Command(EmployeeRecordTransferCommand):
             self.logger.info(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
 
             # Now we must find the matching FS
-            employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
+            employee_record = EmployeeRecord.objects.full_fetch().find_by_batch(batch_filename, line_number).first()
             if not employee_record:
                 self.logger.info(
                     f"Skipping, could not get existing employee record: {batch_filename=}, {line_number=}"
@@ -167,9 +167,11 @@ class Command(EmployeeRecordTransferCommand):
         Upload a file composed of all ready employee records
         """
         self.logger.info("Starting UPLOAD of employee records")
-        employee_records_to_send = EmployeeRecord.objects.filter(
-            status=Status.READY, job_application__state=JobApplicationState.ACCEPTED
-        ).order_by("updated_at", "pk")
+        employee_records_to_send = (
+            EmployeeRecord.objects.full_fetch()
+            .filter(status=Status.READY, job_application__state=JobApplicationState.ACCEPTED)
+            .order_by("updated_at", "pk")
+        )
         for batch in chunks(
             employee_records_to_send, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
         ):

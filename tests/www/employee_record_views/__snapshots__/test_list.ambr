@@ -671,6 +671,16 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  "companies_company"."fields_history",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -701,6 +711,7 @@
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           LEFT OUTER JOIN "asp_commune" ON ("users_jobseekerprofile"."birth_place_id" = "asp_commune"."id")
