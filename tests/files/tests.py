@@ -1,3 +1,4 @@
+import datetime
 import io
 import os
 import re
@@ -9,6 +10,7 @@ from botocore.config import Config
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management import call_command
+from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.antivirus.models import Scan
@@ -152,3 +154,25 @@ def test_find_orphans(caplog):
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.find_orphan_files succeeded in"
     )
+
+
+def test_purge_files(caplog):
+    in_the_past = timezone.now() - datetime.timedelta(days=1)
+    to_purge = FileFactory(deleted_at=in_the_past)
+    not_an_orphan = JobApplicationFactory(resume__deleted_at=in_the_past).resume
+    FileFactory(deleted_at=in_the_past)  # File without S3 object (remove anyway)
+    too_recently_marked = FileFactory(deleted_at=timezone.now())
+
+    for file in [to_purge, not_an_orphan]:
+        with io.BytesIO() as content:
+            default_storage.save(file.key, content)
+
+    call_command("purge_files")
+
+    assert set(File.objects.values_list("key", flat=True)) == {not_an_orphan.key, too_recently_marked.key}
+
+    assert caplog.messages[:-1] == [
+        f"Could not delete protected file {not_an_orphan.key}",
+        "Purged 2 files",
+    ]
+    assert caplog.messages[-1].startswith("Management command itou.files.management.commands.purge_files succeeded in")
