@@ -30,6 +30,14 @@
 
 <script nonce="{{ CSP_NONCE }}">
     $(document).ready(function() {
+        function supports_local_storage() {
+            try {
+                return 'localStorage' in window && window['localStorage'] !== null;
+            } catch (e) {
+                return false;
+            }
+        }
+
         // news modal is rendered if there are recent updates which haven't been viewed on this device
         if (supports_local_storage()) {
             let lastNewsModalViewed = localStorage.getItem("lastNewsModalViewed");
