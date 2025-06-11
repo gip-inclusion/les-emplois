@@ -1,8 +1,8 @@
 # serializer version: 1
 # name: test_sync_commune[modified_communes]
   list([
-    '\tCHANGED name=CRANS changed to value=CRANS-LENNUI',
-    '\tCHANGED name=OUDAIN changed to value=HOUDAIN',
+    "\tCHANGED name=CRANS changed to value=CRANS-LENNUI for item.db_obj.name='CRANS' item.db_obj.code='01129' item.db_obj.pk=76199",
+    "\tCHANGED name=OUDAIN changed to value=HOUDAIN for item.db_obj.name='OUDAIN' item.db_obj.code='62457' item.db_obj.pk=76218",
     '\tADDED {"code": "37139", "name": "LUYNES", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
     '\tADDED {"code": "37200", "name": "RIVARENNES", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
     '\tADDED {"code": "41016", "name": "BILLY", "start_date": "1942-01-01", "end_date": "1999-12-31"}',
