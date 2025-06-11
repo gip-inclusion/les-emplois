@@ -398,7 +398,8 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     Code and name of French communes.
     Mainly used to get the commune code (different from postal code).
 
-    Imported from ASP reference file: ref_insee_com_v1.csv
+    Imported from ASP reference file: ref_insee_com_v2.
+    Newer ones exists (ref_insee_com_v3, ref_insee_com_v4), but we don't use it yet as there are some discrepancies.
 
     Note:
     reference file is currently not up-to-date (2018)
