@@ -337,6 +337,9 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
     ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
+    ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR = (
+        "Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié."
+    )
 
     URL_NAME = "employee_record_views:create_step_2"
 
@@ -345,15 +348,26 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         self.pass_step_1(client)
 
     def test_job_seeker_without_address(self, client):
-        # Job seeker has no address filled (which should not happen without admin operation)
+        # Job seeker has no address filled (which should not happen without an admin operation)
         job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
 
-        response = client.get(self.url)
-        url = reverse("employee_record_views:create_step_2", args=(job_application.pk,))
-        response = client.get(url)
+        response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
 
         assertContains(response, self.NO_ADDRESS_FILLED_IN)
         assertContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
+        assertNotContains(response, self.ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR)
+
+    def test_job_seeker_with_hexa_address(self, client):
+        # Job seeker has already an address filled
+        job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_company=self.company,
+            job_seeker__jobseeker_profile__with_hexa_address=True,
+        )
+
+        response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
+        assertContains(response, self.NO_ADDRESS_FILLED_IN)
+        assertNotContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
+        assertContains(response, self.ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR)
 
     def test_job_seeker_address_geolocated(self, client, snapshot):
         job_seeker = JobSeekerFactory(
@@ -364,9 +378,10 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             to_company=self.company,
             job_seeker=job_seeker,
         )
+        url = reverse(self.URL_NAME, args=(job_application.pk,))
 
-        # Accept geolocated address provided by mock and pass to step 3
-        response = client.get(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
+        # Accept the geolocated address provided by mock and pass to step 3
+        response = client.get(url)
         form_soup = parse_response_to_soup(
             response,
             selector=".s-section form",
@@ -390,9 +405,20 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         )
         assert pretty_indented(form_soup) == snapshot
 
-        response = client.get(reverse("employee_record_views:create_step_3", args=(job_application.pk,)))
-        assertNotContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
-        assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
+        job_seeker.jobseeker_profile.refresh_from_db()  # HEXA address should now have been filled by the GET
+        response = client.post(
+            url,
+            data={
+                "hexa_lane_number": job_seeker.jobseeker_profile.hexa_lane_number,
+                "hexa_std_extension": job_seeker.jobseeker_profile.hexa_std_extension,
+                "hexa_lane_type": job_seeker.jobseeker_profile.hexa_lane_type,
+                "hexa_lane_name": job_seeker.jobseeker_profile.hexa_lane_name,
+                "hexa_additional_address": job_seeker.jobseeker_profile.hexa_additional_address,
+                "hexa_post_code": job_seeker.jobseeker_profile.hexa_post_code,
+                "hexa_commune": job_seeker.jobseeker_profile.hexa_commune.pk,
+            },
+        )
+        assertRedirects(response, reverse("employee_record_views:create_step_3", args=(job_application.pk,)))
 
     def test_job_seeker_address_not_geolocated(self, client):
         # Job seeker has an address filled but can't be geolocated
@@ -404,9 +430,10 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         # Changed job application: new URL
         response = client.get(reverse(self.URL_NAME, args=(job_application.pk,)))
 
-        # Check that when lookup fails, user is properly notified
-        # to input employee address manually
+        # Check that when lookup fails, the user is properly notified
+        # to input the employee address manually
         assertContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
+        assertNotContains(response, self.ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR)
         assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
 
         # Force the way without a profile should raise a PermissionDenied
@@ -415,8 +442,8 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         assert response.status_code == 403
 
     def test_update_form_with_bad_job_seeker_address(self, client):
-        # If HEXA address is valid, user can still change it
-        # but it must be a valid one, otherwise the previous address is discarded
+        # If the HEXA address is valid, the user can still change it,
+        # but it must be valid; otherwise the previous address is discarded
         response = client.get(self.url)
         assert response.status_code == 200
 

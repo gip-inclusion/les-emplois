@@ -400,9 +400,6 @@
                   </option>
               </select>
           </div>
-          <button class="btn btn-outline-primary mb-3">
-              Valider cette adresse
-          </button>
       </fieldset>
       <div class="row">
           <div class="col-12">
@@ -428,11 +425,11 @@
                       </a>
                   </div>
                   <div class="form-group col col-lg-auto order-2 order-lg-3">
-                      <a aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" href="/employee_record/create_step_3/[PK of JobApplication]">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
                           <span>
                               Suivant
                           </span>
-                      </a>
+                      </button>
                   </div>
               </div>
           </div>
