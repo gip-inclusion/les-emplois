@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.utils import timezone
@@ -9,15 +10,17 @@ from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
 from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
+from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.archive.tasks import async_delete_contact
 from itou.companies.enums import CompanyKind
-from itou.companies.models import JobDescription
+from itou.companies.models import CompanyMembership, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
+from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
+from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser, InactiveUser
 from itou.utils.command import BaseCommand
@@ -64,7 +67,7 @@ def get_year_month_or_none(date=None):
 
 def get_filter_kwargs_on_user_for_related_objects_to_check():
     return {
-        f"{obj.name}__isnull": False
+        f"{obj.name}__isnull": True
         for obj in User._meta.related_objects
         if getattr(obj, "on_delete", None) and getattr(obj.on_delete, "__name__", "") != "CASCADE"
     }
@@ -128,6 +131,17 @@ def anonymized_jobapplication(obj):
         hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
         hiring_without_approval=obj.hiring_without_approval,
+    )
+
+
+def anonymized_professional(user):
+    return AnonymizedProfessional(
+        date_joined=get_year_month_or_none(user.date_joined),
+        first_login=get_year_month_or_none(user.first_login),
+        last_login=get_year_month_or_none(user.last_login),
+        department=user.department,
+        title=user.title,
+        identity_provider=user.identity_provider,
     )
 
 
@@ -304,6 +318,60 @@ class Command(BaseCommand):
         )
         jobapplications.delete()
 
+    @transaction.atomic
+    def archive_professionals_after_grace_period(self):
+        now = timezone.now()
+        grace_period_since = now - GRACE_PERIOD
+        self.logger.info("Archiving professionals after grace period, notified before: %s", grace_period_since)
+
+        users_to_anonymize = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__lte=grace_period_since
+            )[: self.batch_size]
+        )
+
+        # split users to anonymize into those that can be deleted and those that can only be anonymized
+        related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
+        users_to_anonymize_and_delete = (
+            User.objects.filter(id__in=[user.id for user in users_to_anonymize])
+            .filter(**related_objects_to_check)
+            .select_for_update(of=("self",), skip_locked=True)
+        )
+        users_to_anonymize_only = User.objects.filter(
+            id__in=[user.id for user in users_to_anonymize if user not in users_to_anonymize_and_delete]
+        ).select_for_update(of=("self",), skip_locked=True, no_key=True)
+
+        if self.wet_run:
+            for user in users_to_anonymize:
+                ArchiveUser(user).send()
+
+            self._anonymize_and_delete_professionals(users_to_anonymize_and_delete)
+            self._anonymize_professionals(users_to_anonymize_only)
+
+        self.logger.info("Archived professionals after grace period, count: %d", len(users_to_anonymize))
+
+    def _anonymize_and_delete_professionals(self, users):
+        AnonymizedProfessional.objects.bulk_create([anonymized_professional(user) for user in users])
+        users.delete()
+
+    def _anonymize_professionals(self, users):
+        users.update(
+            anonymized_at=timezone.now(),
+            is_active=False,
+            password=make_password(None),
+            email=None,
+            phone="",
+            address_line_1="",
+            address_line_2="",
+            post_code="",
+            city="",
+            coords=None,
+            insee_city=None,
+        )
+        CompanyMembership.objects.filter(user__in=users).update(is_active=False)
+        InstitutionMembership.objects.filter(user__in=users).update(is_active=False)
+        PrescriberMembership.objects.filter(user__in=users).update(is_active=False)
+
     @monitor(
         monitor_slug="notify_archive_users",
         monitor_config={
@@ -331,3 +399,4 @@ class Command(BaseCommand):
         self.notify_inactive_professionals()
 
         self.archive_jobseekers_after_grace_period()
+        self.archive_professionals_after_grace_period()
