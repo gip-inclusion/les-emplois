@@ -389,7 +389,7 @@ def evaluated_job_application(
             "job_application__approval",
             "job_application__job_seeker",
         )
-        .select_related("evaluated_siae__evaluation_campaign"),
+        .select_related("evaluated_siae__evaluation_campaign", "evaluated_siae__siae"),
         pk=evaluated_job_application_pk,
         **owner_data,
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
@@ -458,6 +458,8 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
         evaluated_job_application__evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
+    if evaluated_administrative_criteria.criteria_certified:
+        raise Http404
     if action == "reinit":
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
     elif action == "accept":
@@ -527,6 +529,7 @@ def siae_job_applications_list(
         EvaluatedJobApplication.objects.filter(evaluated_siae=evaluated_siae)
         .select_related(
             "evaluated_siae__evaluation_campaign__calendar",
+            "evaluated_siae__siae",
             "job_application",
             "job_application__job_seeker",
             "job_application__approval",
