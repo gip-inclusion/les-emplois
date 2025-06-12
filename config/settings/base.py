@@ -201,6 +201,17 @@ TEMPLATES = [
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
+try:
+    # This module is only available when running under uWSGI
+    # https://uwsgi-docs.readthedocs.io/en/latest/PythonModule.html
+    import uwsgi  # noqa: F401
+except ImportError:
+    db_statement_timeout = int(os.environ.get("SCRIPT_DB_STATEMENT_TIMEOUT", 300_000))
+    db_lock_timeout = int(os.environ.get("SCRIPT_DB_LOCK_TIMEOUT", 150_000))
+else:
+    db_statement_timeout = int(os.environ.get("WWW_DB_STATEMENT_TIMEOUT", 10_000))
+    db_lock_timeout = int(os.environ.get("WWW_DB_LOCK_TIMEOUT", 5_000))
+
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": True,
@@ -218,6 +229,7 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
             "connect_timeout": 5,
+            "options": f"-c statement_timeout={db_statement_timeout} -c lock_timeout={db_lock_timeout}",
         },
     }
 }
