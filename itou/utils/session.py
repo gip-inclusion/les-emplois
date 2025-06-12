@@ -13,6 +13,14 @@ class SessionNamespaceInvalid(Exception):
     pass
 
 
+class SessionNamespaceDoesNotExist(SessionNamespaceInvalid):
+    pass
+
+
+class SessionNamespaceInvalidKind(SessionNamespaceInvalid):
+    pass
+
+
 class SessionNamespace:
     """Class to facilitate the usage of namespaces inside the session."""
 
@@ -31,11 +39,11 @@ class SessionNamespace:
             session_kind = self._session[key]
         except KeyError as e:
             logger.warning(f"Failed to load session, missing {key}.")
-            raise SessionNamespaceInvalid(key) from e
+            raise SessionNamespaceDoesNotExist(key) from e
         else:
             if session_kind != self.expected_session_kind:
                 logger.warning(f"Loading a {session_kind} while expecting a {self.expected_session_kind}.")
-                raise SessionNamespaceInvalid(key)
+                raise SessionNamespaceInvalidKind(key)
 
     def __repr__(self):
         return f"<SessionNamespace({self._session[self.name]!r})>"
