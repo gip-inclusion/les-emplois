@@ -1177,7 +1177,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1196,7 +1196,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1239,7 +1239,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1270,7 +1270,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1313,7 +1313,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1332,7 +1332,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1488,7 +1488,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1510,7 +1510,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1553,7 +1553,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1572,7 +1572,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -1785,7 +1785,7 @@
                           <h3>
                               Autres données
                           </h3>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des DDETS/DREETS
@@ -1841,7 +1841,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination de France Travail
@@ -1870,7 +1870,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des Conseils Départementaux
@@ -1908,7 +1908,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des prescripteurs habilités
@@ -1928,7 +1928,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des SIAE
@@ -1966,7 +1966,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des réseaux de l'IAE
@@ -1986,7 +1986,7 @@
                                   </ul>
                               </div>
                           </div>
-                          <div class="c-box p-0 mb-3 mb-lg-5 flex-grow-1">
+                          <div class="c-box p-0 mb-3 mb-md-4 flex-grow-1">
                               <div class="p-3 p-lg-4">
                                   <h4 class="mb-0">
                                       Tableaux de bord à destination des réseaux de Convergence
@@ -2036,7 +2036,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2058,7 +2058,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2101,7 +2101,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2120,7 +2120,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2276,7 +2276,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2298,7 +2298,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2341,7 +2341,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2363,7 +2363,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2406,7 +2406,7 @@
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
@@ -2425,7 +2425,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col mb-3 mb-md-5">
+                  <div class="col mb-3 mb-md-4">
                       <div class="c-box p-0 h-100">
                           <div class="p-3 p-lg-4">
                               <span class="h4 mb-0">
