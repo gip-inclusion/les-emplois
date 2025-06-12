@@ -2,13 +2,13 @@ import httpx
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from huey.contrib.djhuey import task
+from huey.contrib.djhuey import on_commit_task
 
 from itou.users.enums import UserKind
 from itou.utils.urls import get_absolute_url
 
 
-@task(retries=3, retry_delay=10)
+@on_commit_task(retries=3, retry_delay=10)
 def add_records(doc_id, table_id, records):
     if settings.GRIST_API_KEY is None:
         return
