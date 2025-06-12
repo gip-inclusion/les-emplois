@@ -162,7 +162,7 @@ class TestAsyncSendMessage:
         # Simply to pair with "assert self.HUEY_TEXT not in caplog.text" in test_django_settings.
         assert self.HUEY_TEXT in caplog.text
 
-    def test_django_settings(self, caplog, django_capture_on_commit_callbacks, settings):
+    def test_django_settings(self, caplog, django_capture_on_commit_callbacks):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         with django_capture_on_commit_callbacks(execute=True):
             _async_send_message(email.pk)
