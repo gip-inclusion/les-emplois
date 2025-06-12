@@ -18,6 +18,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.test
       REDIS_URL: redis://127.0.0.1:6379
       REQUIREMENTS_PATH: requirements/test.txt
+      DEBUG_SQL_SNAPSHOT: 'true'
     concurrency:
       group: ${{ github.workflow }}-test-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
       cancel-in-progress: true
