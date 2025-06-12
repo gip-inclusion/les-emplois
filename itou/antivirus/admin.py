@@ -28,7 +28,7 @@ class ScanAdmin(ItouModelAdmin):
     readonly_fields = ["clamav_completed_at", "clamav_signature"]
     fields = ["clamav_completed_at", "clamav_signature", "infected", "comment"]
     list_filter = [SuspiciousFilter, "infected", "clamav_completed_at"]
-    search_fields = ["file__key", "clamav_signature"]
+    search_fields = ["file__id", "clamav_signature"]
 
     @admin.display(boolean=True, description="à vérifier", ordering="suspicious")
     def suspicious(self, obj):

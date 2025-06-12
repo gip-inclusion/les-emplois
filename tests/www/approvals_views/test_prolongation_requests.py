@@ -366,7 +366,7 @@ class TestProlongationReportFileView:
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)
         key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
-        file = FileFactory(key=key)
+        file = FileFactory(id=key)
         request = approvals_factories.ProlongationRequestFactory(
             prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=file
         )
