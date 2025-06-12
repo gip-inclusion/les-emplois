@@ -8,10 +8,13 @@ from itou.files.models import File
 from itou.utils.command import BaseCommand
 
 
+BATCH_SIZE = 1_000
+
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         deleted = 0
-        for file in File.objects.filter(deleted_at__lte=timezone.now() - datetime.timedelta(days=1)):
+        for file in File.objects.filter(deleted_at__lte=timezone.now() - datetime.timedelta(days=1))[:BATCH_SIZE]:
             try:
                 with transaction.atomic():
                     s3_key = file.key
