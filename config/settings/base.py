@@ -207,11 +207,8 @@ try:
 except ImportError:
     uwsgi_db_statement_timeout = None
 else:
-    uwsgi_db_statement_timeout = os.environ.get("UWSGI_DB_STATEMENT_TIMEOUT")
-db_statement_timeout = uwsgi_db_statement_timeout or os.getenv("DB_STATEMENT_TIMEOUT")
-
-if db_statement_timeout is not None:
-    db_statement_timeout = int(db_statement_timeout)
+    uwsgi_db_statement_timeout = os.environ.get("UWSGI_DB_STATEMENT_TIMEOUT", 10_000)
+db_statement_timeout = int(uwsgi_db_statement_timeout or os.getenv("DB_STATEMENT_TIMEOUT", 60_000))
 
 DATABASES = {
     "default": {
@@ -230,9 +227,7 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
             "connect_timeout": 5,
-            **(
-                {"options": f"-c statement_timeout={db_statement_timeout}"} if db_statement_timeout is not None else {}
-            ),
+            "options": f"-c statement_timeout={db_statement_timeout}",
         },
     }
 }
