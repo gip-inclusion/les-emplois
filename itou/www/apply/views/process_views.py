@@ -109,6 +109,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
             "eligibility_diagnosis__author_siae",
             "eligibility_diagnosis__author_prescriber_organization",
             "eligibility_diagnosis__job_seeker__jobseeker_profile",
+            "resume",
         )
         .prefetch_related(
             "selected_jobs",

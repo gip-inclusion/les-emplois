@@ -343,12 +343,12 @@ def assessment_get_file(request, pk, *, file_field):
             filename = assessment.action_financial_assessment_filename()
         case _:
             raise Http404
-    file_key = getattr(assessment, Assessment._meta.get_field(file_field).attname)
-    if file_key is None:
+    file = getattr(assessment, file_field)
+    if file is None:
         raise Http404
     return HttpResponseRedirect(
         default_storage.url(
-            file_key,
+            file.key,
             parameters={
                 "ResponseContentDisposition": content_disposition_header("inline", filename),
             },

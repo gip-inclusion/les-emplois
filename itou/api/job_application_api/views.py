@@ -115,6 +115,7 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
             "sender",
             "sender_prescriber_organization",
             "sender_company",
+            "resume",
         )
         .prefetch_related(
             "job_seeker__approvals__suspension_set",

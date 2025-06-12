@@ -724,12 +724,12 @@ def view_proof(request, evaluated_administrative_criteria_id):
         raise Http404(request.user.kind)
     org_filter = {org_lookup: request.organizations}
     criteria = get_object_or_404(
-        EvaluatedAdministrativeCriteria,
+        EvaluatedAdministrativeCriteria.objects.select_related("proof"),
         pk=evaluated_administrative_criteria_id,
         proof__isnull=False,
         **org_filter,
     )
-    return HttpResponseRedirect(default_storage.url(criteria.proof_id))
+    return HttpResponseRedirect(default_storage.url(criteria.proof.key))
 
 
 @login_not_required
