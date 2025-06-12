@@ -203,12 +203,16 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 try:
     # This module is only available when running under uWSGI
+    # https://uwsgi-docs.readthedocs.io/en/latest/PythonModule.html
     import uwsgi  # noqa: F401
 except ImportError:
     uwsgi_db_statement_timeout = None
+    uwsgi_db_lock_timeout = None
 else:
     uwsgi_db_statement_timeout = os.environ.get("UWSGI_DB_STATEMENT_TIMEOUT", 10_000)
-db_statement_timeout = int(uwsgi_db_statement_timeout or os.getenv("DB_STATEMENT_TIMEOUT", 60_000))
+    uwsgi_db_lock_timeout = os.environ.get("UWSGI_DB_LOCK_TIMEOUT", 5_000)
+db_statement_timeout = int(uwsgi_db_statement_timeout or os.getenv("DB_STATEMENT_TIMEOUT", 0))
+db_lock_timeout = int(uwsgi_db_lock_timeout or os.getenv("DB_LOCK_TIMEOUT", 0))
 
 DATABASES = {
     "default": {
@@ -227,7 +231,7 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
             "connect_timeout": 5,
-            "options": f"-c statement_timeout={db_statement_timeout}",
+            "options": f"-c statement_timeout={db_statement_timeout} -c lock_timeout={db_lock_timeout}",
         },
     }
 }
