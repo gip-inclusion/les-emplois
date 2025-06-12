@@ -38,12 +38,7 @@ from itou.users.models import User
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def authored_by_prescriber_or_geiq(self, geiq):
-        return (
-            self.filter(models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False))
-            # Ordering by created_at is sufficient, because GEIQ can’t create a GEIQEligibilityDiagnosis
-            # when there exists a valid GEIQEligibilityDiagnosis from an authorized prescriber.
-            .order_by("-created_at")
-        )
+        return self.filter(models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False))
 
     def diagnoses_for(self, job_seeker, for_geiq=None):
         # Get *all* GEIQ diagnoses for given job seeker (even expired)
@@ -52,6 +47,9 @@ class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
             .authored_by_prescriber_or_geiq(for_geiq)
             .select_related("author", "author_geiq", "author_prescriber_organization")
             .prefetch_related("administrative_criteria")
+            # Ordering by created_at is sufficient, because GEIQ can’t create a GEIQEligibilityDiagnosis
+            # when there exists a valid GEIQEligibilityDiagnosis from an authorized prescriber.
+            .order_by("-created_at")
         )
 
     def valid_diagnoses_for(self, job_seeker, for_geiq=None):
