@@ -1,10 +1,4 @@
 $(document).ready(function(){
-      infoKey = localStorage.getItem("testAccountsModal");
-      if (!infoKey) {
-          localStorage.setItem("testAccountsModal", true);
-          const testAccountsModal = new bootstrap.Modal("#testAccountsModal");
-      }
-
     $('.postLogin').on('click', function(){
         const actionUrl = $(this).data('action-url');
         const email = $(this).data('email');
