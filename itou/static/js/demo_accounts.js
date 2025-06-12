@@ -1,19 +1,9 @@
 $(document).ready(function(){
-    function supports_local_storage() {
-        try {
-            return 'localStorage' in window && window['localStorage'] !== null;
-        } catch(e){
-            return false;
-        }
-    }
-
-    if (supports_local_storage()) {
-        infoKey = localStorage.getItem("testAccountsModal");
-        if (!infoKey) {
-            localStorage.setItem("testAccountsModal", true);
-            const testAccountsModal = new bootstrap.Modal("#testAccountsModal");
-        }
-    }
+      infoKey = localStorage.getItem("testAccountsModal");
+      if (!infoKey) {
+          localStorage.setItem("testAccountsModal", true);
+          const testAccountsModal = new bootstrap.Modal("#testAccountsModal");
+      }
 
     $('.postLogin').on('click', function(){
         const actionUrl = $(this).data('action-url');
