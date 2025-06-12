@@ -1,5 +1,4 @@
 import logging
-from functools import partial
 from itertools import batched
 
 import sentry_sdk
@@ -9,7 +8,7 @@ from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.db import ProgrammingError, connection, transaction
-from huey.contrib.djhuey import task
+from huey.contrib.djhuey import on_commit_task
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
@@ -65,7 +64,7 @@ _NB_RETRIES = int(
 )
 
 
-@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS, context=True)
+@on_commit_task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS, context=True)
 def _async_send_message(email_id, *, task=None):
     with transaction.atomic():
         try:
@@ -152,5 +151,5 @@ class AsyncEmailBackend(BaseEmailBackend):
                 # retries the failed email.
                 email = Email.from_email_message(mjemail)
                 email.save()
-                transaction.on_commit(partial(_async_send_message, email.pk))
+                _async_send_message(email.pk)
         return emails_count
