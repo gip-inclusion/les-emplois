@@ -34,9 +34,16 @@ class TestSummaryEmployeeRecords:
         client.force_login(self.user)
         response = client.get(self.url)
         profile = self.job_application.job_seeker.jobseeker_profile
-        # Vérifie séparément le label et la valeur pour plus de robustesse
-        assertContains(response, "Lieu de naissance")
-        assertContains(response, f"{profile.birth_place} ({profile.birth_place.department_code})")
+        assertContains(
+            response,
+            f"""
+            <li>
+            <small>Lieu de naissance</small>
+            <strong>{profile.birth_place} ({profile.birth_place.department_code})</strong>
+            </li>
+            """,
+            html=True,
+        )
 
     def test_asp_batch_file_infos(self, client):
         HORODATAGE = "Horodatage ASP"
@@ -49,18 +56,36 @@ class TestSummaryEmployeeRecords:
 
         response = client.get(self.url)
         assertContains(response, HORODATAGE)
-        assertContains(response, "Création")
-        assertContains(response, "RIAE_FS_20210410130000")
+        assertContains(
+            response,
+            """
+            <li>
+            <small>Création</small>
+            <strong>RIAE_FS_20210410130000</strong>
+            </li>
+            """,
+            html=True,
+        )
 
         EmployeeRecordUpdateNotificationFactory(
             employee_record=self.employee_record, asp_batch_file="RIAE_FS_20210510130000.json"
         )
         response = client.get(self.url)
         assertContains(response, HORODATAGE)
-        assertContains(response, "Création")
-        assertContains(response, "RIAE_FS_20210410130000")
-        assertContains(response, "Modification")
-        assertContains(response, "RIAE_FS_20210510130000")
+        assertContains(
+            response,
+            """
+            <li>
+            <small>Création</small>
+            <strong>RIAE_FS_20210410130000</strong>
+            </li>
+            <li>
+            <small>Modification</small>
+            <strong>RIAE_FS_20210510130000</strong>
+            </li>
+            """,
+            html=True,
+        )
 
     def test_technical_infos(self, client):
         client.force_login(self.user)
