@@ -8,6 +8,9 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.archive.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
+from itou.archive.management.commands.notify_archive_users import (
+    get_filter_kwargs_on_user_for_related_objects_to_check,
+)
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.files.models import File
@@ -809,3 +812,20 @@ class TestNotifyArchiveUsersManagementCommand:
 
         assert respx_mock.calls.called
         assert respx_mock.calls.call_count == len(jobseekers)
+
+
+class TestRelatedObjectsConsistency:
+    # Theses tests aims to prevent any add or update FK relationship on User model
+    # that would not be handled by the management command `notify_archive_users`.
+    # If one of these tests fails, consider looking at this command and updating it
+    def test_get_filter_kwargs_on_user_for_related_objects_to_check(self, snapshot):
+        filter_kwargs = get_filter_kwargs_on_user_for_related_objects_to_check()
+        assert filter_kwargs == snapshot(name="filter_kwargs_on_user_for_related_objects_to_check")
+
+    def test_user_related_objects_deleted_on_cascade(self, snapshot):
+        user_related_objects = [
+            {obj.name: obj.related_model}
+            for obj in User._meta.related_objects
+            if getattr(obj, "on_delete", None) and getattr(obj.on_delete, "__name__", "") == "CASCADE"
+        ]
+        assert user_related_objects == snapshot(name="user_related_objects_deleted_on_cascade")

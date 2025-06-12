@@ -62,6 +62,14 @@ def get_year_month_or_none(date=None):
     return date.replace(day=1)
 
 
+def get_filter_kwargs_on_user_for_related_objects_to_check():
+    return {
+        f"{obj.name}__isnull": False
+        for obj in User._meta.related_objects
+        if getattr(obj, "on_delete", None) and getattr(obj.on_delete, "__name__", "") != "CASCADE"
+    }
+
+
 def anonymized_jobseeker(user):
     return AnonymizedJobSeeker(
         date_joined=get_year_month_or_none(user.date_joined),

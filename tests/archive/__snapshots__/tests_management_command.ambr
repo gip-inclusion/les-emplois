@@ -398,3 +398,105 @@
 # name: TestNotifyArchiveUsersManagementCommand.test_suspend_command_setting[True-True][suspend_notify_archive_users_command_log]
   'Archiving users is suspended, exiting command'
 # ---
+# name: TestRelatedObjectsConsistency.test_get_filter_kwargs_on_user_for_related_objects_to_check[filter_kwargs_on_user_for_related_objects_to_check]
+  dict({
+    'approval__isnull': False,
+    'approval_manually_delivered__isnull': False,
+    'approval_manually_refused__isnull': False,
+    'approvals__isnull': False,
+    'approvals_suspended_set__isnull': False,
+    'authorization_status_set__isnull': False,
+    'created_assessments__isnull': False,
+    'created_company_set__isnull': False,
+    'created_follow_up_groups__isnull': False,
+    'created_prescriber_organization_set__isnull': False,
+    'eligibilitydiagnosis__isnull': False,
+    'final_reviewed_assessments__isnull': False,
+    'geiqeligibilitydiagnosis__isnull': False,
+    'job_applications__isnull': False,
+    'job_applications_sent__isnull': False,
+    'jobapplication__isnull': False,
+    'jobapplicationtransitionlog__isnull': False,
+    'prolongationrequest_processed__isnull': False,
+    'prolongationrequests_created__isnull': False,
+    'prolongationrequests_declared__isnull': False,
+    'prolongationrequests_updated__isnull': False,
+    'prolongationrequests_validated__isnull': False,
+    'prolongations_created__isnull': False,
+    'prolongations_declared__isnull': False,
+    'prolongations_updated__isnull': False,
+    'prolongations_validated__isnull': False,
+    'reactivated_siae_convention_set__isnull': False,
+    'reviewed_assessments__isnull': False,
+    'submitted_assessments__isnull': False,
+    'suspension__isnull': False,
+    'updated_companymembership_set__isnull': False,
+    'updated_institutionmembership_set__isnull': False,
+    'updated_prescribermembership_set__isnull': False,
+    'user__isnull': False,
+  })
+# ---
+# name: TestRelatedObjectsConsistency.test_user_related_objects_deleted_on_cascade[user_related_objects_deleted_on_cascade]
+  list([
+    dict({
+      'logentry': <class 'django.contrib.admin.models.LogEntry'>,
+    }),
+    dict({
+      'auth_token': <class 'rest_framework.authtoken.models.Token'>,
+    }),
+    dict({
+      'totpdevice': <class 'django_otp.plugins.otp_totp.models.TOTPDevice'>,
+    }),
+    dict({
+      'emailaddress': <class 'allauth.account.models.EmailAddress'>,
+    }),
+    dict({
+      'companymembership': <class 'itou.companies.models.CompanyMembership'>,
+    }),
+    dict({
+      'jobseeker_profile': <class 'itou.users.models.JobSeekerProfile'>,
+    }),
+    dict({
+      'prescribermembership': <class 'itou.prescribers.models.PrescriberMembership'>,
+    }),
+    dict({
+      'institutionmembership': <class 'itou.institutions.models.InstitutionMembership'>,
+    }),
+    dict({
+      'geiq_eligibility_diagnoses': <class 'itou.eligibility.models.geiq.GEIQEligibilityDiagnosis'>,
+    }),
+    dict({
+      'eligibility_diagnoses': <class 'itou.eligibility.models.iae.EligibilityDiagnosis'>,
+    }),
+    dict({
+      'prescriber_org_invitations': <class 'itou.invitations.models.PrescriberWithOrgInvitation'>,
+    }),
+    dict({
+      'company_invitations': <class 'itou.invitations.models.EmployerInvitation'>,
+    }),
+    dict({
+      'institution_invitations': <class 'itou.invitations.models.LaborInspectorInvitation'>,
+    }),
+    dict({
+      'externaldataimport': <class 'itou.external_data.models.ExternalDataImport'>,
+    }),
+    dict({
+      'jobseekerexternaldata': <class 'itou.external_data.models.JobSeekerExternalData'>,
+    }),
+    dict({
+      'notification_settings': <class 'itou.communications.models.NotificationSettings'>,
+    }),
+    dict({
+      'follow_up_group': <class 'itou.gps.models.FollowUpGroup'>,
+    }),
+    dict({
+      'follow_up_groups': <class 'itou.gps.models.FollowUpGroupMembership'>,
+    }),
+    dict({
+      'rdvi_invitation_requests': <class 'itou.rdv_insertion.models.InvitationRequest'>,
+    }),
+    dict({
+      'rdvi_participations': <class 'itou.rdv_insertion.models.Participation'>,
+    }),
+  ])
+# ---
