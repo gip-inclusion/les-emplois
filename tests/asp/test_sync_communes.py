@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.core import management
 
@@ -58,7 +59,9 @@ def test_sync_commune(snapshot, capsys):
     )
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
-    assert stdout.splitlines() == snapshot(name="modified_communes")
+    assert re.sub(r"item\.db_obj\.pk=\d+", "item.db_obj.pk=[City PK]", stdout).splitlines() == snapshot(
+        name="modified_communes"
+    )
 
     crans.refresh_from_db()
     assert crans.name == "CRANS-LENNUI"
