@@ -1,49 +1,62 @@
 {% load markdownify %}
 {% load str_filters %}
 
-<h3>Informations générales</h3>
-<ul class="list-unstyled mb-5">
+<h2 class="h3">Informations générales</h2>
+<ul class="list-data mb-3">
     {% if job.display_contract_type %}
-        <li class="d-flex align-items-center mb-2">
-            <i class="ri-file-list-3-line me-1" aria-hidden="true"></i>
-            {{ job.display_contract_type }}
+        <li>
+            <small>Type de contrat</small>
+            <strong>{{ job.display_contract_type }}</strong>
         </li>
     {% endif %}
     {% if job.hours_per_week %}
-        <li class="d-flex align-items-center mb-2">
-            <i class="ri-time-line me-1" aria-hidden="true"></i>
-            {{ job.hours_per_week }}h / semaine
+        <li>
+            <small>Nombre d'heures par semaine</small>
+            <strong>{{ job.hours_per_week }}h / semaine</strong>
         </li>
     {% endif %}
-    <li class="d-flex align-items-center mb-2">
-        <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
-        {{ job.display_location }}
+    <li>
+        <small>Localisation du poste</small>
+        <strong>{{ job.display_location }}</strong>
     </li>
 </ul>
 
 {% if siae.is_opcs %}
-    <hr>
-    <h3>Contexte du marché</h3>
-    <div class="mb-5">{{ job.market_context_description|linebreaks }}</div>
+    <hr class="my-4">
+    <h2 class="h3">Contexte du marché</h2>
+    <div class="mb-3 mb-md-4">{{ job.market_context_description|linebreaks }}</div>
 {% endif %}
 
 {% with no_content_message="La structure n'a pas encore renseigné cette rubrique" %}
-    <hr>
-    <h3>Description du poste</h3>
-    <div class="mb-5">{{ job.description|markdownify|default:no_content_message }}</div>
-    <hr>
-    <h3>Profil recherché et prérequis</h3>
-    <div class="mb-3">{{ job.profile_description|markdownify|default:no_content_message }}</div>
+    <hr class="my-4">
+    <h2 class="h3">Description du poste</h2>
+    <div class="mb-3 mb-md-4">
+        {% if job.description %}
+            {{ job.description|markdownify }}
+        {% else %}
+            <i class="text-disabled">{{ no_content_message }}</i>
+        {% endif %}
+    </div>
+
+    <hr class="my-4">
+    <h2 class="h3">Profil recherché et prérequis</h2>
+    <div>
+        {% if job.profile_description %}
+            {{ job.profile_description|markdownify }}
+        {% else %}
+            <i class="text-disabled">{{ no_content_message }}</i>
+        {% endif %}
+    </div>
 {% endwith %}
 
 {% if job.is_resume_mandatory %}
-    <div class="c-info mb-3">
+    <div class="c-info my-3">
         <span class="c-info__summary">L'ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par le recruteur.</span>
     </div>
 {% endif %}
 
 {% if siae.is_opcs and job.is_qpv_mandatory %}
-    <div class="c-info mb-3">
+    <div class="c-info my-3">
         <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQpvMandatoryInfo" aria-expanded="false" aria-controls="collapseQpvMandatoryInfo">
             <span>Cette offre d'emploi est réservée à des typologies de public particulières</span>
         </button>
