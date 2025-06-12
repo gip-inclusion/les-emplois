@@ -450,14 +450,11 @@ def test_prescriber_geiq_diagnosis_priority():
 
 
 def test_authored_by_prescriber_or_geiq():
-    # When using this query set method, if there are multiple valid GEIQ diagnoses,
-    # the prescriber diagnosis must come out in first position
     geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(from_employer=True)
     JobApplicationFactory(
         with_geiq_eligibility_diagnosis=True,
         geiq_eligibility_diagnosis=geiq_diagnosis_with_hiring,
     )
-    # Order matters
     prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker=geiq_diagnosis_with_hiring.job_seeker,
@@ -467,7 +464,24 @@ def test_authored_by_prescriber_or_geiq():
         geiq_diagnosis_with_hiring.author_geiq
     )
 
-    assert [prescriber_diagnosis, geiq_diagnosis_with_hiring] == list(valid_diagnoses)
+    assert {prescriber_diagnosis, geiq_diagnosis_with_hiring} == set(valid_diagnoses)
+
+
+def test_diagnoses_for():
+    geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
+    job_seeker = geiq_diagnosis.job_seeker
+    # Order matters
+    prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
+
+    # without specified GEIQ: authorized prescriber diagnoses only
+    diagnoses_for = GEIQEligibilityDiagnosis.objects.diagnoses_for(job_seeker=job_seeker)
+    assert list(diagnoses_for) == [prescriber_diagnosis]
+
+    # with specified GEIQ: authorized prescriber first and that GEIQ diagnosis
+    diagnoses_for = GEIQEligibilityDiagnosis.objects.diagnoses_for(
+        job_seeker=job_seeker, for_geiq=geiq_diagnosis.author_geiq
+    )
+    assert list(diagnoses_for) == [prescriber_diagnosis, geiq_diagnosis]
 
 
 def test_administrativecriteria_level_annex_consistency():
