@@ -302,8 +302,8 @@ class EvaluatedAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
         if obj.proof_id:
             return format_html(
                 "<a href='{}'>{}</a>",
-                default_storage.url(obj.proof_id),
-                obj.proof_id,
+                default_storage.url(obj.proof.key),
+                obj.proof.key,
             )
         return ""
 

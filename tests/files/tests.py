@@ -88,7 +88,7 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
         ordered=False,
     )
     assertQuerySetEqual(
-        File.objects.filter(deleted_at__isnull=False).values_list("id", flat=True),
+        File.objects.filter(deleted_at__isnull=False).values_list("key", flat=True),
         [
             "resume/11111111-1111-1111-1111-111111111111.pdf",
             "evaluations/test.xlsx",
