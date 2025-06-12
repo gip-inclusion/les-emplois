@@ -65,23 +65,15 @@
                     {% bootstrap_field form.hexa_additional_address %}
                     {% bootstrap_field form.hexa_post_code wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.hexa_commune %}
-
-                    <button class="btn btn-outline-primary mb-3">Valider cette adresse</button>
                 </fieldset>
 
-                {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
                 {% url "employee_record_views:create" job_application.id as secondary_url %}
                 {% url "employee_record_views:list" as reset_url %}
                 {% if request.GET.status %}
-                    {% url_add_query primary_url status=request.GET.status as primary_url %}
                     {% url_add_query secondary_url status=request.GET.status as secondary_url %}
                     {% url_add_query reset_url status=request.GET.status as reset_url %}
                 {% endif %}
-                {% if profile.hexa_address_filled %}
-                    {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url %}
-                {% else %}
-                    {% itou_buttons_form primary_label="Suivant" primary_disabled=True secondary_url=secondary_url reset_url=reset_url %}
-                {% endif %}
+                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url %}
 
             </form>
         </div>
