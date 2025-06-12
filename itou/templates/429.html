@@ -16,7 +16,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
-                    <p>Vous avez effectué trop de requêtes. Réessayez dans quelques minutes.</p>
+                    <p>Vous avez effectué trop de requêtes. Réessayez dans {{ retry_after|default:"quelques minutes" }}.</p>
                 </div>
             </div>
         </div>
