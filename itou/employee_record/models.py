@@ -488,6 +488,28 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         )
         return self.siret != siret_from_asp_source
 
+    def has_valid_data_filled(self):
+        # In `JobSeekerProfile.clean_model()` some fields are only checked if present, but we need them to be filled
+        try:
+            has_extra_required_fields = all(
+                [
+                    self.job_application.job_seeker.jobseeker_profile.birth_country,
+                    self.job_application.job_seeker.jobseeker_profile.hexa_commune,  # Any of the hexa fields will do
+                ]
+            )
+        except AttributeError:
+            return False
+        else:
+            if not has_extra_required_fields:
+                return False
+
+        # Now we can use the common validation methods
+        try:
+            self.clean()
+        except Exception:
+            return False
+        return True
+
     @classmethod
     def from_job_application(cls, job_application, clean=True):
         """

@@ -1,0 +1,60 @@
+# serializer version: 1
+# name: test_send_back_dropdown[with_complete_profile]
+  '''
+  <button class="btn  dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      Renvoyer cette fiche salarié
+  </button>
+  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      
+          <form method="post" action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit">
+              
+              <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
+          </form>
+      
+      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
+  </div>
+  
+  '''
+# ---
+# name: test_send_back_dropdown[without_birth_country]
+  '''
+  <button class="btn  dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      Renvoyer cette fiche salarié
+  </button>
+  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      
+          <div class="dropdown-item">
+              <span class="disabled" aria-label="Le bouton « Renvoyer » est désactivé car certaines informations obligatoires sont manquantes ou erronées. Utilisez le bouton « Modifier et renvoyer ».">Renvoyer</span>
+              <i class="ri-information-line ri-xl text-info ms-1"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Le bouton « Renvoyer » est désactivé car certaines informations obligatoires sont manquantes ou erronées. Utilisez le bouton « Modifier et renvoyer »."
+                 aria-hidden="true"></i>
+          </div>
+      
+      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
+  </div>
+  
+  '''
+# ---
+# name: test_send_back_dropdown[without_hexa_address]
+  '''
+  <button class="btn  dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      Renvoyer cette fiche salarié
+  </button>
+  <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
+      
+          <div class="dropdown-item">
+              <span class="disabled" aria-label="Le bouton « Renvoyer » est désactivé car certaines informations obligatoires sont manquantes ou erronées. Utilisez le bouton « Modifier et renvoyer ».">Renvoyer</span>
+              <i class="ri-information-line ri-xl text-info ms-1"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Le bouton « Renvoyer » est désactivé car certaines informations obligatoires sont manquantes ou erronées. Utilisez le bouton « Modifier et renvoyer »."
+                 aria-hidden="true"></i>
+          </div>
+      
+      <a class="dropdown-item" href="/employee_record/create/[Pk of JobApplication]">Modifier et renvoyer</a>
+  </div>
+  
+  '''
+# ---
