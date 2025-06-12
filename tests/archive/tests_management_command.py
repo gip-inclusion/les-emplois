@@ -882,12 +882,7 @@ class TestNotifyArchiveUsersManagementCommand:
         assert not User.objects.filter(id=user.id).exists()
 
         archived_professional = AnonymizedProfessional.objects.values(
-            "date_joined",
-            "first_login",
-            "last_login",
-            "department",
-            "title",
-            "identity_provider",
+            "date_joined", "first_login", "last_login", "department", "title", "identity_provider", "kind"
         )
         assert list(archived_professional) == snapshot(name="archived_professional")
         assert "Archived professionals after grace period, count: 1" in caplog.messages

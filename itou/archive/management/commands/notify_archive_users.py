@@ -142,6 +142,7 @@ def anonymized_professional(user):
         department=user.department,
         title=user.title,
         identity_provider=user.identity_provider,
+        kind=user.kind,
     )
 
 

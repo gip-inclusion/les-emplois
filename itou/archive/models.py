@@ -122,6 +122,7 @@ class AnonymizedProfessional(models.Model):
         blank=True,
         null=True,
     )
+    kind = models.CharField(max_length=50, verbose_name="type de professionnel", blank=True, null=True)
     identity_provider = models.CharField(max_length=20, verbose_name="fournisseur d'identité (SSO)")
 
     class Meta:
