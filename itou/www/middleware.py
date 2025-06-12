@@ -1,3 +1,5 @@
+from math import ceil
+
 import sentry_sdk
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -9,6 +11,8 @@ from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.utils.cache import add_never_cache_headers
 
+from itou.utils.throttling import FailSafeUserRateThrottle
+
 
 def never_cache(get_response):
     def middleware(request):
@@ -18,6 +22,24 @@ def never_cache(get_response):
         return response
 
     return middleware
+
+
+class RateLimitMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if request.user.is_authenticated and getattr(view_func, "login_required", True):
+            throttler = FailSafeUserRateThrottle()
+            if not throttler.allow_request(request, None):
+                retry_after = throttler.wait()
+                if retry_after is not None:
+                    retry_after = f"{ceil(retry_after)} secondes"
+                return render(request, "429.html", context={"retry_after": retry_after}, status=429)
+        return None
 
 
 def public_health_check(get_response):
