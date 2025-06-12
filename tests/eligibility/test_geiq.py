@@ -470,6 +470,7 @@ def test_authored_by_prescriber_or_geiq():
 def test_diagnoses_for():
     geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     job_seeker = geiq_diagnosis.job_seeker
+    other_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
     # Order matters
     prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
@@ -482,6 +483,12 @@ def test_diagnoses_for():
         job_seeker=job_seeker, for_geiq=geiq_diagnosis.author_geiq
     )
     assert list(diagnoses_for) == [prescriber_diagnosis, geiq_diagnosis]
+
+    # with for_job_seeker=True: all diagnoses for that job seeker
+    diagnoses_for = GEIQEligibilityDiagnosis.objects.diagnoses_for(
+        job_seeker=job_seeker, for_geiq=geiq_diagnosis.author_geiq, for_job_seeker=True
+    )
+    assert list(diagnoses_for) == [prescriber_diagnosis, other_geiq_diagnosis, geiq_diagnosis]
 
 
 def test_administrativecriteria_level_annex_consistency():
