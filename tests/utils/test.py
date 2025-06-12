@@ -26,7 +26,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.utils.session import SessionNamespace, SessionNamespaceInvalid
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -54,7 +54,7 @@ def get_session_name(session, session_kind, ignore=()):
         try:
             SessionNamespace(session, session_kind, session_name)
             found_names.append(session_name)
-        except SessionNamespaceInvalid:
+        except SessionNamespaceException:
             pass
     if len(found_names) > 1:
         raise ValueError("Too many sessions with this kind")

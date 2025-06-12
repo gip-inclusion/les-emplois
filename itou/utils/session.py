@@ -9,15 +9,15 @@ from itou.utils import python
 logger = logging.Logger(__name__)
 
 
-class SessionNamespaceInvalid(Exception):
+class SessionNamespaceException(Exception):
     pass
 
 
-class SessionNamespaceDoesNotExist(SessionNamespaceInvalid):
+class SessionNamespaceDoesNotExist(SessionNamespaceException):
     pass
 
 
-class SessionNamespaceInvalidKind(SessionNamespaceInvalid):
+class SessionNamespaceInvalidKind(SessionNamespaceException):
     pass
 
 

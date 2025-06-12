@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-from itou.utils.session import SessionNamespace, SessionNamespaceInvalid
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class WizardView(TemplateView):
     def load_session(self, session_uuid):
         try:
             wizard_session = SessionNamespace(self.request.session, self.expected_session_kind, session_uuid)
-        except SessionNamespaceInvalid:
+        except SessionNamespaceException:
             # FIXME: It would be great to redirect to a given url
             # (self.failure_redirect_url ?) when there's no session.
             # But we need such an url, and to be able to pass the test_func

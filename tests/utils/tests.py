@@ -1236,7 +1236,7 @@ class TestSessionNamespace:
     def test_load_polluted_session(self):
         session = self._get_session_store()
         ns = itou.utils.session.SessionNamespace.create(session, "test_session_kind", {})
-        with pytest.raises(itou.utils.session.SessionNamespaceInvalid):
+        with pytest.raises(itou.utils.session.SessionNamespaceException):
             itou.utils.session.SessionNamespace(session, "other_session_kind", ns.name)
 
 
