@@ -199,6 +199,18 @@ TEMPLATES = [
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
+try:
+    # This module is only available when running under uWSGI
+    import uwsgi  # noqa: F401
+except ImportError:
+    uwsgi_db_statement_timeout = None
+else:
+    uwsgi_db_statement_timeout = os.environ.get("UWSGI_DB_STATEMENT_TIMEOUT")
+db_statement_timeout = uwsgi_db_statement_timeout or os.getenv("DB_STATEMENT_TIMEOUT")
+
+if db_statement_timeout is not None:
+    db_statement_timeout = int(db_statement_timeout)
+
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": True,
@@ -217,9 +229,7 @@ DATABASES = {
         "OPTIONS": {
             "connect_timeout": 5,
             **(
-                {"options": f"-c statement_timeout={int(db_statement_timeout)}"}
-                if (db_statement_timeout := os.getenv("DB_STATEMENT_TIMEOUT"))
-                else {}
+                {"options": f"-c statement_timeout={db_statement_timeout}"} if db_statement_timeout is not None else {}
             ),
         },
     }
