@@ -1,6 +1,6 @@
 import logging
 
-from huey.contrib.djhuey import task
+from huey.contrib.djhuey import on_commit_task
 
 from itou.utils.brevo import BrevoClient
 
@@ -8,7 +8,7 @@ from itou.utils.brevo import BrevoClient
 logger = logging.getLogger(__name__)
 
 
-@task(retries=24 * 6 * 90, retry_delay=10 * 60, context=True)  # Retry every 10 minutes during 90 days.
+@on_commit_task(retries=24 * 6 * 90, retry_delay=10 * 60, context=True)  # Retry every 10 minutes during 90 days.
 def async_delete_contact(email, *, task=None):
     with BrevoClient() as brevo_client:
         if task.retries % 100 == 0:

@@ -1,6 +1,5 @@
 import datetime
 import logging
-from functools import partial
 
 from django.conf import settings
 from django.db import transaction
@@ -249,7 +248,7 @@ class Command(BaseCommand):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
         User.objects.filter(id__in=[user.id for user in users]).delete()
         for user in users:
-            transaction.on_commit(partial(async_delete_contact, user.email))
+            async_delete_contact(user.email)
 
     def _delete_jobapplications_with_related_objects(self, jobapplications):
         File.objects.filter(deleted_at__isnull=True, jobapplication__in=jobapplications).update(

@@ -6,7 +6,7 @@ import httpx
 from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
-from huey.contrib.djhuey import task
+from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import RetryTask
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
@@ -112,8 +112,7 @@ def certify_criteria(eligibility_diagnosis):
         )
 
 
-@task(retries=24 * 6, retry_delay=10 * 60)  # Retry every 10 minutes for 24h.
-def async_certify_criteria(model_name, eligibility_diagnosis_pk):
+def _async_certify_criteria(model_name, eligibility_diagnosis_pk):
     model = apps.get_model("eligibility", model_name)
     eligibility_diagnosis = model.objects.select_related("job_seeker__jobseeker_profile").get(
         pk=eligibility_diagnosis_pk
@@ -130,3 +129,10 @@ def async_certify_criteria(model_name, eligibility_diagnosis_pk):
         raise
     except Exception as e:
         logger.exception(e)
+
+
+# Retry every 10 minutes for 24h.
+async_certify_criteria = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(_async_certify_criteria)
+# TODO: Use the decorator and drop assignment of call_local if
+# https://github.com/coleifer/huey/pull/848 is integrated.
+async_certify_criteria.call_local = _async_certify_criteria
