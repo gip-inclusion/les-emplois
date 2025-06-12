@@ -18,4 +18,13 @@ class Migration(migrations.Migration):
                 verbose_name="date d'anonymisation de l'utilisateur",
             ),
         ),
+        migrations.AlterField(
+            model_name="user",
+            name="upcoming_deletion_notified_at",
+            field=models.DateTimeField(
+                blank=True,
+                null=True,
+                verbose_name="date de notification de l'anonymisation à venir",
+            ),
+        ),
     ]
