@@ -53,7 +53,7 @@
             <div class="row">
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     {% if prolongation_request.status == ProlongationRequestStatus.GRANTED %}
-                        <div class="c-box mb-3 mb-lg-5">
+                        <div class="c-box mb-3 mb-md-4">
                             <h2>Décision</h2>
                             <hr>
                             <p class="mb-2 fw-bold text-success">
@@ -61,7 +61,7 @@
                             </p>
                         </div>
                     {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
-                        <div class="c-box mb-3 mb-lg-5">
+                        <div class="c-box mb-3 mb-md-4">
                             <h2>Décision</h2>
                             <hr>
                             <p class="mb-2 fw-bold text-danger">
@@ -69,7 +69,7 @@
                             </p>
                         </div>
                     {% endif %}
-                    <div class="c-box mb-3 mb-lg-5">
+                    <div class="c-box mb-3 mb-md-4">
                         <h2>Détail de la demande</h2>
                         <hr>
                         <h3>

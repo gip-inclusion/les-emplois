@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_step_1[progress]
   '''
-  <div class="c-stepper mb-3 mb-lg-5">
+  <div class="c-stepper mb-3 mb-md-4">
       <div class="d-flex">
           <div class="flex-fill">
               <h2>
@@ -31,7 +31,7 @@
 # ---
 # name: test_step_2[progress]
   '''
-  <div class="c-stepper mb-3 mb-lg-5">
+  <div class="c-stepper mb-3 mb-md-4">
       <div class="d-flex">
           <div class="flex-fill">
               <h2>
@@ -61,7 +61,7 @@
 # ---
 # name: test_step_3[progress]
   '''
-  <div class="c-stepper mb-3 mb-lg-5">
+  <div class="c-stepper mb-3 mb-md-4">
       <div class="d-flex">
           <div class="flex-fill">
               <h2>

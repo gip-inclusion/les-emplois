@@ -4941,7 +4941,7 @@
                                           
                                           vers la structure suivante ?
                   </p>
-                  <div class="c-box c-box--structure mb-3 mb-lg-5">
+                  <div class="c-box c-box--structure mb-3 mb-md-4">
                       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
                           <i aria-hidden="true" class="ri-community-line">
                           </i>
@@ -5043,7 +5043,7 @@
                                           
                                           vers la structure suivante ?
                   </p>
-                  <div class="c-box c-box--structure mb-3 mb-lg-5">
+                  <div class="c-box c-box--structure mb-3 mb-md-4">
                       <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
                           <i aria-hidden="true" class="ri-community-line">
                           </i>

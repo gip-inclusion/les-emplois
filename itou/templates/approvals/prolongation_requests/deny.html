@@ -21,7 +21,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="c-stepper mb-3 mb-lg-5">
+                    <div class="c-stepper mb-3 mb-md-4">
                         <div class="progress">
                             <div class="progress-bar progress-bar-{{ wizard.steps|stepper_progress }}" role="progressbar" aria-valuenow="{{ wizard.steps|stepper_progress }}" aria-valuemin="0" aria-valuemax="100">
                             </div>
@@ -36,7 +36,7 @@
                             {% endif %}
                         </p>
                     </div>
-                    <div class="c-form mb-3 mb-lg-5">
+                    <div class="c-form mb-3 mb-md-4">
                         <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
                         {% block form_content %}
                             <form method="post">
