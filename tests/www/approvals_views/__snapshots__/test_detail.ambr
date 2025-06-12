@@ -2336,7 +2336,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval prolongations list as employer]
   '''
-  <div class="c-box mb-3 mb-lg-5">
+  <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h2>
               Prolongations
@@ -2494,7 +2494,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval prolongations list as job_seeker/prescriber]
   '''
-  <div class="c-box mb-3 mb-lg-5">
+  <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h2>
               Prolongations
@@ -4721,7 +4721,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as employer with modification buttons]
   '''
-  <div class="c-box mb-3 mb-lg-5">
+  <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h2>
               Suspensions
@@ -4846,7 +4846,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as employer without modification buttons]
   '''
-  <div class="c-box mb-3 mb-lg-5">
+  <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h2>
               Suspensions
@@ -4955,7 +4955,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval suspensions list as job_seeker/prescriber without modification buttons]
   '''
-  <div class="c-box mb-3 mb-lg-5">
+  <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
           <h2>
               Suspensions
