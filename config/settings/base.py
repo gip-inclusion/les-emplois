@@ -216,6 +216,11 @@ DATABASES = {
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
             "connect_timeout": 5,
+            **(
+                {"options": f"-c statement_timeout={int(db_statement_timeout)}"}
+                if (db_statement_timeout := os.getenv("DB_STATEMENT_TIMEOUT"))
+                else {}
+            ),
         },
     }
 }
