@@ -638,7 +638,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
 
         if resume := self.form.cleaned_data.get("resume"):
             key = f"resume/{uuid.uuid4()}.pdf"
-            file_resume = File.objects.create(key=key)
+            file_resume = File.objects.create(id=key)
             storages["public"].save(key, resume)
             job_application.resume = file_resume
 

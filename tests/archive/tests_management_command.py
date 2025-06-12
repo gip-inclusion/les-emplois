@@ -580,17 +580,18 @@ class TestNotifyArchiveUsersManagementCommand:
             updated_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
-        undesired_file_keys = [FileFactory().key, JobApplicationFactory().resume.key]
+        undesired_file_keys = [FileFactory().id, JobApplicationFactory().resume.id]
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_archive_users", wet_run=True)
 
-        assert File.objects.filter(key__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
+        assert File.objects.filter(id__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
 
-        file = File.objects.get(key=resume_file.key, jobapplication__isnull=True, deleted_at__isnull=False)
+        file = File.objects.get(id=resume_file.id, jobapplication__isnull=True, deleted_at__isnull=False)
 
         if deleted_at is None:
             assert file.deleted_at.date() == timezone.now().date()
+            ("django.urls.reverse",)
         else:
             assert file.deleted_at == deleted_at
 

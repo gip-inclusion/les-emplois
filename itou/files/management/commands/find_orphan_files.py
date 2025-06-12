@@ -28,7 +28,7 @@ class Command(BaseCommand):
         ]
 
     def handle(self, *args, **options):
-        linked_files_ids = functools.reduce(
+        linked_files_pks = functools.reduce(
             operator.or_,
             [
                 set(model.objects.exclude(**{field: None}).values_list(field, flat=True))
@@ -40,7 +40,7 @@ class Command(BaseCommand):
                 deleted_at=None,
                 last_modified__lte=timezone.now() - datetime.timedelta(days=1),
             )
-            .exclude(key__in=linked_files_ids)
+            .exclude(pk__in=linked_files_pks)
             .update(deleted_at=timezone.now())
         )
         self.logger.info(f"Marked {updated} orphans files for deletion")
