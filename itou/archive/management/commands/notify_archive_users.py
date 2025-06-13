@@ -2,25 +2,28 @@ import datetime
 import logging
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
+from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
+from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.archive.tasks import async_delete_contact
 from itou.companies.enums import CompanyKind
-from itou.companies.models import JobDescription
+from itou.companies.models import CompanyMembership, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
+from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
+from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser, InactiveUser
 from itou.utils.command import BaseCommand
-from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 logger = logging.getLogger(__name__)
@@ -60,6 +63,14 @@ def get_year_month_or_none(date=None):
         return timezone.localdate(date).replace(day=1)
 
     return date.replace(day=1)
+
+
+def get_filter_kwargs_on_user_for_related_objects_to_check():
+    return {
+        f"{obj.name}__isnull": True
+        for obj in User._meta.related_objects
+        if getattr(obj, "on_delete", None) and getattr(obj.on_delete, "__name__", "") != "CASCADE"
+    }
 
 
 def anonymized_jobseeker(user):
@@ -123,6 +134,18 @@ def anonymized_jobapplication(obj):
     )
 
 
+def anonymized_professional(user):
+    return AnonymizedProfessional(
+        date_joined=get_year_month_or_none(user.date_joined),
+        first_login=get_year_month_or_none(user.first_login),
+        last_login=get_year_month_or_none(user.last_login),
+        department=user.department,
+        title=user.title,
+        identity_provider=user.identity_provider,
+        kind=user.kind,
+    )
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         super().add_arguments(parser)
@@ -159,6 +182,31 @@ class Command(BaseCommand):
 
         logger.info("Notified inactive job seekers without recent activity: %s", len(users))
 
+    @transaction.atomic
+    def notify_inactive_professionals(self):
+        now = timezone.now()
+        inactive_since = now - INACTIVITY_PERIOD
+        self.logger.info("Notifying inactive professionals without activity before: %s", inactive_since)
+
+        users = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(),
+                upcoming_deletion_notified_at__isnull=True,
+                is_active=True,
+                last_login__lt=inactive_since,
+            )[: self.batch_size]
+        )
+
+        if self.wet_run:
+            for user in users:
+                InactiveUser(
+                    user,
+                    end_of_grace_period=now + GRACE_PERIOD,
+                ).send()
+            User.objects.filter(id__in=[user.id for user in users]).update(upcoming_deletion_notified_at=now)
+
+        logger.info("Notified inactive professionals without recent activity: %s", len(users))
+
     def reset_notified_jobseekers_with_recent_activity(self):
         self.logger.info("Reseting inactive job seekers with recent activity")
 
@@ -173,6 +221,21 @@ class Command(BaseCommand):
         else:
             reset_nb = users_to_reset_qs.count()
         self.logger.info("Reset notified job seekers with recent activity: %s", reset_nb)
+
+    def reset_notified_professionals_with_recent_activity(self):
+        self.logger.info("Reseting inactive professionals with recent activity")
+
+        users_to_reset_qs = User.objects.filter(
+            kind__in=UserKind.professionals(),
+            upcoming_deletion_notified_at__isnull=False,
+            last_login__gte=F("upcoming_deletion_notified_at"),
+        )
+
+        if self.wet_run:
+            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
+        else:
+            reset_nb = users_to_reset_qs.count()
+        self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
 
     @transaction.atomic
     def archive_jobseekers_after_grace_period(self):
@@ -256,6 +319,60 @@ class Command(BaseCommand):
         )
         jobapplications.delete()
 
+    @transaction.atomic
+    def archive_professionals_after_grace_period(self):
+        now = timezone.now()
+        grace_period_since = now - GRACE_PERIOD
+        self.logger.info("Archiving professionals after grace period, notified before: %s", grace_period_since)
+
+        users_to_anonymize = list(
+            User.objects.filter(
+                kind__in=UserKind.professionals(), upcoming_deletion_notified_at__lte=grace_period_since
+            )[: self.batch_size]
+        )
+
+        # split users to anonymize into those that can be deleted and those that can only be anonymized
+        related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
+        users_to_anonymize_and_delete = (
+            User.objects.filter(id__in=[user.id for user in users_to_anonymize])
+            .filter(**related_objects_to_check)
+            .select_for_update(of=("self",), skip_locked=True)
+        )
+        users_to_anonymize_only = User.objects.filter(
+            id__in=[user.id for user in users_to_anonymize if user not in users_to_anonymize_and_delete]
+        ).select_for_update(of=("self",), skip_locked=True, no_key=True)
+
+        if self.wet_run:
+            for user in users_to_anonymize:
+                ArchiveUser(user).send()
+
+            self._anonymize_and_delete_professionals(users_to_anonymize_and_delete)
+            self._anonymize_professionals(users_to_anonymize_only)
+
+        self.logger.info("Archived professionals after grace period, count: %d", len(users_to_anonymize))
+
+    def _anonymize_and_delete_professionals(self, users):
+        AnonymizedProfessional.objects.bulk_create([anonymized_professional(user) for user in users])
+        users.delete()
+
+    def _anonymize_professionals(self, users):
+        users.update(
+            anonymized_at=timezone.now(),
+            is_active=False,
+            password=make_password(None),
+            email=None,
+            phone="",
+            address_line_1="",
+            address_line_2="",
+            post_code="",
+            city="",
+            coords=None,
+            insee_city=None,
+        )
+        CompanyMembership.objects.filter(user__in=users).update(is_active=False)
+        InstitutionMembership.objects.filter(user__in=users).update(is_active=False)
+        PrescriberMembership.objects.filter(user__in=users).update(is_active=False)
+
     @monitor(
         monitor_slug="notify_archive_users",
         monitor_config={
@@ -277,5 +394,10 @@ class Command(BaseCommand):
         self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
+        self.reset_notified_professionals_with_recent_activity()
+
         self.notify_inactive_jobseekers()
+        self.notify_inactive_professionals()
+
         self.archive_jobseekers_after_grace_period()
+        self.archive_professionals_after_grace_period()
