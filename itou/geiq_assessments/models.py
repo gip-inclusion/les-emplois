@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
@@ -443,6 +444,13 @@ class EmployeeContract(models.Model):
     def duration(self):
         end = self.end_at or self.planned_end_at
         return end - self.start_at + timezone.timedelta(days=1)
+
+    def antenna_department(self):
+        antenna = self.other_data.get("antenne")
+        if antenna and antenna.get("id"):
+            postcode = antenna.get("cp")
+            return department_from_postcode(postcode)
+        return None
 
 
 class EmployeePrequalification(models.Model):
