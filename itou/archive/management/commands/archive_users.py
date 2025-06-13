@@ -3,53 +3,27 @@ import logging
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery
+from django.db.models import Count, F, Max, OuterRef, Q, Subquery
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
-from itou.approvals.models import Approval
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
-from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
-from itou.users.notifications import ArchiveUser, InactiveUser
+from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand
-from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
+from itou.utils.constants import GRACE_PERIOD
 
 
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 100
-
-
-def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
-    approval = Approval.objects.filter(user_id=OuterRef("pk"))
-    eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"),
-    )
-    geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"),
-    )
-
-    return (
-        User.objects.filter(
-            kind=UserKind.JOB_SEEKER,
-            upcoming_deletion_notified_at__isnull=True,
-        )
-        .filter(
-            ~Exists(approval),
-            ~Exists(eligibility_diagnosis),
-            ~Exists(geiq_eligibility_diagnosis),
-        )
-        .job_seekers_with_last_activity()
-        .filter(last_activity__lt=inactive_since)[:batch_size]
-    )
 
 
 def get_year_month_or_none(date=None):
@@ -139,25 +113,6 @@ class Command(BaseCommand):
             default=BATCH_SIZE,
             help="Number of users to process in a batch",
         )
-
-    @transaction.atomic
-    def notify_inactive_jobseekers(self):
-        now = timezone.now()
-        inactive_since = now - INACTIVITY_PERIOD
-        self.logger.info("Notifying inactive job seekers without activity before: %s", inactive_since)
-        users = list(
-            inactive_jobseekers_without_related_objects(inactive_since=inactive_since, batch_size=self.batch_size)
-        )
-
-        if self.wet_run:
-            for user in users:
-                InactiveUser(
-                    user,
-                    end_of_grace_period=now + GRACE_PERIOD,
-                ).send()
-            User.objects.filter(id__in=[user.id for user in users]).update(upcoming_deletion_notified_at=now)
-
-        logger.info("Notified inactive job seekers without recent activity: %s", len(users))
 
     def reset_notified_jobseekers_with_recent_activity(self):
         self.logger.info("Reseting inactive job seekers with recent activity")
@@ -268,14 +223,13 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *args, wet_run, batch_size, **options):
-        if settings.SUSPEND_NOTIFY_ARCHIVE_USERS:
+        if settings.SUSPEND_ARCHIVE_USERS:
             self.logger.info("Archiving users is suspended, exiting command")
             return
 
         self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start notifying and archiving users in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start archiving users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
-        self.notify_inactive_jobseekers()
         self.archive_jobseekers_after_grace_period()

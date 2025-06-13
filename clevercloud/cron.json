@@ -2,7 +2,6 @@
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "*/5 0-22 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
-  "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_archive_users --wet-run",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_pec_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
@@ -12,6 +11,7 @@
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 
+  "0 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh archive_users --wet-run",
   "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --upload",
@@ -29,6 +29,7 @@
   "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
+  "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_users --wet-run",
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
