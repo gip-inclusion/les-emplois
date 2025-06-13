@@ -184,3 +184,16 @@ def test_employee_get_prior_actions():
 def test_employee_contract_duration(start, planned_end, end, expected):
     contract = EmployeeContractFactory(start_at=start, planned_end_at=planned_end, end_at=end)
     assert contract.duration().days == expected
+
+
+def test_employee_contract_antenna_department():
+    antenna_contract = EmployeeContractFactory(
+        employee__assessment__label_geiq_post_code="54321",
+        other_data={"antenne": {"id": 123, "nom": "Antenne de fourmi", "cp": "12345"}},
+    )
+    assert antenna_contract.antenna_department() == "12"
+    geiq_contract = EmployeeContractFactory(
+        employee=antenna_contract.employee,
+        other_data={"antenne": {"id": 0, "nom": "Le siège"}},
+    )
+    assert geiq_contract.antenna_department() == "54"
