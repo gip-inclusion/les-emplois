@@ -4,6 +4,7 @@ import httpx
 from django.conf import settings
 from django_datadog_logger.formatters import datadog
 
+from itou.utils.brevo import BREVO_API_URL
 from itou.utils.command import get_current_command_info
 
 
@@ -56,11 +57,15 @@ class HTTPXFilter(logging.Filter):
             # We could add more sensitive urls to redact: add them here
             # In the future, we might want to parametrize this filter but YAGNI
 
-            if isinstance(arg, httpx.URL) and str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
-                redacted_params = [(key, "_REDACTED_") for key, _value in arg.params.multi_items()]
-                redacted_arg = arg.copy_with(params=redacted_params)
-                new_args.append(redacted_arg)
-            else:
-                new_args.append(arg)
+            if isinstance(arg, httpx.URL):
+                if str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
+                    redacted_params = [(key, "_REDACTED_") for key, _value in arg.params.multi_items()]
+                    arg = arg.copy_with(params=redacted_params)
+                elif str(arg).startswith(f"{BREVO_API_URL}/contacts/"):
+                    identifier = arg.path.removeprefix("/v3/contacts/")
+                    if "@" in identifier:
+                        # This is an email address, redact it
+                        arg = arg.copy_with(path="/v3/contacts/_REDACTED_")
+            new_args.append(arg)
         record.args = tuple(new_args)
         return super().filter(record)

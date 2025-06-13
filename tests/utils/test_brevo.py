@@ -75,15 +75,17 @@ def test_import_contacts_request_error(mocker, caplog, brevo_client):
 
 
 def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
+    email = "somebody@mail.com"
     mocker.patch("itou.utils.brevo.httpx.Client.delete", side_effect=httpx.RequestError("Connection timed out"))
 
     with pytest.raises(httpx.RequestError):
         # using the client directly to simulate the error, as async_delete_contact does not propagate it,
         # but catch it for managing retries
-        brevo_client.delete_contact("somebody@mail.com")
+        brevo_client.delete_contact(email)
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-request-error-connection-timed-out")
+    assert email not in caplog.text
 
 
 def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo_client):
@@ -99,3 +101,4 @@ def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-http-error-500")
+    assert email not in caplog.text
