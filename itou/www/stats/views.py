@@ -14,6 +14,7 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
+import datetime
 import re
 
 from django.conf import settings
@@ -22,6 +23,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import (
@@ -467,6 +469,17 @@ def stats_ph_state_main(request):
         ).values_list("pk", flat=True)
     )
 
+    extra_context = {"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}}
+    if request.current_organization.kind == PrescriberOrganizationKind.PLIE:
+        extra_context["pilotage_webinar_banners"] = [
+            {
+                "title": "Découvrez votre tableau de bord",
+                "description": "PLIE, apprenez à manipuler les données disponibles dans ce tableau de bord et à les utiliser dans le cadre de vos missions en consultant le replay du webinaire que nous avons conçu et animé spécialement pour vous.",  # noqa: E501
+                "call_to_action": "Je consulte le replay",
+                "url": "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/articles/34596775109905--AVRIL-MAI-2025-Webinaire-d%C3%A9couverte-pour-les-PLIE",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2025, 8, 31),
+            }
+        ]
     return render_stats_ph(
         request=request,
         page_title="Analyse des candidatures émises et de leur traitement",
@@ -474,7 +487,7 @@ def stats_ph_state_main(request):
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
             mb.C1_PRESCRIBER_ORG_FILTER_KEY: allowed_org_pks,
         },
-        extra_context={"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}},
+        extra_context=extra_context,
     )
 
 
