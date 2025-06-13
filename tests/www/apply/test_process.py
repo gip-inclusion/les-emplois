@@ -103,7 +103,6 @@ NON_IAE_CANCELLATION_CONFIRMATION = (
 )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
 class TestProcessViews:
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
@@ -850,6 +849,42 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
         assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+
+    @pytest.mark.parametrize(
+        "from_authorized_prescriber,company_in_target,assertion",
+        [
+            (True, True, assertContains),
+            (True, False, assertNotContains),
+            (False, True, assertNotContains),
+            (False, False, assertNotContains),
+        ],
+    )
+    def test_details_for_company_display_pmsmp_box(
+        self, client, from_authorized_prescriber, company_in_target, assertion
+    ):
+        TARGET_COMPANIES = [CompanyKind.AI.value, CompanyKind.ACI.value, CompanyKind.EI.value]
+        OTHER_COMPANIES = set(CompanyKind.values) - set(TARGET_COMPANIES)
+
+        kind = random.choice(list(TARGET_COMPANIES)) if company_in_target else random.choice(list(OTHER_COMPANIES))
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=from_authorized_prescriber, to_company__kind=kind
+        )
+
+        client.force_login(job_application.to_company.members.first())
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertion(
+            response,
+            """
+            <p>
+                La <strong>PMSMP</strong> permet à un candidat de découvrir un métier ou valider
+                un projet dans votre structure, sans obligation d’embauche.
+                En cliquant sur « <strong>Proposer une PMSMP</strong> », vous accédez à un formulaire
+                prérempli sur <i>Immersion Facilitée</i>.
+            </p>
+            """,
+            html=True,
+        )
 
     def test_company_information_displayed_for_prescriber_when_refused(self, client, subtests):
         """

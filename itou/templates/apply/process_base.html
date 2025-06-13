@@ -96,6 +96,7 @@
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}
+                                {% include "apply/includes/pmsmp_box.html" with link_if_pmsmp=link_if_pmsmp %}
                             {% elif request.user.is_prescriber %}
                                 {# Approval status. #}
                                 {% if job_application.approval %}

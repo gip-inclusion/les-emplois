@@ -1,6 +1,6 @@
 import datetime
 import logging
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urlencode, urljoin
 
 import httpx
 import sentry_sdk
@@ -26,11 +26,13 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
+from itou.utils.constants import IMMERSION_FACILE_SITE_URL
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -249,6 +251,24 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
 
+    link_if_pmsmp = None
+    if job_application.is_sent_by_authorized_prescriber and job_application.to_company.kind in (
+        [CompanyKind.AI, CompanyKind.ACI, CompanyKind.EI]
+    ):
+        organization = job_application.sender_prescriber_organization
+        agency_kind = {
+            PrescriberOrganizationKind.FT: "pole-emploi",
+            PrescriberOrganizationKind.ML: "mission-locale",
+            PrescriberOrganizationKind.CAP_EMPLOI: "cap-emploi",
+        }[organization.kind] or "autre"
+
+        params = {
+            "agencyDepartment": organization.department,
+            "agencyKind": agency_kind,
+            "siret": job_application.to_company.siret,
+        }
+        link_if_pmsmp = f"{IMMERSION_FACILE_SITE_URL}/demande-immersion?{urlencode(params)}"
+
     context = {
         "can_be_cancelled": can_be_cancelled,
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -268,6 +288,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         ),
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        "link_if_pmsmp": link_if_pmsmp,
     }
 
     return render(request, template_name, context)
