@@ -85,5 +85,5 @@ class BrevoClient:
             logger.error(f"Brevo API: Request failed: {str(e)}")
             raise
         except httpx.HTTPStatusError as e:
-            logger.error(f"Brevo API: HTTP error occurred: {str(e)}")
+            logger.error("Brevo API: Response with status_code=%s", e.response.status_code)
             raise
