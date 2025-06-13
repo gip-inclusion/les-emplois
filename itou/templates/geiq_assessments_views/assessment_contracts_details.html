@@ -109,6 +109,18 @@
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
                                 <li>
+                                    <small>Structure</small>
+                                    {% if contract.other_data.antenne.id == 0 %}
+                                        <strong>Siège</strong>
+                                    {% else %}
+                                        <strong>{{ contract.other_data.antenne.nom }}</strong>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <small>Département</small>
+                                    <strong>{{ contract.antenna_department }}</strong>
+                                </li>
+                                <li>
                                     <small>Type de contrat</small>
                                     <strong>{{ contract.other_data.nature_contrat.libelle|default:"-" }}</strong>
                                 </li>
