@@ -1,14 +1,10 @@
 <form action="{% url 'dashboard:switch_organization' %}" method="post">
     {% csrf_token %}
     <ul class="list-unstyled">
-        {% for org in request.organizations %}
+        {% for org in organizations %}
             <li>
-                <button class="dropdown-item dropdown-item__summary{% if org.pk == request.current_organization.pk %} active{% endif %}" name="organization_id" value="{{ org.pk }}">
-                    {% if request.user.is_employer %}
-                        <i class="ri-community-line" aria-hidden="true"></i>
-                    {% elif request.user.is_prescriber %}
-                        <i class="ri-home-smile-line" aria-hidden="true"></i>
-                    {% endif %}
+                <button class="dropdown-item dropdown-item__summary{% if org.pk == current_organization.pk %} active{% endif %}" name="organization_id" value="{{ org.pk }}">
+                    <i class="{{ icon }}" aria-hidden="true"></i>
                     <span>{{ org.kind }}</span>
                     {% if org.display_name|length > 18 %}
                         <strong data-bs-toggle="tooltip" data-bs-title="{{ org.display_name }}">{{ org.display_name }}</strong>
