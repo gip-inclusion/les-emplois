@@ -352,7 +352,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
             form.save()
             return HttpResponseRedirect(
                 reverse(
-                    "employee_record_views:create_step_2",
+                    "employee_record_views:create_step_3",
                     args=(job_application.id,),
                 )
                 + query_param
