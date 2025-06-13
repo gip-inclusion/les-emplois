@@ -176,3 +176,52 @@ def test_purge_files(caplog):
         "Purged 2 files",
     ]
     assert caplog.messages[-1].startswith("Management command itou.files.management.commands.purge_files succeeded in")
+
+
+def test_update_ids():
+    file = FileFactory()
+    job_application = JobApplicationFactory(resume=file)
+    prolongation_request = ProlongationRequestFactory(report_file=file, reason=ProlongationReason.SENIOR)
+    prolongation = ProlongationFactory(report_file=file, reason=ProlongationReason.SENIOR)
+    scan = Scan.objects.create(file=file, clamav_signature="toto")
+    announcement_item = AnnouncementItemFactory()
+    announcement_item.image_storage = file
+    announcement_item.save()
+    assessment = AssessmentFactory(
+        summary_document_file=file, structure_financial_assessment_file=file, action_financial_assessment_file=file
+    )
+    # Not a OneToOneField
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application  # Don't create a new resume
+    )
+    evaluated_administrative_criteria_1 = EvaluatedAdministrativeCriteriaFactory(
+        proof=file, evaluated_job_application=evaluated_job_application
+    )
+    evaluated_administrative_criteria_2 = EvaluatedAdministrativeCriteriaFactory(
+        proof=file, evaluated_job_application=evaluated_job_application
+    )
+
+    call_command("update_ids")
+
+    new_file = File.objects.get()
+    assert new_file.key == file.key
+    assert new_file.id != file.id
+
+    job_application.refresh_from_db()
+    assert job_application.resume_id == new_file.id
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.report_file_id == new_file.id
+    prolongation.refresh_from_db()
+    assert prolongation.report_file_id == new_file.id
+    scan.refresh_from_db()
+    assert scan.file_id == new_file.id
+    announcement_item.refresh_from_db()
+    assert announcement_item.image_storage_id == new_file.id
+    assessment.refresh_from_db()
+    assert assessment.summary_document_file_id == new_file.id
+    assert assessment.structure_financial_assessment_file_id == new_file.id
+    assert assessment.action_financial_assessment_file_id == new_file.id
+    evaluated_administrative_criteria_1.refresh_from_db()
+    assert evaluated_administrative_criteria_1.proof_id == new_file.id
+    evaluated_administrative_criteria_2.refresh_from_db()
+    assert evaluated_administrative_criteria_2.proof_id == new_file.id
