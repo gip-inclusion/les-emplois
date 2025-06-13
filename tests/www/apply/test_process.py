@@ -3100,6 +3100,53 @@ class TestProcessAcceptViews:
         for attr in ["birthdate", "birth_place", "birth_country"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
+    @freeze_time("2025-06-06")
+    def test_certified_criteria_birth_place_not_readonly_if_empty(self, client):
+        birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
+
+        job_seeker = JobSeekerFactory(
+            born_in_france=True,
+            with_pole_emploi_id=True,
+            with_ban_api_mocked_address=True,
+            jobseeker_profile__birth_place=None,
+        )
+        selected_criteria = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            eligibility_diagnosis__author_siae=self.company,
+            certified=True,
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker,
+            to_company=self.company,
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=selected_criteria.eligibility_diagnosis,
+            selected_jobs=[self.company.jobs.first()],
+        )
+        client.force_login(self.company.members.get())
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url_accept)
+        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertNotContains(
+            response,
+            """<select name="birth_place" class="form-select" disabled=""
+                 aria-describedby="id_birth_place_helptext" id="id_birth_place">
+                    <option value="" selected="">---------</option>
+               </select>""",
+            html=True,
+        )
+        post_data = {
+            "title": job_seeker.title,
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "birth_place": birth_place.pk,
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+        }
+        self.accept_job_application(client, job_application, post_data=post_data)
+
+        refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
+        assert refreshed_job_seeker.jobseeker_profile.birth_place == birth_place
+
 
 class TestProcessTemplates:
     """
