@@ -176,6 +176,40 @@ def test_find_orphans(caplog):
     )
 
 
+def test_remove_orphans(caplog):
+    old_orphan = FileFactory()
+    job_application = JobApplicationFactory()
+    ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    scan = Scan.objects.create(file=FileFactory(), clamav_signature="toto")
+    AnnouncementItemFactory(with_image=True)
+    AssessmentFactory(with_submission_requirements=True)
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application  # Don't create a new resume
+    )
+    EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
+    # Make all files at least one day old
+    File.objects.all().update(last_modified=timezone.now() - datetime.timedelta(days=1))
+
+    FileFactory()  # Too recent orphan file
+    assert File.objects.all().count() == 11
+
+    call_command("remove_orphan_files")
+
+    assert File.objects.all().count() == 9
+    remaining_files_keys = set(File.objects.values_list("pk", flat=True))
+    assert old_orphan.pk not in remaining_files_keys
+    assert scan.file_id not in remaining_files_keys
+
+    assert caplog.messages[:-1] == [
+        "(3, {'antivirus.Scan': 1, 'files.File': 2})",
+        "Deleted 2 orphans files without purging file from S3",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.remove_orphan_files succeeded in"
+    )
+
+
 def test_purge_files(caplog):
     in_the_past = timezone.now() - datetime.timedelta(days=1)
     to_purge = FileFactory(deleted_at=in_the_past)
