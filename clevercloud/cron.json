@@ -1,5 +1,8 @@
 [
+  "* * * * * $ROOT/clevercloud/run_management_command.sh update_ids",
+
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
+  "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
   "*/5 0-22 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
 
@@ -20,6 +23,7 @@
   "0 1 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
+  "30 3 * * * $ROOT/clevercloud/run_management_command.sh purge_files",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
@@ -33,6 +37,7 @@
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
+  "0 3 * * 1 $ROOT/clevercloud/run_management_command.sh find_orphan_files",
   "0 12 * * 1 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 0 1 * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
