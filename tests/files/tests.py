@@ -100,10 +100,23 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
         "Checking existing files: 1 files in database before sync",
         "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
         "permanent=0 files already in database before sync",
-        f"1 database files do not exist in the bucket: [{existing_file.pk!r}]",
+        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.sync_s3_files succeeded in"
+    )
+
+    # Assert a second use does not create more files
+    call_command("sync_s3_files")
+    assertQuerySetEqual(
+        File.objects.values_list("key", flat=True),
+        [
+            "resume/11111111-1111-1111-1111-111111111111.pdf",
+            "evaluations/test.xlsx",
+            "prolongation_report/test.xlsx",
+            existing_file.key,
+        ],
+        ordered=False,
     )
 
 
@@ -153,6 +166,40 @@ def test_find_orphans(caplog):
     assert caplog.messages[:-1] == ["Marked 2 orphans files for deletion"]
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.find_orphan_files succeeded in"
+    )
+
+
+def test_remove_orphans(caplog):
+    old_orphan = FileFactory()
+    job_application = JobApplicationFactory()
+    ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
+    scan = Scan.objects.create(file=FileFactory(), clamav_signature="toto")
+    AnnouncementItemFactory(with_image=True)
+    AssessmentFactory(with_submission_requirements=True)
+    evaluated_job_application = EvaluatedJobApplicationFactory(
+        job_application=job_application  # Don't create a new resume
+    )
+    EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
+    # Make all files at least one day old
+    File.objects.all().update(last_modified=timezone.now() - datetime.timedelta(days=1))
+
+    FileFactory()  # Too recent orphan file
+    assert File.objects.all().count() == 11
+
+    call_command("remove_orphan_files")
+
+    assert File.objects.all().count() == 9
+    remaining_files_keys = set(File.objects.values_list("pk", flat=True))
+    assert old_orphan.pk not in remaining_files_keys
+    assert scan.file_id not in remaining_files_keys
+
+    assert caplog.messages[:-1] == [
+        "(3, {'antivirus.Scan': 1, 'files.File': 2})",
+        "Deleted 2 orphans files without purging file from S3",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.remove_orphan_files succeeded in"
     )
 
 
