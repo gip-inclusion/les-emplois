@@ -24,6 +24,10 @@ class JobApplicationAdminForm(forms.ModelForm):
 
     def clean(self):
         sender = self.cleaned_data["sender"]
+
+        if "sender_kind" not in self.cleaned_data:
+            raise ValidationError("Type émetteur manquant.")
+
         sender_kind = self.cleaned_data["sender_kind"]
         sender_company = self.cleaned_data.get("sender_company")
         sender_prescriber_organization = self.cleaned_data.get("sender_prescriber_organization")
