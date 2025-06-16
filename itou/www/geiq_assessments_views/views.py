@@ -153,6 +153,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         "siret": current_siret,
         "campaign_label_infos": campaign_label_infos,
         "geiq_info": geiq_info,
+        "conflicting_antennas": [],
     }
     if geiq_info is None:
         return render(request, template_name, context)
