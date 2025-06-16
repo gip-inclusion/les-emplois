@@ -184,7 +184,7 @@
 
                                 {% if user.is_job_seeker %}
                                     {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
-                                    {% include "dashboard/includes/job_seeker_approval_card.html" with user=user itou_help_center_url=ITOU_HELP_CENTER_URL only %}
+                                    {% include "dashboard/includes/job_seeker_approval_card.html" with user=user itou_help_center_url=ITOU_HELP_CENTER_URL request=request only %}
                                     {% include "dashboard/includes/job_seeker_eligibility_card.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" itou_help_center_url=ITOU_HELP_CENTER_URL only %}
                                     {% if geiq_eligibility_diagnosis and geiq_eligibility_diagnosis.allowance_amount %}
                                         {% include "dashboard/includes/job_seeker_eligibility_card.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" itou_help_center_url=ITOU_HELP_CENTER_URL only %}
