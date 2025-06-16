@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## 2025-06-16
+
+### Ajouté
+
+- [Vie privée : archivage des fichiers des candidats](https://github.com/gip-inclusion/les-emplois/pull/6299)
+- [Vie privée : Supprimer les emails des candidats de Brevo](https://github.com/gip-inclusion/les-emplois/pull/5989)
+- [Vie privée : permettre la copie de l'ID Public du candidat pour les demandes au support](https://github.com/gip-inclusion/les-emplois/pull/6176) 🖼
+
+### Modifié
+
+- [Admin : Créer automatiquement les EmailAddress lorsque le support change l’email d’un utilisateur Django](https://github.com/gip-inclusion/les-emplois/pull/6262)
+- [Connexion: Améliorer le changement d'adresse e-mail](https://github.com/gip-inclusion/les-emplois/pull/6274)
+- [Eligibilité: Refonte des vues d'éligibilité](https://github.com/gip-inclusion/les-emplois/pull/6223)
+- [Employeur: ajout d'un bandeau sur la page “Métier et recrutement” pour le questionnaire Maze](https://github.com/gip-inclusion/les-emplois/pull/6315)
+- [Fiches Salarié : Ne plus proposer l'option "Renvoyer" si des informations sont manquantes ou erronées](https://github.com/gip-inclusion/les-emplois/pull/6322) 🖼
+- [GEIQ: ajout des DDETS/DREETS en copie de l'email de notification de contrôle définitif](https://github.com/gip-inclusion/les-emplois/pull/6285)
+- [GEIQ: modification des règles d'affichage du bouton d'accès à la décision pour les DDETS/DREETS](https://github.com/gip-inclusion/les-emplois/pull/6277)
+- [GEIQ: tri des contrats par nom de famille puis prénom](https://github.com/gip-inclusion/les-emplois/pull/6302)
+- [GPS: Notification de création de compte spécifique à GPS](https://github.com/gip-inclusion/les-emplois/pull/6298)
+- [Interface: Actualiser l'affichage de la fiche de poste](https://github.com/gip-inclusion/les-emplois/pull/6314) 🖼
+- [Interface: Actualiser l'affichage des templates Fiche Salarié ASP](https://github.com/gip-inclusion/les-emplois/pull/6269)
+- [Nouveautés: correction de l'affichage de la modale](https://github.com/gip-inclusion/les-emplois/pull/6313)
+- [Tech: Ajout d'un mode de maintenance](https://github.com/gip-inclusion/les-emplois/pull/6311) 🖼
+
 ## 2025-06-09
 
 ### Ajouté
