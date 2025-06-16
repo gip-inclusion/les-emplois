@@ -196,7 +196,9 @@ class TestCreateAssessmentView:
         campaign = AssessmentCampaignFactory(year=timezone.localdate().year - 1)
         LabelInfos.objects.create(
             campaign=campaign,
-            data=[{"id": 1234, "nom": "Un Joli GEIQ", "siret": membership.company.siret, "antennes": []}],
+            data=[
+                {"id": 1234, "nom": "Un Joli GEIQ", "siret": membership.company.siret, "antennes": [], "cp": "12345"}
+            ],
         )
         response = client.get(reverse("geiq_assessments_views:create"))
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="No antenna")
@@ -208,6 +210,7 @@ class TestCreateAssessmentView:
         assertRedirects(response, reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
         assert assessment.companies.get() == membership.company
         assert assessment.label_geiq_name == "Un Joli GEIQ"
+        assert assessment.label_geiq_post_code == "12345"
         assert assessment.with_main_geiq is True
         assert assessment.label_antennas == []
         assertQuerySetEqual(assessment.institutions.order_by("kind"), [ddets, dreets])
@@ -256,6 +259,7 @@ class TestCreateAssessmentView:
                         {"id": 3456, "nom": "Une autre antenne", "siret": other_antenna.siret},
                         {"id": 4567, "nom": "Une dernière antenne", "siret": "12345678904567"},
                     ],
+                    "cp": "12345",
                 }
             ],
         )
@@ -278,6 +282,7 @@ class TestCreateAssessmentView:
         assertRedirects(response, reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}))
         assertQuerySetEqual(assessment.companies.order_by("siret"), [membership.company, other_antenna])
         assert assessment.label_geiq_name == "Un Joli GEIQ"
+        assert assessment.label_geiq_post_code == "12345"
         assert assessment.with_main_geiq is True
         assert assessment.label_antennas == [
             {"id": 2345, "name": "Une antenne"},
@@ -322,6 +327,7 @@ class TestCreateAssessmentView:
         )
         assert second_assessment.companies.get() == membership.company
         assert second_assessment.label_geiq_name == "Un Joli GEIQ"
+        assert second_assessment.label_geiq_post_code == "12345"
         assert second_assessment.with_main_geiq is False
         assert second_assessment.label_antennas == [
             {"id": 4567, "name": "Une dernière antenne"},
