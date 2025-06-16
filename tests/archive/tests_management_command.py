@@ -469,6 +469,9 @@ class TestArchiveUsersManagementCommand:
         jobseeker = JobSeekerFactory(notified_days_ago=31, **kwargs)
 
         for jobapplication_kwargs in jobapplication_kwargs_list:
+            if jobapplication_kwargs.get("sender_kind") == UserKind.JOB_SEEKER:
+                jobapplication_kwargs["sender"] = jobseeker
+
             JobApplicationFactory(
                 job_seeker=jobseeker,
                 approval=None,
@@ -568,7 +571,7 @@ class TestArchiveUsersManagementCommand:
         [
             pytest.param(
                 {
-                    "sender__kind": UserKind.JOB_SEEKER,
+                    "sent_by_job_seeker": True,
                     "to_company__kind": CompanyKind.GEIQ,
                     "to_company__department": 76,
                     "to_company__naf": "1234Z",
@@ -586,7 +589,7 @@ class TestArchiveUsersManagementCommand:
             ),
             pytest.param(
                 {
-                    "sender__kind": UserKind.JOB_SEEKER,
+                    "sent_by_job_seeker": True,
                     "to_company__kind": CompanyKind.OPCS,
                     "to_company__department": 76,
                     "to_company__naf": "4567A",
@@ -602,7 +605,7 @@ class TestArchiveUsersManagementCommand:
             ),
             pytest.param(
                 {
-                    "sender__kind": UserKind.EMPLOYER,
+                    "sent_by_another_employer": True,
                     "to_company__kind": CompanyKind.EI,
                     "to_company__department": 76,
                     "to_company__naf": "4567A",
@@ -627,7 +630,7 @@ class TestArchiveUsersManagementCommand:
             ),
             pytest.param(
                 {
-                    "sender__kind": UserKind.EMPLOYER,
+                    "sent_by_another_employer": True,
                     "to_company__kind": CompanyKind.EI,
                     "to_company__department": 76,
                     "to_company__naf": "4567A",
