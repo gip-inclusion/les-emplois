@@ -393,6 +393,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)
         return ""
 
+    @admin.display(description="Historique des valeurs provenant de systèmes externes")
+    def external_data_source_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.external_data_source_history, width=120))
+
     @admin.action(description="Désactiver le compte IC / PC pour changement prescripteur <-> employeur")
     def free_sso_email(self, request, queryset):
         try:
@@ -452,6 +456,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "disabled_notifications",
                 "follow_up_groups_or_members",
                 "upcoming_deletion_notified_at",
+                "external_data_source_history_formatted",
             ]
         )
         if not request.user.is_superuser:
@@ -491,6 +496,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "jobseeker_profile_link",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
+                        "external_data_source_history_formatted",
                     ]
                 },
             ),
