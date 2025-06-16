@@ -72,3 +72,5 @@ if os.getenv("DEBUG_SQL_SNAPSHOT"):
 FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
 
 REQUIRE_OTP_FOR_STAFF = False
+
+BREVO_API_URL = "https://mailer.test.com"

@@ -805,6 +805,7 @@ API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
 # Brevo
 # ------------------------------------------------------------------------------
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+BREVO_API_URL = "https://api.brevo.com/v3"
 
 # Pilotage
 # ------------------------------------------------------------------------------

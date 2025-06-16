@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 from unittest import mock
 
 import httpx
@@ -8,6 +7,7 @@ import pytest
 from allauth.account import models as allauth_models
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
 from django.utils import timezone
@@ -22,7 +22,7 @@ from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.models import User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
-from itou.utils.brevo import BREVO_API_URL, BrevoListID
+from itou.utils.brevo import BrevoListID
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -228,7 +228,7 @@ class TestCommandSendUsersToBrevo:
         settings.BREVO_API_KEY = "BREVO_API_KEY"
 
     @freeze_time("2023-05-01T23:30:00Z")
-    def test_wet_run_siae(self, caplog, respx_mock):
+    def test_wet_run_siae(self, caplog, respx_mock, snapshot):
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
         # Missing verified email and not using IC
@@ -286,7 +286,7 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=dave, company__kind=CompanyKind.ETTI)
         CompanyMembershipFactory(user=eve, company__kind=CompanyKind.EITI)
 
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
         call_command("send_users_to_brevo", wet_run=True)
@@ -347,30 +347,10 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 5"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_siae")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_prescribers(self, caplog, respx_mock):
+    def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
         pe = PrescriberPoleEmploiFactory()
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
         alice = PrescriberFactory(
@@ -405,7 +385,7 @@ class TestCommandSendUsersToBrevo:
             changed_email.email = f"changed+{organization}@mailinator.com"
             changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
@@ -440,30 +420,10 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 2"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_prescribers")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_orienteurs(self, caplog, respx_mock):
+    def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
         PrescriberFactory(
             first_name="Billy",
             last_name="Boo",
@@ -497,7 +457,7 @@ class TestCommandSendUsersToBrevo:
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
@@ -541,30 +501,10 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 3"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_orienteurs")
 
     @freeze_time("2025-02-25")
-    def test_wet_run_job_seekers(self, caplog, respx_mock):
+    def test_wet_run_job_seekers(self, caplog, respx_mock, snapshot):
         billy = JobSeekerFactory(
             first_name="Billy",
             last_name="Boo",
@@ -603,7 +543,7 @@ class TestCommandSendUsersToBrevo:
             verified=False,
         )
 
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
@@ -640,27 +580,7 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 2"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_job_seekers")
 
     @freeze_time("2025-02-25")
     def test_wet_run_stalled_autonomous_job_seekers(self, caplog, respx_mock):
@@ -674,7 +594,7 @@ class TestCommandSendUsersToBrevo:
             jobseeker_profile__is_stalled=True,
         )
         JobSeekerFactory(with_verified_email=True)
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
 
@@ -705,7 +625,7 @@ class TestCommandSendUsersToBrevo:
         }
 
     @freeze_time("2023-05-02")
-    def test_wet_run_batch(self, caplog, respx_mock, mocker):
+    def test_wet_run_batch(self, caplog, respx_mock, mocker, snapshot):
         annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
@@ -719,7 +639,7 @@ class TestCommandSendUsersToBrevo:
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
 
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
         )
         mocker.patch("itou.users.management.commands.send_users_to_brevo.BrevoClient.IMPORT_BATCH_SIZE", 1)
@@ -764,42 +684,17 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 2"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 202 Accepted"',
-            ),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_batch")
 
     @freeze_time("2023-05-02")
-    def test_wet_run_errors(self, caplog, respx_mock):
+    def test_wet_run_errors(self, caplog, respx_mock, snapshot):
         annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
-        import_mock = respx_mock.post(f"{BREVO_API_URL}/contacts/import").mock(
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(400, json={})
         )
 
@@ -825,32 +720,7 @@ class TestCommandSendUsersToBrevo:
                 ],
             },
         ]
-        assert caplog.record_tuples == [
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "SIAE users count: 1"),
-            (
-                "httpx",
-                logging.INFO,
-                'HTTP Request: POST https://api.brevo.com/v3/contacts/import "HTTP/1.1 400 Bad Request"',
-            ),
-            (
-                "itou.utils.brevo",
-                logging.ERROR,
-                "Brevo API: Some emails were not imported, status_code=400, content={}",
-            ),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Prescribers count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Orienteurs count: 0"),
-            ("itou.users.management.commands.send_users_to_brevo", logging.INFO, "Job seekers count: 0"),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Stalled autonomous job seekers count: 0",
-            ),
-            (
-                "itou.users.management.commands.send_users_to_brevo",
-                logging.INFO,
-                "Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds",
-            ),
-        ]
+        assert caplog.record_tuples == snapshot(name="send_users_to_brevo_errors")
 
 
 @freeze_time("2023-05-01")

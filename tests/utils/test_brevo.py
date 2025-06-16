@@ -1,7 +1,8 @@
 import httpx
 import pytest
+from django.conf import settings
 
-from itou.utils.brevo import BREVO_API_URL, BrevoClient
+from itou.utils.brevo import BrevoClient
 from tests.users.factories import JobSeekerFactory
 
 
@@ -48,7 +49,7 @@ def test_import_users(respx_mock, caplog, status_code, content, brevo_client):
         "jsonBody": [{"email": user.email}],
     }
 
-    respx_mock.post(f"{BREVO_API_URL}/contacts/import", json=payload).mock(
+    respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import", json=payload).mock(
         return_value=httpx.Response(status_code, content=content)
     )
 
@@ -90,7 +91,7 @@ def test_delete_contact_request_error(mocker, caplog, snapshot, brevo_client):
 
 def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo_client):
     email = "somebody@mail.com"
-    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
         return_value=httpx.Response(status_code=500)
     )
 

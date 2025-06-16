@@ -1,4 +1,248 @@
 # serializer version: 1
+# name: TestCommandSendUsersToBrevo.test_wet_run_batch[send_users_to_brevo_batch]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_errors[send_users_to_brevo_errors]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 1',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 400 Bad Request"',
+    ),
+    tuple(
+      'itou.utils.brevo',
+      40,
+      'Brevo API: Some emails were not imported, status_code=400, content={}',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_job_seekers[send_users_to_brevo_job_seekers]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_orienteurs[send_users_to_brevo_orienteurs]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 3',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_prescribers[send_users_to_brevo_prescribers]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 2',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
+# name: TestCommandSendUsersToBrevo.test_wet_run_siae[send_users_to_brevo_siae]
+  list([
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'SIAE users count: 5',
+    ),
+    tuple(
+      'httpx',
+      20,
+      'HTTP Request: POST https://mailer.test.com/contacts/import "HTTP/1.1 202 Accepted"',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Prescribers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Orienteurs count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Stalled autonomous job seekers count: 0',
+    ),
+    tuple(
+      'itou.users.management.commands.send_users_to_brevo',
+      20,
+      'Management command itou.users.management.commands.send_users_to_brevo succeeded in 0.00 seconds',
+    ),
+  ])
+# ---
 # name: TestSendCheckAuthorizedMembersEmailManagementCommand.test_check_authorized_members_email_content_members_link[company]
   '''
   Bonjour,
