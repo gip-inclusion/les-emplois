@@ -1,15 +1,15 @@
 import httpx
 import pytest
+from django.conf import settings
 
 from itou.archive.tasks import async_delete_contact
-from itou.utils.brevo import BREVO_API_URL
 from tests.utils.test_brevo import brevo_client_fixture  # noqa: F401
 
 
 @pytest.mark.parametrize("status_code", [204, 404])
 def test_delete_contact(respx_mock, django_capture_on_commit_callbacks, status_code, caplog, brevo_client):
     email = "somebody@mail.com"
-    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
         return_value=httpx.Response(status_code=status_code)
     )
 
@@ -24,7 +24,7 @@ def test_async_delete_contact_retries_warning(
     respx_mock, django_capture_on_commit_callbacks, retries, caplog, snapshot, brevo_client
 ):
     email = "somebody@email.com"
-    respx_mock.delete(f"{BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
         return_value=httpx.Response(status_code=503)
     )
 

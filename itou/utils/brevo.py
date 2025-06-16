@@ -8,8 +8,6 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-BREVO_API_URL = "https://api.brevo.com/v3"
-
 
 # https://app.brevo.com/contact/list-listing
 class BrevoListID(enum.IntEnum):
@@ -28,7 +26,7 @@ class BrevoClient:
                 "api-key": settings.BREVO_API_KEY,
                 "Content-Type": "application/json",
             },
-            base_url=BREVO_API_URL,
+            base_url=settings.BREVO_API_URL,
             timeout=10,
         )
 
