@@ -510,7 +510,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="type de l'émetteur",
         max_length=10,
         choices=SenderKind.choices,
-        default=SenderKind.PRESCRIBER,
     )
 
     # When the sender is an employer, keep a track of his current company.
@@ -788,6 +787,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 raise ValidationError("Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ")
             if self.inverted_vae_contract is not None:
                 raise ValidationError("Un contrat associé à une VAE inversée n'est possible que pour les GEIQ")
+
+        if self.sender and self.sender_kind != self.sender.kind:
+            raise ValidationError(
+                "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur"
+            )
 
     @property
     def is_pending(self):
