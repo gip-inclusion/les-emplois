@@ -1,8 +1,15 @@
 # serializer version: 1
 # name: TestJobDescriptionSearchView.test_dipretty_indentedict
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -320,8 +327,15 @@
 # ---
 # name: TestJobDescriptionSearchView.test_results
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -639,8 +653,15 @@
 # ---
 # name: TestSearchCompany.test_company[SQL queries with company filter]
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -1035,8 +1056,15 @@
 # ---
 # name: TestSearchCompany.test_company[SQL queries without company filter]
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -1430,8 +1458,15 @@
 # ---
 # name: TestSearchCompany.test_dipretty_indentedict
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -1824,8 +1859,15 @@
 # ---
 # name: TestSearchCompany.test_order_by
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',

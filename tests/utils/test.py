@@ -32,7 +32,7 @@ from itou.utils.session import SessionNamespace
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
-BASE_NUM_QUERIES = 2
+BASE_NUM_QUERIES = 3
 
 
 # Used to find the session namespace by elimination
@@ -407,5 +407,7 @@ def normalize_fields_history(fields_history):
     for entry in normalized_fields_history:
         if entry["_timestamp"]:
             entry["_timestamp"] = "[TIMESTAMP]"
+        if entry["_context"] and entry["_context"]["request_id"]:
+            entry["_context"]["request_id"] = "[REQUEST ID]"
 
     return normalized_fields_history
