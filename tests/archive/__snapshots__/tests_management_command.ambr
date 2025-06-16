@@ -290,17 +290,17 @@
     }),
   ])
 # ---
-# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-False][suspend_archive_users_command_log]
-  'Start archiving users in dry_run mode'
+# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_users_command_log]
+  'Start anonymizing users in dry_run mode'
 # ---
-# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-True][suspend_archive_users_command_log]
-  'Archiving users is suspended, exiting command'
+# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_users_command_log]
+  'Anonymizing users is suspended, exiting command'
 # ---
-# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-False][suspend_archive_users_command_log]
-  'Start archiving users in wet_run mode'
+# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_users_command_log]
+  'Start anonymizing users in wet_run mode'
 # ---
-# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-True][suspend_archive_users_command_log]
-  'Archiving users is suspended, exiting command'
+# name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_users_command_log]
+  'Anonymizing users is suspended, exiting command'
 # ---
 # name: TestNotifyInactiveUsersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
   '''

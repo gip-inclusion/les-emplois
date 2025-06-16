@@ -202,13 +202,13 @@ class TestArchiveUsersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
-        settings.SUSPEND_ARCHIVE_USERS = suspended
-        call_command("archive_users", wet_run=wet_run)
-        assert caplog.messages[0] == snapshot(name="suspend_archive_users_command_log")
+        settings.SUSPEND_ANONYMIZE_USERS = suspended
+        call_command("anonymize_users", wet_run=wet_run)
+        assert caplog.messages[0] == snapshot(name="suspend_anonymize_users_command_log")
 
     def test_dry_run(self):
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
-        call_command("archive_users")
+        call_command("anonymize_users")
 
         User.objects.get()
         assert not AnonymizedJobSeeker.objects.exists()
@@ -216,7 +216,7 @@ class TestArchiveUsersManagementCommand:
 
     def test_archive_batch_size(self):
         JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
-        call_command("archive_users", batch_size=2, wet_run=True)
+        call_command("anonymize_users", batch_size=2, wet_run=True)
 
         assert AnonymizedJobSeeker.objects.count() == 2
         assert User.objects.count() == 1
@@ -325,7 +325,7 @@ class TestArchiveUsersManagementCommand:
         if related_object_factory:
             related_object_factory(user)
 
-        call_command("archive_users", wet_run=True)
+        call_command("anonymize_users", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
@@ -365,7 +365,7 @@ class TestArchiveUsersManagementCommand:
     )
     def test_exclude_users_when_archiving(self, user_factory):
         user = user_factory()
-        call_command("archive_users", wet_run=True)
+        call_command("anonymize_users", wet_run=True)
 
         expected_user = User.objects.get()
         assert user == expected_user
@@ -479,7 +479,7 @@ class TestArchiveUsersManagementCommand:
             )
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("archive_users", wet_run=True)
+            call_command("anonymize_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
@@ -504,7 +504,7 @@ class TestArchiveUsersManagementCommand:
         )
         assert list(archived_jobseeker) == snapshot(name="archived_jobseeker")
 
-        assert "Archived jobseekers after grace period, count: 1" in caplog.messages
+        assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
         if jobseeker.is_active:
             [mail] = mailoutbox
             assert jobseeker.email == mail.to[0]
@@ -528,7 +528,7 @@ class TestArchiveUsersManagementCommand:
         assert FollowUpGroupMembership.objects.exists()
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("archive_users", wet_run=True)
+            call_command("anonymize_users", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not FollowUpGroup.objects.exists()
@@ -550,7 +550,7 @@ class TestArchiveUsersManagementCommand:
         undesired_file_keys = [FileFactory().id, JobApplicationFactory().resume.id]
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("archive_users", wet_run=True)
+            call_command("anonymize_users", wet_run=True)
 
         assert File.objects.filter(id__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
 
@@ -683,7 +683,7 @@ class TestArchiveUsersManagementCommand:
             job_application.selected_jobs.set(selected_jobs)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("archive_users", wet_run=True)
+            call_command("anonymize_users", wet_run=True)
 
         archived_application = AnonymizedApplication.objects.all().values(
             "job_seeker_birth_year",
@@ -714,7 +714,7 @@ class TestArchiveUsersManagementCommand:
         )
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
-        assert "Archived job applications after grace period, count: 1" in caplog.messages
+        assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
     def test_async_delete_contact_is_called_when_archiving_user(
         self, django_capture_on_commit_callbacks, respx_mock, brevo_api_key
@@ -726,7 +726,7 @@ class TestArchiveUsersManagementCommand:
             )
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("archive_users", wet_run=True)
+            call_command("anonymize_users", wet_run=True)
 
         assert respx_mock.calls.called
         assert respx_mock.calls.call_count == len(jobseekers)

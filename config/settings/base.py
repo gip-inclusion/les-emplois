@@ -828,9 +828,9 @@ OTP_TOTP_ISSUER = f"Les Emplois de l'inclusion ({ITOU_ENVIRONMENT})"
 OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 
-# archive_users
+# anonymize_users
 # ------------------------------------------------------------------------------
-SUSPEND_ARCHIVE_USERS = os.getenv("SUSPEND_ARCHIVE_USERS", "False") == "True"
+SUSPEND_ANONYMIZE_USERS = os.getenv("SUSPEND_ANONYMIZE_USERS", "False") == "True"
 
 
 # Mainenance mode
