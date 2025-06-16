@@ -495,7 +495,7 @@
 # ---
 # name: TestSiaeSubmitProofsView.test_is_not_submittable_with_submission_freezed[view queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -659,6 +659,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -727,7 +734,7 @@
 # ---
 # name: TestSiaeSubmitProofsView.test_is_submittable[view queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -891,6 +898,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

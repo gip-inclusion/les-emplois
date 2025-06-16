@@ -188,6 +188,7 @@ def test_companies_export(admin_client, snapshot):
 
     with assertNumQueries(
         BASE_NUM_QUERIES
+        + 1  # SELECT set_config()
         + 1  # Load Django session
         + 1  # Load user
         + 2  # count companies in admin list

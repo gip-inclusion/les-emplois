@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import get_user
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from freezegun import freeze_time
@@ -11,7 +12,8 @@ from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
+from tests.utils.test import normalize_fields_history
 
 
 def test_search(admin_client):
@@ -329,3 +331,63 @@ def test_external_data_source_history(admin_client):
         " 'source': 'FC', 'value': True}]</code></pre>"
     )
     assertContains(response, code, html=True)
+
+
+def test_change_asp_uid(admin_client):
+    profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
+
+    admin_client.post(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
+        {
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+            "user": profile.user.pk,
+            "asp_uid": "000000000000000000000000000001",
+            "birthdate": "",
+            "birth_place": "",
+            "birth_country": "",
+            "education_level": "",
+            "nir": "",
+            "lack_of_nir_reason": "",
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": "",
+            "pole_emploi_since": "",
+            "unemployed_since": "",
+            "created_by_prescriber_organization": "",
+            "has_rsa_allocation": "NON",
+            "rsa_allocation_since": "",
+            "ass_allocation_since": "",
+            "aah_allocation_since": "",
+            "are_allocation_since": "",
+            "activity_bonus_since": "",
+            "actor_met_for_business_creation": "",
+            "mean_monthly_income_before_process": "",
+            "eiti_contributions": "",
+            "hexa_lane_number": "",
+            "hexa_std_extension": "",
+            "hexa_non_std_extension": "",
+            "hexa_lane_name": "",
+            "hexa_additional_address": "",
+            "identity_certifications-TOTAL_FORMS": "0",
+            "identity_certifications-INITIAL_FORMS": "0",
+            "identity_certifications-MIN_NUM_FORMS": "0",
+            "identity_certifications-MAX_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": "",
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+        },
+    )
+    profile.refresh_from_db()
+    assert profile.asp_uid == "000000000000000000000000000001"
+    assert normalize_fields_history(profile.fields_history) == [
+        {
+            "_context": {"request_id": "[REQUEST ID]", "user": get_user(admin_client).pk},
+            "_timestamp": "[TIMESTAMP]",
+            "before": {"asp_uid": "000000000000000000000000000000"},
+            "after": {"asp_uid": "000000000000000000000000000001"},
+        }
+    ]

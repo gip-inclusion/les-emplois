@@ -15,6 +15,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
+from itou.utils import triggers
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
     CompanyFactory,
@@ -619,7 +620,8 @@ def test_company_siret_field_history():
     assert company.fields_history == []
 
     company.siret = "00000000000001"
-    company.save()
+    with triggers.context():
+        company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
         {
@@ -628,6 +630,7 @@ def test_company_siret_field_history():
                 "siret": "00000000000001",
             },
             "_timestamp": "[TIMESTAMP]",
+            "_context": {},
         }
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -635,18 +638,21 @@ def test_company_siret_field_history():
     )
 
     company.siret = "00000000000002"
-    company.save()
+    with triggers.context(company=company.pk):
+        company.save()
     company.refresh_from_db()
     assert normalize_fields_history(company.fields_history) == [
         {
             "before": {"siret": "00000000000000"},
             "after": {"siret": "00000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": {},
         },
         {
             "before": {"siret": "00000000000001"},
             "after": {"siret": "00000000000002"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": {"company": company.pk},
         },
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(

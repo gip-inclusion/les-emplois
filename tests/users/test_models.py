@@ -31,6 +31,7 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -1205,13 +1206,15 @@ def test_job_seeker_profile_asp_uid_field_history():
     assert profile.fields_history == []
 
     profile.asp_uid = "000000000000000000000000000001"
-    profile.save()
+    with triggers.context():
+        profile.save()
     profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": {},
         }
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -1219,18 +1222,21 @@ def test_job_seeker_profile_asp_uid_field_history():
     )
 
     profile.asp_uid = "000000000000000000000000000002"
-    profile.save()
+    with triggers.context(profile=profile.pk):
+        profile.save()
     profile.refresh_from_db()
     assert normalize_fields_history(profile.fields_history) == [
         {
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": {},
         },
         {
             "before": {"asp_uid": "000000000000000000000000000001"},
             "after": {"asp_uid": "000000000000000000000000000002"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": {"profile": profile.pk},
         },
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(

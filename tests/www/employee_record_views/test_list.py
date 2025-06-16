@@ -2,6 +2,7 @@ import datetime
 import random
 
 import factory
+import pgtrigger
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import title, urlencode
@@ -273,6 +274,7 @@ class TestListEmployeeRecords:
             == snapshot
         )
 
+    @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_display_alert_when_siret_has_changed(self, client):
         """
         For PROCESSED records only
@@ -290,6 +292,7 @@ class TestListEmployeeRecords:
         assertContains(response, self.HEADER_WARNING_TITLE)
         assertContains(response, self.ITEM_WARNING_TITLE)
 
+    @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_no_alert_when_siret_has_changed(self, client):
         """
         Any status except PROCESSED

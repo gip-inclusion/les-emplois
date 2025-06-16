@@ -1,11 +1,14 @@
 import collections
 import contextlib
 import logging
+import os
 import time
 import uuid
 
 from asgiref.local import Local  # NOQA
 from django.core.management import base
+
+from itou.utils import triggers
 
 
 local = Local()
@@ -63,7 +66,10 @@ class LoggedCommandMixin:
         self.logger = logging.getLogger(self.__class__.__module__)
 
     def execute(self, *args, **kwargs):
-        with _command_info_manager(self), _command_duration_logger(self):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(_command_info_manager(self))
+            stack.enter_context(_command_duration_logger(self))
+            stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=str(self.run_uid)))
             try:
                 return super().execute(*args, **kwargs)
             except Exception:
