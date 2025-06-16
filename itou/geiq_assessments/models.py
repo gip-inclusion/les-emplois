@@ -81,6 +81,7 @@ class Assessment(models.Model):
     )
     label_geiq_id = models.IntegerField(verbose_name="identifiant label du GEIQ principal")
     label_geiq_name = models.CharField(verbose_name="nom du GEIQ principal dans label")
+    label_geiq_post_code = models.CharField(verbose_name="code postal du GEIQ principal dans label", db_default="")
     with_main_geiq = models.BooleanField(verbose_name="avec les contrats du GEIQ principal", default=False)
     label_antennas = models.JSONField(verbose_name="antennes label concernées par le bilan")
 

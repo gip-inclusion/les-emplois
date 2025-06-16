@@ -209,6 +209,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
             campaign=campaign,
             label_geiq_name=geiq_info["nom"],
             label_geiq_id=geiq_info["id"],
+            label_geiq_post_code=geiq_info["cp"],
             label_antennas=sorted(label_antennas, key=operator.itemgetter("id")),  # Stable order to detect duplicates
             with_main_geiq=create_form.cleaned_data["main_geiq"],
         )
