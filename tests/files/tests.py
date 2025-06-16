@@ -100,11 +100,31 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
         "Checking existing files: 1 files in database before sync",
         "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
         "permanent=0 files already in database before sync",
-        f"1 database files do not exist in the bucket: [{existing_file.pk!r}]",
+        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.files.management.commands.sync_s3_files succeeded in"
     )
+
+    # Assert a second use does not create more files
+    caplog.clear()
+    call_command("sync_s3_files")
+    assertQuerySetEqual(
+        File.objects.values_list("key", flat=True),
+        [
+            "resume/11111111-1111-1111-1111-111111111111.pdf",
+            "evaluations/test.xlsx",
+            "prolongation_report/test.xlsx",
+            existing_file.key,
+        ],
+        ordered=False,
+    )
+    assert caplog.messages[:-1] == [
+        "Checking existing files: 4 files in database before sync",
+        "Completed bucket sync: found permanent=0 and temporary=0 files in the bucket",
+        "permanent=3 files already in database before sync",
+        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
+    ]
 
 
 @pytest.mark.skipif(os.getenv("CI") != "true", reason="Not using to Cellar")
