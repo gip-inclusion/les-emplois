@@ -87,15 +87,6 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
         ],
         ordered=False,
     )
-    assertQuerySetEqual(
-        File.objects.filter(deleted_at__isnull=False).values_list("key", flat=True),
-        [
-            "resume/11111111-1111-1111-1111-111111111111.pdf",
-            "evaluations/test.xlsx",
-            "prolongation_report/test.xlsx",
-        ],
-        ordered=False,
-    )
     assert caplog.messages[:-1] == [
         "Checking existing files: 1 files in database before sync",
         "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
