@@ -2255,7 +2255,10 @@ class TestJobApplicationAdminForm:
         job_application.sender_kind = SenderKind.PRESCRIBER
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
+        assert [
+            "Émetteur du mauvais type.",
+            "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur",
+        ] == form.errors["__all__"]
         job_application.sender_kind = sender_kind
 
         job_application.sender_company = JobApplicationSentByCompanyFactory().sender_company
@@ -2289,7 +2292,10 @@ class TestJobApplicationAdminForm:
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
+        assert [
+            "Émetteur du mauvais type.",
+            "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur",
+        ] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
@@ -2316,7 +2322,10 @@ class TestJobApplicationAdminForm:
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
+        assert [
+            "Émetteur du mauvais type.",
+            "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur",
+        ] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
@@ -2346,7 +2355,10 @@ class TestJobApplicationAdminForm:
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
+        assert [
+            "Émetteur du mauvais type.",
+            "Le type de l'émetteur de la candidature ne correspond pas au type de l'utilisateur émetteur",
+        ] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
