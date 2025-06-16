@@ -443,7 +443,7 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
 def assessment_contracts_sync(request, pk):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
-    context = {"assessment": assessment, "active_tab": AssessmentDetailsTab.MAIN}
+    context = {"assessment": assessment, "active_tab": AssessmentDetailsTab.MAIN, "error": False}
     if not assessment.contracts_synced_at:
         # Only sync if the file is not already set
         try:

@@ -11,7 +11,7 @@
                     {% include "geiq_assessments_views/includes/summary_document_box.html" with assessment=assessment only %}
                     {% include "geiq_assessments_views/includes/structure_financial_assessment_box.html" with assessment=assessment only %}
                     {% include "geiq_assessments_views/includes/action_financial_assessment_box.html" with assessment=assessment request=request only %}
-                    {% include "geiq_assessments_views/includes/contracts_box.html" with assessment=assessment request=request only %}
+                    {% include "geiq_assessments_views/includes/contracts_box.html" with assessment=assessment request=request error=False only %}
                     {% include "geiq_assessments_views/includes/geiq_comment_box.html" with assessment=assessment request=request only %}
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
