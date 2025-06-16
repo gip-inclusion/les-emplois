@@ -63,7 +63,7 @@ def anonymized_jobapplication(obj):
             obj.job_seeker.jobseeker_profile.birthdate.year if obj.job_seeker.jobseeker_profile.birthdate else None
         ),
         job_seeker_department_same_as_company_department=obj.job_seeker.department == obj.to_company.department,
-        sender_kind=obj.sender.kind,
+        sender_kind=obj.sender_kind,
         sender_company_kind=obj.sender_company.kind if obj.sender_company else None,
         sender_prescriber_organization_kind=(
             obj.sender_prescriber_organization.kind if obj.sender_prescriber_organization else None
