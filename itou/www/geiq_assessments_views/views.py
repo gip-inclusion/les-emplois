@@ -363,7 +363,7 @@ def assessment_get_file(request, pk, *, file_field):
 def assessment_sync_file(request, pk, *, file_field):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
-    context = {"assessment": assessment}
+    context = {"assessment": assessment, "error": False}
     match file_field:
         case "summary_document_file":
             api_method = "get_synthese_pdf"

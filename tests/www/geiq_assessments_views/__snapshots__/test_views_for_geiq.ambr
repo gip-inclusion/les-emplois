@@ -959,9 +959,9 @@
       <div class="c-box--summary__footer">
           <div class="d-flex justify-content-end">
               
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="load" type="button">
                       <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text"></span>
+                      <span class="stable-text">Récupération de Label</span>
                       <span class="loading-text">Récupération en cours</span>
                   </button>
               
@@ -1976,9 +1976,9 @@
       <div class="c-box--summary__footer">
           <div class="d-flex justify-content-end">
               
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="load" type="button">
                       <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text"></span>
+                      <span class="stable-text">Récupération de Label</span>
                       <span class="loading-text">Récupération en cours</span>
                   </button>
               
@@ -2205,9 +2205,9 @@
       <div class="c-box--summary__footer">
           <div class="d-flex justify-content-end">
               
-                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="" type="button">
+                  <button class="btn btn-ico btn-primary btn-block w-100 w-md-auto" hx-include="#label-sync-form" hx-post="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts/sync" hx-swap="outerHTML" hx-sync=".s-section:queue all" hx-target="#contracts-box" hx-trigger="load" type="button">
                       <i aria-hidden="true" class="ri-refresh-line"></i>
-                      <span class="stable-text"></span>
+                      <span class="stable-text">Récupération de Label</span>
                       <span class="loading-text">Récupération en cours</span>
                   </button>
               
