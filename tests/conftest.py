@@ -1,12 +1,14 @@
 import collections
 import copy
 import datetime
+import inspect
 import io
 import json
 import os
 import socket
 import threading
 import uuid
+from functools import reduce
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -28,8 +30,7 @@ from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
 from paramiko import ServerInterface
-from pytest_django.lazy_django import django_settings_is_configured
-from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
+from slippers.templatetags.slippers import AttrsNode
 
 
 # Rewrite before importing itou code.
@@ -292,68 +293,97 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
     monkeypatch.setattr(loader, "render_to_string", assertive_render)
 
 
+def _fail_for_invalid_template_variable(var):
+    stack = inspect.stack()
+
+    origin = None
+    for frame_info in stack[2:]:
+        if frame_info.function == "render":
+            try:
+                render_self = frame_info.frame.f_locals["self"]
+            except KeyError:
+                continue
+            else:
+                if isinstance(render_self, AttrsNode):
+                    # Escape hatch for AttrsNode, which adds attributes to a tag
+                    # if the matching variables are defined.
+                    return ""
+
+            try:
+                origin = render_self.origin
+            except AttributeError:
+                continue
+            if origin is not None:
+                break
+    if origin is None:
+        # finding the ``render`` needle in the stack
+        frameinfo = reduce(lambda x, y: y if y.function == "render" and "base.py" in y.filename else x, stack)
+        template = frameinfo.frame.f_locals["self"]
+        if isinstance(template, base_template.Template):
+            origin = template.name
+
+    if origin:
+        msg = f"Undefined template variable '{var}' in '{origin}'"
+    else:
+        msg = f"Undefined template variable '{var}'"
+    pytest.fail(msg)
+
+
 @pytest.fixture(autouse=True, scope="session")
 def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_variable):
-    # Workaround following https://github.com/pytest-dev/pytest-django/issues/1059#issue-1665002785
-    # rationale to better handle OneToOne field
-    if os.environ.get(INVALID_TEMPLATE_VARS_ENV, "false") == "true" and django_settings_is_configured():
-        from django.conf import settings as dj_settings
-
-        invalid_var_exception = dj_settings.TEMPLATES[0]["OPTIONS"]["string_if_invalid"]
-
-        # Make InvalidVarException falsy to keep the behavior consistent for OneToOneField
-        invalid_var_exception.__class__.__bool__ = lambda self: False
-
-        # but adapt Django's template code to behave as if it was truthy in resolve
-        # (except when the default filter is used)
-        patchy.patch(
-            base_template.FilterExpression.resolve,
-            """\
-            @@ -7,7 +7,8 @@
+    patchy.patch(
+        base_template.FilterExpression.resolve,
+        """\
+            @@ -7,11 +7,10 @@
                              obj = None
                          else:
                              string_if_invalid = context.template.engine.string_if_invalid
             -                if string_if_invalid:
+            -                    if "%s" in string_if_invalid:
+            -                        return string_if_invalid % self.var
+            -                    else:
+            -                        return string_if_invalid
             +                from django.template.defaultfilters import default as default_filter
             +                if default_filter not in {func for func, _args in self.filters}:
-                                 if "%s" in string_if_invalid:
-                                     return string_if_invalid % self.var
-                                 else:
-            """,
-        )
+            +                    from tests.conftest import _fail_for_invalid_template_variable
+            +                    obj = _fail_for_invalid_template_variable(self.var)
+                             else:
+                                 obj = string_if_invalid
+                 else:
+        """,
+    )
 
 
 @pytest.fixture(autouse=True, scope="function")
 def unknown_variable_template_error(monkeypatch, request):
     marker = request.keywords.get("ignore_unknown_variable_template_error", None)
-    if os.environ.get(INVALID_TEMPLATE_VARS_ENV, "false") == "true":
-        # debug can be injected by django.template.context_processors.debug
-        # user can be injected by django.contrib.auth.context_processors.auth
-        # TODO(xfernandez): remove user from allow list (and remove the matching processor ?)
-        BASE_IGNORE_LIST = {"debug", "user"}
-        strict = True
-        if marker is None:
-            ignore_list = BASE_IGNORE_LIST
-        elif marker.args:
-            ignore_list = BASE_IGNORE_LIST | set(marker.args)
-        else:
-            # Marker without list
-            strict = False
+    # debug can be injected by django.template.context_processors.debug
+    # user can be injected by django.contrib.auth.context_processors.auth
+    # TODO(xfernandez): remove user from allow list (and remove the matching processor ?)
+    BASE_IGNORE_LIST = {"debug", "user"}
+    strict = True
+    if marker is None:
+        ignore_list = BASE_IGNORE_LIST
+    elif marker.args:
+        ignore_list = BASE_IGNORE_LIST | set(marker.args)
+    else:
+        # Marker without list
+        strict = False
 
-        if strict:
-            origin_resolve = base_template.FilterExpression.resolve
+    if strict:
+        origin_resolve = base_template.FilterExpression.resolve
 
-            def stricter_resolve(self, context, ignore_failures=False):
-                if (
-                    self.is_var
-                    and self.var.lookups is not None
-                    and self.var.lookups[0] not in context
-                    and self.var.lookups[0] not in ignore_list
-                ):
-                    ignore_failures = False
-                return origin_resolve(self, context, ignore_failures)
+        def stricter_resolve(self, context, ignore_failures=False):
+            if (
+                self.is_var
+                and self.var.lookups is not None
+                and self.var.lookups[0] not in context
+                and self.var.lookups[0] not in ignore_list
+            ):
+                ignore_failures = False
+            return origin_resolve(self, context, ignore_failures)
 
-            monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
+        monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
 
 
 @pytest.fixture(scope="session", autouse=True)
