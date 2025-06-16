@@ -1,6 +1,7 @@
 import collections
 import datetime
 import shutil
+import uuid
 from pathlib import Path
 
 import pandas as pd
@@ -258,7 +259,8 @@ class TestImportSiaeManagementCommands:
                 create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
         assert not Company.objects.filter(siret=new_siret).exists()
 
-    def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self):
+    def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self, monkeypatch):
+        clever_user_id = f"user_{uuid.uuid4()}"
         company = CompanyFactory(
             source=Company.SOURCE_ASP,
             siret="21540323900000",
@@ -266,12 +268,14 @@ class TestImportSiaeManagementCommands:
             convention=SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=112, siret_signature="21540323900000"),
         )
 
+        monkeypatch.setenv("CC_USER_ID", clever_user_id)
         with freeze_time("2022-10-10"):
             call_command("import_siae", wet_run=True)
         company.refresh_from_db()
         assert company.siret == "21540323900019"
         assert normalize_fields_history(company.fields_history) == [
             {
+                "_context": {"user": clever_user_id, "run_uid": "[RUN UID]"},
                 "_timestamp": "[TIMESTAMP]",
                 "before": {"siret": "21540323900000"},
                 "after": {"siret": "21540323900019"},

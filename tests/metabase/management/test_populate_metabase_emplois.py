@@ -227,7 +227,8 @@ def test_populate_job_seekers():
         created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC),
     )
 
-    num_queries = 1  # Get administrative criteria
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Get administrative criteria
     num_queries += 1  # Count rows
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
@@ -449,7 +450,8 @@ def test_populate_job_seekers():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_criteria():
-    num_queries = 1  # Count criteria
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count criteria
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select criteria IDs
@@ -489,7 +491,8 @@ def test_populate_job_applications():
     )
     ja.selected_jobs.add(job)
 
-    num_queries = 1  # Select siaes for get_active_companies_pks()
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Select siaes for get_active_companies_pks()
     num_queries += 1  # Count job applications
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
@@ -544,7 +547,8 @@ def test_populate_job_applications():
         ]
 
     # no need for a cache clear for the active siae pks, has been done above
-    num_queries = 1  # Count job applications
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count job applications
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select job application IDs
@@ -576,7 +580,8 @@ def test_populate_approvals():
     approval = ApprovalFactory()
     pe_approval = PoleEmploiApprovalFactory()
 
-    num_queries = 1  # Count approvals
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count approvals
     num_queries += 1  # Count PE approvals
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
@@ -648,7 +653,8 @@ def test_populate_prolongations():
     prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
 
-    num_queries = 1  # Count prolongations
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count prolongations
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select prolongation IDs
@@ -695,7 +701,8 @@ def test_populate_prolongation_requests():
 
     ProlongationFactory(with_request=True)  # add another one to ensure we don't fail without a deny_information
 
-    num_queries = 1  # Count prolongation_requests
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count prolongation_requests
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select prolongation_request IDs
@@ -738,7 +745,8 @@ def test_populate_prolongation_requests():
 def test_populate_suspensions():
     suspension = SuspensionFactory()
 
-    num_queries = 1  # Count Suspensions
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count Suspensions
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select pks
@@ -775,7 +783,8 @@ def test_populate_suspensions():
 def test_populate_institutions():
     institution = InstitutionFactory(department="14")
 
-    num_queries = 1  # Count institutions
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count institutions
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select institution IDs
@@ -810,7 +819,8 @@ def test_populate_institutions():
 def test_populate_evaluation_campaigns():
     evaluation_campaign = EvaluationCampaignFactory()
 
-    num_queries = 1  # Count campaigns
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count campaigns
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select campaign IDs
@@ -845,7 +855,8 @@ def test_populate_evaluation_campaigns():
 def test_populate_evaluated_siaes():
     evaluated_siae = EvaluatedSiaeFactory()
 
-    num_queries = 1  # Count evaluated siaes
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count evaluated siaes
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated siae IDs
@@ -882,7 +893,8 @@ def test_populate_evaluated_siaes():
 def test_populate_evaluated_job_applications():
     evaluated_job_application = EvaluatedJobApplicationFactory()
 
-    num_queries = 1  # Count evaluated job applications
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count evaluated job applications
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated job application IDs
@@ -917,7 +929,8 @@ def test_populate_evaluated_criteria():
     evaluated_job_application = EvaluatedJobApplicationFactory()
     evaluated_criteria = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
 
-    num_queries = 1  # Count evaluated criteria
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count evaluated criteria
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated criteria IDs
@@ -968,7 +981,8 @@ def test_populate_users_exclude_job_seekers():
 def test_populate_users():
     pro_user = EmployerFactory()
 
-    num_queries = 1  # Count users
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count users
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select user IDs
@@ -1010,7 +1024,8 @@ def test_populate_memberships():
     InstitutionMembershipFactory(is_active=False, institution=institution_membership.institution)
     InstitutionMembershipFactory(user__is_active=False, institution=institution_membership.institution)
 
-    num_queries = 1  # Count siae memberships
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count siae memberships
     num_queries += 1  # Count prescriber memberships
     num_queries += 1  # Count institution memberships
 
@@ -1119,7 +1134,7 @@ def test_populate_enums():
 def test_data_inconsistencies(caplog):
     approval = ApprovalFactory()
 
-    with assertNumQueries(1):  # Select the job seekers
+    with assertNumQueries(2):  # SELECT set_config() + Select the job seekers
         management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
 
     logs = caplog.messages
@@ -1177,8 +1192,8 @@ def test_populate_job_descriptions():
         }
     ]
 
-    num_queries = 1  # get_active_siaes_pk()
-    num_queries = 1  # Count total rows for job descriptions
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count total rows for job descriptions
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select all job descriptions
@@ -1243,7 +1258,8 @@ def test_populate_companies():
     CompanyMembershipFactory(company=company, is_active=False)
     CompanyMembershipFactory(company=company, user__is_active=False)
 
-    num_queries = 1  # Count Siaes
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count Siaes
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select active SIAES
@@ -1347,7 +1363,8 @@ def test_populate_companies_convergence(settings):
 def test_populate_gps_groups():
     group = FollowUpGroupFactory(for_snapshot=True)
 
-    num_queries = 1  # Count FollowUpGroups
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count FollowUpGroups
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select FollowUpGroups pks
@@ -1385,7 +1402,8 @@ def test_populate_gps_memberships():
     PrescriberMembershipFactory(user=prescriber, organization__department="13")
     PrescriberMembershipFactory(user=prescriber, organization__department="75")
 
-    num_queries = 1  # Count FollowUpGroupMemberships
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Count FollowUpGroupMemberships
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select FollowUpGroupMemberships pks
@@ -1433,7 +1451,8 @@ def test_populate_organizations():
     PrescriberMembershipFactory(organization=first_organisation, is_active=False)
     PrescriberMembershipFactory(organization=first_organisation, user__is_active=False)
 
-    num_queries = 1  # Select get_active_companies_pks()
+    num_queries = 1  # SELECT set_config()
+    num_queries += 1  # Select get_active_companies_pks()
     num_queries += 1  # Count organization
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT get_active_companies_pks (autocommit mode)
