@@ -642,6 +642,12 @@ class TestArchiveUsersManagementCommand:
                 0,
                 id="transferred_application_with_diagoriente_invitation",
             ),
+            pytest.param(
+                {"sent_by_job_seeker": True, "sender": None, "to_company__department": 76, "to_company__naf": "7820Z"},
+                True,
+                3,
+                id="sent_by_jobseeker_without_sender",
+            ),
         ],
     )
     def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(

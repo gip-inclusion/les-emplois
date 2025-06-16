@@ -259,6 +259,37 @@
     }),
   ])
 # ---
+# name: TestArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[sent_by_jobseeker_without_sender][archived_application]
+  list([
+    dict({
+      'applied_at': datetime.date(2025, 2, 1),
+      'company_department': '76',
+      'company_has_convention': True,
+      'company_kind': 'EI',
+      'company_naf': '7820Z',
+      'had_resume': True,
+      'has_been_transferred': False,
+      'has_diagoriente_invitation': False,
+      'hiring_contract_nature': None,
+      'hiring_contract_type': None,
+      'hiring_rome': None,
+      'hiring_start_date': datetime.date(2025, 2, 1),
+      'hiring_without_approval': False,
+      'job_seeker_birth_year': 1978,
+      'job_seeker_department_same_as_company_department': True,
+      'last_transition_at': datetime.date(2025, 3, 1),
+      'number_of_jobs_applied_for': 3,
+      'origin': 'default',
+      'processed_at': None,
+      'refusal_reason': '',
+      'sender_company_kind': None,
+      'sender_kind': 'job_seeker',
+      'sender_prescriber_organization_authorization_status': None,
+      'sender_prescriber_organization_kind': None,
+      'state': 'new',
+    }),
+  ])
+# ---
 # name: TestArchiveUsersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
   list([
     dict({
