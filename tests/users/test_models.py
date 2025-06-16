@@ -1212,6 +1212,7 @@ def test_job_seeker_profile_asp_uid_field_history():
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         }
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -1226,11 +1227,13 @@ def test_job_seeker_profile_asp_uid_field_history():
             "before": {"asp_uid": "000000000000000000000000000000"},
             "after": {"asp_uid": "000000000000000000000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         },
         {
             "before": {"asp_uid": "000000000000000000000000000001"},
             "after": {"asp_uid": "000000000000000000000000000002"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         },
     ]
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(

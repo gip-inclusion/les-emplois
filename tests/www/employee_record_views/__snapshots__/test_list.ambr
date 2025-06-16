@@ -85,7 +85,7 @@
 # ---
 # name: TestListEmployeeRecords.test_new_employee_records_sorted[employee records]
   dict({
-    'num_queries': 14,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -249,6 +249,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

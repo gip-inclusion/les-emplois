@@ -628,6 +628,7 @@ def test_company_siret_field_history():
                 "siret": "00000000000001",
             },
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         }
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
@@ -642,11 +643,13 @@ def test_company_siret_field_history():
             "before": {"siret": "00000000000000"},
             "after": {"siret": "00000000000001"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         },
         {
             "before": {"siret": "00000000000001"},
             "after": {"siret": "00000000000002"},
             "_timestamp": "[TIMESTAMP]",
+            "_context": None,
         },
     ]
     assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
