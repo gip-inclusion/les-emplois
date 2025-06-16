@@ -214,7 +214,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="anonymize_users",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "*/5 7-20 * * MON-FRI"},
+            "schedule": {"type": "crontab", "value": "* 7-20 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
