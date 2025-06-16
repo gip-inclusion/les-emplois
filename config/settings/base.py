@@ -9,6 +9,7 @@ import os
 import re
 import warnings
 
+import csp.constants
 from botocore.config import Config
 from dotenv import load_dotenv
 
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     # Third party apps.
     "anymail",
     "citext",
+    "csp",
     "django_bootstrap5",
     "django_select2",
     "formtools",
@@ -677,9 +679,9 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
-CSP_BASE_URI = ["'none'"]  # We don't use any <base> element in our code, so let's forbid it
-CSP_DEFAULT_SRC = ["'self'"]
-CSP_FRAME_SRC = [
+csp_base_uri = ["'none'"]  # We don't use any <base> element in our code, so let's forbid it
+csp_default_src = ["'self'"]
+csp_frame_src = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
     "*.hotjar.com",
     # For stats/pilotage views
@@ -691,10 +693,10 @@ CSP_FRAME_SRC = [
     "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
     "data:",  # For downloading Metabase questions as PNG on Firefox etc
 ]
-CSP_FRAME_ANCESTORS = [
+csp_frame_ancestors = [
     "https://pilotage.inclusion.beta.gouv.fr",
 ]
-CSP_IMG_SRC = [
+csp_img_src = [
     "'self'",
     "data:",  # Because of tarteaucitron.js and bootstrap5
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
@@ -704,17 +706,17 @@ CSP_IMG_SRC = [
     "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
 ]
-CSP_STYLE_SRC = [
+csp_style_src = [
     "'self'",
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
 ]
-CSP_FONT_SRC = [
+csp_font_src = [
     "'self'",
     # '*' does not allows 'data:' fonts
     "data:",  # Because of tarteaucitron.js
 ]
-CSP_SCRIPT_SRC = [
+csp_script_src = [
     "'self'",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
@@ -722,8 +724,8 @@ CSP_SCRIPT_SRC = [
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
 # But some other don't support script-src-elem... just copy one into the other
-CSP_SCRIPT_SRC_ELEM = CSP_SCRIPT_SRC
-CSP_CONNECT_SRC = [
+csp_script_src_elem = csp_script_src
+csp_connect_src = [
     "'self'",
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
     "*.hotjar.com",
@@ -731,22 +733,38 @@ CSP_CONNECT_SRC = [
     "wss://*.hotjar.com",
 ]
 
-CSP_OBJECT_SRC = ["'none'"]
+csp_object_src = ["'none'"]
 
 if MATOMO_BASE_URL:
-    CSP_IMG_SRC.append(MATOMO_BASE_URL)
-    CSP_SCRIPT_SRC.append(MATOMO_BASE_URL)
-    CSP_CONNECT_SRC.append(MATOMO_BASE_URL)
+    csp_img_src.append(MATOMO_BASE_URL)
+    csp_script_src.append(MATOMO_BASE_URL)
+    csp_connect_src.append(MATOMO_BASE_URL)
 
-CSP_WORKER_SRC = [
+csp_worker_src = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
 
 if API_BAN_BASE_URL:
-    CSP_CONNECT_SRC.append(API_BAN_BASE_URL)
+    csp_connect_src.append(API_BAN_BASE_URL)
 
-CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
-CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "base-uri": csp_base_uri,
+        "connect-src": csp_connect_src,
+        "default-src": csp_default_src,
+        "font-src": csp_font_src,
+        "frame-ancestors": csp_frame_ancestors,
+        "frame-src": csp_frame_src,
+        "img-src": csp_img_src,
+        "object-src": csp_object_src,
+        "report-uri": os.getenv("CSP_REPORT_URI", None),
+        "script-src": csp_script_src + [csp.constants.NONCE],
+        "script-src-elem": csp_script_src_elem + [csp.constants.NONCE],
+        "style-src": csp_style_src,
+        "worker-src": csp_worker_src,
+    }
+}
 
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 
