@@ -1,10 +1,11 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.users import admin
-from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
@@ -314,3 +315,17 @@ def test_change_email(admin_client, caplog):
             emailaddress.verified,
         ),
     )
+
+
+@freeze_time("2025-06-16")
+def test_external_data_source_history(admin_client):
+    user = JobSeekerFactory()
+    user.is_pe_jobseeker = True
+    user.update_external_data_source_history_field(IdentityProvider.FRANCE_CONNECT, "is_pe_jobseeker", True)
+    user.save()
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+    code = (
+        "<pre><code>[{'created_at': '2025-06-16T00:00:00Z', 'field_name': 'is_pe_jobseeker',"
+        " 'source': 'FC', 'value': True}]</code></pre>"
+    )
+    assertContains(response, code, html=True)
