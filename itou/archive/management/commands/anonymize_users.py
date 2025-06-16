@@ -133,7 +133,7 @@ class Command(BaseCommand):
     def archive_jobseekers_after_grace_period(self):
         now = timezone.now()
         grace_period_since = now - GRACE_PERIOD
-        self.logger.info("Archiving job seekers after grace period, notified before: %s", grace_period_since)
+        self.logger.info("Anonymizing job seekers after grace period, notified before: %s", grace_period_since)
 
         # jobseekers
         users_to_archive = list(
@@ -196,8 +196,8 @@ class Command(BaseCommand):
             self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
             self._delete_jobseekers_with_related_objects(users_to_archive)
 
-        self.logger.info("Archived jobseekers after grace period, count: %d", len(archived_jobseekers))
-        self.logger.info("Archived job applications after grace period, count: %d", len(archived_jobapplications))
+        self.logger.info("Anonymized jobseekers after grace period, count: %d", len(archived_jobseekers))
+        self.logger.info("Anonymized job applications after grace period, count: %d", len(archived_jobapplications))
 
     def _delete_jobseekers_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
@@ -212,7 +212,7 @@ class Command(BaseCommand):
         jobapplications.delete()
 
     @monitor(
-        monitor_slug="notify_archive_users",
+        monitor_slug="anonymize_users",
         monitor_config={
             "schedule": {"type": "crontab", "value": "*/5 7-20 * * MON-FRI"},
             "checkin_margin": 5,
@@ -223,13 +223,13 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *args, wet_run, batch_size, **options):
-        if settings.SUSPEND_ARCHIVE_USERS:
-            self.logger.info("Archiving users is suspended, exiting command")
+        if settings.SUSPEND_ANONYMIZE_USERS:
+            self.logger.info("Anonymizing users is suspended, exiting command")
             return
 
         self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start archiving users in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start anonymizing users in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
         self.archive_jobseekers_after_grace_period()
