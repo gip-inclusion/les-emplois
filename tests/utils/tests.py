@@ -1867,3 +1867,13 @@ def test_duration(timedelta, expected):
 @freeze_time("2025-03-13T11:36:36+01:00")
 def test_naturaldate(date_or_datetime, expected):
     assert naturaldate(date_or_datetime) == expected
+
+
+def test_invalid_variable_in_template():
+    with pytest.raises(
+        pytest.fail.Exception, match="Undefined template variable 'invalid_variable' in '<unknown source>'"
+    ):
+        Template("{{ invalid_variable }}").render(Context({}))
+
+    # This should not fail with attrs tag
+    assert Template("{% attrs invalid_variable %}").render(Context({})) == ""
