@@ -36,7 +36,7 @@ from tests.users.factories import (
 )
 
 
-@pytest.fixture(name="brevo_api_key")
+@pytest.fixture(name="brevo_api_key", autouse=True)
 def brevo_api_key_fixture(settings):
     settings.BREVO_API_KEY = "BREVO_API_KEY"
 
@@ -725,9 +725,7 @@ class TestArchiveUsersManagementCommand:
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
-    def test_async_delete_contact_is_called_when_archiving_user(
-        self, django_capture_on_commit_callbacks, respx_mock, brevo_api_key
-    ):
+    def test_async_delete_contact_is_called_when_archiving_user(self, django_capture_on_commit_callbacks, respx_mock):
         jobseekers = JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
         for jobseeker in jobseekers:
             respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{jobseeker.email}?identifierType=email_id").mock(
