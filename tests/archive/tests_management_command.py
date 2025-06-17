@@ -750,3 +750,23 @@ class TestAnonymizeProfessionalManagementCommand:
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_professionals_command_log")
+
+    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+    def test_reset_notified_professional_dry_run(self, factory):
+        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+        call_command("anonymize_professionals")
+
+        user.refresh_from_db()
+        assert user.upcoming_deletion_notified_at is not None
+
+    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+    @pytest.mark.parametrize(
+        "last_login, expected",
+        [(None, False), (timezone.now() - relativedelta(days=1), False), (timezone.now(), True)],
+    )
+    def test_reset_notified_professional(self, factory, last_login, expected):
+        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=last_login)
+        call_command("anonymize_professionals", wet_run=True)
+
+        user.refresh_from_db()
+        assert (user.upcoming_deletion_notified_at is None) == expected
