@@ -1,4 +1,9 @@
-from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check
+import datetime
+
+import pytest
+from django.utils import timezone
+
+from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check, get_year_month_or_none
 from itou.users.models import User
 
 
@@ -17,3 +22,15 @@ class TestRelatedObjectsConsistency:
             if getattr(obj, "on_delete", None) and obj.on_delete.__name__ == "CASCADE"
         ]
         assert user_related_objects == snapshot(name="user_related_objects_deleted_on_cascade")
+
+
+@pytest.mark.parametrize(
+    "date_input, expected_output",
+    [
+        (timezone.make_aware(datetime.datetime(2023, 10, 15)), datetime.date(2023, 10, 1)),
+        (datetime.date(2023, 10, 15), datetime.date(2023, 10, 1)),
+        (None, None),
+    ],
+)
+def test_get_year_month_or_none(date_input, expected_output):
+    assert get_year_month_or_none(date_input) == expected_output
