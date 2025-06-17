@@ -126,6 +126,7 @@ class Command(BaseCommand):
             entering_update_count = JobSeekerProfile.objects.filter(
                 is_stalled=False, pk__in=entering_stalled_status_ids
             ).update(is_stalled=True)
+            # FIXME: Should we reset is_not_stalled_anymore to NULL if the two fields match?
             self.logger.info(
                 "Number of job seekers updated: exiting=%d entering=%d", exiting_update_count, entering_update_count
             )
