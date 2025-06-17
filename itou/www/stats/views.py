@@ -240,7 +240,7 @@ def stats_siae_orga_etp(request):
         raise PermissionDenied
 
     context = {
-        "page_title": "Suivre les effectifs annuels et mensuels (ETP) de ma structure",
+        "page_title": "Suivi des effectifs annuels et mensuels (ETP)",
         "department": request.current_organization.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
