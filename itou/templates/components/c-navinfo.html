@@ -7,9 +7,9 @@
     c_navinfo__prev_url or c_navinfo__next_url can be disabled with .disabled class
     See examples -> https://zeroheight.com/85c89893b/p/9217c1-navinfo
 {% endcomment %}
-{% if c_navinfo__back_url or c_navinfo__info %}
+{% if c_navinfo__back_url|default:"" or c_navinfo__info|default:"" %}
     <div class="c-navinfo">
-        {% if c_navinfo__back_url %}
+        {% if c_navinfo__back_url|default:"" %}
             <div class="c-navinfo__prevstep">
                 <a href="{{ c_navinfo__back_url }}" class="btn btn-ico btn-link ps-0" aria-label={% if c_navinfo__back_url|is_list %}"Retour à la liste"{% else %}"Retour à la page précédente"{% endif %}>
                     <i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>
@@ -20,7 +20,7 @@
                 </a>
             </div>
         {% endif %}
-        {% if c_navinfo__prev_url or c_navinfo__next_url %}
+        {% if c_navinfo__prev_url|default:"" or c_navinfo__next_url|default:"" %}
             {% comment %} The logic will be completed soon, when the need arises {% endcomment %}
             <div class="c-navinfo__prevnext">
                 <a href="{{ c_navinfo__prev_url }}" class="btn btn-ico-only btn-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ c_navinfo__prev_label }}">
@@ -33,6 +33,6 @@
                 </a>
             </div>
         {% endif %}
-        {% if c_navinfo__info %}<div class="c-navinfo__info">{{ c_navinfo__info }}</div>{% endif %}
+        {% if c_navinfo__info|default:"" %}<div class="c-navinfo__info">{{ c_navinfo__info }}</div>{% endif %}
     </div>
 {% endif %}
