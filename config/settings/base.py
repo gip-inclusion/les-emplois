@@ -679,8 +679,8 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
-csp_base_uri = ["'none'"]  # We don't use any <base> element in our code, so let's forbid it
-csp_default_src = ["'self'"]
+csp_base_uri = [csp.constants.NONE]  # We don't use any <base> element in our code, so let's forbid it
+csp_default_src = [csp.constants.SELF]
 csp_frame_src = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
     "*.hotjar.com",
@@ -697,7 +697,7 @@ csp_frame_ancestors = [
     "https://pilotage.inclusion.beta.gouv.fr",
 ]
 csp_img_src = [
-    "'self'",
+    csp.constants.SELF,
     "data:",  # Because of tarteaucitron.js and bootstrap5
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
@@ -707,17 +707,17 @@ csp_img_src = [
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
 ]
 csp_style_src = [
-    "'self'",
+    csp.constants.SELF,
     # It would be better to whilelist styles hashes but it's to much work for now.
-    "'unsafe-inline'",
+    csp.constants.UNSAFE_INLINE,
 ]
 csp_font_src = [
-    "'self'",
+    csp.constants.SELF,
     # '*' does not allows 'data:' fonts
     "data:",  # Because of tarteaucitron.js
 ]
 csp_script_src = [
-    "'self'",
+    csp.constants.SELF,
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://tally.so",
@@ -726,14 +726,14 @@ csp_script_src = [
 # But some other don't support script-src-elem... just copy one into the other
 csp_script_src_elem = csp_script_src
 csp_connect_src = [
-    "'self'",
+    csp.constants.SELF,
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
     "*.hotjar.com",
     "*.hotjar.io",
     "wss://*.hotjar.com",
 ]
 
-csp_object_src = ["'none'"]
+csp_object_src = [csp.constants.NONE]
 
 if MATOMO_BASE_URL:
     csp_img_src.append(MATOMO_BASE_URL)
@@ -741,7 +741,7 @@ if MATOMO_BASE_URL:
     csp_connect_src.append(MATOMO_BASE_URL)
 
 csp_worker_src = [
-    "'self'",
+    csp.constants.SELF,
     "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
 
