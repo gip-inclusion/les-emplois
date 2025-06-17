@@ -274,7 +274,7 @@ def test_free_sso_email_errors(admin_client):
     employer.refresh_from_db()
     assert employer.is_active is True
 
-    # only IC accounts
+    # only SSO accounts
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
         {
@@ -295,6 +295,7 @@ def test_free_sso_email_ic(admin_client):
         email="ic_user@email.com",
         identity_provider=IdentityProvider.INCLUSION_CONNECT,
     )
+    employer.emailaddress_set.create(email=employer.email, verified=True, primary=True)
 
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
@@ -310,6 +311,7 @@ def test_free_sso_email_ic(admin_client):
     assert employer.companymembership_set.get().is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
+    assert not employer.emailaddress_set.exists()
 
     # It won't work twice on the same user
     response = admin_client.post(
@@ -334,6 +336,7 @@ def test_free_sso_email_proconnect(admin_client):
         email="ic_user@email.com",
         identity_provider=IdentityProvider.PRO_CONNECT,
     )
+    assert not employer.emailaddress_set.exists()
 
     response = admin_client.post(
         reverse("admin:users_user_changelist"),
@@ -349,6 +352,7 @@ def test_free_sso_email_proconnect(admin_client):
     assert employer.companymembership_set.get().is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
+    assert not employer.emailaddress_set.exists()
 
     # It won't work twice on the same user
     response = admin_client.post(
