@@ -769,6 +769,9 @@ GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
 # ------------------------------------------------------------------------------
 MON_RECAP_BANNER_DEPARTMENTS = ["59", "69", "93"]
 
+# Immersion facile
+# ------------------------------------------------------------------------------
+IMMERSION_FACILE_SITE_URL = os.getenv("IMMERSION_FACILE_SITE_URL", "https://staging.immersion-facile.beta.gouv.fr")
 
 # Datadog
 # ------------------------------------------------------------------------------
