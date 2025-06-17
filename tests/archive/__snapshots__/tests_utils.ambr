@@ -1,0 +1,103 @@
+# serializer version: 1
+# name: TestRelatedObjectsConsistency.test_get_filter_kwargs_on_user_for_related_objects_to_check[filter_kwargs_on_user_for_related_objects_to_check]
+  dict({
+    'approval__isnull': True,
+    'approval_manually_delivered__isnull': True,
+    'approval_manually_refused__isnull': True,
+    'approvals__isnull': True,
+    'approvals_suspended_set__isnull': True,
+    'authorization_status_set__isnull': True,
+    'created_assessments__isnull': True,
+    'created_company_set__isnull': True,
+    'created_follow_up_groups__isnull': True,
+    'created_prescriber_organization_set__isnull': True,
+    'eligibilitydiagnosis__isnull': True,
+    'final_reviewed_assessments__isnull': True,
+    'geiqeligibilitydiagnosis__isnull': True,
+    'job_applications__isnull': True,
+    'job_applications_sent__isnull': True,
+    'jobapplication__isnull': True,
+    'jobapplicationtransitionlog__isnull': True,
+    'prolongationrequest_processed__isnull': True,
+    'prolongationrequests_created__isnull': True,
+    'prolongationrequests_declared__isnull': True,
+    'prolongationrequests_updated__isnull': True,
+    'prolongationrequests_validated__isnull': True,
+    'prolongations_created__isnull': True,
+    'prolongations_declared__isnull': True,
+    'prolongations_updated__isnull': True,
+    'prolongations_validated__isnull': True,
+    'reactivated_siae_convention_set__isnull': True,
+    'reviewed_assessments__isnull': True,
+    'submitted_assessments__isnull': True,
+    'suspension__isnull': True,
+    'updated_companymembership_set__isnull': True,
+    'updated_institutionmembership_set__isnull': True,
+    'updated_prescribermembership_set__isnull': True,
+    'user__isnull': True,
+  })
+# ---
+# name: TestRelatedObjectsConsistency.test_user_related_objects_deleted_on_cascade[user_related_objects_deleted_on_cascade]
+  list([
+    dict({
+      'logentry': <class 'django.contrib.admin.models.LogEntry'>,
+    }),
+    dict({
+      'auth_token': <class 'rest_framework.authtoken.models.Token'>,
+    }),
+    dict({
+      'totpdevice': <class 'django_otp.plugins.otp_totp.models.TOTPDevice'>,
+    }),
+    dict({
+      'emailaddress': <class 'allauth.account.models.EmailAddress'>,
+    }),
+    dict({
+      'companymembership': <class 'itou.companies.models.CompanyMembership'>,
+    }),
+    dict({
+      'jobseeker_profile': <class 'itou.users.models.JobSeekerProfile'>,
+    }),
+    dict({
+      'prescribermembership': <class 'itou.prescribers.models.PrescriberMembership'>,
+    }),
+    dict({
+      'institutionmembership': <class 'itou.institutions.models.InstitutionMembership'>,
+    }),
+    dict({
+      'geiq_eligibility_diagnoses': <class 'itou.eligibility.models.geiq.GEIQEligibilityDiagnosis'>,
+    }),
+    dict({
+      'eligibility_diagnoses': <class 'itou.eligibility.models.iae.EligibilityDiagnosis'>,
+    }),
+    dict({
+      'prescriber_org_invitations': <class 'itou.invitations.models.PrescriberWithOrgInvitation'>,
+    }),
+    dict({
+      'company_invitations': <class 'itou.invitations.models.EmployerInvitation'>,
+    }),
+    dict({
+      'institution_invitations': <class 'itou.invitations.models.LaborInspectorInvitation'>,
+    }),
+    dict({
+      'externaldataimport': <class 'itou.external_data.models.ExternalDataImport'>,
+    }),
+    dict({
+      'jobseekerexternaldata': <class 'itou.external_data.models.JobSeekerExternalData'>,
+    }),
+    dict({
+      'notification_settings': <class 'itou.communications.models.NotificationSettings'>,
+    }),
+    dict({
+      'follow_up_group': <class 'itou.gps.models.FollowUpGroup'>,
+    }),
+    dict({
+      'follow_up_groups': <class 'itou.gps.models.FollowUpGroupMembership'>,
+    }),
+    dict({
+      'rdvi_invitation_requests': <class 'itou.rdv_insertion.models.InvitationRequest'>,
+    }),
+    dict({
+      'rdvi_participations': <class 'itou.rdv_insertion.models.Participation'>,
+    }),
+  ])
+# ---
