@@ -29,6 +29,7 @@ from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.utils.test import normalize_fields_history
 
 
 class TestCompanyFactories:
@@ -620,25 +621,35 @@ def test_company_siret_field_history():
     company.siret = "00000000000001"
     company.save()
     company.refresh_from_db()
-    fields_history = [
-        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in company.fields_history
+    assert normalize_fields_history(company.fields_history) == [
+        {
+            "before": {"siret": "00000000000000"},
+            "after": {
+                "siret": "00000000000001",
+            },
+            "_timestamp": "[TIMESTAMP]",
+        }
     ]
-    assert fields_history == [{"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}}]
-    assert datetime.fromisoformat(company.fields_history[0]["_timestamp"]).timestamp() == pytest.approx(
+    assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
         datetime.now().timestamp()
     )
 
     company.siret = "00000000000002"
     company.save()
     company.refresh_from_db()
-    fields_history = [
-        {k: v for k, v in operation.items() if k != "_timestamp"} for operation in company.fields_history
+    assert normalize_fields_history(company.fields_history) == [
+        {
+            "before": {"siret": "00000000000000"},
+            "after": {"siret": "00000000000001"},
+            "_timestamp": "[TIMESTAMP]",
+        },
+        {
+            "before": {"siret": "00000000000001"},
+            "after": {"siret": "00000000000002"},
+            "_timestamp": "[TIMESTAMP]",
+        },
     ]
-    assert fields_history == [
-        {"before": {"siret": "00000000000000"}, "after": {"siret": "00000000000001"}},
-        {"before": {"siret": "00000000000001"}, "after": {"siret": "00000000000002"}},
-    ]
-    assert datetime.fromisoformat(company.fields_history[1]["_timestamp"]).timestamp() == pytest.approx(
+    assert datetime.fromisoformat(company.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
         datetime.now().timestamp()
     )
 

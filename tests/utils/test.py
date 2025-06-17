@@ -1,3 +1,4 @@
+import copy
 import datetime
 import importlib
 import inspect
@@ -390,3 +391,15 @@ CursorDebugWrapper.debug_sql = debug_sql
 
 def load_template(path):
     return Template((Path("itou/templates") / path).read_text())
+
+
+def normalize_fields_history(fields_history):
+    if not fields_history:
+        return fields_history
+
+    normalized_fields_history = copy.deepcopy(fields_history)
+    for entry in normalized_fields_history:
+        if entry["_timestamp"]:
+            entry["_timestamp"] = "[TIMESTAMP]"
+
+    return normalized_fields_history
