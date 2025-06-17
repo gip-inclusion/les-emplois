@@ -138,6 +138,10 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
 
 
 class ItouClient(Client):
+    def _login(self, user, backend=None):
+        self.login_user = user
+        return super()._login(user, backend=backend)
+
     def request(self, **request):
         with TestCase.captureOnCommitCallbacks(execute=True):
             response = super().request(**request)
