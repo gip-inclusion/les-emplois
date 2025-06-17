@@ -17,3 +17,18 @@ class AnonymizedJobSeekerAdmin(ReadonlyMixin, ItouModelAdmin):
 @admin.register(models.AnonymizedApplication)
 class AnonymizedApplicationAdmin(ReadonlyMixin, ItouModelAdmin):
     pass
+
+
+@admin.register(models.AnonymizedApproval)
+class AnonymizedApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
+
+
+@admin.register(models.AnonymizedSIAEEligibilityDiagnosis)
+class AnonymizedSIAEEligibilityDiagnosisAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
+
+
+@admin.register(models.AnonymizedGEIQEligibilityDiagnosis)
+class AnonymizedGEIQEligibilityDiagnosisAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
