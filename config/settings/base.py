@@ -679,23 +679,6 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
-csp_base_uri = [csp.constants.NONE]  # We don't use any <base> element in our code, so let's forbid it
-csp_default_src = [csp.constants.SELF]
-csp_frame_src = [
-    "https://app.livestorm.co",  # Upcoming events from the homepage
-    "*.hotjar.com",
-    # For stats/pilotage views
-    "https://tally.so",
-    "https://stats.inclusion.beta.gouv.fr",
-    "https://pilotage.inclusion.beta.gouv.fr",
-    "https://communaute.inclusion.gouv.fr",
-    "https://inclusion.beta.gouv.fr",
-    "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
-    "data:",  # For downloading Metabase questions as PNG on Firefox etc
-]
-csp_frame_ancestors = [
-    "https://pilotage.inclusion.beta.gouv.fr",
-]
 csp_img_src = [
     csp.constants.SELF,
     "data:",  # Because of tarteaucitron.js and bootstrap5
@@ -705,16 +688,6 @@ csp_img_src = [
     "*.hotjar.com",
     "https://cdn.redoc.ly",
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
-]
-csp_style_src = [
-    csp.constants.SELF,
-    # It would be better to whilelist styles hashes but it's to much work for now.
-    csp.constants.UNSAFE_INLINE,
-]
-csp_font_src = [
-    csp.constants.SELF,
-    # '*' does not allows 'data:' fonts
-    "data:",  # Because of tarteaucitron.js
 ]
 csp_script_src = [
     csp.constants.SELF,
@@ -733,37 +706,53 @@ csp_connect_src = [
     "wss://*.hotjar.com",
 ]
 
-csp_object_src = [csp.constants.NONE]
-
 if MATOMO_BASE_URL:
     csp_img_src.append(MATOMO_BASE_URL)
     csp_script_src.append(MATOMO_BASE_URL)
     csp_connect_src.append(MATOMO_BASE_URL)
 
-csp_worker_src = [
-    csp.constants.SELF,
-    "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
-]
-
 if API_BAN_BASE_URL:
     csp_connect_src.append(API_BAN_BASE_URL)
 
-
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "base-uri": csp_base_uri,
+        "base-uri": [csp.constants.NONE],  # We don't use any <base> element in our code, so let's forbid it
         "connect-src": csp_connect_src,
-        "default-src": csp_default_src,
-        "font-src": csp_font_src,
-        "frame-ancestors": csp_frame_ancestors,
-        "frame-src": csp_frame_src,
+        "default-src": [csp.constants.SELF],
+        "font-src": [
+            csp.constants.SELF,
+            # '*' does not allows 'data:' fonts
+            "data:",  # Because of tarteaucitron.js
+        ],
+        "frame-ancestors": [
+            "https://pilotage.inclusion.beta.gouv.fr",
+        ],
+        "frame-src": [
+            "https://app.livestorm.co",  # Upcoming events from the homepage
+            "*.hotjar.com",
+            # For stats/pilotage views
+            "https://tally.so",
+            "https://stats.inclusion.beta.gouv.fr",
+            "https://pilotage.inclusion.beta.gouv.fr",
+            "https://communaute.inclusion.gouv.fr",
+            "https://inclusion.beta.gouv.fr",
+            "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
+            "data:",  # For downloading Metabase questions as PNG on Firefox etc
+        ],
         "img-src": csp_img_src,
-        "object-src": csp_object_src,
+        "object-src": [csp.constants.NONE],
         "report-uri": os.getenv("CSP_REPORT_URI", None),
         "script-src": csp_script_src + [csp.constants.NONCE],
         "script-src-elem": csp_script_src_elem + [csp.constants.NONCE],
-        "style-src": csp_style_src,
-        "worker-src": csp_worker_src,
+        "style-src": [
+            csp.constants.SELF,
+            # It would be better to whilelist styles hashes but it's to much work for now.
+            csp.constants.UNSAFE_INLINE,
+        ],
+        "worker-src": [
+            csp.constants.SELF,
+            "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
+        ],
     }
 }
 
