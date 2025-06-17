@@ -405,6 +405,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             messages.error(request, "Ce compte a déjà été libéré")
             return
 
+        user.emailaddress_set.filter(email=user.email).delete()
         user.email = f"{user.email}_old"
         user.username = f"old_{user.username}"
         user.is_active = False
