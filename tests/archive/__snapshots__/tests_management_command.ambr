@@ -1,4 +1,80 @@
 # serializer version: 1
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_is_anonymized][anonymized_professionals_after_grace_period_detail_log]
+  'Included in this count: 0 to delete, 0 to remove from contact'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_is_anonymized][anonymized_professionals_after_grace_period_log]
+  'Anonymized professionals after grace period, count: 1'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][anonymized_professionals_after_grace_period_detail_log]
+  'Included in this count: 0 to delete, 1 to remove from contact'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][anonymized_professionals_after_grace_period_log]
+  'Anonymized professionals after grace period, count: 1'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][user_values_after_anonymization]
+  <UserQuerySet [{'is_active': False, 'password': 'pbkdf2_sha256$test$hash', 'phone': '', 'address_line_1': '', 'address_line_2': '', 'post_code': '', 'city': '', 'coords': None, 'insee_city': None, 'upcoming_deletion_notified_at': FakeDatetime(2025, 1, 15, 0, 0, tzinfo=datetime.timezone.utc), 'first_name': 'Pierre', 'last_name': 'Dupont'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_is_anonymized][anonymized_professional]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'department': '44', 'title': '', 'kind': 'labor_inspector', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'DJANGO'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_is_anonymized][anonymized_professionals_after_grace_period_detail_log]
+  'Included in this count: 1 to delete, 0 to remove from contact'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_is_anonymized][anonymized_professionals_after_grace_period_log]
+  'Anonymized professionals after grace period, count: 1'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_not_anonymized][anonymized_professional]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'department': '44', 'title': '', 'kind': 'employer', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_not_anonymized][anonymized_professionals_after_grace_period_detail_log]
+  'Included in this count: 1 to delete, 1 to remove from contact'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_not_anonymized][anonymized_professionals_after_grace_period_log]
+  'Anonymized professionals after grace period, count: 1'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_body]
+  '''
+  Bonjour Micheline DUBOIS,
+  Le 15/01/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[authorized_prescriber_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': True}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_company_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_institution_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_prescriber_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[prescriber_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
 # name: TestAnonymizeProfessionalManagementCommand.test_suspend_command_setting[False][suspend_anonymize_professionals_command_log]
   'Start anonymizing professionals in wet_run mode'
 # ---
