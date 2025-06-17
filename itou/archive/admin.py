@@ -5,7 +5,7 @@ from itou.utils.admin import ItouModelAdmin
 
 
 @admin.register(models.AnonymizedJobSeeker)
-class ArchiveJobSeekerAdmin(ItouModelAdmin):
+class AnonymizedJobSeekerAdmin(ItouModelAdmin):
     fields = (
         "date_joined",
         "first_login",
@@ -30,7 +30,7 @@ class ArchiveJobSeekerAdmin(ItouModelAdmin):
 
 
 @admin.register(models.AnonymizedApplication)
-class ArchiveApplicationAdmin(ItouModelAdmin):
+class AnonymizedApplicationAdmin(ItouModelAdmin):
     fields = (
         "job_seeker_birth_year",
         "job_seeker_department_same_as_company_department",
