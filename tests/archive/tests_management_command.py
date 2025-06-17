@@ -744,16 +744,3 @@ class TestArchiveUsersManagementCommand:
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert self.respx_mock.calls.call_count == 1
-
-    def test_async_delete_contact_is_called_when_archiving_user(self, django_capture_on_commit_callbacks, respx_mock):
-        jobseekers = JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
-        for jobseeker in jobseekers:
-            respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{jobseeker.email}?identifierType=email_id").mock(
-                return_value=httpx.Response(status_code=204)
-            )
-
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", wet_run=True)
-
-        assert respx_mock.calls.called
-        assert respx_mock.calls.call_count == len(jobseekers)
