@@ -1,6 +1,6 @@
 from urllib.parse import quote, urlencode
 
-from itou.utils.constants import IMMERSION_FACILE_SITE_URL
+from django.conf import settings
 
 
 def immersion_search_url(user):
@@ -26,4 +26,4 @@ def immersion_search_url(user):
         if all(address_parts):
             params["place"] = ", ".join(address_parts)
 
-    return f"{IMMERSION_FACILE_SITE_URL}/recherche?{urlencode(params, quote_via=quote)}"
+    return f"{settings.IMMERSION_FACILE_SITE_URL}/recherche?{urlencode(params, quote_via=quote)}"

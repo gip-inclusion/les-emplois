@@ -1,4 +1,5 @@
-from itou.utils.constants import IMMERSION_FACILE_SITE_URL
+from django.conf import settings
+
 from itou.utils.immersion_facile import immersion_search_url
 from tests.users.factories import JobSeekerFactory
 
@@ -10,7 +11,7 @@ def test_immersion_search_url():
         with_geoloc=True,
     )
     expected_url = (
-        f"{IMMERSION_FACILE_SITE_URL}/recherche?"
+        f"{settings.IMMERSION_FACILE_SITE_URL}/recherche?"
         f"mtm_campaign=les-emplois-recherche-immersion"
         f"&mtm_kwd=les-emplois-recherche-immersion"
         f"&distanceKm=20"
@@ -22,7 +23,7 @@ def test_immersion_search_url():
 
     user = JobSeekerFactory(without_geoloc=True)
     expected_url = (
-        f"{IMMERSION_FACILE_SITE_URL}/recherche?"
+        f"{settings.IMMERSION_FACILE_SITE_URL}/recherche?"
         f"mtm_campaign=les-emplois-recherche-immersion"
         f"&mtm_kwd=les-emplois-recherche-immersion"
     )
