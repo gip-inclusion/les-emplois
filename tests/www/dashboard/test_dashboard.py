@@ -1137,6 +1137,11 @@ def test_stalled_job_seekers_box(client):
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
     )
+    JobApplicationFactory(
+        sender=prescriber,
+        job_seeker__jobseeker_profile__is_stalled=True,
+        job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
+    )
     JobApplicationFactory(sender=prescriber)
 
     response = client.get(reverse("dashboard:index"))

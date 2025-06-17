@@ -116,7 +116,7 @@ class FilterForm(forms.Form):
             filters.append(pass_status_filter)
 
         if self.cleaned_data.get("is_stalled"):
-            queryset = queryset.filter(jobseeker_profile__is_stalled=True)
+            queryset = queryset.filter(jobseeker_profile__is_considered_stalled=True)
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):
@@ -378,3 +378,11 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         JobSeekerProfile.clean_nir_title_birthdate_fields(
             self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
         )
+
+
+class SwitchStalledStatusForm(forms.ModelForm):
+    is_not_stalled_anymore = forms.BooleanField(required=False, widget=forms.HiddenInput())
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = ["is_not_stalled_anymore"]

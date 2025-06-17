@@ -4,6 +4,7 @@ from urllib.parse import unquote
 from django.conf import settings
 from django.core.cache import caches
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -126,8 +127,14 @@ class Command(BaseCommand):
             entering_update_count = JobSeekerProfile.objects.filter(
                 is_stalled=False, pk__in=entering_stalled_status_ids
             ).update(is_stalled=True)
+            converging_update_count = JobSeekerProfile.objects.filter(is_stalled=~F("is_not_stalled_anymore")).update(
+                is_not_stalled_anymore=None
+            )
             self.logger.info(
-                "Number of job seekers updated: exiting=%d entering=%d", exiting_update_count, entering_update_count
+                "Number of job seekers updated: exiting=%d entering=%d converging=%s",
+                exiting_update_count,
+                entering_update_count,
+                converging_update_count,
             )
 
     def handle(self, *, data, **options):
