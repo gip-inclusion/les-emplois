@@ -1,5 +1,7 @@
 import datetime
+import random
 import re
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -9,25 +11,31 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
+from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
+from itou.companies.models import CompanyMembership
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.jobs.models import Appellation, Rome
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import JobDescriptionFactory
+from tests.cities.factories import create_city_saint_andre
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
 from tests.files.factories import FileFactory
 from tests.gps.factories import FollowUpGroupFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -35,6 +43,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.test import assertSnapshotQueries
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -47,6 +56,20 @@ def respx_delete_mock(respx_mock):
     respx_mock = respx_mock.delete(url__regex=re.compile(f"^{re.escape(settings.BREVO_API_URL)}/contacts/.*")).mock(
         return_value=httpx.Response(status_code=204)
     )
+
+
+@pytest.fixture(autouse=True)
+def mock_make_password():
+    with patch(
+        "itou.archive.management.commands.anonymize_professionals.make_password",
+        return_value="pbkdf2_sha256$test$hash",
+    ):
+        yield
+
+
+@pytest.fixture(name="city")
+def city_fixture():
+    return create_city_saint_andre()
 
 
 class TestNotifyInactiveJobseekersManagementCommand:
@@ -781,3 +804,246 @@ class TestAnonymizeProfessionalManagementCommand:
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == expected
+
+    def test_anonymize_professionals_dry_run(self, respx_mock):
+        user = EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        call_command("anonymize_professionals")
+
+        unmodified_user = User.objects.get()
+        assert user == unmodified_user
+        assert not AnonymizedProfessional.objects.exists()
+        assert not respx_mock.calls.called
+
+    def test_anonymize_professionals_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
+        EmployerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", batch_size=2, wet_run=True)
+
+        assert AnonymizedProfessional.objects.count() == 2
+        assert User.objects.filter(email__isnull=False).count() == 1
+        assert respx_mock.calls.call_count == 2
+
+    @pytest.mark.parametrize(
+        "factory",
+        [
+            pytest.param(
+                lambda: EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29),
+                id="employer_notified_still_in_grace_period",
+            ),
+            pytest.param(
+                lambda: LaborInspectorFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
+                ),
+                id="labor_inspector_with_recent_login",
+            ),
+            pytest.param(
+                lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
+                id="prescriber_never_notified",
+            ),
+            pytest.param(
+                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
+                id="jobseeker_notified",
+            ),
+            pytest.param(
+                lambda: ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
+                id="itou_staff_notified",
+            ),
+        ],
+    )
+    def test_excluded_users_when_anonymizing_professionals(self, factory):
+        user = factory()
+        call_command("anonymize_professionals", wet_run=True)
+
+        expected_user = User.objects.get()
+        assert user == expected_user
+        assert not AnonymizedProfessional.objects.exists()
+
+    @pytest.mark.parametrize(
+        "factory,has_related_objects,is_anonymized",
+        [
+            pytest.param(CompanyMembershipFactory, True, True, id="has_related_objects_and_is_anonymized"),
+            pytest.param(PrescriberMembershipFactory, True, False, id="has_related_objects_and_not_anonymized"),
+            pytest.param(InstitutionMembershipFactory, False, True, id="no_related_objects_and_is_anonymized"),
+            pytest.param(CompanyMembershipFactory, False, False, id="no_related_objects_and_not_anonymized"),
+        ],
+    )
+    @freeze_time("2025-02-15")
+    def test_anonymize_professionals_after_grace_period(
+        self,
+        factory,
+        has_related_objects,
+        is_anonymized,
+        city,
+        django_capture_on_commit_callbacks,
+        snapshot,
+        caplog,
+        respx_mock,
+    ):
+        org = factory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY,
+            user__notified_days_ago=31,
+            user__for_snapshot=True,
+            user__address_line_1="8 rue du moulin",
+            user__address_line_2="Apt 4B",
+            user__post_code=city.post_codes[0],
+            user__city="Test City",
+            user__coords=city.coords,
+            user__insee_city=city,
+            user__email=None if is_anonymized else "test@mail.com",
+        )
+        professional = org.user
+
+        if has_related_objects:
+            JobApplicationFactory(sender=professional)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+
+        # User should be deleted
+        if not has_related_objects:
+            assert not User.objects.filter(id=professional.id).exists()
+            anonymized = AnonymizedProfessional.objects.all().values(
+                "date_joined",
+                "first_login",
+                "last_login",
+                "department",
+                "title",
+                "kind",
+                "number_of_memberships",
+                "number_of_active_memberships",
+                "number_of_memberships_as_administrator",
+                "had_memberships_in_authorized_organization",
+                "identity_provider",
+            )
+            assert anonymized == snapshot(name="anonymized_professional")
+            assert respx_mock.calls.call_count == 0 if is_anonymized else 1
+            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
+                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
+
+        # User is not deletable because of related objects and should be anonymized
+        elif not is_anonymized:
+            user = User.objects.filter(id=professional.id).values(
+                "is_active",
+                "password",
+                "phone",
+                "address_line_1",
+                "address_line_2",
+                "post_code",
+                "city",
+                "coords",
+                "insee_city",
+                "upcoming_deletion_notified_at",
+                "first_name",
+                "last_name",
+            )
+            assert user == snapshot(name="user_values_after_anonymization")
+            assert not AnonymizedProfessional.objects.exists()
+            assert respx_mock.calls.call_count == 1
+            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
+                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
+
+        # User is not deletable because of related objects and is already anonymized
+        else:
+            professional.refresh_from_db()
+            assert professional == User.objects.filter(id=professional.id).first()
+            assert not AnonymizedProfessional.objects.exists()
+            assert not respx_mock.calls.called
+
+        # Check logs
+        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
+        assert (
+            f"Included in this count: {0 if has_related_objects else 1} to delete, {0 if is_anonymized else 1}"
+            " to remove from contact"
+        )
+
+    @pytest.mark.parametrize("is_active", [True, False])
+    @freeze_time("2025-02-15")
+    def test_anonymize_professionals_notification(
+        self, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot, respx_mock
+    ):
+        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+        factory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=31,
+            is_active=is_active,
+            for_snapshot=True,
+            first_name="Micheline",
+            last_name="Dubois",
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+
+        if is_active:
+            [mail] = mailoutbox
+            assert mail.subject == snapshot(name="anonymized_professional_email_subject")
+            assert mail.body == snapshot(name="anonymized_professional_email_body")
+        else:
+            assert mailoutbox == []
+        assert respx_mock.calls.call_count == 1
+
+    @pytest.mark.parametrize(
+        "factory",
+        [
+            pytest.param(
+                lambda: PrescriberMembershipFactory(user__notified_days_ago=31, organization__authorized=True),
+                id="authorized_prescriber_admin_membership",
+            ),
+            pytest.param(
+                lambda: PrescriberMembershipFactory(
+                    user__notified_days_ago=31, organization__authorized=False, is_admin=False
+                ),
+                id="prescriber_membership",
+            ),
+            pytest.param(
+                lambda: PrescriberMembershipFactory(user__notified_days_ago=31, is_active=False),
+                id="disabled_prescriber_membership",
+            ),
+            pytest.param(lambda: CompanyMembershipFactory(user__notified_days_ago=31), id="company_admin_membership"),
+            pytest.param(
+                lambda: CompanyMembershipFactory(user__notified_days_ago=31, is_admin=False), id="company_membership"
+            ),
+            pytest.param(
+                lambda: CompanyMembershipFactory(user__notified_days_ago=31, is_active=False),
+                id="disabled_company_membership",
+            ),
+            pytest.param(
+                lambda: InstitutionMembershipFactory(user__notified_days_ago=31), id="institution_admin_membership"
+            ),
+            pytest.param(
+                lambda: InstitutionMembershipFactory(user__notified_days_ago=31, is_admin=False),
+                id="institution_membership",
+            ),
+            pytest.param(
+                lambda: InstitutionMembershipFactory(user__notified_days_ago=31, is_active=False),
+                id="disabled_institution_membership",
+            ),
+        ],
+    )
+    def test_anonymized_professionals_annotations(self, factory, django_capture_on_commit_callbacks, snapshot):
+        factory()
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+
+        anonymized_professionals = AnonymizedProfessional.objects.values(
+            "number_of_memberships",
+            "number_of_active_memberships",
+            "number_of_memberships_as_administrator",
+            "had_memberships_in_authorized_organization",
+        )
+        assert anonymized_professionals == snapshot(name="anonymized_professionals_with_annotations")
+
+    def test_num_queries(self, snapshot):
+        for pm in PrescriberMembershipFactory.create_batch(
+            3, user__notified_days_ago=31, organization__authorized=True
+        ):
+            PrescriberMembershipFactory.create_batch(2, user=pm.user, organization__authorized=True)
+        for em in CompanyMembershipFactory.create_batch(3, user__notified_days_ago=31):
+            CompanyMembershipFactory.create_batch(2, user=em.user)
+        for im in InstitutionMembershipFactory.create_batch(3, user__notified_days_ago=31):
+            InstitutionMembershipFactory.create_batch(2, user=im.user)
+
+        with assertSnapshotQueries(snapshot(name="anonymize_professionals_queries")):
+            call_command("anonymize_professionals", wet_run=True)

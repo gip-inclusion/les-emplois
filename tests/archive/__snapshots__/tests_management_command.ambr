@@ -333,6 +333,2084 @@
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_jobseekers_command_log]
   'Anonymizing job seekers is suspended, exiting command'
 # ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][user_values_after_anonymization]
+  <UserQuerySet [{'is_active': False, 'password': 'pbkdf2_sha256$test$hash', 'phone': '', 'address_line_1': '', 'address_line_2': '', 'post_code': '', 'city': '', 'coords': None, 'insee_city': None, 'upcoming_deletion_notified_at': FakeDatetime(2025, 1, 15, 0, 0, tzinfo=datetime.timezone.utc), 'first_name': 'Pierre', 'last_name': 'Dupont'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_is_anonymized][anonymized_professional]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'department': '44', 'title': '', 'kind': 'labor_inspector', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'DJANGO'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_not_anonymized][anonymized_professional]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'department': '44', 'title': '', 'kind': 'employer', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_body]
+  '''
+  Bonjour Micheline DUBOIS,
+  Le 15/01/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[authorized_prescriber_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': True}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_company_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_institution_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_prescriber_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_admin_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[prescriber_membership][anonymized_professionals_with_annotations]
+  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
+  dict({
+    'num_queries': 78,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          UPDATE "users_user"
+          SET "upcoming_deletion_notified_at" = NULL
+          WHERE ("users_user"."kind" IN (%s,
+                                         %s,
+                                         %s)
+                 AND "users_user"."last_login" >= ("users_user"."upcoming_deletion_notified_at")
+                 AND "users_user"."upcoming_deletion_notified_at" IS NOT NULL)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_user"."email"::text IS NULL AS "is_deactivated"
+          FROM "users_user"
+          WHERE ("users_user"."kind" IN (%s,
+                                         %s,
+                                         %s)
+                 AND "users_user"."upcoming_deletion_notified_at" <= %s)
+          ORDER BY 36 ASC,
+                   "users_user"."upcoming_deletion_notified_at" ASC
+          LIMIT 100
+          FOR
+          UPDATE OF "users_user" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "prescribers_prescribermembership" U0
+             INNER JOIN "prescribers_prescriberorganization" U1 ON (U0."organization_id" = U1."id")
+             WHERE (U1."authorization_status" = %s
+                    AND U0."user_id" = ("users_user"."id"))
+             LIMIT 1) AS "has_membership_in_authorized_organization"
+          FROM "users_user"
+          LEFT OUTER JOIN "approvals_approval" ON ("users_user"."id" = "approvals_approval"."created_by_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."approval_manually_delivered_by_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T4 ON ("users_user"."id" = T4."approval_manually_refused_by_id")
+          LEFT OUTER JOIN "approvals_approval" T5 ON ("users_user"."id" = T5."user_id")
+          LEFT OUTER JOIN "approvals_suspension" ON ("users_user"."id" = "approvals_suspension"."created_by_id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_user"."id" = "prescribers_prescriberorganization"."authorization_updated_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" ON ("users_user"."id" = "geiq_assessments_assessment"."created_by_id")
+          LEFT OUTER JOIN "companies_company" ON ("users_user"."id" = "companies_company"."created_by_id")
+          LEFT OUTER JOIN "gps_followupgroupmembership" ON ("users_user"."id" = "gps_followupgroupmembership"."creator_id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" T11 ON ("users_user"."id" = T11."created_by_id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."author_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T13 ON ("users_user"."id" = T13."final_reviewed_by_id")
+          LEFT OUTER JOIN "eligibility_geiqeligibilitydiagnosis" ON ("users_user"."id" = "eligibility_geiqeligibilitydiagnosis"."author_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T15 ON ("users_user"."id" = T15."job_seeker_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T16 ON ("users_user"."id" = T16."sender_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T17 ON ("users_user"."id" = T17."transferred_by_id")
+          LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("users_user"."id" = "job_applications_jobapplicationtransitionlog"."user_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" ON ("users_user"."id" = "approvals_prolongationrequest"."processed_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T20 ON ("users_user"."id" = T20."created_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T21 ON ("users_user"."id" = T21."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."validated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" ON ("users_user"."id" = "approvals_prolongation"."created_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T25 ON ("users_user"."id" = T25."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T26 ON ("users_user"."id" = T26."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T27 ON ("users_user"."id" = T27."validated_by_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("users_user"."id" = "companies_siaeconvention"."reactivated_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T29 ON ("users_user"."id" = T29."reviewed_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T30 ON ("users_user"."id" = T30."submitted_by_id")
+          LEFT OUTER JOIN "approvals_suspension" T31 ON ("users_user"."id" = T31."updated_by_id")
+          LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."updated_by_id")
+          LEFT OUTER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."updated_by_id")
+          LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."updated_by_id")
+          LEFT OUTER JOIN "users_user" T35 ON ("users_user"."id" = T35."created_by_id")
+          WHERE ("users_user"."id" IN (%s,
+                                       %s,
+                                       %s,
+                                       %s,
+                                       %s,
+                                       %s,
+                                       %s,
+                                       %s,
+                                       %s)
+                 AND "approvals_approval"."id" IS NULL
+                 AND "job_applications_jobapplication"."id" IS NULL
+                 AND T4."id" IS NULL
+                 AND T5."id" IS NULL
+                 AND "approvals_suspension"."id" IS NULL
+                 AND "prescribers_prescriberorganization"."id" IS NULL
+                 AND "geiq_assessments_assessment"."id" IS NULL
+                 AND "companies_company"."id" IS NULL
+                 AND "gps_followupgroupmembership"."id" IS NULL
+                 AND T11."id" IS NULL
+                 AND "eligibility_eligibilitydiagnosis"."id" IS NULL
+                 AND T13."id" IS NULL
+                 AND "eligibility_geiqeligibilitydiagnosis"."id" IS NULL
+                 AND T15."id" IS NULL
+                 AND T16."id" IS NULL
+                 AND T17."id" IS NULL
+                 AND "job_applications_jobapplicationtransitionlog"."id" IS NULL
+                 AND "approvals_prolongationrequest"."id" IS NULL
+                 AND T20."id" IS NULL
+                 AND T21."id" IS NULL
+                 AND T22."id" IS NULL
+                 AND T23."id" IS NULL
+                 AND "approvals_prolongation"."id" IS NULL
+                 AND T25."id" IS NULL
+                 AND T26."id" IS NULL
+                 AND T27."id" IS NULL
+                 AND "companies_siaeconvention"."id" IS NULL
+                 AND T29."id" IS NULL
+                 AND T30."id" IS NULL
+                 AND T31."id" IS NULL
+                 AND "companies_companymembership"."id" IS NULL
+                 AND "institutions_institutionmembership"."id" IS NULL
+                 AND "prescribers_prescribermembership"."id" IS NULL
+                 AND T35."id" IS NULL)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE "companies_companymembership"."user_id" IN (%s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id"
+          FROM "institutions_institutionmembership"
+          WHERE "institutions_institutionmembership"."user_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."user_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "archive_anonymizedprofessional" ("id",
+                                                        "date_joined",
+                                                        "first_login",
+                                                        "last_login",
+                                                        "anonymized_at",
+                                                        "department",
+                                                        "title",
+                                                        "kind",
+                                                        "number_of_memberships",
+                                                        "number_of_active_memberships",
+                                                        "number_of_memberships_as_administrator",
+                                                        "had_memberships_in_authorized_organization",
+                                                        "identity_provider")
+          SELECT *
+          FROM UNNEST((%s)::UUID[], (%s)::date[], (%s)::date[], (%s)::date[], (%s)::timestamp WITH TIME ZONE[], (%s)::varchar(3)[], (%s)::varchar(3)[], (%s)::varchar(50)[], (%s)::integer[], (%s)::integer[], (%s)::integer[], (%s)::boolean[], (%s)::varchar(20)[])
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "account_emailaddress"."id"
+          FROM "account_emailaddress"
+          WHERE "account_emailaddress"."user_id" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s,
+                                                     %s,
+                                                     %s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id"
+          FROM "companies_company"
+          WHERE "companies_company"."created_by_id" IN (%s,
+                                                        %s,
+                                                        %s,
+                                                        %s,
+                                                        %s,
+                                                        %s,
+                                                        %s,
+                                                        %s,
+                                                        %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE "companies_companymembership"."updated_by_id" IN (%s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_siaeconvention"."id"
+          FROM "companies_siaeconvention"
+          WHERE "companies_siaeconvention"."reactivated_by_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id"
+          FROM "users_user"
+          WHERE "users_user"."created_by_id" IN (%s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerprofile"."user_id"
+          FROM "users_jobseekerprofile"
+          WHERE "users_jobseekerprofile"."user_id" IN (%s,
+                                                       %s,
+                                                       %s,
+                                                       %s,
+                                                       %s,
+                                                       %s,
+                                                       %s,
+                                                       %s,
+                                                       %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."created_by_id" IN (%s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."authorization_updated_by_id" IN (%s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s,
+                                                                                       %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id"
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."updated_by_id" IN (%s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id"
+          FROM "institutions_institutionmembership"
+          WHERE "institutions_institutionmembership"."updated_by_id" IN (%s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."job_seeker_id" IN (%s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."sender_id" IN (%s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."archived_by_id" IN (%s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."approval_manually_delivered_by_id" IN (%s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s,
+                                                                                          %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."approval_manually_refused_by_id" IN (%s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s,
+                                                                                        %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id"
+          FROM "job_applications_jobapplication"
+          WHERE "job_applications_jobapplication"."transferred_by_id" IN (%s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s)
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplicationtransitionlog"."id",
+                 "job_applications_jobapplicationtransitionlog"."transition",
+                 "job_applications_jobapplicationtransitionlog"."from_state",
+                 "job_applications_jobapplicationtransitionlog"."to_state",
+                 "job_applications_jobapplicationtransitionlog"."timestamp",
+                 "job_applications_jobapplicationtransitionlog"."job_application_id",
+                 "job_applications_jobapplicationtransitionlog"."user_id",
+                 "job_applications_jobapplicationtransitionlog"."target_company_id"
+          FROM "job_applications_jobapplicationtransitionlog"
+          WHERE "job_applications_jobapplicationtransitionlog"."user_id" IN (%s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s,
+                                                                             %s)
+          ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."created_by_id" IN (%s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."created_by_id" IN (%s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."updated_by_id" IN (%s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s,
+                                                           %s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."declared_by_id" IN (%s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."validated_by_id" IN (%s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."created_by_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."updated_by_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."processed_by_id" IN (%s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."validated_by_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."declared_by_id" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."validated_by_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."validated_by_id" IN (%s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."validated_by_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."created_by_id" IN (%s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."validated_by_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."updated_by_id" IN (%s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
+                                                             %s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_geiqeligibilitydiagnosis"."id"
+          FROM "eligibility_geiqeligibilitydiagnosis"
+          WHERE "eligibility_geiqeligibilitydiagnosis"."author_id" IN (%s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_geiqeligibilitydiagnosis"."id"
+          FROM "eligibility_geiqeligibilitydiagnosis"
+          WHERE "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" IN (%s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s,
+                                                                           %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."author_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id"
+          FROM "eligibility_eligibilitydiagnosis"
+          WHERE "eligibility_eligibilitydiagnosis"."job_seeker_id" IN (%s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s)
+          ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "external_data_externaldataimport"."id"
+          FROM "external_data_externaldataimport"
+          WHERE "external_data_externaldataimport"."user_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "employee_record_employeerecordtransitionlog"."id",
+                 "employee_record_employeerecordtransitionlog"."transition",
+                 "employee_record_employeerecordtransitionlog"."from_state",
+                 "employee_record_employeerecordtransitionlog"."to_state",
+                 "employee_record_employeerecordtransitionlog"."timestamp",
+                 "employee_record_employeerecordtransitionlog"."asp_processing_code",
+                 "employee_record_employeerecordtransitionlog"."asp_processing_label",
+                 "employee_record_employeerecordtransitionlog"."asp_batch_file",
+                 "employee_record_employeerecordtransitionlog"."asp_batch_line_number",
+                 "employee_record_employeerecordtransitionlog"."archived_json",
+                 "employee_record_employeerecordtransitionlog"."employee_record_id",
+                 "employee_record_employeerecordtransitionlog"."user_id",
+                 "employee_record_employeerecordtransitionlog"."recovered"
+          FROM "employee_record_employeerecordtransitionlog"
+          WHERE "employee_record_employeerecordtransitionlog"."user_id" IN (%s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s,
+                                                                            %s)
+          ORDER BY "employee_record_employeerecordtransitionlog"."timestamp" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id"
+          FROM "geiq_assessments_assessment"
+          WHERE "geiq_assessments_assessment"."created_by_id" IN (%s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id"
+          FROM "geiq_assessments_assessment"
+          WHERE "geiq_assessments_assessment"."submitted_by_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id"
+          FROM "geiq_assessments_assessment"
+          WHERE "geiq_assessments_assessment"."reviewed_by_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "geiq_assessments_assessment"."id"
+          FROM "geiq_assessments_assessment"
+          WHERE "geiq_assessments_assessment"."final_reviewed_by_id" IN (%s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s,
+                                                                         %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "communications_notificationsettings"."id"
+          FROM "communications_notificationsettings"
+          WHERE "communications_notificationsettings"."user_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id"
+          FROM "gps_followupgroup"
+          WHERE "gps_followupgroup"."beneficiary_id" IN (%s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroupmembership"."id",
+                 "gps_followupgroupmembership"."is_referent_certified",
+                 "gps_followupgroupmembership"."is_active",
+                 "gps_followupgroupmembership"."created_at",
+                 "gps_followupgroupmembership"."created_in_bulk",
+                 "gps_followupgroupmembership"."last_contact_at",
+                 "gps_followupgroupmembership"."started_at",
+                 "gps_followupgroupmembership"."ended_at",
+                 "gps_followupgroupmembership"."updated_at",
+                 "gps_followupgroupmembership"."can_view_personal_information",
+                 "gps_followupgroupmembership"."follow_up_group_id",
+                 "gps_followupgroupmembership"."member_id",
+                 "gps_followupgroupmembership"."creator_id",
+                 "gps_followupgroupmembership"."reason",
+                 "gps_followupgroupmembership"."end_reason"
+          FROM "gps_followupgroupmembership"
+          WHERE "gps_followupgroupmembership"."creator_id" IN (%s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "rdv_insertion_invitationrequest"."id"
+          FROM "rdv_insertion_invitationrequest"
+          WHERE "rdv_insertion_invitationrequest"."job_seeker_id" IN (%s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s,
+                                                                      %s)
+          ORDER BY "rdv_insertion_invitationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "django_admin_log"
+          WHERE "django_admin_log"."user_id" IN (%s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "authtoken_token"
+          WHERE "authtoken_token"."user_id" IN (%s,
+                                                %s,
+                                                %s,
+                                                %s,
+                                                %s,
+                                                %s,
+                                                %s,
+                                                %s,
+                                                %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "otp_totp_totpdevice"
+          WHERE "otp_totp_totpdevice"."user_id" IN (%s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "companies_companymembership"
+          WHERE "companies_companymembership"."user_id" IN (%s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_user_groups"
+          WHERE "users_user_groups"."user_id" IN (%s,
+                                                  %s,
+                                                  %s,
+                                                  %s,
+                                                  %s,
+                                                  %s,
+                                                  %s,
+                                                  %s,
+                                                  %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_user_user_permissions"
+          WHERE "users_user_user_permissions"."user_id" IN (%s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s,
+                                                            %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "prescribers_prescribermembership"
+          WHERE "prescribers_prescribermembership"."user_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "institutions_institutionmembership"
+          WHERE "institutions_institutionmembership"."user_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "invitations_prescriberwithorginvitation"
+          WHERE "invitations_prescriberwithorginvitation"."sender_id" IN (%s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s,
+                                                                          %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "invitations_employerinvitation"
+          WHERE "invitations_employerinvitation"."sender_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "invitations_laborinspectorinvitation"
+          WHERE "invitations_laborinspectorinvitation"."sender_id" IN (%s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s,
+                                                                       %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "external_data_jobseekerexternaldata"
+          WHERE "external_data_jobseekerexternaldata"."user_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "gps_followupgroupmembership"
+          WHERE "gps_followupgroupmembership"."member_id" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "rdv_insertion_participation"
+          WHERE "rdv_insertion_participation"."job_seeker_id" IN (%s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s,
+                                      %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
