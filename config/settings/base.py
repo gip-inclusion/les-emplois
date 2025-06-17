@@ -741,7 +741,8 @@ if MATOMO_BASE_URL:
     csp_connect_src.append(MATOMO_BASE_URL)
 
 csp_worker_src = [
-    "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
+    "'self'",
+    "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
 
 if API_BAN_BASE_URL:
