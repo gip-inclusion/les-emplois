@@ -177,6 +177,7 @@ def test_multiple(client, snapshot):
         job_seeker__public_id="11111111-1111-1111-1111-111111111111",
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
+        job_seeker__jobseeker_profile__is_stalled=True,
         sent_by_authorized_prescriber_organisation=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
     )
@@ -195,6 +196,7 @@ def test_multiple(client, snapshot):
         job_seeker__public_id="22222222-2222-2222-2222-222222222222",
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
+        job_seeker__jobseeker_profile__is_stalled=True,
         eligibility_diagnosis=None,
     )
     # Other app with approval
@@ -205,6 +207,8 @@ def test_multiple(client, snapshot):
         job_seeker__public_id="33333333-3333-3333-3333-333333333333",
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
+        job_seeker__jobseeker_profile__is_stalled=True,
+        job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
         with_approval=True,
     )
 
@@ -737,9 +741,18 @@ def test_filtered_by_is_stalled(client):
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
     )
+    not_stalled_anymore = JobApplicationFactory(
+        created_at=timezone.now() - datetime.timedelta(days=90),
+        eligibility_diagnosis=None,
+        sender=prescriber,
+        job_seeker__jobseeker_profile__is_stalled=True,
+        job_seeker__jobseeker_profile__is_not_stalled_anymore=True,
+    )
     other = JobApplicationFactory(sender=prescriber)
     response = client.get(reverse("job_seekers_views:list"))
-    assert Counter(response.context["page_obj"].object_list) == Counter([stalled.job_seeker, other.job_seeker])
+    assert Counter(response.context["page_obj"].object_list) == Counter(
+        [stalled.job_seeker, not_stalled_anymore.job_seeker, other.job_seeker]
+    )
     response = client.get(reverse("job_seekers_views:list"), {"is_stalled": "on"})
     assert response.context["page_obj"].object_list == [stalled.job_seeker]
 

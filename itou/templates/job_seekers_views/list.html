@@ -84,7 +84,7 @@
                             {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                     </div>
-                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request order=order only %}
+                    {% include "job_seekers_views/includes/list_results.html" with page_obj=page_obj request=request csrf_token=csrf_token order=order only %}
                 </div>
             </div>
         </div>

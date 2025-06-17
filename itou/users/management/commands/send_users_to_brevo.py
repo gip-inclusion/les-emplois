@@ -172,7 +172,7 @@ class Command(BaseCommand):
         if wet_run:
             client.import_users(recently_joined, BrevoListID.CANDIDATS, job_seeker_serializer)
 
-        stalled_autonomous_job_seekers = job_seekers.filter(jobseeker_profile__is_stalled=True)
+        stalled_autonomous_job_seekers = job_seekers.filter(jobseeker_profile__is_considered_stalled=True)
         self.logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
         if wet_run:
             client.import_users(
