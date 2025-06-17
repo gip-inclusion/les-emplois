@@ -80,3 +80,25 @@ class AnonymizedApplicationAdmin(ItouModelAdmin):
     )
 
     readonly_fields = fields
+
+
+@admin.register(models.AnonymizedApproval)
+class AnonymizedApprovalAdmin(ItouModelAdmin):
+    fields = (
+        "anonymized_at",
+        "origin",
+        "origin_company_kind",
+        "origin_sender_kind",
+        "origin_prescriber_organization_kind",
+        "start_at",
+        "end_at",
+        "had_eligibility_diagnosis",
+        "number_of_prolongations",
+        "duration_of_prolongations",
+        "number_of_suspensions",
+        "duration_of_suspensions",
+        "number_of_job_applications",
+        "number_of_accepted_job_applications",
+    )
+
+    readonly_fields = fields
