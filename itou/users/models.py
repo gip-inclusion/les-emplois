@@ -262,13 +262,15 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         )
 
         if stalled is not None:
-            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_stalled=stalled)
+            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_stalled=stalled).exclude(
+                jobseeker_profile__is_not_stalled_anymore=True
+            )
             job_seekers_applications = job_seekers_applications.filter(
                 job_seeker__jobseeker_profile__is_stalled=stalled
-            )
+            ).exclude(job_seeker__jobseeker_profile__is_not_stalled_anymore=True)
             job_seekers_eligibility_diagnosis = job_seekers_eligibility_diagnosis.filter(
                 job_seeker__jobseeker_profile__is_stalled=stalled
-            )
+            ).exclude(job_seeker__jobseeker_profile__is_not_stalled_anymore=True)
 
         return self.none().union(
             created_job_seekers.values_list("id", flat=True),
@@ -1185,6 +1187,7 @@ class JobSeekerProfile(models.Model):
             "et a émis sa première candidature il y a plus de 30 jours."
         ),
     )
+    is_not_stalled_anymore = models.BooleanField(null=True, blank=True, default=None)
 
     fields_history = ArrayField(
         models.JSONField(
@@ -1220,9 +1223,15 @@ class JobSeekerProfile(models.Model):
             ),
         ]
         indexes = [
-            models.Index(fields=["is_stalled"], name="users_jobseeker_stalled_idx", condition=Q(is_stalled=True)),
+            models.Index(
+                fields=["is_stalled", "is_not_stalled_anymore"],
+                name="users_jobseeker_stalled_idx",
+                condition=Q(is_stalled=True),
+            ),
         ]
-        triggers = [FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid"])]
+        triggers = [
+            FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid", "is_not_stalled_anymore"])
+        ]
 
     def __str__(self):
         return str(self.user)
