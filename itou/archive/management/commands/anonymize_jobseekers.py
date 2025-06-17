@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, F, Max, OuterRef, Q, Subquery
@@ -8,6 +6,7 @@ from sentry_sdk.crons import monitor
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
+from itou.archive.utils import get_year_month_or_none
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.files.models import File
@@ -21,16 +20,6 @@ from itou.utils.constants import GRACE_PERIOD
 
 
 BATCH_SIZE = 100
-
-
-def get_year_month_or_none(date=None):
-    if not date:
-        return None
-
-    if isinstance(date, datetime.datetime):
-        return timezone.localdate(date).replace(day=1)
-
-    return date.replace(day=1)
 
 
 def anonymized_jobseeker(user):
