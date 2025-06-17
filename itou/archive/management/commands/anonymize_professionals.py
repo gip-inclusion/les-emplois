@@ -1,8 +1,10 @@
 import logging
 
 from django.conf import settings
+from django.db.models import F
 from sentry_sdk.crons import monitor
 
+from itou.users.models import User, UserKind
 from itou.utils.command import BaseCommand
 
 
@@ -28,6 +30,21 @@ class Command(BaseCommand):
             help="Number of users to process in a batch",
         )
 
+    def reset_notified_professionals_with_recent_activity(self):
+        self.logger.info("Reseting inactive professionals with recent activity")
+
+        users_to_reset_qs = User.objects.filter(
+            kind__in=UserKind.professionals(),
+            upcoming_deletion_notified_at__isnull=False,
+            last_login__gte=F("upcoming_deletion_notified_at"),
+        )
+
+        if self.wet_run:
+            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
+        else:
+            reset_nb = users_to_reset_qs.count()
+        self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
+
     @monitor(
         monitor_slug="notify_archive_users",
         monitor_config={
@@ -46,3 +63,5 @@ class Command(BaseCommand):
         self.wet_run = wet_run
         self.batch_size = batch_size
         self.logger.info("Start anonymizing professionals in %s mode", "wet_run" if wet_run else "dry_run")
+
+        self.reset_notified_professionals_with_recent_activity()
