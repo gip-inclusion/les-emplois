@@ -63,13 +63,13 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL", "https://api-adresse.data.gouv.fr")
 if API_BAN_BASE_URL:
-    CSP_CONNECT_SRC.append(API_BAN_BASE_URL)  # noqa: F405
+    CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"].append(API_BAN_BASE_URL)  # noqa: F405
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
 MATOMO_SITE_ID = 220
-CSP_IMG_SRC.append(MATOMO_BASE_URL)  # noqa: F405
-CSP_SCRIPT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
-CSP_CONNECT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"].append(MATOMO_BASE_URL)  # noqa: F405
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"].append(MATOMO_BASE_URL)  # noqa: F405
 
 # use almost the same settings for metabase as base PG.
 METABASE_HOST = os.getenv("METABASE_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405
@@ -80,7 +80,7 @@ METABASE_DATABASE = os.getenv("METABASE_DATABASE", os.getenv("PGDATABASE", "meta
 
 
 AWS_STORAGE_BUCKET_NAME = "dev"
-CSP_IMG_SRC.append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
