@@ -742,3 +742,11 @@ class TestArchiveUsersManagementCommand:
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert self.respx_mock.calls.call_count == 1
+
+
+class TestAnonymizeProfessionalManagementCommand:
+    @pytest.mark.parametrize("suspended", [True, False])
+    def test_suspend_command_setting(self, settings, suspended, caplog, snapshot):
+        settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
+        call_command("anonymize_professionals", wet_run=True)
+        assert caplog.messages[0] == snapshot(name="suspend_anonymize_professionals_command_log")
