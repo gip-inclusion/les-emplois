@@ -19,7 +19,7 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block title_navinfo %}
-    {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info %}
+    {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info|default:"" %}
         {% if job.company == request.current_organization %}
             {% fragment as c_navinfo__info %}
                 {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=True job_description=job csrf_token=csrf_token request=request only %}
