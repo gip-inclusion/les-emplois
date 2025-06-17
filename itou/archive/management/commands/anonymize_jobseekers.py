@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, F, Max, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery, Sum
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
+from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.archive.models import AnonymizedApplication, AnonymizedApproval, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
 from itou.archive.utils import count_related_subquery, get_year_month_or_none
 from itou.companies.enums import CompanyKind
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
@@ -78,6 +80,24 @@ def anonymized_jobapplication(obj):
         hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
         hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
+    )
+
+
+def anonymized_approval(obj):
+    return AnonymizedApproval(
+        origin=obj.origin,
+        origin_company_kind=obj.origin_siae_kind,
+        origin_sender_kind=obj.origin_sender_kind,
+        origin_prescriber_organization_kind=obj.origin_prescriber_organization_kind,
+        start_at=get_year_month_or_none(obj.start_at),
+        end_at=get_year_month_or_none(obj.end_at),
+        has_eligibility_diagnosis=obj.has_eligibility_diagnosis,
+        number_of_prolongations=obj.number_of_prolongations,
+        duration_of_prolongations=obj.duration_of_prolongations,
+        number_of_suspensions=obj.number_of_suspensions,
+        duration_of_suspensions=obj.duration_of_suspensions,
+        number_of_job_applications=obj.number_of_job_applications,
+        number_of_accepted_job_applications=obj.number_of_accepted_job_applications,
     )
 
 
@@ -168,6 +188,39 @@ class Command(BaseCommand):
             anonymized_jobapplication(job_application) for job_application in jobapplications_to_archive
         ]
 
+        # approvals
+        has_eligibility_diagnosis_subquery = EligibilityDiagnosis.objects.filter(approval=OuterRef("pk"))
+        duration_of_prolongations_subquery = (
+            Prolongation.objects.filter(approval=OuterRef("pk"))
+            .values("approval")
+            .annotate(duration_of_prolongations=Sum(F("end_at") - F("start_at")))
+            .values("duration_of_prolongations")
+        )
+        duration_of_suspensions_subquery = (
+            Suspension.objects.filter(approval=OuterRef("pk"))
+            .values("approval")
+            .annotate(duration_of_suspensions=Sum(F("end_at") - F("start_at")))
+            .values("duration_of_suspensions")
+        )
+        number_of_accepted_job_applications_subquery = count_related_subquery(
+            JobApplication,
+            "approval",
+            "pk",
+            extra_filters={"state": JobApplicationState.ACCEPTED},
+        )
+
+        approvals_to_archive = Approval.objects.filter(user__in=users_to_archive).annotate(
+            has_eligibility_diagnosis=Exists(has_eligibility_diagnosis_subquery),
+            number_of_prolongations=Count("prolongation"),
+            duration_of_prolongations=Subquery(duration_of_prolongations_subquery),
+            number_of_suspensions=Count("suspension"),
+            duration_of_suspensions=Subquery(duration_of_suspensions_subquery),
+            number_of_job_applications=Count("jobapplication"),
+            number_of_accepted_job_applications=Subquery(number_of_accepted_job_applications_subquery),
+        )
+
+        anonymized_jobapplications = [anonymized_approval(approval) for approval in approvals_to_archive]
+
         if self.wet_run:
             for user in users_to_archive:
                 ArchiveUser(
@@ -176,7 +229,9 @@ class Command(BaseCommand):
 
             AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
             AnonymizedApplication.objects.bulk_create(archived_jobapplications)
+            AnonymizedApproval.objects.bulk_create(anonymized_jobapplications)
             self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
+            approvals_to_archive.delete()
             self._delete_jobseekers_with_related_objects(users_to_archive)
 
         self.logger.info("Anonymized jobseekers after grace period, count: %d", len(archived_jobseekers))
