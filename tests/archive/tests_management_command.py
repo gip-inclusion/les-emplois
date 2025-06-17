@@ -1,6 +1,7 @@
 import datetime
 import random
 import re
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import httpx
@@ -11,20 +12,23 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
+from itou.approvals.enums import Origin
+from itou.approvals.models import Approval
+from itou.archive.models import AnonymizedApplication, AnonymizedApproval, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.companies.models import CompanyMembership
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.jobs.models import Appellation, Rome
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
@@ -44,6 +48,17 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
+
+
+@contextmanager
+def allow_manual_updated_at(model_class, field_name="updated_at"):
+    field = model_class._meta.get_field(field_name)
+    original_auto_now = field.auto_now
+    field.auto_now = False
+    try:
+        yield
+    finally:
+        field.auto_now = original_auto_now
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -286,6 +301,25 @@ class TestAnonymizeJobseekersManagementCommand:
             )
         )
 
+    def _get_anonymized_approval(self):
+        return list(
+            AnonymizedApproval.objects.all().values(
+                "origin",
+                "origin_company_kind",
+                "origin_sender_kind",
+                "origin_prescriber_organization_kind",
+                "start_at",
+                "end_at",
+                "had_eligibility_diagnosis",
+                "number_of_prolongations",
+                "duration_of_prolongations",
+                "number_of_suspensions",
+                "duration_of_suspensions",
+                "number_of_job_applications",
+                "number_of_accepted_job_applications",
+            )
+        )
+
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
@@ -294,12 +328,18 @@ class TestAnonymizeJobseekersManagementCommand:
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
 
     def test_dry_run(self, respx_mock):
-        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+        job_application = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=30, with_approval=True
+        )
         call_command("anonymize_jobseekers")
 
-        User.objects.get()
+        User.objects.get(id=job_application.job_seeker.id)
+        JobApplication.objects.get()
+        Approval.objects.get()
+
         assert not AnonymizedJobSeeker.objects.exists()
         assert not AnonymizedApplication.objects.exists()
+        assert not AnonymizedApproval.objects.exists()
         assert not respx_mock.calls.called
 
     def test_archive_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
@@ -817,6 +857,149 @@ class TestAnonymizeJobseekersManagementCommand:
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert respx_mock.calls.call_count == 1
+
+    @pytest.mark.parametrize(
+        "approval_kwargs,prolongation_kwargs_list,suspension_kwargs_list,job_application_kwargs_list",
+        [
+            pytest.param(
+                {
+                    "for_snapshot": True,
+                    "origin_sender_kind": SenderKind.EMPLOYER,
+                    "origin_siae_kind": CompanyKind.EA,
+                    "origin_prescriber_organization_kind": PrescriberOrganizationKind.MSA,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                },
+                [],
+                [],
+                [],
+                id="jobseeker_with_few_datas",
+            ),
+            pytest.param(
+                {
+                    "origin_sender_kind": SenderKind.PRESCRIBER,
+                    "origin_prescriber_organization_kind": PrescriberOrganizationKind.CCAS,
+                    "origin_siae_kind": None,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                    "eligibility_diagnosis__updated_at": timezone.now() - relativedelta(years=3),
+                },
+                [
+                    {
+                        "for_snapshot": True,
+                        "start_at": datetime.date(2022, 5, 17),
+                    }
+                ],
+                [
+                    {
+                        "start_at": datetime.date(2020, 5, 17),
+                        "end_at": datetime.date(2020, 6, 10),
+                    }
+                ],
+                [{"state": JobApplicationState.ACCEPTED}],
+                id="jobseeker_with_some_datas",
+            ),
+            pytest.param(
+                {
+                    "origin": Origin.ADMIN,
+                    "origin_siae_kind": CompanyKind.EA,
+                    "origin_sender_kind": SenderKind.EMPLOYER,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                    "eligibility_diagnosis__updated_at": timezone.now() - relativedelta(years=3),
+                },
+                [
+                    {
+                        "start_at": datetime.date(2022, 5, 17),
+                    },
+                    {
+                        "start_at": datetime.date(2022, 7, 16),
+                    },
+                    {
+                        "start_at": datetime.date(2022, 9, 16),
+                    },
+                ],
+                [
+                    {
+                        "start_at": datetime.date(2020, 5, 17),
+                        "end_at": datetime.date(2020, 5, 20),
+                    },
+                    {
+                        "start_at": datetime.date(2020, 9, 17),
+                        "end_at": datetime.date(2020, 9, 20),
+                    },
+                ],
+                [
+                    {"state": JobApplicationState.ACCEPTED},
+                    {"state": JobApplicationState.NEW},
+                ],
+                id="jobseeker_with_lot_of_datas",
+            ),
+        ],
+    )
+    def test_archive_jobseeker_with_approval(
+        self,
+        approval_kwargs,
+        prolongation_kwargs_list,
+        suspension_kwargs_list,
+        job_application_kwargs_list,
+        snapshot,
+    ):
+        job_seeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+        )
+        approval = ApprovalFactory(user=job_seeker, **approval_kwargs)
+        [ProlongationFactory(approval=approval, **kwargs) for kwargs in prolongation_kwargs_list]
+        [SuspensionFactory(approval=approval, **kwargs) for kwargs in suspension_kwargs_list]
+        [
+            JobApplicationFactory(
+                job_seeker=job_seeker,
+                approval=approval,
+                eligibility_diagnosis=approval.eligibility_diagnosis,
+                updated_at=timezone.now() - relativedelta(years=3),
+                to_company__department=76,
+                to_company__naf="4567A",
+                **kwargs,
+            )
+            for kwargs in job_application_kwargs_list
+        ]
+
+        with allow_manual_updated_at(Approval):
+            approval.updated_at = timezone.now() - relativedelta(years=3)
+            approval.save()
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not Approval.objects.exists()
+
+        assert self._get_anonymized_approval() == snapshot(name="anonymized_approval")
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
+        assert self._get_anonymized_application() == snapshot(name="anonymized_application")
+
+    def test_archive_jobseeker_with_several_approvals(self, snapshot):
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+        )
+        for start_at in [datetime.date(2019, 4, 18), datetime.date(2022, 5, 17)]:
+            ApprovalFactory(
+                user=jobseeker,
+                start_at=start_at,
+                end_at=start_at + relativedelta(years=2),
+                eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+            )
+
+        with allow_manual_updated_at(Approval):
+            jobseeker.approvals.update(updated_at=timezone.now() - relativedelta(years=3))
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not Approval.objects.exists()
+        assert AnonymizedApproval.objects.count() == 2
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
 
 
 class TestNotifyInactiveProfessionalsManagementCommand:
