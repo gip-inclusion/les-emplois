@@ -3,6 +3,38 @@ import uuid
 from django.db import models
 
 
+class AnonymizedProfessional(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # from User model
+    date_joined = models.DateField(verbose_name="année et mois d'inscription")
+    first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
+    last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
+    department = models.CharField(max_length=3, verbose_name="département", blank=True, null=True)
+    title = models.CharField(
+        max_length=3,
+        verbose_name="civilité",
+        blank=True,
+        null=True,
+    )
+    kind = models.CharField(max_length=50, verbose_name="type de professionnel", blank=True, null=True)
+    number_of_memberships = models.PositiveIntegerField(verbose_name="nombre d'adhésions", default=0)
+    number_of_active_memberships = models.PositiveIntegerField(verbose_name="nombre d'adhésions actives", default=0)
+    number_of_memberships_as_administrator = models.PositiveIntegerField(
+        verbose_name="nombre d'adhésions en tant qu'administrateur", default=0
+    )
+    had_memberships_in_authorized_organization = models.BooleanField(
+        verbose_name="adhésion à au moins une organisation habilitée", default=False
+    )
+    identity_provider = models.CharField(max_length=20, verbose_name="fournisseur d'identité (SSO)")
+
+    class Meta:
+        verbose_name = "professionnel anonymisé"
+        verbose_name_plural = "professionnels anonymisés"
+        ordering = ["-anonymized_at"]
+
+
 class AnonymizedJobSeeker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
