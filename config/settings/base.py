@@ -691,13 +691,11 @@ csp_img_src = [
 ]
 csp_script_src = [
     csp.constants.SELF,
+    csp.constants.NONCE,
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://tally.so",
 ]
-# Some browsers don't seem to fallback on script-src if script-src-elem is not there
-# But some other don't support script-src-elem... just copy one into the other
-csp_script_src_elem = csp_script_src
 csp_connect_src = [
     csp.constants.SELF,
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
@@ -742,8 +740,10 @@ CONTENT_SECURITY_POLICY = {
         "img-src": csp_img_src,
         "object-src": [csp.constants.NONE],
         "report-uri": os.getenv("CSP_REPORT_URI", None),
-        "script-src": csp_script_src + [csp.constants.NONCE],
-        "script-src-elem": csp_script_src_elem + [csp.constants.NONCE],
+        "script-src": csp_script_src,
+        # Some browsers don't seem to fallback on script-src if script-src-elem is not there
+        # But some other don't support script-src-elem... just copy one into the other
+        "script-src-elem": csp_script_src,
         "style-src": [
             csp.constants.SELF,
             # It would be better to whilelist styles hashes but it's to much work for now.
