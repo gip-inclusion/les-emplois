@@ -144,7 +144,7 @@
                                     <small>Dont 90 jours en {{ assessment.campaign.year }}</small>
                                     <div>
                                         <strong>
-                                            {% if contract.nb_days_in_campaign_year %}
+                                            {% if contract.nb_days_in_campaign_year >= 90 %}
                                                 Oui
                                             {% else %}
                                                 Non
