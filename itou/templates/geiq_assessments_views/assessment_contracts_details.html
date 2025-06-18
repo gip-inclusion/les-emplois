@@ -54,13 +54,7 @@
                                 </li>
                                 <li>
                                     <small>Sexe</small>
-                                    <strong>
-                                        {% if contract.employee.title == "MME" %}
-                                            F
-                                        {% elif contract.employee.title == "M" %}
-                                            H
-                                        {% endif %}
-                                    </strong>
+                                    <strong>{{ contract.employee.sex_display }}</strong>
                                 </li>
                                 <li>
                                     <small>Date de naissance</small>
