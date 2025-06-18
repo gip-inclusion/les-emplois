@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(
                 blank=True,
                 null=True,
-                verbose_name="date de notification de l'archivage à venir",
+                verbose_name="date de notification de l'anonymisation à venir",
             ),
         ),
     ]
