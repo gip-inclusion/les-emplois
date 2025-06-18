@@ -415,6 +415,14 @@ class Employee(models.Model):
             )
         return actions
 
+    def sex_display(self):
+        if self.title == Title.M:
+            return "H"
+        elif self.title == Title.MME:
+            return "F"
+        else:
+            return ""
+
 
 class EmployeeContract(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
