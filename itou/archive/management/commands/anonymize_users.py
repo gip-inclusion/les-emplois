@@ -137,9 +137,8 @@ class Command(BaseCommand):
 
         # jobseekers
         users_to_archive = list(
-            User.objects.filter(
-                kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__lte=grace_period_since
-            ).annotate(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__lte=grace_period_since)
+            .annotate(
                 count_accepted_applications=Count(
                     "job_applications__id", filter=Q(job_applications__state=JobApplicationState.ACCEPTED)
                 ),
@@ -147,7 +146,8 @@ class Command(BaseCommand):
                     "job_applications__id", filter=Q(job_applications__to_company__kind__in=CompanyKind.siae_kinds())
                 ),
                 count_total_applications=Count("job_applications__id"),
-            )[: self.batch_size]
+            )
+            .order_by("upcoming_deletion_notified_at")[: self.batch_size]
         )
 
         archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
