@@ -341,7 +341,7 @@
                                 </li>
                                 <li>
                                     <small>Type de rupture anticipée</small>
-                                    <strong>{{ contract.rupture_kind_display }}</strong>
+                                    <strong>{{ contract.rupture_kind_display|default:"-" }}</strong>
                                 </li>
                                 <li>
                                     <small>Situation post-contrat</small>

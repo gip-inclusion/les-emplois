@@ -3,6 +3,7 @@ import io
 import logging
 import operator
 import uuid
+from functools import partial
 
 from django.conf import settings
 from django.contrib import messages
@@ -39,7 +40,12 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.utils.apis import geiq_label
 from itou.utils.auth import check_user
+from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
+from itou.www.geiq_assessments_views.export import (
+    export_format_for_user_kind,
+    serialize_employee_contract,
+)
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
     CreateForm,
@@ -568,6 +574,34 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "stats": stats,
     }
     return render(request, template_name, context)
+
+
+@require_safe
+@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+def assessment_contracts_export(request, pk):
+    if request.user.is_employer:
+        filter_kwargs = {"companies": request.current_organization}
+        contract_filter_kwargs = {}
+    elif request.user.is_labor_inspector:
+        filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
+        contract_filter_kwargs = {"allowance_requested": True}
+    else:
+        raise Http404  # This should never happen thanks to check_user
+    assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
+    contracts_qs = (
+        EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
+        .select_related("employee__assessment")
+        .prefetch_related("employee__prequalifications")
+        .order_by("employee__last_name", "employee__first_name", "start_at", "pk")
+    )
+    export_format = export_format_for_user_kind(request.user.kind)
+    return to_streaming_response(
+        contracts_qs,
+        f"Contrats - {assessment.label_geiq_name} - {timezone.localdate().isoformat()}",
+        list(export_format.keys()),
+        partial(serialize_employee_contract, export_format=export_format),
+        columns=[column.export_format for column in export_format.values()],
+    )
 
 
 class AssessmentContractDetailsTab(models.TextChoices):

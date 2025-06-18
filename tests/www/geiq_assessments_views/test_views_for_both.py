@@ -5,11 +5,13 @@ import uuid
 import pytest
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
+from itou.users.enums import Title
 from itou.www.geiq_assessments_views.views import AssessmentContractDetailsTab
 from tests.companies.factories import CompanyMembershipFactory
 from tests.geiq_assessments.factories import (
@@ -19,7 +21,12 @@ from tests.geiq_assessments.factories import (
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.test import (
+    assertSnapshotQueries,
+    get_rows_from_streaming_response,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestAssessmentContractsListAndToggle:
@@ -673,3 +680,150 @@ class TestEmployeeContractToggleView:
             headers={"HX-Request": "true"},
         )
         assert response.status_code == 404
+
+
+class TestAssessmentContractsExportView:
+    def test_anonymous_access(self, client):
+        assessment = AssessmentFactory()
+        url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    def test_unauthorized_access(self, client):
+        assessment = AssessmentFactory()
+        url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        for user, expected_status in [
+            (JobSeekerFactory(), 403),
+            (PrescriberFactory(), 403),
+            (EmployerFactory(with_company=True), 404),
+            (LaborInspectorFactory(membership=True), 404),
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == expected_status
+
+    @freeze_time("2025-06-01 12:00:00")
+    def test_export(self, client, snapshot):
+        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            created_by__first_name="Jean",
+            created_by__last_name="Dupont",
+            created_by__email="jean.dupont@example.com",
+            label_geiq_name="Un Joli GEIQ",
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            with_submission_requirements=True,
+            submitted_at=timezone.now() + datetime.timedelta(seconds=1),
+            submitted_by=geiq_membership.user,
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=ddets_membership.institution,
+            with_convention=True,
+        )
+        EmployeeContractFactory(
+            id=uuid.UUID("11111111-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__title=Title.M,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__birthdate="1990-01-01",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2023, 12, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=False,
+            allowance_granted=False,
+        )
+        EmployeeContractFactory(
+            id=uuid.UUID("22222222-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__title=Title.MME,
+            employee__last_name="Martin",
+            employee__first_name="Cécile",
+            employee__birthdate="1992-02-02",
+            employee__allowance_amount=814,
+            start_at=datetime.date(2024, 2, 1),
+            end_at=datetime.date(2024, 3, 30),
+            planned_end_at=datetime.date(2024, 6, 30),
+            allowance_requested=True,
+            allowance_granted=False,
+        )
+        EmployeeContractFactory(
+            id=uuid.UUID("33333333-4444-4444-4444-444444444444"),
+            employee__assessment=assessment,
+            employee__title=Title.M,
+            employee__last_name="Dupond",
+            employee__first_name="Jean-Pierre",
+            employee__birthdate="1993-03-03",
+            employee__allowance_amount=1_400,
+            start_at=datetime.date(2024, 4, 1),
+            end_at=datetime.date(2024, 6, 30),
+            planned_end_at=datetime.date(2024, 6, 30),
+            allowance_requested=True,
+            allowance_granted=True,
+        )
+        url = reverse("geiq_assessments_views:assessment_contracts_export", kwargs={"pk": assessment.pk})
+        client.force_login(geiq_membership.user)
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(url)
+            excel_export = get_rows_from_streaming_response(response)
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
+        assert len(excel_export) == 4  # 3 contracts + header
+        assert excel_export[0] == snapshot(name="excel export headers for the employer")
+        assert excel_export[1][:4] == [
+            "Dupond",
+            "Jean-Pierre",
+            "H",
+            datetime.datetime(1993, 3, 3, 0, 0),
+        ]
+        assert excel_export[1][-1] == "Oui"  # allowance requested
+        assert excel_export[2][:4] == [
+            "Dupont",
+            "Jean",
+            "H",
+            datetime.datetime(1990, 1, 1, 0, 0),
+        ]
+        assert excel_export[2][-1] == "Non"  # allowance requested
+        assert excel_export[3][:4] == [
+            "Martin",
+            "Cécile",
+            "F",
+            datetime.datetime(1992, 2, 2, 0, 0),
+        ]
+        assert excel_export[3][-1] == "Oui"  # allowance requested
+
+        client.force_login(ddets_membership.user)
+        response = client.get(url)
+        excel_export = get_rows_from_streaming_response(response)
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
+        assert len(excel_export) == 3  # 2 contracts + header
+        assert excel_export[0] == snapshot(name="excel export headers for the DDETS")
+        assert excel_export[1][:4] == [
+            "Dupond",
+            "Jean-Pierre",
+            "H",
+            datetime.datetime(1993, 3, 3, 0, 0),
+        ]
+        assert excel_export[1][-1] == "Oui"  # allowance granted
+        assert excel_export[2][:4] == [
+            "Martin",
+            "Cécile",
+            "F",
+            datetime.datetime(1992, 2, 2, 0, 0),
+        ]
+        assert excel_export[2][-1] == "Non"  # allowance granted
