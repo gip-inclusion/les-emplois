@@ -79,6 +79,10 @@
                                     <strong>{{ contract.employee.other_data.autre_prescripteur|default:"-" }}</strong>
                                 </li>
                                 <li>
+                                    <small>Aide potentielle</small>
+                                    <strong>{{ contract.employee.allowance_amount|format_int_euros }}</strong>
+                                </li>
+                                <li>
                                     <small>Critères public prioritaire</small>
                                     <strong>
                                         <ul>
