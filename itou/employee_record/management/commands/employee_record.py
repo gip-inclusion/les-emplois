@@ -1,7 +1,8 @@
 import argparse
 import uuid
 
-from itou.employee_record.enums import Status
+from django.db import transaction
+
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.command import BaseCommand
@@ -39,33 +40,40 @@ class Command(BaseCommand):
 
         resend = subparsers.add_parser("resend")
         resend.add_argument("employee_record", type=int)
+        resend.add_argument("--unarchive", action="store_true")
         resend.add_argument("--wet-run", action="store_true")
 
-    @staticmethod
-    def _validate_and_save(obj, ready, wet_run):
-        if ready:
-            obj.status = Status.READY
-        obj.validate_unique()
-        obj.validate_constraints()
-        if wet_run:
-            obj.save()
-
     def create(self, *, job_application, siret, ready, wet_run):
-        employee_record = EmployeeRecord(job_application=JobApplication.objects.get(pk=job_application))
-        employee_record._fill_denormalized_fields()
+        sid = transaction.savepoint()
+
+        employee_record = EmployeeRecord.from_job_application(JobApplication.objects.get(pk=job_application))
+        if ready:
+            employee_record.ready()
         if siret is not None:
             # In some edge cases we need to send an employee record for an old/previous SIRET but don't want to mess
             # with the existing one (i.e. already processed by the ASP)
             employee_record.siret = siret
+            employee_record.save(update_fields={"siret", "updated_at"})
 
-        self._validate_and_save(employee_record, ready, wet_run)
+        if wet_run:
+            transaction.savepoint_commit(sid)
+        else:
+            transaction.savepoint_rollback(sid)
 
-    def resend(self, *, employee_record, wet_run):
+    def resend(self, *, employee_record, unarchive, wet_run):
+        sid = transaction.savepoint()
+
         employee_record = EmployeeRecord.objects.get(pk=employee_record)
-        employee_record._fill_denormalized_fields()
+        if unarchive:
+            employee_record.unarchive()
+        employee_record.ready()
 
-        self._validate_and_save(employee_record, True, wet_run)
+        if wet_run:
+            transaction.savepoint_commit(sid)
+        else:
+            transaction.savepoint_rollback(sid)
 
+    @transaction.atomic()
     def handle(self, *, command, **options):
         match command:
             case "create":
@@ -76,4 +84,8 @@ class Command(BaseCommand):
                     wet_run=options["wet_run"],
                 )
             case "resend":
-                self.resend(employee_record=options["employee_record"], wet_run=options["wet_run"])
+                self.resend(
+                    employee_record=options["employee_record"],
+                    unarchive=options["unarchive"],
+                    wet_run=options["wet_run"],
+                )
