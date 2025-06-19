@@ -464,6 +464,15 @@ class EmployeeContract(models.Model):
             return department_from_postcode(postcode)
         return None
 
+    def rupture_kind_display(self):
+        rupture = self.other_data.get("rupture")
+        if rupture is None:
+            return ""
+        elif rupture:
+            return "Hors période d’essai"
+        else:
+            return "En période d’essai"
+
 
 class EmployeePrequalification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
