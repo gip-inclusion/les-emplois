@@ -344,14 +344,14 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     ).order_by(*order.order_by)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
-    _add_pending_for_weeks(job_applications_page)
+    _add_pending_for_weeks(job_applications_page)  # djaf causes extra sql
 
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
     iae_company = company.kind in CompanyKind.siae_kinds()
     if iae_company:
-        _add_administrative_criteria(job_applications_page)
+        _add_administrative_criteria(job_applications_page)  # djaf causes extra sql
 
     context = {
         "title": title,
