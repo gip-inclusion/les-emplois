@@ -351,16 +351,25 @@ class TestProcessListSiae:
         response = client.get(reverse("apply:list_for_siae"), {"senders": [job_app.sender.id]})
         assert response.context["job_applications_page"].object_list == [job_app]
 
-    def test_list_for_siae_filtered_by_job_seeker_name(self, client):
+    def test_list_for_siae_filtered_by_job_seeker_cancels_other_filters(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company)
-        _another_job_app = JobApplicationFactory(to_company=company)
+        job_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+        _another_job_app = JobApplicationFactory(
+            to_company=company, job_seeker=job_app.job_seeker, state=JobApplicationState.NEW
+        )
+        _job_app_from_other_job_seeker = JobApplicationFactory(to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"job_seeker": job_app.job_seeker.pk})
-        assert response.context["job_applications_page"].object_list == [job_app]
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
+
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {"job_seeker": job_app.job_seeker.pk, "states": [JobApplicationState.ACCEPTED]},
+        )
+        assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
     def test_list_for_siae_filtered_by_pass_state(self, client):
         company = CompanyFactory(with_membership=True)
@@ -595,11 +604,12 @@ class TestProcessListSiae:
                     "end_date": timezone.localdate(job_app.created_at).strftime(date_format),
                     "sender_prescriber_organizations": [job_app.sender_prescriber_organization.id],
                     "senders": [job_app.sender.id],
-                    "job_seeker": job_app.job_seeker.pk,
                     "pass_iae_active": True,
                     "eligibility_validated": True,
                     "criteria": [level1_criterion.pk],
                     "departments": ["37"],
+                    # Do not filter by job_seeker as it cancels all other filters
+                    # "job_seeker": job_app.job_seeker.pk,
                 },
             )
         assert len(response.context["job_applications_page"].object_list) == 1
