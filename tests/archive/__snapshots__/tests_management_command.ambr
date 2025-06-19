@@ -1,4 +1,10 @@
 # serializer version: 1
+# name: TestAnonymizeProfessionalManagementCommand.test_suspend_command_setting[False][suspend_anonymize_professionals_command_log]
+  'Start anonymizing professionals in wet_run mode'
+# ---
+# name: TestAnonymizeProfessionalManagementCommand.test_suspend_command_setting[True][suspend_anonymize_professionals_command_log]
+  'Anonymizing professionals is suspended, exiting command'
+# ---
 # name: TestArchiveUsersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
   list([
     dict({
