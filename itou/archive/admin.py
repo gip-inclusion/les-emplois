@@ -13,6 +13,11 @@ class AnonymizedProfessionalAdmin(ItouModelAdmin):
         "anonymized_at",
         "department",
         "title",
+        "kind",
+        "number_of_memberships",
+        "number_of_active_memberships",
+        "number_of_memberships_as_administrator",
+        "had_memberships_in_authorized_organization",
         "identity_provider",
     )
 
