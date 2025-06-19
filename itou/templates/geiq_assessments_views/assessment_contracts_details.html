@@ -219,10 +219,6 @@
                                     <strong>{{ contract.other_data.accompagnement_apres_contrat|default:0 }} {{ contract.other_data.accompagnement_apres_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
                                 </li>
                                 <li>
-                                    <small>Métier préparé</small>
-                                    <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
-                                </li>
-                                <li>
                                     <small>Heures de suivi de l’évaluation des compétences prévues</small>
                                     <strong>{{ contract.other_data.heures_suivi_evaluation_competences_geiq_prevues|formatfloat_with_unit:"h"|default:"-" }}</strong>
                                 </li>
