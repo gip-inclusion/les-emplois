@@ -1029,8 +1029,6 @@
       }),
       dict({
         'origin': list([
-          'User.latest_approval[users/models.py]',
-          'User.has_valid_approval[users/models.py]',
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
@@ -1062,8 +1060,9 @@
                  "approvals_approval"."origin_prescriber_organization_kind",
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."created_at" DESC
+          WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
+          ORDER BY "approvals_approval"."created_at" ASC
+          LIMIT 1
         ''',
       }),
       dict({
