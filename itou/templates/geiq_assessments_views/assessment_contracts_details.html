@@ -205,10 +205,6 @@
                                     <small>Nombre d’entreprises</small>
                                     <strong>{{ contract.other_data.mad_nb_entreprises|default:"-" }}</strong>
                                 </li>
-                                <li>
-                                    <small>Type de rupture anticipée</small>
-                                    <strong>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</strong>
-                                </li>
                             </ul>
                         </div>
                     {% elif active_tab == AssessmentContractDetailsTab.SUPPORT_AND_TRAINING %}
