@@ -169,7 +169,9 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     # A diagnosis is considered valid for the whole duration of an approval.
     # Methods below (whose name contain `considered`) take into account
-    # the existence of an ongoing approval.
+    # the existence of an ongoing approval associated to the diagnosis.
+    # There should be 0 or 1 associated approval, but for a handful of diagnoses
+    # there are 2, so we pick the last one.
     # They must not be used "as-is" in admin's `list_display` because checking
     # the latest approvals would trigger additional SQL queries for each row.
 
@@ -179,8 +181,9 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @property
     def considered_to_expire_at(self):
-        if self.job_seeker.has_valid_approval:
-            return self.job_seeker.latest_approval.end_at
+        latest_approval = self.approval_set.last()
+        if latest_approval and latest_approval.is_valid():
+            return latest_approval.end_at
         return self.expires_at
 
     @classmethod
