@@ -852,9 +852,6 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
 
-        if job_seeker := self.cleaned_data.get("job_seeker"):
-            queryset = queryset.filter(job_seeker__id=job_seeker)
-
         match self.cleaned_data["archived"]:
             case ArchivedChoices.ACTIVE:
                 queryset = queryset.filter(archived_at=None)
@@ -902,7 +899,13 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
             ]
 
     def filter(self, queryset):
+        if job_seeker := self.cleaned_data.get("job_seeker"):
+            # If filtering is performed on the job seeker name, ignore all other filters
+            queryset = queryset.filter(job_seeker__id=job_seeker)
+            return queryset
+
         queryset = super().filter(queryset)
+
         if sender_prescriber_organizations := self.cleaned_data.get("sender_prescriber_organizations"):
             queryset = queryset.filter(sender_prescriber_organization__id__in=sender_prescriber_organizations)
         if sender_companies := self.cleaned_data.get("sender_companies"):
@@ -950,6 +953,10 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         return sorted(users, key=lambda user: user[1])
 
     def filter(self, queryset):
+        if job_seeker := self.cleaned_data.get("job_seeker"):
+            # If filtering is performed on the job seeker name, ignore all other filters
+            return queryset.filter(job_seeker__id=job_seeker)
+
         queryset = super().filter(queryset)
         if to_companies := self.cleaned_data.get("to_companies"):
             queryset = queryset.filter(to_company__id__in=to_companies)
