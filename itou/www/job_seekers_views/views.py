@@ -31,7 +31,7 @@ from itou.utils.auth import check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
@@ -220,8 +220,9 @@ class GetOrCreateJobSeekerStartView(View):
         # apply data
         if self.tunnel == "sender" or self.tunnel == "hire":
             apply_session_uuid = request.GET.get("apply_session_uuid")
-            apply_session = SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
-            if not apply_session.exists():
+            try:
+                SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+            except SessionNamespaceException:
                 raise Http404("Session de candidature invalide")
             apply_data = {"session_uuid": apply_session_uuid}
             try:
@@ -231,9 +232,7 @@ class GetOrCreateJobSeekerStartView(View):
                 raise Http404("Aucune entreprise n'a été trouvée")
             data["apply"] = apply_data
 
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
-            request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
-        )
+        self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
@@ -257,8 +256,9 @@ class ExpectedJobSeekerSessionMixin:
         self.job_seeker_session = None
 
     def setup(self, request, *args, session_uuid, **kwargs):
-        self.job_seeker_session = SessionNamespace(request.session, self.EXPECTED_SESSION_KIND, session_uuid)
-        if not self.job_seeker_session.exists():
+        try:
+            self.job_seeker_session = SessionNamespace(request.session, self.EXPECTED_SESSION_KIND, session_uuid)
+        except SessionNamespaceException:
             raise Http404
         super().setup(request, *args, **kwargs)
 
@@ -882,7 +882,7 @@ class UpdateJobSeekerStartView(View):
         if request.user.is_job_seeker or not can_view_personal_information(request, job_seeker):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
 
-        self.job_seeker_session = SessionNamespace.create_uuid_namespace(
+        self.job_seeker_session = SessionNamespace.create(
             request.session,
             JobSeekerSessionKinds.UPDATE,
             data={

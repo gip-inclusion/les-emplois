@@ -24,7 +24,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
-from itou.utils.session import SessionNamespace
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
@@ -81,7 +81,7 @@ def _get_job_seeker_to_apply_for(request):
 
 
 def initialize_apply_session(request, data):
-    return SessionNamespace.create_uuid_namespace(request.session, APPLY_SESSION_KIND, data)
+    return SessionNamespace.create(request.session, APPLY_SESSION_KIND, data)
 
 
 class ApplicationPermissionMixin:
@@ -155,7 +155,7 @@ class StartView(ApplicationPermissionMixin, View):
         return self.reset_url
 
     def init_job_seeker_session(self, request):
-        job_seeker_session = SessionNamespace.create_uuid_namespace(
+        job_seeker_session = SessionNamespace.create(
             request.session,
             JobSeekerSessionKinds.CHECK_NIR_JOB_SEEKER,
             data={
@@ -240,9 +240,9 @@ class RequireApplySessionMixin:
 
     def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        self.apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
-        if not self.apply_session.exists():
+        try:
+            self.apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
+        except SessionNamespaceException:
             raise Http404
 
     def get_reset_url(self):

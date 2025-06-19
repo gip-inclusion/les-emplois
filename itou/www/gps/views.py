@@ -406,9 +406,7 @@ def join_group_from_nir(request, template_name="gps/join_group_from_nir.html"):
                 },
                 "profile": {"nir": form.cleaned_data["nir"]},
             }
-            job_seeker_session = SessionNamespace.create_uuid_namespace(
-                request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
-            )
+            job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
             return HttpResponseRedirect(
                 reverse(
                     "job_seekers_views:search_by_email_for_sender",
@@ -482,7 +480,7 @@ def join_group_from_name_and_email(request, template_name="gps/join_group_from_n
                     },
                     "user": form.cleaned_data,
                 }
-                job_seeker_session = SessionNamespace.create_uuid_namespace(
+                job_seeker_session = SessionNamespace.create(
                     request.session, JobSeekerSessionKinds.GET_OR_CREATE, data
                 )
                 return HttpResponseRedirect(
