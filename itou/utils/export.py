@@ -17,7 +17,7 @@ class Format(enum.Enum):
     FLOAT = 1.1
     DATETIME = datetime.datetime.now()
     DATE = datetime.date.today()
-    BOOLEAN = True
+    BOOLEAN = False  # Do not use True, which would conflict with Format.INTEGER value 1
 
 
 def generate_excel_sheet(headers, rows):
