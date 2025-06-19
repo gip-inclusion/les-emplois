@@ -177,7 +177,8 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @property
     def is_considered_valid(self):
-        return self.is_valid or self.job_seeker.has_valid_approval
+        valid_approvals = self.approval_set.filter(end_at__gt=timezone.localdate())
+        return self.is_valid or valid_approvals.exists()
 
     @property
     def considered_to_expire_at(self):
