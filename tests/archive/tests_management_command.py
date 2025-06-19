@@ -42,6 +42,13 @@ def brevo_api_key_fixture(settings):
     settings.BREVO_API_KEY = "BREVO_API_KEY"
 
 
+@pytest.fixture(autouse=True)
+def respx_delete_mock(respx_mock):
+    respx_mock = respx_mock.delete(url__regex=re.compile(f"^{re.escape(settings.BREVO_API_URL)}/contacts/.*")).mock(
+        return_value=httpx.Response(status_code=204)
+    )
+
+
 class TestNotifyInactiveJobseekersManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
         user = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
@@ -200,12 +207,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
 
 class TestAnonymizeJobseekersManagementCommand:
-    @pytest.fixture(autouse=True)
-    def respx_delete_mock(self, respx_mock):
-        self.respx_mock = respx_mock.delete(
-            url__regex=re.compile(f"^{re.escape(settings.BREVO_API_URL)}/contacts/.*")
-        ).mock(return_value=httpx.Response(status_code=204))
-
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
@@ -213,16 +214,16 @@ class TestAnonymizeJobseekersManagementCommand:
         call_command("anonymize_jobseekers", wet_run=wet_run)
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
 
-    def test_dry_run(self):
+    def test_dry_run(self, respx_mock):
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
         call_command("anonymize_jobseekers")
 
         User.objects.get()
         assert not AnonymizedJobSeeker.objects.exists()
         assert not AnonymizedApplication.objects.exists()
-        assert not self.respx_mock.calls.called
+        assert not respx_mock.calls.called
 
-    def test_archive_batch_size(self, django_capture_on_commit_callbacks):
+    def test_archive_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
         JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
 
         with django_capture_on_commit_callbacks(execute=True):
@@ -230,7 +231,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert AnonymizedJobSeeker.objects.count() == 2
         assert User.objects.count() == 1
-        assert self.respx_mock.calls.call_count == 2
+        assert respx_mock.calls.call_count == 2
 
     @pytest.mark.parametrize(
         "factory, related_object_factory, notification_reset",
@@ -331,7 +332,9 @@ class TestAnonymizeJobseekersManagementCommand:
             ),
         ],
     )
-    def test_reset_notified_jobseekers_with_recent_activity(self, factory, related_object_factory, notification_reset):
+    def test_reset_notified_jobseekers_with_recent_activity(
+        self, factory, related_object_factory, notification_reset, respx_mock
+    ):
         user = factory()
         if related_object_factory:
             related_object_factory(user)
@@ -340,7 +343,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
-        assert not self.respx_mock.calls.called
+        assert not respx_mock.calls.called
 
     @pytest.mark.parametrize(
         "user_factory",
@@ -375,14 +378,14 @@ class TestAnonymizeJobseekersManagementCommand:
             ),
         ],
     )
-    def test_exclude_users_when_archiving(self, user_factory):
+    def test_exclude_users_when_archiving(self, user_factory, respx_mock):
         user = user_factory()
         call_command("anonymize_jobseekers", wet_run=True)
 
         expected_user = User.objects.get()
         assert user == expected_user
         assert not AnonymizedJobSeeker.objects.exists()
-        assert not self.respx_mock.calls.called
+        assert not respx_mock.calls.called
 
     @pytest.mark.parametrize(
         "kwargs,jobapplication_kwargs_list",
@@ -474,7 +477,14 @@ class TestAnonymizeJobseekersManagementCommand:
         ],
     )
     def test_archive_inactive_jobseekers_after_grace_period(
-        self, kwargs, jobapplication_kwargs_list, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot
+        self,
+        kwargs,
+        jobapplication_kwargs_list,
+        django_capture_on_commit_callbacks,
+        caplog,
+        mailoutbox,
+        snapshot,
+        respx_mock,
     ):
         if kwargs.get("created_by"):
             kwargs["created_by"] = kwargs["created_by"]()
@@ -533,9 +543,9 @@ class TestAnonymizeJobseekersManagementCommand:
         else:
             assert not mailoutbox
 
-        assert self.respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 1
 
-    def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks):
+    def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
         jobseeker = JobSeekerFactory(
             joined_days_ago=365,
             notified_days_ago=31,
@@ -552,10 +562,10 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
         assert AnonymizedJobSeeker.objects.exists()
-        assert self.respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 1
 
     @pytest.mark.parametrize("deleted_at", [None, timezone.make_aware(datetime.datetime(2025, 3, 3, 0, 0))])
-    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, deleted_at):
+    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, deleted_at, respx_mock):
         resume_file = FileFactory(deleted_at=deleted_at)
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
@@ -581,7 +591,7 @@ class TestAnonymizeJobseekersManagementCommand:
         else:
             assert file.deleted_at == deleted_at
 
-        assert self.respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 1
 
     @freeze_time("2025-02-15")
     @pytest.mark.parametrize(
@@ -675,6 +685,7 @@ class TestAnonymizeJobseekersManagementCommand:
         django_capture_on_commit_callbacks,
         caplog,
         snapshot,
+        respx_mock,
     ):
         job_seeker = JobSeekerFactory(
             joined_days_ago=DAYS_OF_INACTIVITY,
@@ -741,7 +752,7 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
-        assert self.respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 1
 
 
 class TestAnonymizeProfessionalManagementCommand:
