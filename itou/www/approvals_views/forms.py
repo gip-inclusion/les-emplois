@@ -490,7 +490,7 @@ class SuspensionForm(forms.ModelForm):
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
-        min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
+        min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date)
         # A suspension is backdatable but cannot start in the future.
         self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
         self.fields["end_at"].widget = DuetDatePickerWidget(
@@ -507,7 +507,7 @@ class SuspensionForm(forms.ModelForm):
             suspension_pk = self.instance.pk
             referent_date = self.instance.created_at.date()
 
-        next_min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
+        next_min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date)
         if start_at < next_min_start_at:
             raise ValidationError(
                 f"Vous ne pouvez pas saisir une date de début de suspension "
