@@ -3,7 +3,7 @@ from django.db.models import F
 from sentry_sdk.crons import monitor
 
 from itou.users.models import User, UserKind
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 BATCH_SIZE = 100
@@ -35,10 +35,7 @@ class Command(BaseCommand):
             last_login__gte=F("upcoming_deletion_notified_at"),
         )
 
-        if self.wet_run:
-            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
-        else:
-            reset_nb = users_to_reset_qs.count()
+        reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
         self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
 
     @monitor(
@@ -52,12 +49,12 @@ class Command(BaseCommand):
             "timezone": "UTC",
         },
     )
-    def handle(self, *args, wet_run, batch_size, **options):
+    @dry_runnable
+    def handle(self, *args, batch_size, **options):
         if settings.SUSPEND_ANONYMIZE_PROFESSIONALS:
             self.logger.info("Anonymizing professionals is suspended, exiting command")
             return
-        self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start anonymizing professionals in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start anonymizing professionals")
 
         self.reset_notified_professionals_with_recent_activity()
