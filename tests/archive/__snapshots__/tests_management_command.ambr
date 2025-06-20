@@ -322,13 +322,13 @@
   ])
 # ---
 # name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_users_command_log]
-  'Start anonymizing users in dry_run mode'
+  'Start anonymizing users'
 # ---
 # name: TestArchiveUsersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_users_command_log]
   'Anonymizing users is suspended, exiting command'
 # ---
 # name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_users_command_log]
-  'Start anonymizing users in wet_run mode'
+  'Start anonymizing users'
 # ---
 # name: TestArchiveUsersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_users_command_log]
   'Anonymizing users is suspended, exiting command'
