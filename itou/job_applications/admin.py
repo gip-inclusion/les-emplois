@@ -105,6 +105,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "job_seeker",
         "eligibility_diagnosis",
         "geiq_eligibility_diagnosis",
+        "hired_job",
         "sender",
         "sender_company",
         "sender_prescriber_organization",
