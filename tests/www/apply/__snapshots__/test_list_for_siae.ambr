@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 28,
+    'num_queries': 29,
     'queries': list([
       dict({
         'origin': list([
@@ -165,6 +165,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -960,6 +967,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history",
                  T7."id",
                  T7."password",
@@ -1427,7 +1435,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -1591,6 +1599,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2315,6 +2330,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history",
                  T7."id",
                  T7."password",
@@ -2755,7 +2771,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries filters]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -2919,6 +2935,13 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

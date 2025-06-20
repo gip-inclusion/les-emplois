@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditJobSeekerInfo.test_edit_by_company_with_nir[view queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -168,6 +168,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -250,6 +257,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
@@ -394,7 +402,7 @@
 # ---
 # name: TestEditJobSeekerInfo.test_edit_by_prescriber[view queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -508,6 +516,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -590,6 +605,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")

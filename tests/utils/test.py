@@ -1,3 +1,4 @@
+import copy
 import datetime
 import importlib
 import inspect
@@ -31,7 +32,7 @@ from itou.utils.session import SessionNamespace
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
-BASE_NUM_QUERIES = 2
+BASE_NUM_QUERIES = 3
 
 
 # Used to find the session namespace by elimination
@@ -138,6 +139,10 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
 
 
 class ItouClient(Client):
+    def _login(self, user, backend=None):
+        self.login_user = user
+        return super()._login(user, backend=backend)
+
     def request(self, **request):
         with TestCase.captureOnCommitCallbacks(execute=True):
             response = super().request(**request)
@@ -392,3 +397,17 @@ CursorDebugWrapper.debug_sql = debug_sql
 
 def load_template(path):
     return Template((Path("itou/templates") / path).read_text())
+
+
+def normalize_fields_history(fields_history):
+    if not fields_history:
+        return fields_history
+
+    normalized_fields_history = copy.deepcopy(fields_history)
+    for entry in normalized_fields_history:
+        if entry["_timestamp"]:
+            entry["_timestamp"] = "[TIMESTAMP]"
+        if entry["_context"] and entry["_context"]["request_id"]:
+            entry["_context"]["request_id"] = "[REQUEST ID]"
+
+    return normalized_fields_history

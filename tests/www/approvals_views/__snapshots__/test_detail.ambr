@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -410,6 +410,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -511,6 +518,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -1105,7 +1113,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1165,6 +1173,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1269,6 +1284,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -1689,7 +1705,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1803,6 +1819,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -1904,6 +1927,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -2627,7 +2651,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -2794,6 +2818,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -2895,6 +2926,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -3490,7 +3522,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -3550,6 +3582,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -3654,6 +3693,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
@@ -4074,7 +4114,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -4188,6 +4228,13 @@
       }),
       dict({
         'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -4289,6 +4336,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")

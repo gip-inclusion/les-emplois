@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django.views.decorators.http import require_safe
+from django.views.decorators.http import require_POST, require_safe
 from django.views.generic import DetailView, TemplateView, View
 
 from itou.companies.enums import CompanyKind
@@ -27,7 +27,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -44,6 +44,7 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
     JobSeekerExistsForm,
+    SwitchStalledStatusForm,
 )
 
 
@@ -117,6 +118,25 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
         }
+
+
+@require_POST
+@check_request(lambda request: request.from_authorized_prescriber)
+def switch_stalled_status(request, public_id):
+    job_seeker = get_object_or_404(
+        User.objects.filter(kind=UserKind.JOB_SEEKER, jobseeker_profile__is_stalled=True).select_related(
+            "jobseeker_profile"
+        ),
+        public_id=public_id,
+    )
+
+    form = SwitchStalledStatusForm(data=request.POST, instance=job_seeker.jobseeker_profile)
+    if form.is_valid() and form.has_changed():
+        form.save()
+        messages.success(request, "Modification réussie", extra_tags="toast")
+    else:
+        messages.error(request, "Modification impossible", extra_tags="toast")
+    return HttpResponseRedirect(get_safe_url(request, "back_url", fallback_url=reverse("job_seekers_views:list")))
 
 
 @require_safe

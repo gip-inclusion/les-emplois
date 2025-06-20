@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestExportCTA.test_export.1
   dict({
-    'num_queries': 6,
+    'num_queries': 7,
     'queries': list([
       dict({
         'origin': list([
@@ -61,6 +61,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -270,7 +277,7 @@
 # ---
 # name: TestExportJobApplications.test_export[after].1
   dict({
-    'num_queries': 5,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -330,6 +337,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -477,6 +491,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -907,7 +922,7 @@
 # ---
 # name: TestExportJobApplications.test_export[before].1
   dict({
-    'num_queries': 5,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -967,6 +982,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1114,6 +1136,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -1544,7 +1567,7 @@
 # ---
 # name: TestExportJobApplications.test_export[contains].1
   dict({
-    'num_queries': 10,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -1604,6 +1627,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1751,6 +1781,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -2338,7 +2369,7 @@
 # ---
 # name: TestExportPEApiRejections.test_export.1
   dict({
-    'num_queries': 5,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -2398,6 +2429,13 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
+      }),
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2503,6 +2541,7 @@
                  "users_jobseekerprofile"."pe_last_certification_attempt_at",
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
