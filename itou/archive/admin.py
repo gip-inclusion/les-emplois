@@ -20,7 +20,7 @@ class AnonymizedProfessionalAdmin(ItouModelAdmin):
 
 
 @admin.register(models.AnonymizedJobSeeker)
-class ArchiveJobSeekerAdmin(ItouModelAdmin):
+class AnonymizedJobSeekerAdmin(ItouModelAdmin):
     fields = (
         "date_joined",
         "first_login",
@@ -45,7 +45,7 @@ class ArchiveJobSeekerAdmin(ItouModelAdmin):
 
 
 @admin.register(models.AnonymizedApplication)
-class ArchiveApplicationAdmin(ItouModelAdmin):
+class AnonymizedApplicationAdmin(ItouModelAdmin):
     fields = (
         "job_seeker_birth_year",
         "job_seeker_department_same_as_company_department",
@@ -73,6 +73,56 @@ class ArchiveApplicationAdmin(ItouModelAdmin):
         "hiring_contract_nature",
         "hiring_start_date",
         "hiring_without_approval",
+    )
+
+    readonly_fields = fields
+
+
+@admin.register(models.AnonymizedApproval)
+class AnonymizedApprovalAdmin(ItouModelAdmin):
+    fields = (
+        "anonymized_at",
+        "origin",
+        "origin_company_kind",
+        "origin_sender_kind",
+        "origin_prescriber_organization_kind",
+        "start_at",
+        "end_at",
+        "had_eligibility_diagnosis",
+        "number_of_prolongations",
+        "duration_of_prolongations",
+        "number_of_suspensions",
+        "duration_of_suspensions",
+        "number_of_job_applications",
+        "number_of_accepted_job_applications",
+    )
+
+    readonly_fields = fields
+
+
+@admin.register(models.AnonymizedEligibilityDiagnosis)
+class AnonymizedEligibilityDiagnosisAdmin(ItouModelAdmin):
+    fields = (
+        "anonymized_at",
+        "created_at",
+        "expired_at",
+        "job_seeker_birth_year",
+        "job_seeker_department",
+        "job_seeker_had_pole_emploi_id",
+        "job_seeker_had_nir",
+        "author_kind",
+        "author_prescriber_organization_kind",
+        "author_siae_kind",
+        "author_geiq_kind",
+        "number_of_approvals",
+        "first_approval_start_at",
+        "last_approval_end_at",
+        "number_of_administrative_criteria_level_1",
+        "number_of_administrative_criteria_level_2",
+        "number_of_certified_administrative_criteria_level_1",
+        "number_of_certified_administrative_criteria_level_2",
+        "number_of_job_applications",
+        "number_of_accepted_job_applications",
     )
 
     readonly_fields = fields
