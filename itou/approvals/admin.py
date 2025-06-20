@@ -1,3 +1,6 @@
+from datetime import UTC, datetime
+
+from django import forms
 from django.contrib import admin, messages
 from django.core.files.storage import default_storage
 from django.urls import path, reverse_lazy
@@ -437,6 +440,31 @@ class FromProlongationRequest(admin.SimpleListFilter):
         return queryset
 
 
+class SuspensionAdminForm(forms.ModelForm):
+    APPROVAL_START_AT_ERR = "La suspension doit commencer après le début du PASS IAE."
+
+    def clean(self):
+        super().clean()
+
+        start_at = self.cleaned_data.get("start_at")
+        if start_at and "start_at" in self.errors:
+            # Model's clean method raises if new start_at is before suspension.created_at
+            # but people sometimes make mistakes. Allow customer service to update it.
+            if start_at < self.instance.created_at.date():
+                del self.errors["start_at"]
+                self.cleaned_data["start_at"] = self.data["start_at"]
+        return self.cleaned_data
+
+    def save(self, commit=True):
+        # If the end users wants to modify the start_date, it will raise
+        # if created at > new start_at (which could happen if the customer support
+        # updated it before).
+        date = self.cleaned_data.get("start_at")
+        if date and self.instance.created_at.date() > date:
+            self.instance.created_at = datetime(date.year, date.month, date.day, tzinfo=UTC)
+        return super().save(commit=commit)
+
+
 @admin.register(models.Suspension)
 class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display = (
@@ -461,6 +489,7 @@ class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
         "approval__number",
     )
     inlines = (PkSupportRemarkInline,)
+    form = SuspensionAdminForm
 
     @admin.display(boolean=True, description="en cours")
     def is_in_progress(self, obj):

@@ -1,10 +1,17 @@
+import copy
+from datetime import UTC, datetime
+
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
+from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.approvals.enums import Origin, ProlongationReason
+from itou.approvals.models import Suspension
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
@@ -281,3 +288,94 @@ def test_search_fields(admin_client):
     response = admin_client.get(list_url, {"q": "martin"})
     assertNotContains(response, url_1)
     assertContains(response, url_2)
+
+
+@freeze_time("2025-06-20", tick=False)
+def test_suspension_form(admin_client):
+    # Approval starts today.
+    # Suspension starts between approval.start_at and today.
+    initial_start_date = datetime(2025, 6, 1, tzinfo=UTC)
+    initial_end_date = Suspension.get_max_end_at(initial_start_date)
+    suspension = SuspensionFactory(
+        start_at=initial_start_date.date(),
+        end_at=initial_end_date.date(),
+        approval__start_at=datetime(2025, 2, 1, tzinfo=UTC).date(),
+        created_at=initial_start_date,
+    )
+    url = reverse("admin:approvals_suspension_change", args=(suspension.pk,))
+    response = admin_client.get(url)
+    assert response.status_code == 200
+
+    basic_data = {
+        "approval": suspension.approval.pk,
+        "siae": suspension.siae.pk,
+        "reason": suspension.reason,
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": 0,
+        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": 1,
+        "utils-pksupportremark-content_type-object_id-0-remark": "",
+        "utils-pksupportremark-content_type-object_id-0-id": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+    }
+
+    # Test Suspension.clean() method to make sure is taken into account in the SuspensionAdminForm too.
+    # new suspension.start at > suspension.created_at
+    new_start_date = datetime(2025, 6, 20, tzinfo=UTC)
+    new_end_date = Suspension.get_max_end_at(new_start_date)
+
+    response = admin_client.post(
+        url,
+        data=basic_data
+        | {
+            "start_at": new_start_date.strftime("%d/%m/%Y"),
+            "initial-start_at": initial_start_date.strftime("%d/%m/%Y"),
+            "end_at": new_end_date.strftime("%d/%m/%Y"),
+            "initial-end_at": initial_end_date.strftime("%d/%m/%Y"),
+        },
+    )
+    assert response.status_code == 302
+    suspension.refresh_from_db()
+    assert suspension.start_at == new_start_date.date()
+    assert suspension.end_at == new_end_date.date()
+
+    # New start date is before approval.start_at. Also part of the parent.clean() method.
+    new_start_date = suspension.approval.start_at - relativedelta(days=4)
+    new_end_at = Suspension.get_max_end_at(new_start_date)
+    original_suspension = copy.deepcopy(suspension)
+    response = admin_client.post(
+        url,
+        data=basic_data
+        | {
+            "start_at": new_start_date.strftime("%d/%m/%Y"),
+            "initial-start_at": initial_start_date.strftime("%d/%m/%Y"),
+            "end_at": new_end_at.strftime("%d/%m/%Y"),
+            "initial-end_at": initial_end_date.strftime("%d/%m/%Y"),
+        },
+    )
+    assertContains(response, "La suspension ne peut pas commencer en dehors des limites du PASS IAE")
+    suspension.refresh_from_db()
+    assert suspension.start_at == original_suspension.start_at
+    assert suspension.created_at == original_suspension.created_at
+    assert suspension.end_at == original_suspension.end_at
+
+    # Only for the admin: new suspension start at < suspension.created_at is allowed.
+    new_start_date = suspension.created_at - relativedelta(days=4)
+    new_end_date = Suspension.get_max_end_at(new_start_date)
+    response = admin_client.post(
+        url,
+        data=basic_data
+        | {
+            "start_at": new_start_date.strftime("%d/%m/%Y"),
+            "initial-start_at": suspension.start_at.strftime("%d/%m/%Y"),
+            "end_at": new_end_date.strftime("%d/%m/%Y"),
+            "initial-end_at": suspension.end_at.strftime("%d/%m/%Y"),
+        },
+    )
+    assert response.status_code == 302
+    suspension.refresh_from_db()
+    assert suspension.start_at == new_start_date.date()
+    assert suspension.end_at == new_end_date.date()
+    assert suspension.updated_at == timezone.now()
+    assert suspension.created_at == new_start_date

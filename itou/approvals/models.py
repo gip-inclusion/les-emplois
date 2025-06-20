@@ -1336,6 +1336,10 @@ class Suspension(models.Model):
                 return start_at_threshold
 
         # FIXME: at this point start_at can still be None if `with_retroactivity_limitation` is `False`
+        # TODO(cms): as customer support why boundary is suspension.created_at and not approval.start_at
+        # if not start_at:
+        #     start_at = approval.start_at
+
         return start_at
 
 
