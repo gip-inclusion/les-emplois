@@ -45,6 +45,10 @@
                     </form>
                 {% endif %}
             {% endif %}
+            <a class="btn btn-lg btn-ico btn-secondary" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
+                <i class="ri-download-line fw-medium" aria-hidden="true"></i>
+                <span>Exporter</span>
+            </a>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}

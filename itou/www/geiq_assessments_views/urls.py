@@ -63,6 +63,11 @@ urlpatterns = [
         name="assessment_contracts_list",
     ),
     path(
+        "<uuid:pk>/export",
+        views.assessment_contracts_export,
+        name="assessment_contracts_export",
+    ),
+    path(
         "contracts/<uuid:contract_pk>/include",
         views.assessment_contracts_toggle,
         name="assessment_contracts_include",

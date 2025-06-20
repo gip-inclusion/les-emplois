@@ -415,6 +415,14 @@ class Employee(models.Model):
             )
         return actions
 
+    def sex_display(self):
+        if self.title == Title.M:
+            return "H"
+        elif self.title == Title.MME:
+            return "F"
+        else:
+            return ""
+
 
 class EmployeeContract(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -455,6 +463,15 @@ class EmployeeContract(models.Model):
                 postcode = self.employee.assessment.label_geiq_post_code
             return department_from_postcode(postcode)
         return None
+
+    def rupture_kind_display(self):
+        rupture = self.other_data.get("rupture")
+        if rupture:
+            return "Hors période d’essai"
+        elif rupture is None:
+            return ""
+        else:
+            return "En période d’essai"
 
 
 class EmployeePrequalification(models.Model):
