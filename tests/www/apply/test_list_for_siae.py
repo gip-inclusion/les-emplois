@@ -1286,8 +1286,8 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     assert get_transfer_button() is None
 
     # The employer needs at least an other Company to be able to transfer an application
-    other_company_1 = CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company
-    other_company_2 = CompanyMembershipFactory(
+    CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company
+    CompanyMembershipFactory(
         company__pk=3333, company__kind=CompanyKind.EITI, company__name="Superbe snapshot", user=employer
     ).company
 
@@ -1296,9 +1296,8 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     assert transfer_button is not None
     assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
 
-    other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
-    modal_selector = other_company_1_button["data-bs-target"]
-    assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
+    modal_selector = transfer_button["data-bs-target"]
+    assert modal_selector == "#transfer_confirmation_modal"
     modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
     assert pretty_indented(modal) == snapshot(name="modal with 1 transferable application")
 
@@ -1313,9 +1312,8 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     assert transfer_button is not None
     assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
 
-    other_company_1_button = transfer_button.parent.find_all("button", attrs={"data-bs-target": True})[0]
-    modal_selector = other_company_1_button["data-bs-target"]
-    assert modal_selector == f"#transfer_confirmation_modal_{other_company_1.pk}"
+    modal_selector = transfer_button["data-bs-target"]
+    assert modal_selector == "#transfer_confirmation_modal"
     modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
     assert pretty_indented(modal) == snapshot(name="modal with 2 transferable application")
 
@@ -1327,8 +1325,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         simulate_applications_selection(app_list)
         transfer_button = get_transfer_button()
         assert pretty_indented(transfer_button) == snapshot(name="inactive archive button")
-        assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_1.pk}") is None
-        assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_2.pk}") is None
+        assert simulated_page.find(id="transfer_confirmation_modal") is None
 
 
 def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
