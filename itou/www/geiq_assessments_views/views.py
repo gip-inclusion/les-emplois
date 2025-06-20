@@ -153,6 +153,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         "siret": current_siret,
         "campaign_label_infos": campaign_label_infos,
         "geiq_info": geiq_info,
+        "conflicting_antennas": [],
     }
     if geiq_info is None:
         return render(request, template_name, context)
@@ -362,7 +363,7 @@ def assessment_get_file(request, pk, *, file_field):
 def assessment_sync_file(request, pk, *, file_field):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
-    context = {"assessment": assessment}
+    context = {"assessment": assessment, "error": False}
     match file_field:
         case "summary_document_file":
             api_method = "get_synthese_pdf"
@@ -442,7 +443,7 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
 def assessment_contracts_sync(request, pk):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
-    context = {"assessment": assessment, "active_tab": AssessmentDetailsTab.MAIN}
+    context = {"assessment": assessment, "active_tab": AssessmentDetailsTab.MAIN, "error": False}
     if not assessment.contracts_synced_at:
         # Only sync if the file is not already set
         try:

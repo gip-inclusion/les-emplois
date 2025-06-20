@@ -6,7 +6,7 @@ import factory.fuzzy
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.geiq.sync import _nb_days_in_year
+from itou.geiq.sync import CONTRACT_MAPPING, EMPLOYEE_MAPPING, PREQUALIFICATION_MAPPING, _nb_days_in_year
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -17,6 +17,11 @@ from itou.geiq_assessments.models import (
 )
 from itou.users.enums import Title
 from tests.files.factories import FileFactory
+from tests.geiq.factories import (
+    SalarieContratLabelDataFactory,
+    SalarieLabelDataFactory,
+    SalariePreQualificationLabelDataFactory,
+)
 from tests.users.factories import EmployerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -75,8 +80,14 @@ class EmployeeFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     title = factory.fuzzy.FuzzyChoice(Title.values)
-    other_data = factory.LazyFunction(dict)
     allowance_amount = 0
+
+    @factory.lazy_attribute
+    def other_data(self):
+        data = SalarieLabelDataFactory.build()
+        for key in EMPLOYEE_MAPPING.values():
+            data.pop(key, None)
+        return data
 
 
 class EmployeePrequalificationFactory(factory.django.DjangoModelFactory):
@@ -87,7 +98,13 @@ class EmployeePrequalificationFactory(factory.django.DjangoModelFactory):
     label_id = factory.Sequence(int)
     start_at = factory.Faker("date_between", start_date="-5y", end_date="-6M")
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + datetime.timedelta(days=random.randint(0, 500)))
-    other_data = factory.LazyFunction(dict)
+
+    @factory.lazy_attribute
+    def other_data(self):
+        data = SalariePreQualificationLabelDataFactory.build()
+        for key in PREQUALIFICATION_MAPPING.values():
+            data.pop(key, None)
+        return data
 
 
 class EmployeeContractFactory(factory.django.DjangoModelFactory):
@@ -103,7 +120,6 @@ class EmployeeContractFactory(factory.django.DjangoModelFactory):
     end_at = factory.LazyAttribute(
         lambda obj: obj.planned_end_at - random.randint(0, 1) * datetime.timedelta(days=random.randint(0, 10))
     )
-    other_data = factory.LazyFunction(dict)
     nb_days_in_campaign_year = factory.LazyAttribute(
         lambda obj: _nb_days_in_year(
             obj.start_at,
@@ -115,3 +131,10 @@ class EmployeeContractFactory(factory.django.DjangoModelFactory):
         lambda obj: obj.nb_days_in_campaign_year > MIN_DAYS_IN_YEAR_FOR_ALLOWANCE
     )
     allowance_granted = False
+
+    @factory.lazy_attribute
+    def other_data(self):
+        data = SalarieContratLabelDataFactory.build()
+        for key in CONTRACT_MAPPING.values():
+            data.pop(key, None)
+        return data
