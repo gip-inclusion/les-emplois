@@ -906,6 +906,41 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
 
 
 @freeze_time("2022-09-13")
+def test_pe_certify_users_dry_run(settings, respx_mock, caplog, snapshot):
+    user = JobSeekerFactory(
+        pk=424242,
+        first_name="Yoder",
+        last_name="Olson",
+        jobseeker_profile__birthdate=datetime.date(1994, 2, 22),
+        jobseeker_profile__nir="194022734304328",
+    )
+    settings.API_ESD = {
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+    respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+        200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+    )
+
+    # user found immediately
+    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+        200, json=API_RECHERCHE_RESULT_KNOWN
+    )
+    call_command("pe_certify_users")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.users.management.commands.pe_certify_users succeeded in "
+    )
+    assert caplog.messages[:-1] == snapshot()
+
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+    assert user.jobseeker_profile.identity_certifications.all().count() == 0
+
+
+@freeze_time("2022-09-13")
 def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     user = JobSeekerFactory(
         pk=424243,

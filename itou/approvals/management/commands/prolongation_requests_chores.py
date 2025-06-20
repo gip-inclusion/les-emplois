@@ -9,7 +9,7 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.approvals.notifications import ProlongationRequestCreatedReminderForPrescriberNotification
 from itou.prescribers.models import PrescriberMembership
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 class Command(BaseCommand):
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     @transaction.atomic
-    def send_reminder_to_prescriber_organization_other_members(self, wet_run):
+    def send_reminder_to_prescriber_organization_other_members(self):
         first_reminder = Q(reminder_sent_at=None, created_at__date__lte=timezone.localdate() - relativedelta(days=10))
         subsequent_reminders = Q(reminder_sent_at__date__lte=timezone.localdate() - relativedelta(days=10))
 
@@ -32,36 +32,36 @@ class Command(BaseCommand):
 
         prolongation_reminded = 0
         for prolongation_request in queryset:
-            if wet_run:
+            ProlongationRequestCreatedReminderForPrescriberNotification(
+                prolongation_request.validated_by,
+                prolongation_request.prescriber_organization,
+                prolongation_request=prolongation_request,
+            ).send()
+            colleagues_to_notify = [
+                membership.user
+                for membership in PrescriberMembership.objects.active()
+                .filter(organization=prolongation_request.prescriber_organization)
+                .exclude(user=prolongation_request.validated_by)
+                .select_related("user")
+                # Limit to the last 10 active colleagues, admins take precedence over regular members.
+                # It should cover the ones dedicated to the IAE and some more.
+                .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
+            ]
+            for colleague in colleagues_to_notify:
                 ProlongationRequestCreatedReminderForPrescriberNotification(
-                    prolongation_request.validated_by,
+                    colleague,
                     prolongation_request.prescriber_organization,
                     prolongation_request=prolongation_request,
                 ).send()
-                colleagues_to_notify = [
-                    membership.user
-                    for membership in PrescriberMembership.objects.active()
-                    .filter(organization=prolongation_request.prescriber_organization)
-                    .exclude(user=prolongation_request.validated_by)
-                    .select_related("user")
-                    # Limit to the last 10 active colleagues, admins take precedence over regular members.
-                    # It should cover the ones dedicated to the IAE and some more.
-                    .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
-                ]
-                for colleague in colleagues_to_notify:
-                    ProlongationRequestCreatedReminderForPrescriberNotification(
-                        colleague,
-                        prolongation_request.prescriber_organization,
-                        prolongation_request=prolongation_request,
-                    ).send()
 
-                prolongation_request.reminder_sent_at = timezone.now()
-                prolongation_request.save(update_fields=["reminder_sent_at", "updated_at"])
-                prolongation_reminded += 1
+            prolongation_request.reminder_sent_at = timezone.now()
+            prolongation_request.save(update_fields=["reminder_sent_at", "updated_at"])
+            prolongation_reminded += 1
         self.logger.info(f"{prolongation_reminded}/{len(queryset)} prolongation request{pluralize(queryset)} reminded")
 
-    def handle(self, *, command, wet_run, **options):
+    @dry_runnable
+    def handle(self, *, command, **options):
         if command == "email_reminder":
-            self.send_reminder_to_prescriber_organization_other_members(wet_run=wet_run)
+            self.send_reminder_to_prescriber_organization_other_members()
         else:
             raise CommandError(f"Unknown {command=}")

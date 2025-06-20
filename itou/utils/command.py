@@ -1,5 +1,6 @@
 import collections
 import contextlib
+import functools
 import logging
 import os
 import time
@@ -7,6 +8,7 @@ import uuid
 
 from asgiref.local import Local  # NOQA
 from django.core.management import base
+from django.db import connection, transaction
 
 from itou.utils import triggers
 
@@ -86,3 +88,20 @@ class LoggedCommandMixin:
 class BaseCommand(LoggedCommandMixin, base.BaseCommand):
     def handle(self, *args, **options):
         raise NotImplementedError()
+
+
+def dry_runnable(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        wet_run = kwargs.get("wet_run")
+        if wet_run is None:
+            raise RuntimeError('No "wet_run" argument was given')
+
+        with transaction.atomic():
+            func(*args, **kwargs)
+            if not wet_run:
+                with connection.cursor() as cursor:
+                    cursor.execute("SET CONSTRAINTS ALL IMMEDIATE;")
+                transaction.set_rollback(True)
+
+    return wrapper

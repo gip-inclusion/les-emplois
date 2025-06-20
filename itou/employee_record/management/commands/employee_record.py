@@ -1,11 +1,9 @@
 import argparse
 import uuid
 
-from django.db import transaction
-
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 class Command(BaseCommand):
@@ -44,8 +42,6 @@ class Command(BaseCommand):
         resend.add_argument("--wet-run", action="store_true")
 
     def create(self, *, job_application, siret, ready, wet_run):
-        sid = transaction.savepoint()
-
         employee_record = EmployeeRecord.from_job_application(JobApplication.objects.get(pk=job_application))
         if ready:
             employee_record.ready()
@@ -55,25 +51,13 @@ class Command(BaseCommand):
             employee_record.siret = siret
             employee_record.save(update_fields={"siret", "updated_at"})
 
-        if wet_run:
-            transaction.savepoint_commit(sid)
-        else:
-            transaction.savepoint_rollback(sid)
-
     def resend(self, *, employee_record, unarchive, wet_run):
-        sid = transaction.savepoint()
-
         employee_record = EmployeeRecord.objects.get(pk=employee_record)
         if unarchive:
             employee_record.unarchive()
         employee_record.ready()
 
-        if wet_run:
-            transaction.savepoint_commit(sid)
-        else:
-            transaction.savepoint_rollback(sid)
-
-    @transaction.atomic()
+    @dry_runnable
     def handle(self, *, command, **options):
         match command:
             case "create":

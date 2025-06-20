@@ -856,7 +856,7 @@ class TestAnonymizeProfessionalManagementCommand:
         "suspended,expected_message",
         [
             (True, "Anonymizing professionals is suspended, exiting command"),
-            (False, "Start anonymizing professionals in wet_run mode"),
+            (False, "Start anonymizing professionals"),
         ],
     )
     def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):

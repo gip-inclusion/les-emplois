@@ -14,7 +14,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 from itou.utils.constants import GRACE_PERIOD
 
 
@@ -47,10 +47,7 @@ class Command(BaseCommand):
             last_login__gte=F("upcoming_deletion_notified_at"),
         )
 
-        if self.wet_run:
-            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
-        else:
-            reset_nb = users_to_reset_qs.count()
+        reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
         self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
 
     @transaction.atomic
@@ -70,13 +67,12 @@ class Command(BaseCommand):
         # users to anonymize or delete that have an email set
         users_to_remove_from_contact = [user for user in users if user.email]
 
-        if self.wet_run:
-            for user in users:
-                ArchiveUser(user).send()
+        for user in users:
+            ArchiveUser(user).send()
 
-            self.anonymize_and_delete_professionals(users_to_delete)
-            self.anonymize_professionals_without_deletion(users_to_anonymize)
-            self.remove_from_contact(users_to_remove_from_contact)
+        self.anonymize_and_delete_professionals(users_to_delete)
+        self.anonymize_professionals_without_deletion(users_to_anonymize)
+        self.remove_from_contact(users_to_remove_from_contact)
 
         self.logger.info("Anonymized professionals after grace period, count: %d", len(users))
         self.logger.info(
@@ -168,13 +164,13 @@ class Command(BaseCommand):
             "timezone": "UTC",
         },
     )
-    def handle(self, *args, wet_run, batch_size, **options):
+    @dry_runnable
+    def handle(self, *args, batch_size, **options):
         if settings.SUSPEND_ANONYMIZE_PROFESSIONALS:
             self.logger.info("Anonymizing professionals is suspended, exiting command")
             return
-        self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start anonymizing professionals in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start anonymizing professionals")
 
         self.reset_notified_professionals_with_recent_activity()
         self.anonymize_professionals_after_grace_period()

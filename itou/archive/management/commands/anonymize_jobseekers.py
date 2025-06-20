@@ -15,7 +15,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 from itou.utils.constants import GRACE_PERIOD
 
 
@@ -108,10 +108,7 @@ class Command(BaseCommand):
             .filter(last_activity__gte=F("upcoming_deletion_notified_at"))
         )
 
-        if self.wet_run:
-            reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
-        else:
-            reset_nb = users_to_reset_qs.count()
+        reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
         self.logger.info("Reset notified job seekers with recent activity: %s", reset_nb)
 
     @transaction.atomic
@@ -169,16 +166,15 @@ class Command(BaseCommand):
             anonymized_jobapplication(job_application) for job_application in jobapplications_to_archive
         ]
 
-        if self.wet_run:
-            for user in users_to_archive:
-                ArchiveUser(
-                    user,
-                ).send()
+        for user in users_to_archive:
+            ArchiveUser(
+                user,
+            ).send()
 
-            AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
-            AnonymizedApplication.objects.bulk_create(archived_jobapplications)
-            self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
-            self._delete_jobseekers_with_related_objects(users_to_archive)
+        AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
+        AnonymizedApplication.objects.bulk_create(archived_jobapplications)
+        self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
+        self._delete_jobseekers_with_related_objects(users_to_archive)
 
         self.logger.info("Anonymized jobseekers after grace period, count: %d", len(archived_jobseekers))
         self.logger.info("Anonymized job applications after grace period, count: %d", len(archived_jobapplications))
@@ -205,14 +201,14 @@ class Command(BaseCommand):
             "timezone": "UTC",
         },
     )
-    def handle(self, *args, wet_run, batch_size, **options):
+    @dry_runnable
+    def handle(self, *args, batch_size, **options):
         if settings.SUSPEND_ANONYMIZE_JOBSEEKERS:
             self.logger.info("Anonymizing job seekers is suspended, exiting command")
             return
 
-        self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start anonymizing job seekers in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start anonymizing job seekers")
 
         self.reset_notified_jobseekers_with_recent_activity()
         self.archive_jobseekers_after_grace_period()
