@@ -410,6 +410,20 @@
     'count=0 users have been swapped',
   ])
 # ---
+# name: test_pe_certify_users_dry_run
+  list([
+    'about to resolve first_name and last_name for count=1 users',
+    'only count=1 users have the necessary data to be resolved',
+    'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
+    'HTTP Request: POST https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie "HTTP/1.1 200 OK"',
+    'certified user pk=424242',
+    'count=1 users have been examined.',
+    'count=1 users have been certified',
+    'count=1 identity certifications recorded.',
+    'count=0 users could not be certified.',
+    'count=0 users have been swapped',
+  ])
+# ---
 # name: test_pe_certify_users_with_swap
   list([
     'about to resolve first_name and last_name for count=1 users',

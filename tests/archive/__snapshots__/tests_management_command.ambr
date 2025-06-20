@@ -78,13 +78,13 @@
   <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'postponed', 'refusal_reason': '', 'had_been_transferred': True, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
-  'Start anonymizing job seekers in dry_run mode'
+  'Start anonymizing job seekers'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_jobseekers_command_log]
   'Anonymizing job seekers is suspended, exiting command'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_jobseekers_command_log]
-  'Start anonymizing job seekers in wet_run mode'
+  'Start anonymizing job seekers'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_jobseekers_command_log]
   'Anonymizing job seekers is suspended, exiting command'
@@ -143,21 +143,30 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 79,
+    'num_queries': 81,
     'queries': list([
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -174,6 +183,7 @@
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -183,6 +193,7 @@
           'Command.get_users[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -239,6 +250,7 @@
           'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -370,6 +382,7 @@
           'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -400,6 +413,7 @@
           'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -430,6 +444,7 @@
           'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -462,6 +477,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -484,6 +500,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -506,6 +523,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -528,6 +546,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -550,6 +569,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -572,6 +592,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -594,6 +615,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -616,6 +638,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -638,6 +661,7 @@
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -658,6 +682,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -683,6 +708,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -738,6 +764,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -760,6 +787,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -782,6 +810,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -812,6 +841,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -834,6 +864,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -856,6 +887,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -878,6 +910,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -900,6 +933,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -922,6 +956,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -952,6 +987,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -982,6 +1018,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1004,6 +1041,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1026,6 +1064,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1048,6 +1087,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1070,6 +1110,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1092,6 +1133,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1114,6 +1156,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1143,6 +1186,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1165,6 +1209,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1187,6 +1232,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1219,6 +1265,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1251,6 +1298,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1273,6 +1321,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1295,6 +1344,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1317,6 +1367,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1339,6 +1390,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1361,6 +1413,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1401,6 +1454,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1441,6 +1495,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1481,6 +1536,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1521,6 +1577,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1543,6 +1600,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1565,6 +1623,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1587,6 +1646,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1609,6 +1669,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1631,6 +1692,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1665,6 +1727,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1687,6 +1750,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1709,6 +1773,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1731,6 +1796,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1753,6 +1819,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1775,6 +1842,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1797,6 +1865,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1833,6 +1902,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1855,6 +1925,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1876,6 +1947,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1897,6 +1969,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1918,6 +1991,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1939,6 +2013,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1960,6 +2035,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1981,6 +2057,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2002,6 +2079,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2023,6 +2101,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2044,6 +2123,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2065,6 +2145,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2086,6 +2167,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2107,6 +2189,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2128,6 +2211,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2149,6 +2233,7 @@
           'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2169,6 +2254,15 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',

@@ -19,7 +19,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
 )
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 RETRY_DELAY = datetime.timedelta(days=7)
@@ -31,7 +31,8 @@ class Command(BaseCommand):
         # default chunk size is chosen to be 200 so that the cron lasts about 3 minutes.
         parser.add_argument("--chunk-size", action="store", dest="chunk_size", default=200, type=int)
 
-    def handle(self, wet_run, chunk_size, **options):
+    @dry_runnable
+    def handle(self, chunk_size, **options):
         pe_client = pole_emploi_partenaire_api_client()
 
         @tenacity.retry(
@@ -103,28 +104,27 @@ class Command(BaseCommand):
             else:
                 certify_user(user, response)
 
-        if wet_run:
-            self.logger.info("count=%d users have been examined.", len(examined_profiles))
+        self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
-            JobSeekerProfile.objects.bulk_update(
-                certified_profiles,
-                [
-                    "pe_obfuscated_nir",
-                    "pe_last_certification_attempt_at",
-                ],
-                batch_size=1000,
-            )
-            self.logger.info("count=%d users have been certified", len(certified_profiles))
-            IdentityCertification.objects.upsert_certifications(identity_certifications)
-            self.logger.info("count=%d identity certifications recorded.", len(identity_certifications))
+        JobSeekerProfile.objects.bulk_update(
+            certified_profiles,
+            [
+                "pe_obfuscated_nir",
+                "pe_last_certification_attempt_at",
+            ],
+            batch_size=1000,
+        )
+        self.logger.info("count=%d users have been certified", len(certified_profiles))
+        IdentityCertification.objects.upsert_certifications(identity_certifications)
+        self.logger.info("count=%d identity certifications recorded.", len(identity_certifications))
 
-            not_certified = set(examined_profiles) - set(certified_profiles)
-            JobSeekerProfile.objects.bulk_update(
-                not_certified,
-                ["pe_last_certification_attempt_at"],
-                batch_size=1000,
-            )
-            self.logger.info("count=%d users could not be certified.", len(not_certified))
+        not_certified = set(examined_profiles) - set(certified_profiles)
+        JobSeekerProfile.objects.bulk_update(
+            not_certified,
+            ["pe_last_certification_attempt_at"],
+            batch_size=1000,
+        )
+        self.logger.info("count=%d users could not be certified.", len(not_certified))
 
-            User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
-            self.logger.info("count=%d users have been swapped", len(swapped_users))
+        User.objects.bulk_update(swapped_users, ["first_name", "last_name"], batch_size=1000)
+        self.logger.info("count=%d users have been swapped", len(swapped_users))

@@ -3,7 +3,7 @@ import argparse
 from django.db import transaction
 
 from itou.companies import models as companies_models, transfer
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 HELP_TEXT = """
@@ -28,10 +28,6 @@ HELP_TEXT = """
     And in production:
     $ cd && cd app_* && django-admin move_company_data --from 3243 --to 9612 --wet-run
 """
-
-
-class DryRunException(Exception):
-    """Used to rollback database changes"""
 
 
 class Command(BaseCommand):
@@ -74,12 +70,12 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
+    @dry_runnable
     def handle(
         self,
         from_id,
         to_id,
         *,
-        wet_run,
         ignore_siae_evaluations,
         only_job_applications,
         preserve_to_company_data,
@@ -166,15 +162,9 @@ class Command(BaseCommand):
                         )
                     else:
                         self.stdout.write(f"| {section.label}: {len(section_changes)}")
-                        if wet_run:
-                            # Print more info to help a possible rollback
-                            for section_change in section_changes:
-                                self.stdout.write(f"| - {section_change}")
+                        # Print more info to help a possible rollback
+                        for section_change in section_changes:
+                            self.stdout.write(f"| - {section_change}")
 
-                if not wet_run:
-                    raise DryRunException("Rollback!")
         except transfer.TransferError as e:
             self.stderr.write(e.args[0])
-        except DryRunException:
-            self.stdout.write("Transfer rolled back in dry run mode.\n")
-            return
