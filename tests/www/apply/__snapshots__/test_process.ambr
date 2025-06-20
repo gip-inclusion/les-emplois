@@ -223,6 +223,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -1274,6 +1279,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
           
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0
@@ -2481,6 +2491,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
           
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0
@@ -3641,6 +3656,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
           
             (SELECT COUNT(U0."id") AS "count"
              FROM "rdv_insertion_participation" U0

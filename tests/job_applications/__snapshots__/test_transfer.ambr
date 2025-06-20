@@ -335,7 +335,12 @@
               "qualification_level" = %s,
               "planned_training_hours" = NULL,
               "inverted_vae_contract" = NULL,
-              "diagoriente_invite_sent_at" = NULL
+              "diagoriente_invite_sent_at" = NULL,
+              "shared_comment" = NULL,
+              "shared_comment_last_modified_at" = NULL,
+              "shared_comment_last_modified_by_id" = NULL,
+              "shared_comment_locked_at" = NULL,
+              "shared_comment_locked_by_id" = NULL
           WHERE "job_applications_jobapplication"."id" = %s
         ''',
       }),

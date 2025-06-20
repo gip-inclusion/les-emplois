@@ -84,6 +84,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  COALESCE(
                             (SELECT U0."timestamp" AS "timestamp"
                              FROM "job_applications_jobapplicationtransitionlog" U0
@@ -330,7 +335,7 @@
                                  FROM "job_applications_jobapplicationtransitionlog" U0
                                  ORDER BY 1 DESC
                                  LIMIT 1), "job_applications_jobapplication"."updated_at") >= %s)
-          ORDER BY 47 DESC
+          ORDER BY 52 DESC
           LIMIT 3
         ''',
       }),
