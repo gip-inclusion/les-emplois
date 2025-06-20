@@ -145,7 +145,7 @@
                           <label class="form-label" for="id_organization_members">
                               Nom de la personne
                           </label>
-                          <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
+                          <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_organization_members" lang="fr" multiple="" name="organization_members">
                           </select>
                       </div>
                   </div>
@@ -178,7 +178,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
                                                   <label class="form-check-label" for="id_eligibility_validated">
                                                       Valide
                                                   </label>
@@ -188,7 +188,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
                                                   <label class="form-check-label" for="id_eligibility_pending">
                                                       À valider
                                                   </label>
@@ -206,7 +206,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
                                                   <label class="form-check-label" for="id_pass_iae_active">
                                                       Valide
                                                   </label>
@@ -216,7 +216,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
                                                   <label class="form-check-label" for="id_pass_iae_expired">
                                                       Expiré
                                                   </label>
@@ -226,7 +226,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
                                                   <label class="form-check-label" for="id_no_pass_iae">
                                                       Aucun
                                                   </label>
@@ -243,7 +243,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
                                                   <label class="form-check-label" for="id_is_stalled">
                                                       N’afficher que les candidats sans solution
                                                   </label>
@@ -289,7 +289,7 @@
                                   <label class="visually-hidden" for="id_job_seeker">
                                       Nom
                                   </label>
-                                  <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
                                       </option>
                                   </select>
@@ -476,7 +476,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/>
                                                   <label class="form-check-label" for="id_eligibility_validated">
                                                       Valide
                                                   </label>
@@ -486,7 +486,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_eligibility_pending" name="eligibility_pending" type="checkbox"/>
                                                   <label class="form-check-label" for="id_eligibility_pending">
                                                       À valider
                                                   </label>
@@ -504,7 +504,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/>
                                                   <label class="form-check-label" for="id_pass_iae_active">
                                                       Valide
                                                   </label>
@@ -514,7 +514,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_pass_iae_expired" name="pass_iae_expired" type="checkbox"/>
                                                   <label class="form-check-label" for="id_pass_iae_expired">
                                                       Expiré
                                                   </label>
@@ -524,7 +524,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_no_pass_iae" name="no_pass_iae" type="checkbox"/>
                                                   <label class="form-check-label" for="id_no_pass_iae">
                                                       Aucun
                                                   </label>
@@ -541,7 +541,7 @@
                                       <li>
                                           <div class="dropdown-item">
                                               <div class="form-check">
-                                                  <input class="form-check-input" id="id_is_stalled" name="is_stalled" type="checkbox"/>
+                                                  <input class="form-check-input is-valid" id="id_is_stalled" name="is_stalled" type="checkbox"/>
                                                   <label class="form-check-label" for="id_is_stalled">
                                                       N’afficher que les candidats sans solution
                                                   </label>
@@ -578,7 +578,7 @@
                                   <label class="visually-hidden" for="id_job_seeker">
                                       Nom
                                   </label>
-                                  <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
+                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du candidat" data-theme="bootstrap-5" id="id_job_seeker" lang="fr" name="job_seeker">
                                       <option selected="" value="">
                                       </option>
                                   </select>

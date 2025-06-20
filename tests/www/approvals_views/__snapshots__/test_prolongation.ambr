@@ -25,7 +25,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           12 mois (365 jours) maximum pour chaque demande.
@@ -42,7 +42,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           12 mois (365 jours) maximum pour chaque demande.
@@ -59,7 +59,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           12 mois (365 jours) maximum pour chaque demande.
@@ -76,7 +76,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="" value="2024-10-22">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           12 mois (365 jours) maximum pour chaque demande.
@@ -93,7 +93,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" required="" value="2033-10-20">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" required="" value="2033-10-20">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).
@@ -162,7 +162,7 @@
       <label class="form-label" for="id_end_at">
           Du 23/10/2023 au
       </label>
-      <duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" required="" value="2033-10-20">
+      <duet-date-picker aria-describedby="id_end_at_helptext" class="is-valid" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" required="" value="2033-10-20">
       </duet-date-picker>
       <div class="form-text" id="id_end_at_helptext">
           Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).
