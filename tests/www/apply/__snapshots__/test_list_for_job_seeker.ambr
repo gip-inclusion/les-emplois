@@ -315,6 +315,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -617,9 +622,9 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
-                   52,
-                   53,
+                   54,
+                   57,
+                   58,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -903,6 +908,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -1177,8 +1187,8 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
-                   50,
+                   54,
+                   55,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
