@@ -1268,14 +1268,14 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
 
     def get_transfer_button():
-        archive_buttons = [
+        transfer_buttons = [
             button
             for button in simulated_page.find(id="batch-action-box").find_all("button")
-            if button.contents[0].strip() == "Transférer vers"
+            if button.text.strip() == "Transférer vers"
         ]
-        if not archive_buttons:
+        if not transfer_buttons:
             return None
-        [archive_button] = archive_buttons
+        [archive_button] = transfer_buttons
         return archive_button
 
     # assert get_archive_modal() is None
