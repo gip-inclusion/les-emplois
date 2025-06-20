@@ -64,8 +64,15 @@
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries with result]
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -421,8 +428,15 @@
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries without filter]
   dict({
-    'num_queries': 7,
+    'num_queries': 8,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -776,8 +790,15 @@
 # ---
 # name: test_candidatures_geiq_nominal[SQL queries without result]
   dict({
-    'num_queries': 3,
+    'num_queries': 4,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
