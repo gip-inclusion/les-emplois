@@ -184,7 +184,7 @@ def get_rows_from_streaming_response(response):
     content = b"".join(response.streaming_content)
     workbook = openpyxl.load_workbook(io.BytesIO(content))
     worksheet = workbook.active
-    return [[cell.value or "" for cell in row] for row in worksheet.rows]
+    return [[cell.value if cell.value is not None else "" for cell in row] for row in worksheet.rows]
 
 
 def excel_date_format(value):
