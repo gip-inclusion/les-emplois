@@ -139,6 +139,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "transferred_from",
         "origin",
         "state",
+        "diagoriente_invite_sent_at",
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline, EmployeeRecordInline)
 
@@ -157,6 +158,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "answer_to_prescriber",
                     "hiring_start_at",
                     "hiring_end_at",
+                    "hired_job",
                     "create_employee_record",
                 ]
             },
@@ -216,6 +218,8 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "updated_at",
                     "processed_at",
                     "archived_at",
+                    "archived_by",
+                    "diagoriente_invite_sent_at",
                 ]
             },
         ),
