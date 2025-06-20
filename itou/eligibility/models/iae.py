@@ -4,7 +4,7 @@ import logging
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import Case, Exists, OuterRef, When
+from django.db.models import Case, Exists, OuterRef, Q, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
@@ -107,6 +107,29 @@ class EligibilityDiagnosisManager(models.Manager):
             last = query.for_job_seeker_and_siae(job_seeker, siae=for_siae).last()
 
         return last
+
+    def last_for_job_seeker(self, job_seeker):
+        """
+        Retrieves the given job seeker eligibility diagnosis from his perpective:
+          - a valid diagnosis (considered valid even if expired, if an approval is ongoing),
+        either from an authorized prescriber or from an employer, if the diagnosis leads
+        to an approval
+          - an expired diagnosis if there is no valid diagnoses but an expired one
+        """
+
+        approval_subquery = Exists(Approval.objects.filter(eligibility_diagnosis=OuterRef("pk")))
+        query = (
+            self.filter(job_seeker=job_seeker)
+            .prefetch_related("approval_set")
+            .annotate(with_approval=approval_subquery)
+            .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
+            .filter(Q(with_approval=True) | Q(author_kind=AuthorKind.PRESCRIBER))
+            .order_by("-from_prescriber", "-created_at")
+            .prefetch_related("selected_administrative_criteria__administrative_criteria")
+            .select_related("author", "author_siae", "author_prescriber_organization", "job_seeker")
+        )
+
+        return query.first()
 
 
 class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):

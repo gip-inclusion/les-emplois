@@ -1587,14 +1587,20 @@ def test_approval_state_badge(snapshot):
     assert badges.approval_state_badge(approval, force_valid=True) == snapshot(name="valid")
 
 
-@pytest.mark.parametrize("is_eligible", [True, False])
-def test_iae_eligibility_badge(snapshot, is_eligible):
-    assert badges.iae_eligibility_badge(is_eligible=is_eligible) == snapshot
+@pytest.mark.parametrize("is_eligible", [pytest.param(True, id="eligible"), pytest.param(False, id="not_eligible")])
+@pytest.mark.parametrize(
+    "for_job_seeker", [pytest.param(True, id="for_job_seeker"), pytest.param(False, id="not_for_job_seeker")]
+)
+def test_iae_eligibility_badge(snapshot, is_eligible, for_job_seeker):
+    assert badges.iae_eligibility_badge(is_eligible=is_eligible, for_job_seeker=for_job_seeker) == snapshot
 
 
-@pytest.mark.parametrize("is_eligible", [True, False])
-def test_geiq_eligibility_badge(snapshot, is_eligible):
-    assert badges.geiq_eligibility_badge(is_eligible=is_eligible) == snapshot
+@pytest.mark.parametrize("is_eligible", [pytest.param(True, id="eligible"), pytest.param(False, id="not_eligible")])
+@pytest.mark.parametrize(
+    "for_job_seeker", [pytest.param(True, id="for_job_seeker"), pytest.param(False, id="not_for_job_seeker")]
+)
+def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
+    assert badges.geiq_eligibility_badge(is_eligible=is_eligible, for_job_seeker=for_job_seeker) == snapshot
 
 
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
