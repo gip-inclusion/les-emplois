@@ -47,7 +47,7 @@
                                                 {% for field_name in category.notifications %}
                                                     <li>
                                                         {% get_form_field notification_form field_name as field %}
-                                                        {% bootstrap_field field field_class="mb-n3 notification-checkbox" %}
+                                                        {% bootstrap_field field wrapper_class="mb-0" field_class="notification-checkbox" %}
                                                     </li>
                                                 {% endfor %}
                                             </ul>
