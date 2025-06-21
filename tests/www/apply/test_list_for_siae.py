@@ -1293,7 +1293,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         transfer_buttons = [
             button
             for button in simulated_page.find(id="batch-action-box").find_all("button")
-            if button.contents[0].strip() == "Transférer vers"
+            if button.text.strip() == "Transférer vers"
         ]
         if not transfer_buttons:
             return None
