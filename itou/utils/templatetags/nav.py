@@ -1,11 +1,10 @@
-import sentry_sdk
 from django import template
-from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
 from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
+from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 
@@ -286,14 +285,6 @@ NAV_ENTRIES = {
 }
 
 
-def handle_nav_exception(e):
-    if settings.DEBUG:
-        # The django 500 page is used, it does not include this template tag.
-        raise
-    # Keep going, we may be rendering the 500 page.
-    sentry_sdk.capture_exception(e)
-
-
 def is_active(request, menu_item):
     return request.resolver_match.view_name in menu_item.active_view_names
 
@@ -379,7 +370,7 @@ def nav(request):
                 except AttributeError:
                     group_or_item.active = is_active(request, group_or_item)
     except Exception as e:
-        handle_nav_exception(e)
+        silently_report_exception(e)
     return {"menu_items": menu_items}
 
 
@@ -394,7 +385,7 @@ def nav_anonymous(request, *, mobile):
             for item in menu_items:
                 item.active = is_active(request, item)
     except Exception as e:
-        handle_nav_exception(e)
+        silently_report_exception(e)
     return {
         "menu_items": menu_items,
         "mobile": mobile,

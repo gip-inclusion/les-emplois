@@ -1,0 +1,22 @@
+{% if organizations|length == 0 %}
+    <div class="dropdown-toggle dropdown-toggle__summary">
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        <span>{{ kind_display }}</span>
+        <strong>{{ no_org_display }}</strong>
+    </div>
+{% elif organizations|length == 1 %}
+    <div class="dropdown-toggle dropdown-toggle__summary">
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        <span>{{ current_organization.kind }}</span>
+        <strong>{{ current_organization.display_name }}</strong>
+    </div>
+{% else %}
+    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        <span>{{ current_organization.kind }}</span>
+        <strong>{{ current_organization.display_name }}</strong>
+    </button>
+    <div class="dropdown-menu" id="switchUserDropdownMobile">
+        {% include "layout/_structure_switcher_dropdown_menu.html" %}
+    </div>
+{% endif %}

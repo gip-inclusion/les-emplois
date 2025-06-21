@@ -2,6 +2,7 @@
 {% load nav %}
 {% load redirection_fields %}
 {% load static %}
+{% load structure_switcher %}
 {% load theme_inclusion %}
 
 <header role="banner" id="header">
@@ -26,28 +27,7 @@
                                     {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=False csrf_token=csrf_token only %}
                                 </div>
                             </li>
-                            {% if request.organizations|length > 1 %}
-                                {# If the name of the organisation.display_name is longer than the .dropdown-structure width, it will be automatically truncated in css and it will be displayed in full in a tooltip. #}
-                                <li class="d-none d-lg-inline-block dropdown dropdown-structure">
-                                    <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
-                                        {% if user.is_employer %}
-                                            <i class="ri-community-line" aria-hidden="true"></i>
-                                        {% elif user.is_prescriber %}
-                                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
-                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
-                                            {% else %}
-                                                <i class="ri-group-line" aria-hidden="true"></i>
-                                            {% endif %}
-                                        {% else %}
-                                            <i class="ri-government-line" aria-hidden="true"></i>
-                                        {% endif %}
-                                        <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name }}</span>
-                                    </button>
-                                    <div class="dropdown-menu w-100" id="switchUserDropdown">
-                                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
-                                    </div>
-                                </li>
-                            {% endif %}
+                            {% structure_switcher mobile=False %}
                         </ul>
                     </nav>
                 </div>
@@ -63,76 +43,7 @@
 
     <div class="offcanvas" id="offcanvasNav" aria-label="Barre de navigation principale">
         <div class="offcanvas-header offcanvas-header--structure">
-            <div class="dropdown dropdown-structure flex-grow-1 py-4">
-                {% if request.organizations|length == 0 %}
-                    {% if user.is_job_seeker %}
-                        <div class="dropdown-toggle dropdown-toggle__summary">
-                            <i class="ri-user-line" aria-hidden="true"></i>
-                            <span>Candidat</span>
-                            <strong>{{ user.get_full_name }}</strong>
-                        </div>
-                    {% elif user.is_staff %}
-                        <div class="dropdown-toggle dropdown-toggle__summary">
-                            <i class="ri-admin-line" aria-hidden="true"></i>
-                            <span>Itou</span>
-                            <strong>Staff</strong>
-                        </div>
-                    {% elif user.is_employer %}
-                        <div class="dropdown-toggle dropdown-toggle__summary">
-                            <i class="ri-community-line" aria-hidden="true"></i>
-                            <span>Employeur</span>
-                            <strong>Compte inactif</strong>
-                        </div>
-                    {% elif user.is_labor_inspector %}
-                        <div class="dropdown-toggle dropdown-toggle__summary">
-                            <i class="ri-community-line" aria-hidden="true"></i>
-                            <span>Inspecteur du travail</span>
-                            <strong>Compte inactif</strong>
-                        </div>
-                    {% elif user.is_prescriber %}
-                        <div class="dropdown-toggle dropdown-toggle__summary">
-                            <i class="ri-user-line" aria-hidden="true"></i>
-                            <span>Orienteur seul</span>
-                            <strong>{{ user.get_full_name }}</strong>
-                        </div>
-                    {% endif %}
-                {% elif request.organizations|length == 1 %}
-                    <div class="dropdown-toggle dropdown-toggle__summary">
-                        {% if user.is_employer %}
-                            <i class="ri-community-line" aria-hidden="true"></i>
-                        {% elif user.is_prescriber %}
-                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
-                                <i class="ri-home-smile-line" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="ri-group-line" aria-hidden="true"></i>
-                            {% endif %}
-                        {% else %}
-                            <i class="ri-government-line" aria-hidden="true"></i>
-                        {% endif %}
-                        <span>{{ request.current_organization.kind }}</span>
-                        <strong>{{ request.current_organization.display_name }}</strong>
-                    </div>
-                {% else %}
-                    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
-                        {% if user.is_employer %}
-                            <i class="ri-community-line" aria-hidden="true"></i>
-                        {% elif user.is_prescriber %}
-                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
-                                <i class="ri-home-smile-line" aria-hidden="true"></i>
-                            {% else %}
-                                <i class="ri-group-line" aria-hidden="true"></i>
-                            {% endif %}
-                        {% else %}
-                            <i class="ri-government-line" aria-hidden="true"></i>
-                        {% endif %}
-                        <span>{{ request.current_organization.kind }}</span>
-                        <strong>{{ request.current_organization.display_name }}</strong>
-                    </button>
-                    <div class="dropdown-menu" id="switchUserDropdownMobile">
-                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
-                    </div>
-                {% endif %}
-            </div>
+            <div class="dropdown dropdown-structure flex-grow-1 py-4">{% structure_switcher mobile=True %}</div>
             <div class="border-start border-nuance-08 d-xl-none">
                 <button type="button" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
                     <i class="ri-close-line" aria-hidden="true"></i>
