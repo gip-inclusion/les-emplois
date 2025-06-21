@@ -81,6 +81,9 @@ def state_display_for_employer(evaluated_job_application):
             return ACCEPTED_BADGE
         return REFUSED_BADGE
 
+    if evaluated_job_application.accepted_from_certified_criteria():
+        return ACCEPTED_BADGE
+
     if evaluated_job_application.hide_state_from_siae():
         submitted_state = EvaluatedJobApplicationsState.SUBMITTED
         real_state_priority = EvaluatedJobApplication.STATES_PRIORITY.index(state)
