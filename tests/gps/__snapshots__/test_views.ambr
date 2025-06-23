@@ -3886,7 +3886,7 @@
                   </p>
               </div>
               <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" name="cancel" type="submit" value="1">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
                       Ce n'est pas le bénéficiaire que je cherche
                   </button>
                   <button class="btn btn-sm btn-primary" name="confirm" type="submit" value="1">
