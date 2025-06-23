@@ -388,8 +388,6 @@ ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
 BOOTSTRAP5 = {
     "required_css_class": "form-group-required",
-    # Fix https://github.com/zostera/django-bootstrap5/issues/287
-    "field_renderers": {"default": "itou.utils.custom_renderer.CustomFieldRenderer"},
     "wrapper_class": "form-group",
     "error_css_class": "is-invalid",
     "set_placeholder": False,

@@ -340,7 +340,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
           'IncludeNode[dashboard/edit_job_seeker_info.html]',
           'BlockNode[layout/base.html]',
@@ -695,7 +694,6 @@
       dict({
         'origin': list([
           'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
           'IncludeNode[dashboard/edit_job_seeker_info.html]',
           'BlockNode[layout/base.html]',
@@ -720,7 +718,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[dashboard/includes/edit_job_seeker_info_form.html]',
           'IncludeNode[dashboard/edit_job_seeker_info.html]',
           'BlockNode[layout/base.html]',
