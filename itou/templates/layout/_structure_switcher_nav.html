@@ -1,10 +1,10 @@
 {% if organizations|length > 1 %}
     <li class="d-none d-lg-inline-block dropdown dropdown-structure">
-        <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+        <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchStructureDropdown" aria-expanded="false">
             <i class="{{ icon }}" aria-hidden="true"></i>
             <span>{{ current_organization.kind }} - {{ current_organization.display_name }}</span>
         </button>
-        <div class="dropdown-menu w-100" id="switchUserDropdown">
+        <div class="dropdown-menu w-100" id="switchStructureDropdown">
             {% include "layout/_structure_switcher_dropdown_menu.html" %}
         </div>
     </li>
