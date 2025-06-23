@@ -1407,14 +1407,9 @@ class TestJoinGroupFromNir:
         )
         assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_nir"}]
 
-        # if we cancel: back to start with the nir we didn't find in the input
-        response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "cancel": "1"})
-        html_detail = parse_response_to_soup(response, selector="#main")
-        del html_detail.find(id="id_nir").attrs["value"]
-        assert pretty_indented(html_detail) == snapshot(name="get")
-        assert gps_logs(caplog) == [{"message": "GPS visit_join_group_from_nir"}]
+        # Cancelling dismissed the modal, nothing to test
 
-        # But if we accept:
+        # If we accept:
         response = client.post(self.URL, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": "1"})
         assertRedirects(response, reverse("gps:group_list"))
         assert_new_beneficiary_toast(response, job_seeker)

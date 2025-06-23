@@ -40,7 +40,9 @@
                                             </div>
                                             <div class="modal-footer">
                                                 {# Reload this page with a new form. #}
-                                                {% bootstrap_button "Ce n'est pas le bénéficiaire que je cherche" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">
+                                                    Ce n'est pas le bénéficiaire que je cherche
+                                                </button>
                                                 {# Go to the next step. #}
                                                 {% bootstrap_button "Ajouter le bénéficiaire" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                                             </div>
