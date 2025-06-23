@@ -1463,7 +1463,6 @@
       dict({
         'origin': list([
           'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[apply/includes/job_application_accept_form.html]',
           'IfNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
@@ -1491,7 +1490,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[apply/includes/job_application_accept_form.html]',
           'IfNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
@@ -2002,7 +2000,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -3097,7 +3094,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -4222,7 +4218,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -5317,7 +5312,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -6442,7 +6436,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -7537,7 +7530,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -8662,7 +8654,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
@@ -9757,7 +9748,6 @@
       }),
       dict({
         'origin': list([
-          'CustomFieldRenderer.render[utils/custom_renderer.py]',
           'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
           'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',

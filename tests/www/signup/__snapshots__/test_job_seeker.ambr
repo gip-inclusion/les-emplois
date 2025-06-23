@@ -276,19 +276,19 @@
           <label class="form-label" for="id_last_name">
               Nom
           </label>
-          <input class="form-control" disabled="" id="id_last_name" name="last_name" type="text" value="Doe"/>
+          <input class="form-control is-valid" disabled="" id="id_last_name" name="last_name" type="text" value="Doe"/>
       </div>
       <div class="form-group">
           <label class="form-label" for="id_first_name">
               Prénom
           </label>
-          <input class="form-control" disabled="" id="id_first_name" name="first_name" type="text" value="Jane"/>
+          <input class="form-control is-valid" disabled="" id="id_first_name" name="first_name" type="text" value="Jane"/>
       </div>
       <div class="form-group form-group-input-w-lg-33">
           <label class="form-label" for="id_birthdate">
               Date de naissance
           </label>
-          <input aria-describedby="id_birthdate_helptext" class="form-control" disabled="" id="id_birthdate" name="birthdate" type="text" value="01/01/1990"/>
+          <input aria-describedby="id_birthdate_helptext" class="form-control is-valid" disabled="" id="id_birthdate" name="birthdate" type="text" value="01/01/1990"/>
           <div class="form-text" id="id_birthdate_helptext">
               Au format JJ/MM/AAAA, par exemple 20/12/1978
           </div>
@@ -297,7 +297,7 @@
           <label class="form-label" for="id_birth_place">
               Commune de naissance
           </label>
-          <select class="form-select" disabled="" id="id_birth_place" name="birth_place">
+          <select class="form-select is-valid" disabled="" id="id_birth_place" name="birth_place">
               <option value="">
                   ---------
               </option>
@@ -310,7 +310,7 @@
           <label class="form-label" for="id_birth_country">
               Pays de naissance
           </label>
-          <select class="form-select" disabled="" id="id_birth_country" name="birth_country">
+          <select class="form-select is-valid" disabled="" id="id_birth_country" name="birth_country">
               <option value="">
                   ---------
               </option>
@@ -323,13 +323,13 @@
           <label class="form-label" for="id_nir">
               Numéro de sécurité sociale
           </label>
-          <input class="form-control" disabled="" id="id_nir" name="nir" type="text" value="290010101010125"/>
+          <input class="form-control is-valid" disabled="" id="id_nir" name="nir" type="text" value="290010101010125"/>
       </div>
       <div class="form-group form-group-input-w-lg-66">
           <label class="form-label" for="id_email">
               Adresse e-mail
           </label>
-          <input class="form-control" disabled="" id="id_email" maxlength="320" name="email" type="email" value="jane.doe@test.local"/>
+          <input class="form-control is-valid" disabled="" id="id_email" maxlength="320" name="email" type="email" value="jane.doe@test.local"/>
       </div>
       <p class="text-secondary fs-sm">
           Ces informations sont incorrectes ?
@@ -369,7 +369,7 @@
               Mot de passe (confirmation)
           </label>
           <div class="input-group">
-              <input autocomplete="new-password" class="form-control" id="id_password2" name="password2" placeholder="" required="" type="password"/>
+              <input autocomplete="new-password" class="form-control is-valid" id="id_password2" name="password2" placeholder="" required="" type="password"/>
               <div class="input-group-text p-0">
                   <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
                       <i aria-hidden="true" class="ri-eye-line">

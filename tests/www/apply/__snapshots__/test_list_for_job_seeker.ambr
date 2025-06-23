@@ -103,14 +103,14 @@
                       <label class="form-label" for="id_start_date">
                           À partir du
                       </label>
-                      <duet-date-picker class="" identifier="id_start_date" name="start_date">
+                      <duet-date-picker class="is-valid" identifier="id_start_date" name="start_date">
                       </duet-date-picker>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_end_date">
                           Jusqu'au
                       </label>
-                      <duet-date-picker class="" identifier="id_end_date" name="end_date">
+                      <duet-date-picker class="is-valid" identifier="id_end_date" name="end_date">
                       </duet-date-picker>
                   </div>
               </div>

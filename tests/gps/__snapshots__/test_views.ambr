@@ -2182,7 +2182,7 @@
                                   <label class="visually-hidden" for="id_beneficiary">
                                       Nom du bénéficiaire
                                   </label>
-                                  <select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du bénéficiaire" data-theme="bootstrap-5" id="id_beneficiary" lang="fr" name="beneficiary">
+                                  <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="Nom du bénéficiaire" data-theme="bootstrap-5" id="id_beneficiary" lang="fr" name="beneficiary">
                                       <option selected="" value="">
                                       </option>
                                       <option value="[PK of JobSeeker]">
@@ -3269,19 +3269,19 @@
                                   <label class="form-label" for="id_first_name">
                                       Prénom
                                   </label>
-                                  <input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/>
+                                  <input class="form-control is-valid" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_last_name">
                                       Nom
                                   </label>
-                                  <input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/>
+                                  <input class="form-control is-valid" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_email">
                                       Email
                                   </label>
-                                  <input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
+                                  <input autocomplete="off" class="form-control is-valid" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
                               </div>
                               <div class="row">
                                   <div class="col-12">
@@ -3381,19 +3381,19 @@
                                   <label class="form-label" for="id_first_name">
                                       Prénom
                                   </label>
-                                  <input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/>
+                                  <input class="form-control is-valid" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="Jane"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_last_name">
                                       Nom
                                   </label>
-                                  <input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/>
+                                  <input class="form-control is-valid" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Doe"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_email">
                                       Email
                                   </label>
-                                  <input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
+                                  <input autocomplete="off" class="form-control is-valid" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
                               </div>
                               <div class="row">
                                   <div class="col-12">
@@ -3496,19 +3496,19 @@
                                   <label class="form-label" for="id_first_name">
                                       Prénom
                                   </label>
-                                  <input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/>
+                                  <input class="form-control is-valid" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_last_name">
                                       Nom
                                   </label>
-                                  <input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/>
+                                  <input class="form-control is-valid" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_email">
                                       Email
                                   </label>
-                                  <input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
+                                  <input autocomplete="off" class="form-control is-valid" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
                               </div>
                               <div class="row">
                                   <div class="col-12">
@@ -3628,19 +3628,19 @@
                                   <label class="form-label" for="id_first_name">
                                       Prénom
                                   </label>
-                                  <input class="form-control" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/>
+                                  <input class="form-control is-valid" id="id_first_name" maxlength="150" name="first_name" required="" type="text" value="John"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_last_name">
                                       Nom
                                   </label>
-                                  <input class="form-control" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/>
+                                  <input class="form-control is-valid" id="id_last_name" maxlength="150" name="last_name" required="" type="text" value="Snow"/>
                               </div>
                               <div class="form-group form-group-required">
                                   <label class="form-label" for="id_email">
                                       Email
                                   </label>
-                                  <input autocomplete="off" class="form-control" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
+                                  <input autocomplete="off" class="form-control is-valid" id="id_email" maxlength="320" name="email" required="" type="text" value="jane.doe@test.local"/>
                               </div>
                               <div class="row">
                                   <div class="col-12">
