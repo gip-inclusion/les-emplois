@@ -75,7 +75,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
     )
     filters_form = MembershipsFiltersForm(
         memberships_qs=memberships,
-        data=request.GET or None,
+        data=request.GET,
         request=request,
     )
 

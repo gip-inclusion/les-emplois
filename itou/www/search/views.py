@@ -40,7 +40,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["data"] = self.request.GET or None
+        kwargs["data"] = self.request.GET
         return kwargs
 
     def get(self, request, *args, **kwargs):
@@ -288,7 +288,7 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
     city = None
     distance = None
-    form = PrescriberSearchForm(data=request.GET or None, initial={"distance": PrescriberSearchForm.DISTANCE_DEFAULT})
+    form = PrescriberSearchForm(data=request.GET, initial={"distance": PrescriberSearchForm.DISTANCE_DEFAULT})
     prescriber_orgs = []
 
     if form.is_valid():

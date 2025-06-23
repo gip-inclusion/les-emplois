@@ -85,7 +85,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if self.siae:
-            self.form = ApprovalForm(self.siae.pk, self.request.GET or None)
+            self.form = ApprovalForm(self.siae.pk, self.request.GET)
 
     def get_template_names(self):
         return ["approvals/includes/list_results.html" if self.request.htmx else "approvals/list.html"]

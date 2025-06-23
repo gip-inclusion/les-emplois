@@ -184,7 +184,7 @@ def company_select(request, template_name="signup/company_select.html"):
 
     next_url = get_safe_url(request, "next")
 
-    siren_form = forms.CompanySearchBySirenForm(data=request.GET or None)
+    siren_form = forms.CompanySearchBySirenForm(data=request.GET)
     company_select_form = None
 
     # The SIREN, when available, is always passed in the querystring.
