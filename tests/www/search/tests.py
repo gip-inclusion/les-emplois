@@ -11,7 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
-from itou.companies.models import Company
+from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import (
@@ -242,24 +242,26 @@ class TestSearchCompany:
         )
         assertContains(response, "Offres clauses sociales")
 
-    def test_is_overwhelmed(self, client):
+    def test_is_unpopular(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(company=company)
-        JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(
+            JobDescription.UNPOPULAR_THRESHOLD, to_company=company, selected_jobs=[job], state="new"
+        )
         response = client.get(self.URL, {"city": city.slug})
-        overwhelmed_badge = """
+        unpopular_badge = """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                <i class="ri-group-line me-1" aria-hidden="true"></i>
-                20+<span class="ms-1">candidatures</span>
+                <i class="ri-mail-send-line me-1" aria-hidden="true"></i>
+                <span class="ms-1">Soyez parmi les premiers à postuler</span>
             </span>
             """
-        assertNotContains(response, overwhelmed_badge, html=True)
+        assertContains(response, unpopular_badge, html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        assertContains(response, overwhelmed_badge, html=True)
+        assertNotContains(response, unpopular_badge, html=True)
 
     def test_has_no_active_members(self, client):
         create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
@@ -847,24 +849,26 @@ class TestJobDescriptionSearchView:
         jobs_results = response.context["results_page"]
         assert list(jobs_results) == [job1, job2, job3]
 
-    def test_is_overwhelmed(self, client):
+    def test_is_unpopular(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(company=company)
-        JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(
+            JobDescription.UNPOPULAR_THRESHOLD, to_company=company, selected_jobs=[job], state="new"
+        )
         response = client.get(self.URL, {"city": city.slug})
-        overwhelmed_badge = """
+        unpopular_badge = """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                <i class="ri-group-line me-1" aria-hidden="true"></i>
-                20+<span class="ms-1">candidatures</span>
+                <i class="ri-mail-send-line me-1" aria-hidden="true"></i>
+                <span class="ms-1">Soyez parmi les premiers à postuler</span>
             </span>
             """
-        assertNotContains(response, overwhelmed_badge, html=True)
+        assertContains(response, unpopular_badge, html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
-        assertContains(response, overwhelmed_badge, html=True)
+        assertNotContains(response, unpopular_badge, html=True)
 
     def test_no_department(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))

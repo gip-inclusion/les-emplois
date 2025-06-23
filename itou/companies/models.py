@@ -617,17 +617,10 @@ class JobDescriptionQuerySet(models.QuerySet):
             ),
         )
 
-    def with_annotation_is_overwhelmed(self):
-        # Avoid a circular import
-        from itou.job_applications.models import JobApplicationWorkflow
-
-        job_apps_filters = {
-            "jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES,
-            "jobapplication__archived_at": None,
-        }
-        annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(
-            is_overwhelmed=Case(
-                When(job_applications_count__gte=self.model.OVERWHELMED_THRESHOLD, then=True),
+    def with_annotation_is_unpopular(self):
+        annotation = self.with_job_applications_count().annotate(
+            is_unpopular=Case(
+                When(job_applications_count__lte=self.model.UNPOPULAR_THRESHOLD, then=True),
                 default=False,
                 output_field=BooleanField(),
             )
@@ -661,7 +654,7 @@ class JobDescription(models.Model):
     """
 
     MAX_UI_RANK = 32767
-    OVERWHELMED_THRESHOLD = 20
+    UNPOPULAR_THRESHOLD = 1
     # Max number or workable hours per week in France (Code du Travail)
     MAX_WORKED_HOURS_PER_WEEK = 48
 

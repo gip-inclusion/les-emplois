@@ -14,7 +14,6 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
 from itou.invitations.models import EmployerInvitation
-from itou.job_applications.enums import JobApplicationState
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
     CompanyFactory,
@@ -440,66 +439,39 @@ class TestCompanyQuerySet:
 
 
 class TestJobDescriptionQuerySet:
-    def test_with_annotation_is_overwhelmed(self):
+    def test_with_annotation_is_unpopular(self):
         company = CompanyFactory(with_jobs=True)
         job_seeker = JobSeekerFactory()  # We don't care if it's always the same
         siae_job_descriptions = company.job_description_through.all()
-        threshold_exceeded = JobDescription.OVERWHELMED_THRESHOLD + 1
+        popular_threshold = JobDescription.UNPOPULAR_THRESHOLD + 1
 
         # Test attribute presence
-        siae_job_description = JobDescription.objects.with_annotation_is_overwhelmed().first()
-        assert hasattr(siae_job_description, "is_overwhelmed")
+        siae_job_description = JobDescription.objects.with_annotation_is_unpopular().first()
+        assert hasattr(siae_job_description, "is_unpopular")
 
-        # Test overwhelmed threshold: overwhelmed job description
-        overwhelmed_job_description = siae_job_descriptions[0]
+        # Test unpopular job description
+        unpopular_job_description = siae_job_descriptions[0]
         JobApplicationFactory.create_batch(
-            threshold_exceeded,
+            popular_threshold - 1,
             to_company=company,
-            selected_jobs=[overwhelmed_job_description],
+            selected_jobs=[unpopular_job_description],
+            job_seeker=job_seeker,
+        )
+
+        assert JobDescription.objects.with_annotation_is_unpopular().get(pk=unpopular_job_description.pk).is_unpopular
+
+        # Test popular job description
+        popular_job_description = siae_job_descriptions[1]
+        JobApplicationFactory.create_batch(
+            popular_threshold,
+            to_company=company,
+            selected_jobs=[popular_job_description],
             job_seeker=job_seeker,
         )
 
         assert (
-            JobDescription.objects.with_annotation_is_overwhelmed()
-            .get(pk=overwhelmed_job_description.pk)
-            .is_overwhelmed
+            not JobDescription.objects.with_annotation_is_unpopular().get(pk=popular_job_description.pk).is_unpopular
         )
-
-        # Test overwhelmed threshold: non overwhelmed job description
-        non_overwhelmed_job_description = siae_job_descriptions[1]
-        JobApplicationFactory(to_company=company, selected_jobs=[non_overwhelmed_job_description])
-
-        assert (
-            not JobDescription.objects.with_annotation_is_overwhelmed()
-            .get(pk=non_overwhelmed_job_description.pk)
-            .is_overwhelmed
-        )
-
-        # Overwhelmed job descriptions count related **pending** job applications.
-        # They should ignore other states.
-        job_description = siae_job_descriptions[2]
-
-        JobApplicationFactory.create_batch(
-            threshold_exceeded,
-            to_company=company,
-            job_seeker=job_seeker,
-            selected_jobs=[overwhelmed_job_description],
-            state=JobApplicationState.ACCEPTED,
-        )
-
-        assert not JobDescription.objects.with_annotation_is_overwhelmed().get(pk=job_description.pk).is_overwhelmed
-
-        # Archived job applications should not count towards is_overwhelmed threshold.
-        job_description = siae_job_descriptions[3]
-        JobApplicationFactory.create_batch(
-            threshold_exceeded,
-            to_company=company,
-            job_seeker=job_seeker,
-            selected_jobs=[job_description],
-            archived_at=timezone.now() - timedelta(days=1),
-        )
-
-        assert not JobDescription.objects.with_annotation_is_overwhelmed().get(pk=job_description.pk).is_overwhelmed
 
     def test_with_job_applications_count(self):
         company = CompanyFactory(with_jobs=True)
