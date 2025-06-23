@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2025-06-23
+
+### Ajouté
+
+- [Employeur : prescrire une PMSMP depuis les Emplois](https://github.com/gip-inclusion/les-emplois/pull/6334)
+- [GEIQ: ajout de l'information de structure & son département aux contrats dans le bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/6343)
+- [Vie privée : mise à jour des modèles necessaire à l'anonymisation des professionnels](https://github.com/gip-inclusion/les-emplois/pull/6370)
+
+### Modifié
+
+- [Admin: ajout de champs manquant pour les candidatures](https://github.com/gip-inclusion/les-emplois/pull/6380)
+- [Candidature : permettre l'édition de la commune de naissance lors de l'acceptation d'une candidature, même si le candidat a des critères certifiés](https://github.com/gip-inclusion/les-emplois/pull/6333)
+- [Fiches Salarié : Suppression du bouton "Valider cette adresse" pour l'étape "Domiciliation du salarié"](https://github.com/gip-inclusion/les-emplois/pull/6325)
+- [GEIQ: diverses améliorations d'affichage pour le bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/6375)
+- [Interface: Correction de bugs à l'impression des fiches candidatures](https://github.com/gip-inclusion/les-emplois/pull/6372)
+- [Vie privée : ajout d'un tri sur la date de notification des candidats à anonymiser](https://github.com/gip-inclusion/les-emplois/pull/6373)
+
 ## 2025-06-16
 
 ### Ajouté
