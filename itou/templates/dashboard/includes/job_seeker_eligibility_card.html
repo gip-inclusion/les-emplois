@@ -15,9 +15,9 @@
                 {% endif %}
             </span>
             {% if kind == "IAE" %}
-                {% iae_eligibility_badge is_eligible=eligibility_diagnosis.is_considered_valid extra_class="badge-sm float-end" for_job_seeker=True %}
+                {% iae_eligibility_badge is_eligible=eligibility_diagnosis.is_considered_valid|default:False extra_class="badge-sm float-end" for_job_seeker=True %}
             {% elif kind == "GEIQ" %}
-                {% geiq_eligibility_badge is_eligible=eligibility_diagnosis.is_valid extra_class="badge-sm float-end" for_job_seeker=True %}
+                {% geiq_eligibility_badge is_eligible=eligibility_diagnosis.is_valid|default:False extra_class="badge-sm float-end" for_job_seeker=True %}
             {% endif %}
         </div>
         <div class="px-3 px-lg-4">
