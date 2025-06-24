@@ -3,14 +3,18 @@ import io
 import operator
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.contrib.gis.geos import Point
 from django.core import management
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
+from itou.companies.models import JobDescription
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 
 
@@ -197,3 +201,22 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     assert company_3.geocoding_score == 0.83
     assert company_3.coords.x == 13.13
     assert company_3.coords.y == 42.42
+
+
+def test_deactivate_old_job_description():
+    create_test_romes_and_appellations(("N1101",))
+    companies_factories.JobDescriptionFactory(
+        last_employer_update_at=timezone.now() - relativedelta(years=2),
+        location=None,
+    )
+    companies_factories.JobDescriptionFactory(
+        last_employer_update_at=None,
+        location=None,
+    )
+    recently_updated_job_description = companies_factories.JobDescriptionFactory(
+        last_employer_update_at=timezone.now() - relativedelta(years=2) + relativedelta(days=1),
+        location=None,
+    )
+    assert JobDescription.objects.active().count() == 3
+    management.call_command("deactivate_old_job_descriptions")
+    assert JobDescription.objects.active().get() == recently_updated_job_description
