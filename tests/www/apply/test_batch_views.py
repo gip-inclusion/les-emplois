@@ -446,7 +446,6 @@ class TestBatchPostpone:
             to_company=company,
             state=JobApplicationState.POSTPONED,
             answer="An existing answer",
-            archived_at=timezone.now(),
         )
         assert not postponed_app.postpone.is_available()
 
@@ -475,10 +474,10 @@ class TestBatchPostpone:
         client.force_login(employer)
 
         apps = [
-            # 2 archivable applications:
+            # 2 postponable applications:
             JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
             JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
-            # 1 unarchivable application:
+            # 1 unpostponable application:
             JobApplicationFactory(
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
@@ -491,7 +490,6 @@ class TestBatchPostpone:
                 job_seeker__last_name="Bond",
                 to_company=company,
                 state=JobApplicationState.POSTPONED,
-                archived_at=timezone.now(),
             ),
         ]
         next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})

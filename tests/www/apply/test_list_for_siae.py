@@ -1268,17 +1268,16 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
 
     def get_transfer_button():
-        archive_buttons = [
+        transfer_buttons = [
             button
             for button in simulated_page.find(id="batch-action-box").find_all("button")
             if button.contents[0].strip() == "Transférer vers"
         ]
-        if not archive_buttons:
+        if not transfer_buttons:
             return None
-        [archive_button] = archive_buttons
-        return archive_button
+        [transfer_button] = transfer_buttons
+        return transfer_button
 
-    # assert get_archive_modal() is None
     assert get_transfer_button() is None
 
     # Select 1 transferable application
@@ -1326,7 +1325,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     ]:
         simulate_applications_selection(app_list)
         transfer_button = get_transfer_button()
-        assert pretty_indented(transfer_button) == snapshot(name="inactive archive button")
+        assert pretty_indented(transfer_button) == snapshot(name="inactive transfer button")
         assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_1.pk}") is None
         assert simulated_page.find(id=f"transfer_confirmation_modal_{other_company_2.pk}") is None
 
@@ -1502,7 +1501,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
 
     assert get_refuse_button() is None
 
-    # Select 1 postponable application
+    # Select 1 refusable application
     simulate_applications_selection([refusable_app_1.pk])
     refuse_button = get_refuse_button()
     assert refuse_button is not None
@@ -1513,13 +1512,13 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     assert refuse_form_action.path == reverse("apply:batch_refuse")
     assert parse_qs(refuse_form_action.query) == {"next_url": [table_url]}
 
-    # Select 2 postponable applications
+    # Select 2 refusable applications
     simulate_applications_selection([refusable_app_1.pk, refusable_app_2.pk])
     refuse_button = get_refuse_button()
     assert refuse_button is not None
     assert pretty_indented(refuse_button) == snapshot(name="active refuse button")
 
-    # Test with unpostponable batches
+    # Test with unrefusable batches
     for app_list in [
         [unrefusable_app.pk],
         [refused_app.pk, refusable_app_1.pk],
