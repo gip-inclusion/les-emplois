@@ -56,6 +56,27 @@
                         <span class="badge badge-base rounded-pill bg-info text-white ms-2">{{ other_actions_count }}</span>
                     </button>
                     <div class="dropdown-menu w-100" aria-labelledby="other_actions">
+                        {% if can_process %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    {% matomo_event "candidature" "clic" "batch-process-applications-open-modal" %}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#process_confirmation_modal">
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Étudier</span>
+                            </button>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seules les candidatures au statut « Nouvelle candidature » peuvent être mises à l’étude.">
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Étudier</span>
+                            </button>
+                        {% endif %}
                         {% if can_postpone %}
                             <button type="button"
                                     class="btn justify-content-start dropdown-item"

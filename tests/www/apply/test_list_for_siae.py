@@ -1460,6 +1460,106 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     assert pretty_indented(postpone_button) == snapshot(name="inactive postpone button as GEIQ")
 
 
+def test_list_for_siae_select_applications_batch_process(client, snapshot):
+    MODAL_ID = "process_confirmation_modal"
+
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    processable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
+    )
+    assert processable_app_1.process.is_available()
+    processable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.NEW
+    )
+    assert processable_app_2.process.is_available()
+    processed_app = JobApplicationFactory(
+        to_company=company, state=JobApplicationState.PROCESSING, archived_at=timezone.now()
+    )
+    assert not processed_app.process.is_available()
+
+    unprocessable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    assert not unprocessable_app.process.is_available()
+
+    client.force_login(employer)
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_process_modal():
+        return simulated_page.find(id=MODAL_ID)
+
+    def get_process_button():
+        processable_buttons = [
+            button
+            for button in simulated_page.find(id="batch-action-box").find_all("button")
+            if button.text.strip() == "Étudier"
+        ]
+        if not processable_buttons:
+            return None
+        [processable_button] = processable_buttons
+        return processable_button
+
+    assert get_process_modal() is None
+    assert get_process_button() is None
+
+    # Select 1 processable application
+    simulate_applications_selection([processable_app_1.pk])
+    postpone_button = get_process_button()
+    assert postpone_button is not None
+    assert postpone_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(postpone_button) == snapshot(name="active process button")
+
+    modal = get_process_modal()
+    assert pretty_indented(modal) == snapshot(name="modal with 1 processable application")
+    # Check that the next_url is correctly transmitted
+    modal_form_action = urlsplit(modal.find("form")["action"])
+    assert modal_form_action.path == reverse("apply:batch_process")
+    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 processable applications
+    simulate_applications_selection([processable_app_1.pk, processable_app_2.pk])
+    postpone_button = get_process_button()
+    assert postpone_button is not None
+    assert postpone_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(postpone_button) == snapshot(name="active process button")
+    assert pretty_indented(get_process_modal()) == snapshot(name="modal with 2 processable applications")
+
+    # Test with unprocessable batches
+    for app_list in [
+        [processed_app.pk],
+        [unprocessable_app.pk],
+        [processed_app.pk, processable_app_1.pk],
+        [unprocessable_app.pk, processable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        # No modal & linked button
+        assert get_process_modal() is None
+        postpone_button = get_process_button()
+        assert pretty_indented(postpone_button) == snapshot(name="inactive process button")
+
+
 def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
