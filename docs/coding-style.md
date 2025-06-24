@@ -27,3 +27,12 @@ Penser à :
 - l'admin
 - les [factories](https://factoryboy.readthedocs.io/)
 - les `ModelForm`s
+
+## Utilisation systématique de l’argument `of` pour `select_for_update()`
+
+Le comportement de `select_for_update()` est de verrouiller toutes les lignes
+associées à une requête, [y compris celles des
+`select_related()`](https://docs.djangoproject.com/en/dev/ref/models/querysets/#:~:text=locks%20all%20rows%20that%20are%20selected%20by%20the%20query).
+
+Afin de limiter la contention imprévue, il est recommandé de préciser quelles
+lignes doivent être verrouillées via l’argument `of`.

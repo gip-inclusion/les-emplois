@@ -385,6 +385,35 @@ def make_unordered_queries_randomly_ordered():
     )
 
 
+@pytest.fixture(scope="session", autouse=True)
+def warn_select_for_update_with_select_related():
+    """
+    To avoid accidentally locking all rows in a join with select_for_update,
+    enforce usage of the `of` keyword argument to `select_for_update`.
+    """
+    from django.db.models.sql.compiler import SQLCompiler
+
+    # Django maintains the joins in alias_map.
+    patchy.patch(
+        SQLCompiler.as_sql,
+        """\
+        @@ -105,6 +105,12 @@
+                         skip_locked = self.query.select_for_update_skip_locked
+                         of = self.query.select_for_update_of
+                         no_key = self.query.select_for_no_key_update
+        +                if self.query.select_related and not of:
+        +                    raise TypeError(
+        +                       "select_for_update(of=...) must be specified "
+        +                       "to avoid locking relations unexpectedly when "
+        +                       "select_related is used."
+        +                    )
+                         # If it's a NOWAIT/SKIP LOCKED/OF/NO KEY query but the
+                         # backend doesn't support it, raise NotSupportedError to
+                         # prevent a possible deadlock.
+        """,
+    )
+
+
 @pytest.fixture
 def pdf_file():
     with open("tests/data/empty.pdf", "rb") as pdf:
