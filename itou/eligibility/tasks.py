@@ -114,9 +114,17 @@ def certify_criteria(eligibility_diagnosis):
 
 def _async_certify_criteria(model_name, eligibility_diagnosis_pk):
     model = apps.get_model("eligibility", model_name)
-    eligibility_diagnosis = model.objects.select_related("job_seeker__jobseeker_profile").get(
-        pk=eligibility_diagnosis_pk
-    )
+    try:
+        eligibility_diagnosis = model.objects.select_related("job_seeker__jobseeker_profile").get(
+            pk=eligibility_diagnosis_pk
+        )
+    except model.DoesNotExist:
+        logger.info(
+            "%s with pk %d does not exist, it cannot be certified.",
+            model_name,
+            eligibility_diagnosis_pk,
+        )
+        return
     try:
         with transaction.atomic():
             certify_criteria(eligibility_diagnosis)
