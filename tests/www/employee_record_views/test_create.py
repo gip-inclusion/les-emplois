@@ -3,12 +3,14 @@ import random
 
 import freezegun
 import pytest
+from django.contrib.gis.geos import Point
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
+from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
@@ -17,6 +19,7 @@ from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
+from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -370,6 +373,14 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         assertContains(response, self.ERRONEOUS_ADDRESS_COULD_LEAD_TO_ERROR)
 
     def test_job_seeker_address_geolocated(self, client, snapshot):
+        City.objects.create(
+            name="Sauvigny-les-Bois",
+            slug="sauvigny-58",
+            department="58",
+            coords=Point(7.644817, 48.515883),
+            post_codes=["58160"],
+            code_insee="58273",
+        )
         job_seeker = JobSeekerFactory(
             for_snapshot=True,
             with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
@@ -462,15 +473,18 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
 
     def test_address_updated_by_user(self, client):
         # User can now update the geolocated address if invalid
-
+        geispolsheim_commune = Commune.objects.by_insee_code("67152")
+        geispolsheim = create_city_geispolsheim()
+        geispolsheim_commune.city = geispolsheim
+        geispolsheim_commune.save(update_fields=["city"])
         test_data = {
             "hexa_lane_number": "15",
             "hexa_std_extension": "B",
             "hexa_lane_type": "RUE",
             "hexa_lane_name": "des colonies",
             "hexa_additional_address": "Bat A",
-            "hexa_post_code": "67000",
-            "hexa_commune": Commune.objects.by_insee_code("67482").pk,
+            "hexa_post_code": geispolsheim.post_codes[0],
+            "hexa_commune": geispolsheim_commune.pk,
         }
 
         response = client.post(self.url, data=test_data)
@@ -525,12 +539,26 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             "hexa_post_code": ["Code postal incorrect"],
         }
 
-        # Coherence with INSEE code
-        data["hexa_lane_number"] = "12345"
+        data["hexa_post_code"] = "12345"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
         assert response.context["form"].errors == {
-            "hexa_post_code": ["Code postal incorrect"],
+            "hexa_post_code": ["Le code postal doit correspondre à la commune."],
+        }
+
+        del data["hexa_post_code"]
+        response = client.post(self.url, data=data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_post_code": ["Ce champ est obligatoire."],
+        }
+
+        data["hexa_post_code"] = "12345"
+        data["hexa_commune"] = Commune.objects.filter(city=None).first().pk
+        response = client.post(self.url, data=data)
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_post_code": ["Le code postal ne correspond à aucune ville."],
         }
 
         # Lane name and additional address

@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, RSAAllocation
+from itou.cities.models import City
 from itou.employee_record.enums import Status
 from itou.users.models import JobSeekerProfile
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
@@ -94,7 +95,7 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
 
     hexa_commune = forms.ModelChoiceField(
-        queryset=Commune.objects,
+        queryset=Commune.objects.select_related("city"),
         label="Commune",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
@@ -150,12 +151,15 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         if self.cleaned_data.get("hexa_std_extension") and not self.cleaned_data.get("hexa_lane_number"):
             raise forms.ValidationError("L'extension doit être saisie avec un numéro de voie")
 
-        hexa_commune = self.cleaned_data.get("hexa_commune")
-        post_code = self.cleaned_data.get("hexa_post_code")
-
-        # Check basic coherence between post-code and INSEE code:
-        if post_code and hexa_commune and post_code[:2] != hexa_commune.code[:2]:
-            raise forms.ValidationError("Le code postal ne correspond pas à la commune")
+        if not self.errors:
+            hexa_commune = self.cleaned_data["hexa_commune"]
+            post_code = self.cleaned_data["hexa_post_code"]
+            if hexa_commune.city:
+                if post_code not in hexa_commune.city.post_codes:
+                    self.add_error("hexa_post_code", "Le code postal doit correspondre à la commune.")
+            else:
+                if not City.objects.filter(post_codes__contains=[post_code]).exists():
+                    self.add_error("hexa_post_code", "Le code postal ne correspond à aucune ville.")
 
 
 class NewEmployeeRecordStep3Form(forms.ModelForm):
