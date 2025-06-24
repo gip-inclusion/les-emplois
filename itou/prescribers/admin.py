@@ -258,6 +258,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, Organiz
 
         return super().response_change(request, obj)
 
-    @admin.display(description="Habilitation")
+    @admin.display(boolean=True, description="Habilitation")
     def is_authorized(self, obj):
         return obj.is_authorized
