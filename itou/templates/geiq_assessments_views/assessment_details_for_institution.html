@@ -28,8 +28,8 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8 order-2 order-lg-1">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>Dossier transmis par le GEIQ</h2>
                     {% if not assessment.submitted_at %}
                         <div class="c-box">
@@ -214,7 +214,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                     {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token request=request InstitutionKind=InstitutionKind only %}
                     {% if assessment.submitted_at %}
                         <div class="c-box mb-3 mb-md-4">

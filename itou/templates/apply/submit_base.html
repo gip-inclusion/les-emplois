@@ -14,13 +14,13 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8 {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}order-2 order-lg-1{% endif %}">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}order-2 order-xxl-1{% endif %}">
                     {% block content_extend %}{% endblock %}
                 </div>
                 {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}
                     {# We don't want to show expired approval when applying/hiring #}
-                    <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                         {% include "approvals/includes/box.html" with approval=job_seeker.latest_approval link_from_current_url=request.get_full_path extra_class='my-3 my-md-4' only %}
                     </div>
                 {% endif %}

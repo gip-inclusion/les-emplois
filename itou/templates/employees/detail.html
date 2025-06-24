@@ -22,8 +22,8 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8 order-2 order-lg-1">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     {# Job seeker info ------------------------------------------------------------------------- #}
                     <div class="c-box mb-3 mb-md-4">
                         <h2>Informations du salarié</h2>
@@ -46,7 +46,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}
                         {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
                     {% endif %}

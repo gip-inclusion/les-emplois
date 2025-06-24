@@ -3467,7 +3467,7 @@
                       <div class="tab-content">
                           <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
                               <div class="row">
-                                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                       <h2>
                                           Informations
                                       </h2>
@@ -3601,7 +3601,7 @@
                                           </ul>
                                       </div>
                                   </div>
-                                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                                       <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
                                           <div class="mb-3 mb-md-4">
                                               <span class="badge badge-base rounded-pill bg-success text-white">

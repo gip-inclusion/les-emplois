@@ -5,8 +5,8 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8 order-2 order-lg-1">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <h2>Mon dossier</h2>
                     {% include "geiq_assessments_views/includes/summary_document_box.html" with assessment=assessment only %}
                     {% include "geiq_assessments_views/includes/structure_financial_assessment_box.html" with assessment=assessment only %}
@@ -14,7 +14,7 @@
                     {% include "geiq_assessments_views/includes/contracts_box.html" with assessment=assessment request=request only %}
                     {% include "geiq_assessments_views/includes/geiq_comment_box.html" with assessment=assessment request=request only %}
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                     {% include "geiq_assessments_views/includes/assessment_status_box_for_geiq.html" with assessment=assessment csrf_token=csrf_token request=request institution_to_contact=institution_to_contact only %}
                     {% if assessment.contracts_selection_validated_at %}
                         <div class="c-box mb-3 mb-md-4">

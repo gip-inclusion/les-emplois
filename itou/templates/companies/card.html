@@ -92,8 +92,8 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0 {% if not siae.description and not siae.provided_support %}d-none d-lg-block{% endif %}">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 mt-3 mt-xxl-0 {% if not siae.description and not siae.provided_support %}d-none d-xxl-block{% endif %}">
                     <div class="c-box h-100 {% if not siae.description and not siae.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
                         {% if siae.description %}
                             <article class="mb-3 mb-lg-5">
@@ -124,7 +124,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                     {% if not siae.has_active_members %}
                         <div class="c-box mb-3 mb-md-4 bg-emploi-lightest border-info">
                             <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
