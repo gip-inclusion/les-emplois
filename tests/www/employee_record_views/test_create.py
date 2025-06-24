@@ -473,8 +473,7 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             "hexa_commune": Commune.objects.by_insee_code("67482").pk,
         }
 
-        data = test_data
-        response = client.post(self.url, data=data)
+        response = client.post(self.url, data=test_data)
         # This data set should pass
         assert response.status_code == 302
 
