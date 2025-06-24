@@ -452,7 +452,11 @@ class AcceptView(common_views.BaseAcceptView):
         self.company = self.job_application.to_company
         self.job_seeker = self.job_application.job_seeker
 
-        self.next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})
+        self.next_url = get_safe_url(
+            request,
+            "next_url",
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
+        )
 
         if self.company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
@@ -473,6 +477,9 @@ class AcceptView(common_views.BaseAcceptView):
         return self.next_url
 
     def get_error_url(self):
+        return self.next_url
+
+    def get_success_url(self):
         return self.next_url
 
 
