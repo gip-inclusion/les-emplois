@@ -810,6 +810,11 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
     def get_error_url(self):
         return self.request.get_full_path()
 
+    def get_success_url(self):
+        if self.company.is_subject_to_eligibility_rules and self.job_application.approval:
+            return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
+        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
