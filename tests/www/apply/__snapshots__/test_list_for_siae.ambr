@@ -6642,6 +6642,109 @@
   
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_process[active process button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-target="#process_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-process-applications-open-modal" type="button">
+      <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+      </i>
+      <span>
+          Étudier
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_process[inactive process button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » peuvent être mises à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+      </i>
+      <span>
+          Étudier
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_process[modal with 1 processable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="process_modal_title" class="modal" id="process_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="postpone_modal_title">
+                      Mettre à l’étude 1 candidature
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir mettre à l’étude
+                                  
+                                      la candidature sélectionnée
+                                  
+                                  ?
+                  </p>
+              </div>
+              <form action="/apply/company/batch/process?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-process-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_process[modal with 2 processable applications]
+  '''
+  <div aria-hidden="true" aria-labelledby="process_modal_title" class="modal" id="process_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="postpone_modal_title">
+                      Mettre à l’étude 2 candidatures
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir mettre à l’étude
+                                  
+                                      les 2 candidatures sélectionnées
+                                  
+                                  ?
+                  </p>
+              </div>
+              <form action="/apply/company/batch/process?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-process-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_list_for_siae_select_applications_batch_refuse[active refuse button]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-refuse-applications-start-wizard" type="submit">
