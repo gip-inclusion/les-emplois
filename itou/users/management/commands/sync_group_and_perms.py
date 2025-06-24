@@ -46,6 +46,7 @@ def get_permissions_dict():
 
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ALL,
+        analytics_models.Datum: PERMS_READ,
         approvals_models.Approval: PERMS_ALL | PERMS_EXPORT_FT_API_REJECTIONS,
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
