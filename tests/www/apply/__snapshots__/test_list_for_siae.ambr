@@ -4913,7 +4913,7 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_transfer[inactive archive button]
+# name: test_list_for_siae_select_applications_batch_transfer[inactive transfer button]
   '''
   <button class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle text-end" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
       Transférer vers
