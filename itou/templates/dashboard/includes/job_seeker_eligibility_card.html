@@ -56,7 +56,7 @@
                                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
                             {% endif %}
                         </p>
-                        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True only %}
+                        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True itou_help_center_url=itou_help_center_url request=request only %}
                     </div>
                 {% endif %}
             {% elif kind == "GEIQ" %}
