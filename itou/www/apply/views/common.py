@@ -5,7 +5,6 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.generic import FormView, TemplateView
@@ -143,6 +142,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                     job_application.sender_kind = UserKind.EMPLOYER
                     job_application.sender_company = self.company
                     job_application.process(user=request.user)
+                    self.job_application = job_application  # store in class to have access later
                 job_application.accept(user=request.user)
 
                 # Mark job seeker's infos as up-to-date
@@ -179,14 +179,9 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             job_application.geiq_eligibility_diagnosis = self.geiq_eligibility_diagnosis
             job_application.save(update_fields=["geiq_eligibility_diagnosis", "updated_at"])
 
-        if creating and self.company.is_subject_to_eligibility_rules and job_application.approval:
-            final_url = reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
-        else:
-            final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-
         self.clean_session()
 
-        return HttpResponseClientRedirect(final_url)
+        return HttpResponseClientRedirect(self.get_success_url())
 
 
 class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
