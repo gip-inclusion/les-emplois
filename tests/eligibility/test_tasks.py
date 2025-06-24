@@ -149,3 +149,9 @@ class TestCertifyCriteria:
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
 
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
+
+    def test_no_retries_when_diag_does_not_exist(self, caplog, factory):
+        eligibility_diagnosis_model = factory._meta.model
+        modelname = eligibility_diagnosis_model._meta.model_name
+        async_certify_criteria.call_local(modelname, 0)
+        assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]
