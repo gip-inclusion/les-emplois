@@ -480,33 +480,50 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         # Check form validators
 
         # Lane number :
-        data = test_data
+        data = test_data.copy()
 
         # Can't use extension without number
         data["hexa_lane_number"] = ""
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "__all__": ["L'extension doit être saisie avec un numéro de voie"],
+        }
 
         # Can't use anything else than up to 5 digits
         data["hexa_lane_number"] = "a"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "__all__": ["L'extension doit être saisie avec un numéro de voie"],
+            "hexa_lane_number": ["Numéro de voie incorrect"],
+        }
 
         data["hexa_lane_number"] = "123456"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "__all__": ["L'extension doit être saisie avec un numéro de voie"],
+            "hexa_lane_number": ["Numéro de voie incorrect"],
+        }
 
         # Post code :
-        data = test_data
+        data = test_data.copy()
 
         # 5 digits exactly
         data["hexa_post_code"] = "123456"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_post_code": ["Code postal incorrect"],
+        }
 
         data["hexa_post_code"] = "1234"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_post_code": ["Code postal incorrect"],
+        }
 
         data["hexa_lane_number"] = "1234a"
         response = client.post(self.url, data=data)
@@ -516,29 +533,52 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
         data["hexa_lane_number"] = "12345"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_post_code": ["Code postal incorrect"],
+        }
 
         # Lane name and additional address
-        data = test_data
+        data = test_data.copy()
 
         # No special characters
         data["hexa_lane_name"] = "des colons !"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_lane_name": [
+                "Le champ ne doit contenir ni caractères spéciaux, ni accents et ne pas excéder 32 caractères"
+            ],
+        }
 
         # 32 chars max
         data["hexa_lane_name"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_lane_name": [
+                "Le champ ne doit contenir ni caractères spéciaux, ni accents et ne pas excéder 32 caractères"
+            ],
+        }
 
-        data = test_data
+        data = test_data.copy()
         data["hexa_additional_address"] = "Bat a !"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_additional_address": [
+                "Le champ ne doit contenir ni caractères spéciaux, ni accents et ne pas excéder 32 caractères"
+            ],
+        }
 
         # 32 chars max
         data["hexa_additional_address"] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         response = client.post(self.url, data=data)
         assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "hexa_additional_address": [
+                "Le champ ne doit contenir ni caractères spéciaux, ni accents et ne pas excéder 32 caractères"
+            ],
+        }
 
 
 class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
