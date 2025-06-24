@@ -13,6 +13,7 @@ from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
+from itou.users.utils import NIR_RE
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
@@ -292,13 +293,8 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
                 # Handle partial numbers not starting with the prefix (migrated PEApproval)
                 search_fields.append("number__contains")
 
-        if search_term.isdecimal() and 13 <= len(search_term) <= 15:
-            # Searching by NIR is much more expensive than by number
-            # so only do so for long numbers
-            if len(search_term) == 15:  # Complete NIR
-                search_fields.append("user__jobseeker_profile__nir__exact")
-            else:
-                search_fields.append("user__jobseeker_profile__nir__contains")
+        if NIR_RE.match(search_term):
+            search_fields.append("user__jobseeker_profile__nir__exact")
 
         if not search_fields:
             search_fields.append("user__email")

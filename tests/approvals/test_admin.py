@@ -262,11 +262,6 @@ def test_search_fields(admin_client):
     assertContains(response, url_1)
     assertNotContains(response, url_2)
 
-    # Search by NIR truncated
-    response = admin_client.get(list_url, {"q": approval1.user.jobseeker_profile.nir[:-2]})
-    assertContains(response, url_1)
-    assertNotContains(response, url_2)
-
     # Search on email
     response = admin_client.get(list_url, {"q": "michel@example"})
     assertContains(response, url_1)

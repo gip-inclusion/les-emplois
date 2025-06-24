@@ -33,6 +33,7 @@ from itou.users.admin_forms import (
     UserAdminForm,
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
+from itou.users.utils import NIR_RE
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -533,9 +534,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
             search_fields.append("public_id__exact")
         except ValueError:
             pass
+        if NIR_RE.match(search_term):
+            search_fields.append("jobseeker_profile__nir__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
-            search_fields.append("jobseeker_profile__nir__exact")
         else:
             search_fields.append("email")
             if "@" not in search_term:
@@ -909,9 +911,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                 pass
             else:
                 search_fields.append("asp_uid__exact")
+        if NIR_RE.match(search_term):
+            search_fields.append("nir__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
-            search_fields.append("nir__exact")
         else:
             search_fields.append("user__email")
             if "@" not in search_term:
