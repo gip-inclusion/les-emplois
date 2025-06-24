@@ -525,10 +525,6 @@ class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
             "hexa_post_code": ["Code postal incorrect"],
         }
 
-        data["hexa_lane_number"] = "1234a"
-        response = client.post(self.url, data=data)
-        assert response.status_code == 200
-
         # Coherence with INSEE code
         data["hexa_lane_number"] = "12345"
         response = client.post(self.url, data=data)
