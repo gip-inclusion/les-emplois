@@ -1572,6 +1572,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep1View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep1View.get_object[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1654,6 +1655,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep1View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep1View.get_object[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1908,6 +1910,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep2View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep2View.get_object[www/siae_evaluations_views/views.py]',
           'InstitutionEvaluatedSiaeNotifyStep2View.get[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
@@ -1991,6 +1994,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep2View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep2View.get_object[www/siae_evaluations_views/views.py]',
           'InstitutionEvaluatedSiaeNotifyStep2View.get[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
@@ -2246,6 +2250,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
@@ -2329,6 +2334,7 @@
       dict({
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''

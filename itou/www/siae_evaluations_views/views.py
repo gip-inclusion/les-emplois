@@ -231,6 +231,12 @@ class InstitutionEvaluatedSiaeNotifyMixin(SingleObjectMixin):
             )
         )
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset=queryset)
+        if obj.state != evaluation_enums.EvaluatedSiaeState.REFUSED:
+            raise Http404
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(evaluation_campaign_data_context(self.object))

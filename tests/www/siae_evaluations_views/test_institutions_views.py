@@ -1812,6 +1812,21 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         assert response.status_code == 404
 
+    def test_access_accepted_siae(self, client):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+        )
+        self.login(client, evaluated_siae)
+        response = client.get(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        assert response.status_code == 404
+
     @freeze_time("2023-01-24 11:11:00")
     def test_data_card_statistics(self, client):
         company = CompanyFactory()
