@@ -3,8 +3,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       <div class="c-form">
                           <form class="js-prevent-multiple-submit" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -52,8 +52,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <h2>Mon dossier</h2>
                       
   
@@ -216,7 +216,7 @@
   </div>
   
                   </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
@@ -845,8 +845,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <h2>Mon dossier</h2>
                       
   
@@ -997,7 +997,7 @@
   </div>
   
                   </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
@@ -1168,8 +1168,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12 col-lg-8 order-2 order-lg-1">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                   <h2>
                       Mon dossier
                   </h2>
@@ -1312,7 +1312,7 @@
                       </div>
                   </div>
               </div>
-              <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
                       <h4>
                           Votre dossier a été transmis le 27/05/2025
@@ -1846,8 +1846,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <h2>Mon dossier</h2>
                       
   
@@ -2014,7 +2014,7 @@
   </div>
   
                   </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
@@ -2075,8 +2075,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8 order-2 order-lg-1">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <h2>Mon dossier</h2>
                       
   
@@ -2243,7 +2243,7 @@
   </div>
   
                   </div>
-                  <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                  <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
@@ -2304,8 +2304,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12 col-lg-8 order-2 order-lg-1">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                   <h2 class="h4">
                       1. Téléchargez le modèle du document
                   </h2>
@@ -2444,8 +2444,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
                           <div class="c-form">
                               <form method="post">
@@ -2555,8 +2555,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
                           <div class="c-form">
                               <form method="post">
@@ -2672,8 +2672,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
                           <div class="c-form">
                               <form method="post">
@@ -2755,8 +2755,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
                           La campagne actuelle n'est pas encore ouverte ou les données LABEL ne sont pas encore disponibles.
                       
@@ -2770,8 +2770,8 @@
   '''
   <section class="s-section">
           <div class="s-section__container container">
-              <div class="row">
-                  <div class="col-12 col-lg-8">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       
                           Le SIRET (12345678901234) de votre entreprise actuelle ne semble pas connu de LABEL: impossible de créer un bilan.
                       

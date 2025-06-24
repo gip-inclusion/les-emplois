@@ -126,7 +126,7 @@ def test_show_view(snapshot, client):
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
-    assert pretty_indented(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, ".s-section .col-xxl-8 .c-box:last-child")) == snapshot
     assert_previous_step(response, reverse("approvals:prolongation_requests_list") + "?only_pending=on")
 
 

@@ -14,15 +14,15 @@
 
 {% block content %}
     <section class="s-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
+        <div class="s-section_container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% if siae %}
                         {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class="mb-3 mb-md-4" only %}
                     {% endif %}
                     {% block left_column %}{% endblock %}
                 </div>
-                <div class="col-12 col-lg-4 d-none d-lg-block ps-xl-5">
+                <div class="s-section_col col-12 col-xxl-4 col-xxxl-3 d-none d-xxl-block ps-xxxl-5">
                     <h2 class="h2 ff-extra-01">Où trouver {{ request.user.is_job_seeker|yesno:"mon,le" }} numéro de sécurité sociale ?</h2>
                     <img class="img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
                     <p class="ff-extra-01 mb-0">

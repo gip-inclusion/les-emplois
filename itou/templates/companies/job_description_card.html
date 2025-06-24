@@ -122,10 +122,10 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1 mt-3 mt-xxl-0">
                     <div class="c-box">{% include "companies/includes/_job_description_details.html" %}</div>
                 </div>
-                <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 d-flex flex-column">
                     {% if can_update_job_description != True %}
                         {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class="" back_url=back_url|default:request.get_full_path show=True job_app_to_transfer=job_app_to_transfer job_seeker=job_seeker|default:None only %}
                     {% endif %}
