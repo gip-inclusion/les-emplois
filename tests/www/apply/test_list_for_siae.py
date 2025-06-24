@@ -571,19 +571,23 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+        level1_criterion = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH)
+        diagnosis.administrative_criteria.add(level1_criterion)
+
         job_app = JobApplicationFactory(
             to_company=company,
             created_at=timezone.now() - timezone.timedelta(days=1),
             sent_by_authorized_prescriber_organisation=True,
             job_seeker__post_code="37000",
+            with_approval=True,
+            eligibility_diagnosis=diagnosis,
         )
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
 
-        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
-
         client.force_login(employer)
         with assertSnapshotQueries(snapshot(name="SQL queries filters")):
-            client.get(
+            response = client.get(
                 reverse("apply:list_for_siae"),
                 {
                     "states": [JobApplicationState.ACCEPTED],
@@ -598,6 +602,7 @@ class TestProcessListSiae:
                     "departments": ["37"],
                 },
             )
+        assert len(response.context["job_applications_page"].object_list) == 1
 
     def test_prescriptions(self, client):
         company = CompanyFactory(with_membership=True)
