@@ -105,7 +105,7 @@ PREQUALIFICATION_MAPPING = {
 
 def _cleanup_employee_info(employee_info):
     employee_info["date_naissance"] = convert_iso_datetime_to_date(employee_info["date_naissance"])
-    employee_info["sexe"] = {"H": Title.M, "F": Title.MME}[employee_info["sexe"]]
+    employee_info["sexe"] = {"H": Title.M, "F": Title.MME, "M": Title.M}[employee_info["sexe"]]
 
 
 def _nb_days_in_year(start: datetime.date, end: datetime.date, *, year: int):
