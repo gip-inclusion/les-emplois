@@ -14,24 +14,28 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 class TestINSEEApi:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings):
-        settings.API_INSEE_BASE_URL = "https://fake.insee.url"
-        settings.API_INSEE_CONSUMER_KEY = "foo"
-        settings.API_INSEE_CONSUMER_SECRET = "bar"
+        settings.API_INSEE_AUTH_URL = "https://fake.insee.url"
+        settings.API_INSEE_CLIENT_ID = "foo"
+        settings.API_INSEE_CLIENT_SECRET = "bar"
+        settings.API_INSEE_USERNAME = "baz"
+        settings.API_INSEE_PASSWORD = "qux"
 
     @respx.mock
     def test_access_token(self):
-        endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, json=INSEE_API_RESULT_MOCK)
+        endpoint = respx.post(f"{settings.API_INSEE_AUTH_URL}/token").respond(200, json=INSEE_API_RESULT_MOCK)
 
         access_token = api_entreprise.get_access_token()
 
         assert endpoint.called
-        assert b"grant_type=client_credentials" in endpoint.calls.last.request.content
-        assert endpoint.calls.last.request.headers["Authorization"].startswith("Basic ")
+        assert (
+            endpoint.calls.last.request.content
+            == b"grant_type=password&client_id=foo&client_secret=bar&username=baz&password=qux"
+        )
         assert access_token == INSEE_API_RESULT_MOCK["access_token"]
 
     @respx.mock
     def test_access_token_with_http_error(self, caplog):
-        respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(400)
+        respx.post(f"{settings.API_INSEE_AUTH_URL}/token").respond(400)
         caplog.set_level(logging.ERROR)
 
         access_token = api_entreprise.get_access_token()
@@ -41,7 +45,7 @@ class TestINSEEApi:
 
     @respx.mock
     def test_access_token_with_json_error(self, caplog):
-        respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(200, content=b"not-json")
+        respx.post(f"{settings.API_INSEE_AUTH_URL}/token").respond(200, content=b"not-json")
         caplog.set_level(logging.ERROR)
 
         access_token = api_entreprise.get_access_token()
@@ -53,17 +57,15 @@ class TestINSEEApi:
 class TestApiEntreprise:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings):
-        settings.API_INSEE_BASE_URL = "https://fake.insee.url"
-        settings.API_INSEE_SIRENE_BASE_URL = "https://api.entreprise.fake.com"
-        settings.API_INSEE_CONSUMER_KEY = "foo"
-        settings.API_INSEE_CONSUMER_SECRET = "bar"
+        settings.API_INSEE_AUTH_URL = "https://fake.insee.url"
+        settings.API_INSEE_SIRENE_URL = "https://api.entreprise.fake.com"
 
-        self.token_endpoint = respx.post(f"{settings.API_INSEE_BASE_URL}/token").respond(
+        self.token_endpoint = respx.post(f"{settings.API_INSEE_AUTH_URL}/token").respond(
             200,
             json=INSEE_API_RESULT_MOCK,
         )
 
-        self.siret_endpoint = respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/26570134200148")
+        self.siret_endpoint = respx.get(f"{settings.API_INSEE_SIRENE_URL}/siret/26570134200148")
 
     @respx.mock
     def test_etablissement_get_or_error(self):

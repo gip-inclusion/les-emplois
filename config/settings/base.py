@@ -428,12 +428,15 @@ API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
 
-# https://api.insee.fr/catalogue/site/pages/list-apis.jag
-API_INSEE_BASE_URL = os.getenv("API_INSEE_BASE_URL")
-API_INSEE_CONSUMER_KEY = os.getenv("API_INSEE_CONSUMER_KEY")
-API_INSEE_CONSUMER_SECRET = os.getenv("API_INSEE_CONSUMER_SECRET")
-# https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee
-API_INSEE_SIRENE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene"
+# https://portail-api.insee.fr/catalog/all
+API_INSEE_AUTH_URL = os.getenv("API_INSEE_AUTH_URL")
+API_INSEE_CLIENT_ID = os.getenv("API_INSEE_CLIENT_ID")
+API_INSEE_CLIENT_SECRET = os.getenv("API_INSEE_CLIENT_SECRET")
+API_INSEE_USERNAME = os.getenv("API_INSEE_USERNAME")
+API_INSEE_PASSWORD = os.getenv("API_INSEE_PASSWORD")
+# https://portail-api.insee.fr/catalog/api/26d13266-689d-3fee-845d-c08e12b8f0dd/doc?page=4a0ebed4-14e5-4520-8ebe-d414e5e52004
+# This link requires to login : click on Sign-in > CONNEXION-POUR-LES-EXTERNES and use the credentials in Bitwarden
+API_INSEE_SIRENE_URL = os.getenv("API_INSEE_SIRENE_URL")
 
 API_DATA_INCLUSION_BASE_URL = os.getenv("API_DATA_INCLUSION_BASE_URL")
 API_DATA_INCLUSION_TOKEN = os.getenv("API_DATA_INCLUSION_TOKEN")
