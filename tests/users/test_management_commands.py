@@ -16,7 +16,7 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
@@ -26,6 +26,7 @@ from itou.utils.brevo import BrevoListID
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
@@ -617,6 +618,80 @@ class TestCommandSendUsersToBrevo:
                         "prenom": "Billy",
                         "nom": "BOO",
                         "date_inscription": "2025-02-25",
+                        "departement": "67",
+                        "id": billy.pk,
+                    },
+                },
+            ],
+        }
+
+    @freeze_time("2025-06-25")
+    def test_wet_run_autonomous_job_seekers_with_diagnosis_and_no_accepted_application(self, caplog, respx_mock):
+        billy = IAEEligibilityDiagnosisFactory(
+            job_seeker__first_name="Willy",
+            job_seeker__last_name="Boo",
+            job_seeker__email="willy.boo@mailinator.com",
+            # Needed to fill the department field.
+            job_seeker__with_ban_geoloc_address=True,
+            job_seeker__with_verified_email=True,
+            job_seeker__last_login=timezone.now(),
+            from_prescriber=True,
+        ).job_seeker
+        # Diagnosis too old: ignored
+        IAEEligibilityDiagnosisFactory(
+            job_seeker__with_verified_email=True,
+            job_seeker__last_login=timezone.now(),
+            created_at=timezone.now() - datetime.timedelta(days=310),
+            from_prescriber=True,
+        )
+        # Employer diagnosis: ignored
+        IAEEligibilityDiagnosisFactory(
+            job_seeker__with_verified_email=True,
+            job_seeker__last_login=timezone.now(),
+            from_employer=True,
+        )
+        # Recent diagnosis but an accepted application: ignored
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            job_seeker=IAEEligibilityDiagnosisFactory(
+                job_seeker__with_verified_email=True,
+                job_seeker__last_login=timezone.now(),
+                from_prescriber=True,
+            ).job_seeker,
+        )
+        # Job seeker is not autonomous: ignored
+        IAEEligibilityDiagnosisFactory(
+            job_seeker__with_verified_email=True,
+            job_seeker__last_login=None,
+            from_prescriber=True,
+        )
+        import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
+            return_value=httpx.Response(202, json={"processId": 106})
+        )
+
+        call_command("send_users_to_brevo", wet_run=True)
+
+        # Employers and prescribers are created by the factories, ignore them.
+        assert "Job seekers count: 5" in caplog.messages
+        assert "Autonomous job seekers with IAE diag and no accepted applications count: 1" in caplog.messages
+        [autonomous_job_seeker_mock_call] = [
+            call
+            for call in import_mock.calls
+            if json.loads(call.request.content)["listIds"] == [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC]
+        ]
+        assert json.loads(autonomous_job_seeker_mock_call.request.content) == {
+            "listIds": [BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC],
+            "emailBlacklist": False,
+            "smsBlacklist": False,
+            "updateExistingContacts": False,
+            "emptyContactsAttributes": False,
+            "jsonBody": [
+                {
+                    "email": "willy.boo@mailinator.com",
+                    "attributes": {
+                        "prenom": "Willy",
+                        "nom": "BOO",
+                        "date_inscription": "2025-06-25",
                         "departement": "67",
                         "id": billy.pk,
                     },

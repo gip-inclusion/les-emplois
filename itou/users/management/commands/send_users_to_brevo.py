@@ -1,5 +1,6 @@
 import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 from allauth.account.models import EmailAddress
 from django.db.models import Exists, OuterRef, Q
@@ -8,6 +9,9 @@ from sentry_sdk.crons import monitor
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
+from itou.eligibility.enums import AuthorKind
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
@@ -17,6 +21,8 @@ from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)
+
+RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
 
 
 def professional_serializer(user, brevo_type):
@@ -175,5 +181,33 @@ class Command(BaseCommand):
             client.import_users(
                 stalled_autonomous_job_seekers,
                 BrevoListID.CANDIDATS_AUTONOMES_BLOQUES,
+                job_seeker_serializer,
+            )
+
+        autonomous_job_seekers_with_diagnosis_and_no_accepted_application = job_seekers.filter(
+            last_login__isnull=False,
+        ).filter(
+            Exists(
+                EligibilityDiagnosis.objects.filter(
+                    job_seeker_id=OuterRef("pk"),
+                    author_kind=AuthorKind.PRESCRIBER,
+                    created_at__gte=RECENT_DIAGNOSIS_THRESHOLD,
+                )
+            ),
+            ~Exists(
+                JobApplication.objects.filter(
+                    job_seeker_id=OuterRef("pk"),
+                    state=JobApplicationState.ACCEPTED,
+                )
+            ),
+        )
+        logger.info(
+            "Autonomous job seekers with IAE diag and no accepted applications count: %d",
+            len(autonomous_job_seekers_with_diagnosis_and_no_accepted_application),
+        )
+        if wet_run:
+            client.import_users(
+                autonomous_job_seekers_with_diagnosis_and_no_accepted_application,
+                BrevoListID.CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC,
                 job_seeker_serializer,
             )
