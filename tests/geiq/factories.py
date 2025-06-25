@@ -79,7 +79,7 @@ class SalarieLabelDataFactory(factory.DictFactory):
     numero = None
     _date_naissance = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     date_naissance = factory.LazyAttribute(lambda obj: _date_to_label_iso_format(obj._date_naissance))
-    sexe = factory.fuzzy.FuzzyChoice(["H", "F"])
+    sexe = factory.fuzzy.FuzzyChoice(["H", "F", "M"])
     prescripteur = factory.fuzzy.FuzzyChoice(
         [
             {"id": 1, "libelle": "Pôle Emploi", "libelle_abr": "PE"},
