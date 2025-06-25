@@ -357,30 +357,23 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
 @pytest.fixture(autouse=True, scope="function")
 def unknown_variable_template_error(monkeypatch, request):
     marker = request.keywords.get("ignore_unknown_variable_template_error", None)
-    BASE_IGNORE_LIST = set()
-    strict = True
-    if marker is None:
-        ignore_list = BASE_IGNORE_LIST
-    elif marker.args:
-        ignore_list = BASE_IGNORE_LIST | set(marker.args)
-    else:
-        # Marker without list
-        strict = False
+    ignore_list = set()
+    if marker and marker.args:
+        ignore_list.update(marker.args)
 
-    if strict:
-        origin_resolve = base_template.FilterExpression.resolve
+    origin_resolve = base_template.FilterExpression.resolve
 
-        def stricter_resolve(self, context, ignore_failures=False):
-            if (
-                self.is_var
-                and self.var.lookups is not None
-                and self.var.lookups[0] not in context
-                and self.var.lookups[0] not in ignore_list
-            ):
-                ignore_failures = False
-            return origin_resolve(self, context, ignore_failures)
+    def stricter_resolve(self, context, ignore_failures=False):
+        if (
+            self.is_var
+            and self.var.lookups is not None
+            and self.var.lookups[0] not in context
+            and self.var.lookups[0] not in ignore_list
+        ):
+            ignore_failures = False
+        return origin_resolve(self, context, ignore_failures)
 
-        monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
+    monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
 
 
 @pytest.fixture(scope="session", autouse=True)
