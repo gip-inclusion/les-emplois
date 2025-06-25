@@ -357,10 +357,9 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
 @pytest.fixture(autouse=True, scope="function")
 def unknown_variable_template_error(monkeypatch, request):
     marker = request.keywords.get("ignore_unknown_variable_template_error", None)
-    # debug can be injected by django.template.context_processors.debug
     # user can be injected by django.contrib.auth.context_processors.auth
     # TODO(xfernandez): remove user from allow list (and remove the matching processor ?)
-    BASE_IGNORE_LIST = {"debug", "user"}
+    BASE_IGNORE_LIST = {"user"}
     strict = True
     if marker is None:
         ignore_list = BASE_IGNORE_LIST
