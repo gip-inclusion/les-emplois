@@ -95,6 +95,7 @@ ASSET_INFOS = {
         "download": {
             "url": "https://github.com/ganlanyuan/tiny-slider/archive/refs/tags/v2.9.4.zip",
             "sha256": "ac906066c097361fd9240ebf7521ee21753ca0740e7b2d31924c8d1ddb91a0ea",
+            "filename": "tinyslider-v2.9.4.zip",
         },
         "extract": {
             "origin": "tiny-slider-2.9.4/dist",
