@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateNotUsed, assertTemplateUsed
 
@@ -14,7 +13,6 @@ from tests.users.factories import JobSeekerFactory
 from tests.www.apply.test_submit import fake_session_initialization
 
 
-@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 class TestJobApplicationGEIQEligibilityDetails:
     VALID_DIAGNOSIS = "Éligibilité public prioritaire GEIQ validée"
     # this string does not depends on the diagnosis author
