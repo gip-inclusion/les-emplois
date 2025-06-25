@@ -1,3 +1,4 @@
+from functools import partial
 from unittest import mock
 
 from django import forms
@@ -8,6 +9,8 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
+from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
@@ -158,6 +161,24 @@ class ItouModelAdmin(ModelAdmin):
         # Eager-loading all relations, but only when editing one object because `list_select_related` exists
         with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
             return super().get_object(request, object_id, from_field)
+
+    def display_object_with_pii(self, obj, field_name):
+        return getattr(obj, field_name).display_with_pii
+
+    def get_list_display(self, request):
+        list_display = super().get_list_display(request)
+        for i, field_name in enumerate(list(list_display)):
+            try:
+                field = self.model._meta.get_field(field_name)
+            except FieldDoesNotExist:
+                continue
+            else:
+                if isinstance(field.remote_field, models.ManyToOneRel) and hasattr(
+                    field.related_model, "display_with_pii"
+                ):
+                    list_display[i] = partial(self.display_object_with_pii, field_name=field_name)
+
+        return list_display
 
 
 def add_support_remark_to_obj(obj, text):
