@@ -14,6 +14,7 @@ class BrevoListID(enum.IntEnum):
     LES_EMPLOIS = 31
     CANDIDATS = 82
     CANDIDATS_AUTONOMES_BLOQUES = 83
+    CANDIDATS_AUTONOMES_AVEC_DIAGNOSTIC = 116
 
 
 class BrevoClient:
