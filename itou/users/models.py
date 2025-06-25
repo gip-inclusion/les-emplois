@@ -1198,6 +1198,10 @@ class JobSeekerProfile(models.Model):
     def __str__(self):
         return f"JobSeekerProfile — pk={self.pk}"
 
+    @property
+    def display_with_pii(self):
+        return self.user.display_with_pii
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_old_values()
