@@ -31,6 +31,12 @@ class TestApprovalAdmin:
         response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
         assert response.status_code == 200
 
+    def test_change_approval_user_display_with_pii(self, client):
+        approval = ApprovalFactory()
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+        assertContains(response, approval.user.display_with_pii)
+
 
 @pytest.mark.parametrize("field", ["start_at", "end_at"])
 def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, snapshot, field):
