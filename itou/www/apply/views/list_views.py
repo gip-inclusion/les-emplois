@@ -30,6 +30,7 @@ from itou.www.apply.forms import (
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
 )
+from itou.www.apply.views.process_views import _get_geiq_eligibility_diagnosis
 from itou.www.stats.utils import can_view_stats_ft
 
 
@@ -429,15 +430,25 @@ def list_for_siae_actions(request):
     can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
-    can_transfer = all(job_application.transfer.is_available() for job_application in selected_job_applications)
+    can_transfer = (
+        all(job_application.transfer.is_available() for job_application in selected_job_applications)
+        and len(request.organizations) > 1
+    )
+    can_accept = len(selected_job_applications) == 1 and selected_job_applications[0].accept.is_available()
+    if can_accept and company.kind == CompanyKind.GEIQ:
+        selected_job_applications[0].geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(
+            selected_job_applications[0], only_prescriber=False
+        )
     context = {
         "batch_mode": bool(selected_job_applications),
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
+        "can_accept": can_accept,
         "can_archive": can_archive,
         "can_postpone": can_postpone,
         "can_refuse": can_refuse,
         "can_transfer": can_transfer,
+        "other_actions_count": sum([can_postpone, can_archive, can_transfer]),
         "transfer_form": JobApplicationInternalTransferForm(request, job_app_count=selected_nb),
         "postpone_form": BatchPostponeForm(
             job_seeker_nb=len(set(job_application.job_seeker_id for job_application in selected_job_applications))
@@ -445,6 +456,7 @@ def list_for_siae_actions(request):
         if can_postpone
         else None,
         "list_url": get_safe_url(request, "list_url", fallback_url=reverse("apply:list_for_siae")),
+        "acceptable_job_application": selected_job_applications[0] if can_accept else None,
     }
     response = render(
         request,
