@@ -1202,7 +1202,8 @@ class TestBatchTransfer:
 
     def test_sent_application(self, client):
         transferable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
-        to_company = transferable_app.to_company
+        employer = transferable_app.sender
+        other_company = CompanyMembershipFactory(user=employer).company
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         assert transferable_app.transfer.is_available()
 
@@ -1210,13 +1211,13 @@ class TestBatchTransfer:
         response = client.post(
             reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
-                "target_company_id": transferable_app.sender_company.pk,
+                "target_company_id": other_company.pk,
                 "application_ids": [transferable_app.pk],
             },
         )
         assertRedirects(response, next_url)
         transferable_app.refresh_from_db()
-        assert transferable_app.to_company == to_company
+        assert transferable_app.to_company == transferable_app.to_company
         assertMessages(
             response,
             [
@@ -1230,13 +1231,14 @@ class TestBatchTransfer:
     def test_unexisting_app(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
+        other_company = CompanyMembershipFactory(user=employer).company
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
         response = client.post(
             reverse("apply:batch_transfer", query={"next_url": next_url}),
             data={
-                "target_company_id": company.pk,
+                "target_company_id": other_company.pk,
                 "application_ids": [uuid.uuid4()],
             },
         )
