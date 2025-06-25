@@ -124,7 +124,7 @@
                         <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
                             {% block sidebar %}
                                 {{ block.super }}
-                                {% include "apply/includes/job_application_comment.html" with job_application=job_application form=shared_comment_form csrf_token=csrf_token only %}
+                                {% include "apply/includes/job_application_comment.html" with job_application=job_application form=shared_comment_form mode="view" is_locked=False csrf_token=csrf_token only %}
                             {% endblock %}
                         </div>
                     </div>

@@ -946,9 +946,12 @@ class JobApplicationCommentForCompany(forms.ModelForm):
             "shared_comment",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, mode="view", **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["shared_comment"].widget = ReadonlyDivWidget(attrs={"class": "form-control"})
+        if mode == "edit":
+            self.fields["shared_comment"].widget = forms.Textarea(attrs={"data-it-expandable": "true"})
+        else:
+            self.fields["shared_comment"].widget = ReadonlyDivWidget(attrs={"class": "form-control"})
 
 
 class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):

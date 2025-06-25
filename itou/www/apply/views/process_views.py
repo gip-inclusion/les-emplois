@@ -277,13 +277,40 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "add_prior_action_form": (
             PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
         ),
-        "shared_comment_form": JobApplicationCommentForCompany(instance=job_application),
+        "shared_comment_form": JobApplicationCommentForCompany(instance=job_application, mode="view"),
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
         "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,
     }
 
     return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def shared_comment_for_company(request, job_application_id):
+    queryset = JobApplication.objects.is_active_company_member(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+    is_locked = False
+    mode = "view"
+
+    if request.POST.get("acquire_lock"):
+        is_locked = job_application.acquire_shared_comment_lock(request.user)
+        mode = "view" if is_locked else "edit"
+    elif request.POST.get("reset"):
+        mode = "view"
+        job_application.release_shared_comment_lock(request.user)
+    elif shared_comment := request.POST.get("shared_comment"):
+        job_application.update_shared_comment(shared_comment, request.user)
+
+    context = {
+        "job_application": job_application,
+        "form": JobApplicationCommentForCompany(instance=job_application, mode=mode),
+        "mode": mode,
+        "is_locked": is_locked,
+    }
+
+    return render(request, "apply/includes/job_application_comment.html", context)
 
 
 @check_user(lambda u: u.is_prescriber or u.is_employer)

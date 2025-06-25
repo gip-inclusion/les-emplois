@@ -1,11 +1,42 @@
 {% load django_bootstrap5 %}
 <div class="c-box c-box--note mb-3 mb-md-4" id="shared_comment_box">
-    <form action="">
+    <form hx-post="{% url 'apply:shared_comment_for_company' job_application_id=job_application.id %}" hx-target="#shared_comment_box" hx-indicator="#shared_comment_box" hx-swap="outerHTML">
+        {% csrf_token %}
+
         {% bootstrap_field form.shared_comment %}
         {% if job_application.shared_comment_last_modified_at and job_application.shared_comment_last_modified_by %}
             <div class="form-text">
                 le {{ job_application.shared_comment_last_modified_at|date:"d/m/Y" }} par {{ job_application.shared_comment_last_modified_by.get_full_name }}
             </div>
         {% endif %}
+        <div class="form-row">
+            {% if mode == "edit" and is_locked %}
+                <span class="form-text">Modification en cours par {{ job_application.shared_comment_locked_by.get_full_name }}</span>
+            {% elif mode == "view" %}
+                <button hx-post="{% url 'apply:shared_comment_for_company' job_application_id=job_application.id %}"
+                        hx-target="#shared_comment_box"
+                        hx-indicator="#shared_comment_box"
+                        hx-swap="outerHTML"
+                        hx-vals='{"acquire_lock": "True"}'
+                        class="btn btn-sm btn-ico-only">
+                    <span class="visually-hidden">Modifier la note partagée avec tous les membres de la structurs</span>
+                    <i class="ri-edit-line" aria-hidden="true"></i>
+                </button>
+            {% else %}
+                <button hx-post="{% url 'apply:shared_comment_for_company' job_application_id=job_application.id %}"
+                        hx-target="#shared_comment_box"
+                        hx-indicator="#shared_comment_box"
+                        hx-swap="outerHTML"
+                        hx-vals='{"reset": "True"}'
+                        class="btn btn-sm btn-ico-only">
+                    <span class="visually-hidden">Annuler l'ajout d'une note partagée avec tous les membres de la structure</span>
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </button>
+                <button type="submit" class="btn btn-sm btn-ico-only">
+                    <span class="visually-hidden">Valider l'ajout d'une note partagée avec tous les membres de la structure</span>
+                    <i class="ri-check-line" aria-hidden="true"></i>
+                </button>
+            {% endif %}
+        </div>
     </form>
 </div>
