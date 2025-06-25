@@ -1304,7 +1304,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
 
     # Select 1 transferable application
     simulate_applications_selection([transferable_app_1.pk])
-    assert get_transfer_button() is None
+    assert "disabled" in get_transfer_button().attrs
 
     # The employer needs at least an other Company to be able to transfer an application
     CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company
@@ -1315,7 +1315,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     simulate_applications_selection([transferable_app_1.pk])
     transfer_button = get_transfer_button()
     assert transfer_button is not None
-    assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
+    assert pretty_indented(transfer_button) == snapshot(name="active transfer button")
 
     modal_selector = transfer_button["data-bs-target"]
     assert modal_selector == "#transfer_confirmation_modal"
@@ -1331,7 +1331,7 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     simulate_applications_selection([transferable_app_1.pk, transferable_app_2.pk])
     transfer_button = get_transfer_button()
     assert transfer_button is not None
-    assert pretty_indented(transfer_button.parent) == snapshot(name="active transfer button")
+    assert pretty_indented(transfer_button) == snapshot(name="active transfer button")
 
     modal_selector = transfer_button["data-bs-target"]
     assert modal_selector == "#transfer_confirmation_modal"
@@ -1403,9 +1403,9 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
 
     def get_postpone_button():
         postponable_buttons = [
-            span.parent
-            for span in simulated_page.find(id="batch-action-box").select("button > span")
-            if span.contents == ["Mettre en liste d’attente"]
+            button
+            for button in simulated_page.find(id="batch-action-box").find_all("button")
+            if button.text.strip() == "Mettre en attente"
         ]
         if not postponable_buttons:
             return None
@@ -1553,6 +1553,83 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     simulate_applications_selection([refused_app.pk, refusable_app_1.pk])
     refuse_button = get_refuse_button()
     assert pretty_indented(refuse_button) == snapshot(name="inactive refuse button as GEIQ")
+
+
+def test_list_for_siae_select_applications_batch_accept(client, snapshot):
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    acceptable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+    )
+    assert acceptable_app_1.accept.is_available()
+    acceptable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.PRIOR_TO_HIRE,
+    )
+    assert acceptable_app_2.accept.is_available()
+
+    unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    assert not unacceptable_app.accept.is_available()
+
+    client.force_login(employer)
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_accept_button():
+        accept_buttons = [
+            span.parent
+            for span in simulated_page.find(id="batch-action-box").select("span")
+            if span.contents == ["Accepter"]
+        ]
+        if not accept_buttons:
+            return None
+        [accept_button] = accept_buttons
+        return accept_button
+
+    assert get_accept_button() is None
+
+    # Select 1 acceptable application
+    simulate_applications_selection([acceptable_app_1.pk])
+    accept_button = get_accept_button()
+    assert accept_button is not None
+    assert pretty_indented(accept_button) == snapshot(name="active accept button")
+
+    # Check that the next_url is correctly transmitted
+    assert accept_button["href"] == reverse(
+        "apply:accept", kwargs={"job_application_id": acceptable_app_1.pk}, query={"next_url": table_url}
+    )
+
+    # Test with unacceptable batches
+    for app_list in [
+        [unacceptable_app.pk],
+        [acceptable_app_1.pk, acceptable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        accept_button = get_accept_button()
+        assert pretty_indented(accept_button) == snapshot(name="inactive accept button")
 
 
 def test_order(client, subtests):
