@@ -64,15 +64,15 @@ def test_prolongation_report_file_filter(admin_client):
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist"), follow=True)
     assertContains(response, prolongation.approval.number)
-    assertContains(response, prolongation.declared_by)
+    assertContains(response, prolongation.declared_by.display_with_pii)
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=yes", follow=True)
     assertContains(response, prolongation.approval.number)
-    assertContains(response, prolongation.declared_by)
+    assertContains(response, prolongation.declared_by.display_with_pii)
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=no", follow=True)
     assertNotContains(response, prolongation.approval.number)
-    assertNotContains(response, prolongation.declared_by)
+    assertNotContains(response, prolongation.declared_by.display_with_pii)
 
 
 def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):

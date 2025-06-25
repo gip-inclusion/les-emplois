@@ -1,6 +1,8 @@
+from functools import partial
 from unittest import mock
 
 from django import forms
+from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
@@ -8,6 +10,8 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
+from django.core.exceptions import FieldDoesNotExist
+from django.db import models
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
@@ -133,11 +137,41 @@ class InconsistencyCheckMixin:
         )
 
 
+def get_field_display_with_pii(obj, field):
+    value = getattr(obj, field)
+    if value is not None:
+        value = value.display_with_pii
+    return value
+
+
 class ItouModelMixin:
     # Add save buttons on top of each change forms by default
     save_on_top = True
     get_object_ignored_prefetch_related_fields = set()  # Remove automatically added (but useless) fields
     get_object_extra_select_related_fields = set()  # Add extra fields to select_related (like OneToOne relations)
+
+    def list_display_with_pii(self):
+        fields = {}
+        for field_name in self.list_display:
+            try:
+                field = self.model._meta.get_field(field_name)
+            except FieldDoesNotExist:
+                continue
+            else:
+                if isinstance(field.remote_field, models.ManyToOneRel) and hasattr(
+                    field.related_model, "display_with_pii"
+                ):
+                    fields[field_name] = field
+        return fields
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.list_display_with_pii().values():
+            setattr(
+                self,
+                f"{field.name}_display_with_pii",
+                admin.display(description=field.verbose_name)(partial(get_field_display_with_pii, field=field.name)),
+            )
 
     def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
@@ -164,6 +198,15 @@ class ItouModelMixin:
         # Eager-loading all relations, but only when editing one object because `list_select_related` exists
         with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
             return super().get_object(request, object_id, from_field)
+
+    def get_list_display(self, request):
+        fields_with_pii = self.list_display_with_pii()
+        list_display = super().get_list_display(request)
+        new_list = list(list_display)
+        for i, field_name in enumerate(list_display):
+            if field_name in fields_with_pii:
+                new_list[i] = f"{field_name}_display_with_pii"
+        return tuple(new_list)
 
 
 class ItouModelAdmin(ItouModelMixin, ModelAdmin):
