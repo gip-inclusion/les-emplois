@@ -26,7 +26,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, ReadonlyDivWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -924,6 +924,31 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
         sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda org: org[0])
+
+
+class JobApplicationCommentForCompany(forms.ModelForm):
+    """
+    Allows members of a company to edit a shared common comment on the job application detail page.
+    There are two modes:
+    - edit: the comment can be edited via a textarea
+    - view: the comment can be read via a custom div widget
+    """
+
+    shared_comment = forms.CharField(
+        strip=True,
+        label="Note partagée avec tous les membres de la structure",
+        required=False,
+    )
+
+    class Meta:
+        model = JobApplication
+        fields = [
+            "shared_comment",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["shared_comment"].widget = ReadonlyDivWidget(attrs={"class": "form-control"})
 
 
 class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):

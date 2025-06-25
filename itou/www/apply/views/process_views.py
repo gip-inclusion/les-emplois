@@ -37,6 +37,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
+    JobApplicationCommentForCompany,
     PriorActionForm,
     TransferJobApplicationForm,
 )
@@ -276,6 +277,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "add_prior_action_form": (
             PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
         ),
+        "shared_comment_form": JobApplicationCommentForCompany(instance=job_application),
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
         "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,

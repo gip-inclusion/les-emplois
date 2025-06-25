@@ -1,0 +1,11 @@
+{% load django_bootstrap5 %}
+<div class="c-box c-box--note mb-3 mb-md-4" id="shared_comment_box">
+    <form action="">
+        {% bootstrap_field form.shared_comment %}
+        {% if job_application.shared_comment_last_modified_at and job_application.shared_comment_last_modified_by %}
+            <div class="form-text">
+                le {{ job_application.shared_comment_last_modified_at|date:"d/m/Y" }} par {{ job_application.shared_comment_last_modified_by.get_full_name }}
+            </div>
+        {% endif %}
+    </form>
+</div>

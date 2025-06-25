@@ -121,8 +121,11 @@
                             {# Negative answers ------------------------------------------------------------------------- #}
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
-                        <div class="col-12 col-lg-4 order-1 order-lg-2">
-                            {% block sidebar %}{{ block.super }}{% endblock %}
+                        <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                            {% block sidebar %}
+                                {{ block.super }}
+                                {% include "apply/includes/job_application_comment.html" with job_application=job_application form=shared_comment_form csrf_token=csrf_token only %}
+                            {% endblock %}
                         </div>
                     </div>
                 </div>
