@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import httpx
 from django.conf import settings
-from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
 
@@ -28,9 +27,14 @@ def get_access_token():
     try:
         access_token = (
             httpx.post(
-                f"{settings.API_INSEE_BASE_URL}/token",
-                data={"grant_type": "client_credentials"},
-                auth=(settings.API_INSEE_CONSUMER_KEY, settings.API_INSEE_CONSUMER_SECRET),
+                f"{settings.API_INSEE_AUTH_URL}/token",
+                data={
+                    "grant_type": "password",
+                    "client_id": settings.API_INSEE_CLIENT_ID,
+                    "client_secret": settings.API_INSEE_CLIENT_SECRET,
+                    "username": settings.API_INSEE_USERNAME,
+                    "password": settings.API_INSEE_PASSWORD,
+                },
             )
             .raise_for_status()
             .json()["access_token"]
@@ -52,12 +56,11 @@ def etablissement_get_or_error(siret):
     if not access_token:
         return None, "Problème de connexion à la base Sirene. Essayez ultérieurement."
 
-    url = f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}"
+    url = f"{settings.API_INSEE_SIRENE_URL}/siret/{siret}"
     try:
         r = httpx.get(
             url,
             headers={"Authorization": f"Bearer {access_token}"},
-            params={"date": timezone.localdate().isoformat()},
         ).raise_for_status()
     except httpx.RequestError:
         logger.exception("A request to the INSEE API failed")

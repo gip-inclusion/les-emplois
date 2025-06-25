@@ -36,18 +36,18 @@ from tests.utils.test import ItouClient
 
 @pytest.fixture(autouse=True)
 def setup_api_insee(settings):
-    settings.API_INSEE_BASE_URL = "https://insee.fake"
-    settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
-    settings.API_INSEE_CONSUMER_KEY = "foo"
-    settings.API_INSEE_CONSUMER_SECRET = "bar"
+    settings.API_INSEE_AUTH_URL = "https://insee.fake"
+    settings.API_INSEE_SIRENE_URL = "https://entreprise.fake"
+    settings.API_INSEE_CLIENT_ID = "foo"
+    settings.API_INSEE_CLIENT_SECRET = "bar"
 
 
 class TestPrescriberSignup:
     def setup_method(self):
-        respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
+        respx.post(f"{settings.API_INSEE_AUTH_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
         )
-        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/26570134200148").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_URL}/siret/26570134200148").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 
@@ -625,7 +625,7 @@ class TestPrescriberSignup:
         )
         # Same SIRET as mock.
         siret = "26570134200148"
-        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganizationKind.ML)
@@ -691,7 +691,7 @@ class TestPrescriberSignup:
         )
         # Same SIRET as mock but with same expected kind.
         siret = "26570134200148"
-        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         prescriber_organization = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganizationKind.PLIE)
