@@ -855,7 +855,6 @@ class TestProConnectLogout:
 
 
 class TestProConnectMapChannel:
-    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @respx.mock
     def test_happy_path(self, client, pro_connect):
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
@@ -888,7 +887,6 @@ class TestProConnectMapChannel:
         response = client.get(response.url)
         assert response.status_code == 200
 
-    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @respx.mock
     def test_create_user(self, client, pro_connect):
         # Application sent by a colleague from the same agency but not by the prescriber himself.

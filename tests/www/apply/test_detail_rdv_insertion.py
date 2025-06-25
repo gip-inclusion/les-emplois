@@ -40,7 +40,6 @@ def mock_rdvs_api(settings):
     )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 @freeze_time("2024-08-01")
 class TestRdvInsertionAppointmentsList:
     APPOINTMENTS_TAB_TITLE = "Rendez-vous"
@@ -354,7 +353,6 @@ class TestRdvInsertionInvitationRequestsList:
             for_snapshot=True,
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @pytest.mark.parametrize(
         "profile,view_name,invitations_presence",
         [
@@ -376,7 +374,6 @@ class TestRdvInsertionInvitationRequestsList:
             with assertRaisesMessage(ValueError, "not enough values to unpack (expected 1, got 0)"):
                 parse_response_to_soup(response, selector="#rdvi-invitation-requests")
 
-    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @pytest.mark.parametrize(
         "profile,view_name,contains_invite_button",
         [
