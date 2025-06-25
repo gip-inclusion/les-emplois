@@ -6396,10 +6396,34 @@
   
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_accept[active accept button]
+  '''
+  <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/11111111-1111-1111-1111-111111111111/siae/accept?next_url=%2Fapply%2Fsiae%2Flist%3Fdisplay%3Dtable%26start_date%3D2015-01-01">
+      <i aria-hidden="true" class="ri-check-line fw-medium">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </a>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_accept[inactive accept button]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Une seule candidature doit être séléctionnée pour être acceptée." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </button>
+  
+  '''
+# ---
 # name: test_list_for_siae_select_applications_batch_archive[active archive button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-target="#archive_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-open-modal" type="button">
-      <i aria-hidden="true" class="ri-archive-line fw-medium">
+  <button class="btn justify-content-start dropdown-item" data-bs-target="#archive_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-open-modal" type="button">
+      <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
       </i>
       <span>
           Archiver
@@ -6410,8 +6434,8 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[inactive archive button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
-      <i aria-hidden="true" class="ri-archive-line fw-medium">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
       </i>
       <span>
           Archiver
@@ -6501,11 +6525,11 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[active postpone button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-target="#postpone_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-open-modal" type="button">
-      <i aria-hidden="true" class="ri-history-line fw-medium">
+  <button class="btn justify-content-start dropdown-item" data-bs-target="#postpone_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-postpone-applications-open-modal" type="button">
+      <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
-          Mettre en liste d’attente
+          Mettre en attente
       </span>
   </button>
   
@@ -6513,11 +6537,11 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button as GEIQ]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-      <i aria-hidden="true" class="ri-history-line fw-medium">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
-          Mettre en liste d’attente
+          Mettre en attente
       </span>
   </button>
   
@@ -6525,11 +6549,11 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
-      <i aria-hidden="true" class="ri-history-line fw-medium">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
-          Mettre en liste d’attente
+          Mettre en attente
       </span>
   </button>
   
@@ -6632,7 +6656,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button as GEIQ]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche » et « En attente » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-close-line">
       </i>
       <span>
@@ -6644,7 +6668,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude » et « En attente » peuvent être déclinées.²" data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude » et « En attente » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-close-line">
       </i>
       <span>
@@ -6656,22 +6680,20 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[active transfer button]
   '''
-  <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-      <button aria-haspopup="true" class="btn btn-lg btn-link-white btn-block btn-ico w-lg-auto text-end" data-bs-target="#transfer_confirmation_modal" data-bs-toggle="modal" id="transfer_to_button" type="button">
-          <i class="ri-arrow-left-right-line">
-          </i>
-          <span>
-              Transférer vers
-          </span>
-      </button>
-  </div>
+  <button aria-haspopup="true" class="btn justify-content-start dropdown-item" data-bs-target="#transfer_confirmation_modal" data-bs-toggle="modal" id="transfer_to_button" type="button">
+      <i class="ri-arrow-left-right-line me-2">
+      </i>
+      <span>
+          Transférer vers
+      </span>
+  </button>
   
   '''
 # ---
 # name: test_list_for_siae_select_applications_batch_transfer[inactive transfer button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico w-lg-auto" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
-      <i class="ri-arrow-left-right-line">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
+      <i class="ri-arrow-left-right-line me-2">
       </i>
       <span>
           Transférer vers

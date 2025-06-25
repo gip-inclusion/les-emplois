@@ -1,4 +1,5 @@
 {% load enums %}
+{% load job_application_actions %}
 {% load matomo %}
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
@@ -7,6 +8,22 @@
     <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
+            <div class="form-group col-12 col-lg-auto">
+                {% if can_accept %}
+                    {% accept_button acceptable_job_application acceptable_job_application.geiq_eligibility_diagnosis batch_mode=True next_url=list_url %}
+                {% else %}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
+                            disabled
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-custom-class="c-box--action-tooltip"
+                            data-bs-title="Une seule candidature doit être séléctionnée pour être acceptée.">
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                        <span>Accepter</span>
+                    </button>
+                {% endif %}
+            </div>
             <div class="form-group col-12 col-lg-auto">
                 {% if can_refuse %}
                     <form method="post" action="{% url 'apply:batch_refuse' %}?next_url={{ list_url|urlencode }}">
@@ -26,79 +43,82 @@
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             data-bs-custom-class="c-box--action-tooltip"
-                            data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « En attente » peuvent être déclinées.²">
+                            data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « En attente » peuvent être déclinées.">
                         <i class="ri-close-line" aria-hidden="true"></i>
                         <span>Décliner</span>
                     </button>
                 {% endif %}
             </div>
-            <div class="form-group col-12 col-lg-auto">
-                {% if can_postpone %}
-                    <button type="button"
-                            class="btn btn-lg btn-link-white btn-block btn-ico"
-                            {% matomo_event "candidature" "clic" "batch-postpone-applications-open-modal" %}
-                            data-bs-toggle="modal"
-                            data-bs-target="#postpone_confirmation_modal">
-                        <i class="ri-history-line fw-medium" aria-hidden="true"></i>
-                        <span>Mettre en liste d’attente</span>
+            <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                <div class="dropdown">
+                    <button id="other_actions" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                        Autres actions
+                        <span class="badge badge-base rounded-pill bg-info text-white ms-2">{{ other_actions_count }}</span>
                     </button>
-                {% else %}
-                    <button type="button"
-                            class="btn btn-lg btn-link-white btn-block btn-ico"
-                            disabled
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            data-bs-custom-class="c-box--action-tooltip"
-                            data-bs-title="Seules les candidatures au statut « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %} ou « Action préalable à l’embauche »{% endif %} peuvent être mises en liste d’attente.">
-                        <i class="ri-history-line fw-medium" aria-hidden="true"></i>
-                        <span>Mettre en liste d’attente</span>
-                    </button>
-                {% endif %}
-            </div>
-            <div class="form-group col-12 col-lg-auto">
-                {% if can_archive %}
-                    <button type="button"
-                            class="btn btn-lg btn-link-white btn-block btn-ico"
-                            {% matomo_event "candidature" "clic" "batch-archive-applications-open-modal" %}
-                            data-bs-toggle="modal"
-                            data-bs-target="#archive_confirmation_modal">
-                        <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
-                        <span>Archiver</span>
-                    </button>
-                {% else %}
-                    <button type="button"
-                            class="btn btn-lg btn-link-white btn-block btn-ico"
-                            disabled
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            data-bs-custom-class="c-box--action-tooltip"
-                            data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées.">
-                        <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
-                        <span>Archiver</span>
-                    </button>
-                {% endif %}
-            </div>
-            {% if request.organizations|length > 1 %}
-                <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-                    {% if can_transfer %}
-                        <button id="transfer_to_button" class="btn btn-lg btn-link-white btn-block btn-ico w-lg-auto text-end" type="button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
-                            <i class="ri-arrow-left-right-line"></i>
-                            <span>Transférer vers</span>
-                        </button>
-                    {% else %}
-                        <button class="btn btn-lg btn-link-white btn-block btn-ico w-lg-auto"
-                                type="button"
-                                disabled
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                data-bs-custom-class="c-box--action-tooltip"
-                                data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées.">
-                            <i class="ri-arrow-left-right-line"></i>
-                            <span>Transférer vers</span>
-                        </button>
-                    {% endif %}
+                    <div class="dropdown-menu w-100" aria-labelledby="other_actions">
+                        {% if can_postpone %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    {% matomo_event "candidature" "clic" "batch-postpone-applications-open-modal" %}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#postpone_confirmation_modal">
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Mettre en attente</span>
+                            </button>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seules les candidatures au statut « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %} ou « Action préalable à l’embauche »{% endif %} peuvent être mises en liste d’attente.">
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Mettre en attente</span>
+                            </button>
+                        {% endif %}
+                        <hr class="dropdown-divider m-0">
+                        {% if can_transfer %}
+                            <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
+                                <i class="ri-arrow-left-right-line me-2"></i>
+                                <span>Transférer vers</span>
+                            </button>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées.">
+                                <i class="ri-arrow-left-right-line me-2"></i>
+                                <span>Transférer vers</span>
+                            </button>
+                        {% endif %}
+                        {% if can_archive %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    {% matomo_event "candidature" "clic" "batch-archive-applications-open-modal" %}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#archive_confirmation_modal">
+                                <i class="ri-archive-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Archiver</span>
+                            </button>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées.">
+                                <i class="ri-archive-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Archiver</span>
+                            </button>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 {% else %}
