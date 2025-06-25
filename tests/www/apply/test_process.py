@@ -103,7 +103,7 @@ NON_IAE_CANCELLATION_CONFIRMATION = (
 )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
 class TestProcessViews:
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
