@@ -21,6 +21,7 @@ from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     BatchPostponeForm,
+    JobApplicationInternalTransferForm,
     JobApplicationRefusalJobSeekerAnswerForm,
     JobApplicationRefusalPrescriberAnswerForm,
     JobApplicationRefusalReasonForm,
@@ -383,13 +384,16 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
 @check_user(lambda user: user.is_employer)
 @require_POST
 def transfer(request):
+    form = JobApplicationInternalTransferForm(request, data=request.POST)
+    if not form.is_valid():
+        raise Http404
     next_url = get_safe_url(request, "next_url")
     if next_url is None:
         # This is somewhat extreme but will force developpers to always provide a proper next_url
         raise Http404
     target_company = get_object_or_404(
         Company.objects.filter(pk__in={org.pk for org in request.organizations}),
-        pk=request.POST.get("target_company_id"),
+        pk=form.cleaned_data["target_company_id"],
     )
     applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
     transferred_ids = []
