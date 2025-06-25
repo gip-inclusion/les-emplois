@@ -458,6 +458,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     WEEKS_BEFORE_CONSIDERED_OLD = 3
 
+    SHARED_COMMENT_LOCK_DURATION_IN_MINUTES = 5
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
@@ -1336,6 +1338,45 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/diagoriente_job_seeker_invite_body.txt"
         context = {"job_application": self}
         return get_email_message(to, context, subject, body)
+
+    def is_shared_comment_locked(self, user):
+        past_dt = timezone.now() - timezone.timedelta(minutes=self.SHARED_COMMENT_LOCK_DURATION_IN_MINUTES)
+        return (
+            self.shared_comment_locked_by
+            and self.shared_comment_locked_at
+            and self.shared_comment_locked_by != user
+            and self.shared_comment_locked_at >= past_dt
+        )
+
+    def acquire_shared_comment_lock(self, user):
+        if not self.is_shared_comment_locked(user):
+            self.shared_comment_locked_at = timezone.now()
+            self.shared_comment_locked_by = user
+            self.save(update_fields=["shared_comment_locked_at", "shared_comment_locked_by"])
+            return False
+        return True
+
+    def release_shared_comment_lock(self, user):
+        if self.is_shared_comment_locked(user):
+            self.shared_comment_locked_at = None
+            self.shared_comment_locked_by = None
+            self.save(update_fields=["shared_comment_locked_at", "shared_comment_locked_by"])
+
+    def update_shared_comment(self, shared_comment, user):
+        if not self.is_shared_comment_locked(user):
+            self.shared_comment = shared_comment
+            self.shared_comment_last_modified_at = timezone.now()
+            self.shared_comment_last_modified_by = user
+            self.release_shared_comment_lock(user)
+            self.save(
+                update_fields=[
+                    "shared_comment",
+                    "shared_comment_last_modified_at",
+                    "shared_comment_last_modified_by",
+                    "shared_comment_locked_at",
+                    "shared_comment_locked_by",
+                ]
+            )
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
