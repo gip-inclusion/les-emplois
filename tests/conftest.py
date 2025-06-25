@@ -363,17 +363,21 @@ def unknown_variable_template_error(monkeypatch, request):
 
     origin_resolve = base_template.FilterExpression.resolve
 
+    seen_variables = set()
+
     def stricter_resolve(self, context, ignore_failures=False):
-        if (
-            self.is_var
-            and self.var.lookups is not None
-            and self.var.lookups[0] not in context
-            and self.var.lookups[0] not in ignore_list
-        ):
-            ignore_failures = False
+        if self.is_var and self.var.lookups is not None:
+            seen_variables.add(self.var.lookups[0])
+            if self.var.lookups[0] not in context and self.var.lookups[0] not in ignore_list:
+                ignore_failures = False
         return origin_resolve(self, context, ignore_failures)
 
     monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
+    yield
+
+    ignored_variable_not_seen = ignore_list - seen_variables
+    if ignored_variable_not_seen:
+        pytest.fail(f"Unnecessary usage of 'ignore_unknown_variable_template_error' for: {ignored_variable_not_seen}")
 
 
 @pytest.fixture(scope="session", autouse=True)
