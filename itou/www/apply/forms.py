@@ -991,3 +991,22 @@ class BatchPostponeForm(AnswerForm):
                 if job_seeker_nb > 1
                 else "Commentaire à envoyer au candidat"
             )
+
+
+class JobApplicationInternalTransferForm(forms.Form):
+    target_company_id = forms.ChoiceField(label="Sélectionnez la structure")
+
+    def __init__(self, request, *args, job_app_count=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["target_company_id"].choices = [("", "Sélectionnez une structure")] + [
+            (org.pk, f"{org.kind} - {org.display_name}")
+            for org in request.organizations
+            if org != request.current_organization
+        ]
+        if job_app_count is not None:
+            label = "Sélectionnez la structure vers laquelle vous souhaitez transférer "
+            if job_app_count == 1:
+                label += "la candidature."
+            elif job_app_count > 1:
+                label += f"les {job_app_count} candidatures."
+            self.fields["target_company_id"].label = label
