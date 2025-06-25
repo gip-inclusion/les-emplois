@@ -2725,7 +2725,7 @@ class TestDirectHireFullProcess:
             status_code=403,
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("is_subject_to_eligibility_rules", "job_seeker")
+    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     @freeze_time()
     def test_hire_as_company(self, client):
         """Apply as company (and create new job seeker)"""
@@ -4997,7 +4997,6 @@ class TestCheckJobSeekerInformationsForHire:
         assertContains(response, reverse("dashboard:index"))
 
 
-@pytest.mark.ignore_unknown_variable_template_error("is_subject_to_eligibility_rules")
 class TestCheckPreviousApplicationsForHireView:
     @pytest.fixture(autouse=True)
     def self(cls):
@@ -5068,7 +5067,6 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("is_subject_to_eligibility_rules")
 class TestEligibilityForHire:
     @pytest.fixture(autouse=True)
     def setup_method(self):
