@@ -537,6 +537,243 @@ class TestBatchPostpone:
         )
 
 
+class TestBatchProcess:
+    def test_invalid_access(self, client):
+        processable_app = JobApplicationFactory(state=JobApplicationState.NEW)
+        assert processable_app.process.is_available()
+        for user in [processable_app.job_seeker, processable_app.sender, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.post(reverse("apply:batch_process"))
+            assert response.status_code == 403
+
+    def test_no_next_url(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        processable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+        assert processable_app.process.is_available()
+
+        response = client.post(reverse("apply:batch_process"), data={"application_ids": [processable_app.pk]})
+        assert response.status_code == 404
+
+    def test_single_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
+        client.force_login(employer)
+
+        processable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [processable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        processable_app.refresh_from_db()
+        assert processable_app.state == JobApplicationState.PROCESSING
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "La candidature a bien été mise à l'étude.", extra_tags="toast")],
+        )
+
+    def test_multiple_apps(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        processable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.NEW)
+
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [processable_app.pk for processable_app in processable_apps]},
+        )
+        # Check that next_url parameter is honored
+        assertRedirects(response, next_url)
+        for processable_app in processable_apps:
+            processable_app.refresh_from_db()
+            assert processable_app.state == JobApplicationState.PROCESSING
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "2 candidatures ont bien été mises à l'étude.", extra_tags="toast")],
+        )
+
+    def test_sent_application(self, client):
+        processable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.NEW)
+        assert processable_app.process.is_available()
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
+        client.force_login(processable_app.sender)
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [processable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        processable_app.refresh_from_db()
+        assert processable_app.state == JobApplicationState.NEW
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unexisting_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
+        client.force_login(employer)
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [uuid.uuid4()]},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unprocessable(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        unprocessable_app = JobApplicationFactory(
+            job_seeker__first_name="John",
+            job_seeker__last_name="Rambo",
+            to_company=company,
+            state=JobApplicationState.POSTPONED,
+        )
+        assert not unprocessable_app.process.is_available()
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [unprocessable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        unprocessable_app.refresh_from_db()
+        assert unprocessable_app.state == JobApplicationState.POSTPONED
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La candidature de John RAMBO n’a pas pu être mise à l'étude car elle est au statut "
+                        "« Candidature en attente »."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_already_processing(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        processed_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="Bond",
+            to_company=company,
+            state=JobApplicationState.PROCESSING,
+        )
+        assert not processed_app.process.is_available()
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={"application_ids": [processed_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        processed_app.refresh_from_db()
+        assert processed_app.state == JobApplicationState.PROCESSING
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND est déjà à l'étude.",
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_mishmash(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        apps = [
+            # 2 processable applications:
+            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
+            # 1 unprocessable application:
+            JobApplicationFactory(
+                job_seeker__first_name="John",
+                job_seeker__last_name="Rambo",
+                to_company=company,
+                state=JobApplicationState.POSTPONED,
+            ),
+            # 1 already processing application:
+            JobApplicationFactory(
+                job_seeker__first_name="Jean",
+                job_seeker__last_name="Bond",
+                to_company=company,
+                state=JobApplicationState.PROCESSING,
+            ),
+        ]
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})
+
+        response = client.post(
+            reverse("apply:batch_process", query={"next_url": next_url}),
+            data={
+                "application_ids": [app.pk for app in apps] + [uuid.uuid4(), uuid.uuid4()],
+            },
+        )
+        # Check that next_url parameter is honored
+        assertRedirects(response, next_url)
+        # 2 processable apps have been successfully archived despite all the error messages
+        apps[0].refresh_from_db()
+        assert apps[0].state == JobApplicationState.PROCESSING
+        apps[1].refresh_from_db()
+        assert apps[1].state == JobApplicationState.PROCESSING
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "2 candidatures sélectionnées n’existent plus ou ont été transférées.",
+                ),
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND est déjà à l'étude.",
+                    extra_tags="toast",
+                ),
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La candidature de John RAMBO n’a pas pu être mise à l'étude car elle est au statut "
+                        "« Candidature en attente »."
+                    ),
+                    extra_tags="toast",
+                ),
+                messages.Message(messages.SUCCESS, "2 candidatures ont bien été mises à l'étude.", extra_tags="toast"),
+            ],
+        )
+
+
 class TestBatchRefuse:
     FAKE_JOB_SEEKER_ANSWER = "Lorem ipsum candidatum"
     FAKE_PRESCRIBER_ANSWER = "Lorem ipsum prescribum"
