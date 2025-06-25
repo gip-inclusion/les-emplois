@@ -163,6 +163,55 @@ def postpone(request):
     return HttpResponseRedirect(next_url)
 
 
+@check_user(lambda user: user.is_employer)
+@require_POST
+def process(request):
+    next_url = get_safe_url(request, "next_url")
+    if next_url is None:
+        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        raise Http404
+    applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
+
+    processed_ids = []
+
+    for job_application in applications:
+        if job_application.state == JobApplicationState.PROCESSING:
+            messages.warning(
+                request,
+                f"La candidature de {job_application.job_seeker.get_full_name()} est déjà à l'étude.",
+                extra_tags="toast",
+            )
+            continue
+        try:
+            job_application.process(user=request.user)
+        except xwf_models.InvalidTransitionError:
+            messages.error(
+                request,
+                (
+                    f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être mise à l'étude "
+                    f"car elle est au statut « {job_application.get_state_display()} »."
+                ),
+                extra_tags="toast",
+            )
+        else:
+            processed_ids.append(job_application.pk)
+
+    processed_nb = len(processed_ids)
+
+    if processed_nb > 1:
+        messages.success(request, f"{processed_nb} candidatures ont bien été mises à l'étude.", extra_tags="toast")
+    elif processed_nb == 1:
+        messages.success(request, "La candidature a bien été mise à l'étude.", extra_tags="toast")
+
+    logger.info(
+        "user=%s batch processed %s applications: %s",
+        request.user.pk,
+        processed_nb,
+        ",".join(str(app_uid) for app_uid in processed_ids),
+    )
+    return HttpResponseRedirect(next_url)
+
+
 class RefuseViewStep(enum.StrEnum):
     REASON = "reason"
     JOB_SEEKER_ANSWER = "job-seeker-answer"
