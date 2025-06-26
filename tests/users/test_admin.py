@@ -423,3 +423,13 @@ def test_nir_modification_request_display_requested_by_kind(admin_client):
     url = reverse("admin:users_nirmodificationrequest_change", args=[nir_modification_request.pk])
     response = admin_client.get(url)
     assertContains(response, f'<div class="readonly">{display_kind}</div>')
+
+
+def test_change_display_with_pii(admin_client):
+    job_seeker = JobSeekerFactory()
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": job_seeker.pk}))
+    assertContains(response, f"<h2>{job_seeker.display_with_pii}</h2>")
+    response = admin_client.get(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker.jobseeker_profile.pk})
+    )
+    assertContains(response, f"<h2>{job_seeker.display_with_pii}</h2>")
