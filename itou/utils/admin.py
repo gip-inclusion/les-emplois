@@ -142,7 +142,7 @@ def get_field_display_with_pii(obj, field):
     return value
 
 
-class ItouModelAdmin(ModelAdmin):
+class ItouModelMixin:
     # Add save buttons on top of each change forms by default
     save_on_top = True
 
@@ -209,6 +209,10 @@ class ItouModelAdmin(ModelAdmin):
             if field_name in fields_with_pii:
                 new_list[i] = f"{field_name}_display_with_pii"
         return tuple(new_list)
+
+
+class ItouModelAdmin(ItouModelMixin, ModelAdmin):
+    pass
 
 
 def add_support_remark_to_obj(obj, text):
