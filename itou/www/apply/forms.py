@@ -1,5 +1,6 @@
 import datetime
 import logging
+from functools import wraps
 from operator import itemgetter
 
 import sentry_sdk
@@ -756,6 +757,18 @@ class ArchivedChoices(TextChoices):
     ALL = "all", "Toutes les candidatures"
 
 
+def cancel_other_filters_if_filter_by_job_seeker(f):
+    @wraps(f)
+    def wrap(self, queryset):
+        if job_seeker := self.cleaned_data.get("job_seeker"):
+            queryset = queryset.filter(job_seeker__id=job_seeker)
+            return queryset
+        queryset = f(self, queryset)
+        return queryset
+
+    return wrap
+
+
 class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Job applications filters common to companies and Prescribers.
@@ -898,14 +911,9 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
                 if k != job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
             ]
 
+    @cancel_other_filters_if_filter_by_job_seeker
     def filter(self, queryset):
-        if job_seeker := self.cleaned_data.get("job_seeker"):
-            # If filtering is performed on the job seeker name, ignore all other filters
-            queryset = queryset.filter(job_seeker__id=job_seeker)
-            return queryset
-
         queryset = super().filter(queryset)
-
         if sender_prescriber_organizations := self.cleaned_data.get("sender_prescriber_organizations"):
             queryset = queryset.filter(sender_prescriber_organization__id__in=sender_prescriber_organizations)
         if sender_companies := self.cleaned_data.get("sender_companies"):
@@ -952,11 +960,8 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         ]
         return sorted(users, key=lambda user: user[1])
 
+    @cancel_other_filters_if_filter_by_job_seeker
     def filter(self, queryset):
-        if job_seeker := self.cleaned_data.get("job_seeker"):
-            # If filtering is performed on the job seeker name, ignore all other filters
-            return queryset.filter(job_seeker__id=job_seeker)
-
         queryset = super().filter(queryset)
         if to_companies := self.cleaned_data.get("to_companies"):
             queryset = queryset.filter(to_company__id__in=to_companies)
