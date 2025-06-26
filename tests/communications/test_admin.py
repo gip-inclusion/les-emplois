@@ -1,5 +1,4 @@
 import io
-import pathlib
 import uuid
 
 import pytest
@@ -22,7 +21,11 @@ class TestAnnouncementItemAdmin:
             buf.seek(0)
             yield buf.getvalue()
 
-    def test_add_image(self, admin_client, black_pixel):
+    def test_add_image(self, admin_client, black_pixel, mocker):
+        mocker.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        )
         response = admin_client.post(
             reverse("admin:communications_announcementcampaign_add"),
             {
@@ -41,16 +44,21 @@ class TestAnnouncementItemAdmin:
             },
         )
         assertRedirects(response, reverse("admin:communications_announcementcampaign_changelist"))
+        assert File.objects.count() == 1
         campaign = AnnouncementCampaign.objects.get()
         [item] = campaign.items.all()
-        filename = pathlib.Path(item.image.name)
-        assert uuid.UUID(filename.stem)  # Did not use the provided filename
-        assert filename.suffix == ".png"
-        file = File.objects.get()
-        assert file.key.startswith("news-images/")
+        assert item.image.name == "news-images/11111111-1111-1111-1111-111111111111.png"
+        assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"
 
-    def test_change_image(self, admin_client, black_pixel):
+    def test_change_image(self, admin_client, black_pixel, mocker):
+        # Create item before patching File.anonymized_filename's uuid,
+        # otherwise Django will consider the name already exists and will append a uuid to
+        # the original name.
         item = AnnouncementItemFactory(with_image=True)
+        mocker.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        )
         url = reverse("admin:communications_announcementcampaign_change", args=(item.campaign_id,))
         response = admin_client.post(
             url,
@@ -72,9 +80,7 @@ class TestAnnouncementItemAdmin:
         )
         assertRedirects(response, reverse("admin:communications_announcementcampaign_changelist"))
         item.refresh_from_db()
-        filename = pathlib.Path(item.image.name)
-        assert uuid.UUID(filename.stem)  # Did not use the provided filename
-        assert filename.suffix == ".png"
+        assert item.image.name == "news-images/11111111-1111-1111-1111-111111111111.png"
         assert File.objects.filter(deleted_at__isnull=False).count() == 1
         assert item.image_storage.deleted_at is None
-        assert item.image_storage.key.startswith("news-images/")
+        assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"

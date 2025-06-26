@@ -191,6 +191,10 @@ class AnnouncementCampaign(models.Model):
         ][: self.max_items]
 
 
+def anonymize_upload_to(instance, filename):
+    return f"news-images/{File.anonymized_filename(filename)}"
+
+
 class AnnouncementItemQuerySet(models.QuerySet):
     def get_queryset(self):
         return super().get_queryset().select_related("campaign")
@@ -214,7 +218,7 @@ class AnnouncementItem(models.Model):
     )
     image = models.ImageField(
         blank=True,
-        upload_to="news-images/",
+        upload_to=anonymize_upload_to,
         storage=storages["public"],
         verbose_name="capture d'écran",
         help_text="1200x600 recommandé",
