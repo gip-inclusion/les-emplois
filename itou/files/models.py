@@ -42,8 +42,7 @@ class File(models.Model):
 
     def copy(self):
         """Return a new File with a copy of the file on the storage"""
-
-        new_key = str(pathlib.Path(self.key).with_stem(str(uuid.uuid4())))
+        new_key = pathlib.Path(self.key).with_stem(str(uuid.uuid4()))
         with default_storage.open(self.key) as file:
             default_storage.save(new_key, file)
         return self.__class__.objects.create(key=new_key)
