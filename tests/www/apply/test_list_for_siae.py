@@ -595,7 +595,7 @@ class TestProcessListSiae:
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
 
         client.force_login(employer)
-        with assertSnapshotQueries(snapshot(name="SQL queries filters")):
+        with assertSnapshotQueries(snapshot(name="SQL queries with all filters but job_seeker")):
             response = client.get(
                 reverse("apply:list_for_siae"),
                 {
@@ -608,8 +608,15 @@ class TestProcessListSiae:
                     "eligibility_validated": True,
                     "criteria": [level1_criterion.pk],
                     "departments": ["37"],
-                    # Do not filter by job_seeker as it cancels all other filters
-                    # "job_seeker": job_app.job_seeker.pk,
+                },
+            )
+        assert len(response.context["job_applications_page"].object_list) == 1
+
+        with assertSnapshotQueries(snapshot(name="SQL queries with only job_seeker filter")):
+            response = client.get(
+                reverse("apply:list_for_siae"),
+                {
+                    "job_seeker": job_app.job_seeker.pk,
                 },
             )
         assert len(response.context["job_applications_page"].object_list) == 1
