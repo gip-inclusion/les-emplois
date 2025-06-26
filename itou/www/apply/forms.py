@@ -761,10 +761,8 @@ def cancel_other_filters_if_filter_by_job_seeker(f):
     @wraps(f)
     def wrap(self, queryset):
         if job_seeker := self.cleaned_data.get("job_seeker"):
-            queryset = queryset.filter(job_seeker__id=job_seeker)
-            return queryset
-        queryset = f(self, queryset)
-        return queryset
+            return queryset.filter(job_seeker__id=job_seeker)
+        return f(self, queryset)
 
     return wrap
 
