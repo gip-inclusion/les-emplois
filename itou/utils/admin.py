@@ -2,6 +2,7 @@ from functools import partial
 from unittest import mock
 
 from django import forms
+from django.contrib import admin
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.admin import GenericStackedInline
@@ -134,9 +135,39 @@ class InconsistencyCheckMixin:
         )
 
 
+def get_field_display_with_pii(obj, field):
+    value = getattr(obj, field)
+    if value is not None:
+        value = value.display_with_pii
+    return value
+
+
 class ItouModelAdmin(ModelAdmin):
     # Add save buttons on top of each change forms by default
     save_on_top = True
+
+    def list_display_with_pii(self):
+        fields = {}
+        for field_name in self.list_display:
+            try:
+                field = self.model._meta.get_field(field_name)
+            except FieldDoesNotExist:
+                continue
+            else:
+                if isinstance(field.remote_field, models.ManyToOneRel) and hasattr(
+                    field.related_model, "display_with_pii"
+                ):
+                    fields[field_name] = field
+        return fields
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.list_display_with_pii().values():
+            setattr(
+                self,
+                f"{field.name}_display_with_pii",
+                admin.display(description=field.verbose_name)(partial(get_field_display_with_pii, field=field.name)),
+            )
 
     def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
@@ -166,19 +197,13 @@ class ItouModelAdmin(ModelAdmin):
         return getattr(obj, field_name).display_with_pii
 
     def get_list_display(self, request):
+        fields_with_pii = self.list_display_with_pii()
         list_display = super().get_list_display(request)
-        for i, field_name in enumerate(list(list_display)):
-            try:
-                field = self.model._meta.get_field(field_name)
-            except FieldDoesNotExist:
-                continue
-            else:
-                if isinstance(field.remote_field, models.ManyToOneRel) and hasattr(
-                    field.related_model, "display_with_pii"
-                ):
-                    list_display[i] = partial(self.display_object_with_pii, field_name=field_name)
-
-        return list_display
+        new_list = list(list_display)
+        for i, field_name in enumerate(list_display):
+            if field_name in fields_with_pii:
+                new_list[i] = f"{field_name}_display_with_pii"
+        return tuple(new_list)
 
 
 def add_support_remark_to_obj(obj, text):
