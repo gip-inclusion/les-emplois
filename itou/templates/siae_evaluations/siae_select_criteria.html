@@ -1,32 +1,39 @@
 {% extends "layout/base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load siae_evaluations_tags %}
 {% load static %}
 
 {% block title %}
     Auto-prescriptions à justifier pour {{ evaluated_job_application.job_application.job_seeker.get_full_name }}
 {% endblock %}
 
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Modifier les critères administratifs
+                {% evaluated_job_application_state_display evaluated_job_application %}
+            </h1>
+            <p>{{ evaluated_job_application.job_application.job_seeker.get_full_name }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="s-section__row row justify-content-center">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="card">
-                        <div class="card-header">
-                            {% include "siae_evaluations/includes/job_seeker_infos.html" with request=request evaluated_job_application=evaluated_job_application only %}
-                        </div>
-                        <div class="card-body">
-                            <div class="row mt-3">
-                                <div class="col-md-12">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <div class="c-form">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "approvals/includes/box.html" with approval=evaluated_job_application.job_application.approval extra_class='mb-3 mb-md-4' %}
                 </div>
             </div>
         </div>
