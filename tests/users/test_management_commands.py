@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.management import call_command
+from django.template.defaultfilters import pluralize
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
@@ -20,7 +21,7 @@ from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.models import User
+from itou.users.models import NirModificationRequest, User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
@@ -1432,3 +1433,23 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
                 f"vérifiez la liste des membres de l’organisation {expected_membership.institution.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]
+
+
+@pytest.mark.parametrize("is_after_cutoff", [True, False])
+def test_delete_old_nir_modification_requests(is_after_cutoff, caplog):
+    job_seeker = JobSeekerFactory()
+    now = timezone.now()
+    processed_at = (now - datetime.timedelta(182)) if is_after_cutoff else (now - datetime.timedelta(181))
+    NirModificationRequest.objects.create(
+        jobseeker_profile=job_seeker.jobseeker_profile,
+        requested_by=job_seeker,
+        processed_at=processed_at,
+    )
+    del_count = 1 if is_after_cutoff else 0
+    call_command("delete_old_nir_modification_requests", wet_run=False)
+    assert caplog.messages[1] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert NirModificationRequest.objects.count() == 1
+
+    call_command("delete_old_nir_modification_requests", wet_run=True)
+    assert caplog.messages[4] == f"Deleted {del_count} NIR modification request{pluralize(del_count)}"
+    assert NirModificationRequest.objects.count() == 1 - del_count

@@ -1,5 +1,4 @@
 import enum
-import uuid
 
 from allauth.account.internal.flows.email_verification import send_verification_email_to_address
 from allauth.account.models import EmailAddress
@@ -299,7 +298,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
             instance=request.user,
             editor=request.user,
             data=request.POST or None,
-            tally_form_query=f"jobseeker={request.user.pk}",
+            back_url=request.get_full_path(),
         )
     else:
         form = EditUserInfoForm(
@@ -328,10 +327,6 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
         public_id=job_seeker_public_id,
     )
-    try:
-        from_application_uuid = uuid.UUID(request.GET.get("from_application"))
-    except (TypeError, ValueError):
-        from_application_uuid = None
     if not can_edit_personal_information(request, job_seeker):
         raise PermissionDenied
 
@@ -341,7 +336,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
         instance=job_seeker,
         editor=request.user,
         data=request.POST or None,
-        tally_form_query=f"jobapplication={from_application_uuid}" if from_application_uuid else None,
+        back_url=request.get_full_path(),
     )
 
     if request.method == "POST" and form.is_valid():

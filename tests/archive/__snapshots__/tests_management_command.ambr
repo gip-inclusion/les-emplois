@@ -143,7 +143,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 81,
+    'num_queries': 82,
     'queries': list([
       dict({
         'origin': list([
@@ -902,6 +902,34 @@
                                                        %s,
                                                        %s,
                                                        %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_nirmodificationrequest"."id",
+                 "users_nirmodificationrequest"."jobseeker_profile_id",
+                 "users_nirmodificationrequest"."nir",
+                 "users_nirmodificationrequest"."requested_by_id",
+                 "users_nirmodificationrequest"."created_at",
+                 "users_nirmodificationrequest"."processed_at"
+          FROM "users_nirmodificationrequest"
+          WHERE "users_nirmodificationrequest"."requested_by_id" IN (%s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s)
           ORDER BY RANDOM() ASC
         ''',
       }),

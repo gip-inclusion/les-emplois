@@ -48,7 +48,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             forms["personal_data"] = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
                 data=self.request.POST or None,
-                tally_form_query=f"jobapplication={self.job_application.pk}" if self.job_application else None,
+                back_url=self.request.get_full_path(),
             )
             forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
         elif self.company.kind == CompanyKind.GEIQ:

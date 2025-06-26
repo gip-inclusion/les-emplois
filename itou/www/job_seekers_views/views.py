@@ -44,6 +44,7 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
     JobSeekerExistsForm,
+    NirModificationRequestForm,
     SwitchStalledStatusForm,
 )
 
@@ -1003,6 +1004,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
                 ),
             },
             data=request.POST or None,
+            back_url=request.get_full_path(),
         )
         if not can_edit_personal_information(self.request, self.job_seeker):
             self._disable_form()
@@ -1265,3 +1267,28 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
         }
+
+
+@check_user(lambda user: user.is_job_seeker or user.is_employer or user.is_prescriber)
+def nir_modification_request(request, public_id, template_name="job_seekers_views/nir_modification_request.html"):
+    job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    if not can_view_personal_information(request, job_seeker):
+        raise Http404
+
+    back_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+    form = NirModificationRequestForm(job_seeker=job_seeker, requested_by=request.user, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        nir_modification_request = form.save()
+        nir_modification_request.email_nir_modification_request_notification().send()
+        messages.success(request, "Demande de régularisation du NIR envoyée.", extra_tags="toast")
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "form": form,
+        "job_seeker": job_seeker,
+        "is_request_from_proxy": request.user != job_seeker,
+        "back_url": back_url,
+        "matomo_custom_title": "Demande de régularisation NIR",
+    }
+    return render(request, template_name, context)
