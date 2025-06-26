@@ -618,7 +618,14 @@ class JobDescriptionQuerySet(models.QuerySet):
         )
 
     def with_annotation_is_unpopular(self):
-        annotation = self.with_job_applications_count().annotate(
+        # Avoid a circular import
+        job_application_model = self.model._meta.get_field("jobapplication").related_model
+
+        job_apps_filters = {
+            "jobapplication__created_at__gte": timezone.now()
+            - timezone.timedelta(weeks=job_application_model.WEEKS_BEFORE_CONSIDERED_OLD),
+        }
+        annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(
             is_unpopular=Case(
                 When(job_applications_count__lte=self.model.UNPOPULAR_THRESHOLD, then=True),
                 default=False,
