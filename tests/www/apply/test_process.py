@@ -1559,6 +1559,60 @@ class TestProcessViews:
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
+    def test_eligibility_with_next_url(self, client):
+        """Test the page propagates the next url to the accept view"""
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            eligibility_diagnosis=None,
+        )
+
+        assert job_application.state.is_processing
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_company
+        )
+        assert not has_considered_valid_diagnoses
+
+        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
+        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
+        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+
+        next_url = reverse("apply:list_for_siae")
+        url = reverse(
+            "apply:eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={"next_url": next_url},
+        )
+        response = client.get(url)
+        assert response.status_code == 200
+        assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertContains(
+            response,
+            f"""
+            <a href="{next_url}"
+               class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+               aria-label="Annuler la saisie de ce formulaire">
+                <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                <span>Annuler</span>
+            </a>
+            """,
+            html=True,
+        )
+
+        post_data = {
+            # Administrative criteria level 1.
+            f"{criterion1.key}": "true",
+            # Administrative criteria level 2.
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
+        }
+        response = client.post(url, data=post_data)
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url})
+        assertRedirects(response, url)
+
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
 
