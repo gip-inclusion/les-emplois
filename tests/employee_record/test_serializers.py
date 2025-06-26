@@ -279,7 +279,7 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
     assert data["situationSalarie"] == snapshot(name="employee record update notification")
 
 
-@pytest.mark.parametrize("pole_emploi_id", ["1234567A", "12345678900", ""])
+@pytest.mark.parametrize("pole_emploi_id", ["1234567A", "12345678912", ""])
 def test_situation_salarie_serializer_pole_emploi_id(snapshot, pole_emploi_id):
     pole_emploi_since = AllocationDuration.FROM_6_TO_11_MONTHS if pole_emploi_id else ""
     employee_record = EmployeeRecordWithProfileFactory(

@@ -165,7 +165,7 @@ class _SituationSerializer(serializers.Serializer):
     )  # Required if registered with France Travail
     numeroIDE = NullIfEmptyCharField(
         source="job_application.job_seeker.jobseeker_profile.pole_emploi_id",
-        truncate=8,
+        truncate=11,
     )  # Required if registered with France Travail
 
     salarieRQTH = serializers.BooleanField(
