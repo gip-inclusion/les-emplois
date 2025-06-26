@@ -126,15 +126,23 @@ def test_cellar_does_not_support_checksum_validation():
     client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key="file")
 
 
-def test_copy(pdf_file):
-    key = "resume/11111111-1111-1111-1111-111111111111.pdf"
-    default_storage.save(key, pdf_file)
-    existing_file = FileFactory(key=key)
+def test_copy(pdf_file, mocker):
+    mocker.patch(
+        "itou.files.models.uuid.uuid4",
+        return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+    )
+    existing_file = FileFactory(key="resume/test.pdf")
+    default_storage.save(existing_file.key, pdf_file)
+
+    mocker.patch(
+        "itou.files.models.uuid.uuid4",
+        return_value=uuid.UUID("11111111-1111-1111-2222-111111111111"),
+    )
 
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
-    with default_storage.open(key) as old, default_storage.open(new_file.key) as new:
+    with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 
 
