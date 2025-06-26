@@ -28,6 +28,8 @@ urlpatterns = [
         name="list_organization",
         kwargs={"list_organization": True},
     ),
+    # NIR modification request
+    path("nir-modification/<uuid:public_id>", views.nir_modification_request, name="nir_modification_request"),
     path(
         "start",
         views.GetOrCreateJobSeekerStartView.as_view(),

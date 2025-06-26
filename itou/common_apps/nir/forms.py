@@ -1,10 +1,10 @@
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.forms import widgets
+from django.urls import reverse
 from django.utils.html import format_html
 
 from itou.users.enums import LackOfNIRReason
-from itou.utils.urls import get_tally_form_url
 from itou.utils.validators import validate_nir
 
 
@@ -14,7 +14,7 @@ class JobSeekerNIRUpdateMixin:
     nir & lack_of_nir_reason must be declared in the form's Meta.fields
     """
 
-    def __init__(self, *args, editor=None, tally_form_query=None, **kwargs):
+    def __init__(self, *args, editor=None, back_url=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         # A transient checkbox used to collapse optional block
@@ -45,12 +45,14 @@ class JobSeekerNIRUpdateMixin:
         # This is a hack to easily tweak this field bootstrap form_group_class
         self.fields["lack_of_nir_reason"].form_group_class = "form-group ms-4 collapse lack_of_nir_reason_group"
 
-        tally_url = get_tally_form_url("wzxQlg")
-        if tally_form_query is not None:
-            tally_url += f"?{tally_form_query}"
-        tally_link = format_html(
-            '<a href="{}" target="_blank" rel="noopener">Demander la correction du numéro de sécurité sociale</a>',
-            tally_url,
+        query = {"back_url": back_url} if back_url else {}
+        nir_modification_request_link = format_html(
+            '<a href="{}">Demander la correction du numéro de sécurité sociale</a>',
+            reverse(
+                "job_seekers_views:nir_modification_request",
+                kwargs={"public_id": self.instance.public_id},
+                query=query,
+            ),
         )
 
         if self.initial.get("nir"):
@@ -67,13 +69,13 @@ class JobSeekerNIRUpdateMixin:
                         "Vous ne pouvez pas modifier ses informations."
                     )
                 else:
-                    nir_help_text = tally_link
+                    nir_help_text = nir_modification_request_link
                 self.fields["nir"].help_text = nir_help_text
         else:
             self.fields["nir"].help_text = "Numéro à 15 chiffres."
 
         if self.initial.get("lack_of_nir_reason") == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
-            self.fields["lack_of_nir_reason"].help_text = tally_link
+            self.fields["lack_of_nir_reason"].help_text = nir_modification_request_link
 
         if self["lack_of_nir_reason"].value():
             self.initial["lack_of_nir"] = True
