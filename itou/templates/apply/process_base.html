@@ -40,6 +40,18 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% block sidebar %}
+                        {% if request.user.is_employer %}
+                            <div class="c-box mb-4">
+                                <div class="mb-2">Besoin d'aide avec cette candidatue ?</div>
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new?tf_anonymous_requester_email={{ user.email }}&tf_15923279049745=employeur_siae&tf_16096444701329=ei&tf_16096639918353={{ request.current_organization.siret }}&tf_16096931518225={{ request.current_organization.name }}"
+                                   class="btn btn-outline-primary w-100"
+                                   target="_blank"
+                                   rel="noopener">
+                                    Contacter le support
+                                    <i class="ri-external-link-line" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        {% endif %}
                         {% if job_application.archived_at %}
                             <div class="c-box mb-4">
                                 <div class="mb-2">
