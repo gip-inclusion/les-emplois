@@ -5,12 +5,12 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 
 from itou.users import admin
 from itou.users.enums import IdentityCertificationAuthorities
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeekerProfile, NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 
 
 def test_search(admin_client):
@@ -314,3 +314,18 @@ def test_change_email(admin_client, caplog):
             emailaddress.verified,
         ),
     )
+
+
+def test_nir_modification_request_changelist(admin_client):
+    job_seekers = JobSeekerFactory.create_batch(2)
+    nir_modification_requests = [
+        NirModificationRequest(jobseeker_profile=job_seeker.jobseeker_profile, requested_by=EmployerFactory())
+        for job_seeker in job_seekers
+    ]
+    NirModificationRequest.objects.bulk_create(nir_modification_requests)
+
+    url = reverse("admin:users_nirmodificationrequest_changelist")
+    response = admin_client.get(url)
+    for nir_modification_request in nir_modification_requests:
+        assertContains(response, nir_modification_request.jobseeker_profile.user.get_full_name())
+        assertContains(response, nir_modification_request.requested_by.get_full_name())
