@@ -57,7 +57,3 @@ class File(models.Model):
         obfuscated_name = f"{uuid.uuid4()}"
         _, extension = os.path.splitext(filename)
         return f"{obfuscated_name}{extension}"
-
-    @staticmethod
-    def rename_image_field_filename(instance, filename):
-        return f"news-images/{File.anonymized_filename(filename)}"
