@@ -1,61 +1,68 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load i18n %}
+{% load siae_evaluations_tags %}
 {% load static %}
 
 {% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
 
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Ajouter un justificatif
+                {% evaluated_job_application_state_display evaluated_administrative_criteria.evaluated_job_application %}
+            </h1>
+            <p>{{ evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker.get_full_name }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="s-section__row row justify-content-center">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="card">
-                        <div class="card-header">
-                            {% include "siae_evaluations/includes/job_seeker_infos.html" with request=request evaluated_job_application=evaluated_administrative_criteria.evaluated_job_application only %}
-                        </div>
-                        <div class="card-body">
-                            <div class="row mt-3">
-                                <div class="col-md-12">
-                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
-                                </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <div class="c-form">
+                        {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
+                        {% if evaluated_administrative_criteria.proof_id %}
+                            <div class="mt-3">
+                                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
                             </div>
-                            {% if evaluated_administrative_criteria.proof_id %}
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
+                        {% endif %}
+                        <div class="mt-3">
+                            <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                                {% csrf_token %}
+                                {% bootstrap_form form alert_error_type="all" %}
+                                <div class="mt-3 alert alert-info" role="status">
+                                    <div class="row">
+                                        <div class="col-auto pe-0">
+                                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-0">
+                                                Si vous êtes dans l'incapacité à fournir le bon justificatif, vous pouvez créer et fournir en lieu et place de celui-ci, une attestation au nom de votre structure pour en expliquer les raisons à votre DDETS.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            {% endif %}
-                            <div class="row mt-3">
-                                <div class="col-md-12">
-                                    <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
-                                        {% csrf_token %}
-                                        {% bootstrap_form form alert_error_type="all" %}
-                                        <div class="mt-3 alert alert-info small" role="status">
-                                            <div class="row">
-                                                <div class="col-auto pe-0">
-                                                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                                                </div>
-                                                <div class="col">
-                                                    <p class="mb-0">
-                                                        Si vous êtes dans l'incapacité à fournir le bon justificatif, vous pouvez créer et fournir en lieu et place de celui-ci, une attestation au nom de votre structure pour en expliquer les raisons à votre DDETS.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-primary float-end">
-                                            {% if evaluated_administrative_criteria.proof_id %}
-                                                Enregistrer le nouveau justificatif
-                                            {% else %}
-                                                Enregistrer le justificatif
-                                            {% endif %}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                                {% if evaluated_administrative_criteria.proof_id %}
+                                    {% itou_buttons_form primary_label="Enregistrer le nouveau justificatif" %}
+                                {% else %}
+                                    {% itou_buttons_form primary_label="Enregistrer le justificatif" %}
+                                {% endif %}
+                            </form>
                         </div>
                     </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "approvals/includes/box.html" with approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval extra_class='mb-3 mb-md-4' %}
                 </div>
             </div>
         </div>
