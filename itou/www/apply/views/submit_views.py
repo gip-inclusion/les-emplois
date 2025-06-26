@@ -636,9 +636,8 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
-            key = f"resume/{File.anonymized_filename(resume.name)}"
-            file_resume = File.objects.create(key=key)
-            storages["public"].save(key, resume)
+            file_resume = File.objects.create(key_prefix="resume/", filename=resume.name)
+            storages["public"].save(file_resume.key, resume)
             job_application.resume = file_resume
 
         # Save the job application
