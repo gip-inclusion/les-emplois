@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.gis.forms import widgets as gis_widgets
 from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
+from django.forms.widgets import Widget
 from django_select2.forms import Select2Widget
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
@@ -208,3 +209,7 @@ class EasyMDEEditor(forms.Textarea):
                 classes.append(easymde_class)
         attrs["class"] = " ".join(classes)
         return attrs
+
+
+class ReadonlyDivWidget(Widget):
+    template_name = "utils/widgets/readonly_div_widget.html"

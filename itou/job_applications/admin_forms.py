@@ -9,6 +9,13 @@ class JobApplicationAdminForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = "__all__"
+        exclude = (
+            "shared_comment",
+            "shared_comment_last_modified_at",
+            "shared_comment_last_modified_by",
+            "shared_comment_locked_at",
+            "shared_comment_locked_by",
+        )
         labels = {
             "sender_company": "Entreprise émettrice (si type est Employeur)",
             "sender_prescriber_organization": "Organisation émettrice (si type est Prescripteur)",

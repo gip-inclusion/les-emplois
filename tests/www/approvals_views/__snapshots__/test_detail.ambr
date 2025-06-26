@@ -961,6 +961,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  CASE
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
@@ -988,7 +993,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 47 DESC,
+          ORDER BY 52 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -3030,6 +3035,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  CASE
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
                      WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
@@ -3057,7 +3067,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 47 DESC,
+          ORDER BY 52 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
