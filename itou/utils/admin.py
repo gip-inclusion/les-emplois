@@ -173,6 +173,11 @@ class ItouModelMixin:
                 admin.display(description=field.verbose_name)(partial(get_field_display_with_pii, field=field.name)),
             )
 
+    def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
+        if obj is not None and hasattr(obj, "display_with_pii"):
+            context["subtitle"] = obj.display_with_pii
+        return super().render_change_form(request, context, add=add, change=change, form_url=form_url, obj=obj)
+
     def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
         for field in self.model._meta.get_fields():
