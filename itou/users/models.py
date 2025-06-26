@@ -1490,6 +1490,39 @@ class JobSeekerProfile(models.Model):
         return blocked_fields
 
 
+class NirModificationRequest(models.Model):
+    jobseeker_profile = models.ForeignKey(
+        JobSeekerProfile,
+        verbose_name="profil demandeur d'emploi",
+        related_name="nir_modification_requests",
+        on_delete=models.CASCADE,
+    )
+    new_nir = models.CharField(verbose_name="nouveau NIR", max_length=15, validators=[validate_nir])
+    job_application = models.ForeignKey(
+        "job_applications.JobApplication",
+        verbose_name="candidature",
+        related_name="nir_modification_requests",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    requestor = models.ForeignKey(
+        User,
+        verbose_name="auteur de la demande",
+        related_name="nir_modification_requests",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    created_at = models.DateTimeField("créée le", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "demande de régularisation NIR"
+        verbose_name_plural = "demandes de régularisation NIR"
+
+    def __str__(self):
+        return f"Demande de régularisation NIR pour {self.jobseeker_profile.user.get_full_name()}"
+
+
 class IdentityCertificationManager(models.Manager):
     def upsert_certifications(self, certifications):
         IdentityCertification.objects.bulk_create(
