@@ -14,6 +14,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
 from itou.invitations.models import EmployerInvitation
+from itou.job_applications.models import JobApplication
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
     CompanyFactory,
@@ -456,6 +457,17 @@ class TestJobDescriptionQuerySet:
             to_company=company,
             selected_jobs=[unpopular_job_description],
             job_seeker=job_seeker,
+        )
+
+        assert JobDescription.objects.with_annotation_is_unpopular().get(pk=unpopular_job_description.pk).is_unpopular
+
+        # Test old job applications do not count towards popularity
+        JobApplicationFactory.create_batch(
+            popular_threshold,
+            to_company=company,
+            selected_jobs=[unpopular_job_description],
+            job_seeker=job_seeker,
+            created_at=timezone.now() - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD, days=1),
         )
 
         assert JobDescription.objects.with_annotation_is_unpopular().get(pk=unpopular_job_description.pk).is_unpopular

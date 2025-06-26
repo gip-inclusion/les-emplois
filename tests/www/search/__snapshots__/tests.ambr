@@ -929,9 +929,11 @@
                  "companies_jobdescription"."source_url",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
-                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "job_applications_count",
+                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                    WHERE "job_applications_jobapplication"."created_at" >= %s) AS "job_applications_count",
                  CASE
-                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") <= %s THEN %s
+                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                             WHERE ("job_applications_jobapplication"."created_at" >= %s)) <= %s THEN %s
                      ELSE %s
                  END AS "is_unpopular",
                  "jobs_appellation"."updated_at",
@@ -987,6 +989,7 @@
                  "cities_city"."edition_mode"
           FROM "companies_jobdescription"
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
@@ -1318,9 +1321,11 @@
                  "companies_jobdescription"."source_url",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
-                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "job_applications_count",
+                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                    WHERE "job_applications_jobapplication"."created_at" >= %s) AS "job_applications_count",
                  CASE
-                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") <= %s THEN %s
+                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                             WHERE ("job_applications_jobapplication"."created_at" >= %s)) <= %s THEN %s
                      ELSE %s
                  END AS "is_unpopular",
                  "jobs_appellation"."updated_at",
@@ -1376,6 +1381,7 @@
                  "cities_city"."edition_mode"
           FROM "companies_jobdescription"
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
@@ -1708,9 +1714,11 @@
                  "companies_jobdescription"."source_url",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
-                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "job_applications_count",
+                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                    WHERE "job_applications_jobapplication"."created_at" >= %s) AS "job_applications_count",
                  CASE
-                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") <= %s THEN %s
+                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                             WHERE ("job_applications_jobapplication"."created_at" >= %s)) <= %s THEN %s
                      ELSE %s
                  END AS "is_unpopular",
                  "jobs_appellation"."updated_at",
@@ -1766,6 +1774,7 @@
                  "cities_city"."edition_mode"
           FROM "companies_jobdescription"
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
@@ -2097,9 +2106,11 @@
                  "companies_jobdescription"."source_url",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
-                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "job_applications_count",
+                 COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                    WHERE "job_applications_jobapplication"."created_at" >= %s) AS "job_applications_count",
                  CASE
-                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") <= %s THEN %s
+                     WHEN COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
+                                                                                                             WHERE ("job_applications_jobapplication"."created_at" >= %s)) <= %s THEN %s
                      ELSE %s
                  END AS "is_unpopular",
                  "jobs_appellation"."updated_at",
@@ -2155,6 +2166,7 @@
                  "cities_city"."edition_mode"
           FROM "companies_jobdescription"
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
