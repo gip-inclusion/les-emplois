@@ -1,4 +1,3 @@
-import uuid
 from datetime import date
 
 import factory
@@ -45,7 +44,6 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
     class Params:
         with_image = factory.Trait(
             image=factory.django.ImageField(
-                filename=factory.LazyFunction(lambda: f"{uuid.uuid4()}.png"),
                 width=1,
                 height=1,
                 format="JPEG",

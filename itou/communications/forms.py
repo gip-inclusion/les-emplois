@@ -1,6 +1,3 @@
-import pathlib
-import uuid
-
 from django import forms
 from django.utils import timezone
 
@@ -35,12 +32,12 @@ class AnnouncementItemForm(forms.ModelForm):
 
     def save(self, commit=True):
         if "image" in self.changed_data:
-            extension = pathlib.Path(self.instance.image.name).suffix
-            self.instance.image.name = f"{uuid.uuid4()}{extension}"
-            if image := self.initial.get("image"):
-                File.objects.filter(key=image.name).update(deleted_at=timezone.now())
-        instance = super().save(commit=commit)
-        if "image" in self.changed_data:
-            instance.image_storage = File.objects.create(key=instance.image.name)
-            instance.save()
-        return instance
+            if image_storage := self.instance.image_storage:
+                image_storage.deleted_at = timezone.now()
+                image_storage.save(update_fields=["deleted_at"])
+
+            self.instance.image_storage = File.objects.create(
+                key_prefix="news-images/", filename=self.cleaned_data["image"].name
+            )
+
+        return super().save(commit=commit)
