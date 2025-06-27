@@ -26,7 +26,7 @@
         </ul>
     {% endif %}
 
-    {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis %}
+    {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
     {% if diagnosis.allowance_amount %}
         <p>
