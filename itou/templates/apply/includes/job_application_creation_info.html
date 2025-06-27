@@ -1,16 +1,19 @@
 {% load badges %}
+{% load enums %}
+{% job_applications_enums as job_applications_enums %}
+
 
 <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
     <p class="fs-sm mb-0 flex-grow-1">
         Émise le {{ job_application.created_at|date:"d F Y" }} par
         {% if request.user == job_application.sender %}
             <strong>Vous</strong>
-        {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.JOB_SEEKER %}
             <i class="ri-user-line me-1" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
-        {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.EMPLOYER %}
             <strong>{{ job_application.sender_company.display_name }}</strong>
             {% if request.user.is_employer %}
-                {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+                {% if job_application.origin == job_applications_enums.Origin.PE_APPROVAL %}
                     <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
                 {% elif job_application.sender_company == job_application.to_company %}
                     <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
@@ -20,7 +23,7 @@
             {% elif request.user.is_job_seeker %}
                 <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
             {% endif %}
-        {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER %}
             {% if job_application.sender_prescriber_organization %}
                 <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
             {% else %}

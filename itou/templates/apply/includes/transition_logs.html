@@ -1,3 +1,5 @@
+{% load enums %}
+{% job_applications_enums as job_applications_enums %}
 <ul class="list-step" id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %}>
     {% with dt_format="d F Y à H:i" %}
         {% for log in transition_logs %}
@@ -9,7 +11,9 @@
                     {% else %}
                         Passé en "{{ log.pretty_to_state }}"
                     {% endif %}
-                    {% if log.user and log.to_state != JobApplicationState.OBSOLETE %}par {{ log.user.get_full_name }}{% endif %}
+                    {% if log.user and log.to_state != job_applications_enums.JobApplicationState.OBSOLETE %}
+                        par {{ log.user.get_full_name }}
+                    {% endif %}
                 </span>
             </li>
         {% endfor %}

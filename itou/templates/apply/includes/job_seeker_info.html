@@ -1,6 +1,8 @@
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
+{% job_applications_enums as job_applications_enums %}
 
 <div class="row mb-3">
     <div class="col-12 col-sm">
@@ -102,6 +104,6 @@
     {% endif %}
 </ul>
 {# Diagoriente invite #}
-{% if request.user.is_employer and job_application and not job_application.resume_id and job_application.sender_kind == SenderKind.PRESCRIBER %}
+{% if request.user.is_employer and job_application and not job_application.resume_id and job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER %}
     {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
 {% endif %}

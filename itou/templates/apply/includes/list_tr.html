@@ -1,6 +1,9 @@
 {% load badges %}
+{% load enums %}
 {% load matomo %}
 {% load str_filters %}
+{% job_applications_enums as job_applications_enums %}
+
 
 {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
     {% url 'apply:details_for_prescriber' job_application_id=job_application.id as details_url %}
@@ -59,12 +62,12 @@
     <td>
         {% if request.user == job_application.sender %}
             Vous
-        {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.JOB_SEEKER %}
             <i class="ri-user-line me-1" aria-hidden="true"></i>Le candidat lui-même
-        {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.EMPLOYER %}
             <i class="ri-community-line" aria-hidden="true"></i>
             {{ job_application.sender_company.display_name }}
-        {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+        {% elif job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER %}
             <i class="ri-home-smile-2-line" aria-hidden="true"></i>
             {% if job_application.sender_prescriber_organization %}
                 {{ job_application.sender_prescriber_organization.display_name }}

@@ -1,5 +1,7 @@
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
+{% job_applications_enums as job_applications_enums %}
 
 {% if job_application_sender_left_org %}
     <div class="alert alert-warning alert-dismissible fade show" role="status">
@@ -27,7 +29,7 @@
     </li>
     <li>
         <small>Adresse e-mail</small>
-        {% if request.user.is_job_seeker and job_application.sender_kind != SenderKind.JOB_SEEKER %}
+        {% if request.user.is_job_seeker and job_application.sender_kind != job_applications_enums.SenderKind.JOB_SEEKER %}
             <strong>Non communiquée</strong>
         {% elif job_application_sender_left_org %}
             <div class="text-warning fst-italic">Les réponses seront transmises aux administrateurs de l’organisation</div>
