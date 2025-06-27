@@ -1,0 +1,22 @@
+[
+{
+  "model": "users.nirmodificationrequest",
+  "pk": 1,
+  "fields": {
+    "jobseeker_profile": 2,
+    "new_nir": "111111111111120",
+    "job_application": null,
+    "requestor": 67
+  }
+},
+{
+  "model": "users.nirmodificationrequest",
+  "pk": 2,
+  "fields": {
+    "jobseeker_profile": 17,
+    "new_nir": "111111111111219",
+    "job_application": null,
+    "requestor": 17
+  }
+}
+]

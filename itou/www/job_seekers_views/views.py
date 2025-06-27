@@ -44,6 +44,7 @@ from itou.www.job_seekers_views.forms import (
     CreateOrUpdateJobSeekerStep3Form,
     FilterForm,
     JobSeekerExistsForm,
+    NirModificationRequestForm,
 )
 
 
@@ -1244,3 +1245,33 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
         }
+
+
+@check_user(lambda user: user.is_job_seeker or user.is_employer or user.is_prescriber)
+def nir_modification_request(request, public_id=None, template_name="job_seekers_views/nir_modification_request.html"):
+    if (public_id and request.user.is_job_seeker) or (not public_id and not request.user.is_job_seeker):
+        raise PermissionDenied
+    if public_id:
+        job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
+    else:
+        job_seeker = request.user
+
+    job_application = JobApplication.objects.filter(pk=request.GET.get("job_application")).first()
+    back_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+    form = NirModificationRequestForm(
+        job_seeker=job_seeker, requestor=request.user, job_application=job_application, data=request.POST or None
+    )
+    is_request_from_proxy = public_id is not None
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Demande de régularisation du NIR envoyée !", extra_tags="toast")
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "form": form,
+        "job_seeker": job_seeker,
+        "is_request_from_proxy": is_request_from_proxy,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
