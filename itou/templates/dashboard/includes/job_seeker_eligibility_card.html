@@ -69,7 +69,7 @@
                     </p>
                     <ul>
                         {% for criterion in eligibility_diagnosis.criteria_display|dictsort:"administrative_criteria.ui_rank" %}
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with diagnosis=eligibility_diagnosis criterion=criterion %}
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
                         {% endfor %}
                     </ul>
                     <p>

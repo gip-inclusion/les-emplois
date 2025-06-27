@@ -29,7 +29,7 @@
                         <ul>
                         {% endif %}
                         {% for criterion in criteria %}
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with diagnosis=eligibility_diagnosis criterion=criterion %}
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
                         {% endfor %}
                         {% if not flat_criteria_list %}
                         </ul>
