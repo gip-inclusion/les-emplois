@@ -1382,7 +1382,8 @@
                  "users_jobseekerprofile"."fields_history"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "users_user"."public_id" = %s
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
           LIMIT 21
         ''',
       }),
@@ -3881,7 +3882,8 @@
                  "users_jobseekerprofile"."fields_history"
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE "users_user"."public_id" = %s
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
           LIMIT 21
         ''',
       }),
