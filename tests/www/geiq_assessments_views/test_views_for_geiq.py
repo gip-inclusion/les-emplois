@@ -844,6 +844,7 @@ class TestAssessmentSyncFile:
         assertContains(response, reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk}))
         assessment.refresh_from_db()
         assert assessment.summary_document_file is not None
+        assert len(default_storage.listdir("geiq-assessment")[-1]) == 1
         with default_storage.open(assessment.summary_document_file.key) as f:
             assert f.read() == pdf_file_content
 

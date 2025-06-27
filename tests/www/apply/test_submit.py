@@ -6,6 +6,7 @@ from unittest import mock
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.core.files.storage import default_storage
 from django.template.defaultfilters import date, time
 from django.urls import resolve, reverse
 from django.utils import timezone
@@ -661,6 +662,7 @@ class TestApplyAsJobSeeker:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage.listdir("resume")[-1]) == 1
 
         assert apply_session_name not in client.session
 
@@ -1196,6 +1198,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage.listdir("resume")[-1]) == 1
 
         assert apply_session_name not in client.session
 
@@ -1529,6 +1532,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage.listdir("resume")[-1]) == 1
 
         assert apply_session_name not in client.session
 
@@ -1994,6 +1998,7 @@ class TestApplyAsPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage.listdir("resume")[-1]) == 1
 
         assert apply_session_name not in client.session
 
@@ -2570,6 +2575,7 @@ class TestApplyAsCompany:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage.listdir("resume")[-1]) == 1
 
         assert apply_session_name not in client.session
 

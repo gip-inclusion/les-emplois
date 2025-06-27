@@ -142,6 +142,8 @@ def test_copy(pdf_file, mocker):
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
+    # default_storage.listdir returns a tuple: ([<list_of_subdirectories>], [<list_of_files>])
+    assert len(default_storage.listdir("resume")[-1]) == 2
     with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 

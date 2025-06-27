@@ -2,6 +2,7 @@ import io
 import uuid
 
 import pytest
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from PIL import Image
@@ -49,6 +50,8 @@ class TestAnnouncementItemAdmin:
         [item] = campaign.items.all()
         assert item.image.name == "news-images/11111111-1111-1111-1111-111111111111.png"
         assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"
+        # default_storage.listdir returns a tuple: ([<list_of_subdirectories>], [<list_of_files>])
+        assert len(default_storage.listdir("news-images")[-1]) == 1
 
     def test_change_image(self, admin_client, black_pixel, mocker):
         # Create item before patching File.anonymized_filename's uuid,
@@ -84,3 +87,4 @@ class TestAnnouncementItemAdmin:
         assert File.objects.filter(deleted_at__isnull=False).count() == 1
         assert item.image_storage.deleted_at is None
         assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"
+        assert len(default_storage.listdir("news-images")[-1]) == 2
