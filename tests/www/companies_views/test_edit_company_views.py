@@ -3,9 +3,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.models import Company
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
-from tests.companies.factories import (
-    CompanyFactory,
-)
+from tests.companies.factories import CompanyFactory
 
 
 def test_edit(client, mocker):
@@ -40,7 +38,7 @@ def test_edit(client, mocker):
     assertRedirects(response, reverse("companies_views:edit_company_step_description"))
 
     response = client.post(url, data=post_data, follow=True)
-    assertContains(response, "Présentation de l'activité")
+    assertContains(response, '<legend class="h3">Activité</legend>')
 
     # Go to next step: summary and check the rendered markdown
     url = response.redirect_chain[-1][0]
@@ -54,7 +52,7 @@ def test_edit(client, mocker):
 
     response = client.post(url, data=post_data, follow=True)
     attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
-    assertContains(response, "Aperçu de la fiche")
+    assertContains(response, '<legend class="h3">Aperçu</legend>')
     assertContains(
         response,
         (
@@ -73,7 +71,7 @@ def test_edit(client, mocker):
     # Go back, should not be an issue
     step_2_url = reverse("companies_views:edit_company_step_description")
     response = client.get(step_2_url)
-    assertContains(response, "Présentation de l'activité")
+    assertContains(response, '<legend class="h3">Activité</legend>')
     assert client.session["edit_siae_session_key"] == {
         "address_line_1": "1 Rue Jeanne d'Arc",
         "address_line_2": "",
@@ -91,7 +89,7 @@ def test_edit(client, mocker):
     # Go forward again
     response = client.post(step_2_url, data=post_data, follow=True)
     attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
-    assertContains(response, "Aperçu de la fiche")
+    assertContains(response, '<legend class="h3">Aperçu</legend>')
     assertContains(
         response,
         (
