@@ -1,4 +1,5 @@
 import datetime
+import random
 import uuid
 
 from django.urls import reverse
@@ -12,7 +13,13 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
@@ -31,6 +38,16 @@ def test_refused_access(client):
         client.force_login(user)
         response = client.get(url)
         assert response.status_code == 403
+
+
+def test_not_a_job_seeker(client):
+    not_a_job_seeker = random.choice(
+        [PrescriberFactory(), EmployerFactory(), ItouStaffFactory(), LaborInspectorFactory()]
+    )
+    client.force_login(PrescriberFactory())
+    url = reverse("job_seekers_views:details", kwargs={"public_id": not_a_job_seeker.public_id})
+    response = client.get(url)
+    assert response.status_code == 404
 
 
 @freeze_time("2024-08-14")

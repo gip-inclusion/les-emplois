@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
-    queryset = User.objects.select_related("jobseeker_profile")
+    queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
     context_object_name = "job_seeker"
