@@ -40,7 +40,7 @@
             <div class="row my-3 my-md-4">
                 <div class="col-12">
                     <div class="tab-content">
-                        {% include 'employee_record/includes/list_header.html' %}
+                        {% include 'employee_record/includes/list_header.html' with num_recently_missing_employee_records=num_recently_missing_employee_records request=request show_siret_has_changed_warning=show_siret_has_changed_warning ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                         <p>
                             Cette interface vous permet de créer et transmettre vos fiches salariés à l'Extranet IAE 2.0 de l'ASP.
                             <a href="{{ ITOU_HELP_CENTER_URL }}/articles/29251628906257--Fonctionnement-des-fiches-salarié"
@@ -62,7 +62,7 @@
                                         Statut
                                     </button>
                                     <ul class="dropdown-menu">
-                                        {% include "employee_record/includes/employee_record_filters/status.html" %}
+                                        {% include "employee_record/includes/employee_record_filters/status.html" with badges=badges form=form request=request only %}
                                     </ul>
                                 </div>
                             </div>
@@ -70,8 +70,8 @@
                             {{ form.order.as_hidden }}
                         </form>
                         <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
-                            {% include "employee_record/includes/list_counter.html" %}
-                            {% include "employee_record/includes/list_order.html" %}
+                            {% include "employee_record/includes/list_counter.html" with navigation_pages=navigation_pages request=request only %}
+                            {% include "employee_record/includes/list_order.html" with form=form ordered_by_label=ordered_by_label request=request only %}
                             <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
                                 <form id="employee-record-job_seeker-form"
                                       hx-get="{% url 'employee_record_views:list' %}"

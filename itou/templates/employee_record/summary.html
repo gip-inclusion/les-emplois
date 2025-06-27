@@ -90,7 +90,9 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
-                    <div class="c-box mb-3 mb-md-4">{% include "employee_record/includes/employee_record_summary.html" %}</div>
+                    <div class="c-box mb-3 mb-md-4">
+                        {% include "employee_record/includes/employee_record_summary.html" with employee_record=employee_record request=request CompanyKind=CompanyKind only %}
+                    </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     <div class="c-box bg-info-lightest border-info mb-3 mb-md-4">
