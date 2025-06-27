@@ -11,6 +11,7 @@ from pytest_django.asserts import assertRedirects
 from itou.communications.models import AnnouncementCampaign
 from itou.files.models import File
 from tests.communications.factories import AnnouncementItemFactory
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 class TestAnnouncementItemAdmin:
@@ -49,6 +50,7 @@ class TestAnnouncementItemAdmin:
         assert filename.suffix == ".png"
         file = File.objects.get()
         assert file.key.startswith("news-images/")
+        assert len(default_storage_ls_files("news-images")) == 1
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_change_image(self, admin_client, black_pixel):
@@ -80,3 +82,4 @@ class TestAnnouncementItemAdmin:
         assert File.objects.filter(deleted_at__isnull=False).count() == 1
         assert item.image_storage.deleted_at is None
         assert item.image_storage.key.startswith("news-images/")
+        assert len(default_storage_ls_files("news-images")) == 2
