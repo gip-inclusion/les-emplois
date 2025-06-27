@@ -1,10 +1,20 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Modifier les informations de ma structure</h1>
+            <p>SIRET :&nbsp;{{ siae.siret | default:"-" }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -20,57 +30,37 @@
                             <strong>Étape 1</strong>/3 : Informations générales
                         </p>
                     </div>
-
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <div class="c-form">
-                        <div class="text-center mb-3 mb-lg-5">
-                            <div class="mb-2">
-                                <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" class="edit-siae-header-image">
-                            </div>
-                            <h1>
-                                Informations générales
-                                <br class="d-none d-lg-inline">
-                                de ma structure
-                            </h1>
-                        </div>
-
-                        <div class="c-box c-box--structure mb-3 mb-md-4">
-                            <div class="c-box--structure__summary">
-                                <i class="ri-community-line" aria-hidden="true"></i>
-                                <div>
-                                    <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ siae.get_kind_display }}">{{ siae.kind }}</button>
-                                    <h3>{{ siae.display_name }}</h3>
-                                </div>
-                            </div>
-                            <div class="c-box--structure__detail">
-                                <hr class="my-4">
-                                <ul class="c-box--structure__list-contact">
-                                    <li>
-                                        SIRET :&nbsp;<strong>{{ siae.siret | default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
                         <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% bootstrap_form_errors form type="all" %}
+                            <fieldset>
+                                <legend class="h3">Informations générales</legend>
 
-                            {% bootstrap_field form.brand %}
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
 
-                            {% bootstrap_field form.address_line_1 %}
-                            {% bootstrap_field form.address_line_2 %}
+                                {% bootstrap_field form.brand %}
 
-                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.city %}
+                                {% bootstrap_field form.address_line_1 %}
+                                {% bootstrap_field form.address_line_2 %}
 
-                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% bootstrap_field form.website %}
+                                {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                                {% bootstrap_field form.city %}
 
-                            {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-contact-structure" reset_url=reset_url %}
+                                {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                                {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.website %}
+
+                                {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-contact-structure" reset_url=reset_url %}
+                            </fieldset>
                         </form>
-
                     </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "includes/structures/_structure_info.html" with structure=siae show=True extra_box_class="mb-3 mb-md-4" open_in_tab=False company_show_cta=True only %}
                 </div>
             </div>
         </div>

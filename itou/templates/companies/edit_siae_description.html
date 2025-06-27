@@ -1,10 +1,20 @@
 {% extends "layout/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Modifier les informations de ma structure</h1>
+            <p>SIRET :&nbsp;{{ siae.siret | default:"-" }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -20,34 +30,35 @@
                             <strong>Étape 2</strong>/3 : Activité de ma structure
                         </p>
                     </div>
-
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <div class="c-form">
-                        <div class="text-center mb-3 mb-lg-5">
-                            <div class="mb-2">
-                                <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" class="edit-siae-header-image">
-                            </div>
-                            <h1>
-                                Présentation de l'activité
-                                <br class="d-none d-lg-inline">
-                                de ma structure
-                            </h1>
-                        </div>
                         <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% bootstrap_form_errors form type="all" %}
+                            <fieldset>
+                                <legend class="h3">Activité</legend>
 
-                            {% bootstrap_field form.description %}
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.</span>
-                            </div>
-                            <hr>
-                            {% bootstrap_field form.provided_support %}
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever</span>
-                            </div>
-                            {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url secondary_aria_label="Retourner à l'édition des coordonnées" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-description-structure" %}
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+
+                                {% bootstrap_field form.description %}
+                                <div class="c-info mb-3 mb-md-4">
+                                    <span class="c-info__summary">Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.</span>
+                                </div>
+
+                                {% bootstrap_field form.provided_support %}
+                                <div class="c-info mb-3 mb-md-4">
+                                    <span class="c-info__summary">Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever</span>
+                                </div>
+
+                                {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url secondary_aria_label="Retourner à l'édition des coordonnées" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-description-structure" %}
+                            </fieldset>
                         </form>
                     </div>
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "includes/structures/_structure_info.html" with structure=siae show=True extra_box_class="mb-3 mb-md-4" open_in_tab=False company_show_cta=True only %}
                 </div>
             </div>
         </div>
