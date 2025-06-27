@@ -11,7 +11,7 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import JobSeekerProfile, NirModificationRequest, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
@@ -378,3 +378,53 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         JobSeekerProfile.clean_nir_title_birthdate_fields(
             self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
         )
+
+
+class NirModificationRequestForm(forms.ModelForm):
+    nir = forms.CharField(
+        label="Nouveau numéro de sécurité sociale",
+        max_length=21,  # 15 + 6 white spaces
+        required=True,
+        strip=True,
+        validators=[validate_nir],
+        help_text=("Par exemple: 2 69 05 49 588 157 80"),
+    )
+
+    class Meta:
+        model = NirModificationRequest
+        fields = ["nir"]
+
+    def __init__(self, *args, job_seeker, requested_by, **kwargs):
+        self.job_seeker = job_seeker
+        self.requested_by = requested_by
+        super().__init__(*args, **kwargs)
+        if requested_by == job_seeker:
+            self.fields["nir"].label = "Votre nouveau numéro de sécurité sociale"
+
+    def clean_nir(self):
+        nir = self.cleaned_data["nir"].replace(" ", "")
+        previous_nir = self.job_seeker.jobseeker_profile.nir
+        if nir == previous_nir:
+            error = forms.ValidationError("Le nouveau numéro de sécurité sociale est identique au précédent.")
+            self.add_error("nir", error)
+        return nir
+
+    def clean(self):
+        super().clean()
+        ongoing_requests = NirModificationRequest.objects.filter(
+            jobseeker_profile=self.job_seeker.jobseeker_profile, processed_at__isnull=True
+        )
+        if ongoing_requests.exists():
+            message = (
+                "Une demande est déjà en cours de traitement"
+                f"{' pour ce candidat' if self.job_seeker != self.requested_by else ''}."
+            )
+            error = forms.ValidationError(message)
+            self.add_error(None, error)
+
+    def save(self, *args, **kwargs):
+        nir_modification_request = super().save(commit=False)
+        nir_modification_request.jobseeker_profile = self.job_seeker.jobseeker_profile
+        nir_modification_request.requested_by = self.requested_by
+        nir_modification_request.save()
+        return nir_modification_request
