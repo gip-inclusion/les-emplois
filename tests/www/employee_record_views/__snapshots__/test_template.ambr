@@ -7,7 +7,7 @@
   <div class="dropdown-menu" id="sendBackRecordDropDown-[Pk of EmployeeRecord]">
       
           <form method="post" action="/employee_record/create_step_5/[Pk of JobApplication]" class="js-prevent-multiple-submit">
-              
+              <input type="hidden" name="csrfmiddlewaretoken" value="CSRF_TOKEN">
               <button type="submit" class="dropdown-item" aria-label="Renvoyer la fiche salarié sans modification">Renvoyer</button>
           </form>
       
