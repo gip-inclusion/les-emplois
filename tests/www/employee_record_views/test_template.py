@@ -19,7 +19,9 @@ def test_send_back_dropdown(snapshot, factory_kwargs):
         **{f"job_application__job_seeker__jobseeker_profile__{k}": v for k, v in factory_kwargs.items()}
     )
 
-    html = template.render(Context({"employee_record": employee_record, "extra_class": ""}))
+    html = template.render(
+        Context({"csrf_token": "CSRF_TOKEN", "employee_record": employee_record, "extra_class": ""})
+    )
     normalized_html = (
         html.replace(
             f"/employee_record/create/{employee_record.job_application_id}",

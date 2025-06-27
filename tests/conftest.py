@@ -721,3 +721,17 @@ def setup_pro_connect():
 
     with pro_connect_setup():
         yield pro_connect_setup
+
+
+@pytest.fixture(autouse=True, scope="session")
+def detect_missing_csrf_token():
+    from django.template.defaulttags import CsrfTokenNode
+
+    origin_render = CsrfTokenNode.render
+
+    def render(self, context):
+        if context.get("csrf_token") is None:
+            pytest.fail(f"Missing csrf_token variable: {self.origin}")
+        return origin_render(self, context)
+
+    CsrfTokenNode.render = render
