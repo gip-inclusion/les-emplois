@@ -112,7 +112,7 @@
                                         {% endfor %}
                                         {% if job_application.can_change_prior_actions %}
                                             {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
-                                            {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url final_hr=False %}
+                                            {% include "apply/includes/job_application_prior_action_form.html" with csrf_token=csrf_token form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url final_hr=False only %}
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
