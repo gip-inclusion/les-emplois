@@ -452,6 +452,7 @@ def test_step_3(client, snapshot, pdf_file):
     assert new_job_application.sender == employer
     assert new_job_application.state == JobApplicationState.NEW
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_job_application.resume.key)
+    assert new_job_application.resume.key != job_application.resume.key
 
     transfer_log = job_application.logs.last()
     assert transfer_log.transition == "external_transfer"
