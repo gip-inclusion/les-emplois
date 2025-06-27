@@ -1,3 +1,10 @@
+{% comment %}
+
+    {% include "siae_evaluations/includes/job_seeker_infos.html" with evaluated_job_application=evaluated_job_application request=request only %}
+
+    request is needed by evaluated_job_application_state_display tag
+
+{% endcomment %}
 {% load format_filters %}
 {% load siae_evaluations_tags %}
 
