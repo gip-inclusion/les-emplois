@@ -927,5 +927,27 @@ class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
     inlines = (PkSupportRemarkInline,)
 
 
+@admin.register(models.NirModificationRequest)
+class NirModificationRequestAdmin(ReadonlyMixin, ItouModelAdmin):
+    fields = ("jobseeker_profile", "requestor", "new_nir", "job_application", "created_at")
+    list_display = ("pk", "jobseeker_profile", "requestor", "created_at")
+    list_display_links = ("pk", "jobseeker_profile")
+
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        if NIR_RE.match(search_term):
+            search_fields.append("new_nir__exact")
+            search_fields.append("jobseeker_profile__nir__exact")
+        if search_term.isdecimal():
+            search_fields.append("jobseeker_profile__pk__exact")
+        else:
+            search_fields.append("jobseeker_profile__user__email")
+            if "@" not in search_term:
+                search_fields.append("jobseeker_profile__user__first_name__unaccent")
+                search_fields.append("jobseeker_profile__user__last_name__unaccent")
+        return search_fields
+
+
 admin.site.unregister(EmailAddress)
 admin.site.register(EmailAddress, EmailAddressWithRemarkAdmin)
