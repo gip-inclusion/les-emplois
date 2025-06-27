@@ -735,3 +735,27 @@ def detect_missing_csrf_token():
         return origin_render(self, context)
 
     CsrfTokenNode.render = render
+
+
+@pytest.fixture(autouse=True, scope="session")
+def detect_useless_include_arg():
+    from django.template.loader import get_template
+    from django.template.loader_tags import IncludeNode
+
+    origin_render = IncludeNode.render
+
+    templates_variables = collections.defaultdict(set)
+
+    def render(self, context):
+        if self.extra_context:
+            template_name = self.template.resolve(context)
+            template = get_template(template_name)
+            template_variables = templates_variables[template_name]
+            for key in self.extra_context:
+                if key not in template_variables:
+                    if key not in template.template.source:
+                        raise ValueError(f"{template_name} included with apparently unused var: {key}")
+                    template_variables.add(key)
+        return origin_render(self, context)
+
+    IncludeNode.render = render
