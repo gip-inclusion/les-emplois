@@ -19,6 +19,6 @@ def test_overview(client, description, provided_support):
     client.force_login(company.members.get())
     response = client.get(reverse("companies_views:overview"))
     assertion = assertContains if description else assertNotContains
-    assertion(response, "<h3>Son activité</h3>")
+    assertion(response, '<h3 class="mb-2">Son activité</h3>')
     assertion = assertContains if provided_support else assertNotContains
-    assertion(response, "<h3>L'accompagnement proposé</h3>")
+    assertion(response, '<h3 class="mb-2">L\'accompagnement proposé</h3>')

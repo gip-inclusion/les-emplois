@@ -67,15 +67,15 @@
                             <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                 <div class="c-box h-100 {% if not company.description and not company.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
                                     {% if company.description %}
-                                        <article class="mb-3 mb-lg-5">
-                                            <h3>Son activité</h3>
+                                        <article class="mb-3 mb-md-5">
+                                            <h3 class="mb-2">Son activité</h3>
                                             {{ company.description|markdownify }}
                                         </article>
                                     {% endif %}
 
                                     {% if company.provided_support %}
                                         <article>
-                                            <h3>L'accompagnement proposé</h3>
+                                            <h3 class="mb-2">L'accompagnement proposé</h3>
                                             {{ company.provided_support|markdownify }}
                                         </article>
                                     {% endif %}

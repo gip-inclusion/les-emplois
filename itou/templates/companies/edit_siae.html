@@ -1,78 +1,42 @@
-{% extends "layout/base.html" %}
+{% extends "companies/edit_siae_base.html" %}
 {% load buttons_form %}
 {% load django_bootstrap5 %}
-{% load static %}
-{% load theme_inclusion %}
 
-{% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
-
-{% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="c-stepper mb-3 mb-md-4">
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
-                            </div>
-                        </div>
-                        <p>
-                            <strong>Étape 1</strong>/3 : Informations générales
-                        </p>
-                    </div>
-
-                    <div class="c-form">
-                        <div class="text-center mb-3 mb-lg-5">
-                            <div class="mb-2">
-                                <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" class="edit-siae-header-image">
-                            </div>
-                            <h1>
-                                Informations générales
-                                <br class="d-none d-lg-inline">
-                                de ma structure
-                            </h1>
-                        </div>
-
-                        <div class="c-box c-box--structure mb-3 mb-md-4">
-                            <div class="c-box--structure__summary">
-                                <i class="ri-community-line" aria-hidden="true"></i>
-                                <div>
-                                    <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ siae.get_kind_display }}">{{ siae.kind }}</button>
-                                    <h3>{{ siae.display_name }}</h3>
-                                </div>
-                            </div>
-                            <div class="c-box--structure__detail">
-                                <hr class="my-4">
-                                <ul class="c-box--structure__list-contact">
-                                    <li>
-                                        SIRET :&nbsp;<strong>{{ siae.siret | default:"-" }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% bootstrap_form_errors form type="all" %}
-
-                            {% bootstrap_field form.brand %}
-
-                            {% bootstrap_field form.address_line_1 %}
-                            {% bootstrap_field form.address_line_2 %}
-
-                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.city %}
-
-                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% bootstrap_field form.website %}
-
-                            {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-contact-structure" reset_url=reset_url %}
-                        </form>
-
-                    </div>
-                </div>
+{% block stepper %}
+    <div class="c-stepper mb-3 mb-md-4">
+        <div class="progress">
+            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
             </div>
         </div>
-    </section>
-{% endblock %}
+        <p>
+            <strong>Étape 1</strong>/3 : Informations générales
+        </p>
+    </div>
+{% endblock stepper %}
+
+{% block form %}
+    <div class="c-form">
+        <form method="post" class="js-prevent-multiple-submit">
+            <fieldset>
+                <legend class="h3">Informations générales</legend>
+
+                {% csrf_token %}
+                {% bootstrap_form_errors form type="all" %}
+
+                {% bootstrap_field form.brand %}
+
+                {% bootstrap_field form.address_line_1 %}
+                {% bootstrap_field form.address_line_2 %}
+
+                {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                {% bootstrap_field form.city %}
+
+                {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+                {% bootstrap_field form.website %}
+
+                {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-contact-structure" reset_url=reset_url %}
+            </fieldset>
+        </form>
+    </div>
+{% endblock form %}
