@@ -33,6 +33,12 @@ DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
 DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
 HUEY["immediate"] = True  # noqa: F405
+HUEY["name"] = "test_pg_huey"  # noqa: F405
+
+LOGGING["loggers"]["huey"] = {  # noqa: F405
+    "handlers": ["console"],
+    "level": "INFO",
+}
 
 cellar_addon_host = os.getenv("CELLAR_ADDON_HOST_TEST")
 AWS_S3_ENDPOINT_URL = (
