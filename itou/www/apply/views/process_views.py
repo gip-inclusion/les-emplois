@@ -469,7 +469,11 @@ class AcceptView(common_views.BaseAcceptView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.job_application.eligibility_diagnosis_by_siae_required():
-            messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
+            messages.error(
+                request,
+                "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.",
+                extra_tags="toast",
+            )
             return HttpResponseRedirect(self.next_url)
         return super().dispatch(request, *args, **kwargs)
 

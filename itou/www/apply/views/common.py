@@ -149,7 +149,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                 job_application.job_seeker.last_checked_at = timezone.now()
                 job_application.job_seeker.save(update_fields=["last_checked_at"])
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
             return HttpResponseClientRedirect(self.get_error_url())
 
         if job_application.to_company.is_subject_to_eligibility_rules:
