@@ -39,6 +39,7 @@ from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
+    ItouModelMixin,
     ItouTabularInline,
     PkSupportRemarkInline,
     ReadonlyMixin,
@@ -254,7 +255,7 @@ def get_fields_to_transfer_for_job_seekers():
 
 
 @admin.register(models.User)
-class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin):
+class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelMixin, UserAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
