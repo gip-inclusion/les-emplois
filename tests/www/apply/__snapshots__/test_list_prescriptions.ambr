@@ -174,6 +174,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "users_user"."id",
                              "users_user"."password",
                              "users_user"."last_login",
@@ -270,6 +275,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              T3."id",
                              T3."password",
                              T3."last_login",
@@ -389,7 +399,12 @@
                  "job_applications_jobapplication"."qualification_level",
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id"
           FROM "job_applications_jobapplication"
           WHERE "job_applications_jobapplication"."sender_id" = %s
           ORDER BY "job_applications_jobapplication"."created_at" DESC
@@ -494,6 +509,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "companies_company"."id",
                              "companies_company"."address_line_1",
                              "companies_company"."address_line_2",
@@ -659,6 +679,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -962,9 +987,9 @@
           WHERE ("job_applications_jobapplication"."sender_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
-                   50,
-                   53,
+                   54,
+                   55,
+                   58,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -1324,6 +1349,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -1597,7 +1627,7 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
+                   54,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -3045,6 +3075,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "users_user"."id",
                              "users_user"."password",
                              "users_user"."last_login",
@@ -3143,6 +3178,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              T4."id",
                              T4."password",
                              T4."last_login",
@@ -3264,7 +3304,12 @@
                  "job_applications_jobapplication"."qualification_level",
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id"
           FROM "job_applications_jobapplication"
           WHERE (("job_applications_jobapplication"."sender_id" = %s
                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
@@ -3371,6 +3416,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "companies_company"."id",
                              "companies_company"."address_line_1",
                              "companies_company"."address_line_2",
@@ -3540,6 +3590,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -3845,9 +3900,9 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
-                   50,
-                   53,
+                   54,
+                   55,
+                   58,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -4194,6 +4249,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "users_user"."id",
                              "users_user"."password",
                              "users_user"."last_login",
@@ -4292,6 +4352,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              T4."id",
                              T4."password",
                              T4."last_login",
@@ -4413,7 +4478,12 @@
                  "job_applications_jobapplication"."qualification_level",
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id"
           FROM "job_applications_jobapplication"
           WHERE (("job_applications_jobapplication"."sender_id" = %s
                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
@@ -4520,6 +4590,11 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             "job_applications_jobapplication"."shared_comment",
+                             "job_applications_jobapplication"."shared_comment_last_modified_at",
+                             "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                             "job_applications_jobapplication"."shared_comment_locked_at",
+                             "job_applications_jobapplication"."shared_comment_locked_by_id",
                              "companies_company"."id",
                              "companies_company"."address_line_1",
                              "companies_company"."address_line_2",
@@ -4660,6 +4735,11 @@
                  "job_applications_jobapplication"."planned_training_hours",
                  "job_applications_jobapplication"."inverted_vae_contract",
                  "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "job_applications_jobapplication"."shared_comment",
+                 "job_applications_jobapplication"."shared_comment_last_modified_at",
+                 "job_applications_jobapplication"."shared_comment_last_modified_by_id",
+                 "job_applications_jobapplication"."shared_comment_locked_at",
+                 "job_applications_jobapplication"."shared_comment_locked_by_id",
                  GREATEST("job_applications_jobapplication"."created_at", MAX("job_applications_jobapplicationtransitionlog"."timestamp")) AS "last_change",
           
             (SELECT U0."id" AS "id"
@@ -4937,8 +5017,8 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
-                   50,
+                   54,
+                   55,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",

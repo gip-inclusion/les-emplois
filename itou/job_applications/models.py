@@ -693,6 +693,38 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         editable=False,
     )
 
+    shared_comment = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="commentaire partageable entre membres d'une même structure",
+    )
+    shared_comment_last_modified_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="date de la dernière modification du commentaire",
+    )
+    shared_comment_last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability.
+        verbose_name="auteur de la dernière modification du commentaire",
+        related_name="+",
+    )
+    shared_comment_locked_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="commentaire bloqué depuis le",
+    )
+    shared_comment_locked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability.
+        verbose_name="commentaire bloqué par",
+        related_name="+",
+    )
+
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
