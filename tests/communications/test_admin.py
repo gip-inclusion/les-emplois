@@ -10,6 +10,7 @@ from pytest_django.asserts import assertRedirects
 from itou.communications.models import AnnouncementCampaign
 from itou.files.models import File
 from tests.communications.factories import AnnouncementItemFactory
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 class TestAnnouncementItemAdmin:
@@ -49,6 +50,7 @@ class TestAnnouncementItemAdmin:
         [item] = campaign.items.all()
         assert item.image.name == "news-images/11111111-1111-1111-1111-111111111111.png"
         assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"
+        assert len(default_storage_ls_files("news-images")) == 1
 
     def test_change_image(self, admin_client, black_pixel, mocker):
         # Create item before patching File.anonymized_filename's uuid,
@@ -84,3 +86,4 @@ class TestAnnouncementItemAdmin:
         assert File.objects.filter(deleted_at__isnull=False).count() == 1
         assert item.image_storage.deleted_at is None
         assert item.image_storage.key == "news-images/11111111-1111-1111-1111-111111111111.png"
+        assert len(default_storage_ls_files("news-images")) == 2

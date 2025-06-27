@@ -67,6 +67,7 @@ from tests.users.factories import (
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
 from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -661,6 +662,7 @@ class TestApplyAsJobSeeker:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage_ls_files("resume")) == 1
 
         assert apply_session_name not in client.session
 
@@ -1196,6 +1198,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage_ls_files("resume")) == 1
 
         assert apply_session_name not in client.session
 
@@ -1529,6 +1532,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage_ls_files("resume")) == 1
 
         assert apply_session_name not in client.session
 
@@ -1994,6 +1998,7 @@ class TestApplyAsPrescriber:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage_ls_files("resume")) == 1
 
         assert apply_session_name not in client.session
 
@@ -2570,6 +2575,7 @@ class TestApplyAsCompany:
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume.key == "resume/11111111-1111-1111-1111-111111111111.pdf"
+        assert len(default_storage_ls_files("resume")) == 1
 
         assert apply_session_name not in client.session
 
