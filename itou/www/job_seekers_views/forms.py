@@ -11,7 +11,7 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import JobSeekerProfile, NirModificationRequest, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
@@ -378,3 +378,39 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         JobSeekerProfile.clean_nir_title_birthdate_fields(
             self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
         )
+
+
+class NirModificationRequestForm(forms.ModelForm):
+    new_nir = forms.CharField(
+        label="Nouveau numéro de sécurité sociale",
+        max_length=21,  # 15 + 6 white spaces
+        required=True,
+        strip=True,
+        validators=[validate_nir],
+        help_text=("Par exemple: 2 69 05 49 588 157 80"),
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "2 69 05 49 588 157 80",
+            }
+        ),
+    )
+
+    class Meta:
+        model = NirModificationRequest
+        fields = ["new_nir"]
+
+    def __init__(self, *args, job_seeker, requestor, job_application=None, **kwargs):
+        self.job_seeker = job_seeker
+        self.requestor = requestor
+        self.job_application = job_application
+        super().__init__(*args, **kwargs)
+        if requestor == job_seeker:
+            self.fields["new_nir"].label = "Votre nouveau numéro de sécurité sociale"
+
+    def save(self, *args, **kwargs):
+        nir_modification_request = super().save(commit=False)
+        nir_modification_request.jobseeker_profile = self.job_seeker.jobseeker_profile
+        nir_modification_request.requestor = self.requestor
+        nir_modification_request.job_application = self.job_application
+        nir_modification_request.save()
+        return nir_modification_request
