@@ -1,3 +1,5 @@
+{% load enums %}
+{% enums "institutions" "InstitutionKind" as InstitutionKind %}
 {% if not assessment.submitted_at %}
     <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
         <h4>Bilan d’exécution à valider</h4>

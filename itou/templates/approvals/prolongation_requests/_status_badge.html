@@ -1,3 +1,5 @@
+{% load enums %}
+{% enums "approvals" "ProlongationRequestStatus" as ProlongationRequestStatus %}
 {% with label=prolongation_request.get_status_display base_classes="badge rounded-pill" %}
     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
         <span class="{{ base_classes }} {{ badge_size }} bg-accent-03 text-primary">{{ label }}</span>

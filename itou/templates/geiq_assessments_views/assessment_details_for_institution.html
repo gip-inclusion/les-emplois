@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load format_filters %}
 {% load geiq_assessments_badges %}
 
@@ -215,7 +216,7 @@
                     {% endif %}
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                    {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token request=request InstitutionKind=InstitutionKind only %}
+                    {% include "geiq_assessments_views/includes/assessment_status_box_for_institution.html" with assessment=assessment InstitutionAction=InstitutionAction csrf_token=csrf_token request=request only %}
                     {% if assessment.submitted_at %}
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data mb-3">
@@ -274,6 +275,7 @@
 
 
 {% block modals %}
+    {% enums "institutions" "InstitutionKind" as InstitutionKind %}
     {{ block.super }}
     {% if request.current_organization.kind == InstitutionKind.DREETS_GEIQ and not assessment.final_reviewed_at %}
         <div id="final_review_modal" class="modal" tabindex="-1" aria-labelledby="final_review_modal_title" aria-hidden="true">

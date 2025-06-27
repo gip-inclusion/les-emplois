@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load enums %}
 {% load format_filters %}
 {% load static %}
 {% load str_filters %}
@@ -19,6 +20,7 @@
 {% endblock %}
 
 {% block content %}
+    {% enums "approvals" "ProlongationRequestStatus" as ProlongationRequestStatus %}
     <section class="s-section" hx-select=".s-section" hx-target=".s-section" hx-swap="outerHTML show:window:top">
         <div class="s-section__container container">
             <div class="row">

@@ -1,8 +1,9 @@
 {% extends "layout/base_email_text_body.txt" %}
+{% load enums %}
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
-
+{% enums "job_applications" "SenderKind" as SenderKind %}
 Embauche annulée
 
 Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_name }} a bien été annulée.

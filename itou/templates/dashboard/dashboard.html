@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load enums %}
 {% load matomo %}
 {% load static %}
 {% load tally %}
@@ -11,6 +12,7 @@
 {% endblock %}
 
 {% block title_messages %}
+    {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     {{ block.super }}
 
     {% if user.is_employer and request.current_organization and not request.current_organization.jobs.exists %}

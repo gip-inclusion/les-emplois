@@ -1,4 +1,7 @@
+{% load enums %}
 {% load wording %}
+
+{% enums "companies" "CompanyKind" as CompanyKind %}
 
 {% with profile=employee_record.job_application.job_seeker.jobseeker_profile employee=employee_record.job_application.job_seeker %}
     <div>

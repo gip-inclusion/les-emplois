@@ -1,5 +1,7 @@
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
+{% enums "job_applications" "SenderKind" as SenderKind %}
 
 {% if job_application_sender_left_org %}
     <div class="alert alert-warning alert-dismissible fade show" role="status">

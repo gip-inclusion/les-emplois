@@ -1,6 +1,9 @@
 {% load badges %}
+{% load enums %}
 {% load matomo %}
 {% load str_filters %}
+{% enums "job_applications" "SenderKind" as SenderKind %}
+
 
 {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
     {% url 'apply:details_for_prescriber' job_application_id=job_application.id as details_url %}
