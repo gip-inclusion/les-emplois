@@ -7,7 +7,8 @@ from itou.files.models import File
 
 
 class FileFactory(factory.django.DjangoModelFactory):
-    key = factory.Faker("file_path", absolute=False, depth=2)
+    # depth=1 means a file under a directory, eg: resume/amazing.pdf
+    key = factory.Faker("file_path", absolute=False, depth=1)
     last_modified = factory.LazyFunction(timezone.now)
 
     class Meta:

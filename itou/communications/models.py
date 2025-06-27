@@ -212,9 +212,10 @@ class AnnouncementItem(models.Model):
         base_field=models.CharField(choices=UserKind.choices),
         verbose_name="utilisateurs concernés",
     )
+    # TODO(cms): check it's not saved twice in the S3.
     image = models.ImageField(
         blank=True,
-        upload_to="news-images/",
+        upload_to=lambda _, filename: f"news-images/{File.anonymized_filename(filename)}",
         storage=storages["public"],
         verbose_name="capture d'écran",
         help_text="1200x600 recommandé",
