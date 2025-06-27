@@ -1,0 +1,37 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+{% load theme_inclusion %}
+
+{% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Modifier les informations de ma structure</h1>
+            <p>SIRET {{ siae.siret | default:"-" }}</p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    {% block stepper %}
+                    {% endblock stepper %}
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    {% block form %}
+                    {% endblock form %}
+                </div>
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                    {% include "includes/structures/_structure_info.html" with structure=siae show=True extra_box_class="mb-3 mb-md-4" open_in_tab=False company_show_cta=True only %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
