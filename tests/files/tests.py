@@ -23,6 +23,7 @@ from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 def test_bucket_policy_for_anonymous_user():
@@ -134,6 +135,7 @@ def test_copy(pdf_file):
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
+    assert len(default_storage_ls_files("resume")) == 2
     with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 

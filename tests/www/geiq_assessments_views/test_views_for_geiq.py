@@ -24,6 +24,7 @@ from tests.institutions.factories import InstitutionFactory, InstitutionMembersh
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 @pytest.fixture
@@ -844,6 +845,7 @@ class TestAssessmentSyncFile:
         assertContains(response, reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk}))
         assessment.refresh_from_db()
         assert assessment.summary_document_file is not None
+        assert len(default_storage_ls_files("geiq-assessment")) == 1
         with default_storage.open(assessment.summary_document_file.key) as f:
             assert f.read() == pdf_file_content
 
