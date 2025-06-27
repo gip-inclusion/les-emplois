@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load enums %}
 {% load markdownify %}
 {% load matomo %}
 {% load static %}
@@ -28,6 +29,7 @@
 {% endblock %}
 
 {% block content %}
+    {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">

@@ -1,7 +1,11 @@
 {% load components %}
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
 {% load url_add_query %}
+
+{% enums "companies" "CompanyKind" as CompanyKind %}
+{% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
 
 {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
     {% fragment as c_title__main %}

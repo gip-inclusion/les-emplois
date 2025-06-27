@@ -1,8 +1,9 @@
 {% extends "layout/base_email_text_body.txt" %}
+{% load enums %}
 {% load format_filters %}
 {% load str_filters %}
 {% block body %}
-
+{% enums "job_applications" "SenderKind" as SenderKind %}
 Vous avez reçu une nouvelle candidature !
 
 *Candidat* :

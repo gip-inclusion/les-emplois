@@ -2,6 +2,7 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 
 {% block title %}Modifier cette organisation {{ block.super }}{% endblock %}
 
@@ -18,6 +19,7 @@
 {% endblock %}
 
 {% block title_messages %}
+    {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     {{ block.super }}
     {% if organization.is_authorized %}
         <div class="alert alert-info" role="status">

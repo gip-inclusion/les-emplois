@@ -2,12 +2,14 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load format_filters %}
 {% load matomo %}
 {% load static %}
 {% load str_filters %}
 
 {% block title_content %}
+    {% enums "companies" "CompanyKind" as CompanyKind %}
     {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
         {% fragment as c_title__main %}
             <h1>{% include 'apply/includes/_submit_title.html' %}</h1>

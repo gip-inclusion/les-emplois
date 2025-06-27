@@ -1,10 +1,5 @@
 from urllib.parse import urlencode
 
-import itou.approvals.enums as approvals_enums
-import itou.companies.enums as companies_enums
-import itou.institutions.enums as institutions_enums
-import itou.job_applications.enums as job_applications_enums
-import itou.prescribers.enums as prescribers_enums
 from itou.communications.cache import get_cached_active_announcement
 
 
@@ -14,17 +9,7 @@ def expose_enums(*args):
     https://docs.djangoproject.com/en/4.1/ref/templates/api/#using-requestcontext
     """
 
-    return {
-        "ApprovalOrigin": approvals_enums.Origin,
-        "InstitutionKind": institutions_enums.InstitutionKind,
-        "JobApplicationOrigin": job_applications_enums.Origin,
-        "JobApplicationState": job_applications_enums.JobApplicationState,
-        "PrescriberOrganizationKind": prescribers_enums.PrescriberOrganizationKind,
-        "ProlongationRequestStatus": approvals_enums.ProlongationRequestStatus,
-        "RefusalReason": job_applications_enums.RefusalReason,
-        "SenderKind": job_applications_enums.SenderKind,
-        "CompanyKind": companies_enums.CompanyKind,
-    }
+    return {}
 
 
 def matomo(request):

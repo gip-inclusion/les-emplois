@@ -1,4 +1,7 @@
+{% load enums %}
 {% load matomo %}
+
+{% enums "companies" "CompanyKind" as CompanyKind %}
 
 {% if batch_mode %}
     <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>

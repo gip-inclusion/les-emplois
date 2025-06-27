@@ -69,7 +69,7 @@
             </div>
         {% elif display_kind.is_list %}
             {% for job_application in job_applications_page %}
-                {% include "apply/includes/list_card_body.html" with csrf_token=csrf_token job_application=job_application job_applications_list_kind=job_applications_list_kind request=request SenderKind=SenderKind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin only %}
+                {% include "apply/includes/list_card_body.html" with csrf_token=csrf_token job_application=job_application job_applications_list_kind=job_applications_list_kind request=request JobApplicationsListKind=JobApplicationsListKind only %}
             {% endfor %}
         {% endif %}
         {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" extra_attributes='data-emplois-elements-visibility-on-selection="hidden"' %}
