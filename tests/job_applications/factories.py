@@ -227,7 +227,6 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
     """Generates a JobApplication() object without an Approval() object."""
 
     state = JobApplicationState.ACCEPTED
-    hiring_without_approval = True
 
 
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):

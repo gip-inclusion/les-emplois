@@ -312,7 +312,6 @@
               "refusal_reason_shared_with_job_seeker" = %s,
               "hiring_start_at" = %s,
               "hiring_end_at" = %s,
-              "hiring_without_approval" = %s,
               "origin" = %s,
               "approval_id" = NULL,
               "approval_delivery_mode" = %s,

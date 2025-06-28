@@ -103,8 +103,6 @@
                                     {% include "approvals/includes/box.html" with approval=job_application.approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
                                 {% elif job_application.job_seeker.has_valid_approval %}
                                     {% include "approvals/includes/box.html" with approval=job_application.job_seeker.latest_approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
-                                {% elif job_application.hiring_without_approval %}
-                                    <div class="c-box mb-4">Vous n'avez pas demandé de PASS IAE (agrément).</div>
                                 {% elif job_application.approval_manually_refused_at %}
                                     <div class="c-box mb-4">PASS IAE refusé (délai de carence non respecté).</div>
                                 {% elif job_application.manual_approval_delivery_required %}

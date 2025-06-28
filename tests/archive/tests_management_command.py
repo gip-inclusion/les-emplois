@@ -599,7 +599,6 @@ class TestArchiveUsersManagementCommand:
                     "hired_job__contract_nature": ContractNature.PEC_OFFER,
                     "to_company__romes": ["N1101"],
                     "hiring_start_at": datetime.date(2025, 2, 2),
-                    "hiring_without_approval": True,
                 },
                 True,
                 3,
@@ -737,7 +736,6 @@ class TestArchiveUsersManagementCommand:
             "hiring_contract_type",
             "hiring_contract_nature",
             "hiring_start_date",
-            "hiring_without_approval",
         )
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()

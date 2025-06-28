@@ -157,7 +157,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             if job_application.approval:
                 messages.success(request, "Candidature acceptée !", extra_tags="toast")
             # Manual approval delivery mode.
-            elif not job_application.hiring_without_approval:
+            else:
                 external_link = get_external_link_markup(
                     url=(
                         f"{global_constants.ITOU_HELP_CENTER_URL}/articles/"

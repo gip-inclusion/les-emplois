@@ -72,7 +72,6 @@ class ArchiveApplicationAdmin(ItouModelAdmin):
         "hiring_contract_type",
         "hiring_contract_nature",
         "hiring_start_date",
-        "hiring_without_approval",
     )
 
     readonly_fields = fields

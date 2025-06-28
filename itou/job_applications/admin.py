@@ -180,7 +180,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             {
                 "fields": [
                     "eligibility_diagnosis",
-                    "hiring_without_approval",
                     "approval",
                     "approval_delivery_mode",
                     "approval_number_sent_by_email",

@@ -58,7 +58,6 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
-    JobApplicationWithoutApprovalFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
@@ -1618,31 +1617,6 @@ class TestJobApplicationWorkflow:
         # Email sent to the job seeker.
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mailoutbox[1].subject
 
-    def test_accept_job_application_by_siae_with_no_approval(self, django_capture_on_commit_callbacks, mailoutbox):
-        """
-        A SIAE can hire somebody without getting approval if they don't want one
-        Basically the same as the 'accept' part, except we don't create an approval
-        and we don't notify
-        """
-        job_application = JobApplicationWithoutApprovalFactory(
-            state=JobApplicationState.PROCESSING,
-            job_seeker__with_pole_emploi_id=True,
-        )
-        # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
-        assert job_application.to_company.is_subject_to_eligibility_rules
-        assert job_application.approval is None
-        assert not job_application.approval_number_sent_by_email
-        assert job_application.approval_delivery_mode == ""
-        # Check sent email (no notification of approval).
-        assert len(mailoutbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mailoutbox[0].subject
-        # Email sent to the proxy.
-        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mailoutbox[1].subject
-
     def test_accept_job_application_hiring_after_approval_expires(self):
         """
         To be accepted a job must start while the approval is valid.
@@ -2171,7 +2145,6 @@ class TestJobApplicationAdminForm:
             "refusal_reason_shared_with_job_seeker",
             "hiring_start_at",
             "hiring_end_at",
-            "hiring_without_approval",
             "origin",
             "approval",
             "approval_delivery_mode",
