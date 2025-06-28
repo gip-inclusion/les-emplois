@@ -455,8 +455,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
         elif (
             # Keep in sync with the JobApplication.accept() transition logic.
-            not self.instance.hiring_without_approval
-            and self.company.is_subject_to_eligibility_rules
+            self.company.is_subject_to_eligibility_rules
             and self.job_seeker.has_valid_approval
             and hiring_start_at > self.job_seeker.latest_approval.end_at
         ):

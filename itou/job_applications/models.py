@@ -570,10 +570,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     hiring_start_at = models.DateField(verbose_name="date de début du contrat", blank=True, null=True, db_index=True)
     hiring_end_at = models.DateField(verbose_name="date prévisionnelle de fin du contrat", blank=True, null=True)
 
-    hiring_without_approval = models.BooleanField(
-        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
-    )
-
     origin = models.CharField(
         verbose_name="origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
@@ -1029,7 +1025,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 )
 
         # Approval issuance logic.
-        if not self.hiring_without_approval and self.to_company.is_subject_to_eligibility_rules:
+        if self.to_company.is_subject_to_eligibility_rules:
             if self.job_seeker.has_latest_common_approval_in_waiting_period:
                 if self.job_seeker.new_approval_blocked_by_waiting_period(
                     siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization

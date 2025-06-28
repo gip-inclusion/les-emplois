@@ -937,7 +937,6 @@
                  "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
                  "job_applications_jobapplication"."origin",
                  "job_applications_jobapplication"."approval_id",
                  "job_applications_jobapplication"."approval_delivery_mode",
@@ -988,7 +987,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 47 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',
@@ -3006,7 +3005,6 @@
                  "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
                  "job_applications_jobapplication"."origin",
                  "job_applications_jobapplication"."approval_id",
                  "job_applications_jobapplication"."approval_delivery_mode",
@@ -3057,7 +3055,7 @@
                                                     %s,
                                                     %s,
                                                     %s))
-          ORDER BY 47 DESC,
+          ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
           LIMIT 1
         ''',

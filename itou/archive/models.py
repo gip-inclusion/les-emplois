@@ -128,7 +128,6 @@ class AnonymizedApplication(models.Model):
     hiring_contract_type = models.CharField(verbose_name="type de contrat de l'embauche", blank=True, null=True)
     hiring_contract_nature = models.CharField(verbose_name="nature du contrat de l'embauche", blank=True, null=True)
     hiring_start_date = models.DateField(verbose_name="année et mois de début de l'embauche", blank=True, null=True)
-    hiring_without_approval = models.BooleanField(verbose_name="embauche sans PASS IAE", default=False)
 
     class Meta:
         verbose_name = "candidature anonymisée"

@@ -465,10 +465,7 @@ class AcceptView(common_views.BaseAcceptView):
             ).first()
 
     def dispatch(self, request, *args, **kwargs):
-        if (
-            not self.job_application.hiring_without_approval
-            and self.job_application.eligibility_diagnosis_by_siae_required()
-        ):
+        if self.job_application.eligibility_diagnosis_by_siae_required():
             messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
             return HttpResponseRedirect(self.next_url)
         return super().dispatch(request, *args, **kwargs)

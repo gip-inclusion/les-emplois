@@ -40,7 +40,6 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
-    JobApplicationWithoutApprovalFactory,
 )
 from tests.users.factories import EmployerFactory
 
@@ -75,7 +74,7 @@ class TestEmployeeRecordModel:
 
     def test_creation_without_approval(self):
         with pytest.raises(ValidationError) as exc:
-            job_application = JobApplicationWithoutApprovalFactory()
+            job_application = JobApplicationFactory(state=JobApplicationState.ACCEPTED)
             EmployeeRecord.from_job_application(job_application)
         assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL
 

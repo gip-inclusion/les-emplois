@@ -291,7 +291,6 @@
                  "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
                  "job_applications_jobapplication"."origin",
                  "job_applications_jobapplication"."approval_id",
                  "job_applications_jobapplication"."approval_delivery_mode",
@@ -617,9 +616,9 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
-                   49,
+                   48,
+                   51,
                    52,
-                   53,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -879,7 +878,6 @@
                  "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
                  "job_applications_jobapplication"."origin",
                  "job_applications_jobapplication"."approval_id",
                  "job_applications_jobapplication"."approval_delivery_mode",
@@ -1177,8 +1175,8 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   48,
                    49,
-                   50,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
