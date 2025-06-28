@@ -6537,7 +6537,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button as GEIQ]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
@@ -6549,7 +6549,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
