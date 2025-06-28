@@ -385,7 +385,7 @@ def test_can_have_prior_action():
     geiq = CompanyFactory.build(kind=CompanyKind.GEIQ)
     non_geiq = CompanyFactory.build(kind=CompanyKind.AI)
 
-    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_have_prior_action is False
+    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_have_prior_action is True
     assert (
         JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_have_prior_action is True
     )
@@ -399,9 +399,7 @@ def test_can_change_prior_actions():
     geiq = CompanyFactory(kind=CompanyKind.GEIQ)
     non_geiq = CompanyFactory(kind=CompanyKind.ACI)
 
-    assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_change_prior_actions is False
-    )
+    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_change_prior_actions is True
     assert (
         JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
         is True

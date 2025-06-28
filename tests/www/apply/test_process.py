@@ -3703,26 +3703,8 @@ def test_accept_button(client):
     assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
 
-def test_add_prior_action_new(client):
-    # State is new
-    job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
-    client.force_login(job_application.to_company.members.first())
-    add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
-    today = timezone.localdate()
-    response = client.post(
-        add_prior_action_url,
-        data={
-            "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": today,
-            "end_at": today + relativedelta(days=2),
-        },
-    )
-    assert response.status_code == 403
-    assert not job_application.prior_actions.exists()
-
-
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
-def test_add_prior_action_processing(client, snapshot):
+def test_add_prior_action(client, snapshot):
     job_application = JobApplicationFactory(
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
@@ -3732,14 +3714,18 @@ def test_add_prior_action_processing(client, snapshot):
     client.force_login(job_application.to_company.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
     today = timezone.localdate()
-    response = client.post(
-        add_prior_action_url,
-        data={
-            "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": today,
-            "end_at": today + relativedelta(days=2),
-        },
-    )
+
+    def add_prior_action():
+        return client.post(
+            add_prior_action_url,
+            data={
+                "action": job_applications_enums.Prequalification.AFPR,
+                "start_at": today,
+                "end_at": today + relativedelta(days=2),
+            },
+        )
+
+    response = add_prior_action()
     assert response.status_code == 200
     job_application.refresh_from_db()
     assert job_application.state.is_prior_to_hire
@@ -3754,15 +3740,7 @@ def test_add_prior_action_processing(client, snapshot):
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.processed_at = timezone.now()
     job_application.save(update_fields=("state", "processed_at", "updated_at"))
-    today = timezone.localdate()
-    response = client.post(
-        add_prior_action_url,
-        data={
-            "action": job_applications_enums.Prequalification.POE,
-            "start_at": today,
-            "end_at": today + relativedelta(days=2),
-        },
-    )
+    response = add_prior_action()
     assert response.status_code == 403
     assert not job_application.prior_actions.filter(action=job_applications_enums.Prequalification.POE).exists()
 
@@ -3771,15 +3749,7 @@ def test_add_prior_action_processing(client, snapshot):
         to_company__kind=CompanyKind.AI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     client.force_login(job_application.to_company.members.first())
-    today = timezone.localdate()
-    response = client.post(
-        add_prior_action_url,
-        data={
-            "action": job_applications_enums.Prequalification.AFPR,
-            "start_at": today,
-            "end_at": today + relativedelta(days=2),
-        },
-    )
+    response = add_prior_action()
     assert response.status_code == 404
     assert not job_application.prior_actions.exists()
 
@@ -3997,20 +3967,11 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
 
     details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
-    # The job application is still new
-    assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
-
-    # Switch state to processing
-    response = client.post(reverse("apply:process", kwargs={"job_application_id": job_application.pk}))
-    assertRedirects(response, details_url)
-    job_application.refresh_from_db()
-    assert job_application.state == job_applications_enums.JobApplicationState.PROCESSING
 
     END_AT_LABEL = "Date de fin prévisionnelle"
     MISSING_FIELD_MESSAGE = "Ce champ est obligatoire"
     ADD_AN_ACTION_SELECTED = '<option value="" selected>Ajouter une action</option>'
 
-    # Now the prior action section is visible
     response = client.get(details_url)
     assertContains(response, PRIOR_ACTION_SECTION_TITLE)
     # With PriorActionForm
