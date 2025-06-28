@@ -95,6 +95,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.POSTPONED,
     ]
     CAN_ADD_PRIOR_ACTION_STATES = [
+        JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.OBSOLETE,
@@ -861,7 +862,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_have_prior_action(self):
-        return self.to_company.can_have_prior_action and not self.state.is_new
+        return self.to_company.can_have_prior_action
 
     @property
     def can_change_prior_actions(self):
