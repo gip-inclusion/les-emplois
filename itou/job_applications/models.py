@@ -79,6 +79,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     )
 
     CAN_BE_ACCEPTED_STATES = [
+        JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.PRIOR_TO_HIRE,
@@ -86,7 +87,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.REFUSED,
         JobApplicationState.CANCELLED,
     ]
-    CAN_BE_TRANSFERRED_STATES = [JobApplicationState.NEW] + CAN_BE_ACCEPTED_STATES
+    CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
     CAN_BE_REFUSED_STATES = [
         JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
@@ -94,6 +95,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.POSTPONED,
     ]
     CAN_ADD_PRIOR_ACTION_STATES = [
+        JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.OBSOLETE,
@@ -106,14 +108,15 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.CANCELLED,
         JobApplicationState.OBSOLETE,
     ]
+    CAN_BE_POSTPONED_STATES = [
+        JobApplicationState.NEW,
+        JobApplicationState.PROCESSING,
+        JobApplicationState.PRIOR_TO_HIRE,
+    ]
 
     transitions = (
         (TRANSITION_PROCESS, JobApplicationState.NEW, JobApplicationState.PROCESSING),
-        (
-            TRANSITION_POSTPONE,
-            [JobApplicationState.PROCESSING, JobApplicationState.PRIOR_TO_HIRE],
-            JobApplicationState.POSTPONED,
-        ),
+        (TRANSITION_POSTPONE, CAN_BE_POSTPONED_STATES, JobApplicationState.POSTPONED),
         (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, JobApplicationState.ACCEPTED),
         (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, JobApplicationState.PRIOR_TO_HIRE),
         (TRANSITION_CANCEL_PRIOR_TO_HIRE, [JobApplicationState.PRIOR_TO_HIRE], JobApplicationState.PROCESSING),
@@ -856,7 +859,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_have_prior_action(self):
-        return self.to_company.can_have_prior_action and not self.state.is_new
+        return self.to_company.can_have_prior_action
 
     @property
     def can_change_prior_actions(self):

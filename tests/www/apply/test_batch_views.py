@@ -409,7 +409,7 @@ class TestBatchPostpone:
             job_seeker__first_name="John",
             job_seeker__last_name="Rambo",
             to_company=company,
-            state=JobApplicationState.NEW,
+            state=JobApplicationState.REFUSED,
         )
         assert not unpostponable_app.postpone.is_available()
 
@@ -419,7 +419,7 @@ class TestBatchPostpone:
         )
         assertRedirects(response, next_url)
         unpostponable_app.refresh_from_db()
-        assert unpostponable_app.state == JobApplicationState.NEW
+        assert unpostponable_app.state == JobApplicationState.REFUSED
         assertMessages(
             response,
             [
@@ -427,7 +427,7 @@ class TestBatchPostpone:
                     messages.ERROR,
                     (
                         "La candidature de John RAMBO n’a pas pu être mise en attente car elle est au statut "
-                        "« Nouvelle candidature »."
+                        "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
                 ),
@@ -475,14 +475,14 @@ class TestBatchPostpone:
 
         apps = [
             # 2 postponable applications:
-            JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
+            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
             JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
             # 1 unpostponable application:
             JobApplicationFactory(
                 job_seeker__first_name="John",
                 job_seeker__last_name="Rambo",
                 to_company=company,
-                state=JobApplicationState.NEW,
+                state=JobApplicationState.REFUSED,
             ),
             # 1 already postponed application:
             JobApplicationFactory(
@@ -526,7 +526,7 @@ class TestBatchPostpone:
                     messages.ERROR,
                     (
                         "La candidature de John RAMBO n’a pas pu être mise en attente car elle est au statut "
-                        "« Nouvelle candidature »."
+                        "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
                 ),

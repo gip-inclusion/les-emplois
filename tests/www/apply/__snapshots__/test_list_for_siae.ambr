@@ -6398,7 +6398,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_accept[active accept button]
   '''
-  <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-cente" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/11111111-1111-1111-1111-111111111111/siae/accept?next_url=%2Fapply%2Fsiae%2Flist%3Fdisplay%3Dtable%26start_date%3D2015-01-01">
+  <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-cente" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept?next_url=%2Fapply%2Fsiae%2Flist%3Fdisplay%3Dtable%26start_date%3D2015-01-01">
       <i aria-hidden="true" class="ri-check-line fw-medium">
       </i>
       <span>
@@ -6537,7 +6537,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button as GEIQ]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
@@ -6549,7 +6549,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>

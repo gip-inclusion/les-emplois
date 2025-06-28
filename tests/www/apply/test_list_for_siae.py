@@ -1370,7 +1370,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     )
     assert not postponed_app.postpone.is_available()
 
-    unpostponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.NEW)
+    unpostponable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
     assert not unpostponable_app.postpone.is_available()
 
     client.force_login(employer)
@@ -1669,6 +1669,12 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
         state=JobApplicationState.PRIOR_TO_HIRE,
     )
     assert acceptable_app_2.accept.is_available()
+    acceptable_app_3 = JobApplicationFactory(
+        pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
+        to_company=company,
+        state=JobApplicationState.NEW,
+    )
+    assert acceptable_app_3.accept.is_available()
 
     unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
     assert not unacceptable_app.accept.is_available()
@@ -1710,22 +1716,23 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
         return accept_button
 
     assert get_accept_button() is None
-
     # Select 1 acceptable application
-    simulate_applications_selection([acceptable_app_1.pk])
-    accept_button = get_accept_button()
-    assert accept_button is not None
-    assert pretty_indented(accept_button) == snapshot(name="active accept button")
-
-    # Check that the next_url is correctly transmitted
-    assert accept_button["href"] == reverse(
-        "apply:accept", kwargs={"job_application_id": acceptable_app_1.pk}, query={"next_url": table_url}
-    )
+    for acceptable_app in [acceptable_app_1, acceptable_app_2, acceptable_app_3]:
+        simulate_applications_selection([acceptable_app.pk])
+        accept_button = get_accept_button()
+        assert accept_button is not None
+        assert pretty_indented(accept_button).replace(str(acceptable_app.pk), "[PK of JobApplication]") == snapshot(
+            name="active accept button"
+        )
+        # Check that the next_url is correctly transmitted
+        assert accept_button["href"] == reverse(
+            "apply:accept", kwargs={"job_application_id": acceptable_app.pk}, query={"next_url": table_url}
+        )
 
     # Test with unacceptable batches
     for app_list in [
         [unacceptable_app.pk],
-        [acceptable_app_1.pk, acceptable_app_2.pk],
+        [acceptable_app_1.pk, acceptable_app_2.pk, acceptable_app_3.pk],
     ]:
         simulate_applications_selection(app_list)
         accept_button = get_accept_button()

@@ -1124,6 +1124,15 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
@@ -5299,7 +5308,7 @@
 # name: TestProcessViews.test_postpone_from_prescriber[postpone_email_to_proxy_subject]
   '[DEV] Candidature de Jane DOE mise en attente par EI Acme inc.'
 # ---
-# name: test_add_prior_action_processing
+# name: test_add_prior_action
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">
       <li>
