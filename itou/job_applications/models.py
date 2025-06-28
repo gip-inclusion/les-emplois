@@ -107,14 +107,15 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.CANCELLED,
         JobApplicationState.OBSOLETE,
     ]
+    CAN_BE_POSTPONED_STATES = [
+        JobApplicationState.NEW,
+        JobApplicationState.PROCESSING,
+        JobApplicationState.PRIOR_TO_HIRE,
+    ]
 
     transitions = (
         (TRANSITION_PROCESS, JobApplicationState.NEW, JobApplicationState.PROCESSING),
-        (
-            TRANSITION_POSTPONE,
-            [JobApplicationState.PROCESSING, JobApplicationState.PRIOR_TO_HIRE],
-            JobApplicationState.POSTPONED,
-        ),
+        (TRANSITION_POSTPONE, CAN_BE_POSTPONED_STATES, JobApplicationState.POSTPONED),
         (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, JobApplicationState.ACCEPTED),
         (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, JobApplicationState.PRIOR_TO_HIRE),
         (TRANSITION_CANCEL_PRIOR_TO_HIRE, [JobApplicationState.PRIOR_TO_HIRE], JobApplicationState.PROCESSING),
