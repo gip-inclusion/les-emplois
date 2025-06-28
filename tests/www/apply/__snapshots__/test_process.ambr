@@ -990,6 +990,695 @@
     ]),
   })
 # ---
+# name: TestProcessTemplates.test_details_template_for_state_accepted
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_canceled
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_canceled_valid_diagnosis
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_new
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                      <i aria-hidden="true" class="ri-file-search-line fw-medium">
+                      </i>
+                      <span>
+                          Étudier
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_obsolete
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_obsolete_valid_diagnosis
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_postponed
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_postponed_valid_diagnosis
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_prior_to_hire
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                  <i aria-hidden="true" class="ri-history-line fw-medium">
+                  </i>
+                  <span>
+                      Mettre en liste d'attente
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_processing
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                  <i aria-hidden="true" class="ri-history-line fw-medium">
+                  </i>
+                  <span>
+                      Mettre en liste d'attente
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_processing_but_suspended_siae
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-white btn-block btn-ico disabled" data-bs-placement="top" data-bs-title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. Dans votre cas, le retrait définitif de la capacité d'auto-prescription est effectif depuis le 26/06/2025." data-bs-toggle="tooltip">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </button>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                  <i aria-hidden="true" class="ri-history-line fw-medium">
+                  </i>
+                  <span>
+                      Mettre en liste d'attente
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_refused
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_refused_valid_diagnosis
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                      <i aria-hidden="true" class="ri-archive-line fw-medium">
+                      </i>
+                      <span>
+                          Archiver
+                      </span>
+                  </button>
+              </form>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_geiq_missing_eligibility
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <button class="btn btn-lg btn-white btn-block btn-ico" data-bs-target="#confirm_no_allowance_modal" data-bs-toggle="modal">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </button>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                  <i aria-hidden="true" class="ri-history-line fw-medium">
+                  </i>
+                  <span>
+                      Mettre en liste d'attente
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown dropdown-structure">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
+                      Transférer cette candidature vers
+                  </button>
+                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
+                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
+                          <div class="dropdown-item disabled">
+                              <i aria-hidden="true" class="ri-home-smile-line">
+                              </i>
+                              <strong>
+                                  Une autre structure
+                              </strong>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestProcessTransferJobApplication.test_job_application_external_transfer_disabled_for_bad_state
   '''
   <div class="dropdown dropdown-structure">
