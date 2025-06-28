@@ -79,6 +79,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     )
 
     CAN_BE_ACCEPTED_STATES = [
+        JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.PRIOR_TO_HIRE,
@@ -86,7 +87,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.REFUSED,
         JobApplicationState.CANCELLED,
     ]
-    CAN_BE_TRANSFERRED_STATES = [JobApplicationState.NEW] + CAN_BE_ACCEPTED_STATES
+    CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
     CAN_BE_REFUSED_STATES = [
         JobApplicationState.NEW,
         JobApplicationState.PROCESSING,

@@ -1124,6 +1124,15 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
