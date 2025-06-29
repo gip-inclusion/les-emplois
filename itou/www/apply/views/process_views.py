@@ -452,7 +452,11 @@ class AcceptView(common_views.BaseAcceptView):
         self.company = self.job_application.to_company
         self.job_seeker = self.job_application.job_seeker
 
-        self.next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})
+        self.next_url = get_safe_url(
+            request,
+            "next_url",
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
+        )
 
         if self.company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
@@ -465,7 +469,11 @@ class AcceptView(common_views.BaseAcceptView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.job_application.eligibility_diagnosis_by_siae_required():
-            messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
+            messages.error(
+                request,
+                "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.",
+                extra_tags="toast",
+            )
             return HttpResponseRedirect(self.next_url)
         return super().dispatch(request, *args, **kwargs)
 
@@ -473,6 +481,9 @@ class AcceptView(common_views.BaseAcceptView):
         return self.next_url
 
     def get_error_url(self):
+        return self.next_url
+
+    def get_success_url(self):
         return self.next_url
 
 
@@ -857,11 +868,17 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
         self.company = self.job_application.to_company
         self.job_seeker = self.job_application.job_seeker
 
+        self.next_url = get_safe_url(request, "next_url")
+
     def get_success_url(self):
-        return reverse("apply:accept", kwargs={"job_application_id": self.job_application.id})
+        return reverse(
+            "apply:accept",
+            kwargs={"job_application_id": self.job_application.id},
+            query={"next_url": self.next_url} if self.next_url else None,
+        )
 
     def get_cancel_url(self):
-        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id})
+        return self.next_url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

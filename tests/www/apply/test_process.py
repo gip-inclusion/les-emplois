@@ -1559,6 +1559,60 @@ class TestProcessViews:
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
+    def test_eligibility_with_next_url(self, client):
+        """Test the page propagates the next url to the accept view"""
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            eligibility_diagnosis=None,
+        )
+
+        assert job_application.state.is_processing
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_company
+        )
+        assert not has_considered_valid_diagnoses
+
+        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
+        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
+        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+
+        next_url = reverse("apply:list_for_siae")
+        url = reverse(
+            "apply:eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={"next_url": next_url},
+        )
+        response = client.get(url)
+        assert response.status_code == 200
+        assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertContains(
+            response,
+            f"""
+            <a href="{next_url}"
+               class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
+               aria-label="Annuler la saisie de ce formulaire">
+                <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                <span>Annuler</span>
+            </a>
+            """,
+            html=True,
+        )
+
+        post_data = {
+            # Administrative criteria level 1.
+            f"{criterion1.key}": "true",
+            # Administrative criteria level 2.
+            f"{criterion2.key}": "true",
+            f"{criterion3.key}": "true",
+        }
+        response = client.post(url, data=post_data)
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url})
+        assertRedirects(response, url)
+
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
 
@@ -2083,7 +2137,7 @@ class TestProcessAcceptViews:
             **accept_default_fields,
         } | extra_post_data
 
-    def accept_job_application(self, client, job_application, post_data=None, assert_successful=True):
+    def accept_job_application(self, client, job_application, post_data=None, assert_successful=True, next_url=None):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -2093,7 +2147,11 @@ class TestProcessAcceptViews:
         If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
         If not provided, a new one will be created and linked to the given job application.
         """
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(
+            "apply:accept",
+            kwargs={"job_application_id": job_application.pk},
+            query={"next_url": next_url} if next_url else None,
+        )
         response = client.get(url_accept)
         assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
@@ -2123,7 +2181,7 @@ class TestProcessAcceptViews:
 
         post_data = post_data | {"confirmed": "True"}
         response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        next_url = next_url or reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
         # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
         # I guess it's normal as it's an AJAX response.
@@ -2178,6 +2236,26 @@ class TestProcessAcceptViews:
             assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_accept_with_next_url(self, client):
+        today = timezone.localdate()
+        job_application = self.create_job_application(
+            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
+        )
+
+        employer = self.company.members.first()
+        client.force_login(employer)
+        # Good duration.
+        hiring_start_at = today
+        post_data = {"hiring_end_at": ""}
+
+        next_url = reverse("apply:list_for_siae")
+        self.accept_job_application(client, job_application, post_data=post_data, next_url=next_url)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at is None
+        assert job_application.state.is_accepted
 
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(self, client, mocker):
