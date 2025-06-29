@@ -23,11 +23,7 @@ def member_list(request, template_name="institutions/members.html"):
         admin_count=Count("pk", filter=Q(is_admin=True)),
     )
 
-    pending_invitations = None
-    # Institution members can only be labor inspectors for the moment,
-    # but this is likely to change in the future.
-    if request.user.is_labor_inspector:
-        pending_invitations = institution.invitations.pending()
+    pending_invitations = institution.invitations.pending()
 
     context = {
         "institution": institution,
