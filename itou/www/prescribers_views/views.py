@@ -1,12 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
@@ -66,29 +65,14 @@ def overview(request, template_name="prescribers/overview.html"):
     return render(request, template_name, context)
 
 
-def member_list(request, template_name="prescribers/members.html"):
-    """
-    List members of a prescriber organization.
-    """
-    organization = get_current_org_or_404(request)
+class MemberList(BaseMemberList):
+    template_name = "prescribers/members.html"
+    membership_related_name = "prescribermembership_set"
+    context_object_name = "organization"
 
-    members = (
-        organization.prescribermembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
-    )
-    members_stats = members.aggregate(
-        total_count=Count("pk"),
-        admin_count=Count("pk", filter=Q(is_admin=True)),
-    )
-    pending_invitations = organization.invitations.pending()
-
-    context = {
-        "organization": organization,
-        "members": members,
-        "members_stats": members_stats,
-        "pending_invitations": pending_invitations,
-        "back_url": reverse("dashboard:index"),
-    }
-    return render(request, template_name, context)
+    def setup(self, request, *args, **kwargs):
+        self.organization = get_current_org_or_404(request)
+        return super().setup(request, *args, **kwargs)
 
 
 @check_user(lambda user: user.is_prescriber)

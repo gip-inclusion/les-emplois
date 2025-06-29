@@ -39,11 +39,11 @@ class TestMembers:
         url = reverse("companies_views:members")
         response = client.get(url)
         assert response.status_code == 200
-        assert len(response.context["members"]) == 1
-        assert active_member_active_user in response.context["members"]
-        assert active_member_inactive_user not in response.context["members"]
-        assert inactive_member_active_user not in response.context["members"]
-        assert inactive_member_inactive_user not in response.context["members"]
+        assert len(response.context["object_list"]) == 1
+        assert active_member_active_user in response.context["object_list"]
+        assert active_member_inactive_user not in response.context["object_list"]
+        assert inactive_member_active_user not in response.context["object_list"]
+        assert inactive_member_inactive_user not in response.context["object_list"]
 
     def test_members_admin_warning_one_user(self, client):
         company = CompanyFactory(with_membership=True)
