@@ -78,6 +78,11 @@ def test_create_job_application_does_not_crash(admin_client):
     assertContains(response, "Émetteur prescripteur manquant")
 
 
+def test_check_sender_kind(admin_client):
+    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), {})
+    assertContains(response, "Type émetteur manquant")
+
+
 def test_check_inconsistency_check(admin_client):
     consistent_application = factories.JobApplicationFactory()
 
