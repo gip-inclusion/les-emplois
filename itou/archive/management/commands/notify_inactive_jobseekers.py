@@ -79,7 +79,7 @@ class Command(BaseCommand):
         logger.info("Notified inactive job seekers without recent activity: %s", len(users))
 
     @monitor(
-        monitor_slug="notify_inactive_users",
+        monitor_slug="notify_inactive_jobseekers",
         monitor_config={
             "schedule": {"type": "crontab", "value": "0 7 * * MON-FRI"},
             "checkin_margin": 5,
