@@ -27,7 +27,7 @@ class Command(BaseCommand):
             action="store",
             type=int,
             default=BATCH_SIZE,
-            help="Number of users to process in a batch",
+            help="Number of professionals to process in a batch",
         )
 
     def reset_notified_professionals_with_recent_activity(self):

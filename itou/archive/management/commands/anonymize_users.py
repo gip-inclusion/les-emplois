@@ -102,7 +102,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--wet-run",
             action="store_true",
-            help="Perform the actual archiving of users",
+            help="Perform the anonymization of job seekers",
         )
 
         parser.add_argument(
@@ -110,7 +110,7 @@ class Command(BaseCommand):
             action="store",
             type=int,
             default=BATCH_SIZE,
-            help="Number of users to process in a batch",
+            help="Number of job seekers to process in a batch",
         )
 
     def reset_notified_jobseekers_with_recent_activity(self):
@@ -223,12 +223,12 @@ class Command(BaseCommand):
     )
     def handle(self, *args, wet_run, batch_size, **options):
         if settings.SUSPEND_ANONYMIZE_JOBSEEKERS:
-            self.logger.info("Anonymizing users is suspended, exiting command")
+            self.logger.info("Anonymizing job seekers is suspended, exiting command")
             return
 
         self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start anonymizing users in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start anonymizing job seekers in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.reset_notified_jobseekers_with_recent_activity()
         self.archive_jobseekers_after_grace_period()
