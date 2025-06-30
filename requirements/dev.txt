@@ -1308,9 +1308,9 @@ pynacl==1.5.0 \
     # via
     #   -r requirements/test.txt
     #   paramiko
-pypdf==5.6.1 \
-    --hash=sha256:dde36cd67afe3afd733a562a0dd08a3c1dcdf01fe01de13785291319c8a883ff \
-    --hash=sha256:ff09d03d37addbc40f75db3624997a660ff5fe41c61e7ae4db6828dc3f581e4d
+pypdf==5.7.0 \
+    --hash=sha256:203379453439f5b68b7a1cd43cdf4c5f7a02b84810cefa7f93a47b350aaaba48 \
+    --hash=sha256:68c92f2e1aae878bab1150e74447f31ab3848b1c0a6f8becae9f0b1904460b6f
     # via -r requirements/test.txt
 pytest==8.4.1 \
     --hash=sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7 \
