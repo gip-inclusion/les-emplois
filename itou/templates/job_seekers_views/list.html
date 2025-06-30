@@ -56,7 +56,7 @@
 {% endblock title_extra %}
 
 {% block content %}
-    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas.html" with list_organization=list_organization %}
+    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas.html" with filters_counter=filters_counter filters_form=filters_form list_organization=list_organization order=order request=request only %}
     <section class="s-section">
         <div class="s-section__container container">
             {% if list_organization %}
