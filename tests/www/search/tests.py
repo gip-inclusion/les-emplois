@@ -252,7 +252,7 @@ class TestSearchCompany:
         )
         response = client.get(self.URL, {"city": city.slug})
         unpopular_badge = """
-            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+            <span class="badge badge-sm rounded-pill bg-info text-white">
                 <i class="ri-mail-send-line me-1" aria-hidden="true"></i>
                 <span class="ms-1">Soyez parmi les premiers à postuler</span>
             </span>
@@ -859,7 +859,7 @@ class TestJobDescriptionSearchView:
         )
         response = client.get(self.URL, {"city": city.slug})
         unpopular_badge = """
-            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+            <span class="badge badge-sm rounded-pill bg-info text-white">
                 <i class="ri-mail-send-line me-1" aria-hidden="true"></i>
                 <span class="ms-1">Soyez parmi les premiers à postuler</span>
             </span>
