@@ -230,51 +230,39 @@ def stats_siae_etp(request):
     )
 
 
-def stats_siae_orga_etp(request):
-    """
-    SIAE stats shown to their own members.
-    They can only view data for their own SIAE.
-    These stats are about ETP data from the ASP.
-    """
-    if not utils.can_view_stats_siae(request):
-        raise PermissionDenied
-
-    context = {
-        "page_title": "Suivi des effectifs annuels et mensuels (ETP)",
-        "department": request.current_organization.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
-    }
-    return render_stats(
-        request=request,
-        context=context,
-        params={
-            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
-                org.convention.asp_id for org in request.organizations if org.convention is not None
-            ],
-        },
-    )
-
-
-def render_stats_siae(request, page_title):
+def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY):
     """
     SIAE stats shown only to their own members.
     Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
     These stats are built directly from C1 data.
     """
+    if not utils.can_view_stats_siae(request):
+        raise PermissionDenied
+
     context = {
         "page_title": page_title,
         "department": request.current_organization.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
+    match filter_param:
+        case mb.C1_SIAE_FILTER_KEY:
+            params = {
+                mb.C1_SIAE_FILTER_KEY: [
+                    str(membership.company_id)
+                    for membership in request.user.active_or_in_grace_period_company_memberships()
+                ]
+            }
+        case mb.ASP_SIAE_FILTER_KEY_FLAVOR3:
+            params = {
+                mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
+                    org.convention.asp_id for org in request.organizations if org.convention is not None
+                ],
+            }
+
     return render_stats(
         request=request,
         context=context,
-        params={
-            mb.C1_SIAE_FILTER_KEY: [
-                str(membership.company_id)
-                for membership in request.user.active_or_in_grace_period_company_memberships()
-            ]
-        },
+        params=params,
     )
 
 
@@ -285,6 +273,19 @@ def stats_siae_hiring(request):
 def stats_siae_auto_prescription(request):
     return render_stats_siae(
         request=request, page_title="Suivi de l’activité d’auto-prescription et du contrôle à posteriori"
+    )
+
+
+def stats_siae_orga_etp(request):
+    """
+    SIAE stats shown to their own members.
+    They can only view data for their own SIAE.
+    These stats are about ETP data from the ASP.
+    """
+    return render_stats_siae(
+        request=request,
+        page_title="Suivi des effectifs annuels et mensuels (ETP)",
+        filter_param=mb.ASP_SIAE_FILTER_KEY_FLAVOR3,
     )
 
 
