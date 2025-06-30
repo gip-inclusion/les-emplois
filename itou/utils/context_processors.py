@@ -3,15 +3,6 @@ from urllib.parse import urlencode
 from itou.communications.cache import get_cached_active_announcement
 
 
-def expose_enums(*args):
-    """
-    Put things into the context to make them available in templates.
-    https://docs.djangoproject.com/en/4.1/ref/templates/api/#using-requestcontext
-    """
-
-    return {}
-
-
 def matomo(request):
     context = {}
     url = request.path
