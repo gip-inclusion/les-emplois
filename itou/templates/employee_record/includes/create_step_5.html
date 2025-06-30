@@ -24,7 +24,7 @@
             </div>
             <hr class="my-4">
 
-            {% include "employee_record/includes/employee_record_summary.html" %}
+            {% include "employee_record/includes/employee_record_summary.html" with employee_record=employee_record request=request CompanyKind=CompanyKind only %}
 
             {% if job_application.hiring_starts_in_future %}
                 <hr class="my-4">
