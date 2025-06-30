@@ -983,6 +983,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
                 ),
             },
             data=request.POST or None,
+            back_url=request.get_full_path(),
         )
         if not can_edit_personal_information(self.request, self.job_seeker):
             self._disable_form()
