@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2025-06-30
+
+### Ajouté
+
+- [Brevo: alimentation de la liste des candidats actifs avec diagnostics](https://github.com/gip-inclusion/les-emplois/pull/6415)
+- [Demandeur d'emploi : afficher le statut d’éligibilité du candidat sur sa page d’accueil](https://github.com/gip-inclusion/les-emplois/pull/6084)
+- [GEIQ: ajout de l'export des données de contrats en Excel](https://github.com/gip-inclusion/les-emplois/pull/6385)
+
+### Modifié
+
+- [admin : Permettre les recherches de NIR contenant un A ou un B](https://github.com/gip-inclusion/les-emplois/pull/6413)
+- [Admin: ajoute l'accès aux données analytiques](https://github.com/gip-inclusion/les-emplois/pull/6410)
+- [Admin: Améliorer l'affichage du statut d'habilitation des organisations prescriptrices](https://github.com/gip-inclusion/les-emplois/pull/6402) 🖼
+- [Candidature : rendre le filtre “Nom du candidat” indépendant des autres filtres](https://github.com/gip-inclusion/les-emplois/pull/6376)
+- [Contrôle a posteriori : Empêcher les sanctions sur une SIAE dont le contrôle est accepté](https://github.com/gip-inclusion/les-emplois/pull/6408)
+- [Employeur: Désactivation des fiches de poste non mises à jour depuis plus de 2 ans](https://github.com/gip-inclusion/les-emplois/pull/6398)
+- [Fiches Salarié : Ne plus tronquer l'identifiant France Travail lors de l'envoi à l'Extranet IAE](https://github.com/gip-inclusion/les-emplois/pull/6419)
+- [Fiches salarié : Retrait d’une vérification de cohérence de l’adresse](https://github.com/gip-inclusion/les-emplois/pull/6407)
+- [Interface: Garder le menu en sidebar visible sur les petits écrans de bureau et les ordinateurs portables](https://github.com/gip-inclusion/les-emplois/pull/6405) 🖼
+- [Tech: Mise à jour de l'API SIRENE](https://github.com/gip-inclusion/les-emplois/pull/6406)
+
+### Tech
+
+- [Limiter le nombre d’actions par minute pour les utilisateurs authentifiés](https://github.com/gip-inclusion/les-emplois/pull/6327) 🖼
+- [Tech: ajoute la possibilité de configurer un `statement_timeout`](https://github.com/gip-inclusion/les-emplois/pull/6323)
+
 ## 2025-06-23
 
 ### Ajouté
