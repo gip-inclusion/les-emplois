@@ -88,8 +88,6 @@
 
 {% block script %}
     {{ block.super }}
-    <script src="{% static 'js/split_nir.js' %}"></script>
-
     <script nonce="{{ CSP_NONCE }}">
         $(document).ready(() => {
             /**

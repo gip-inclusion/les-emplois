@@ -70,9 +70,3 @@
     </div>
     {% include "signup/includes/login_reminder.html" only %}
 {% endblock job_seeker_signup_content %}
-
-
-{% block script %}
-    {{ block.super }}
-    <script src="{% static 'js/split_nir.js' %}"></script>
-{% endblock %}
