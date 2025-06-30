@@ -46,7 +46,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
         user = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_users")
+            call_command("notify_inactive_jobseekers")
 
         user.refresh_from_db()
         assert not mailoutbox
@@ -54,7 +54,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
     def test_notify_batch_size(self):
         JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY)
-        call_command("notify_inactive_users", batch_size=2, wet_run=True)
+        call_command("notify_inactive_jobseekers", batch_size=2, wet_run=True)
 
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
@@ -173,7 +173,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             related_object_factory(user)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_users", wet_run=True)
+            call_command("notify_inactive_jobseekers", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is not None) == updated_notification_date
