@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # This table is only used by anonymize_users management command
+        # This table is only used by anonymize_jobseekers management command
         # it's okay if one run fails during the deployment
         migrations.RemoveField(
             model_name="anonymizedapplication",

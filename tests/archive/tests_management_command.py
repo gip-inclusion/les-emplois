@@ -210,12 +210,12 @@ class TestAnonymizeJobseekersManagementCommand:
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
-        call_command("anonymize_users", wet_run=wet_run)
+        call_command("anonymize_jobseekers", wet_run=wet_run)
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
 
     def test_dry_run(self):
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
-        call_command("anonymize_users")
+        call_command("anonymize_jobseekers")
 
         User.objects.get()
         assert not AnonymizedJobSeeker.objects.exists()
@@ -226,7 +226,7 @@ class TestAnonymizeJobseekersManagementCommand:
         JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", batch_size=2, wet_run=True)
+            call_command("anonymize_jobseekers", batch_size=2, wet_run=True)
 
         assert AnonymizedJobSeeker.objects.count() == 2
         assert User.objects.count() == 1
@@ -336,7 +336,7 @@ class TestAnonymizeJobseekersManagementCommand:
         if related_object_factory:
             related_object_factory(user)
 
-        call_command("anonymize_users", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
 
         user.refresh_from_db()
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
@@ -377,7 +377,7 @@ class TestAnonymizeJobseekersManagementCommand:
     )
     def test_exclude_users_when_archiving(self, user_factory):
         user = user_factory()
-        call_command("anonymize_users", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
 
         expected_user = User.objects.get()
         assert user == expected_user
@@ -495,7 +495,7 @@ class TestAnonymizeJobseekersManagementCommand:
             )
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", wet_run=True)
+            call_command("anonymize_jobseekers", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
@@ -546,7 +546,7 @@ class TestAnonymizeJobseekersManagementCommand:
         assert FollowUpGroupMembership.objects.exists()
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", wet_run=True)
+            call_command("anonymize_jobseekers", wet_run=True)
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not FollowUpGroup.objects.exists()
@@ -569,7 +569,7 @@ class TestAnonymizeJobseekersManagementCommand:
         undesired_file_keys = [FileFactory().id, JobApplicationFactory().resume.id]
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", wet_run=True)
+            call_command("anonymize_jobseekers", wet_run=True)
 
         assert File.objects.filter(id__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
 
@@ -709,7 +709,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_application.selected_jobs.set(selected_jobs)
 
         with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_users", wet_run=True)
+            call_command("anonymize_jobseekers", wet_run=True)
 
         archived_application = AnonymizedApplication.objects.all().values(
             "job_seeker_birth_year",
