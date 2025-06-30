@@ -6,6 +6,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains
 
 from itou.users.models import NirModificationRequest
+from itou.utils.urls import get_absolute_url
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -63,7 +64,7 @@ def test_create_request_invalid_nir(client, data):
     assert NirModificationRequest.objects.count() == 0
 
 
-def test_create_with_ongoing_request(client):
+def test_create_with_ongoing_request(client, mailoutbox):
     client.force_login(PrescriberFactory(membership=True, membership__organization__authorized=True))
     job_seeker = JobSeekerFactory(jobseeker_profile__nir="190031398700953")
 
@@ -78,6 +79,7 @@ def test_create_with_ongoing_request(client):
 
     assertContains(response, "Une demande est déjà en cours de traitement pour ce candidat.")
     assert NirModificationRequest.objects.count() == 1
+    assert len(mailoutbox) == 0
 
     # Closed request
     nir_modification_request.processed_at = timezone.now()
@@ -89,6 +91,7 @@ def test_create_with_ongoing_request(client):
 
     assert response.status_code == 302  # Redirected to back_url
     assert NirModificationRequest.objects.count() == 2
+    assert len(mailoutbox) == 1
 
 
 def test_create_request_valid(client, mailoutbox):
@@ -105,3 +108,9 @@ def test_create_request_valid(client, mailoutbox):
     assert nir_modification_request.requested_by == user
     assert nir_modification_request.processed_at is None
     assert nir_modification_request.nir == "111111111111120"
+
+    [email] = mailoutbox
+    admin_url = get_absolute_url(
+        reverse("admin:users_nirmodificationrequest_change", args=(nir_modification_request.pk,))
+    )
+    assert admin_url in email.body
