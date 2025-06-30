@@ -5,7 +5,6 @@ import factory
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.gis.geos import Point
-from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
@@ -26,7 +25,7 @@ DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 
 
 class TestEditJobSeekerInfo:
-    NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    NIR_UPDATE_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
 
     @pytest.fixture(autouse=True)
@@ -60,7 +59,6 @@ class TestEditJobSeekerInfo:
         assert math.isclose(user.latitude, geocoding_data.get("latitude"), abs_tol=1e-5)
         assert math.isclose(user.longitude, geocoding_data.get("longitude"), abs_tol=1e-5)
 
-    @override_settings(TALLY_URL="https://tally.so")
     def test_edit_by_company_with_nir(self, client, mocker, snapshot):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
@@ -84,14 +82,20 @@ class TestEditJobSeekerInfo:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(url)
-        assertContains(
-            response,
-            (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                f'rel="noopener">{self.NIR_UPDATE_TALLY_LINK_LABEL}</a>'
-            ),
-            html=True,
-        )
+            assertContains(
+                response,
+                (
+                    '<a href="'
+                    f'{
+                        reverse(
+                            "job_seekers_views:nir_modification_request",
+                            kwargs={"public_id": job_application.job_seeker.public_id},
+                            query={"back_url": url},
+                        )
+                    }">{self.NIR_UPDATE_LINK_LABEL}</a>'
+                ),
+                html=True,
+            )
 
         birthdate = datetime.date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
@@ -157,7 +161,7 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
         assertContains(response, DISABLED_NIR)
-        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
@@ -214,7 +218,7 @@ class TestEditJobSeekerInfo:
         response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
 
         birthdate = datetime.date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
