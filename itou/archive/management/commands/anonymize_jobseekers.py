@@ -211,7 +211,7 @@ class Command(BaseCommand):
         jobapplications.delete()
 
     @monitor(
-        monitor_slug="anonymize_users",
+        monitor_slug="anonymize_jobseekers",
         monitor_config={
             "schedule": {"type": "crontab", "value": "0 7-20 * * MON-FRI"},
             "checkin_margin": 5,
