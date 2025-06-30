@@ -12,6 +12,7 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.gps.models import FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -89,6 +90,35 @@ def handle_token(model, from_user, to_user):
     Token.objects.filter(user=from_user).update(user=to_user)
 
 
+def handle_follow_up_group_membership(model, from_user, to_user):
+    from_user_memberships = model.objects.filter(user=from_user)
+    updated_pks = []
+    moved_pks = []
+    for from_user_membership in from_user_memberships:
+        if to_user_membership := model.objects.filter(
+            follow_up_group=from_user_membership.follow_up_group_id, member=to_user
+        ).first():
+            updated_pks.append(to_user_membership.pk)
+            to_user_membership.is_referent_certified |= from_user_membership.is_referent_certified
+            to_user_membership.is_active |= from_user_membership.is_active
+            to_user_membership.created_at = min(to_user_membership.created_at, from_user_membership.created_at)
+            to_user_membership.last_contact_at = max(to_user_membership.created_at, from_user_membership.created_at)
+            to_user_membership.is_active |= from_user_membership.is_active
+            to_user_membership.updated_at = timezone.now()
+            to_user_membership.updated_by = to_user_membership.updated_by or from_user_membership.updated_by
+            to_user_membership.save()
+        else:
+            moved_pks.append(from_user_membership.pk)
+            from_user_membership.member = to_user
+            from_user_membership.save()
+    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.user"
+    if updated_pks:
+        logger.info(f"{base_log} updated : {updated_pks}")
+    if moved_pks:
+        logger.info(f"{base_log} moved : {moved_pks}")
+    return len(from_user_memberships)
+
+
 def noop(*args):
     return 0
 
@@ -100,6 +130,7 @@ MODEL_MAPPING = {
     (EmailAddress, "user"): noop,
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
+    (FollowUpGroupMembership, "member"): handle_follow_up_group_membership,
 }
 
 MODEL_REPR_MAPPING = {

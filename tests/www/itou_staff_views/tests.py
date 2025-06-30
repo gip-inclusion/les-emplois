@@ -557,6 +557,27 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
+    def test_merge_followupgroupmemberships(self, client, caplog):
+        employer_1 = EmployerFactory()
+        employer_2 = EmployerFactory()
+        other_employer = EmployerFactory()
+        membership_1 = FollowUpGroupMembershipFactory(member=employer_1)
+        membership_2 = FollowUpGroupMembershipFactory(member=employer_2, follow_up_group=membership_1.follow_up_group)
+
+        with freeze_time() as frozen_now:
+            client.force_login(ItouStaffFactory(is_superuser=True))
+            url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.public_id, employer_2.public_id))
+            response = client.post(url, data={"user_to_keep": "to_user"})
+            assertMessages(response, [])
+            assert response.status_code == 200
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — "
+            f"itou.companies.models.CompanyMembership.user updated : [{membership_1.pk}]",
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
     def test_merge_other_relations(self, client, caplog):
         prescriber_1 = PrescriberFactory()
         prescriber_2 = PrescriberFactory()
