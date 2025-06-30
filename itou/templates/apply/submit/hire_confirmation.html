@@ -28,7 +28,6 @@
 {% block script %}
     {# XXX: should this also be an include ? #}
     {{ block.super }}
-
     <script src="{% static 'js/split_nir.js' %}"></script>
 
     <!-- Needed to use the Datepicker JS widget. -->
@@ -50,7 +49,6 @@
             });
         });
     </script>
-    {{ block.super }}
 
     {% if form_user_address %}
         {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
