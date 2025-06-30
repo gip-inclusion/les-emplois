@@ -1178,11 +1178,6 @@ class TestSuspensionModel:
         )
         job_application_4 = JobApplicationFactory(with_approval=True, hiring_start_at=None, origin=Origin.PE_APPROVAL)
 
-        # TODO: must be checked with PO
-        # - empty hiring start date
-        # - `with_retroactivity_limitation` set to `False`
-        # What should be the expected suspension mimimum start date ?
-
         min_start_at = Suspension.next_min_start_at(job_application_1.approval)
         assert min_start_at == today
 

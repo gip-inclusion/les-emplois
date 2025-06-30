@@ -1269,7 +1269,7 @@ class Suspension(models.Model):
                 )
 
             referent_date = self.created_at.date() if self.pk else None
-            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
+            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date)
             if next_min_start_at and self.start_at < next_min_start_at:
                 raise ValidationError({"start_at": (f"La date de début minimum est : {next_min_start_at:%d/%m/%Y}.")})
 
@@ -1309,7 +1309,6 @@ class Suspension(models.Model):
         approval,
         pk_suspension=None,
         referent_date=None,
-        with_retroactivity_limitation=True,
     ):
         """
         Returns the minimum date on which a suspension can begin.
@@ -1326,16 +1325,13 @@ class Suspension(models.Model):
         if last_old_suspension := approval.last_old_suspension(pk_suspension):
             start_at = last_old_suspension.end_at + relativedelta(days=1)
 
-        if with_retroactivity_limitation:
-            start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
-            # At this point, `start_at` can be None if:
-            # - hiring start date has not been filled in last accepted job application,
-            # - there is no previous suspension for this approval.
-            # Hence a more defensive approach.
-            if not start_at or start_at < start_at_threshold:
-                return start_at_threshold
-
-        # FIXME: at this point start_at can still be None if `with_retroactivity_limitation` is `False`
+        start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
+        # At this point, `start_at` can be None if:
+        # - hiring start date has not been filled in last accepted job application,
+        # - there is no previous suspension for this approval.
+        # Hence a more defensive approach.
+        if not start_at or start_at < start_at_threshold:
+            return start_at_threshold
         return start_at
 
 
