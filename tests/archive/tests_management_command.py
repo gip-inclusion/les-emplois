@@ -778,6 +778,98 @@ class TestAnonymizeJobseekersManagementCommand:
         assert respx_mock.calls.call_count == 1
 
 
+class TestNotifyInactiveProfessionalsManagementCommand:
+    def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
+        EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+        PrescriberFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+        LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_inactive_professionals")
+
+        assert not mailoutbox
+        assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False)
+
+    def test_notify_batch_size(self):
+        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+        factory.create_batch(3, last_login_days_ago=DAYS_OF_INACTIVITY)
+
+        call_command("notify_inactive_professionals", batch_size=2, wet_run=True)
+
+        assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
+        assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
+
+    @pytest.mark.parametrize(
+        "factory_kwargs,expected_notification",
+        [
+            pytest.param({"last_login_days_ago": DAYS_OF_INACTIVITY}, True, id="professional_without_recent_activity"),
+            pytest.param(
+                {"is_active": False, "last_login_days_ago": DAYS_OF_INACTIVITY},
+                True,
+                id="deactivated_professional_without_recent_activity",
+            ),
+            pytest.param(
+                {"last_login_days_ago": DAYS_OF_INACTIVITY - 1}, False, id="professional_soon_without_recent_activity"
+            ),
+            pytest.param({}, False, id="professional_never_logged_in"),
+            pytest.param(
+                {"last_login_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1},
+                False,
+                id="professional_without_recent_activity_already_notified",
+            ),
+        ],
+    )
+    def test_notify_inactive_professionals(
+        self,
+        factory_kwargs,
+        expected_notification,
+        django_capture_on_commit_callbacks,
+        caplog,
+        mailoutbox,
+        snapshot,
+    ):
+        factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
+        user = factory(for_snapshot=True, first_name="Micheline", last_name="Dubois", **factory_kwargs)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_inactive_professionals", wet_run=True)
+
+        updated_user = User.objects.get()
+        assert (
+            updated_user.upcoming_deletion_notified_at is not None
+        ) == expected_notification or user.upcoming_deletion_notified_at is not None
+
+        if expected_notification:
+            assert "Notified inactive professionals without recent activity: 1" in caplog.messages
+
+            if user.is_active:
+                [mail] = mailoutbox
+                assert [user.email] == mail.to
+                assert mail.subject == snapshot(name="inactive_professional_email_subject")
+                fmt_last_login = timezone.localdate(user.last_login).strftime("%d/%m/%Y")
+                fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
+                    "%d/%m/%Y"
+                )
+                body = mail.body.replace(fmt_last_login, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
+                assert body == snapshot(name="inactive_professional_email_body")
+            else:
+                assert not mailoutbox
+
+        else:
+            assert not mailoutbox
+            assert "Notified inactive professionals without recent activity: 0" in caplog.messages
+
+    def test_excluded_users_kind(
+        self,
+    ):
+        JobSeekerFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+        ItouStaffFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
+
+        call_command("notify_inactive_professionals", wet_run=True)
+
+        assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False)
+
+
 class TestAnonymizeProfessionalManagementCommand:
     @pytest.mark.parametrize(
         "suspended,expected_message",
