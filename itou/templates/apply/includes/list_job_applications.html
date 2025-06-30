@@ -78,11 +78,11 @@
 
 {% if request.htmx %}
     {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED or job_applications_list_kind is JobApplicationsListKind.SENT %}
-        {% include "apply/includes/list_job_applications_title.html" %}
+        {% include "apply/includes/list_job_applications_title.html" with title=title request=request only %}
     {% endif %}
-    {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True %}
-    {% include "apply/includes/list_counter.html" %}
-    {% include "apply/includes/job_applications_export_button.html" %}
-    {% include "apply/includes/job_applications_filters/offcanvas_footer.html" %}
-    {% include "apply/includes/list_view_switcher.html" %}
+    {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True display_kind=display_kind filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
+    {% include "apply/includes/list_counter.html" with job_applications_page=job_applications_page request=request only %}
+    {% include "apply/includes/job_applications_export_button.html" with list_exports_url=list_exports_url request=request only %}
+    {% include "apply/includes/job_applications_filters/offcanvas_footer.html" with display_kind=display_kind filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
+    {% include "apply/includes/list_view_switcher.html" with display_kind=display_kind job_applications_list_kind=job_applications_list_kind request=request JobApplicationsListKind=JobApplicationsListKind only %}
 {% endif %}
