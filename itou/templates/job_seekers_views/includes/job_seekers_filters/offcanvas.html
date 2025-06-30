@@ -13,6 +13,6 @@ the viewable backdrop and no filter offcanvas.
         </h4>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
     </div>
-    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_body.html" %}
-    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_footer.html" %}
+    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_body.html" with filters_form=filters_form list_organization=list_organization request=request only %}
+    {% include "job_seekers_views/includes/job_seekers_filters/offcanvas_footer.html" with filters_counter=filters_counter list_organization=list_organization order=order request=request only %}
 </div>
