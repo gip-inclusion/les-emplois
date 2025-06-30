@@ -265,7 +265,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
         "display_refusal_info": False,
         "eligibility_diagnosis": eligibility_diagnosis,
-        "eligibility_diagnosis_by_siae_required": job_application.eligibility_diagnosis_by_siae_required(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
@@ -931,8 +930,6 @@ def delete_prior_action(request, job_application_id, prior_action_id):
             context={
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all(),
-                # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                "eligibility_diagnosis_by_siae_required": False,
                 "geiq_eligibility_diagnosis": (
                     _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
                     if job_application.to_company.kind == CompanyKind.GEIQ
@@ -974,8 +971,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             {
                 "job_application": job_application,
                 "prior_action": prior_action,
-                # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                "eligibility_diagnosis_by_siae_required": False,
                 "add_prior_action_form": None,
                 "with_oob_state_update": False,
             },
@@ -1017,8 +1012,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     # If out-of-band changes are needed
                     "with_oob_state_update": state_update,
                     "transition_logs": job_application.logs.select_related("user").all() if state_update else None,
-                    # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                    "eligibility_diagnosis_by_siae_required": False,
                     "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
                 },
             )

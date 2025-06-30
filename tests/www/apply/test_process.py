@@ -3204,208 +3204,106 @@ class TestProcessTemplates:
     """
 
     @pytest.fixture(autouse=True)
-    def setup_method(self, client):
+    def setup_method(self):
         self.job_application = JobApplicationFactory(eligibility_diagnosis=None)
         self.employer = self.job_application.to_company.members.first()
+        self.url_details = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
-        kwargs = {"job_application_id": self.job_application.pk}
-        self.url_details = reverse("apply:details_for_company", kwargs=kwargs)
-        self.url_process = reverse("apply:process", kwargs=kwargs)
-        self.url_eligibility = reverse("apply:eligibility", kwargs=kwargs)
-        self.url_refuse = reverse("apply:refuse", kwargs=kwargs)
-        self.url_postpone = reverse("apply:postpone", kwargs=kwargs)
-        self.url_accept = reverse("apply:accept", kwargs=kwargs)
-
-    def test_details_template_for_state_new(self, client):
-        """Test actions available when the state is new."""
+    def compare_to_snapshot(self, client, snapshot):
         client.force_login(self.employer)
         response = client.get(self.url_details)
-        # Test template content.
-        assertContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        assert (
+            pretty_indented(parse_response_to_soup(response, ".c-box--action")).replace(
+                str(self.job_application.pk), "[PK of JobApplication]"
+            )
+            == snapshot
+        )
 
-    def test_details_template_for_state_processing(self, client):
-        """Test actions available when the state is processing."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_new(self, client, snapshot):
+        self.compare_to_snapshot(client, snapshot)
+
+    def test_details_template_for_state_processing(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertContains(response, self.url_refuse)
-        assertContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_prior_to_hire(self, client):
-        """Test actions available when the state is prior_to_hire."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_prior_to_hire(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertContains(response, self.url_refuse)
-        assertContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_processing_but_suspended_siae(self, client):
-        """Test actions available when the state is processing but SIAE is suspended"""
+    @freeze_time("2025-06-27")
+    def test_details_template_for_state_processing_but_suspended_siae(self, client, snapshot):
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=self.job_application.to_company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
-        client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertContains(
-            response,
-            (
-                "Vous ne pouvez pas valider les critères d'éligibilité suite aux "
-                "mesures prises dans le cadre du contrôle a posteriori"
-            ),
-        )
-        assertContains(response, self.url_refuse)
-        assertContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_postponed(self, client):
-        """Test actions available when the state is postponed."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_postponed(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_postponed_valid_diagnosis(self, client):
-        """Test actions available when the state is postponed."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_postponed_valid_diagnosis(self, client, snapshot):
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_obsolete(self, client):
-        client.force_login(self.employer)
+    def test_details_template_for_state_obsolete(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
+        self.compare_to_snapshot(client, snapshot)
 
-        response = client.get(self.url_details)
-
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
-
-    def test_details_template_for_state_obsolete_valid_diagnosis(self, client):
-        client.force_login(self.employer)
+    def test_details_template_for_state_obsolete_valid_diagnosis(self, client, snapshot):
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
+        self.compare_to_snapshot(client, snapshot)
 
-        response = client.get(self.url_details)
-
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertContains(response, self.url_accept)
-
-    def test_details_template_for_state_refused(self, client):
-        """Test actions available for other states."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_refused(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_refused_valid_diagnosis(self, client):
-        """Test actions available for other states."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_refused_valid_diagnosis(self, client, snapshot):
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_canceled(self, client):
-        """Test actions available for other states."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_canceled(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_canceled_valid_diagnosis(self, client):
-        """Test actions available for other states."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_canceled_valid_diagnosis(self, client, snapshot):
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
 
-    def test_details_template_for_state_accepted(self, client):
-        """Test actions available for other states."""
-        client.force_login(self.employer)
+    def test_details_template_for_state_accepted(self, client, snapshot):
         self.job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
-        response = client.get(self.url_details)
-        # Test template content.
-        assertNotContains(response, self.url_process)
-        assertNotContains(response, self.url_eligibility)
-        assertNotContains(response, self.url_refuse)
-        assertNotContains(response, self.url_postpone)
-        assertNotContains(response, self.url_accept)
+        self.compare_to_snapshot(client, snapshot)
+
+    def test_geiq_missing_eligibility(self, client, snapshot):
+        self.job_application.to_company.kind = CompanyKind.GEIQ
+        self.job_application.to_company.save()
+        self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
+        self.job_application.save()
+        self.compare_to_snapshot(client, snapshot)
 
 
 class TestProcessTransferJobApplication:
