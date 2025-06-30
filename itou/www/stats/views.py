@@ -289,6 +289,14 @@ def stats_siae_orga_etp(request):
     )
 
 
+def stats_siae_beneficiaries(request):
+    return render_stats_siae(
+        request=request,
+        page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
+        filter_param=mb.ASP_SIAE_FILTER_KEY_FLAVOR3,
+    )
+
+
 def render_stats_cd(request, page_title, *, params=None, extra_context=None):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
