@@ -48,7 +48,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--wet-run",
             action="store_true",
-            help="Perform the actual archiving of users",
+            help="Perform the notification of inactive job seekers",
         )
 
         parser.add_argument(
@@ -56,7 +56,7 @@ class Command(BaseCommand):
             action="store",
             type=int,
             default=BATCH_SIZE,
-            help="Number of users to process in a batch",
+            help="Number of job seekers to process in a batch",
         )
 
     @transaction.atomic
@@ -92,6 +92,6 @@ class Command(BaseCommand):
     def handle(self, *args, wet_run, batch_size, **options):
         self.wet_run = wet_run
         self.batch_size = batch_size
-        self.logger.info("Start notifying inactive users in %s mode", "wet_run" if wet_run else "dry_run")
+        self.logger.info("Start notifying inactive job seekers in %s mode", "wet_run" if wet_run else "dry_run")
 
         self.notify_inactive_jobseekers()

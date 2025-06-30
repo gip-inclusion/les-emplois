@@ -42,7 +42,7 @@ def brevo_api_key_fixture(settings):
     settings.BREVO_API_KEY = "BREVO_API_KEY"
 
 
-class TestNotifyInactiveUsersManagementCommand:
+class TestNotifyInactiveJobseekersManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
         user = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
         with django_capture_on_commit_callbacks(execute=True):
@@ -199,7 +199,7 @@ class TestNotifyInactiveUsersManagementCommand:
             assert not mailoutbox
 
 
-class TestArchiveUsersManagementCommand:
+class TestAnonymizeJobseekersManagementCommand:
     @pytest.fixture(autouse=True)
     def respx_delete_mock(self, respx_mock):
         self.respx_mock = respx_mock.delete(
@@ -211,7 +211,7 @@ class TestArchiveUsersManagementCommand:
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
         call_command("anonymize_users", wet_run=wet_run)
-        assert caplog.messages[0] == snapshot(name="suspend_anonymize_users_command_log")
+        assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
 
     def test_dry_run(self):
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
