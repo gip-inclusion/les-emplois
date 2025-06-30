@@ -63,7 +63,7 @@
                    {% matomo_event "candidature" "clic" "voir_candidature_prescripteur" %}>Voir sa candidature</a>
             {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                 {% if request.current_organization.rdv_solidarites_id %}
-                    {% include "apply/includes/buttons/rdv_insertion_invite.html" with job_application=job_application for_detail=False %}
+                    {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=False only %}
                 {% endif %}
                 <a class="btn btn-outline-primary btn-block w-100 w-md-auto"
                    href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
