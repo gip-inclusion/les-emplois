@@ -1259,7 +1259,8 @@ def nir_modification_request(request, public_id, template_name="job_seekers_view
     is_request_from_proxy = request.user != job_seeker
 
     if request.method == "POST" and form.is_valid():
-        form.save()
+        nir_modification_request = form.save()
+        nir_modification_request.email_nir_modification_request_notification().send()
         messages.success(request, "Demande de régularisation du NIR envoyée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
