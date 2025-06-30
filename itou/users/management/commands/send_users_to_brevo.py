@@ -1,5 +1,4 @@
 import datetime
-import logging
 from zoneinfo import ZoneInfo
 
 from allauth.account.models import EmailAddress
@@ -19,8 +18,6 @@ from itou.users.models import User
 from itou.utils.brevo import BrevoClient, BrevoListID
 from itou.utils.command import BaseCommand
 
-
-logger = logging.getLogger(__name__)
 
 RECENT_DIAGNOSIS_THRESHOLD = datetime.datetime(2025, 4, 1, tzinfo=ZoneInfo("Europe/Paris"))
 
@@ -121,7 +118,7 @@ class Command(BaseCommand):
                 )
             )
         )
-        logger.info("SIAE users count: %d", len(employers))
+        self.logger.info("SIAE users count: %d", len(employers))
         if wet_run:
             client.import_users(employers, BrevoListID.LES_EMPLOIS, employer_serializer)
 
@@ -133,12 +130,12 @@ class Command(BaseCommand):
             organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))
-        logger.info("Prescribers count: %d", len(prescribers))
+        self.logger.info("Prescribers count: %d", len(prescribers))
         if wet_run:
             client.import_users(prescribers, BrevoListID.LES_EMPLOIS, authorized_prescriber_serializer)
 
         orienteurs = list(all_prescribers.exclude(Exists(authorized_prescriber_memberships)))
-        logger.info("Orienteurs count: %d", len(orienteurs))
+        self.logger.info("Orienteurs count: %d", len(orienteurs))
         if wet_run:
             client.import_users(orienteurs, BrevoListID.LES_EMPLOIS, prescriber_serializer)
 
@@ -171,12 +168,12 @@ class Command(BaseCommand):
         )
         a_month_ago = midnight_today - datetime.timedelta(days=30)
         recently_joined = job_seekers.filter(date_joined__gte=a_month_ago)
-        logger.info("Job seekers count: %d", len(recently_joined))
+        self.logger.info("Job seekers count: %d", len(recently_joined))
         if wet_run:
             client.import_users(recently_joined, BrevoListID.CANDIDATS, job_seeker_serializer)
 
         stalled_autonomous_job_seekers = job_seekers.filter(jobseeker_profile__is_stalled=True)
-        logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
+        self.logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
         if wet_run:
             client.import_users(
                 stalled_autonomous_job_seekers,
@@ -201,7 +198,7 @@ class Command(BaseCommand):
                 )
             ),
         )
-        logger.info(
+        self.logger.info(
             "Autonomous job seekers with IAE diag and no accepted applications count: %d",
             len(autonomous_job_seekers_with_diagnosis_and_no_accepted_application),
         )

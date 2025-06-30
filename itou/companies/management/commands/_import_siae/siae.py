@@ -6,8 +6,6 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
 
-import logging
-
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -15,9 +13,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
-
-
-logger = logging.getLogger(__name__)
 
 
 def build_siae(row, kind, *, is_active):

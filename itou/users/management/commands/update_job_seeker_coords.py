@@ -19,15 +19,10 @@ get the best possible geolocation for our users.
 
 """
 
-import logging
-
 from itou.common_apps.address.models import geolocate_qs
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

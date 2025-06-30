@@ -1,5 +1,3 @@
-import logging
-
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
@@ -12,8 +10,6 @@ from itou.users.notifications import InactiveUser
 from itou.utils.command import BaseCommand
 from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
-
-logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 200
 
@@ -76,7 +72,7 @@ class Command(BaseCommand):
                 ).send()
             User.objects.filter(id__in=[user.id for user in users]).update(upcoming_deletion_notified_at=now)
 
-        logger.info("Notified inactive job seekers without recent activity: %s", len(users))
+        self.logger.info("Notified inactive job seekers without recent activity: %s", len(users))
 
     @monitor(
         monitor_slug="notify_inactive_jobseekers",
