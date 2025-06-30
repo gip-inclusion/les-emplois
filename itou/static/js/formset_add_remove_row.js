@@ -25,6 +25,7 @@
     ```
     Working example: itou.templates.invitations_views.create.html
 *********************************************/
+"use strict";
 function updateElementIndex(el, prefix, ndx) {
   const id_regex = new RegExp(`(${prefix}-\\d+)`);
   const replacement = `${prefix}-${ndx}`;

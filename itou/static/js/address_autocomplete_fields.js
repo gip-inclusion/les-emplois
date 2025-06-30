@@ -1,3 +1,4 @@
+"use strict";
 htmx.onLoad(function () {
   let autocompleteNbErrors = 0;
   let addressSearchInput = $("#id_address_for_autocomplete");

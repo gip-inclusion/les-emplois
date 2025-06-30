@@ -1,3 +1,4 @@
+"use strict";
 $(document).ready(function(){
     $('.postLogin').on('click', function(){
         const actionUrl = $(this).data('action-url');

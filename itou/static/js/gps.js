@@ -1,3 +1,4 @@
+"use strict";
 htmx.onLoad((target) => {
     // Verify this override when Select2 is updated.
     // Overriding the noResults text is extraordinarily complicated.

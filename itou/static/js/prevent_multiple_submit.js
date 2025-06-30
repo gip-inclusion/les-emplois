@@ -1,3 +1,4 @@
+"use strict";
 htmx.onLoad((target) => {
 
   // Prevent multiple submit client side.

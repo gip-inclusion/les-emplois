@@ -1,3 +1,4 @@
+"use strict";
 htmx.onLoad((target) => {
   function querySelectorAllIncludingTarget(target, selector) {
     const results = Array.from(target.querySelectorAll(selector))
