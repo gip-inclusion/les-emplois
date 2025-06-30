@@ -222,7 +222,7 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *args, wet_run, batch_size, **options):
-        if settings.SUSPEND_ANONYMIZE_USERS:
+        if settings.SUSPEND_ANONYMIZE_JOBSEEKERS:
             self.logger.info("Anonymizing users is suspended, exiting command")
             return
 
