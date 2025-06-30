@@ -28,8 +28,6 @@
 {% block script %}
     {{ block.super }}
 
-    <script src="{% static 'js/split_nir.js' %}"></script>
-
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media.js }}
     {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
