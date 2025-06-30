@@ -50,6 +50,7 @@ from itou.users.enums import (
 from itou.users.notifications import JobSeekerCreatedByProxyNotification, JobSeekerCreatedByProxyNotificationForGPS
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
+from itou.utils.emails import get_email_message
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -1514,6 +1515,14 @@ class NirModificationRequest(models.Model):
 
     def __str__(self):
         return f"Demande de régularisation NIR pour le candidat #{self.jobseeker_profile.pk}"
+
+    def email_nir_modification_request_notification(self):
+        to = [settings.ITOU_EMAIL_CONTACT]
+        url = get_absolute_url(reverse("admin:users_nirmodificationrequest_change", args=[self.pk]))
+        context = {"pk": self.pk, "request_url": url}
+        subject = "users/emails/nir_modification_request_subject.txt"
+        body = "users/emails/nir_modification_request_body.txt"
+        return get_email_message(to, context, subject, body)
 
 
 class IdentityCertificationManager(models.Manager):
