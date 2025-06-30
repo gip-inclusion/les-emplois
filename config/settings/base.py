@@ -856,8 +856,9 @@ REQUIRE_OTP_FOR_STAFF = os.getenv("REQUIRE_OTP_FOR_STAFF", "True") == "True"
 
 # anonymize_users
 # ------------------------------------------------------------------------------
-SUSPEND_ANONYMIZE_USERS = os.getenv("SUSPEND_ANONYMIZE_USERS", "False") == "True"
+SUSPEND_ANONYMIZE_JOBSEEKERS = os.getenv("SUSPEND_ANONYMIZE_JOBSEEKERS", "False") == "True"
 SUSPEND_ANONYMIZE_PROFESSIONALS = os.getenv("SUSPEND_ANONYMIZE_PROFESSIONALS", "False") == "True"
+
 
 # Mainenance mode
 # ------------------------------------------------------------------------------

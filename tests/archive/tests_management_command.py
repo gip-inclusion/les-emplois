@@ -209,7 +209,7 @@ class TestArchiveUsersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
-        settings.SUSPEND_ANONYMIZE_USERS = suspended
+        settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
         call_command("anonymize_users", wet_run=wet_run)
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_users_command_log")
 
