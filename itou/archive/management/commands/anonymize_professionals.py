@@ -1,5 +1,3 @@
-import logging
-
 from django.conf import settings
 from django.db.models import F
 from sentry_sdk.crons import monitor
@@ -7,8 +5,6 @@ from sentry_sdk.crons import monitor
 from itou.users.models import User, UserKind
 from itou.utils.command import BaseCommand
 
-
-logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 100
 

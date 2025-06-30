@@ -1,5 +1,4 @@
 import datetime
-import logging
 
 from django.conf import settings
 from django.db import transaction
@@ -20,8 +19,6 @@ from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand
 from itou.utils.constants import GRACE_PERIOD
 
-
-logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 100
 

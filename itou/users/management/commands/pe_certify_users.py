@@ -5,7 +5,6 @@ if needed.
 """
 
 import datetime
-import logging
 
 import tenacity
 from django.db.models import F, Q
@@ -21,9 +20,6 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRateLimitException,
 )
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 RETRY_DELAY = datetime.timedelta(days=7)

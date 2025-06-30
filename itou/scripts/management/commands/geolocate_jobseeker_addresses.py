@@ -1,5 +1,4 @@
 import csv
-import logging
 import os.path
 from io import StringIO
 
@@ -27,9 +26,6 @@ MIN_SCORE = 0.0
 # - created in settings.EXPORT_DIR
 # - imported from settings.IMPORT_DIR
 DEFAULT_FILENAME = "job_seeker_geocoding_data.csv"
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -132,7 +128,7 @@ class Command(BaseCommand):
             for result in results:
                 pk = result.get("id")
                 if not pk:
-                    logger.error("Could not find user id in result")
+                    self.logger.error("Could not find user id in result")
                     errors += 1
                     continue
 
@@ -144,7 +140,7 @@ class Command(BaseCommand):
                     latitude = float(result["latitude"])
                     longitude = float(result["longitude"])
                 except ValueError as value_error:
-                    logger.error(f"Error in coords fields: {value_error}")
+                    self.logger.error(f"Error in coords fields: {value_error}")
                     errors += 1
                     continue
                 else:
@@ -155,7 +151,7 @@ class Command(BaseCommand):
                             try:
                                 user.save(update_fields=["geocoding_score", "coords"])
                             except ValueError as value_error:
-                                logger.error(f"Could not update user {user}: {value_error}")
+                                self.logger.error(f"Could not update user {user}: {value_error}")
                                 errors += 1
                             else:
                                 updated += 1

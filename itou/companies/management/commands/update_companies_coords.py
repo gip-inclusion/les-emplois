@@ -19,14 +19,9 @@ to edit the addresses manually since our ASP import script does not update the
 address of a structure, only stores it upon its creation.
 """
 
-import logging
-
 from itou.common_apps.address.models import geolocate_qs
 from itou.companies.models import Company
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

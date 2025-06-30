@@ -14,8 +14,6 @@ I think it's fair to agree that for the 0.5% of those pathologic cities
 that we can ask the users to fix it.
 """
 
-import logging
-
 from django.core.management.base import CommandError
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, resolve_insee_city
@@ -24,9 +22,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

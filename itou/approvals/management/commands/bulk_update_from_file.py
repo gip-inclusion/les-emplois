@@ -1,5 +1,3 @@
-import logging
-
 import pandas as pd
 from django.conf import settings
 from django.db import transaction
@@ -11,9 +9,6 @@ from itou.employee_record.enums import Status
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

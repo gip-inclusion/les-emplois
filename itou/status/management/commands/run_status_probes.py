@@ -1,13 +1,8 @@
-import logging
-
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.status import models, probes
 from itou.utils.command import BaseCommand
-
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -40,10 +35,10 @@ class Command(BaseCommand):
             try:
                 success, info = probe().check()
             except Exception as e:
-                logger.exception("Probe %r failed", probe.name)
+                self.logger.exception("Probe %r failed", probe.name)
                 success, info = False, str(e)
             else:
-                logger.info("Probe %r succeeded", probe.name)
+                self.logger.info("Probe %r succeeded", probe.name)
 
             status, _ = models.ProbeStatus.objects.get_or_create(name=probe.name)
             if success:
