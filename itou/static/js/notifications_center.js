@@ -1,3 +1,4 @@
+"use strict";
 htmx.onLoad((target) => {
   const allNotifications = document.getElementById("id_notifications-all");
   const form = allNotifications.closest("form");

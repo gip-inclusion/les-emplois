@@ -7,6 +7,7 @@
   <script src='{% static "js/nps_popup.js" %}' data-delaypopup="true" data-userkind="employeur" data-page="liste-candidatures"></script>
 
 ********************************************************************/
+"use strict";
 
 const data = document.currentScript.dataset;
 

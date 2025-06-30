@@ -1,3 +1,4 @@
+"use strict";
 
 let textareas = document.querySelectorAll(".easymde-box");
 

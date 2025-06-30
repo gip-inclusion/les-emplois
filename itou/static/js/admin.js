@@ -1,3 +1,4 @@
+"use strict";
 (function() {
   document.addEventListener("DOMContentLoaded", function(event) {
     function handlePaste(event) {
