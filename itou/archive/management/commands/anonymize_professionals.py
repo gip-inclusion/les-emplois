@@ -46,7 +46,7 @@ class Command(BaseCommand):
         self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
 
     @monitor(
-        monitor_slug="notify_archive_users",
+        monitor_slug="anonymize_professionals",
         monitor_config={
             "schedule": {"type": "crontab", "value": "0 7-20 * * MON-FRI"},
             "checkin_margin": 5,
