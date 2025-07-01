@@ -106,22 +106,6 @@ ASSET_INFOS = {
             ],
         },
     },
-    "htmx.org": {
-        "download": {
-            "url": "https://registry.npmjs.org/htmx.org/-/htmx.org-2.0.5.tgz",
-            "sha256": "a0b6aa269b34623e3730ed0eed24c0688c1123c1d147e69397beb777268d6261",
-        },
-        "extract": {
-            "origin": "package",
-            "destination": "vendor/htmx",
-            "files": [
-                "LICENSE",
-                ("dist/htmx.min.js", "htmx.min.js"),
-                ("dist/ext/debug.js", "ext/debug.js"),
-                ("dist/ext/event-header.js", "ext/event-header.js"),
-            ],
-        },
-    },
     "jquery": {
         "download": {
             "url": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",

@@ -118,11 +118,7 @@
         <script src="{% static "vendor/tiny-slider/min/tiny-slider.js" %}"></script>
         <script src="{% static "vendor/intro-js/intro.min.js" %}"></script>
         <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
-        <script src="{% static "vendor/htmx/htmx.min.js" %}"></script>
-        {% if debug|default:False %}
-            <script src="{% static "vendor/htmx/ext/debug.js" %}"></script>
-            <script src="{% static "vendor/htmx/ext/event-header.js" %}"></script>
-        {% endif %}
+        <script src="{% static "django_htmx/htmx.min.js" %}"></script>
         <script src="{% static "js/easymde_config.js" %}"></script>
         <script src="{% static "js/htmx_handlers.js" %}"></script>
         <script src="{% static "js/modal_control.js" %}"></script>
