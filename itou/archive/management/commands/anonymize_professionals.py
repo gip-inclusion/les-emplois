@@ -111,10 +111,6 @@ class Command(BaseCommand):
             )
         )
 
-    # def get_users_to_anonymize_without_deletion(self, users):
-    #    # we do not want to anonymize users that have no email set, as they are already anonymized
-    #    return list(User.objects.filter(id__in=[user.id for user in users], email__isnull=False))
-
     def make_anonymized_professional(self, user):
         memberships = [
             *user.companymembership_set.all(),
