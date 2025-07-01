@@ -16,7 +16,7 @@ class TestExpireOldEmails:
         with freeze_time(now - timedelta(days=61)):
             after_cutoff = Email.objects.create(to=["recent@test.local"], subject="Recent stuff", body_text="Recent")
         call_command("delete_old_emails")
-        assert caplog.messages[0] == "Deleted 1 email"
+        assert caplog.messages[1] == "Deleted 1 email"
         assertQuerySetEqual(Email.objects.all(), [after_cutoff, old])
 
     def test_wet_run(self, caplog):

@@ -412,6 +412,7 @@
 # ---
 # name: test_pe_certify_users_dry_run
   list([
+    'Command launched with wet_run=False',
     'about to resolve first_name and last_name for count=1 users',
     'only count=1 users have the necessary data to be resolved',
     'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
@@ -422,6 +423,7 @@
     'count=1 identity certifications recorded.',
     'count=0 users could not be certified.',
     'count=0 users have been swapped',
+    'Setting transaction to be rollback as wet_run=False',
   ])
 # ---
 # name: test_pe_certify_users_with_swap
