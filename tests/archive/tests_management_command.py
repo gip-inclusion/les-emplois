@@ -779,11 +779,17 @@ class TestAnonymizeJobseekersManagementCommand:
 
 
 class TestAnonymizeProfessionalManagementCommand:
-    @pytest.mark.parametrize("suspended", [True, False])
-    def test_suspend_command_setting(self, settings, suspended, caplog, snapshot):
+    @pytest.mark.parametrize(
+        "suspended,expected_message",
+        [
+            (True, "Anonymizing professionals is suspended, exiting command"),
+            (False, "Start anonymizing professionals in wet_run mode"),
+        ],
+    )
+    def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
-        assert caplog.messages[0] == snapshot(name="suspend_anonymize_professionals_command_log")
+        assert expected_message in caplog.messages
 
     @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
     def test_reset_notified_professional_dry_run(self, factory):
