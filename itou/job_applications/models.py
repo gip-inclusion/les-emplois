@@ -508,7 +508,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     sender_kind = models.CharField(
         verbose_name="type de l'émetteur",
-        max_length=10,
         choices=SenderKind.choices,
         default=SenderKind.PRESCRIBER,
     )
