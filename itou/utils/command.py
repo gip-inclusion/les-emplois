@@ -12,7 +12,7 @@ from django.db import connection, transaction
 
 local = Local()
 
-CommandInfo = collections.namedtuple("CommandInfo", ["run_uid", "name"])
+CommandInfo = collections.namedtuple("CommandInfo", ["run_uid", "name", "wet_run"])
 
 
 def get_current_command_info():
@@ -47,15 +47,16 @@ def _command_duration_logger(command):
 
 
 @contextlib.contextmanager
-def _command_info_manager(command):
+def _command_info_manager(command, *, wet_run=None):
     command_info_before = get_current_command_info()
-    if command_info_before is None:
-        local.command_info = CommandInfo(str(command.run_uid), command.__class__.__module__)
+    local.command_info = CommandInfo(str(command.run_uid), command.__class__.__module__, wet_run)
     try:
         yield
     finally:
         if command_info_before is None:
             del local.command_info
+        else:
+            local.command_info = command_info_before
 
 
 class LoggedCommandMixin:
@@ -91,11 +92,18 @@ def dry_runnable(func):
         if wet_run is None:
             raise RuntimeError('No "wet_run" argument was given')
 
-        with transaction.atomic():
+        command = args[0] if args and args[0] and isinstance(args[0], LoggedCommandMixin) else None
+        command_info = _command_info_manager(args[0], wet_run=wet_run) if command else contextlib.nullcontext()
+
+        with transaction.atomic(), command_info:
+            if not wet_run and command:
+                command.logger.info("Command launched with wet_run=%s", wet_run)
             func(*args, **kwargs)
             if not wet_run:
                 with connection.cursor() as cursor:
                     cursor.execute("SET CONSTRAINTS ALL IMMEDIATE;")
                 transaction.set_rollback(True)
+                if command:
+                    command.logger.info("Setting transaction to be rollback as wet_run=%s", wet_run)
 
     return wrapper

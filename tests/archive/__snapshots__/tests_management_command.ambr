@@ -316,10 +316,10 @@
   ])
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
-  'Start anonymizing job seekers'
+  'Command launched with wet_run=False'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_jobseekers_command_log]
-  'Anonymizing job seekers is suspended, exiting command'
+  'Command launched with wet_run=False'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_jobseekers_command_log]
   'Start anonymizing job seekers'
