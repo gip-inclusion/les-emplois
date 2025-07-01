@@ -339,7 +339,7 @@ class User(AbstractUser, AddressMixin):
     )
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
-    kind = models.CharField(max_length=20, verbose_name="type", choices=UserKind.choices, blank=False)
+    kind = models.CharField(verbose_name="type", choices=UserKind.choices, blank=False)
 
     identity_provider = models.CharField(
         max_length=20,
