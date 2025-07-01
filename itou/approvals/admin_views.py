@@ -25,7 +25,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.apis import enums as api_enums
 from itou.utils.emails import get_email_text_template
-from itou.utils.urls import add_url_params
+from itou.utils.urls import add_url_params, get_absolute_url
 
 
 def manually_add_approval(
@@ -140,7 +140,14 @@ def manually_refuse_approval(
         "approvals/email/refuse_manually_subject.txt", {"job_application": job_application}
     )
     email_body_template = get_email_text_template(
-        "approvals/email/refuse_manually_body.txt", {"job_application": job_application}
+        "approvals/email/refuse_manually_body.txt",
+        {
+            "job_application": job_application,
+            "job_application_url": get_absolute_url(
+                reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+            ),
+            "search_url": get_absolute_url(reverse("search:prescribers_home")),
+        },
     )
 
     context = {

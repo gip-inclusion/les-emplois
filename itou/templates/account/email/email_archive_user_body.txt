@@ -9,5 +9,5 @@
 Bonjour {{ user.get_full_name }},
 Le {{ user.upcoming_deletion_notified_at|date:"d/m/Y" }}, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
 A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
-En cas de besoin, vous pouvez toujours vous réinscrire sur https://emplois.inclusion.beta.gouv.fr/
+En cas de besoin, vous pouvez toujours vous réinscrire sur {{ base_url }}
 {% endblock body %}
