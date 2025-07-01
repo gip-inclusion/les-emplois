@@ -78,10 +78,10 @@
   <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'postponed', 'refusal_reason': '', 'had_been_transferred': True, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
-  'Start anonymizing job seekers'
+  'Command launched with wet_run=False'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_jobseekers_command_log]
-  'Anonymizing job seekers is suspended, exiting command'
+  'Command launched with wet_run=False'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_jobseekers_command_log]
   'Start anonymizing job seekers'

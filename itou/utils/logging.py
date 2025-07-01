@@ -46,6 +46,7 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
         if (command_info := get_current_command_info()) is not None:
             log_entry_dict["command.run_uid"] = command_info.run_uid
             log_entry_dict["command.name"] = command_info.name
+            log_entry_dict["command.wet_run"] = command_info.wet_run
         return log_entry_dict
 
 

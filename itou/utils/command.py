@@ -15,14 +15,11 @@ from itou.utils import triggers
 
 local = Local()
 
-CommandInfo = collections.namedtuple("CommandInfo", ["run_uid", "name"])
+CommandInfo = collections.namedtuple("CommandInfo", ["run_uid", "name", "wet_run"])
 
 
 def get_current_command_info():
-    try:
-        return local.command_info
-    except AttributeError:
-        return None
+    return getattr(local, "command_info", None)
 
 
 def _log_command_result(command, duration_in_ns, result):
@@ -50,28 +47,26 @@ def _command_duration_logger(command):
 
 
 @contextlib.contextmanager
-def _command_info_manager(command):
+def _command_info_manager(command, *, wet_run=None):
     command_info_before = get_current_command_info()
-    if command_info_before is None:
-        local.command_info = CommandInfo(str(command.run_uid), command.__class__.__module__)
+    run_uid = command_info_before.run_uid if command_info_before else str(uuid.uuid4())
+    local.command_info = CommandInfo(run_uid, command.__class__.__module__, wet_run)
     try:
-        yield
+        yield local.command_info
     finally:
-        if command_info_before is None:
-            del local.command_info
+        local.command_info = command_info_before
 
 
 class LoggedCommandMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.run_uid = uuid.uuid4()
         self.logger = logging.getLogger(self.__class__.__module__)
 
     def execute(self, *args, **kwargs):
         with contextlib.ExitStack() as stack:
-            stack.enter_context(_command_info_manager(self))
+            command_info = stack.enter_context(_command_info_manager(self, wet_run=kwargs.get("wet_run")))
             stack.enter_context(_command_duration_logger(self))
-            stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=str(self.run_uid)))
+            stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=command_info.run_uid))
             try:
                 return super().execute(*args, **kwargs)
             except Exception:
@@ -97,11 +92,19 @@ def dry_runnable(func):
         if wet_run is None:
             raise RuntimeError('No "wet_run" argument was given')
 
+        logger = (
+            args[0].logger
+            if args and args[0] and isinstance(args[0], LoggedCommandMixin)
+            else logging.getLogger(func.__module__)
+        )
         with transaction.atomic():
+            if not wet_run:
+                logger.info("Command launched with wet_run=%s", wet_run)
             func(*args, **kwargs)
             if not wet_run:
                 with connection.cursor() as cursor:
                     cursor.execute("SET CONSTRAINTS ALL IMMEDIATE;")
                 transaction.set_rollback(True)
+                logger.info("Setting transaction to be rollback as wet_run=%s", wet_run)
 
     return wrapper
