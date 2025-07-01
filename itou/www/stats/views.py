@@ -753,7 +753,7 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
         for organization in (
             PrescriberOrganization.objects.with_has_active_members()
             # Only authorized prescriber organizations
-            .filter(is_authorized=True, authorization_status=PrescriberAuthorizationStatus.VALIDATED)
+            .filter(authorization_status=PrescriberAuthorizationStatus.VALIDATED)
             # Mimic `can_view_stats_ph()`
             .filter(has_active_members=True, kind__in=utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
             # Limit to the selected department
