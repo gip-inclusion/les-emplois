@@ -822,7 +822,7 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
             self.eligibility_diagnosis.job_seeker = self.job_seeker
             self.eligibility_diagnosis.criteria_display = iae_criteria_for_display(self.eligibility_diagnosis)
 
-        context["expired_eligibility_diagnosis"] = None  # XXX: should we search for an expired diagnosis here ?
+        context["expired_eligibility_diagnosis"] = None
         return context
 
 
