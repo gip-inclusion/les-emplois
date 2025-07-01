@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                     ("prescriber", "Prescripteur"),
                     ("employer", "Employeur"),
                 ],
-                default=("prescriber",),
                 verbose_name="type de l'émetteur",
             ),
         ),

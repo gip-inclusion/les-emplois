@@ -40,7 +40,7 @@ from itou.job_applications.enums import (
 from itou.job_applications.export import JOB_APPLICATION_XSLX_FORMAT, _resolve_title, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.users.enums import LackOfPoleEmploiId, Title
+from itou.users.enums import LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -60,7 +60,12 @@ from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import excel_date_format, get_rows_from_streaming_response
 
 
@@ -218,6 +223,30 @@ def test_sender_jobseeker_constraint(factory, validation_should_pass):
     else:
         with pytest.raises(IntegrityError, match="job_seeker_sender_coherence"):
             factory()
+
+
+@pytest.mark.parametrize(
+    "job_application_factory",
+    [
+        JobApplicationSentByCompanyFactory,
+        JobApplicationSentByPrescriberFactory,
+        JobApplicationSentByJobSeekerFactory,
+    ],
+)
+def test_sender_kind_of_job_application(job_application_factory):
+    # sender_kind is equal to the sender's kind
+    job_application = job_application_factory()
+    job_application.clean()
+
+    # sender_kind is different from the sender's kind
+    job_application.sender_kind = random.choice([kind for kind in UserKind if kind != job_application.sender.kind])
+    with pytest.raises(ValidationError):
+        job_application.clean()
+
+    # sender_kind and sender are None
+    job_application.sender_kind = None
+    job_application.sender = None
+    job_application.clean()
 
 
 def test_can_be_cancelled():
