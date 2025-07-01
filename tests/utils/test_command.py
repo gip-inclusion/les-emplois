@@ -1,9 +1,12 @@
+
 import pytest
 from django.db import IntegrityError
 
 from itou.users.models import User
 from itou.utils.command import dry_runnable
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import (
+    JobSeekerFactory,
+)
 
 
 def test_dry_runnable_check_constraints():
