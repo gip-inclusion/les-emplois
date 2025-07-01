@@ -128,8 +128,8 @@ def test_cellar_does_not_support_checksum_validation():
 
 def test_copy(pdf_file):
     key = "resume/11111111-1111-1111-1111-111111111111.pdf"
-    default_storage.save(key, pdf_file)
     existing_file = FileFactory(key=key)
+    default_storage.save(existing_file.key, pdf_file)
 
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
