@@ -3002,7 +3002,18 @@ class TestDirectHireFullProcess:
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(
+            response,
+            f"""
+            <a href="{check_infos_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}">
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
         hiring_start_at = timezone.localdate()
         post_data = {
@@ -3158,7 +3169,18 @@ class TestDirectHireFullProcess:
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(
+            response,
+            f"""
+            <a href="{check_infos_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}">
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
         hiring_start_at = timezone.localdate()
         post_data = {
