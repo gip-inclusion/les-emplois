@@ -822,13 +822,7 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
             self.eligibility_diagnosis.job_seeker = self.job_seeker
             self.eligibility_diagnosis.criteria_display = iae_criteria_for_display(self.eligibility_diagnosis)
 
-        context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.job_seeker)
-        context["is_subject_to_eligibility_rules"] = self.company.is_subject_to_eligibility_rules
-        context["geiq_eligibility_diagnosis"] = self.geiq_eligibility_diagnosis
-        context["eligibility_diagnosis"] = self.eligibility_diagnosis
         context["expired_eligibility_diagnosis"] = None  # XXX: should we search for an expired diagnosis here ?
-        context["is_subject_to_geiq_eligibility_rules"] = self.company.kind == CompanyKind.GEIQ
-
         return context
 
 
