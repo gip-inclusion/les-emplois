@@ -25,11 +25,10 @@ class File(models.Model):
 
     def copy(self):
         """Return a new File with a copy of the file on the storage"""
-
-        new_key = self.anonymized_filename(self.key)
+        new_file = self.__class__.objects.create(key=self.anonymized_filename(self.key))
         with default_storage.open(self.key) as file:
-            default_storage.save(new_key, file)
-        return self.__class__.objects.create(key=new_key)
+            default_storage.save(new_file.key, file)
+        return new_file
 
     @staticmethod
     def anonymized_filename(filename):
