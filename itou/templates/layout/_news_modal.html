@@ -18,7 +18,7 @@
                 </div>
                 {% for item in active_campaign_announce_items %}
                     <h6>{{ forloop.counter }}. {{ item.title }}</h6>
-                    <p>{{ item.description }}</p>
+                    <p>{{ item.description|linebreaksbr }}</p>
                 {% endfor %}
             </div>
             <div class="modal-footer">
