@@ -10,6 +10,6 @@ Une nouvelle organisation de prescripteur a été créée. L'habilitation de cet
 - ID : {{ organization.id }}
 - Type sélectionné par l’utilisateur : {{ organization.get_kind_display }}
 
-{{ itou_protocol }}://{{ itou_fqdn }}{% url 'admin:prescribers_prescriberorganization_change' organization.id %}
+{{ admin_url }}
 
 {% endblock body %}

@@ -324,7 +324,12 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         => prescriber organization authorization must be validated
         """
         to = [settings.ITOU_EMAIL_CONTACT]
-        context = {"organization": self}
+        context = {
+            "organization": self,
+            "admin_url": get_absolute_url(
+                reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": self.pk})
+            ),
+        }
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)

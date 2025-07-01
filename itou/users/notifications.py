@@ -2,6 +2,7 @@ from django.conf import settings
 
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, PrescriberOrEmployerOrLaborInspectorNotification
+from itou.utils.urls import get_absolute_url
 
 
 @notifications_registry.register
@@ -44,6 +45,11 @@ class InactiveUser(EmailNotification):
     body_template = "account/email/email_inactive_user_body.txt"
     can_be_disabled = False
 
+    def get_context(self):
+        context = super().get_context()
+        context["base_url"] = get_absolute_url()
+        return context
+
 
 @notifications_registry.register
 class ArchiveUser(EmailNotification):
@@ -52,3 +58,8 @@ class ArchiveUser(EmailNotification):
     subject_template = "account/email/email_archive_user_subject.txt"
     body_template = "account/email/email_archive_user_body.txt"
     can_be_disabled = False
+
+    def get_context(self):
+        context = super().get_context()
+        context["base_url"] = get_absolute_url()
+        return context

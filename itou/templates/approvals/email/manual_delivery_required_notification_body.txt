@@ -22,6 +22,6 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candid
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
 Délivrer un PASS IAE dans l'admin :
-{{ itou_protocol }}://{{ itou_fqdn }}{{ admin_manually_add_approval_url }}
+{{ admin_manually_add_approval_url }}
 
 {% endblock body %}

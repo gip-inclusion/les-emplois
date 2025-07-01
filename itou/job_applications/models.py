@@ -1268,8 +1268,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "job_application": self,
-            "admin_manually_add_approval_url": reverse(
-                "admin:approvals_approval_manually_add_approval", args=[self.pk]
+            "admin_manually_add_approval_url": get_absolute_url(
+                reverse("admin:approvals_approval_manually_add_approval", args=[self.pk])
             ),
         }
         if accepted_by:
@@ -1283,7 +1283,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.accepted_by:
             raise RuntimeError("Unable to determine the recipient email address.")
         to = [self.accepted_by.email]
-        context = {"job_application": self}
+        context = {
+            "job_application": self,
+            "job_application_url": get_absolute_url(
+                reverse("apply:details_for_company", kwargs={"job_application_id": self.pk})
+            ),
+            "search_url": get_absolute_url(reverse("search:prescribers_home")),
+        }
         subject = "approvals/email/refuse_manually_subject.txt"
         body = "approvals/email/refuse_manually_body.txt"
         return get_email_message(to, context, subject, body)

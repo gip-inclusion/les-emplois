@@ -7,7 +7,7 @@ from django.utils.http import urlencode
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pe_connect.constants import PE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.pro_connect.constants import PRO_CONNECT_SESSION_KEY
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 
 
 class UserAdapter(DefaultAccountAdapter):
@@ -105,4 +105,6 @@ class UserAdapter(DefaultAccountAdapter):
         context["itou_environment"] = settings.ITOU_ENVIRONMENT
         context["itou_protocol"] = settings.ITOU_PROTOCOL
         context["itou_fqdn"] = settings.ITOU_FQDN
+        context["base_url"] = get_absolute_url()
+        context["signup_url"] = get_absolute_url(reverse("signup:choose_user_kind"))
         super().send_mail(template_prefix, email, context)
