@@ -1183,7 +1183,7 @@
 # ---
 # name: test_job_application_tab[job seeker job applications view with sent job applications]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1294,13 +1294,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -3689,7 +3682,7 @@
 # ---
 # name: test_with_approval[SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -3800,13 +3793,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

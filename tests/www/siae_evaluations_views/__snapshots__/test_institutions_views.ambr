@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestInstitutionEvaluatedJobApplicationView.test_num_queries_in_view
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -101,13 +101,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -416,7 +409,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeDetailView.test_num_queries_in_view
   dict({
-    'num_queries': 15,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -516,13 +509,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -885,7 +871,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_num_queries
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -985,13 +971,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1481,7 +1460,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1581,13 +1560,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1826,7 +1798,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep2.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1926,13 +1898,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2173,7 +2138,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2273,13 +2238,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

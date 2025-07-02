@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -407,13 +407,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1111,7 +1104,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as job_seeker]
   dict({
-    'num_queries': 12,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -1171,13 +1164,6 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1702,7 +1688,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1813,13 +1799,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -2647,7 +2626,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -2811,13 +2790,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -3516,7 +3488,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as job_seeker]
   dict({
-    'num_queries': 12,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -3576,13 +3548,6 @@
           WHERE "users_user"."id" = %s
           LIMIT 21
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -4107,7 +4072,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -4218,13 +4183,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

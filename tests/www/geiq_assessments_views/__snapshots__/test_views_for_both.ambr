@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAssessmentContractsExportView.test_export[SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -165,13 +165,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -473,7 +466,7 @@
 # ---
 # name: TestAssessmentContractsListAndToggle.test_access_as_geiq[SQL queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -637,13 +630,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1383,7 +1369,7 @@
 # ---
 # name: TestAssessmentContractsListAndToggle.test_access_as_institution[SQL queries]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -1483,13 +1469,6 @@
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY "institutions_institutionmembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

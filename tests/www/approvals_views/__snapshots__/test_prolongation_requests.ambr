@@ -734,7 +734,7 @@
 # ---
 # name: test_empty_list_view[SQL queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -845,13 +845,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([
@@ -1080,7 +1073,7 @@
 # ---
 # name: test_list_view[SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -1191,13 +1184,6 @@
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
       dict({
         'origin': list([

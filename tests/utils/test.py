@@ -31,7 +31,7 @@ from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
-BASE_NUM_QUERIES = 3
+BASE_NUM_QUERIES = 2
 
 
 # Used to find the session namespace by elimination
