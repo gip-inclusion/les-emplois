@@ -407,6 +407,7 @@ def test_step_2_without_session(client):
 
 
 @freeze_time()
+@pytest.mark.usefixtures("temporary_bucket")
 def test_step_3(client, snapshot, pdf_file):
     job_application = JobApplicationFactory(
         state=JobApplicationState.REFUSED,
@@ -458,6 +459,7 @@ def test_step_3(client, snapshot, pdf_file):
     assert transfer_log.target_company == other_company
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_step_3_no_previous_CV(client, mocker, pdf_file):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, resume=None)
     employer = job_application.to_company.members.get()
@@ -540,6 +542,7 @@ def test_step_3_remove_previous_CV(client):
     assert new_job_application.state == JobApplicationState.NEW
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     job_application = JobApplicationFactory(state=JobApplicationState.REFUSED)
     assert job_application.resume
@@ -597,6 +600,7 @@ def test_access_step_3_without_session(client):
     assert response.status_code == 404
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_full_process(client, pdf_file):
     create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
     vannes = create_city_vannes()

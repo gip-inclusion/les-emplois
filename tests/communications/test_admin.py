@@ -22,6 +22,7 @@ class TestAnnouncementItemAdmin:
             buf.seek(0)
             yield buf.getvalue()
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_add_image(self, admin_client, black_pixel):
         response = admin_client.post(
             reverse("admin:communications_announcementcampaign_add"),
@@ -49,6 +50,7 @@ class TestAnnouncementItemAdmin:
         file = File.objects.get()
         assert file.key.startswith("news-images/")
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_change_image(self, admin_client, black_pixel):
         item = AnnouncementItemFactory(with_image=True)
         url = reverse("admin:communications_announcementcampaign_change", args=(item.campaign_id,))
