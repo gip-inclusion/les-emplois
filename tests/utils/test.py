@@ -403,5 +403,7 @@ def normalize_fields_history(fields_history):
             entry["_timestamp"] = "[TIMESTAMP]"
         if entry["_context"] and "request_id" in entry["_context"]:
             entry["_context"]["request_id"] = "[REQUEST ID]"
+        if entry["_context"] and "run_uid" in entry["_context"]:
+            entry["_context"]["run_uid"] = "[RUN UID]"
 
     return normalized_fields_history

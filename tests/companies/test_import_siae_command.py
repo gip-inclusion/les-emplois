@@ -272,6 +272,7 @@ class TestImportSiaeManagementCommands:
         assert company.siret == "21540323900019"
         assert normalize_fields_history(company.fields_history) == [
             {
+                "_context": {"run_uid": "[RUN UID]"},
                 "_timestamp": "[TIMESTAMP]",
                 "before": {"siret": "21540323900000"},
                 "after": {"siret": "21540323900019"},

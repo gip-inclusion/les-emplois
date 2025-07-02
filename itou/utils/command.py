@@ -7,6 +7,8 @@ import uuid
 from asgiref.local import Local  # NOQA
 from django.core.management import base
 
+from itou.utils import triggers
+
 
 local = Local()
 
@@ -63,7 +65,7 @@ class LoggedCommandMixin:
         self.logger = logging.getLogger(self.__class__.__module__)
 
     def execute(self, *args, **kwargs):
-        with _command_info_manager(self), _command_duration_logger(self):
+        with _command_info_manager(self), _command_duration_logger(self), triggers.context(run_uid=str(self.run_uid)):
             try:
                 return super().execute(*args, **kwargs)
             except Exception:
