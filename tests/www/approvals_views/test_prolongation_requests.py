@@ -362,6 +362,7 @@ class TestProlongationReportFileView:
         )
         assert response.status_code == 404
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_ok(self, client, xlsx_file):
         org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
         prescriber = users_factories.PrescriberFactory(membership__organization=org)

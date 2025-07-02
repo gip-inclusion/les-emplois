@@ -450,6 +450,7 @@ class TestViewProof:
         response = client.get(url)
         assert response.status_code == 404
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_access_siae(self, client, pdf_file):
         job_app = EvaluatedJobApplicationFactory()
         key = default_storage.save("evaluations/test.pdf", pdf_file)
@@ -477,6 +478,7 @@ class TestViewProof:
         response = client.get(url)
         assert response.status_code == 404
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_access_institution(self, client, pdf_file):
         membership = InstitutionMembershipFactory()
         job_app = EvaluatedJobApplicationFactory(
