@@ -10,45 +10,33 @@ from pgtrigger import Condition, core
 
 
 _context = threading.local()
-_context_is_up_to_date = threading.Event()
-_context_query_in_progress = threading.Event()
-_context_connection_wrapper_installed = threading.Event()
 
 
 def _set_context_connection_wrapper(execute, *args, **kwargs):
-    if not _context_is_up_to_date.is_set() and not _context_query_in_progress.is_set():
+    context_is_outdated = getattr(_context, "last_data_set", None) != _context.data
+    if context_is_outdated:
+        _context.last_data_set = _context.data
         with connection.cursor() as cursor:
-            _context_query_in_progress.set()
-            try:
-                cursor.execute(
-                    "SELECT set_config('itou.context', %s, true)",
-                    [json.dumps(_context.data)],
-                )
-            finally:
-                _context_query_in_progress.clear()
-        _context_is_up_to_date.set()
+            cursor.execute(
+                "SELECT set_config('itou.context', %s, true)",
+                [json.dumps(_context.data)],
+            )
 
     return execute(*args, **kwargs)
 
 
 @contextlib.contextmanager
 def context(**kwargs):
-    previous_data, _context.data = (
-        getattr(_context, "data", None),
-        kwargs,
-    )  # FIXME: Should we merge instead of replace?
-    _context_is_up_to_date.clear()
+    previous_data, _context.data = getattr(_context, "data", None), kwargs
 
-    with contextlib.ExitStack() as stack:
-        if not _context_connection_wrapper_installed.is_set():
-            stack.enter_context(connection.execute_wrapper(_set_context_connection_wrapper))
-            _context_connection_wrapper_installed.set()
-            stack.callback(_context_connection_wrapper_installed.clear)
+    if _set_context_connection_wrapper not in connection.execute_wrappers:
+        cm = connection.execute_wrapper(_set_context_connection_wrapper)
+    else:
+        cm = contextlib.nullcontext()
 
+    with cm:
         yield
-
     _context.data = previous_data
-    _context_is_up_to_date.clear()
 
 
 class FieldsHistory(core.Trigger):
@@ -94,6 +82,10 @@ class FieldsHistory(core.Trigger):
             EXCEPTION
                 WHEN undefined_object THEN current_context := NULL;  -- set_config() was not called, ever.
             END;
+
+            IF current_context IS NULL THEN
+                RAISE EXCEPTION 'No context available';
+            END IF;
 
             SELECT jsonb_build_object(
                 'before', jsonb_object_agg(pre.key, pre.value),
