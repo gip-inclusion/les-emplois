@@ -39,6 +39,7 @@ from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
     ItouModelAdmin,
+    ItouModelMixin,
     ItouTabularInline,
     PkSupportRemarkInline,
     ReadonlyMixin,
@@ -254,7 +255,7 @@ def get_fields_to_transfer_for_job_seekers():
 
 
 @admin.register(models.User)
-class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin):
+class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelMixin, UserAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
@@ -262,6 +263,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, UserAdmin)
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
     form = UserAdminForm
+    get_object_ignored_prefetch_related_fields = {"groups", "user_permissions"}  # Not displayed/editable in the admin
+    get_object_extra_select_related_fields = {"jobseeker_profile"}
     list_display = (
         "pk",
         "email",
