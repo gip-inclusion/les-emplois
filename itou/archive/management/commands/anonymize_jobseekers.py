@@ -1,15 +1,23 @@
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import transaction
-from django.db.models import Count, Exists, F, Max, OuterRef, Q, Subquery, Sum
+from django.db.models import Count, Exists, F, Max, Min, OuterRef, Q, Subquery, Sum
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.archive.models import AnonymizedApplication, AnonymizedApproval, AnonymizedJobSeeker
+from itou.archive.models import (
+    AnonymizedApplication,
+    AnonymizedApproval,
+    AnonymizedGEIQEligibilityDiagnosis,
+    AnonymizedJobSeeker,
+    AnonymizedSIAEEligibilityDiagnosis,
+)
 from itou.archive.tasks import async_delete_contact
 from itou.archive.utils import count_related_subquery, get_year_month_or_none
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
@@ -99,6 +107,40 @@ def anonymized_approval(obj):
         number_of_job_applications=obj.number_of_job_applications,
         number_of_accepted_job_applications=obj.number_of_accepted_job_applications,
     )
+
+
+def anonymized_eligibility_diagnosis(obj, model, siae_extra_fields=False):
+    data = dict(
+        created_at=get_year_month_or_none(obj.created_at),
+        expired_at=get_year_month_or_none(obj.expires_at),
+        job_seeker_birth_year=(
+            obj.job_seeker.jobseeker_profile.birthdate.year if obj.job_seeker.jobseeker_profile.birthdate else None
+        ),
+        job_seeker_department=obj.job_seeker.department,
+        job_seeker_had_pole_emploi_id=bool(obj.job_seeker.jobseeker_profile.pole_emploi_id),
+        job_seeker_had_nir=bool(obj.job_seeker.jobseeker_profile.nir),
+        author_kind=obj.author_kind,
+        author_prescriber_organization_kind=(
+            obj.author_prescriber_organization.kind if obj.author_prescriber_organization else None
+        ),
+        number_of_administrative_criteria=obj.number_of_administrative_criteria,
+        number_of_administrative_criteria_level_1=obj.number_of_administrative_criteria_level_1,
+        number_of_administrative_criteria_level_2=obj.number_of_administrative_criteria_level_2,
+        number_of_certified_administrative_criteria=obj.number_of_certified_administrative_criteria,
+        selected_administrative_criteria=obj.selected_administrative_criteria,
+        number_of_job_applications=obj.number_of_job_applications,
+        number_of_accepted_job_applications=obj.number_of_accepted_job_applications,
+    )
+    if siae_extra_fields:
+        data.update(
+            {
+                "author_siae_kind": obj.author_siae.kind,
+                "number_of_approvals": obj.number_of_approvals,
+                "first_approval_start_at": obj.first_approval_start_at,
+                "last_approval_end_at": obj.last_approval_end_at,
+            }
+        )
+    return model(**data)
 
 
 class Command(BaseCommand):
@@ -221,6 +263,104 @@ class Command(BaseCommand):
 
         anonymized_jobapplications = [anonymized_approval(approval) for approval in approvals_to_archive]
 
+        # eligibility diagnoses
+        number_of_approvals_subquery = count_related_subquery(Approval, "eligibility_diagnosis", "id")
+        first_approval_start_at_subquery = (
+            Approval.objects.filter(eligibility_diagnosis=OuterRef("pk"))
+            .values("eligibility_diagnosis")
+            .annotate(first_approval_start_at=Min("start_at"))
+            .values("first_approval_start_at")
+        )
+        last_approval_end_at_subquery = (
+            Approval.objects.filter(eligibility_diagnosis=OuterRef("pk"))
+            .values("eligibility_diagnosis")
+            .annotate(last_approval_end_at=Max("end_at"))
+            .values("last_approval_end_at")
+        )
+        number_of_jobapplications_subquery = count_related_subquery(JobApplication, "eligibility_diagnosis", "id")
+        number_of_accepted_job_applications_subquery = count_related_subquery(
+            JobApplication,
+            "eligibility_diagnosis",
+            "id",
+            extra_filters={"state": JobApplicationState.ACCEPTED},
+        )
+
+        siae_eligibility_diagnoses_to_archive = (
+            EligibilityDiagnosis.objects.filter(job_seeker__in=users_to_archive)
+            .annotate(
+                number_of_approvals=Subquery(number_of_approvals_subquery),
+                first_approval_start_at=Subquery(first_approval_start_at_subquery),
+                last_approval_end_at=Subquery(last_approval_end_at_subquery),
+                number_of_administrative_criteria=Count("selected_administrative_criteria"),
+                number_of_administrative_criteria_level_1=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(selected_administrative_criteria__administrative_criteria__level=1),
+                ),
+                number_of_administrative_criteria_level_2=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(selected_administrative_criteria__administrative_criteria__level=2),
+                ),
+                number_of_certified_administrative_criteria=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(
+                        selected_administrative_criteria__certified=True,
+                    ),
+                ),
+                selected_administrative_criteria=ArrayAgg(
+                    "administrative_criteria__kind", ordering=["administrative_criteria__kind"]
+                ),
+                number_of_jobapplications=Subquery(number_of_jobapplications_subquery),
+                number_of_accepted_job_applications=Subquery(number_of_accepted_job_applications_subquery),
+            )
+            .select_related(
+                "author_siae", "job_seeker", "job_seeker__jobseeker_profile", "author_prescriber_organization"
+            )
+        )
+        anonymized_siae_eligibility_diagnoses = [
+            anonymized_eligibility_diagnosis(
+                eligibility_diagnosis,
+                model=AnonymizedSIAEEligibilityDiagnosis,
+                siae_extra_fields=True,
+            )
+            for eligibility_diagnosis in siae_eligibility_diagnoses_to_archive
+        ]
+
+        geiq_eligibility_diagnoses_to_archive = (
+            GEIQEligibilityDiagnosis.objects.filter(job_seeker__in=users_to_archive)
+            .annotate(
+                number_of_administrative_criteria=Count("selected_administrative_criteria"),
+                number_of_administrative_criteria_level_1=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(selected_administrative_criteria__administrative_criteria__level=1),
+                ),
+                number_of_administrative_criteria_level_2=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(selected_administrative_criteria__administrative_criteria__level=2),
+                ),
+                number_of_certified_administrative_criteria=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(
+                        selected_administrative_criteria__certified=True,
+                    ),
+                ),
+                selected_administrative_criteria=ArrayAgg(
+                    "administrative_criteria__kind", ordering=["administrative_criteria__kind"]
+                ),
+                number_of_jobapplications=Subquery(number_of_jobapplications_subquery),
+                number_of_accepted_job_applications=Subquery(number_of_accepted_job_applications_subquery),
+            )
+            .select_related(
+                "author_geiq", "job_seeker", "job_seeker__jobseeker_profile", "author_prescriber_organization"
+            )
+        )
+        anonymized_geiq_eligibility_diagnoses = [
+            anonymized_eligibility_diagnosis(
+                eligibility_diagnosis,
+                model=AnonymizedGEIQEligibilityDiagnosis,
+            )
+            for eligibility_diagnosis in geiq_eligibility_diagnoses_to_archive
+        ]
+
         if self.wet_run:
             for user in users_to_archive:
                 ArchiveUser(
@@ -230,8 +370,12 @@ class Command(BaseCommand):
             AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
             AnonymizedApplication.objects.bulk_create(archived_jobapplications)
             AnonymizedApproval.objects.bulk_create(anonymized_jobapplications)
+            AnonymizedSIAEEligibilityDiagnosis.objects.bulk_create(anonymized_siae_eligibility_diagnoses)
+            AnonymizedGEIQEligibilityDiagnosis.objects.bulk_create(anonymized_geiq_eligibility_diagnoses)
             self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
             approvals_to_archive.delete()
+            siae_eligibility_diagnoses_to_archive.delete()
+            geiq_eligibility_diagnoses_to_archive.delete()
             self._delete_jobseekers_with_related_objects(users_to_archive)
 
         self.logger.info("Anonymized jobseekers after grace period, count: %d", len(archived_jobseekers))
