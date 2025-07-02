@@ -33,6 +33,7 @@ from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactor
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.utils.test import normalize_fields_history
 
 
 class TestImportSiaeManagementCommands:
@@ -256,6 +257,26 @@ class TestImportSiaeManagementCommands:
             with pytest.raises(AssertionError, match=error_message):
                 create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
         assert not Company.objects.filter(siret=new_siret).exists()
+
+    def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self):
+        company = CompanyFactory(
+            source=Company.SOURCE_ASP,
+            siret="21540323900000",
+            kind=CompanyKind.ACI,
+            convention=SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=112, siret_signature="21540323900000"),
+        )
+
+        with freeze_time("2022-10-10"):
+            call_command("import_siae", wet_run=True)
+        company.refresh_from_db()
+        assert company.siret == "21540323900019"
+        assert normalize_fields_history(company.fields_history) == [
+            {
+                "_timestamp": "[TIMESTAMP]",
+                "before": {"siret": "21540323900000"},
+                "after": {"siret": "21540323900019"},
+            }
+        ]
 
 
 @override_settings(METABASE_HASH_SALT="foobar2000")

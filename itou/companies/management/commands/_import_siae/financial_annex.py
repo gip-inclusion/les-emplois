@@ -52,7 +52,7 @@ def get_creatable_and_deletable_afs(af_number_to_row):
                 af.convention = convention
                 updated_fields.add("convention")
 
-        af.save(update_fields=updated_fields)
+        af.save(update_fields=updated_fields | {"updated_at"})
 
     creatable_af_numbers = set(af_number_to_row) - db_af_numbers
     creatable_afs = list(
