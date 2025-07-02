@@ -55,7 +55,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
             )
             assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
             convention.asp_id = row.asp_id
-            convention.save(update_fields={"asp_id"})
+            convention.save(update_fields={"asp_id", "updated_at"})
             continue
 
         # Siret_signature can change from one export to the next!
@@ -88,7 +88,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
                 conventions_to_deactivate.append(convention)
 
         if updated_fields:
-            convention.save(update_fields=updated_fields)
+            convention.save(update_fields=updated_fields | {"updated_at"})
 
     print(f"{reactivations} conventions have been reactivated")
 

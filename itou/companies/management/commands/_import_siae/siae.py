@@ -114,7 +114,7 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
             updated_fields.add("siret")
 
         if updated_fields:
-            siae.save(update_fields=updated_fields)
+            siae.save(update_fields=updated_fields | {"updated_at"})
 
     print(f"{auth_email_updates} siae.auth_email fields have been updated")
     return errors
@@ -170,7 +170,7 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
             )
             existing_siae.source = Company.SOURCE_ASP
             existing_siae.convention = None
-            existing_siae.save(update_fields={"source", "convention"})
+            existing_siae.save(update_fields={"source", "convention", "updated_at"})
 
     print("--- beginning of CSV output of all creatable_siaes ---")
     print("siret;kind;department;name;address")
@@ -249,7 +249,7 @@ def manage_staff_created_siaes():
     for siae in staff_created_siaes.filter(convention__isnull=False):
         print(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
         siae.source = Company.SOURCE_USER_CREATED
-        siae.save(update_fields={"source"})
+        siae.save(update_fields={"source", "updated_at"})
 
     recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
     print(

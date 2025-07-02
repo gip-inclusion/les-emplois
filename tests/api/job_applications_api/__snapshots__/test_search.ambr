@@ -1,8 +1,15 @@
 # serializer version: 1
 # name: TestJobApplicationSearchApi.test_performances
   dict({
-    'num_queries': 8,
+    'num_queries': 9,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',

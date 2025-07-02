@@ -4,6 +4,7 @@ import itertools
 from datetime import timedelta
 from unittest import mock
 
+import pgtrigger
 import pytest
 import xworkflows
 from dateutil.relativedelta import relativedelta
@@ -283,6 +284,7 @@ class TestEmployeeRecordModel:
         employee_record = BareEmployeeRecordFactory(asp_processing_code=code)
         assert employee_record.status_based_on_asp_processing_code is expected
 
+    @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source(self):
         employee_record = EmployeeRecordFactory(
             job_application__to_company__siret="10000000000001", job_application__to_company__source=Company.SOURCE_ASP
@@ -297,6 +299,7 @@ class TestEmployeeRecordModel:
 
         assert employee_record.has_siret_different_from_asp_source() is True
 
+    @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source_for_antenna(self):
         main_company = CompanyFactory(source=Company.SOURCE_ASP, siret="10000000000001")
         employee_record = EmployeeRecordFactory(

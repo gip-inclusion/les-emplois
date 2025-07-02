@@ -381,8 +381,17 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 78,
+    'num_queries': 79,
     'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
       dict({
         'origin': list([
           'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
