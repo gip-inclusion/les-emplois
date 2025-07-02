@@ -87,7 +87,7 @@ class TestRenderAnnouncementCampaign:
         assert response.status_code == 200
         content = parse_response_to_soup(response, "#news-modal")
         assert pretty_indented(content) == snapshot
-        assert len(content.select("p")) == 3
+        assert len(content.select("li > div")) == 3
         assert "Item D" not in str(content)
 
     def test_campaign_not_rendered_without_items(self, client):
@@ -132,5 +132,5 @@ class TestRenderAnnouncementCampaign:
         assert response.status_code == 200
         content = parse_response_to_soup(response, "#news-modal")
         assert pretty_indented(content) == snapshot
-        assert len(content.select("p")) == 3
+        assert len(content.select("li > div")) == 3
         assert "Item C" not in str(content)

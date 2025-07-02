@@ -12,27 +12,35 @@
                   </button>
               </div>
               <div class="modal-body">
-                  <div aria-hidden="true" class="text-center mb-5">
-                      <img alt="Dessin d'étoiles" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
+                  <div aria-hidden="true" class="text-center mb-3">
+                      <img alt="" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
                   </div>
-                  <h6>
-                      1. Item A
-                  </h6>
-                  <p>
-                      Item A
-                  </p>
-                  <h6>
-                      2. Item B
-                  </h6>
-                  <p>
-                      Item B
-                  </p>
-                  <h6>
-                      3. Item C
-                  </h6>
-                  <p>
-                      Item C
-                  </p>
+                  <ol>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item A
+                          </strong>
+                          <div>
+                              Item A
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item B
+                          </strong>
+                          <div>
+                              Item B
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item C
+                          </strong>
+                          <div>
+                              Item C
+                          </div>
+                      </li>
+                  </ol>
               </div>
               <div class="modal-footer">
                   <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
@@ -58,27 +66,35 @@
                   </button>
               </div>
               <div class="modal-body">
-                  <div aria-hidden="true" class="text-center mb-5">
-                      <img alt="Dessin d'étoiles" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
+                  <div aria-hidden="true" class="text-center mb-3">
+                      <img alt="" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
                   </div>
-                  <h6>
-                      1. Item A
-                  </h6>
-                  <p>
-                      Item A
-                  </p>
-                  <h6>
-                      2. Item B
-                  </h6>
-                  <p>
-                      Item B
-                  </p>
-                  <h6>
-                      3. Item D
-                  </h6>
-                  <p>
-                      Item D
-                  </p>
+                  <ol>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item A
+                          </strong>
+                          <div>
+                              Item A
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item B
+                          </strong>
+                          <div>
+                              Item B
+                          </div>
+                      </li>
+                      <li class="mb-5">
+                          <strong class="d-block">
+                              Item D
+                          </strong>
+                          <div>
+                              Item D
+                          </div>
+                      </li>
+                  </ol>
               </div>
               <div class="modal-footer">
                   <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">
