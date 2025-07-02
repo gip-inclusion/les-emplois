@@ -18,9 +18,13 @@
 {% endblock %}
 
 {% block title_extra %}
-    <form class="mt-md-4">
-        {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
-    </form>
+    <div class="c-search mt-3 mt-md-4">
+        <div class="c-search__bar">
+            <form class="mt-md-4">
+                {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
+            </form>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
