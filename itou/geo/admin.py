@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
 from itou.geo.models import QPV, ZRR
-from itou.utils.admin import ItouModelAdmin
+from itou.utils.admin import ItouModelAdmin, ItouModelMixin
 
 
 @admin.register(QPV)
-class QPVAdmin(GISModelAdmin):
+class QPVAdmin(ItouModelMixin, GISModelAdmin):
     list_display = (
         "pk",
         "code",
