@@ -402,6 +402,7 @@ class TestAssessmentDetailsForGEIQView:
         assert str(parse_response_to_soup(response, ".s-title-02")) == snapshot(name="assessment details title")
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="assessment details section")
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_htmx_load(self, client, settings, label_settings, respx_mock, pdf_file):
         pdf_file_content = pdf_file.read()
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -812,6 +813,7 @@ class TestAssessmentSyncFile:
                 response = client.post(url)
                 assert response.status_code == expected_status
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_sync(self, client, pdf_file, respx_mock, label_settings):
         pdf_file_content = pdf_file.read()
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
@@ -956,6 +958,7 @@ class TestAssessmentUploadActionFinancialAssessment:
             response = client.get(url)
             assert response.status_code == expected_status
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_access_and_upload(self, client, pdf_file, settings, snapshot):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]

@@ -859,6 +859,7 @@ class TestSiaeUploadDocsView:
         )
         assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_post(self, client, pdf_file):
         fake_now = timezone.now()
         client.force_login(self.user)

@@ -23,7 +23,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import caches
-from django.core.files.storage import default_storage, storages
+from django.core.files.storage import storages
 from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
@@ -138,19 +138,6 @@ def preload_country_france(django_db_setup, django_db_blocker):
 
 
 @pytest.fixture(autouse=True)
-def storage_prefix_per_test():
-    public_storage = storages["public"]
-    original_default_location = default_storage.location
-    original_public_location = public_storage.location
-    namespace = f"{uuid.uuid4()}"
-    default_storage.location = namespace
-    public_storage.location = namespace
-    yield
-    default_storage.location = original_default_location
-    public_storage.location = original_public_location
-
-
-@pytest.fixture(autouse=True)
 def cache_per_test(settings):
     caches = copy.deepcopy(settings.CACHES)
     for cache_config in caches.values():
@@ -194,32 +181,40 @@ def failing_cache():
         yield cache
 
 
-@pytest.fixture
-def temporary_bucket():
+@pytest.fixture(name="temporary_bucket_name", autouse=True)
+def temporary_bucket_name_fixture(monkeypatch):
     bucket_name = f"tests-{uuid.uuid4()}"
     with override_settings(AWS_STORAGE_BUCKET_NAME=bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=bucket_name):
-        call_command("configure_bucket")
-        yield
-        client = s3_client()
-        paginator = client.get_paginator("list_object_versions")
-        try:
-            for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
-                objects_to_delete = page.get("DeleteMarkers", []) + page.get("Versions", [])
-                client.delete_objects(
-                    Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                    Delete={
-                        "Objects": [
-                            {
-                                "Key": obj["Key"],
-                                "VersionId": obj["VersionId"],
-                            }
-                            for obj in objects_to_delete
-                        ]
-                    },
-                )
-            client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
-        except client.exceptions.NoSuchBucket:
-            pass
+        for storage in {"default", "public"}:
+            monkeypatch.setattr(storages[storage], "bucket_name", settings.AWS_STORAGE_BUCKET_NAME)
+            monkeypatch.setattr(storages[storage], "_bucket", None)
+        yield bucket_name
+
+
+@pytest.fixture
+def temporary_bucket(temporary_bucket_name):
+    call_command("configure_bucket")
+    yield
+    client = s3_client()
+    paginator = client.get_paginator("list_object_versions")
+    try:
+        for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
+            objects_to_delete = page.get("DeleteMarkers", []) + page.get("Versions", [])
+            client.delete_objects(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Delete={
+                    "Objects": [
+                        {
+                            "Key": obj["Key"],
+                            "VersionId": obj["VersionId"],
+                        }
+                        for obj in objects_to_delete
+                    ]
+                },
+            )
+        client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
+    except client.exceptions.NoSuchBucket:
+        pass
 
 
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")

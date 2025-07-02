@@ -543,6 +543,7 @@ class TestApplyAsJobSeeker:
             ),
         )
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_jobseeker(self, client, pdf_file):
         """Apply as jobseeker."""
 
@@ -771,6 +772,7 @@ class TestApplyAsJobSeeker:
 
         assertContains(response, LINK_RESET_MARKUP % reset_url_job_description)
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_job_seeker_sent_emails(self, client, pdf_file, mailoutbox):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         employer = company.members.get()
@@ -914,6 +916,7 @@ class TestApplyAsAuthorizedPrescriber:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_prescriber_with_pending_authorization(self, client, pdf_file):
         """Apply as prescriber that has pending authorization."""
 
@@ -1208,6 +1211,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
     @freeze_time()
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_authorized_prescriber(self, client, pdf_file, snapshot):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), for_snapshot=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1676,6 +1680,7 @@ class TestApplyAsPrescriber:
             ),
         )
 
+    @pytest.mark.usefixtures("temporary_bucket")
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -2586,6 +2591,7 @@ class TestApplyAsCompany:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
+    @pytest.mark.usefixtures("temporary_bucket")
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_employer(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -2602,6 +2608,7 @@ class TestApplyAsCompany:
         )
         self._test_apply_as_company(client, employer, company, dummy_job_seeker, pdf_file)
 
+    @pytest.mark.usefixtures("temporary_bucket")
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_another_employer(self, client, pdf_file):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
