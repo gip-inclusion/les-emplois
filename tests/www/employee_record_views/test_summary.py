@@ -1,3 +1,4 @@
+import pgtrigger
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -164,6 +165,7 @@ class TestSummaryEmployeeRecords:
             Status.PROCESSED,
         ],
     )
+    @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_action_bar_with_changed_siret(self, client, status, snapshot):
         self.employee_record.status = status
         self.company.siret = "10000000000001"

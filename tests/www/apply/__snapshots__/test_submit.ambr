@@ -465,7 +465,7 @@
 # ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
-    'num_queries': 29,
+    'num_queries': 30,
     'queries': list([
       dict({
         'origin': list([
