@@ -131,7 +131,7 @@ class InconsistencyCheckMixin:
         )
 
 
-class ItouModelAdmin(ModelAdmin):
+class ItouModelMixin:
     # Add save buttons on top of each change forms by default
     save_on_top = True
     get_object_ignored_prefetch_related_fields = set()  # Remove automatically added (but useless) fields
@@ -162,6 +162,10 @@ class ItouModelAdmin(ModelAdmin):
         # Eager-loading all relations, but only when editing one object because `list_select_related` exists
         with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
             return super().get_object(request, object_id, from_field)
+
+
+class ItouModelAdmin(ItouModelMixin, ModelAdmin):
+    pass
 
 
 def add_support_remark_to_obj(obj, text):
