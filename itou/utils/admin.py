@@ -134,6 +134,8 @@ class InconsistencyCheckMixin:
 class ItouModelAdmin(ModelAdmin):
     # Add save buttons on top of each change forms by default
     save_on_top = True
+    get_object_ignored_prefetch_related_fields = set()  # Remove automatically added (but useless) fields
+    get_object_extra_select_related_fields = set()  # Add extra fields to select_related (like OneToOne relations)
 
     def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
@@ -146,6 +148,8 @@ class ItouModelAdmin(ModelAdmin):
             else:
                 select_related_fields.add(field.name)
 
+        prefetch_related_fields -= self.get_object_ignored_prefetch_related_fields
+        select_related_fields |= self.get_object_extra_select_related_fields
         return (
             super()
             .get_queryset(request)
