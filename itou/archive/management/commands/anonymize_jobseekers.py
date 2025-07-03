@@ -6,7 +6,7 @@ from sentry_sdk.crons import monitor
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import get_year_month_or_none
+from itou.archive.utils import count_related_subquery, get_year_month_or_none
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.files.models import File
@@ -138,11 +138,10 @@ class Command(BaseCommand):
         archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
 
         # job applications
-        number_of_jobs_applied_for_subquery = (
-            JobDescription.objects.filter(jobapplication__id=OuterRef("id"))
-            .values("jobapplication")
-            .annotate(number_of_jobs_applied_for=Count("pk"))
-            .values("number_of_jobs_applied_for")
+        number_of_jobs_applied_for_subquery = count_related_subquery(
+            JobDescription,
+            "jobapplication",
+            "pk",
         )
         last_transition_at_subquery = (
             JobApplicationTransitionLog.objects.filter(job_application__id=OuterRef("id"))
