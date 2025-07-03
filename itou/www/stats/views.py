@@ -757,27 +757,31 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
             .get()
         }
     elif kind == "ph":
-        organization_pks = set()
-        organization_labels = set()
-        for organization in (
-            PrescriberOrganization.objects.with_has_active_members()
-            # Only authorized prescriber organizations
-            .filter(authorization_status=PrescriberAuthorizationStatus.VALIDATED)
-            # Mimic `can_view_stats_ph()`
-            .filter(has_active_members=True, kind__in=utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
-            # Limit to the selected department
-            .filter(department=DGEFP_SHOWROOM_DEPARTMENT)
-            .values_list("pk", "kind", named=True)
-        ):
-            organization_pks.add(organization.pk)
-            organization_labels.add(PrescriberOrganizationKind(organization.kind).label)
-        params = {
-            mb.PRESCRIBER_FILTER_KEY: list(organization_labels),
-            mb.C1_PRESCRIBER_ORG_FILTER_KEY: list(organization_pks),
-        }
+        match name:
+            case "state_main":
+                organization_pks = set()
+                organization_labels = set()
+                for organization in (
+                    PrescriberOrganization.objects.with_has_active_members()
+                    # Only authorized prescriber organizations
+                    .filter(authorization_status=PrescriberAuthorizationStatus.VALIDATED)
+                    # Mimic `can_view_stats_ph()`
+                    .filter(has_active_members=True, kind__in=utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
+                    # Limit to the selected department
+                    .filter(department=DGEFP_SHOWROOM_DEPARTMENT)
+                    .values_list("pk", "kind", named=True)
+                ):
+                    organization_pks.add(organization.pk)
+                    organization_labels.add(PrescriberOrganizationKind(organization.kind).label)
+                params = {
+                    mb.PRESCRIBER_FILTER_KEY: list(organization_labels),
+                    mb.C1_PRESCRIBER_ORG_FILTER_KEY: list(organization_pks),
+                }
+            case "beneficiaries":
+                params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
     elif kind == "siae":
         match name:
-            case "orga_etp":
+            case "orga_etp" | "beneficiaries":
                 param_name, value_field = mb.ASP_SIAE_FILTER_KEY_FLAVOR3, "convention__asp_id"
             case _:
                 param_name, value_field = mb.C1_SIAE_FILTER_KEY, "pk"
