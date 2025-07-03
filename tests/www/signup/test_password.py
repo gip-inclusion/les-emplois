@@ -1,3 +1,5 @@
+import re
+
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
@@ -16,7 +18,7 @@ class TestPasswordReset:
         key = default_token_generator.make_token(user)
         return reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
 
-    def test_password_reset_flow(self, client, mailoutbox):
+    def test_password_reset_flow(self, client, mailoutbox, snapshot):
         user = JobSeekerFactory(last_login=timezone.now(), password="somethingElse%")
 
         # Ask for password reset.
@@ -31,12 +33,11 @@ class TestPasswordReset:
         assertRedirects(response, f"{next_url}?{args}")
 
         # Check sent email.
-        assert len(mailoutbox) == 1
-        email = mailoutbox[0]
+        [email] = mailoutbox
         assert "Réinitialisation de votre mot de passe" in email.subject
-        assert (
-            "Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer ce message"
-            in email.body
+        # http://testserver/accounts/password/reset/key/10i-csd61p-5e1867fba060dbbcb8e24f9dd29ee30b/
+        assert re.sub(r"(reset/key/)[A-Za-z0-9\-]+/", r"\1[Reset password key]", email.body) == snapshot(
+            name="password_reset_key_message"
         )
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
         assert len(email.to) == 1
@@ -54,7 +55,7 @@ class TestPasswordReset:
         assert client.login(username=user.email, password=DEFAULT_PASSWORD)
         client.logout()
 
-    def test_password_reset_with_nonexistent_email(self, client):
+    def test_password_reset_with_nonexistent_email(self, client, mailoutbox, snapshot):
         """
         Avoid user enumeration: redirect to the success page even with a nonexistent email.
         """
@@ -66,6 +67,11 @@ class TestPasswordReset:
         args = urlencode({"email": post_data["email"]})
         next_url = reverse("account_reset_password_done")
         assert response.url == f"{next_url}?{args}"
+
+        # Check sent email.
+        [email] = mailoutbox
+        assert "E-mail de réinitialisation du mot de passe" in email.subject
+        assert email.body == snapshot(name="unknown_account_message")
 
     def test_password_reset_user_creation(self, client, snapshot):
         # user creation differs because they are logged in and redirected to the welcoming tour on creation
