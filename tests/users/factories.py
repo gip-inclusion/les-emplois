@@ -387,3 +387,15 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         nir = f"{incomplete_nir}{control_key}"
         validate_nir(nir)
         return nir
+
+
+def random_user_kind_factory(**kwargs):
+    return random.choice(
+        [
+            ItouStaffFactory,
+            JobSeekerFactory,
+            PrescriberFactory,
+            functools.partial(EmployerFactory, with_company=True),
+            functools.partial(LaborInspectorFactory, membership=True),
+        ]
+    )(**kwargs)

@@ -12,7 +12,7 @@ from pytest_django.asserts import assertNumQueries
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, random_user_kind_factory
 
 
 class TestAnnouncementCampaignCache:
@@ -23,7 +23,7 @@ class TestAnnouncementCampaignCache:
     def test_active_announcement_campaign_context_processor_cached(self):
         campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
         request = RequestFactory()
-        request.user = AnonymousUser()
+        request.user = random_user_kind_factory()
 
         with assertNumQueries(0):
             active_announcement_campaign(request)["active_campaign_announce"] == campaign
@@ -58,7 +58,7 @@ class TestAnnouncementCampaignCache:
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
         request = RequestFactory()
-        request.user = AnonymousUser()
+        request.user = random_user_kind_factory()
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
@@ -67,11 +67,18 @@ class TestAnnouncementCampaignCache:
         with assertNumQueries(0):
             assert active_announcement_campaign(request)["active_campaign_announce"] is None
 
+    def test_costless_announcement_campaign_cache_for_anonymous_user(self):
+        request = RequestFactory()
+        request.user = AnonymousUser()
+
+        with assertNumQueries(0):
+            assert active_announcement_campaign(request) == {}
+
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
         request = RequestFactory()
-        request.user = AnonymousUser()
+        request.user = random_user_kind_factory()
 
         with assertNumQueries(0):
             assert active_announcement_campaign(request)["active_campaign_announce"] == campaign

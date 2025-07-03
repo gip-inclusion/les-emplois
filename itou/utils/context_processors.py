@@ -18,6 +18,8 @@ def matomo(request):
 
 
 def active_announcement_campaign(request):
+    if not (request.user and request.user.is_authenticated):
+        return {}
     campaign = get_cached_active_announcement()
 
     return {

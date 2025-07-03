@@ -92,6 +92,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
+    random_user_kind_factory,
 )
 from tests.utils.test import create_fake_postcode, parse_response_to_soup, pretty_indented
 
@@ -1582,6 +1583,11 @@ def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
     campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
+    response = client.get(reverse("search:employers_home"))
+    assert response.status_code == 200
+    assert "active_campaign_announce" not in response.context
+
+    client.force_login(random_user_kind_factory())
     response = client.get(reverse("search:employers_home"))
     assert response.status_code == 200
     assert response.context["active_campaign_announce"] == campaign

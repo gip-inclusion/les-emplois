@@ -273,7 +273,7 @@
 
         {% block script %}{% endblock %}
 
-        {% if active_campaign_announce %}
+        {% if request.user and request.user.is_authenticated and active_campaign_announce %}
             {% include "layout/_news_modal.html" %}
         {% endif %}
 
