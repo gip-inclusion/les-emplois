@@ -22,7 +22,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_ddets_review_and_dreets_final_review[body of mail sent to GEIQ members]
@@ -53,7 +53,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestAssessmentDetailsForInstitutionView.test_details_for_institution[assessment details section after submission]

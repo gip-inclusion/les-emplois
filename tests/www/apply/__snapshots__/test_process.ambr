@@ -5225,7 +5225,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_subject]
@@ -5244,7 +5244,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_subject]
@@ -5263,7 +5263,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_subject]
@@ -5278,7 +5278,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[postpone_email_to_job_seeker_subject]
@@ -5293,7 +5293,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[postpone_email_to_proxy_subject]

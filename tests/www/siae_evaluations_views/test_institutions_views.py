@@ -2401,7 +2401,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == "RDV le lundi 8 à 15h à la DDETS"
         assert evaluated_siae.sanctions.suspension_dates is None
@@ -2460,7 +2460,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(
@@ -2806,7 +2806,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
@@ -2920,7 +2920,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
@@ -3070,7 +3070,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
@@ -3129,7 +3129,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
@@ -3182,7 +3182,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
@@ -3259,7 +3259,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
             "merci de ne pas en tenir compte [DEV]\n"
             "Les emplois de l'inclusion\n"
-            "http://localhost:8000"
+            "http://localhost:8000/"
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
