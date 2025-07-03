@@ -4,11 +4,12 @@ import pytest
 from django.forms import ModelForm
 from django.forms.models import model_to_dict
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.communications.models import AnnouncementCampaign
 from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, random_user_kind_factory
 from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
@@ -77,6 +78,7 @@ class TestRenderAnnouncementCampaign:
         pass
 
     def test_campaign_rendered_dashboard(self, client, snapshot):
+        MODAL_ID = "news-modal"
         campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
         AnnouncementItemFactory(campaign=campaign, title="Item A", description="Item A", priority=0)
         AnnouncementItemFactory(campaign=campaign, title="Item B", description="Item B", priority=1)
@@ -84,8 +86,13 @@ class TestRenderAnnouncementCampaign:
         AnnouncementItemFactory(campaign=campaign, title="Item C", description="Item C", priority=2)
 
         response = client.get(reverse("search:employers_home"))
-        assert response.status_code == 200
-        content = parse_response_to_soup(response, "#news-modal")
+        assertNotContains(response, MODAL_ID)
+
+        client.force_login(random_user_kind_factory())
+        response = client.get(reverse("search:employers_home"))
+        assertContains(response, MODAL_ID)
+
+        content = parse_response_to_soup(response, f"#{MODAL_ID}")
         assert pretty_indented(content) == snapshot
         assert len(content.select("li > div")) == 3
         assert "Item D" not in str(content)
