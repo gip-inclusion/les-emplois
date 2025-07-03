@@ -4,7 +4,6 @@ from itou.geiq_assessments.models import (
     AssessmentInstitutionLink,
 )
 from itou.institutions.models import InstitutionMembership
-from itou.utils.urls import get_absolute_url
 
 
 @notifications_registry.register
@@ -17,11 +16,6 @@ class AssessmentSubmittedForLaborInspectorNotification(EmailNotification):
     subject_template = "geiq_assessments/email/assessment_submission_subject.txt"
     body_template = "geiq_assessments/email/assessment_submission_body.txt"
 
-    def get_context(self):
-        context = super().get_context()
-        context["base_url"] = get_absolute_url()
-        return context
-
 
 @notifications_registry.register
 class AssessmentReviewedForDREETSLaborInspectorNotification(EmailNotification):
@@ -32,11 +26,6 @@ class AssessmentReviewedForDREETSLaborInspectorNotification(EmailNotification):
     can_be_disabled = False
     subject_template = "geiq_assessments/email/assessment_review_for_dreets_subject.txt"
     body_template = "geiq_assessments/email/assessment_review_for_dreets_body.txt"
-
-    def get_context(self):
-        context = super().get_context()
-        context["base_url"] = get_absolute_url()
-        return context
 
 
 @notifications_registry.register

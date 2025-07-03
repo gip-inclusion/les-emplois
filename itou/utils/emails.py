@@ -7,6 +7,7 @@ from django.template.loader import get_template
 
 from itou.utils import constants as global_constants
 from itou.utils.enums import ItouEnvironment
+from itou.utils.urls import get_absolute_url
 
 
 def remove_extra_line_breaks(text):
@@ -24,8 +25,7 @@ def get_email_text_template(template, context):
         {
             "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
             "itou_environment": settings.ITOU_ENVIRONMENT,
-            "itou_fqdn": settings.ITOU_FQDN,
-            "itou_protocol": settings.ITOU_PROTOCOL,
+            "base_url": get_absolute_url(),
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())

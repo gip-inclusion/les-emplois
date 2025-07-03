@@ -1161,7 +1161,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestAssessmentDetailsForGEIQView.test_submission[submitted assessment details section]

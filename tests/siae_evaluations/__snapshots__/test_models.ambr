@@ -12,7 +12,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_close_no_response[no docs email body]
@@ -32,7 +32,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_close_no_response[sanction notification email body]
@@ -50,7 +50,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_close_refused_but_not_reviewed[refused email body]
@@ -68,7 +68,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_close_refused_but_not_reviewed[sanction notification email body]
@@ -86,7 +86,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_populate
@@ -583,7 +583,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[force accepted email body]
@@ -601,7 +601,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[institution summary email body]
@@ -629,7 +629,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[no docs email body]
@@ -651,7 +651,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[no response email body]
@@ -673,7 +673,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[refused review email body]
@@ -697,7 +697,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_accepted_but_not_reviewed[positive review email body]
@@ -713,7 +713,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_force_accepted[force accepted email body]
@@ -731,7 +731,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_force_accepted[institution summary email body]
@@ -747,7 +747,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_forced_to_adversarial_stage[institution summary email body]
@@ -767,7 +767,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_forced_to_adversarial_stage[no response email body]
@@ -789,7 +789,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_refused_but_not_reviewed[negative review email body]
@@ -813,6 +813,6 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---

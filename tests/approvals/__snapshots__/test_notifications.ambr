@@ -46,7 +46,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_created[subject]
@@ -105,7 +105,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_created_reminder[subject]
@@ -140,7 +140,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_denied_employer[subject]
@@ -173,7 +173,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_denied_jobseeker[subject]
@@ -194,7 +194,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_granted_employer[subject]
@@ -213,7 +213,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://localhost:8000
+  http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_granted_jobseeker[subject]
