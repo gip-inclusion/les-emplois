@@ -3,10 +3,18 @@ import datetime
 import pytest
 import pytz
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
-from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check, get_year_month_or_none
+from itou.archive.utils import (
+    count_related_subquery,
+    get_filter_kwargs_on_user_for_related_objects_to_check,
+    get_year_month_or_none,
+)
+from itou.invitations.models import EmployerInvitation
 from itou.users.models import User
+from tests.invitations.factories import EmployerInvitationFactory
+from tests.users.factories import EmployerFactory
 
 
 class TestRelatedObjectsConsistency:
@@ -24,6 +32,42 @@ class TestRelatedObjectsConsistency:
             if getattr(obj, "on_delete", None) and obj.on_delete == models.CASCADE
         ]
         assert user_related_objects == snapshot(name="user_related_objects_deleted_on_cascade")
+
+
+class TestCountRelatedSubquery:
+    def test_count_related_subquery(self):
+        sqs = count_related_subquery(EmployerInvitation, "sender", "pk")
+        assert sqs.identity[0] == Coalesce
+        assert sqs.source_expressions[0].model == EmployerInvitation
+        assert sqs.source_expressions[1].value == 0
+
+    def test_count_related_subquery_results(self, subtests):
+        employer = EmployerFactory()
+        EmployerInvitationFactory(sender=employer, accepted_at=timezone.now())
+        EmployerInvitationFactory(sender=employer)
+
+        qs = User.objects.filter(id=employer.id)
+
+        assert list(qs.annotate(nbr=count_related_subquery(EmployerInvitation, "sender", "pk")).values("nbr")) == [
+            {"nbr": 2}
+        ]
+        assert list(
+            qs.annotate(
+                nbr=count_related_subquery(
+                    EmployerInvitation, "sender", "pk", extra_filters={"accepted_at__isnull": False}
+                )
+            ).values("nbr")
+        ) == [{"nbr": 1}]
+        assert list(
+            qs.annotate(
+                nbr=count_related_subquery(
+                    EmployerInvitation,
+                    "sender",
+                    "pk",
+                    extra_filters={"accepted_at__isnull": True, "sender__isnull": True},
+                )
+            ).values("nbr")
+        ) == [{"nbr": 0}]
 
 
 @pytest.mark.parametrize(

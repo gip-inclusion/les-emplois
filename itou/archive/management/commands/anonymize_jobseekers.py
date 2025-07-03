@@ -6,7 +6,7 @@ from sentry_sdk.crons import monitor
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import get_year_month_or_none
+from itou.archive.utils import count_related_subquery, get_year_month_or_none
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.files.models import File
@@ -73,7 +73,7 @@ def anonymized_jobapplication(obj):
         state=obj.state,
         refusal_reason=obj.refusal_reason,
         has_been_transferred=obj.transferred_at is not None,
-        number_of_jobs_applied_for=obj.number_of_jobs_applied_for or 0,
+        number_of_jobs_applied_for=obj.number_of_jobs_applied_for,
         has_diagoriente_invitation=obj.diagoriente_invite_sent_at is not None,
         hiring_rome=obj.hired_job.appellation.rome if obj.hired_job else None,
         hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
@@ -138,11 +138,10 @@ class Command(BaseCommand):
         archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
 
         # job applications
-        number_of_jobs_applied_for_subquery = (
-            JobDescription.objects.filter(jobapplication__id=OuterRef("id"))
-            .values("jobapplication")
-            .annotate(number_of_jobs_applied_for=Count("pk"))
-            .values("number_of_jobs_applied_for")
+        number_of_jobs_applied_for_count = count_related_subquery(
+            JobDescription,
+            "jobapplication",
+            "pk",
         )
         last_transition_at_subquery = (
             JobApplicationTransitionLog.objects.filter(job_application__id=OuterRef("id"))
@@ -153,7 +152,7 @@ class Command(BaseCommand):
         jobapplications_to_archive = (
             JobApplication.objects.filter(job_seeker__in=users_to_archive)
             .annotate(
-                number_of_jobs_applied_for=Subquery(number_of_jobs_applied_for_subquery),
+                number_of_jobs_applied_for=number_of_jobs_applied_for_count,
                 last_transition_at=Subquery(last_transition_at_subquery),
             )
             .select_related(
