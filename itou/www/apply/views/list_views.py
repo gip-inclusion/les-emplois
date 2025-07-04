@@ -441,7 +441,7 @@ def list_for_siae_actions(request):
             selected_job_applications[0], only_prescriber=False
         )
     context = {
-        "batch_mode": bool(selected_job_applications),
+        "display_batch_actions": bool(selected_job_applications),
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
         "can_accept": can_accept,
