@@ -25,6 +25,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_bucket_policy_for_anonymous_user():
     base_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}"
     response = httpx.head(f"{base_url}/test_file.pdf")
@@ -126,6 +127,7 @@ def test_cellar_does_not_support_checksum_validation():
     client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key="file")
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_copy(pdf_file):
     key = "resume/11111111-1111-1111-1111-111111111111.pdf"
     default_storage.save(key, pdf_file)
@@ -138,6 +140,7 @@ def test_copy(pdf_file):
         assert old.read() == new.read()
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_find_orphans(caplog):
     old_orphan = FileFactory()
     job_application = JobApplicationFactory()
@@ -167,6 +170,7 @@ def test_find_orphans(caplog):
     )
 
 
+@pytest.mark.usefixtures("temporary_bucket")
 def test_purge_files(caplog):
     in_the_past = timezone.now() - datetime.timedelta(days=1)
     to_purge = FileFactory(deleted_at=in_the_past)

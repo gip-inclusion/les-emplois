@@ -429,63 +429,6 @@ class TestApprovalProlongation:
         # No email should have been sent.
         assert len(mailoutbox) == 0
 
-    # Boto3 uses the current time to sign the request, and cannot be ignored due to
-    # https://github.com/spulec/freezegun/pull/430
-    # TODO: Consider switching to time-machine:
-    # https://github.com/adamchainz/time-machine
-    @freeze_time()
-    def test_prolongation_report_file(self, client, faker, xlsx_file, mailoutbox):
-        # Check that report file object is saved and linked to prolongation
-        # Bad reason types are checked by UI (JS) and ultimately by DB constraints
-
-        self._setup_with_company_kind(CompanyKind.AI)
-        client.force_login(self.employer)
-        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        response = client.get(url)
-
-        reason = ProlongationReason.RQTH
-        end_at = self.approval.end_at + relativedelta(days=30)
-
-        post_data = {
-            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "reason": reason,
-            "email": self.prescriber.email,
-            "contact_email": faker.email(),
-            "contact_phone": faker.phone_number(),
-            "report_file": xlsx_file,
-            "prescriber_organization": self.prescriber_organization.pk,
-            "preview": "1",
-        }
-
-        response = client.post(url, data=post_data)
-        assert response.status_code == 200
-        assert response.context["preview"] is True
-
-        # Save to DB.
-        del post_data["preview"]
-        del post_data["report_file"]
-        post_data["save"] = 1
-
-        response = client.post(url, data=post_data)
-        assert response.status_code == 302
-        assertRedirects(response, reverse("dashboard:index"))
-
-        prolongation_request = self.approval.prolongationrequest_set.get()
-        assert prolongation_request.report_file
-        assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
-
-        [email] = mailoutbox
-        assert email.to == [post_data["email"]]
-        assert email.subject == f"[DEV] Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
-        assert (
-            reverse(
-                "approvals:prolongation_request_report_file",
-                kwargs={"prolongation_request_id": prolongation_request.pk},
-            )
-            in email.body
-        )
-        assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
-
     def test_check_single_prescriber_organization(self, client, faker):
         client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
@@ -566,3 +509,67 @@ class TestApprovalProlongation:
 
         error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
         assert pretty_indented(error_msg) == snapshot(name="unknown authorized prescriber")
+
+
+@pytest.mark.usefixtures("temporary_bucket")
+def test_prolongation_report_file(client, faker, xlsx_file, mailoutbox):
+    # Check that report file object is saved and linked to prolongation
+    # Bad reason types are checked by UI (JS) and ultimately by DB constraints
+    prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    prescriber = prescriber_organization.members.first()
+
+    today = timezone.localdate()
+    job_application = JobApplicationFactory(
+        with_approval=True,
+        # Ensure that the job_application cannot be canceled.
+        hiring_start_at=today - relativedelta(days=1),
+        approval__start_at=today - relativedelta(months=12),
+        approval__end_at=today + relativedelta(months=2),
+        to_company__kind=CompanyKind.AI,
+    )
+    employer = job_application.to_company.members.first()
+    approval = job_application.approval
+    assert 0 == approval.prolongation_set.count()
+
+    client.force_login(employer)
+    url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk})
+
+    post_data = {
+        "end_at": (approval.end_at + relativedelta(days=30)).strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "reason": ProlongationReason.RQTH,
+        "email": prescriber.email,
+        "contact_email": faker.email(),
+        "contact_phone": faker.phone_number(),
+        "report_file": xlsx_file,
+        "prescriber_organization": prescriber_organization.pk,
+        "preview": "1",
+    }
+
+    response = client.post(url, data=post_data)
+    assert response.status_code == 200
+    assert response.context["preview"] is True
+
+    # Save to DB.
+    del post_data["preview"]
+    del post_data["report_file"]
+    post_data["save"] = 1
+
+    response = client.post(url, data=post_data)
+    assert response.status_code == 302
+    assertRedirects(response, reverse("dashboard:index"))
+
+    prolongation_request = approval.prolongationrequest_set.get()
+    assert prolongation_request.report_file
+    assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
+
+    [email] = mailoutbox
+    assert email.to == [post_data["email"]]
+    assert email.subject == f"[DEV] Demande de prolongation du PASS IAE de {approval.user.get_full_name()}"
+    assert (
+        reverse(
+            "approvals:prolongation_request_report_file",
+            kwargs={"prolongation_request_id": prolongation_request.pk},
+        )
+        in email.body
+    )
+    assert TestApprovalProlongation.PROLONGATION_EMAIL_REPORT_TEXT in email.body

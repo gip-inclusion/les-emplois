@@ -111,6 +111,7 @@ class TestNewsRender:
         client.force_login(JobSeekerFactory())
         assert_content_matches_snapshot(client.get(url))
 
+    @pytest.mark.usefixtures("temporary_bucket")
     def test_rendering_invalid_file_does_not_crash(self, client):
         user = JobSeekerFactory()
         item = AnnouncementItemFactory(with_image=True, user_kind_tags=[user.kind])
