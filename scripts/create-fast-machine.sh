@@ -25,7 +25,7 @@ clever create "$APP_NAME" --type python --region par --alias "$APP_NAME" --org I
 clever link "$APP_NAME" --org Itou
 clever scale --flavor XL --alias "$APP_NAME"
 
-clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias "$APP_NAME"
+clever env set ITOU_ENVIRONMENT "PROD" --alias "$APP_NAME"
 # By default Clever creates a python app with CC_PYTHON_VERSION set to "3"
 clever env rm CC_PYTHON_VERSION --alias "$APP_NAME"
 

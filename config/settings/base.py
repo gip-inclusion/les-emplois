@@ -504,7 +504,7 @@ STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIS
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
-# Production instances (`PROD`, `DEMO`, `PENTEST`, `FAST-MACHINE`, ...) share the same redis but different DB
+# Production instances (`PROD`, `DEMO`, `PENTEST`, ...) share the same redis but different DB
 redis_url = os.environ["REDIS_URL"]
 redis_db = os.environ["REDIS_DB"]
 redis_common_django_settings = {
@@ -543,8 +543,6 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    # Send emails immediately in FAST-MACHINE, there are no queue consumers in that environment.
-    "immediate": ITOU_ENVIRONMENT == ItouEnvironment.FAST_MACHINE,
 }
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
