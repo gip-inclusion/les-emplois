@@ -391,6 +391,8 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
+            "apply:hire_step_job_seeker",
+            "apply:hire_step_contract",
             "apply:hire_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
@@ -447,6 +449,8 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
+            "apply:hire_step_job_seeker",
+            "apply:hire_step_contract",
             "apply:hire_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
@@ -462,6 +466,8 @@ class TestHire:
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:iae_eligibility_for_hire",
+            "apply:hire_step_job_seeker",
+            "apply:hire_step_contract",
             "apply:hire_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})

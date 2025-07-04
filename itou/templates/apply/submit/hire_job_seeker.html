@@ -1,0 +1,77 @@
+{% extends "apply/submit_base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                Déclarer l’embauche de {{ job_seeker.get_full_name }}
+                {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content_extend %}
+    <div class="c-box my-4">
+        <h2>Candidat</h2>
+        <form method="post" class="js-format-nir js-prevent-multiple-submit">
+            {% csrf_token %}
+
+            {% if has_form_error %}
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
+                </div>
+            {% endif %}
+
+            {% if form_personal_data %}
+                {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
+                {% if form_personal_data.pole_emploi_id_error %}{{ form_personal_data.pole_emploi_id_error }}{% endif %}
+
+                {% include "includes/job_seekers/readonly_form.html" with form=form_personal_data ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+                {% bootstrap_form_errors form_personal_data type='non_fields' %}
+                {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
+                {% bootstrap_field form_personal_data.lack_of_nir %}
+                <div class="ps-3 pb-1 mb-3 border-start border-primary collapse lack_of_nir_reason_group">
+                    {% bootstrap_field form_personal_data.lack_of_nir_reason %}
+                </div>
+                {% bootstrap_field form_personal_data.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
+                {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
+                {% bootstrap_field form_personal_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
+                {% bootstrap_field form_personal_data.birth_place %}
+                {% bootstrap_field form_personal_data.birth_country %}
+            {% endif %}
+
+            {% if form_birth_place %}
+                {% bootstrap_form form_birth_place %}
+            {% endif %}
+
+            {% if form_user_address %}
+                {% bootstrap_field form_user_address.address_for_autocomplete %}
+                {% bootstrap_field form_user_address.address_line_1 %}
+                {% bootstrap_field form_user_address.address_line_2 %}
+                {% bootstrap_field form_user_address.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                {% bootstrap_field form_user_address.city %}
+
+                {% bootstrap_field form_user_address.insee_code %}
+                {% bootstrap_field form_user_address.ban_api_resolved_address %}
+                {% bootstrap_field form_user_address.fill_mode %}
+            {% endif %}
+
+            {% itou_buttons_form primary_label="Valider" secondary_url=back_url %}
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
+    {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
+    {% if form_user_address %}
+        {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+        {{ form_user_address.media.js }}
+    {% endif %}
+{% endblock %}

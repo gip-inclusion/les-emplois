@@ -91,6 +91,19 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     path(
+        "<uuid:session_uuid>/hire/job-seeker",
+        submit_views.HireJobSeekerView.as_view(),
+        name="hire_step_job_seeker",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/contract",
+        submit_views.HireContractView.as_view(),
+        name="hire_step_contract",
+        kwargs={"hire_process": True},
+    ),
+    # TODO(François): Remove after a week (transition to hire_step_*).
+    path(
         "<uuid:session_uuid>/hire/confirm",
         submit_views.HireConfirmationView.as_view(),
         name="hire_confirmation",

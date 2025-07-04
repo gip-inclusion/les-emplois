@@ -28,6 +28,195 @@ from itou.www.apply.forms import (
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
+class BaseAcceptJobSeekerView(UserPassesTestMixin, TemplateView):
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def get_back_url(self):
+        raise NotImplementedError
+
+    def get_forms(self):
+        forms = {}
+        if self.company.is_subject_to_eligibility_rules:
+            # Info that will be used to search for an existing Pôle emploi approval.
+            forms["personal_data"] = JobSeekerPersonalDataForm(
+                instance=self.job_seeker,
+                data=self.request.POST or None,
+                tally_form_query=f"jobapplication={self.job_application.pk}" if self.job_application else None,
+            )
+            forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
+        elif self.company.kind == CompanyKind.GEIQ:
+            if self.geiq_eligibility_diagnosis and self.geiq_eligibility_diagnosis.criteria_can_be_certified():
+                forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
+                    instance=self.job_seeker.jobseeker_profile,
+                    birthdate=self.job_seeker.jobseeker_profile.birthdate,
+                    data=self.request.POST or None,
+                )
+        return forms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        forms = self.get_forms()
+        context["back_url"] = self.get_back_url()
+        context["can_edit_personal_information"] = True
+        context["form_user_address"] = forms.get("user_address")
+        context["form_personal_data"] = forms.get("personal_data")
+        context["form_birth_place"] = forms.get("birth_place")
+        context["has_form_error"] = any(form.errors for form in forms.values())
+        context["job_seeker"] = self.job_seeker
+        return context
+
+    def post(self, request, *args, **kwargs):
+        forms = self.get_forms()
+        if all([form.is_valid() for form in forms.values()]):
+            if form_personal_data := forms.get("personal_data"):
+                form_personal_data.save()
+                if (
+                    self.eligibility_diagnosis
+                    and self.eligibility_diagnosis.criteria_can_be_certified()
+                    and settings.API_PARTICULIER_TOKEN
+                ):
+                    self.eligibility_diagnosis.certify_criteria()
+            if form_user_address := forms.get("user_address"):
+                form_user_address.save()
+            if form_birth_place := forms.get("birth_place"):
+                form_birth_place.save()
+                if settings.API_PARTICULIER_TOKEN:
+                    self.geiq_eligibility_diagnosis.certify_criteria()
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:hire_step_contract",
+                    kwargs={
+                        "session_uuid": self.apply_session.name,
+                    },
+                )
+            )
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+
+class BaseAcceptContractView(UserPassesTestMixin, TemplateView):
+    template_name = None
+    form_class = AcceptForm
+
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+
+    def get_back_url(self):
+        raise NotImplementedError
+
+    def get_error_url(self):
+        raise NotImplementedError
+
+    def clean_session(self):
+        pass
+
+    def get_form_kwargs(self):
+        return {
+            "instance": self.job_application,
+            "company": self.company,
+            "job_seeker": self.job_seeker,
+            "data": self.request.POST or None,
+        }
+
+    def get_context_data(self, *, form=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form_accept"] = form or self.form_class(**self.get_form_kwargs())
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["hide_value"] = ContractType.OTHER.value
+        context["matomo_custom_title"] = "Candidature acceptée"
+        context["job_application"] = self.job_application
+        context["job_seeker"] = self.job_seeker
+        context["company"] = self.company
+        context["back_url"] = self.get_back_url()
+        context["hire_process"] = self.job_application is None
+        return context
+
+    def get_template_names(self):
+        if self.request.htmx:
+            return "apply/includes/hire_contract_form.html"
+        return super().get_template_names()
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(**self.get_form_kwargs())
+        if not form.is_valid():
+            context = self.get_context_data(**kwargs, form=form)
+            return self.render_to_response(context)
+
+        if request.htmx and not request.POST.get("confirmed"):
+            return TemplateResponse(
+                request=request,
+                template="apply/includes/hire_contract_form.html",
+                context=self.get_context_data(),
+                headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
+            )
+
+        creating = self.job_application is None
+
+        try:
+            with transaction.atomic():
+                # Instance will be committed by the transition, performed by django-xworkflows.
+                job_application = form.save(commit=False)
+                if creating:
+                    job_application.job_seeker = self.job_seeker
+                    job_application.to_company = self.company
+                    job_application.sender = request.user
+                    job_application.sender_kind = UserKind.EMPLOYER
+                    job_application.sender_company = self.company
+                    job_application.process(user=request.user)
+                job_application.accept(user=request.user)
+
+                # Mark job seeker's infos as up-to-date
+                job_application.job_seeker.last_checked_at = timezone.now()
+                job_application.job_seeker.save(update_fields=["last_checked_at"])
+        except xwf_models.InvalidTransitionError:
+            messages.error(request, "Action déjà effectuée.")
+            return HttpResponseClientRedirect(self.get_error_url())
+
+        if job_application.to_company.is_subject_to_eligibility_rules:
+            # Automatic approval delivery mode.
+            if job_application.approval:
+                messages.success(request, "Candidature acceptée !", extra_tags="toast")
+            # Manual approval delivery mode.
+            elif not job_application.hiring_without_approval:
+                external_link = get_external_link_markup(
+                    url=(
+                        f"{global_constants.ITOU_HELP_CENTER_URL}/articles/"
+                        "14733528375185--PASS-IAE-Comment-ça-marche-/#verification-des-demandes-de-pass-iae"
+                    ),
+                    text="consulter notre espace documentation",
+                )
+                messages.success(
+                    request,
+                    mark_safe(
+                        "Votre demande de PASS IAE est en cours de vérification auprès de nos équipes.<br>"
+                        "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
+                        f"{external_link}."
+                    ),
+                )
+        elif self.geiq_eligibility_diagnosis:
+            # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
+            # link this diagnosis to the current job application
+            job_application.geiq_eligibility_diagnosis = self.geiq_eligibility_diagnosis
+            job_application.save(update_fields=["geiq_eligibility_diagnosis", "updated_at"])
+
+        if creating and self.company.is_subject_to_eligibility_rules and job_application.approval:
+            final_url = reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
+        else:
+            final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        self.clean_session()
+
+        return HttpResponseClientRedirect(final_url)
+
+
+# TODO(François): Legacy view, remove next week.
 class BaseAcceptView(UserPassesTestMixin, TemplateView):
     template_name = None
 

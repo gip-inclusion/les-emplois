@@ -1,0 +1,33 @@
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% load str_filters %}
+
+<div class="c-form" id="acceptFormDiv">
+    <h2>Contrat</h2>
+    <hr class="my-4">
+    <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm">
+        {% csrf_token %}
+        {% bootstrap_form_errors form_accept type="non_fields" %}
+
+        {# reloadable contract type and options for GEIQ #}
+        {% if company.kind == CompanyKind.GEIQ %}
+            {% include "apply/includes/geiq/geiq_contract_type_and_options.html" %}
+        {% endif %}
+
+        {# job description: mandatory for GEIQ, optional for other types #}
+        {% include "apply/includes/job_description_fields.html" %}
+
+        {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-33" %}
+
+        {# reloadable training and qualification for GEIQ #}
+        {% if company.kind == CompanyKind.GEIQ %}
+            {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
+        {% endif %}
+
+        {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
+        {% bootstrap_field form_accept.answer %}
+
+        {% itou_buttons_form primary_label="Valider l'embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information secondary_url=back_url %}
+    </form>
+</div>
