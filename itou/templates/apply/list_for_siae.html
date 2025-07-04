@@ -28,7 +28,7 @@
         {% endif %}
     </div>
 
-    {% include "apply/includes/siae_actions.html" with batch_mode=False %}
+    {% include "apply/includes/siae_batch_actions.html" with batch_mode=False %}
 {% endblock %}
 
 {% block title_messages %}
@@ -61,7 +61,7 @@
 
 {% block modals %}
     {{ block.super }}
-    {% include "apply/includes/siae_actions_modals.html" with batch_mode=False %}
+    {% include "apply/includes/siae_batch_actions_modals.html" with batch_mode=False %}
 {% endblock %}
 
 {% block script %}

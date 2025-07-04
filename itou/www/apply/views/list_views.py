@@ -462,7 +462,7 @@ def list_for_siae_actions(request):
     }
     response = render(
         request,
-        "apply/includes/siae_actions.html",
+        "apply/includes/siae_batch_actions.html",
         context,
     )
     return response
