@@ -20,7 +20,7 @@ from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
-from itou.users.models import User
+from itou.users.models import NirModificationRequest, User
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
@@ -1396,3 +1396,43 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
                 f"vérifiez la liste des membres de l’organisation {expected_membership.institution.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]
+
+
+class TestDeleteOldNirModificationRequests:
+    def test_dry_run(self, caplog):
+        job_seekers = JobSeekerFactory.create_batch(2)
+        now = timezone.now()
+        with freeze_time(now - datetime.timedelta(182)):
+            old = NirModificationRequest.objects.create(
+                jobseeker_profile=job_seekers[0].jobseeker_profile,
+                requested_by=job_seekers[0],
+                processed_at=timezone.now(),
+            )
+        with freeze_time(now - datetime.timedelta(181)):
+            after_cutoff = NirModificationRequest.objects.create(
+                jobseeker_profile=job_seekers[1].jobseeker_profile,
+                requested_by=job_seekers[1],
+                processed_at=timezone.now(),
+            )
+        call_command("delete_old_nir_modification_requests")
+        assert caplog.messages[0] == "Would delete 1 NIR modification request"
+        assertQuerySetEqual(NirModificationRequest.objects.all(), [after_cutoff, old], ordered=False)
+
+    def test_wet_run(self, caplog):
+        job_seekers = JobSeekerFactory.create_batch(2)
+        now = timezone.now()
+        with freeze_time(now - datetime.timedelta(182)):
+            NirModificationRequest.objects.create(
+                jobseeker_profile=job_seekers[0].jobseeker_profile,
+                requested_by=job_seekers[0],
+                processed_at=timezone.now(),
+            )
+        with freeze_time(now - datetime.timedelta(181)):
+            after_cutoff = NirModificationRequest.objects.create(
+                jobseeker_profile=job_seekers[1].jobseeker_profile,
+                requested_by=job_seekers[1],
+                processed_at=timezone.now(),
+            )
+        call_command("delete_old_nir_modification_requests", wet_run=True)
+        assert caplog.messages[0] == "Deleted 1 NIR modification request"
+        assertQuerySetEqual(list(NirModificationRequest.objects.all()), [after_cutoff])
