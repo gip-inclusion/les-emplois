@@ -42,33 +42,36 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% bootstrap_form_errors form type="all" %}
+                            <legend class="h3">Informations générales</legend>
+                            <fieldset>
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
 
-                            {% if form.siret %}
-                                {% bootstrap_field form.siret %}
-                            {% endif %}
+                                {% if form.siret %}
+                                    {% bootstrap_field form.siret %}
+                                {% endif %}
 
-                            {% if form.name %}
-                                {% bootstrap_field form.name %}
-                            {% endif %}
+                                {% if form.name %}
+                                    {% bootstrap_field form.name %}
+                                {% endif %}
 
-                            {% bootstrap_field form.address_line_1 %}
-                            {% bootstrap_field form.address_line_2 %}
-                            {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.city %}
-                            {% bootstrap_field form.department %}
+                                {% bootstrap_field form.address_line_1 %}
+                                {% bootstrap_field form.address_line_2 %}
+                                {% bootstrap_field form.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
+                                {% bootstrap_field form.city %}
+                                {% bootstrap_field form.department %}
 
-                            {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
-                            {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% bootstrap_field form.website %}
-                            {% if form.description %}
-                                {% bootstrap_field form.description %}
-                            {% endif %}
+                                {% bootstrap_field form.phone wrapper_class="form-group form-group-input-w-lg-33" %}
+                                {% bootstrap_field form.email wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.website %}
+                                {% if form.description %}
+                                    {% bootstrap_field form.description %}
+                                {% endif %}
 
-                            {% if not form.readonly %}
-                                {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer la modification" %}
-                            {% endif %}
+                                {% if not form.readonly %}
+                                    {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer la modification" %}
+                                {% endif %}
+                            </fieldset>
                         </form>
                     </div>
                 </div>
