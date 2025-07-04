@@ -23,6 +23,7 @@ from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
+from tests.utils.test_s3 import default_storage_ls_files
 
 
 def test_bucket_policy_for_anonymous_user():
@@ -128,13 +129,14 @@ def test_cellar_does_not_support_checksum_validation():
 
 def test_copy(pdf_file):
     key = "resume/11111111-1111-1111-1111-111111111111.pdf"
-    default_storage.save(key, pdf_file)
     existing_file = FileFactory(key=key)
+    default_storage.save(existing_file.key, pdf_file)
 
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
-    with default_storage.open(key) as old, default_storage.open(new_file.key) as new:
+    assert len(default_storage_ls_files("resume")) == 2
+    with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 
 
@@ -187,3 +189,44 @@ def test_purge_files(caplog):
         "Purged 2 files",
     ]
     assert caplog.messages[-1].startswith("Management command itou.files.management.commands.purge_files succeeded in")
+
+
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("resume.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("something-very-long EVEN WITH SPACES! YUK!.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("spreadsheet.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("spreadsheet.pdf.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("open-office.odt", "11111111-1111-1111-1111-111111111111.odt"),
+    ],
+)
+def test_anonymised_filename(mocker, filename, expected):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    assert File.anonymized_filename(filename) == expected
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"key": "folder/file.txt"},
+        {"key_prefix": "folder/", "filename": "file.txt"},
+        {"key_prefix": "folder", "filename": "file.txt"},
+    ],
+)
+def test_create(mocker, params):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    file = File.objects.create(**params)
+    assert file.key == "folder/11111111-1111-1111-1111-111111111111.txt"
+
+
+def test_create_raises_exception():
+    with pytest.raises(KeyError):
+        File.objects.create(filename="file.txt", key="folder/file.txt")
+
+    with pytest.raises(ValueError) as exc:
+        File.objects.create(key="folder/subfolder/file.txt")
+        assert (
+            str(exc) == "<ExceptionInfo ValueError('File tree depth is too deep. Only one level is allowed.', "
+            "'folder/subfolder/file.txt') tblen=2>"
+        )
