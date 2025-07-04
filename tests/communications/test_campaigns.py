@@ -80,15 +80,24 @@ class TestRenderAnnouncementCampaign:
     def test_campaign_rendered_dashboard(self, client, snapshot):
         MODAL_ID = "news-modal"
         campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
-        AnnouncementItemFactory(campaign=campaign, title="Item A", description="Item A", priority=0)
-        AnnouncementItemFactory(campaign=campaign, title="Item B", description="Item B", priority=1)
-        AnnouncementItemFactory(campaign=campaign, title="Item D", description="Item D", priority=3)
-        AnnouncementItemFactory(campaign=campaign, title="Item C", description="Item C", priority=2)
+        user = random_user_kind_factory()
+        AnnouncementItemFactory(
+            campaign=campaign, title="Item A", description="Item A", priority=0, user_kind_tags=[user.kind]
+        )
+        AnnouncementItemFactory(
+            campaign=campaign, title="Item B", description="Item B", priority=1, user_kind_tags=[user.kind]
+        )
+        AnnouncementItemFactory(
+            campaign=campaign, title="Item D", description="Item D", priority=3, user_kind_tags=[user.kind]
+        )
+        AnnouncementItemFactory(
+            campaign=campaign, title="Item C", description="Item C", priority=2, user_kind_tags=[user.kind]
+        )
 
         response = client.get(reverse("search:employers_home"))
         assertNotContains(response, MODAL_ID)
 
-        client.force_login(random_user_kind_factory())
+        client.force_login(user)
         response = client.get(reverse("search:employers_home"))
         assertContains(response, MODAL_ID)
 
