@@ -11,7 +11,7 @@ from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from django.utils.cache import add_never_cache_headers
 
-from itou.utils.throttling import FailSafeUserRateThrottle
+from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
 
 
 def never_cache(get_response):
@@ -32,8 +32,9 @@ class RateLimitMiddleware:
         return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if request.user.is_authenticated and getattr(view_func, "login_required", True):
-            throttler = FailSafeUserRateThrottle()
+        # Django REST Framework handles the rate limiting on the API.
+        if "itou.api" not in request.resolver_match.app_names:
+            throttler = FailSafeUserRateThrottle() if request.user.is_authenticated else FailSafeAnonRateThrottle()
             if not throttler.allow_request(request, None):
                 retry_after = throttler.wait()
                 if retry_after is not None:
