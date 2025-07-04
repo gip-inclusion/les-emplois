@@ -2668,8 +2668,14 @@ class TestProcessAcceptViews:
         assertContains(
             response,
             (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+                '<a href="'
+                f'{
+                    reverse(
+                        "job_seekers_views:nir_modification_request",
+                        kwargs={"public_id": job_application.job_seeker.public_id},
+                        query={"back_url": url_accept},
+                    )
+                }">Demander la correction du numéro de sécurité sociale</a>'
             ),
             html=True,
         )
@@ -2817,12 +2823,18 @@ class TestProcessAcceptViews:
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
 
-        # Check that the tally link is there
+        # Check that the NIR modification link is there
         assertContains(
             response,
             (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+                '<a href="'
+                f'{
+                    reverse(
+                        "job_seekers_views:nir_modification_request",
+                        kwargs={"public_id": job_application.job_seeker.public_id},
+                        query={"back_url": url_accept},
+                    )
+                }">Demander la correction du numéro de sécurité sociale</a>'
             ),
             html=True,
         )
