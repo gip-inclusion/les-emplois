@@ -2,7 +2,7 @@
 {% load matomo %}
 {% load str_filters %}
 
-{% if batch_mode %}
+{% if display_batch_actions %}
     <div id="batch-action-modals" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         {% if can_process %}
             <div id="process_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="process_modal_title" aria-hidden="true">

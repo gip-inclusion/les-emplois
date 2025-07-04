@@ -4,7 +4,7 @@
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
-{% if batch_mode %}
+{% if display_batch_actions %}
     <div id="batch-action-box" class="c-box c-box--action selection-indicator" data-emplois-elements-visibility-on-selection="shown" {% if request.htmx %}hx-swap-oob="true"{% endif %}>
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
