@@ -3,9 +3,13 @@
         <div class="s-home-search__row row">
             <div class="s-home-search__col col-12">
                 <h1 class="lh-sm text-center text-tertiary">{{ title }}</h1>
-                <form method="get" action="{% url url_search %}" role="search" class="s-home-search__form">
-                    {% include template_form_name with form=form is_home=True %}
-                </form>
+                <div class="c-search mt-3 mt-md-4">
+                    <div class="c-search__bar">
+                        <form method="get" action="{% url url_search %}" role="search">
+                            {% include template_form_name with form=form is_home=True %}
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
