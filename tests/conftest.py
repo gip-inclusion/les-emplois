@@ -450,6 +450,12 @@ def xlsx_file():
         yield xlsx
 
 
+@pytest.fixture
+def png_file():
+    with open("tests/data/black_pixel.png", "rb") as png:
+        yield png
+
+
 # SFTP related fixtures
 # ------------------------------------------------------------------------------
 class Server(paramiko.ServerInterface):
