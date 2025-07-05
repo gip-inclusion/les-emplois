@@ -1,3 +1,7 @@
+import binascii
+import contextlib
+
+from django.db import connection
 from django.db.models import Q
 
 
@@ -16,3 +20,17 @@ def dictfetchall(cursor):
     """
     columns = [col[0] for col in cursor.description]
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+@contextlib.contextmanager
+def pg_advisory_lock(name):
+    lock_id = binascii.crc32(name.encode())
+    with connection.cursor() as cursor:
+        cursor.execute("SHOW statement_timeout")
+        [statement_timeout_row] = cursor.fetchall()
+        [statement_timeout] = statement_timeout_row
+        cursor.execute("SET statement_timeout TO 0")
+        cursor.execute("SELECT pg_advisory_lock(%s)", (lock_id,))
+        yield
+        cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
+        cursor.execute("SET statement_timeout TO %s", (statement_timeout,))
