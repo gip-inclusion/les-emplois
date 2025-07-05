@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
@@ -587,9 +588,8 @@ class TestAnonymizeJobseekersManagementCommand:
         assert AnonymizedJobSeeker.objects.exists()
         assert respx_mock.calls.call_count == 1
 
-    @pytest.mark.parametrize("deleted_at", [None, timezone.make_aware(datetime.datetime(2025, 3, 3, 0, 0))])
-    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, deleted_at, respx_mock):
-        resume_file = FileFactory(deleted_at=deleted_at)
+    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, respx_mock):
+        resume_file = FileFactory()
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
             job_seeker__date_joined=timezone.make_aware(datetime.datetime(2023, 10, 30, 0, 0)),
@@ -599,21 +599,12 @@ class TestAnonymizeJobseekersManagementCommand:
             updated_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
-        undesired_file_keys = [FileFactory().id, JobApplicationFactory().resume.id]
+        other_files = [FileFactory(), JobApplicationFactory().resume]
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
-        assert File.objects.filter(id__in=undesired_file_keys, deleted_at__isnull=True).count() == 2
-
-        file = File.objects.get(id=resume_file.id, jobapplication__isnull=True, deleted_at__isnull=False)
-
-        if deleted_at is None:
-            assert file.deleted_at.date() == timezone.now().date()
-            ("django.urls.reverse",)
-        else:
-            assert file.deleted_at == deleted_at
-
+        assertQuerySetEqual(File.objects.all(), other_files, ordered=False)
         assert respx_mock.calls.call_count == 1
 
     @freeze_time("2025-02-15")
