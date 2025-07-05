@@ -16,9 +16,6 @@ class File(models.Model):
     key = models.CharField(max_length=1024, unique=True)
 
     last_modified = models.DateTimeField("dernière modification sur Cellar", default=timezone.now)
-    deleted_at = models.DateTimeField(
-        verbose_name="supprimé le", help_text="Marqué pour suppression du stockage", null=True
-    )
 
     class Meta:
         verbose_name = "fichier"

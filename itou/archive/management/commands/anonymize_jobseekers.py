@@ -191,10 +191,9 @@ class Command(BaseCommand):
             async_delete_contact(user.email)
 
     def _delete_jobapplications_with_related_objects(self, jobapplications):
-        File.objects.filter(deleted_at__isnull=True, jobapplication__in=jobapplications).update(
-            deleted_at=timezone.now()
-        )
+        resume_pks = list(File.objects.filter(jobapplication__in=jobapplications).values_list("pk", flat=True))
         jobapplications.delete()
+        File.objects.filter(pk__in=resume_pks).delete()
 
     @monitor(
         monitor_slug="anonymize_jobseekers",

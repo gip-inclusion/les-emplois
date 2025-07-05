@@ -11,7 +11,7 @@ class FileAdmin(ItouModelAdmin):
     list_display = ["key", "last_modified"]
     readonly_fields = ["key", "link", "last_modified"]
 
-    fields = ["key", "link", "last_modified", "deleted_at"]
+    fields = ["key", "link", "last_modified"]
 
     @admin.display(description="lien")
     def link(self, obj):

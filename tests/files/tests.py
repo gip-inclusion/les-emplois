@@ -11,12 +11,11 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.utils import timezone
-from pytest_django.asserts import assertQuerySetEqual
 
 from itou.antivirus.models import Scan
 from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
-from itou.utils.storage.s3 import s3_client
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 from tests.approvals.factories import ProlongationFactory, ProlongationRequestFactory
 from tests.communications.factories import AnnouncementItemFactory
 from tests.files.factories import FileFactory
@@ -66,56 +65,57 @@ def test_deletion(temporary_bucket):
     assert page_after_deletion["KeyCount"] == 0
 
 
-def test_sync_files_ignores_temporary_storage(temporary_bucket, caplog):
+def test_remove_unknown_s3_files(temporary_bucket, caplog, mocker):
     client = s3_client()
-    for key in [
+    existing_file = FileFactory()
+    missing_file = FileFactory()
+
+    # create unknown files in the s3
+    keys = [
+        f"{TEMPORARY_STORAGE_PREFIX}/test.pdf",  # temporary file (will be ignored)
+        existing_file.key,  # exists in db
+        # files to clean
         "resume/11111111-1111-1111-1111-111111111111.pdf",
         "evaluations/test.xlsx",
         "prolongation_report/test.xlsx",
-    ]:
+    ]
+    for key in keys:
         with io.BytesIO() as content:
             client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
-    existing_file = FileFactory()
-    call_command("sync_s3_files")
-    assertQuerySetEqual(
-        File.objects.values_list("key", flat=True),
-        [
-            "resume/11111111-1111-1111-1111-111111111111.pdf",
-            "evaluations/test.xlsx",
-            "prolongation_report/test.xlsx",
-            existing_file.key,
-        ],
-        ordered=False,
-    )
+
+    # With the default 1 day delay, no file will be removed. It's a security to ensure we don't delete
+    # a file that was just uploaded before the File object wes commited to the database.
+    call_command("remove_unknown_s3_files")
+    assert File.objects.count() == 2  # No changes in db
     assert caplog.messages[:-1] == [
-        "Checking existing files: 1 files in database before sync",
-        "Completed bucket sync: found permanent=3 and temporary=0 files in the bucket",
-        "permanent=0 files already in database before sync",
-        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
+        "Checking existing files: 2 files in database",
+        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=0 files",
+        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
     ]
     assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.sync_s3_files succeeded in"
+        "Management command itou.files.management.commands.remove_unknown_s3_files succeeded in"
     )
+    assert sorted(
+        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
+    ) == sorted(keys)
 
-    # Assert a second use does not create more files
+    # Without delay
+    mocker.patch("itou.files.management.commands.remove_unknown_s3_files.S3_CLEANING_DELAY", datetime.timedelta())
     caplog.clear()
-    call_command("sync_s3_files")
-    assertQuerySetEqual(
-        File.objects.values_list("key", flat=True),
-        [
-            "resume/11111111-1111-1111-1111-111111111111.pdf",
-            "evaluations/test.xlsx",
-            "prolongation_report/test.xlsx",
-            existing_file.key,
-        ],
-        ordered=False,
-    )
+
+    call_command("remove_unknown_s3_files")
+    assert File.objects.count() == 2  # No changes in db
     assert caplog.messages[:-1] == [
-        "Checking existing files: 4 files in database before sync",
-        "Completed bucket sync: found permanent=0 and temporary=0 files in the bucket",
-        "permanent=3 files already in database before sync",
-        f"1 database files do not exist in the bucket: [{existing_file.key!r}]",
+        "Checking existing files: 2 files in database",
+        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=3 files",
+        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
     ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.remove_unknown_s3_files succeeded in"
+    )
+    assert sorted(
+        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
+    ) == sorted(keys[:2])
 
 
 @pytest.mark.skipif(os.getenv("CI") != "true", reason="Not using to Cellar")
@@ -138,7 +138,7 @@ def test_copy(pdf_file):
         assert old.read() == new.read()
 
 
-def test_find_orphans(caplog):
+def test_delete_orphans(caplog):
     old_orphan = FileFactory()
     job_application = JobApplicationFactory()
     ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
@@ -156,34 +156,12 @@ def test_find_orphans(caplog):
     FileFactory()  # Too recent orphan file
     assert File.objects.all().count() == 11
 
-    call_command("find_orphan_files")
+    call_command("delete_orphan_files")
 
-    orphan_pks = set(File.objects.filter(deleted_at__isnull=False).values_list("pk", flat=True))
-    assert orphan_pks == {old_orphan.pk, scan.file_id}
+    assert File.objects.all().count() == 9
+    assert not File.objects.filter(pk__in=[old_orphan.pk, scan.file_id]).exists()
 
     assert caplog.messages[:-1] == ["Marked 2 orphans files for deletion"]
     assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.find_orphan_files succeeded in"
+        "Management command itou.files.management.commands.delete_orphan_files succeeded in"
     )
-
-
-def test_purge_files(caplog):
-    in_the_past = timezone.now() - datetime.timedelta(days=1)
-    to_purge = FileFactory(deleted_at=in_the_past)
-    not_an_orphan = JobApplicationFactory(resume__deleted_at=in_the_past).resume
-    FileFactory(deleted_at=in_the_past)  # File without S3 object (remove anyway)
-    too_recently_marked = FileFactory(deleted_at=timezone.now())
-
-    for file in [to_purge, not_an_orphan]:
-        with io.BytesIO() as content:
-            default_storage.save(file.key, content)
-
-    call_command("purge_files")
-
-    assert set(File.objects.values_list("pk", flat=True)) == {not_an_orphan.pk, too_recently_marked.pk}
-
-    assert caplog.messages[:-1] == [
-        f"Could not delete protected file {not_an_orphan.key}",
-        "Purged 2 files",
-    ]
-    assert caplog.messages[-1].startswith("Management command itou.files.management.commands.purge_files succeeded in")
