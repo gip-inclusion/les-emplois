@@ -4596,7 +4596,6 @@
                  "files_file"."id",
                  "files_file"."key",
                  "files_file"."last_modified",
-                 "files_file"."deleted_at",
                  T12."id",
                  T12."password",
                  T12."last_login",
