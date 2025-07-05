@@ -21,7 +21,6 @@
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
-  "30 3 * * * $ROOT/clevercloud/run_management_command.sh purge_files",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "30 4 * * * $ROOT/clevercloud/run_management_command.sh redact_zendesk_attachments",
   "0 5 * * * $ROOT/clevercloud/run_management_command.sh deactivate_old_job_descriptions",
