@@ -125,6 +125,12 @@ TABLE.add_columns(
             "fn": lambda o: bool(o.archived_at),
         },
         {
+            "name": "candidature_refusée_automatiquement",
+            "type": "boolean",
+            "comment": "Candidature automatiquement refusée car en attente depuis plus de 2 mois",
+            "fn": lambda o: bool(o.refused_by is None),
+        },
+        {
             "name": "date_candidature",
             "type": "date",
             "comment": "Date de la candidature",

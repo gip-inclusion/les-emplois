@@ -501,6 +501,7 @@ def test_populate_job_applications():
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="job_applications")
 
