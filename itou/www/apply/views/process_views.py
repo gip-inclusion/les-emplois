@@ -37,6 +37,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
+    JobApplicationInternalTransferForm,
     PriorActionForm,
     TransferJobApplicationForm,
 )
@@ -168,6 +169,33 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     return render(request, template_name, context)
 
 
+def get_siae_actions_context(request, job_application):
+    can_accept = job_application.accept.is_available()
+    can_archive = job_application.can_be_archived
+    can_process = job_application.process.is_available()
+    can_postpone = job_application.postpone.is_available()
+    can_refuse = job_application.refuse.is_available()
+    can_transfer_internal = job_application.transfer.is_available() and len(request.organizations) > 1
+    can_transfer_external = job_application.state.is_refused
+    can_unarchive = job_application.archived_at is not None
+    return {
+        "can_accept": can_accept,
+        "can_archive": can_archive,
+        "can_process": can_process,
+        "can_postpone": can_postpone,
+        "can_refuse": can_refuse,
+        "can_transfer_internal": can_transfer_internal,
+        "can_transfer_external": can_transfer_external,
+        "can_unarchive": can_unarchive,
+        "transfer_form": JobApplicationInternalTransferForm(request, job_app_count=1)
+        if can_transfer_internal
+        else None,
+        "other_actions_count": sum(
+            [can_process, can_postpone, can_archive, can_transfer_internal or can_transfer_external]
+        ),
+    }
+
+
 @check_user(lambda user: user.is_employer)
 def details_for_company(request, job_application_id, template_name="apply/process_details_company.html"):
     """
@@ -278,7 +306,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
         "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,
-    }
+    } | get_siae_actions_context(request, job_application)
 
     return render(request, template_name, context)
 
@@ -952,7 +980,8 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                     if job_application.to_company.kind == CompanyKind.GEIQ
                     else None
                 ),
-            },
+            }
+            | get_siae_actions_context(request, job_application),
             request=request,
         )
         if state_changed
@@ -1030,7 +1059,8 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     "with_oob_state_update": state_update,
                     "transition_logs": job_application.logs.select_related("user").all() if state_update else None,
                     "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
-                },
+                }
+                | get_siae_actions_context(request, job_application),
             )
 
     context = {
