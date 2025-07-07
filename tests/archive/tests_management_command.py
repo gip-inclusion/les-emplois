@@ -305,6 +305,34 @@ class TestAnonymizeJobseekersManagementCommand:
                 id="notified_jobseeker_with_recent_approval",
             ),
             pytest.param(
+                lambda: JobSeekerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY,
+                    notified_days_ago=1,
+                ),
+                lambda jobseeker: ApprovalFactory(
+                    user=jobseeker,
+                    expired=True,
+                    updated_at=timezone.now() - relativedelta(years=3),
+                    eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                ),
+                False,
+                id="notified_jobseeker_with_expired_approval_not_recently_updated",
+            ),
+            pytest.param(
+                lambda: JobSeekerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY,
+                    notified_days_ago=1,
+                ),
+                lambda jobseeker: ApprovalFactory(
+                    user=jobseeker,
+                    expired=True,
+                    updated_at=timezone.now(),
+                    eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                ),
+                True,
+                id="notified_jobseeker_with_expired_approval_recently_updated",
+            ),
+            pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
                 lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
                 True,
