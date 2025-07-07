@@ -164,36 +164,45 @@
     {% enums "companies" "CompanyKind" as CompanyKind %}
     {{ block.super }}
     {# Job application transfer modals triggered by apply/includes/transfer_job_application.html #}
-    {% if job_application.transfer.is_available %}
-        {% for siae in request.organizations %}
-            {% if siae != request.current_organization %}
-                <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title_{{ siae.pk }}" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modal_title_{{ siae.pk }}">Confirmation du transfert</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>
-                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
-                                </p>
-                                {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class="mb-3 mb-md-4" open_in_tab=True only %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
-                                <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
-                                    <input type="hidden" name="back_url" value="{{ back_url }}" />
-                                    <button class="btn btn-sm btn-primary">Confirmer</button>
-                                </form>
-                            </div>
+    {% if can_transfer_internal %}
+        <div id="transfer_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="transfer_modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
+                    {% csrf_token %}
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="transfer_modal_title">Transfert de la candidature</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">{% bootstrap_field transfer_form.target_company_id label_class="" %}</div>
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Annuler</button>
+                            {% if can_transfer_external %}
+                                <a class="btn btn-sm btn-ico btn-outline-primary" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
+                                    <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                    <strong>Une autre structure</strong>
+                                </a>
+                            {% else %}
+                                <button type="button"
+                                        class="btn btn-sm btn-ico btn-outline-primary"
+                                        disabled
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur.">
+                                    <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                    <strong>Une autre structure</strong>
+                                </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
+                                Confirmer
+                            </button>
                         </div>
                     </div>
-                </div>
-            {% endif %}
-        {% endfor %}
+                </form>
+            </div>
+        </div>
     {% endif %}
     {% if can_be_cancelled %}
         <div id="cancel_hire_modal" class="modal" tabindex="-1" aria-labelledby="cancel_hire_modal_title" aria-hidden="true">

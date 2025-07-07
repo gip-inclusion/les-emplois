@@ -1,60 +1,145 @@
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load format_filters %}
 {% load job_application_actions %}
 {% load matomo %}
 
+{% enums "companies" "CompanyKind" as CompanyKind %}
+
 <div class="c-box c-box--action" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
     <h2 class="visually-hidden">Actions rapides</h2>
-    <div class="form-row align-items-center gx-3">
-        {% if job_application.state.is_new %}
+    {% if not job_application.state.is_accepted %}
+        <div class="form-row align-items-center gx-3">
             <div class="form-group col-12 col-lg-auto">
-                <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
-                    {% csrf_token %}
-                    <button class="btn btn-lg btn-white btn-block btn-ico" {% matomo_event "candidature" "submit" "processing_application" %}>
-                        <i class="ri-file-search-line fw-medium" aria-hidden="true"></i>
-                        <span>Étudier</span>
-                    </button>
-                </form>
+                {% accept_button job_application geiq_eligibility_diagnosis batch_mode=True %}
             </div>
-            <div class="form-group col-12 col-lg-auto">{% accept_button job_application geiq_eligibility_diagnosis %}</div>
-            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
-        {% endif %}
-
-        {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
-        {% if job_application.state.is_processing or job_application.state.is_prior_to_hire %}
-            <div class="form-group col-12 col-lg-auto">{% accept_button job_application geiq_eligibility_diagnosis %}</div>
-            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
-            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/postpone.html" %}</div>
-        {% endif %}
-
-        {# Possible next steps when the state is postponed ------------------------------------------------------ #}
-        {% if job_application.state.is_postponed %}
-            <div class="form-group col-12 col-lg-auto">{% accept_button job_application geiq_eligibility_diagnosis %}</div>
-            <div class="form-group col-12 col-lg-auto">{% include "apply/includes/buttons/refuse.html" %}</div>
-        {% endif %}
-
-        {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
-        {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
-            <div class="form-group col-12 col-lg-auto">{% accept_button job_application geiq_eligibility_diagnosis %}</div>
-        {% endif %}
-
-        {% if job_application.can_be_archived %}
             <div class="form-group col-12 col-lg-auto">
-                <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
-                    {% csrf_token %}
-                    <button class="btn btn-lg btn-outline-white btn-block btn-ico">
-                        <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
-                        <span>Archiver</span>
+                {% if can_archive %}
+                    <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                            <i class="ri-archive-line fw-medium" aria-hidden="true"></i>
+                            <span>Archiver</span>
+                        </button>
+                    </form>
+                {% elif can_unarchive %}
+                    <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-lg btn-link-white btn-block btn-ico">
+                            <i class="ri-arrow-go-back-line fw-medium" aria-hidden="true"></i>
+                            <span>Désarchiver</span>
+                        </button>
+                    </form>
+                {% elif can_refuse %}
+                    <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-lg btn-link-white btn-block btn-ico" {% matomo_event "candidature" "clic" "refuse_application" %}>
+                        <i class="ri-close-line fw-medium" aria-hidden="true"></i>
+                        <span>Décliner</span>
+                    </a>
+                {% else %}
+                    {# We should never display this #}
+                    <button type="button"
+                            class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
+                            disabled
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            data-bs-custom-class="c-box--action-tooltip"
+                            data-bs-title="Seule une candidature au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « En attente » peut être déclinée.">
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                        <span>Décliner</span>
                     </button>
-                </form>
+                {% endif %}
             </div>
-        {% endif %}
-
-        {# Transfer ------------------------------------------------------ #}
-        {% if job_application.transfer.is_available %}
             <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-                {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
+                <div class="dropdown">
+                    <button id="other_actions" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+                        Autres actions
+                        <span class="badge badge-base rounded-pill bg-info text-white ms-2">{{ other_actions_count }}</span>
+                    </button>
+                    <div class="dropdown-menu w-100" aria-labelledby="other_actions">
+                        {% if can_process %}
+                            <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                <button class="btn justify-content-start dropdown-item" {% matomo_event "candidature" "submit" "processing_application" %}>
+                                    <i class="ri-eye-line fw-medium me-2" aria-hidden="true"></i>
+                                    <span>Étudier</span>
+                                </button>
+                            </form>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude.">
+                                <i class="ri-eye-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Étudier</span>
+                            </button>
+                        {% endif %}
+                        {% if can_postpone %}
+                            <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn justify-content-start dropdown-item" {% matomo_event "candidature" "clic" "postpone_application" %}>
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Mettre en attente</span>
+                            </a>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seule une candidature au statut « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %} ou « Action préalable à l’embauche »{% endif %} peut être mise en liste d’attente.">
+                                <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Mettre en attente</span>
+                            </button>
+                        {% endif %}
+                        <hr class="dropdown-divider m-0">
+                        {% if can_transfer_internal %}
+                            <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
+                                <i class="ri-arrow-left-right-line me-2"></i>
+                                <span>Transférer vers</span>
+                            </button>
+                        {% elif can_transfer_external %}
+                            <a class="btn justify-content-start dropdown-item" id="transfer_to_button" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
+                                <i class="ri-arrow-left-right-line me-2"></i>
+                                <span>Transférer vers</span>
+                            </a>
+                        {% else %}
+                            <button type="button"
+                                    id="transfer_to_button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    {% if request.organizations|length == 1 %} data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." {% else %} data-bs-title="Une candidature au statut « Acceptée » ne peut pas être transférée." {% endif %}>
+                                <i class="ri-arrow-left-right-line me-2"></i>
+                                <span>Transférer vers</span>
+                            </button>
+                        {% endif %}
+                        {% if can_archive %}
+                            <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
+                                {% csrf_token %}
+                                <button class="btn justify-content-start dropdown-item">
+                                    <i class="ri-archive-line fw-medium me-2" aria-hidden="true"></i>
+                                    <span>Archiver</span>
+                                </button>
+                            </form>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées.">
+                                <i class="ri-archive-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Archiver</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 </div>

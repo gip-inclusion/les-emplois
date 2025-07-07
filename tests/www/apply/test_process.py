@@ -3385,11 +3385,11 @@ class TestProcessTemplates:
 
 
 class TestProcessTransferJobApplication:
-    TRANSFER_TO_OTHER_COMPANY_SENTENCE = "Transférer cette candidature vers"
+    TRANSFER_MODAL_ID = "transfer_confirmation_modal"
+    TRANSFER_BUTTON_ID = "transfer_to_button"
 
     def test_job_application_external_transfer_only_for_lone_users(self, client, snapshot):
-        # A user member of only one company will see the button but with
-        # only the "+ autre structure" link
+        # A user member of only one company. The dropdown item is enabled and sends to external transfer first step
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
@@ -3400,19 +3400,13 @@ class TestProcessTransferJobApplication:
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
         assert (
             pretty_indented(
                 parse_response_to_soup(
                     response,
-                    ".c-box--action .dropdown-structure",
-                    replace_in_attr=[
-                        (
-                            "href",
-                            f"/apply/{job_application.pk}/siae/external-transfer/1",
-                            "/apply/[PK of JobApplication]/siae/external-transfer/1",
-                        )
-                    ],
+                    f"#{self.TRANSFER_BUTTON_ID}",
+                    replace_in_attr=[("href", str(job_application.pk), "[PK of JobApplication]")],
                 )
             )
             == snapshot
@@ -3430,8 +3424,8 @@ class TestProcessTransferJobApplication:
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-        assert pretty_indented(parse_response_to_soup(response, ".c-box--action .dropdown-structure")) == snapshot
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot
 
     def test_job_application_transfer_disabled_for_bad_state(self, client):
         # A user member of multiple companies must not be able to transfer
@@ -3447,30 +3441,11 @@ class TestProcessTransferJobApplication:
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
+        assertNotContains(response, self.TRANSFER_BUTTON_ID)
 
-    def test_job_application_transfer_enabled(self, client):
+    def test_job_application_transfer_enabled(self, client, snapshot):
         # A user member of several company can transfer a job application
-        company = CompanyFactory(with_membership=True)
-        other_company = CompanyFactory(with_membership=True)
-        user = company.members.first()
-        other_company.members.add(user)
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            to_company=company,
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-        )
-
-        assert 2 == user.companymembership_set.count()
-
-        client.force_login(user)
-        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-
-    def test_job_application_transfer_redirection(self, client, snapshot):
-        # After transfering a job application,
-        # user must be redirected to job application list
-        # with a nice message
         company = CompanyFactory(with_membership=True)
         other_company = CompanyFactory(with_membership=True, for_snapshot=True)
         user = company.members.first()
@@ -3482,14 +3457,48 @@ class TestProcessTransferJobApplication:
             job_seeker__for_snapshot=True,
             job_seeker__first_name="<>html escaped<>",
         )
-        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+
+        assert 2 == user.companymembership_set.count()
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot(
+            name="button"
+        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                f"#{self.TRANSFER_MODAL_ID}",
+                replace_in_attr=[
+                    ("href", str(job_application.pk), "[PK of JobApplication]"),
+                    ("action", str(job_application.pk), "[PK of JobApplication]"),
+                    ("value", str(other_company.pk), "[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="modal")
 
-        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-        assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
-        assertContains(response, "target_company_id")
+        # enable external transfer button if refused
+        job_application.refuse(user=user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot(
+            name="button"
+        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                f"#{self.TRANSFER_MODAL_ID}",
+                replace_in_attr=[
+                    ("href", str(job_application.pk), "[PK of JobApplication]"),
+                    ("action", str(job_application.pk), "[PK of JobApplication]"),
+                    ("value", str(other_company.pk), "[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="modal_with_external")
+
+        # Test redirection
+        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
         assertContains(response, transfer_url)
 
         # Confirm from modal window
@@ -3500,11 +3509,11 @@ class TestProcessTransferJobApplication:
         assertRedirects(response, reverse("apply:list_for_siae"))
         assert messages
         assert len(messages) == 1
-        assert str(messages[0]) == snapshot(name="job application transfer message")
+        assert str(messages[0]) == snapshot(name="transfer message")
 
         job_application.refresh_from_db()
         assert job_application.state == job_applications_enums.JobApplicationState.NEW
-        assert job_application.logs.get().transition == "transfer"
+        assert job_application.logs.order_by("timestamp").last().transition == "transfer"
         assert job_application.to_company_id == other_company.pk
 
     def test_job_application_transfer_without_rights(self, client):
@@ -3684,7 +3693,7 @@ def test_accept_button(client):
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
     DIRECT_ACCEPT_BUTTON = (
-        f'<a href="{accept_url}" class="btn btn-lg btn-white btn-block btn-ico" '
+        f'<a href="{accept_url}" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" '
         'data-matomo-event="true" data-matomo-category="candidature" '
         'data-matomo-action="clic" data-matomo-option="accept_application">'
         '\n            <i class="ri-check-line fw-medium" aria-hidden="true"></i>'

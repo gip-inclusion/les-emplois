@@ -996,8 +996,6 @@
       <h2 class="visually-hidden">
           Actions rapides
       </h2>
-      <div class="form-row align-items-center gx-3">
-      </div>
   </div>
   
   '''
@@ -1010,7 +1008,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1021,7 +1019,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1031,20 +1029,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
                               </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1061,7 +1085,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1072,7 +1096,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1082,20 +1106,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
                               </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1112,19 +1162,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
-                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
-                      <i aria-hidden="true" class="ri-file-search-line fw-medium">
-                      </i>
-                      <span>
-                          Étudier
-                      </span>
-                  </button>
-              </form>
-          </div>
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1133,7 +1171,7 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1142,20 +1180,46 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          2
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                              <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                               </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                              <span>
+                                  Étudier
+                              </span>
+                          </button>
+                      </form>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1172,7 +1236,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1183,7 +1247,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1193,20 +1257,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
                               </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1223,7 +1313,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1234,7 +1324,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1244,20 +1334,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
                               </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1274,7 +1390,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1283,7 +1399,7 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1292,20 +1408,43 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          0
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1322,7 +1461,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1331,7 +1470,7 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1340,20 +1479,43 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          0
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1370,7 +1532,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1379,7 +1541,7 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1387,30 +1549,44 @@
                   </span>
               </a>
           </div>
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                  <i aria-hidden="true" class="ri-history-line fw-medium">
-                  </i>
-                  <span>
-                      Mettre en liste d'attente
-                  </span>
-              </a>
-          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1427,7 +1603,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1436,7 +1612,7 @@
               </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1444,30 +1620,44 @@
                   </span>
               </a>
           </div>
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                  <i aria-hidden="true" class="ri-history-line fw-medium">
-                  </i>
-                  <span>
-                      Mettre en liste d'attente
-                  </span>
-              </a>
-          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1484,7 +1674,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-white btn-block btn-ico disabled" data-bs-placement="top" data-bs-title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. Dans votre cas, le retrait définitif de la capacité d'auto-prescription est effectif depuis le 26/06/2025." data-bs-toggle="tooltip">
+              <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center disabled" data-bs-placement="top" data-bs-title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. Dans votre cas, le retrait définitif de la capacité d'auto-prescription est effectif depuis le 26/06/2025." data-bs-toggle="tooltip">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1493,7 +1683,7 @@
               </button>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1501,30 +1691,44 @@
                   </span>
               </a>
           </div>
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                  <i aria-hidden="true" class="ri-history-line fw-medium">
-                  </i>
-                  <span>
-                      Mettre en liste d'attente
-                  </span>
-              </a>
-          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1541,7 +1745,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1552,7 +1756,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1562,18 +1766,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          2
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
-                          <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
-                          <strong>
-                              Une autre structure
-                          </strong>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
                       </a>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                              </i>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1590,7 +1822,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1601,7 +1833,7 @@
           <div class="form-group col-12 col-lg-auto">
               <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                  <button class="btn btn-lg btn-link-white btn-block btn-ico">
                       <i aria-hidden="true" class="ri-archive-line fw-medium">
                       </i>
                       <span>
@@ -1611,18 +1843,46 @@
               </form>
           </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          2
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
-                          <i aria-hidden="true" class="ri-home-smile-line">
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
-                          <strong>
-                              Une autre structure
-                          </strong>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
                       </a>
+                      <form action="/apply/[PK of JobApplication]/siae/archive" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item">
+                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                              </i>
+                              <span>
+                                  Archiver
+                              </span>
+                          </button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -1639,7 +1899,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-white btn-block btn-ico" data-bs-target="#confirm_no_allowance_modal" data-bs-toggle="modal">
+              <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-target="#confirm_no_allowance_modal" data-bs-toggle="modal">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1648,7 +1908,7 @@
               </button>
           </div>
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-outline-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
                   <i aria-hidden="true" class="ri-close-line fw-medium">
                   </i>
                   <span>
@@ -1656,30 +1916,44 @@
                   </span>
               </a>
           </div>
-          <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
-                  <i aria-hidden="true" class="ri-history-line fw-medium">
-                  </i>
-                  <span>
-                      Mettre en liste d'attente
-                  </span>
-              </a>
-          </div>
           <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-              <div class="dropdown dropdown-structure">
-                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-                      Transférer cette candidature vers
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          1
+                      </span>
                   </button>
-                  <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-                      <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-                          <div class="dropdown-item disabled">
-                              <i aria-hidden="true" class="ri-home-smile-line">
-                              </i>
-                              <strong>
-                                  Une autre structure
-                              </strong>
-                          </div>
-                      </div>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Étudier
+                          </span>
+                      </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1690,45 +1964,143 @@
 # ---
 # name: TestProcessTransferJobApplication.test_job_application_external_transfer_disabled_for_bad_state
   '''
-  <div class="dropdown dropdown-structure">
-      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-          Transférer cette candidature vers
-      </button>
-      <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-          <div data-bs-placement="bottom" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur" data-bs-toggle="tooltip" role="button" tabindex="0">
-              <div class="dropdown-item disabled">
-                  <i aria-hidden="true" class="ri-home-smile-line">
-                  </i>
-                  <strong>
-                      Une autre structure
-                  </strong>
-              </div>
-          </div>
-      </div>
-  </div>
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+      <i class="ri-arrow-left-right-line me-2">
+      </i>
+      <span>
+          Transférer vers
+      </span>
+  </button>
   
   '''
 # ---
 # name: TestProcessTransferJobApplication.test_job_application_external_transfer_only_for_lone_users
   '''
-  <div class="dropdown dropdown-structure">
-      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="transfer_to_button" type="button">
-          Transférer cette candidature vers
-      </button>
-      <div aria-labelledby="transfer_to_button" class="dropdown-menu w-100">
-          <a class="dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
-              <i aria-hidden="true" class="ri-home-smile-line">
-              </i>
-              <strong>
-                  Une autre structure
-              </strong>
-          </a>
+  <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
+      <i class="ri-arrow-left-right-line me-2">
+      </i>
+      <span>
+          Transférer vers
+      </span>
+  </a>
+  
+  '''
+# ---
+# name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[button]
+  '''
+  <button aria-haspopup="true" class="btn justify-content-start dropdown-item" data-bs-target="#transfer_confirmation_modal" data-bs-toggle="modal" id="transfer_to_button" type="button">
+      <i class="ri-arrow-left-right-line me-2">
+      </i>
+      <span>
+          Transférer vers
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[modal]
+  '''
+  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <form action="/apply/[PK of JobApplication]/siae/transfer" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h2 class="modal-title" id="transfer_modal_title">
+                          Transfert de la candidature
+                      </h2>
+                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group form-group-required">
+                          <label class="form-label" for="id_target_company_id">
+                              Sélectionnez la structure vers laquelle vous souhaitez transférer la candidature.
+                          </label>
+                          <select class="form-select" id="id_target_company_id" name="target_company_id" required="">
+                              <option selected="" value="">
+                                  Sélectionnez une structure
+                              </option>
+                              <option value="[PK of Company]">
+                                  EI - Acme inc.
+                              </option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
+                          Annuler
+                      </button>
+                      <button class="btn btn-sm btn-ico btn-outline-primary" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </button>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </div>
+          </form>
       </div>
   </div>
   
   '''
 # ---
-# name: TestProcessTransferJobApplication.test_job_application_transfer_redirection[job application transfer message]
+# name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[modal_with_external]
+  '''
+  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <form action="/apply/[PK of JobApplication]/siae/transfer" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h2 class="modal-title" id="transfer_modal_title">
+                          Transfert de la candidature
+                      </h2>
+                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group form-group-required">
+                          <label class="form-label" for="id_target_company_id">
+                              Sélectionnez la structure vers laquelle vous souhaitez transférer la candidature.
+                          </label>
+                          <select class="form-select" id="id_target_company_id" name="target_company_id" required="">
+                              <option selected="" value="">
+                                  Sélectionnez une structure
+                              </option>
+                              <option value="[PK of Company]">
+                                  EI - Acme inc.
+                              </option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
+                          Annuler
+                      </button>
+                      <a class="btn btn-sm btn-ico btn-outline-primary" href="/apply/[PK of JobApplication]/siae/external-transfer/1">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </a>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[transfer message]
   'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[copy_public_id]
