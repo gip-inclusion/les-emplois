@@ -119,23 +119,6 @@ def render_stats(
 
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
-    if (
-        "pilotage_webinar_banners" not in base_context
-        and request.user.is_authenticated
-        and request.from_authorized_prescriber
-    ):
-        base_context["pilotage_webinar_banners"] = [
-            {
-                "title": (
-                    'Venez découvrir le nouveau tableau de bord "Suivi des bénéficiaires, '
-                    'taux d’encadrement et présence en emploi" lors du webinaire du 2 juillet 2025 !'
-                ),
-                "description": "Ce nouveau tableau de bord permet d’obtenir des statistiques sur les profils des personnes en parcours en SIAE, sur les taux d’encadrement et sur les taux de présence en emploi. Il sera présenté lors d’un webinaire de 45 minutes, le 2 juillet 2025 à 14h30.",  # noqa: E501
-                "call_to_action": "Inscrivez-vous !",
-                "url": "https://bfv4l.r.bh.d.sendibt3.com/mk/cl/f/sh/7nVU1aA6Qs4xyddr7jLEI5zJTDDBH5a/RhtHBPIyqIDu",
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2025, 7, 2),
-            }
-        ]
     if "pilotage_webinar_banners" not in base_context:
         base_context["pilotage_webinar_banners"] = [
             {
