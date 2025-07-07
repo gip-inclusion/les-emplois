@@ -16,12 +16,13 @@ from itou.users.models import IdentityCertification
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 faker = Faker()
 
 
-class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory):
+class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     class Meta:
         abstract = True
 
