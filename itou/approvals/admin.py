@@ -191,6 +191,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
         "assigned_company",
         "created_at",
         "created_by",
+        "end_at",
         "get_remainder_display",
         "number",
         "origin",

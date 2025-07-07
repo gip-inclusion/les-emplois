@@ -38,9 +38,8 @@ class TestApprovalAdmin:
         assertContains(response, approval.user.display_with_pii)
 
 
-@pytest.mark.parametrize("field", ["start_at", "end_at"])
-def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, snapshot, field):
-    selector = f"#id_{field}_helptext"
+def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, snapshot):
+    selector = "#id_start_at_helptext"
 
     approval = ApprovalFactory()
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
@@ -50,13 +49,13 @@ def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, 
     suspension = SuspensionFactory(approval=approval)
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     field_helptext = parse_response_to_soup(response, selector=selector)
-    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
+    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at warning")
 
     suspension.delete()
     ProlongationFactory(approval=approval)
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     field_helptext = parse_response_to_soup(response, selector=selector)
-    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
+    assert pretty_indented(field_helptext) == snapshot(name="obnoxious start_at warning")
 
 
 def test_prolongation_report_file_filter(admin_client):
