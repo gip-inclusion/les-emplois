@@ -32,6 +32,7 @@ def get_permissions_dict():
     import itou.eligibility.models as eligibility_models
     import itou.emails.models as emails_models
     import itou.employee_record.models as employee_record_models
+    import itou.external_data.models as external_data_models
     import itou.files.models as files_models
     import itou.geiq_assessments.models as geiq_assessments_models
     import itou.gps.models as gps_models
@@ -74,6 +75,7 @@ def get_permissions_dict():
         employee_record_models.EmployeeRecord: PERMS_DELETE,
         employee_record_models.EmployeeRecordUpdateNotification: PERMS_READ,
         employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
+        external_data_models.ExternalDataImport: PERMS_DELETE,
         files_models.File: PERMS_READ,
         geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
         geiq_assessments_models.Assessment: PERMS_READ,
@@ -98,7 +100,7 @@ def get_permissions_dict():
         siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
         siae_evaluations_models.Sanctions: PERMS_READ,
         users_models.User: PERMS_ALL | PERMS_HIJACK | PERMS_EXPORT_CTA | PERMS_MERGE_USERS,
-        users_models.JobSeekerProfile: PERMS_EDIT,
+        users_models.JobSeekerProfile: PERMS_DELETE,
         utils_models.PkSupportRemark: PERMS_ADD,
         utils_models.UUIDSupportRemark: PERMS_ADD,
     }
