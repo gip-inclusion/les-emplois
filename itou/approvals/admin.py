@@ -188,21 +188,21 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
     list_display_links = ("pk", "number")
     raw_id_fields = ("user", "created_by", "eligibility_diagnosis")
     readonly_fields = (
+        "assigned_company",
         "created_at",
         "created_by",
-        "updated_at",
+        "get_remainder_display",
         "number",
         "origin",
-        "pe_notification_status",
-        "pe_notification_time",
-        "pe_notification_endpoint",
-        "pe_notification_exit_code",
-        "assigned_company",
         "origin_prescriber_organization_kind",
         "origin_sender_kind",
         "origin_siae_kind",
         "origin_siae_siret",
-        "get_remainder_display",
+        "pe_notification_endpoint",
+        "pe_notification_exit_code",
+        "pe_notification_status",
+        "pe_notification_time",
+        "updated_at",
     )
     show_full_result_count = False
     fieldsets = (
