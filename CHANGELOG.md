@@ -1,30 +1,60 @@
 # Journal des modifications
 
+## 2025-07-07
+
+### Ajouté
+
+- [Candidature : Ajouter un contrôle de cohérence sur le type de l’émetteur](https://github.com/gip-inclusion/les-emplois/pull/6360)
+- [Pilotage : Ouverture du TB "Suivi des bénéficiaires, taux d’encadrement et présence en emploi" aux SIAE](https://github.com/gip-inclusion/les-emplois/pull/6449)
+- [Vie privée : Notifier les professionnels sans activité récente](https://github.com/gip-inclusion/les-emplois/pull/6441)
+- [Vie privée : Anonymiser les professionnels non actifs depuis plus de deux ans](https://github.com/gip-inclusion/les-emplois/pull/6366)
+
+### Modifié
+
+- [Accessibilité: Quelques corrections sur la modale de news](https://github.com/gip-inclusion/les-emplois/pull/6462)
+- [Admin : Permettre la modification de la date de début des suspensions si la nouvelle date est avant la date de création](https://github.com/gip-inclusion/les-emplois/pull/6388)
+- [Admin : Ajout du bouton enregistrer en haut du formulaire pour les utilisateurs et 2 autres modèles](https://github.com/gip-inclusion/les-emplois/pull/6463)
+- [Candidature : Correction du formulaire de recherche de poste](https://github.com/gip-inclusion/les-emplois/pull/6467)
+- [Candidature : Déplacement du bandeau invitant à un entretien utilisateur vers l'espace prescripteur](https://github.com/gip-inclusion/les-emplois/pull/6454)
+- [Candidatures : Modification du fonctionnement de la barre d’action traitement par lot](https://github.com/gip-inclusion/les-emplois/pull/6384) 🖼
+- [Candidature : Ne pas afficher `None` si des informations concernant le candidat sont manquantes](https://github.com/gip-inclusion/les-emplois/pull/6472) 🖼
+- [Fiche de poste : Le badge 20+ candidatures sur les résultats de recherche n’est pas compris et induit en erreur](https://github.com/gip-inclusion/les-emplois/pull/6422) 🖼
+- [Interface : Corrections des écrans du contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/6423) 🖼
+- [Limiter l’accès au site à 30 requêtes par minute pour les utilisateurs non connectés](https://github.com/gip-inclusion/les-emplois/pull/6471)
+- [Page d’accueil : Prendre en compte le retour à la ligne dans la modale nouveauté](https://github.com/gip-inclusion/les-emplois/pull/6460) 🖼
+- [Recherche fiche de poste : Correction de la couleur d'un badge](https://github.com/gip-inclusion/les-emplois/pull/6432) 🖼
+- [Vie privée : Ajout de champs dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/6377)
+
+### Supprimé
+
+- [Employeur : Suppression d'un bandeau sur la page “Métier et recrutement” pour le questionnaire Maze](https://github.com/gip-inclusion/les-emplois/pull/6453)
+- [Nouveautés : Suppression de la modale pour les utilisateurs non connectés](https://github.com/gip-inclusion/les-emplois/pull/6469)
+
 ## 2025-06-30
 
 ### Ajouté
 
-- [Brevo: alimentation de la liste des candidats actifs avec diagnostics](https://github.com/gip-inclusion/les-emplois/pull/6415)
-- [Demandeur d'emploi : afficher le statut d’éligibilité du candidat sur sa page d’accueil](https://github.com/gip-inclusion/les-emplois/pull/6084)
-- [GEIQ: ajout de l'export des données de contrats en Excel](https://github.com/gip-inclusion/les-emplois/pull/6385)
+- [Brevo : Alimentation de la liste des candidats actifs avec diagnostics](https://github.com/gip-inclusion/les-emplois/pull/6415)
+- [Demandeur d'emploi : Afficher le statut d’éligibilité du candidat sur sa page d’accueil](https://github.com/gip-inclusion/les-emplois/pull/6084)
+- [GEIQ : Ajout de l'export des données de contrats en Excel](https://github.com/gip-inclusion/les-emplois/pull/6385)
 
 ### Modifié
 
 - [Admin : Permettre les recherches de NIR contenant un A ou un B](https://github.com/gip-inclusion/les-emplois/pull/6413)
-- [Admin: ajoute l'accès aux données analytiques](https://github.com/gip-inclusion/les-emplois/pull/6410)
-- [Admin: Améliorer l'affichage du statut d'habilitation des organisations prescriptrices](https://github.com/gip-inclusion/les-emplois/pull/6402) 🖼
-- [Candidature : rendre le filtre “Nom du candidat” indépendant des autres filtres](https://github.com/gip-inclusion/les-emplois/pull/6376)
+- [Admin : Ajoute l'accès aux données analytiques](https://github.com/gip-inclusion/les-emplois/pull/6410)
+- [Admin : Améliorer l'affichage du statut d'habilitation des organisations prescriptrices](https://github.com/gip-inclusion/les-emplois/pull/6402) 🖼
+- [Candidature : Rendre le filtre “Nom du candidat” indépendant des autres filtres](https://github.com/gip-inclusion/les-emplois/pull/6376)
 - [Contrôle a posteriori : Empêcher les sanctions sur une SIAE dont le contrôle est accepté](https://github.com/gip-inclusion/les-emplois/pull/6408)
-- [Employeur: Désactivation des fiches de poste non mises à jour depuis plus de 2 ans](https://github.com/gip-inclusion/les-emplois/pull/6398)
+- [Employeur : Désactivation des fiches de poste non mises à jour depuis plus de 2 ans](https://github.com/gip-inclusion/les-emplois/pull/6398)
 - [Fiches Salarié : Ne plus tronquer l'identifiant France Travail lors de l'envoi à l'Extranet IAE](https://github.com/gip-inclusion/les-emplois/pull/6419)
 - [Fiches salarié : Retrait d’une vérification de cohérence de l’adresse](https://github.com/gip-inclusion/les-emplois/pull/6407)
-- [Interface: Garder le menu en sidebar visible sur les petits écrans de bureau et les ordinateurs portables](https://github.com/gip-inclusion/les-emplois/pull/6405) 🖼
-- [Tech: Mise à jour de l'API SIRENE](https://github.com/gip-inclusion/les-emplois/pull/6406)
+- [Interface : Garder le menu en sidebar visible sur les petits écrans de bureau et les ordinateurs portables](https://github.com/gip-inclusion/les-emplois/pull/6405) 🖼
+- [Tech : Mise à jour de l'API SIRENE](https://github.com/gip-inclusion/les-emplois/pull/6406)
 
 ### Tech
 
 - [Limiter le nombre d’actions par minute pour les utilisateurs authentifiés](https://github.com/gip-inclusion/les-emplois/pull/6327) 🖼
-- [Tech: ajoute la possibilité de configurer un `statement_timeout`](https://github.com/gip-inclusion/les-emplois/pull/6323)
+- [Tech : Ajouter la possibilité de configurer un `statement_timeout`](https://github.com/gip-inclusion/les-emplois/pull/6323)
 
 ## 2025-06-23
 
@@ -36,11 +66,11 @@
 
 ### Modifié
 
-- [Admin: ajout de champs manquant pour les candidatures](https://github.com/gip-inclusion/les-emplois/pull/6380)
+- [Admin : ajout de champs manquant pour les candidatures](https://github.com/gip-inclusion/les-emplois/pull/6380)
 - [Candidature : permettre l'édition de la commune de naissance lors de l'acceptation d'une candidature, même si le candidat a des critères certifiés](https://github.com/gip-inclusion/les-emplois/pull/6333)
 - [Fiches Salarié : Suppression du bouton "Valider cette adresse" pour l'étape "Domiciliation du salarié"](https://github.com/gip-inclusion/les-emplois/pull/6325)
-- [GEIQ: diverses améliorations d'affichage pour le bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/6375)
-- [Interface: Correction de bugs à l'impression des fiches candidatures](https://github.com/gip-inclusion/les-emplois/pull/6372)
+- [GEIQ : diverses améliorations d'affichage pour le bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/6375)
+- [Interface : Correction de bugs à l'impression des fiches candidatures](https://github.com/gip-inclusion/les-emplois/pull/6372)
 - [Vie privée : ajout d'un tri sur la date de notification des candidats à anonymiser](https://github.com/gip-inclusion/les-emplois/pull/6373)
 
 ## 2025-06-16
