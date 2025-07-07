@@ -233,12 +233,19 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 
 class ApprovalQuerySet(CommonApprovalQuerySet):
-    def delete(self):
+    def delete(self, enable_mass_delete=False):
         # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to
-        # create a CancelledApproval object for each deleted Approval. Let's disallow it for now
-        # and trace the errors to see it happens frequently enough to warrant the implementation
-        # of a proper handling method, through `post_delete` for example?
-        raise NotImplementedError("Supprimer des PASS IAE en masse est interdit, veuillez les annuler un par un.")
+        # create a CancelledApproval object for each deleted Approval.
+        # NOTE(vincentporte): Mass deletion is needed for jobseekers anonymization, so we make it possible only if
+        # the approvals ended at least 2 years ago.
+        recent_exists = self.filter(end_at__gt=timezone.localdate() - relativedelta(years=2)).exists()
+        if not enable_mass_delete or recent_exists:
+            raise NotImplementedError(
+                "Supprimer en masse des PASS IAE non échus depuis au moins 2 ans est interdit,"
+                " veuillez les annuler un par un."
+            )
+        #
+        return super().delete()
 
     def with_assigned_company(self):
         job_application_model = self.model._meta.get_field("jobapplication").related_model
