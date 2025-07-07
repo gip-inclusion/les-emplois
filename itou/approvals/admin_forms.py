@@ -35,7 +35,7 @@ class ApprovalFormMixin:
 class ApprovalAdminForm(forms.ModelForm):
     class Meta:
         model = Approval
-        fields = ["start_at", "end_at", "user", "eligibility_diagnosis"]
+        fields = ["start_at", "user", "eligibility_diagnosis"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,8 +47,6 @@ class ApprovalAdminForm(forms.ModelForm):
             )
             if "start_at" in self.fields:
                 self.fields["start_at"].help_text = obnoxious_warning
-            if "end_at" in self.fields:
-                self.fields["end_at"].help_text = obnoxious_warning
 
     def clean(self):
         super().clean()
