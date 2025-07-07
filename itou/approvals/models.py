@@ -233,7 +233,11 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 
 class ApprovalQuerySet(CommonApprovalQuerySet):
-    def delete(self):
+    def delete(self, enable_mass_delete=False):
+        if enable_mass_delete:
+            # mass deletion is needed at least for
+            # jobseekers anonymization, so we make it possible.
+            return super().delete()
         # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to
         # create a CancelledApproval object for each deleted Approval. Let's disallow it for now
         # and trace the errors to see it happens frequently enough to warrant the implementation
