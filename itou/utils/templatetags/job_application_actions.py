@@ -10,15 +10,11 @@ register = template.Library()
 
 
 @register.simple_tag
-def accept_button(job_application, geiq_eligibility_diagnosis, *, batch_mode=False, next_url=None):
+def accept_button(job_application, geiq_eligibility_diagnosis, *, next_url=None):
     # You need to include "apply/includes/geiq/no_allowance_modal.html" in the modal block
     # of any template using this templatetag
 
-    class_kwargs = (
-        "btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
-        if batch_mode
-        else "btn btn-lg btn-white btn-block btn-ico"
-    )
+    class_kwargs = "btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
 
     if not job_application.accept.is_available():
         return ""
