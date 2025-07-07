@@ -247,6 +247,16 @@ class TestApprovalModel:
         with pytest.raises(NotImplementedError):
             Approval.objects.all().delete()
 
+        expired_approval = ApprovalFactory(expired=True, end_at=timezone.localdate() - relativedelta(years=2))
+        expiring_soon_approval = ApprovalFactory(
+            expired=True, end_at=expired_approval.end_at + datetime.timedelta(days=1)
+        )
+
+        Approval.objects.filter(id=expired_approval.id).delete(enable_mass_delete=True)
+
+        with pytest.raises(NotImplementedError):
+            Approval.objects.filter(id=expiring_soon_approval.id).delete(enable_mass_delete=True)
+
     def test_is_valid(self):
         # Start today, end in 2 years.
         start_at = timezone.localdate()
