@@ -15,6 +15,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
+from itou.companies.perms import can_create_siae_antenna
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -337,7 +338,9 @@ class TestDashboardView:
 
         client.force_login(user)
         response = client.get(reverse("dashboard:index"))
-        assertion = assertContains if user.can_create_siae_antenna(company) else assertNotContains
+        assertion = (
+            assertContains if can_create_siae_antenna(user, company, is_company_admin=True) else assertNotContains
+        )
         assertion(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_evaluations_institution_access(self, client):

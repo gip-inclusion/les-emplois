@@ -588,30 +588,6 @@ class TestModel:
         del user.has_verified_email
         assert user.has_verified_email
 
-    def test_siae_admin_can_create_siae_antenna(self):
-        company = CompanyFactory(with_membership=True, membership__is_admin=True)
-        user = company.members.get()
-        assert user.can_create_siae_antenna(company)
-
-    def test_siae_normal_member_cannot_create_siae_antenna(self):
-        company = CompanyFactory(with_membership=True, membership__is_admin=False)
-        user = company.members.get()
-        assert not user.can_create_siae_antenna(company)
-
-    def test_siae_admin_without_convention_cannot_create_siae_antenna(self):
-        company = CompanyFactory(with_membership=True, membership__is_admin=True, convention=None)
-        user = company.members.get()
-        assert not user.can_create_siae_antenna(company)
-
-    @pytest.mark.parametrize("kind", CompanyKind)
-    def test_admin_ability_to_create_siae_antenna(self, kind):
-        company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
-        user = company.members.get()
-        if kind == CompanyKind.GEIQ:
-            assert user.can_create_siae_antenna(company)
-        else:
-            assert user.can_create_siae_antenna(company) == company.should_have_convention
-
     def test_user_kind(self):
         non_staff_kinds = [
             UserKind.JOB_SEEKER,

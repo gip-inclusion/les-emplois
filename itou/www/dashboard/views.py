@@ -20,6 +20,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.perms import can_create_siae_antenna
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
@@ -100,7 +101,11 @@ def _employer_dashboard_context(request):
                 "evaluated_job_applications__evaluated_administrative_criteria",
             )
         ),
-        "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
+        "can_create_siae_antenna": can_create_siae_antenna(
+            request.user,
+            request.current_organization,
+            request.is_current_organization_admin,
+        ),
         "can_show_employee_records": current_org.can_use_employee_record,
         "can_show_financial_annexes": current_org.convention_can_be_accessed_by(request.user),
         "evaluated_siae_notifications": (
