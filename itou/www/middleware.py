@@ -1,6 +1,8 @@
+import secrets
 from math import ceil
 
 import sentry_sdk
+from anymail.utils import get_request_basic_auth
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
@@ -34,6 +36,11 @@ class RateLimitMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
         # Django REST Framework handles the rate limiting on the API.
         if "itou.api" not in request.resolver_match.app_names:
+            request_auth = get_request_basic_auth(request)
+            webhook_secret = settings.ANYMAIL["WEBHOOK_SECRET"]
+            if request_auth and webhook_secret and secrets.compare_digest(request_auth, webhook_secret):
+                return None
+
             throttler = FailSafeUserRateThrottle() if request.user.is_authenticated else FailSafeAnonRateThrottle()
             if not throttler.allow_request(request, None):
                 retry_after = throttler.wait()

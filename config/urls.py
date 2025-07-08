@@ -90,7 +90,11 @@ urlpatterns = [
     path("versions/", include("itou.www.releases.urls")),
     # Enable Mailjet status tracking
     # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
-    path("webhooks/anymail/mailjet/tracking/", login_not_required(MailjetTrackingWebhookView.as_view())),
+    path(
+        "webhooks/anymail/mailjet/tracking/",
+        login_not_required(MailjetTrackingWebhookView.as_view()),
+        name="mailjet-webhook",
+    ),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
     path(
