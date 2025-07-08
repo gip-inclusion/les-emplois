@@ -55,6 +55,7 @@ class TestAnnouncementItemAdmin:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_change_image(self, admin_client, black_pixel):
         item = AnnouncementItemFactory(with_image=True)
+        initial_file = item.image_storage
         url = reverse("admin:communications_announcementcampaign_change", args=(item.campaign_id,))
         response = admin_client.post(
             url,
@@ -79,7 +80,7 @@ class TestAnnouncementItemAdmin:
         filename = pathlib.Path(item.image.name)
         assert uuid.UUID(filename.stem)  # Did not use the provided filename
         assert filename.suffix == ".png"
-        assert File.objects.filter(deleted_at__isnull=False).count() == 1
-        assert item.image_storage.deleted_at is None
         assert item.image_storage.key.startswith("news-images/")
         assert len(default_storage_ls_files("news-images")) == 2
+        assert item.image_storage.key != initial_file.key
+        assert item.image_storage.pk != initial_file.pk

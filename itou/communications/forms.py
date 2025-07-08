@@ -2,7 +2,6 @@ import pathlib
 import uuid
 
 from django import forms
-from django.utils import timezone
 
 from itou.communications.models import AnnouncementItem
 from itou.files.forms import ItouAdminImageInput
@@ -37,8 +36,6 @@ class AnnouncementItemForm(forms.ModelForm):
         if "image" in self.changed_data:
             extension = pathlib.Path(self.instance.image.name).suffix
             self.instance.image.name = f"{uuid.uuid4()}{extension}"
-            if image := self.initial.get("image"):
-                File.objects.filter(key=image.name).update(deleted_at=timezone.now())
         instance = super().save(commit=commit)
         if "image" in self.changed_data:
             instance.image_storage = File.objects.create(key=instance.image.name)
