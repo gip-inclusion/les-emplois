@@ -255,6 +255,37 @@ class TestAnonymizeJobseekersManagementCommand:
             )
         )
 
+    def _get_anonymized_application(self):
+        return list(
+            AnonymizedApplication.objects.all().values(
+                "job_seeker_birth_year",
+                "job_seeker_department_same_as_company_department",
+                "sender_kind",
+                "sender_company_kind",
+                "sender_prescriber_organization_kind",
+                "sender_prescriber_organization_authorization_status",
+                "company_kind",
+                "company_department",
+                "company_naf",
+                "company_has_convention",
+                "applied_at",
+                "processed_at",
+                "last_transition_at",
+                "had_resume",
+                "origin",
+                "state",
+                "refusal_reason",
+                "has_been_transferred",
+                "number_of_jobs_applied_for",
+                "has_diagoriente_invitation",
+                "hiring_rome",
+                "hiring_contract_type",
+                "hiring_contract_nature",
+                "hiring_start_date",
+                "has_approval",
+            )
+        )
+
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
@@ -780,33 +811,7 @@ class TestAnonymizeJobseekersManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
-        archived_application = AnonymizedApplication.objects.all().values(
-            "job_seeker_birth_year",
-            "job_seeker_department_same_as_company_department",
-            "sender_kind",
-            "sender_company_kind",
-            "sender_prescriber_organization_kind",
-            "sender_prescriber_organization_authorization_status",
-            "company_kind",
-            "company_department",
-            "company_naf",
-            "company_has_convention",
-            "applied_at",
-            "processed_at",
-            "last_transition_at",
-            "had_resume",
-            "origin",
-            "state",
-            "refusal_reason",
-            "has_been_transferred",
-            "number_of_jobs_applied_for",
-            "has_diagoriente_invitation",
-            "hiring_rome",
-            "hiring_contract_type",
-            "hiring_contract_nature",
-            "hiring_start_date",
-        )
-        assert list(archived_application) == snapshot(name="archived_application")
+        assert self._get_anonymized_application() == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages

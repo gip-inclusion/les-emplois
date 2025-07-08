@@ -83,6 +83,7 @@ def anonymized_jobapplication(obj):
         hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
         hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
+        has_approval=False if obj.approval_id is None else True,
     )
 
 
