@@ -36,7 +36,6 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.enums import CompanyKind
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
@@ -713,28 +712,6 @@ class User(AbstractUser, AddressMixin):
             .all()
         )
         return memberships
-
-    def can_create_siae_antenna(self, parent_siae):
-        """
-        Only admin employers can create an antenna for their SIAE.
-
-        For SIAE structures (AI, ACI...) the convention has to be present to link the parent SIAE and its antenna.
-        In some edge cases (e.g. SIAE created by staff and not yet officialized) the convention is absent,
-        in that case we must absolutely not allow any antenna to be created.
-
-        For non SIAE structures (EA, EATT...) the convention logic is not implemented thus no convention ever exists.
-        Antennas cannot be freely created by the user as the EA system authorities do not allow any non official SIRET
-        to be used (except for GEIQ).
-
-        Finally, for OPCS it has been decided for now to disallow it; those structures are strongly attached to
-        a given territory and thus would not need to join others.
-        """
-        return (
-            self.is_employer
-            and parent_siae.kind in [CompanyKind.GEIQ, *CompanyKind.siae_kinds()]
-            and parent_siae.is_active
-            and parent_siae.has_admin(self)
-        )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:
         """

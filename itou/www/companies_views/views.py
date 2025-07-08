@@ -20,6 +20,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
+from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -604,7 +605,7 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
 
 def create_company(request, template_name="companies/create_siae.html"):
     current_compny = get_current_company_or_404(request)
-    if not request.user.can_create_siae_antenna(parent_siae=current_compny):
+    if not can_create_antenna(request.user, request.current_organization, request.is_current_organization_admin):
         raise PermissionDenied
 
     form = companies_forms.CreateCompanyForm(
