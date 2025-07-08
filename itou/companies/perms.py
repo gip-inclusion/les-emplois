@@ -1,7 +1,7 @@
 from itou.companies.enums import CompanyKind
 
 
-def can_create_siae_antenna(user, company, is_company_admin):
+def can_create_antenna(user, company, is_company_admin):
     """
     Only admin employers can create an antenna for their SIAE.
 
