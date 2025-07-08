@@ -599,7 +599,7 @@ class TestModel:
         assert not user.can_create_siae_antenna(company)
 
     def test_siae_admin_without_convention_cannot_create_siae_antenna(self):
-        company = CompanyFactory(with_membership=True, convention=None)
+        company = CompanyFactory(with_membership=True, membership__is_admin=True, convention=None)
         user = company.members.get()
         assert not user.can_create_siae_antenna(company)
 
