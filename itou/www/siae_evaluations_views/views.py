@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
-from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -11,7 +10,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_safe
 from django.views.generic.detail import SingleObjectMixin
 
-from itou.files.models import File
+from itou.files.models import save_file
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
@@ -656,9 +655,8 @@ def siae_upload_doc(
     )
 
     if request.method == "POST" and form.is_valid():
-        proof_file = form.cleaned_data["proof"]
-        proof_key = default_storage.save(f"evaluations/{proof_file.name}", proof_file)
-        evaluated_administrative_criteria.proof = File.objects.create(key=proof_key)
+        file = save_file(folder="evaluations/", file=form.cleaned_data["proof"])
+        evaluated_administrative_criteria.proof = file
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None

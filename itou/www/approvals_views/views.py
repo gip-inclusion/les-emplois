@@ -1,5 +1,4 @@
 import logging
-import pathlib
 import urllib.parse
 from datetime import timedelta
 
@@ -29,7 +28,7 @@ from itou.approvals.models import (
 )
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
-from itou.files.models import File
+from itou.files.models import save_file
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
@@ -359,13 +358,10 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                 except KeyError:
                     pass
                 else:
-                    filename = pathlib.Path(tmpfile_key).name
                     with default_storage.open(tmpfile_key) as prolongation_report:
-                        prolongation_report_key = default_storage.save(
-                            f"prolongation_report/{filename}", prolongation_report
-                        )
+                        file = save_file(folder="prolongation_report/", file=prolongation_report)
+                    prolongation.report_file = file
                     default_storage.delete(tmpfile_key)
-                    prolongation.report_file = File.objects.create(key=prolongation_report_key)
             prolongation.save()
             prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")

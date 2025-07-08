@@ -6,6 +6,17 @@ from django.db import models
 from django.utils import timezone
 
 
+def save_file(folder, file, storage=None, anonymize_filename=True):
+    if not storage:
+        storage = default_storage
+    if len(pathlib.Path(folder).parts) > 1:
+        raise NotImplementedError("File tree depth is too deep. Only one level is allowed.", folder)
+    # Only keep the final part to avoid subfolders.
+    filename = f"{uuid.uuid4()}{pathlib.Path(file.name).suffix}" if anonymize_filename else file.name
+    key = storage.save(pathlib.Path(folder) / filename, file)
+    return File.objects.create(key=key)
+
+
 class File(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
