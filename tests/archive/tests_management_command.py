@@ -230,6 +230,31 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
 
 class TestAnonymizeJobseekersManagementCommand:
+    def _get_anonymized_jobseeker(self):
+        return list(
+            AnonymizedJobSeeker.objects.all().values(
+                "date_joined",
+                "first_login",
+                "last_login",
+                "user_signup_kind",
+                "department",
+                "title",
+                "identity_provider",
+                "had_pole_emploi_id",
+                "had_nir",
+                "lack_of_nir_reason",
+                "nir_sex",
+                "nir_year",
+                "birth_year",
+                "count_accepted_applications",
+                "count_IAE_applications",
+                "count_total_applications",
+                "count_approvals",
+                "first_approval_start_at",
+                "last_approval_end_at",
+            )
+        )
+
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
@@ -560,28 +585,9 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
-
-        archived_jobseeker = AnonymizedJobSeeker.objects.all().values(
-            "date_joined",
-            "first_login",
-            "last_login",
-            "user_signup_kind",
-            "department",
-            "title",
-            "identity_provider",
-            "had_pole_emploi_id",
-            "had_nir",
-            "lack_of_nir_reason",
-            "nir_sex",
-            "nir_year",
-            "birth_year",
-            "count_accepted_applications",
-            "count_IAE_applications",
-            "count_total_applications",
-        )
-        assert list(archived_jobseeker) == snapshot(name="archived_jobseeker")
-
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
         assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
+
         if jobseeker.is_active:
             [mail] = mailoutbox
             assert jobseeker.email == mail.to[0]
@@ -743,6 +749,7 @@ class TestAnonymizeJobseekersManagementCommand:
             notified_days_ago=30,
             jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
             post_code="76160",
+            for_snapshot=True,
         )
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
@@ -801,6 +808,7 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         assert list(archived_application) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert respx_mock.calls.call_count == 1
