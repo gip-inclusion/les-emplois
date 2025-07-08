@@ -20,12 +20,13 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
+from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.auth import LoginNotRequiredMixin, check_user
+from itou.utils.auth import LoginNotRequiredMixin, check_request, check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.session import SessionNamespace, SessionNamespaceException
@@ -602,11 +603,9 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
         }
 
 
+@check_request(can_create_antenna)
 def create_company(request, template_name="companies/create_siae.html"):
     current_compny = get_current_company_or_404(request)
-    if not request.user.can_create_siae_antenna(parent_siae=current_compny):
-        raise PermissionDenied
-
     form = companies_forms.CreateCompanyForm(
         current_company=current_compny,
         current_user=request.user,
