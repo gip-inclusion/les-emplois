@@ -14,9 +14,18 @@ from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
-from itou.archive.models import AnonymizedApplication, AnonymizedApproval, AnonymizedJobSeeker, AnonymizedProfessional
+from itou.archive.models import (
+    AnonymizedApplication,
+    AnonymizedApproval,
+    AnonymizedGEIQEligibilityDiagnosis,
+    AnonymizedJobSeeker,
+    AnonymizedProfessional,
+    AnonymizedSIAEEligibilityDiagnosis,
+)
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.companies.models import CompanyMembership
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
@@ -320,6 +329,37 @@ class TestAnonymizeJobseekersManagementCommand:
                 "number_of_accepted_job_applications",
             )
         )
+
+    def _get_anonymized_diagnosis(self, model=None):
+        common_fields = [
+            "created_at",
+            "expired_at",
+            "job_seeker_birth_year",
+            "job_seeker_department",
+            "job_seeker_had_pole_emploi_id",
+            "job_seeker_had_nir",
+            "author_kind",
+            "author_prescriber_organization_kind",
+            "number_of_administrative_criteria",
+            "number_of_administrative_criteria_level_1",
+            "number_of_administrative_criteria_level_2",
+            "number_of_certified_administrative_criteria",
+            "selected_administrative_criteria",
+            "number_of_job_applications",
+            "number_of_accepted_job_applications",
+        ]
+        siae_extra_fields = [
+            "author_siae_kind",
+            "number_of_approvals",
+            "first_approval_start_at",
+            "last_approval_end_at",
+        ]
+
+        if model is EligibilityDiagnosis:
+            return list(AnonymizedSIAEEligibilityDiagnosis.objects.values(*common_fields, *siae_extra_fields))
+        if model is GEIQEligibilityDiagnosis:
+            return list(AnonymizedGEIQEligibilityDiagnosis.objects.values(*common_fields))
+        return []
 
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
@@ -1001,6 +1041,85 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not Approval.objects.exists()
         assert AnonymizedApproval.objects.count() == 2
         assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
+
+    @pytest.mark.parametrize(
+        "eligibility_factory,eligibility_kwargs,jobseeker_kwargs,job_application_kwargs_list",
+        [
+            pytest.param(
+                IAEEligibilityDiagnosisFactory,
+                {
+                    "from_employer": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 2, 16, 0, 0, 0)),
+                    "author_siae__kind": CompanyKind.ACI,
+                },
+                {},
+                [
+                    {
+                        "with_approval": True,
+                        "approval__start_at": datetime.date(2020, 4, 18),
+                        "approval__end_at": datetime.date(2023, 4, 17),
+                    }
+                ],
+                id="iae_diag_from_employer_with_approval",
+            ),
+            pytest.param(
+                IAEEligibilityDiagnosisFactory,
+                {
+                    "from_prescriber": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 5, 23, 0, 0, 0)),
+                },
+                {"with_pole_emploi_id": True, "jobseeker_profile__nir": ""},
+                [{"state": JobApplicationState.ACCEPTED}, {"state": JobApplicationState.POSTPONED}],
+                id="iae_diag_from_prescriber_with_several_job_applications",
+            ),
+            pytest.param(
+                GEIQEligibilityDiagnosisFactory,
+                {
+                    "from_employer": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 9, 21, 0, 0, 0)),
+                },
+                {},
+                [],
+                id="geiq_diag_from_employer_without_job_application",
+            ),
+        ],
+    )
+    def test_archive_jobseeker_with_eligibility_diagnosis(
+        self, eligibility_factory, eligibility_kwargs, jobseeker_kwargs, job_application_kwargs_list, snapshot
+    ):
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+            **jobseeker_kwargs,
+        )
+        eligibility_diagnosis = eligibility_factory(
+            job_seeker=jobseeker,
+            updated_at=timezone.now() - relativedelta(years=3),
+            **eligibility_kwargs,
+        )
+        [
+            JobApplicationFactory(
+                job_seeker=jobseeker,
+                eligibility_diagnosis=eligibility_diagnosis,
+                updated_at=timezone.now() - relativedelta(years=3),
+                **kwargs,
+            )
+            for kwargs in job_application_kwargs_list
+        ]
+
+        with allow_manual_updated_at(Approval):
+            jobseeker.approvals.update(updated_at=timezone.now() - relativedelta(years=3))
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not EligibilityDiagnosis.objects.exists()
+        assert not GEIQEligibilityDiagnosis.objects.exists()
+
+        model = (
+            EligibilityDiagnosis if eligibility_factory is IAEEligibilityDiagnosisFactory else GEIQEligibilityDiagnosis
+        )
+        assert self._get_anonymized_diagnosis(model) == snapshot(name="anonymized_diagnosis")
 
 
 class TestNotifyInactiveProfessionalsManagementCommand:

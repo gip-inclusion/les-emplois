@@ -379,6 +379,83 @@
     }),
   ])
 # ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[geiq_diag_from_employer_without_job_application][anonymized_diagnosis]
+  list([
+    dict({
+      'author_kind': 'geiq',
+      'author_prescriber_organization_kind': None,
+      'created_at': datetime.date(2020, 9, 1),
+      'expired_at': datetime.date(2021, 3, 1),
+      'job_seeker_birth_year': 1990,
+      'job_seeker_department': '35',
+      'job_seeker_had_nir': True,
+      'job_seeker_had_pole_emploi_id': False,
+      'number_of_accepted_job_applications': 0,
+      'number_of_administrative_criteria': 0,
+      'number_of_administrative_criteria_level_1': 0,
+      'number_of_administrative_criteria_level_2': 0,
+      'number_of_certified_administrative_criteria': 0,
+      'number_of_job_applications': 0,
+      'selected_administrative_criteria': list([
+        None,
+      ]),
+    }),
+  ])
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[iae_diag_from_employer_with_approval][anonymized_diagnosis]
+  list([
+    dict({
+      'author_kind': 'employer',
+      'author_prescriber_organization_kind': None,
+      'author_siae_kind': 'ACI',
+      'created_at': datetime.date(2020, 2, 1),
+      'expired_at': datetime.date(2020, 8, 1),
+      'first_approval_start_at': datetime.date(2020, 4, 1),
+      'job_seeker_birth_year': 1990,
+      'job_seeker_department': '35',
+      'job_seeker_had_nir': True,
+      'job_seeker_had_pole_emploi_id': False,
+      'last_approval_end_at': datetime.date(2023, 4, 1),
+      'number_of_accepted_job_applications': 1,
+      'number_of_administrative_criteria': 0,
+      'number_of_administrative_criteria_level_1': 0,
+      'number_of_administrative_criteria_level_2': 0,
+      'number_of_approvals': 1,
+      'number_of_certified_administrative_criteria': 0,
+      'number_of_job_applications': 1,
+      'selected_administrative_criteria': list([
+        None,
+      ]),
+    }),
+  ])
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[iae_diag_from_prescriber_with_several_job_applications][anonymized_diagnosis]
+  list([
+    dict({
+      'author_kind': 'prescriber',
+      'author_prescriber_organization_kind': 'FT',
+      'author_siae_kind': None,
+      'created_at': datetime.date(2020, 5, 1),
+      'expired_at': datetime.date(2020, 11, 1),
+      'first_approval_start_at': None,
+      'job_seeker_birth_year': 1990,
+      'job_seeker_department': '35',
+      'job_seeker_had_nir': False,
+      'job_seeker_had_pole_emploi_id': True,
+      'last_approval_end_at': None,
+      'number_of_accepted_job_applications': 1,
+      'number_of_administrative_criteria': 0,
+      'number_of_administrative_criteria_level_1': 0,
+      'number_of_administrative_criteria_level_2': 0,
+      'number_of_approvals': 0,
+      'number_of_certified_administrative_criteria': 0,
+      'number_of_job_applications': 2,
+      'selected_administrative_criteria': list([
+        None,
+      ]),
+    }),
+  ])
+# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_approvals[anonymized_jobseeker]
   list([
     dict({
@@ -774,7 +851,6 @@
   Le 15/01/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
   A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
-  
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -2843,7 +2919,6 @@
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
-  
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -2859,7 +2934,6 @@
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
-  
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -2875,7 +2949,6 @@
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
-  
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
@@ -2891,7 +2964,6 @@
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
-  
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
