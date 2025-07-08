@@ -1,5 +1,4 @@
 import logging
-import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -18,7 +17,7 @@ from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
-from itou.files.models import File
+from itou.files.models import save_file
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
@@ -637,10 +636,8 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
-            key = f"resume/{uuid.uuid4()}.pdf"
-            file_resume = File.objects.create(key=key)
-            storages["public"].save(key, resume)
-            job_application.resume = file_resume
+            file = save_file(folder="resume/", file=resume, storage=storages["public"])
+            job_application.resume = file
 
         # Save the job application
         job_application.save()

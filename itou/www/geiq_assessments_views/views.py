@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
 from django.http import Http404, HttpResponseRedirect
@@ -21,7 +20,7 @@ from django.views.decorators.http import require_POST, require_safe
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
-from itou.files.models import File
+from itou.files.models import save_file
 from itou.geiq_assessments import sync
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
@@ -382,8 +381,12 @@ def assessment_sync_file(request, pk, *, file_field):
         try:
             client = geiq_label.get_client()
             pdf_content = getattr(client, api_method)(geiq_id=assessment.label_geiq_id)
-            key = default_storage.save(f"geiq-assessments/{uuid.uuid4()}.pdf", ContentFile(pdf_content))
-            setattr(assessment, file_field, File.objects.create(key=key))
+            file = save_file(
+                folder="geiq-assessments/",
+                file=ContentFile(content=pdf_content, name=f"{uuid.uuid4()}.pdf"),
+                anonymize_filename=False,
+            )
+            setattr(assessment, file_field, file)
             assessment.save(update_fields=(file_field,))
         except Exception as e:
             # (ImproperlyConfigured, geiq_label.LabelAPIError) are expected
@@ -411,8 +414,7 @@ def upload_action_financial_assessment(
     }
     if request.method == "POST" and form.is_valid():
         assessment_pdf = form.cleaned_data["assessment_file"]
-        file_key = default_storage.save(str(uuid.uuid4()), assessment_pdf)
-        assessment.action_financial_assessment_file = File.objects.create(key=file_key)
+        assessment.action_financial_assessment_file = save_file(folder="geiq-assessments/", file=assessment_pdf)
         assessment.save(update_fields=("action_financial_assessment_file",))
         return HttpResponseRedirect(back_url)
     return render(request, template_name, context)

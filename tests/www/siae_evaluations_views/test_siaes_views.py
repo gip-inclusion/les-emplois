@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -1038,7 +1039,11 @@ class TestSiaeUploadDocsView:
         assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
 
     @pytest.mark.usefixtures("temporary_bucket")
-    def test_post(self, client, pdf_file):
+    def test_post(self, client, mocker, pdf_file):
+        mocker.patch(
+            "itou.files.models.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        )
         fake_now = timezone.now()
         client.force_login(self.user)
 
@@ -1061,6 +1066,9 @@ class TestSiaeUploadDocsView:
         post_data = {"proof": pdf_file}
         response = client.post(url, data=post_data)
         assert response.status_code == 302
+
+        evaluated_administrative_criteria.refresh_from_db()
+        assert evaluated_administrative_criteria.proof.key == "evaluations/11111111-1111-1111-1111-111111111111.pdf"
 
         next_url = (
             reverse(
