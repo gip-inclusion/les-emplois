@@ -1087,6 +1087,7 @@ class TestAnonymizeJobseekersManagementCommand:
     def test_archive_jobseeker_with_eligibility_diagnosis(
         self, eligibility_factory, eligibility_kwargs, jobseeker_kwargs, job_application_kwargs_list, snapshot
     ):
+        # TODO . add criteria, certified criteria, and administrative criteria factories
         jobseeker = JobSeekerFactory(
             joined_days_ago=DAYS_OF_INACTIVITY,
             notified_days_ago=30,
