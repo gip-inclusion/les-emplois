@@ -1,5 +1,4 @@
 import enum
-import io
 import logging
 import operator
 import uuid
@@ -8,6 +7,7 @@ from functools import partial
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import Case, Count, F, Prefetch, Q, Sum, When
@@ -384,7 +384,7 @@ def assessment_sync_file(request, pk, *, file_field):
         try:
             client = geiq_label.get_client()
             pdf_content = getattr(client, api_method)(geiq_id=assessment.label_geiq_id)
-            key = default_storage.save(f"{uuid.uuid4()}.pdf", io.BytesIO(pdf_content))
+            key = default_storage.save(f"{uuid.uuid4()}.pdf", ContentFile(pdf_content))
             setattr(assessment, file_field, File.objects.create(key=key))
             assessment.save(update_fields=(file_field,))
         except Exception as e:
