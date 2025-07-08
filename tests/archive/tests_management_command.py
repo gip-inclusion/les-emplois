@@ -15,9 +15,21 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
-from itou.archive.models import AnonymizedApplication, AnonymizedApproval, AnonymizedJobSeeker, AnonymizedProfessional
+from itou.archive.models import (
+    AnonymizedApplication,
+    AnonymizedApproval,
+    AnonymizedGEIQEligibilityDiagnosis,
+    AnonymizedJobSeeker,
+    AnonymizedProfessional,
+    AnonymizedSIAEEligibilityDiagnosis,
+)
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models.geiq import (
+    GEIQEligibilityDiagnosis,
+)
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
@@ -26,9 +38,9 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.jobs.models import Appellation, Rome
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
+from itou.users.enums import Title, UserKind
 from itou.users.models import User
-from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
+from itou.utils.constants import DAYS_OF_GRACE, DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
@@ -889,13 +901,123 @@ class TestAnonymizeJobseekersManagementCommand:
         assert AnonymizedApproval.objects.count() == 2
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
 
+    def test_archive_jobseeker_with_eligibility_diagnosis(self, snapshot):
+        kwargs = {
+            "updated_at": timezone.now() - relativedelta(years=3),
+            "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
+            "job_seeker__notified_days_ago": DAYS_OF_GRACE,
+        }
+        # IAE Diagnosis from employer with approval
+        iae_diagnosis_from_employer_with_approval = IAEEligibilityDiagnosisFactory(
+            created_at=timezone.make_aware(datetime.datetime(2020, 2, 16, 0, 0, 0)),
+            from_employer=True,
+            author_siae__kind=CompanyKind.ACI,
+            job_seeker__post_code="76160",
+            job_seeker__jobseeker_profile__birthdate=datetime.date(1985, 6, 8),
+            job_seeker__jobseeker_profile__nir="2857612352678",
+            job_seeker__title=Title.MME,
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+                AdministrativeCriteriaKind.AAH,
+                AdministrativeCriteriaKind.PM,
+            ],
+            **kwargs,
+        )
+
+        iae_diagnosis_from_employer_with_approval.selected_administrative_criteria.filter(
+            administrative_criteria__kind="AAH"
+        ).update(certified=True)
+
+        JobApplicationFactory(
+            job_seeker=iae_diagnosis_from_employer_with_approval.job_seeker,
+            eligibility_diagnosis=iae_diagnosis_from_employer_with_approval,
+            updated_at=timezone.now() - relativedelta(years=3),
+            with_approval=True,
+            approval__start_at=datetime.date(2020, 4, 18),
+            approval__end_at=datetime.date(2023, 4, 17),
+        )
+
+        # IAE Diagnosis from prescriber with several job applications
+        iae_diagnosis_from_prescriber_with_several_job_applications = IAEEligibilityDiagnosisFactory(
+            created_at=timezone.make_aware(datetime.datetime(2020, 5, 23, 0, 0, 0)),
+            from_prescriber=True,
+            job_seeker__post_code="14390",
+            job_seeker__jobseeker_profile__birthdate=datetime.date(1980, 5, 5),
+            job_seeker__jobseeker_profile__nir="1801461235267",
+            job_seeker__title=Title.M,
+            **kwargs,
+        )
+        for state in [JobApplicationState.ACCEPTED, JobApplicationState.POSTPONED]:
+            JobApplicationFactory(
+                job_seeker=iae_diagnosis_from_prescriber_with_several_job_applications.job_seeker,
+                eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications,
+                updated_at=timezone.now() - relativedelta(years=3),
+                state=state,
+            )
+        # GEIQ Diagnosis from employer without job application
+        GEIQEligibilityDiagnosisFactory(
+            created_at=timezone.make_aware(datetime.datetime(2020, 9, 21, 0, 0, 0)),
+            from_employer=True,
+            job_seeker__post_code="56120",
+            job_seeker__jobseeker_profile__birthdate=datetime.date(1956, 11, 10),
+            job_seeker__jobseeker_profile__nir="1565612352678",
+            job_seeker__title=Title.M,
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+                AdministrativeCriteriaKind.RECONVERSION,
+                AdministrativeCriteriaKind.PM,
+            ],
+            **kwargs,
+        )
+
+        Approval.objects.update(updated_at=timezone.now() - relativedelta(years=3))
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not EligibilityDiagnosis.objects.exists()
+        assert not GEIQEligibilityDiagnosis.objects.exists()
+        assert list(get_fields_list_for_snapshot(AnonymizedJobSeeker)) == snapshot(name="anonymized_jobseeker")
+        assert list(get_fields_list_for_snapshot(AnonymizedSIAEEligibilityDiagnosis)) == snapshot(
+            name="anonymized_iae_diagnosis"
+        )
+        assert list(get_fields_list_for_snapshot(AnonymizedGEIQEligibilityDiagnosis)) == snapshot(
+            name="anonymized_geiq_diagnosis"
+        )
+
+    def test_archive_jobseeker_with_several_eligibility_diagnoses(self, snapshot):
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+        )
+
+        for eligibility_factory in [
+            IAEEligibilityDiagnosisFactory,
+            IAEEligibilityDiagnosisFactory,
+            GEIQEligibilityDiagnosisFactory,
+        ]:
+            eligibility_factory(
+                job_seeker=jobseeker, from_prescriber=True, updated_at=timezone.now() - relativedelta(years=3)
+            )
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not EligibilityDiagnosis.objects.exists()
+        assert not GEIQEligibilityDiagnosis.objects.exists()
+        assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
+        assert get_fields_list_for_snapshot(AnonymizedSIAEEligibilityDiagnosis) == snapshot(
+            name="anonymized_siae_eligibility_diagnoses"
+        )
+        assert get_fields_list_for_snapshot(AnonymizedGEIQEligibilityDiagnosis) == snapshot(
+            name="anonymized_geiq_eligibility_diagnoses"
+        )
+
     def test_anonymized_at_is_the_first_day_of_the_month(self):
         job_application = JobApplicationFactory(
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
             updated_at=timezone.now() - INACTIVITY_PERIOD,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
+            eligibility_diagnosis__updated_at=timezone.now() - INACTIVITY_PERIOD,
         )
         ApprovalFactory(
             for_snapshot=True,
@@ -904,10 +1026,19 @@ class TestAnonymizeJobseekersManagementCommand:
             end_at=datetime.date(2023, 1, 18),
             updated_at=timezone.now() - INACTIVITY_PERIOD,
         )
+        GEIQEligibilityDiagnosisFactory(
+            job_seeker=job_application.job_seeker, from_prescriber=True, updated_at=timezone.now() - INACTIVITY_PERIOD
+        )
 
         call_command("anonymize_jobseekers", wet_run=True)
 
-        for model in [AnonymizedJobSeeker, AnonymizedApplication, AnonymizedApproval]:
+        for model in [
+            AnonymizedJobSeeker,
+            AnonymizedApplication,
+            AnonymizedApproval,
+            AnonymizedSIAEEligibilityDiagnosis,
+            AnonymizedGEIQEligibilityDiagnosis,
+        ]:
             obj = model.objects.get()
             assert obj.anonymized_at == timezone.localdate().replace(day=1)
 
