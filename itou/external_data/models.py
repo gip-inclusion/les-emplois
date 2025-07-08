@@ -1,4 +1,3 @@
-from citext import CIEmailField
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -104,33 +103,3 @@ class JobSeekerExternalData(models.Model):
             f"[self.pk] JobSeekerExternalData: user={self.user.pk}, "
             f"created_at={self.created_at}, data_import={self.data_import.pk}"
         )
-
-
-# TODO: Now unused model, remove after the change removing the anymail signal
-# listener is deployed.
-class RejectedEmailEventData(models.Model):
-    class Meta:
-        verbose_name = "donnée collectée par le webhook en cas d’erreur d’envoi d’email"
-        verbose_name_plural = "données collectées par le webhook en cas d’erreur d’envoi d’email"
-
-    REASON_INVALID = "invalid"
-    REASON_BOUNCED = "bounced"
-    REASON_TIMED_OUT = "timed_out"
-    REASON_BLOCKED = "blocked"
-    REASON_SPAM = "spam"
-    REASON_UNSUBSCRIBED = "unsubscribed"
-    REASON_OTHER = "other"
-
-    REASON_CHOICES = (
-        (REASON_INVALID, "Adresse du destinataire invalide"),
-        (REASON_BOUNCED, "Adresse préalablement 'bounced' par notre ESP"),
-        (REASON_TIMED_OUT, "Trop de tentatives d’envoi en erreur sur ce destinataire"),
-        (REASON_BLOCKED, "La politique de notre ESP interdit ce destinataire"),
-        (REASON_SPAM, "Le destinataire nous a taggué comme spammeurs"),
-        (REASON_UNSUBSCRIBED, "Le destinataire ne souhaite plus recevoir ces emails"),
-        (REASON_OTHER, "Non précisé par l’ESP"),
-    )
-
-    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    recipient = CIEmailField("adresse e-mail du destinataire", blank=True, db_index=True)
-    reason = models.CharField("la raison du refus de l’envoi d’email", max_length=12, choices=REASON_CHOICES)
