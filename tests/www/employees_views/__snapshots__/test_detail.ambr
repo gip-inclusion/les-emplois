@@ -446,7 +446,6 @@
                  "files_file"."id",
                  "files_file"."key",
                  "files_file"."last_modified",
-                 "files_file"."deleted_at",
                  T10."id",
                  T10."address_line_1",
                  T10."address_line_2",
