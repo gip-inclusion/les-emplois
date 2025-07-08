@@ -169,15 +169,13 @@
             <div class="modal-dialog modal-dialog-centered">
                 <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
                     {% csrf_token %}
-
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h2 class="modal-title" id="transfer_modal_title">Transfert de la candidature</h2>
+                            <h3 class="modal-title" id="transfer_modal_title">Transfert de la candidature</h3>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">{% bootstrap_field transfer_form.target_company_id label_class="" %}</div>
                         <div class="modal-footer">
-
                             <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Annuler</button>
                             {% if can_transfer_external %}
                                 <a class="btn btn-sm btn-ico btn-outline-primary" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=job_application.id %}">
@@ -190,6 +188,7 @@
                                         disabled
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
+                                        data-bs-custom-class="modal-tooltip"
                                         data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur.">
                                     <i class="ri-home-smile-line" aria-hidden="true"></i>
                                     <strong>Une autre structure</strong>
@@ -209,9 +208,9 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="cancel_hire_modal_title">
+                        <h3 class="modal-title" id="cancel_hire_modal_title">
                             Annuler l’embauche de {{ job_application.job_seeker.get_full_name }}
-                        </h5>
+                        </h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">

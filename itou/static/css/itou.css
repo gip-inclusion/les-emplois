@@ -370,6 +370,11 @@ table.table td > .modal .modal-content {
   background-image: url("../img/pro_connect_bouton_hover.svg");
 }
 
+/* Fix tooltip z-index depths under specific conditions */
 .c-box--action-tooltip {
   z-index: 1050 !important;
+}
+
+.modal-tooltip {
+  z-index: 3055 !important;
 }
