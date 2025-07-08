@@ -67,59 +67,6 @@ def test_deletion(temporary_bucket):
     assert page_after_deletion["KeyCount"] == 0
 
 
-def test_remove_unknown_s3_files(temporary_bucket, caplog, mocker):
-    client = s3_client()
-    existing_file = FileFactory()
-    missing_file = FileFactory()
-
-    # create unknown files in the s3
-    keys = [
-        f"{TEMPORARY_STORAGE_PREFIX}/test.pdf",  # temporary file (will be ignored)
-        existing_file.key,  # exists in db
-        # files to clean
-        "resume/11111111-1111-1111-1111-111111111111.pdf",
-        "evaluations/test.xlsx",
-        "prolongation_report/test.xlsx",
-    ]
-    for key in keys:
-        with io.BytesIO() as content:
-            client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
-
-    # With the default 1 day delay, no file will be removed. It's a security to ensure we don't delete
-    # a file that was just uploaded before the File object wes commited to the database.
-    call_command("remove_unknown_s3_files")
-    assert File.objects.count() == 2  # No changes in db
-    assert caplog.messages[:-1] == [
-        "Checking existing files: 2 files in database",
-        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=0 files",
-        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
-    ]
-    assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.remove_unknown_s3_files succeeded in"
-    )
-    assert sorted(
-        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
-    ) == sorted(keys)
-
-    # Without delay
-    mocker.patch("itou.files.management.commands.remove_unknown_s3_files.S3_CLEANING_DELAY", datetime.timedelta())
-    caplog.clear()
-
-    call_command("remove_unknown_s3_files")
-    assert File.objects.count() == 2  # No changes in db
-    assert caplog.messages[:-1] == [
-        "Checking existing files: 2 files in database",
-        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=3 files",
-        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
-    ]
-    assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.remove_unknown_s3_files succeeded in"
-    )
-    assert sorted(
-        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
-    ) == sorted(keys[:2])
-
-
 @pytest.mark.skipif(os.getenv("CI") != "true", reason="Not using to Cellar")
 @pytest.mark.xfail
 def test_cellar_does_not_support_checksum_validation():
@@ -143,7 +90,7 @@ def test_copy(pdf_file):
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_delete_orphans(caplog):
+def test_delete_unused_files_from_database(caplog):
     old_orphan = FileFactory()
     job_application = JobApplicationFactory()
     ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
@@ -161,12 +108,82 @@ def test_delete_orphans(caplog):
     FileFactory()  # Too recent orphan file
     assert File.objects.all().count() == 11
 
-    call_command("delete_orphan_files")
+    client = s3_client()
+    for key in File.objects.values_list("key", flat=True):
+        with io.BytesIO() as content:
+            client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
+
+    call_command("delete_unused_files")
 
     assert File.objects.all().count() == 9
     assert not File.objects.filter(pk__in=[old_orphan.pk, scan.file_id]).exists()
 
-    assert caplog.messages[:-1] == ["Marked 2 orphans files for deletion"]
+    assert caplog.messages[:-1] == [
+        "Starting unused file removal",
+        "Deleted 2 orphans files from database",
+        "Checking existing files: 9 files in database",
+        "Completed bucket cleaning: found unknown=2 and temporary=0 files in the bucket, removed=0 files",
+    ]
     assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.delete_orphan_files succeeded in"
+        "Management command itou.files.management.commands.delete_unused_files succeeded in"
     )
+
+
+def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
+    client = s3_client()
+    existing_file = FileFactory()
+    missing_file = FileFactory()
+    # Create job applications so that these files are not orphans
+    JobApplicationFactory(resume=existing_file)
+    JobApplicationFactory(resume=missing_file)
+
+    # create unknown files in the s3
+    keys = [
+        f"{TEMPORARY_STORAGE_PREFIX}/test.pdf",  # temporary file (will be ignored)
+        existing_file.key,  # exists in db
+        # files to clean
+        "resume/11111111-1111-1111-1111-111111111111.pdf",
+        "evaluations/test.xlsx",
+        "prolongation_report/test.xlsx",
+    ]
+    for key in keys:
+        with io.BytesIO() as content:
+            client.upload_fileobj(content, Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
+
+    # With the default 1 day delay, no file will be removed. It's a security to ensure we don't delete
+    # a file that was just uploaded before the File object was commited to the database.
+    call_command("delete_unused_files")
+    assert File.objects.count() == 2  # No changes in db
+    assert caplog.messages[:-1] == [
+        "Starting unused file removal",
+        "Deleted 0 orphans files from database",
+        "Checking existing files: 2 files in database",
+        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=0 files",
+        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.delete_unused_files succeeded in"
+    )
+    assert sorted(
+        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
+    ) == sorted(keys)
+
+    # Without delay
+    mocker.patch("itou.files.management.commands.delete_unused_files.CLEANING_DELAY", datetime.timedelta())
+    caplog.clear()
+
+    call_command("delete_unused_files")
+    assert File.objects.count() == 2  # No changes in db
+    assert caplog.messages[:-1] == [
+        "Starting unused file removal",
+        "Deleted 0 orphans files from database",
+        "Checking existing files: 2 files in database",
+        "Completed bucket cleaning: found unknown=3 and temporary=1 files in the bucket, removed=3 files",
+        f"1 database files do not exist in the bucket: [{missing_file.key!r}]",
+    ]
+    assert caplog.messages[-1].startswith(
+        "Management command itou.files.management.commands.delete_unused_files succeeded in"
+    )
+    assert sorted(
+        obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
+    ) == sorted(keys[:2])
