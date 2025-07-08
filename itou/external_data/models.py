@@ -106,6 +106,8 @@ class JobSeekerExternalData(models.Model):
         )
 
 
+# TODO: Now unused model, remove after the change removing the anymail signal
+# listener is deployed.
 class RejectedEmailEventData(models.Model):
     class Meta:
         verbose_name = "donnée collectée par le webhook en cas d’erreur d’envoi d’email"
