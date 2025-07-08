@@ -2006,9 +2006,9 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <div class="modal-content">
                   <div class="modal-header">
-                      <h2 class="modal-title" id="transfer_modal_title">
+                      <h3 class="modal-title" id="transfer_modal_title">
                           Transfert de la candidature
-                      </h2>
+                      </h3>
                       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                       </button>
                   </div>
@@ -2031,7 +2031,7 @@
                       <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
                           Annuler
                       </button>
-                      <button class="btn btn-sm btn-ico btn-outline-primary" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn btn-sm btn-ico btn-outline-primary" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-home-smile-line">
                           </i>
                           <strong>
@@ -2057,9 +2057,9 @@
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <div class="modal-content">
                   <div class="modal-header">
-                      <h2 class="modal-title" id="transfer_modal_title">
+                      <h3 class="modal-title" id="transfer_modal_title">
                           Transfert de la candidature
-                      </h2>
+                      </h3>
                       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
                       </button>
                   </div>
