@@ -19,7 +19,6 @@
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --upload",
 
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
-  "0 1 * * * $ROOT/clevercloud/run_management_command.sh sync_s3_files",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
   "30 3 * * * $ROOT/clevercloud/run_management_command.sh purge_files",
@@ -39,6 +38,7 @@
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
   "0 3 * * 1 $ROOT/clevercloud/run_management_command.sh find_orphan_files",
+  "0 4 * * 1 $ROOT/clevercloud/run_management_command.sh remove_unknown_s3_files",
   "0 12 * * 1 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 0 1 * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
