@@ -1,23 +1,51 @@
 import datetime
+import functools
+import operator
 
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 
+from itou.antivirus.models import Scan
 from itou.files.models import File
 from itou.utils.command import BaseCommand
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
 # Wait a bit before deleting a unknown file from S3 in case the database File is still not commited
-S3_CLEANING_DELAY = datetime.timedelta(days=1)
+# Also Wait a bit before deleting a orphan File since it might have ben created outside an atomic transation
+CLEANING_DELAY = datetime.timedelta(days=1)
 
 
 class Command(BaseCommand):
-    help = "Remove any S3 files not listed in the database"
+    def get_relations(self):
+        relations = {
+            (remote_field.field.model, remote_field.field.name)
+            for remote_field in File._meta.get_fields(include_hidden=True)
+            if remote_field.is_relation
+        }
+        relations.remove((Scan, "file"))
+        return relations
 
-    def handle(self, *args, **options):
+    @transaction.atomic
+    def delete_orphan_files(self):
+        linked_files_pks = functools.reduce(
+            operator.or_,
+            [
+                set(model.objects.exclude(**{field: None}).values_list(field, flat=True))
+                for model, field in self.get_relations()
+            ],
+        )
+        _deletions, deletions_per_type = (
+            File.objects.filter(last_modified__lte=timezone.now() - CLEANING_DELAY)
+            .exclude(pk__in=linked_files_pks)
+            .delete()
+        )
+        self.logger.info(f"Deleted {deletions_per_type.get('files.File', 0)} orphans files from database")
+
+    def clean_s3(self):
         client = s3_client()
-        cutoff = timezone.now() - S3_CLEANING_DELAY
+        cutoff = timezone.now() - CLEANING_DELAY
 
         paginator = client.get_paginator("list_objects_v2")
         page_iterator = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
@@ -49,3 +77,8 @@ class Command(BaseCommand):
         if known_keys:
             # keys are present in database as File object but missing from our bucket
             self.logger.error("%d database files do not exist in the bucket: %s", len(known_keys), sorted(known_keys))
+
+    def handle(self, *args, **options):
+        self.logger.info("Starting unused file removal")
+        self.delete_orphan_files()
+        self.clean_s3()
