@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, F, Max, OuterRef, Q, Subquery
+from django.db.models import Count, F, Max, Min, OuterRef, Q, Subquery
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
+from itou.approvals.models import Approval
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker
 from itou.archive.tasks import async_delete_contact
 from itou.archive.utils import count_related_subquery, get_year_month_or_none
@@ -40,6 +41,9 @@ def anonymized_jobseeker(user):
         count_accepted_applications=user.count_accepted_applications,
         count_IAE_applications=user.count_IAE_applications,
         count_total_applications=user.count_total_applications,
+        count_approvals=user.count_approvals,
+        first_approval_start_at=get_year_month_or_none(user.first_approval_start_at),
+        last_approval_end_at=get_year_month_or_none(user.last_approval_end_at),
     )
 
 
@@ -78,6 +82,7 @@ def anonymized_jobapplication(obj):
         hiring_rome=obj.hired_job.appellation.rome if obj.hired_job else None,
         hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
+        had_approval=bool(obj.approval_id),
     )
 
 
@@ -127,6 +132,19 @@ class Command(BaseCommand):
                     "job_applications__id", filter=Q(job_applications__to_company__kind__in=CompanyKind.siae_kinds())
                 ),
                 count_total_applications=Count("job_applications__id"),
+                count_approvals=count_related_subquery(Approval, "user", "pk"),
+                first_approval_start_at=Subquery(
+                    Approval.objects.filter(user=OuterRef("pk"))
+                    .values("user")
+                    .annotate(first_approval_start_at=Min("start_at"))
+                    .values("first_approval_start_at")
+                ),
+                last_approval_end_at=Subquery(
+                    Approval.objects.filter(user=OuterRef("pk"))
+                    .values("user")
+                    .annotate(last_approval_end_at=Max("end_at"))
+                    .values("last_approval_end_at")
+                ),
             )
             .order_by("upcoming_deletion_notified_at")[: self.batch_size]
         )
