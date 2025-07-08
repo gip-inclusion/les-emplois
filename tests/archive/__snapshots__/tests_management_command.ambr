@@ -1,6 +1,294 @@
 # serializer version: 1
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 10, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 7, 'nir_year': 41, 'birth_year': 1964, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2021, 12, 1), 'first_login': datetime.date(2021, 12, 1), 'last_login': datetime.date(2021, 12, 1), 'user_signup_kind': 'employer', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 6, 'nir_year': 55, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 0, 'count_total_applications': 2, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
+  '''
+  Bonjour Johan ANDERSON,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2020, 4, 1), 'first_login': datetime.date(2020, 4, 1), 'last_login': datetime.date(2020, 4, 1), 'user_signup_kind': 'prescriber', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 8, 'nir_year': 55, 'birth_year': 1985, 'count_accepted_applications': 1, 'count_IAE_applications': 2, 'count_total_applications': 2, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
+  '''
+  Bonjour Johanna ANDREWS,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2022, 11, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': False, 'lack_of_nir_reason': 'reason', 'nir_sex': None, 'nir_year': None, 'birth_year': None, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
+  '''
+  Bonjour Martin JACOBSON,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_few_datas][anonymized_application]
+  <QuerySet []>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_few_datas][anonymized_approval]
+  <QuerySet [{'origin': 'pe_approval', 'origin_company_kind': 'EA', 'origin_sender_kind': 'employer', 'origin_prescriber_organization_kind': 'MSA', 'start_at': datetime.date(2020, 4, 1), 'end_at': datetime.date(2023, 4, 1), 'had_eligibility_diagnosis': False, 'number_of_prolongations': 0, 'duration_of_prolongations': 0, 'number_of_suspensions': 0, 'duration_of_suspensions': 0, 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_few_datas][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 1, 'first_approval_start_at': datetime.date(2020, 4, 1), 'last_approval_end_at': datetime.date(2023, 4, 1), 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_lot_of_datas][anonymized_application]
+  <QuerySet [{'job_seeker_birth_year': 1990, 'job_seeker_department_same_as_company_department': False, 'sender_kind': 'prescriber', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 7, 1), 'processed_at': datetime.date(2025, 7, 1), 'last_transition_at': datetime.date(2025, 7, 1), 'had_resume': True, 'origin': 'default', 'state': 'accepted', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': False, 'had_approval': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 7, 1)}, {'job_seeker_birth_year': 1990, 'job_seeker_department_same_as_company_department': False, 'sender_kind': 'prescriber', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 7, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 7, 1), 'had_resume': True, 'origin': 'default', 'state': 'new', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': False, 'had_approval': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 7, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_lot_of_datas][anonymized_approval]
+  <QuerySet [{'origin': 'admin', 'origin_company_kind': 'EA', 'origin_sender_kind': 'employer', 'origin_prescriber_organization_kind': '', 'start_at': datetime.date(2020, 1, 1), 'end_at': datetime.date(2023, 4, 1), 'had_eligibility_diagnosis': True, 'number_of_prolongations': 3, 'duration_of_prolongations': 90, 'number_of_suspensions': 2, 'duration_of_suspensions': 6, 'number_of_job_applications': 2, 'number_of_accepted_job_applications': 1}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_lot_of_datas][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 2, 'count_total_applications': 2, 'count_approvals': 1, 'first_approval_start_at': datetime.date(2020, 1, 1), 'last_approval_end_at': datetime.date(2023, 4, 1), 'count_eligibility_diagnoses': 1}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_some_datas][anonymized_application]
+  <QuerySet [{'job_seeker_birth_year': 1990, 'job_seeker_department_same_as_company_department': False, 'sender_kind': 'prescriber', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 7, 1), 'processed_at': datetime.date(2025, 7, 1), 'last_transition_at': datetime.date(2025, 7, 1), 'had_resume': True, 'origin': 'default', 'state': 'accepted', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': False, 'had_approval': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 7, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_some_datas][anonymized_approval]
+  <QuerySet [{'origin': 'default', 'origin_company_kind': None, 'origin_sender_kind': 'prescriber', 'origin_prescriber_organization_kind': 'CCAS', 'start_at': datetime.date(2020, 4, 1), 'end_at': datetime.date(2023, 6, 1), 'had_eligibility_diagnosis': True, 'number_of_prolongations': 1, 'duration_of_prolongations': 30, 'number_of_suspensions': 1, 'duration_of_suspensions': 24, 'number_of_job_applications': 1, 'number_of_accepted_job_applications': 1}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[jobseeker_with_some_datas][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 1, 'first_approval_start_at': datetime.date(2020, 4, 1), 'last_approval_end_at': datetime.date(2023, 6, 1), 'count_eligibility_diagnoses': 1}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[anonymized_geiq_diagnosis]
+  list([
+    dict({
+      'author_kind': 'geiq',
+      'author_prescriber_organization_kind': None,
+      'created_at': datetime.date(2020, 9, 1),
+      'expired_at': datetime.date(2021, 3, 1),
+      'job_seeker_birth_year': 1956,
+      'job_seeker_department': '56',
+      'job_seeker_had_nir': True,
+      'job_seeker_had_pole_emploi_id': False,
+      'number_of_accepted_job_applications': 0,
+      'number_of_administrative_criteria': 3,
+      'number_of_administrative_criteria_level_1': 1,
+      'number_of_administrative_criteria_level_2': 1,
+      'number_of_certified_administrative_criteria': 0,
+      'number_of_job_applications': 0,
+      'selected_administrative_criteria': list([
+        'PM',
+        'RECONVERSION',
+        'RSA',
+      ]),
+    }),
+  ])
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[anonymized_iae_diagnosis]
+  list([
+    dict({
+      'author_kind': 'employer',
+      'author_prescriber_organization_kind': None,
+      'author_siae_kind': 'ACI',
+      'created_at': datetime.date(2020, 2, 1),
+      'expired_at': datetime.date(2020, 8, 1),
+      'first_approval_start_at': datetime.date(2020, 4, 1),
+      'job_seeker_birth_year': 1985,
+      'job_seeker_department': '76',
+      'job_seeker_had_nir': True,
+      'job_seeker_had_pole_emploi_id': False,
+      'last_approval_end_at': datetime.date(2023, 4, 1),
+      'number_of_accepted_job_applications': 1,
+      'number_of_administrative_criteria': 3,
+      'number_of_administrative_criteria_level_1': 2,
+      'number_of_administrative_criteria_level_2': 1,
+      'number_of_approvals': 1,
+      'number_of_certified_administrative_criteria': 1,
+      'number_of_job_applications': 1,
+      'selected_administrative_criteria': list([
+        'AAH',
+        'PM',
+        'RSA',
+      ]),
+    }),
+    dict({
+      'author_kind': 'prescriber',
+      'author_prescriber_organization_kind': 'FT',
+      'author_siae_kind': None,
+      'created_at': datetime.date(2020, 5, 1),
+      'expired_at': datetime.date(2020, 11, 1),
+      'first_approval_start_at': None,
+      'job_seeker_birth_year': 1980,
+      'job_seeker_department': '14',
+      'job_seeker_had_nir': True,
+      'job_seeker_had_pole_emploi_id': False,
+      'last_approval_end_at': None,
+      'number_of_accepted_job_applications': 1,
+      'number_of_administrative_criteria': 0,
+      'number_of_administrative_criteria_level_1': 0,
+      'number_of_administrative_criteria_level_2': 0,
+      'number_of_approvals': 0,
+      'number_of_certified_administrative_criteria': 0,
+      'number_of_job_applications': 2,
+      'selected_administrative_criteria': list([
+        None,
+      ]),
+    }),
+  ])
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_eligibility_diagnosis[anonymized_jobseeker]
+  list([
+    dict({
+      'birth_year': 1956,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 0,
+      'count_approvals': 0,
+      'count_eligibility_diagnoses': 1,
+      'count_total_applications': 0,
+      'date_joined': datetime.date(2023, 8, 1),
+      'department': '56',
+      'first_approval_start_at': None,
+      'first_login': None,
+      'had_nir': True,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_approval_end_at': None,
+      'last_login': None,
+      'nir_sex': 1,
+      'nir_year': 56,
+      'title': 'M',
+      'user_signup_kind': None,
+    }),
+    dict({
+      'birth_year': 1980,
+      'count_IAE_applications': 2,
+      'count_accepted_applications': 1,
+      'count_approvals': 0,
+      'count_eligibility_diagnoses': 1,
+      'count_total_applications': 2,
+      'date_joined': datetime.date(2023, 8, 1),
+      'department': '14',
+      'first_approval_start_at': None,
+      'first_login': None,
+      'had_nir': True,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_approval_end_at': None,
+      'last_login': None,
+      'nir_sex': 1,
+      'nir_year': 80,
+      'title': 'M',
+      'user_signup_kind': None,
+    }),
+    dict({
+      'birth_year': 1985,
+      'count_IAE_applications': 1,
+      'count_accepted_applications': 1,
+      'count_approvals': 1,
+      'count_eligibility_diagnoses': 1,
+      'count_total_applications': 1,
+      'date_joined': datetime.date(2023, 8, 1),
+      'department': '76',
+      'first_approval_start_at': datetime.date(2020, 4, 1),
+      'first_login': None,
+      'had_nir': True,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_approval_end_at': datetime.date(2023, 4, 1),
+      'last_login': None,
+      'nir_sex': 2,
+      'nir_year': 85,
+      'title': 'MME',
+      'user_signup_kind': None,
+    }),
+  ])
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_approvals[anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 2, 'first_approval_start_at': datetime.date(2019, 4, 1), 'last_approval_end_at': datetime.date(2023, 5, 1), 'count_eligibility_diagnoses': 2}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_geiq_eligibility_diagnoses]
+  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 3}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_siae_eligibility_diagnoses]
+  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}, {'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': False, 'sender_kind': 'prescriber', 'sender_company_kind': None, 'sender_prescriber_organization_kind': 'FT', 'sender_prescriber_organization_authorization_status': 'VALIDATED', 'company_kind': 'EITI', 'company_department': '14', 'company_naf': '8888Y', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'prior_to_hire', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': False, 'had_approval': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': False, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'processing', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': False, 'had_approval': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 1, 'count_IAE_applications': 0, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'GEIQ', 'company_department': '76', 'company_naf': '1234Z', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': datetime.date(2025, 2, 1), 'last_transition_at': datetime.date(2025, 3, 1), 'had_resume': True, 'origin': 'default', 'state': 'accepted', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 3, 'had_diagoriente_invitation': False, 'had_approval': False, 'hiring_rome': "Conduite d'engins de déplacement des charges (N1101)", 'hiring_contract_type': 'FIXED_TERM_TREMPLIN', 'hiring_contract_nature': 'PEC_OFFER', 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'OPCS', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': datetime.date(2025, 2, 1), 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': False, 'origin': 'default', 'state': 'refused', 'refusal_reason': 'reason', 'had_been_transferred': False, 'number_of_jobs_applied_for': 1, 'had_diagoriente_invitation': False, 'had_approval': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[sent_by_jobseeker_without_sender][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[sent_by_jobseeker_without_sender][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '7820Z', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 3, 1), 'had_resume': True, 'origin': 'default', 'state': 'new', 'refusal_reason': '', 'had_been_transferred': False, 'number_of_jobs_applied_for': 3, 'had_diagoriente_invitation': False, 'had_approval': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][anonymized_jobseeker]
+  <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'postponed', 'refusal_reason': '', 'had_been_transferred': True, 'number_of_jobs_applied_for': 0, 'had_diagoriente_invitation': True, 'had_approval': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
+  'Command launched with wet_run=False'
+# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_jobseekers_command_log]
   'Command launched with wet_run=False'
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_jobseekers_command_log]
+  'Start anonymizing job seekers'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_jobseekers_command_log]
   'Anonymizing job seekers is suspended, exiting command'
