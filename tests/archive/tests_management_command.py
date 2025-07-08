@@ -267,6 +267,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 "count_approvals",
                 "first_approval_start_at",
                 "last_approval_end_at",
+                "count_eligibility_diagnoses",
             )
         )
 

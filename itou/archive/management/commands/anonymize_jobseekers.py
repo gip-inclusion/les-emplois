@@ -44,6 +44,7 @@ def anonymized_jobseeker(user):
         count_approvals=user.count_approvals or 0,
         first_approval_start_at=get_year_month_or_none(user.first_approval_start_at),
         last_approval_end_at=get_year_month_or_none(user.last_approval_end_at),
+        count_eligibility_diagnoses=user.count_eligibility_diagnoses or 0,
     )
 
 
@@ -167,6 +168,7 @@ class Command(BaseCommand):
                     .annotate(last_approval_end_at=Max("end_at"))
                     .values("last_approval_end_at")
                 ),
+                count_eligibility_diagnoses=count_related_subquery(EligibilityDiagnosis, "job_seeker", "id"),
             )
             .order_by("upcoming_deletion_notified_at")[: self.batch_size]
         )
