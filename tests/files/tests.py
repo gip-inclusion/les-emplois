@@ -143,7 +143,7 @@ def test_copy(pdf_file):
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_find_orphans(caplog):
+def test_delete_orphans(caplog):
     old_orphan = FileFactory()
     job_application = JobApplicationFactory()
     ProlongationRequestFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
@@ -161,14 +161,14 @@ def test_find_orphans(caplog):
     FileFactory()  # Too recent orphan file
     assert File.objects.all().count() == 11
 
-    call_command("find_orphan_files")
+    call_command("delete_orphan_files")
 
-    orphan_pks = set(File.objects.filter(deleted_at__isnull=False).values_list("pk", flat=True))
-    assert orphan_pks == {old_orphan.pk, scan.file_id}
+    assert File.objects.all().count() == 9
+    assert not File.objects.filter(pk__in=[old_orphan.pk, scan.file_id]).exists()
 
     assert caplog.messages[:-1] == ["Marked 2 orphans files for deletion"]
     assert caplog.messages[-1].startswith(
-        "Management command itou.files.management.commands.find_orphan_files succeeded in"
+        "Management command itou.files.management.commands.delete_orphan_files succeeded in"
     )
 
 
