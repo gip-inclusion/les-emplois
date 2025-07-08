@@ -7,8 +7,7 @@ from django.conf import settings
 
 import itou.external_data.apis.pe_connect as pec
 from itou.external_data.apis.pe_connect import import_user_pe_data
-from itou.external_data.models import ExternalDataImport, RejectedEmailEventData
-from itou.external_data.signals import store_rejected_email_event
+from itou.external_data.models import ExternalDataImport
 from itou.users.enums import IdentityProvider
 from tests.users.factories import JobSeekerFactory
 
@@ -240,28 +239,3 @@ class TestJobSeekerExternalData:
 
         assert user1.has_external_data
         assert not user2.has_external_data
-
-
-class MockEmailWebhookEvent:
-    def __init__(self, event_type, recipient, reason):
-        self.event_type = event_type
-        self.recipient = recipient
-        self.reject_reason = reason
-
-
-class TestAnymailHook:
-    def test_rejected_event(self):
-        """
-        we store information about rejected events in order to be able to do some analytics about errors
-        """
-        recipient = "idont@exi.st"
-        initial_count = RejectedEmailEventData.objects.count()
-        store_rejected_email_event(MockEmailWebhookEvent("rejected", recipient, "invalid"))
-        assert RejectedEmailEventData.objects.count() == initial_count + 1
-
-    def test_accepted_event(self):
-        """we do not store information about accepted emails"""
-        recipient = "ido@exi.st"
-        initial_count = RejectedEmailEventData.objects.count()
-        store_rejected_email_event(MockEmailWebhookEvent("accepted", recipient, ""))
-        assert RejectedEmailEventData.objects.count() == initial_count
