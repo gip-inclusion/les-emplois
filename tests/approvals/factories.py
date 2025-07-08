@@ -116,7 +116,7 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
         return JobSeekerProfileFactory.build(birthdate=self.user_birthdate).nir
 
 
-class SuspensionFactory(factory.django.DjangoModelFactory):
+class SuspensionFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     """Generate a Suspension() object for unit tests."""
 
     class Meta:
@@ -210,7 +210,7 @@ class ProlongationRequestDenyInformationFactory(factory.django.DjangoModelFactor
         )
 
 
-class ProlongationFactory(BaseProlongationFactory):
+class ProlongationFactory(AutoNowOverrideMixin, BaseProlongationFactory):
     class Meta:
         model = Prolongation
         skip_postgeneration_save = True
