@@ -37,7 +37,7 @@
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
-  "0 3 * * 1 $ROOT/clevercloud/run_management_command.sh find_orphan_files",
+  "0 3 * * 1 $ROOT/clevercloud/run_management_command.sh delete_orphan_files",
   "0 4 * * 1 $ROOT/clevercloud/run_management_command.sh remove_unknown_s3_files",
   "0 12 * * 1 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 

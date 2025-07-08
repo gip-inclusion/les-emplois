@@ -27,12 +27,9 @@ class Command(BaseCommand):
                 for model, field in self.get_relations()
             ],
         )
-        updated = (
-            File.objects.filter(
-                deleted_at=None,
-                last_modified__lte=timezone.now() - datetime.timedelta(days=1),
-            )
+        _deletions, deletions_per_type = (
+            File.objects.filter(last_modified__lte=timezone.now() - datetime.timedelta(days=1))
             .exclude(pk__in=linked_files_pks)
-            .update(deleted_at=timezone.now())
+            .delete()
         )
-        self.logger.info(f"Marked {updated} orphans files for deletion")
+        self.logger.info(f"Marked {deletions_per_type.get('files.File')} orphans files for deletion")
