@@ -721,6 +721,7 @@ class TestAnonymizeJobseekersManagementCommand:
             notified_days_ago=30,
             jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
             post_code="76160",
+            for_snapshot=True,
         )
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
@@ -753,6 +754,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
+        assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert respx_mock.calls.call_count == 1
