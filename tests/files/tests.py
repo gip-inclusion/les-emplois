@@ -84,7 +84,7 @@ def test_copy(pdf_file):
     new_file = existing_file.copy()
     assert re.match(r"resume/[-0-9a-z]*.pdf", new_file.key)
 
-    assert len(default_storage_ls_files("resume")) == 2
+    assert default_storage_ls_files() == sorted([key, new_file.key])
     with default_storage.open(existing_file.key) as old, default_storage.open(new_file.key) as new:
         assert old.read() == new.read()
 

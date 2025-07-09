@@ -50,7 +50,7 @@ class TestAnnouncementItemAdmin:
         assert filename.suffix == ".png"
         file = File.objects.get()
         assert file.key.startswith("news-images/")
-        assert len(default_storage_ls_files("news-images")) == 1
+        assert default_storage_ls_files() == [file.key]
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_change_image(self, admin_client, black_pixel):
@@ -81,6 +81,5 @@ class TestAnnouncementItemAdmin:
         assert uuid.UUID(filename.stem)  # Did not use the provided filename
         assert filename.suffix == ".png"
         assert item.image_storage.key.startswith("news-images/")
-        assert len(default_storage_ls_files("news-images")) == 2
-        assert item.image_storage.key != initial_file.key
-        assert item.image_storage.pk != initial_file.pk
+        assert default_storage_ls_files() == sorted([item.image_storage.key, initial_file.key])
+        assert File.objects.count() == 2  # the old file will be garbage collected by delete_unused_files command
