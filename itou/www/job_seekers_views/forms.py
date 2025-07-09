@@ -116,9 +116,7 @@ class FilterForm(forms.Form):
             filters.append(pass_status_filter)
 
         if self.cleaned_data.get("is_stalled"):
-            queryset = queryset.filter(jobseeker_profile__is_stalled=True).exclude(
-                jobseeker_profile__is_not_stalled_anymore=True
-            )
+            queryset = queryset.filter(jobseeker_profile__is_considered_stalled=True)
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):

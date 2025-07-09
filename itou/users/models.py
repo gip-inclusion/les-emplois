@@ -16,6 +16,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Greatest, Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -262,15 +263,13 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         )
 
         if stalled is not None:
-            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_stalled=stalled).exclude(
-                jobseeker_profile__is_not_stalled_anymore=True
-            )
+            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_considered_stalled=stalled)
             job_seekers_applications = job_seekers_applications.filter(
-                job_seeker__jobseeker_profile__is_stalled=stalled
-            ).exclude(job_seeker__jobseeker_profile__is_not_stalled_anymore=True)
+                job_seeker__jobseeker_profile__is_considered_stalled=stalled
+            )
             job_seekers_eligibility_diagnosis = job_seekers_eligibility_diagnosis.filter(
-                job_seeker__jobseeker_profile__is_stalled=stalled
-            ).exclude(job_seeker__jobseeker_profile__is_not_stalled_anymore=True)
+                job_seeker__jobseeker_profile__is_considered_stalled=stalled
+            )
 
         return self.none().union(
             created_job_seekers.values_list("id", flat=True),
@@ -1188,6 +1187,16 @@ class JobSeekerProfile(models.Model):
         ),
     )
     is_not_stalled_anymore = models.BooleanField(null=True, blank=True, default=None)
+    is_considered_stalled = models.GeneratedField(
+        # Equivalent to `Q(is_stalled=True) & ~Q(is_not_stalled_anymore=True)`,
+        # we need an expression and found no better way (for now) than `RawSQL()`.
+        expression=RawSQL(
+            '"is_stalled" AND NOT ("is_not_stalled_anymore" AND "is_not_stalled_anymore" IS NOT NULL)', {}
+        ),
+        output_field=models.BooleanField(),
+        verbose_name="candidat considéré comme sans solution (données et utilisateurs)",
+        db_persist=True,
+    )
 
     fields_history = ArrayField(
         models.JSONField(
@@ -1224,9 +1233,9 @@ class JobSeekerProfile(models.Model):
         ]
         indexes = [
             models.Index(
-                fields=["is_stalled", "is_not_stalled_anymore"],
+                fields=["is_considered_stalled"],
                 name="users_jobseeker_stalled_idx",
-                condition=Q(is_stalled=True),
+                condition=Q(is_considered_stalled=True),
             ),
         ]
         triggers = [
