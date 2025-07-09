@@ -122,7 +122,6 @@ def test_show_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
-    default_storage.location = "snapshot"
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
@@ -136,7 +135,6 @@ def test_show_view_no_siae(client):
     )
     client.force_login(prolongation_request.validated_by)
 
-    default_storage.location = "snapshot"
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
@@ -296,7 +294,6 @@ def test_snapshot_by_status(client, snapshot, status):
     )
     client.force_login(prolongation_request.validated_by)
 
-    default_storage.location = "snapshot"
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
