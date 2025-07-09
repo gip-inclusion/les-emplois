@@ -64,12 +64,26 @@ def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     settings.METABASE_API_KEY = "metabase-api-key"
 
     entering_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=False)
+    entering_and_converging_job_seeker = JobSeekerFactory(
+        jobseeker_profile__is_stalled=False, jobseeker_profile__is_not_stalled_anymore=False
+    )
+    entering_and_not_converging_job_seeker = JobSeekerFactory(
+        jobseeker_profile__is_stalled=False, jobseeker_profile__is_not_stalled_anymore=True
+    )
     exiting_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
+    exiting_and_converging_job_seeker = JobSeekerFactory(
+        jobseeker_profile__is_stalled=True, jobseeker_profile__is_not_stalled_anymore=True
+    )
+    exiting_and_not_converging_job_seeker = JobSeekerFactory(
+        jobseeker_profile__is_stalled=True, jobseeker_profile__is_not_stalled_anymore=False
+    )
     noop_job_seeker = JobSeekerFactory(jobseeker_profile__is_stalled=True)
     mocker.patch(
         "itou.utils.apis.metabase.Client.fetch_card_results",
         return_value=[
             {"ID": entering_job_seeker.pk},
+            {"ID": entering_and_converging_job_seeker.pk},
+            {"ID": entering_and_not_converging_job_seeker.pk},
             {"ID": noop_job_seeker.pk},
         ],
     )
@@ -78,20 +92,55 @@ def test_fetch_stalled_job_seekers(caplog, mocker, snapshot, settings, wet_run):
     if wet_run:
         assertQuerySetEqual(
             User.objects.filter(jobseeker_profile__is_stalled=True),
-            {entering_job_seeker, noop_job_seeker},
+            {
+                entering_job_seeker,
+                entering_and_converging_job_seeker,
+                entering_and_not_converging_job_seeker,
+                noop_job_seeker,
+            },
             ordered=False,
         )
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=False), {exiting_job_seeker}, ordered=False
+            User.objects.filter(jobseeker_profile__is_stalled=False),
+            {exiting_job_seeker, exiting_and_converging_job_seeker, exiting_and_not_converging_job_seeker},
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(jobseeker_profile__is_not_stalled_anymore=True),
+            {entering_and_not_converging_job_seeker},
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(jobseeker_profile__is_not_stalled_anymore=False),
+            {exiting_and_not_converging_job_seeker},
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(jobseeker_profile__is_not_stalled_anymore=None),
+            {
+                entering_job_seeker,
+                entering_and_converging_job_seeker,
+                exiting_job_seeker,
+                exiting_and_converging_job_seeker,
+                noop_job_seeker,
+            },
+            ordered=False,
         )
     else:
         assertQuerySetEqual(
             User.objects.filter(jobseeker_profile__is_stalled=True),
-            {exiting_job_seeker, noop_job_seeker},
+            {
+                exiting_job_seeker,
+                exiting_and_converging_job_seeker,
+                exiting_and_not_converging_job_seeker,
+                noop_job_seeker,
+            },
             ordered=False,
         )
         assertQuerySetEqual(
-            User.objects.filter(jobseeker_profile__is_stalled=False), {entering_job_seeker}, ordered=False
+            User.objects.filter(jobseeker_profile__is_stalled=False),
+            {entering_job_seeker, entering_and_converging_job_seeker, entering_and_not_converging_job_seeker},
+            ordered=False,
         )
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.metabase_data succeeded in "
