@@ -5,7 +5,7 @@ from itou.companies.models import JobDescription
 from itou.utils.command import BaseCommand
 
 
-DEACTIVATION_DELAY = relativedelta(years=2)
+DEACTIVATION_DELAY = relativedelta(years=1)
 
 
 class Command(BaseCommand):
