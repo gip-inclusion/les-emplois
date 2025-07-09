@@ -174,7 +174,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         # Prefer a sub query to a join for performance reasons.
         # See `self.with_count_recent_received_job_apps`.
         return self.annotate(
-            has_active_members=Exists(CompanyMembership.objects.filter(company=OuterRef("pk"), is_active=True))
+            has_active_members=Exists(CompanyMembership.objects.active().filter(company=OuterRef("pk")))
         )
 
 

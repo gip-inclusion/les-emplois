@@ -43,11 +43,8 @@ class C4CompanyView(LoginNotRequiredMixin, generics.ListAPIView):
                 Prefetch(
                     "members",
                     queryset=(
-                        CompanyMembership.objects.filter(
-                            is_admin=True,
-                            is_active=True,
-                            user__is_active=True,
-                        )
+                        CompanyMembership.objects.active()
+                        .filter(is_admin=True)
                         .select_related("user")
                         .order_by("-joined_at")[:1]
                     ),
