@@ -1,4 +1,5 @@
 import collections
+import contextlib
 import copy
 import datetime
 import inspect
@@ -38,7 +39,11 @@ pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
-from itou.utils.storage.s3 import s3_client  # noqa: E402
+from itou.utils.storage.s3 import (  # noqa: E402
+    NoObjectsInBucket,
+    delete_all_objects_versions,
+    s3_client,
+)
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
 from tests.utils.test import ItouClient  # noqa: E402
 
@@ -67,6 +72,13 @@ def pytest_configure(config) -> None:
         (
             "ignore_unknown_variable_template_error(*ignore_names): "
             "ignore unknown variable error in templates, optionally providing specific names to ignore"
+        ),
+    )
+    config.addinivalue_line(
+        "markers",
+        (
+            "empty_temporary_bucket_expected: "
+            "configure temporary_bucket fixture to expect an empty bucket instead of one with objects"
         ),
     )
 
@@ -181,40 +193,47 @@ def failing_cache():
         yield cache
 
 
-@pytest.fixture(name="temporary_bucket_name", autouse=True)
-def temporary_bucket_name_fixture(monkeypatch):
-    bucket_name = f"tests-{uuid.uuid4()}"
-    with override_settings(AWS_STORAGE_BUCKET_NAME=bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=bucket_name):
-        for storage in {"default", "public"}:
-            monkeypatch.setattr(storages[storage], "bucket_name", settings.AWS_STORAGE_BUCKET_NAME)
-            monkeypatch.setattr(storages[storage], "_bucket", None)
-        yield bucket_name
+@pytest.fixture(name="temporary_bucket_name", scope="session")
+def temporary_bucket_name_fixture():
+    yield f"tests-{uuid.uuid4()}"
 
 
-@pytest.fixture
-def temporary_bucket(temporary_bucket_name):
-    call_command("configure_bucket")
-    yield
+@pytest.fixture(name="temporary_bucket_setup", scope="session")
+def temporary_bucket_setup_fixture(temporary_bucket_name):
+    with override_settings(AWS_STORAGE_BUCKET_NAME=temporary_bucket_name):
+        call_command("configure_bucket")
+    yield temporary_bucket_name
     client = s3_client()
-    paginator = client.get_paginator("list_object_versions")
+    with contextlib.suppress(NoObjectsInBucket):
+        delete_all_objects_versions(client, bucket=temporary_bucket_name)
+    client.delete_bucket(Bucket=temporary_bucket_name)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def temporary_bucket_settings(temporary_bucket_name, monkeypatch):
+    with override_settings(
+        AWS_STORAGE_BUCKET_NAME=temporary_bucket_name, PILOTAGE_DATASTORE_S3_BUCKET_NAME=temporary_bucket_name
+    ):
+        for storage in {"default", "public"}:
+            monkeypatch.setattr(storages[storage], "bucket_name", temporary_bucket_name)
+            monkeypatch.setattr(storages[storage], "_bucket", None)
+        yield
+
+
+@pytest.fixture(scope="function")
+def temporary_bucket(request, temporary_bucket_setup, temporary_bucket_settings):
+    marker = request.keywords.get("empty_temporary_bucket_expected", None)
+
+    yield temporary_bucket_setup
+
     try:
-        for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
-            objects_to_delete = page.get("DeleteMarkers", []) + page.get("Versions", [])
-            client.delete_objects(
-                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                Delete={
-                    "Objects": [
-                        {
-                            "Key": obj["Key"],
-                            "VersionId": obj["VersionId"],
-                        }
-                        for obj in objects_to_delete
-                    ]
-                },
-            )
-        client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
-    except client.exceptions.NoSuchBucket:
-        pass
+        delete_all_objects_versions(s3_client(), bucket=temporary_bucket_setup)
+    except NoObjectsInBucket:
+        if not marker:
+            pytest.fail("No objects to delete, do you need the fixture?")
+    else:
+        if marker:
+            pytest.fail("The bucket was not empty like expected")
 
 
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")

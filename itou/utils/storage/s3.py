@@ -2,6 +2,8 @@ import boto3
 from django.conf import settings
 from storages.backends.s3 import S3Storage
 
+from itou.utils.enums import ItouEnvironment
+
 
 TEMPORARY_STORAGE_PREFIX = "temporary_storage"
 
@@ -32,3 +34,31 @@ class PublicStorage(S3Storage):
     # Not using the S3StaticStorage backend to ensure the listdir() operation remains forbidden.
     # Don’t sign URLs, objects are public.
     querystring_auth = False
+
+
+class NoObjectsInBucket(Exception):
+    pass
+
+
+def delete_all_objects_versions(client, *, bucket):
+    if settings.ITOU_ENVIRONMENT == ItouEnvironment.PROD:
+        raise RuntimeError("Not going to delete all objects versions in production, sorry mate.")
+
+    paginator = client.get_paginator("list_object_versions")
+    for page in paginator.paginate(Bucket=bucket):
+        objects_to_delete = page.get("DeleteMarkers", []) + page.get("Versions", [])
+        if not objects_to_delete:
+            raise NoObjectsInBucket()
+
+        client.delete_objects(
+            Bucket=bucket,
+            Delete={
+                "Objects": [
+                    {
+                        "Key": obj["Key"],
+                        "VersionId": obj["VersionId"],
+                    }
+                    for obj in objects_to_delete
+                ]
+            },
+        )

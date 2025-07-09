@@ -79,6 +79,7 @@ def test_deletion(temporary_bucket):
 
 @pytest.mark.skipif(os.getenv("CI") != "true", reason="Not using to Cellar")
 @pytest.mark.xfail
+@pytest.mark.usefixtures("temporary_bucket")
 def test_cellar_does_not_support_checksum_validation():
     client = s3_client()
     client.config = Config()
