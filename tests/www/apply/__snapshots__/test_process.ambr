@@ -340,11 +340,11 @@
           WHERE (EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U0."user_id" = %s
-                           AND U2."is_active")
+                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND U0."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -2837,11 +2837,11 @@
           WHERE (EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U0."user_id" = %s
-                           AND U2."is_active")
+                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND U0."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
@@ -4043,11 +4043,11 @@
           WHERE (EXISTS
                    (SELECT %s AS "a"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U0."user_id" = %s
-                           AND U2."is_active")
+                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND U0."user_id" = %s)
                     LIMIT 1)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
