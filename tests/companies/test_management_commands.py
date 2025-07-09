@@ -206,7 +206,7 @@ def test_update_companies_coords(settings, capsys, respx_mock):
 def test_deactivate_old_job_description():
     create_test_romes_and_appellations(("N1101",))
     companies_factories.JobDescriptionFactory(
-        last_employer_update_at=timezone.now() - relativedelta(years=2),
+        last_employer_update_at=timezone.now() - relativedelta(years=1),
         location=None,
     )
     companies_factories.JobDescriptionFactory(
@@ -214,7 +214,7 @@ def test_deactivate_old_job_description():
         location=None,
     )
     recently_updated_job_description = companies_factories.JobDescriptionFactory(
-        last_employer_update_at=timezone.now() - relativedelta(years=2) + relativedelta(days=1),
+        last_employer_update_at=timezone.now() - relativedelta(years=1) + relativedelta(days=1),
         location=None,
     )
     assert JobDescription.objects.active().count() == 3
