@@ -59,10 +59,10 @@
                                             aria-haspopup="true"
                                             aria-expanded="false"
                                             aria-label="Plus d'actions"
-                                            {% if job_seeker.has_valid_approval and not job_seeker.jobseeker_profile.is_stalled %}disabled{% endif %}>
+                                            {% if not job_seeker.show_more_actions %}disabled{% endif %}>
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
-                                    {% if not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled %}
+                                    {% if job_seeker.show_more_actions %}
                                         <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
                                             {% if not job_seeker.has_valid_approval %}
                                                 <a href=" {% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">

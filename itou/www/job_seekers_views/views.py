@@ -205,6 +205,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
+        job_seeker.show_more_actions = not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled
 
     context = {
         "back_url": get_safe_url(request, "back_url"),
