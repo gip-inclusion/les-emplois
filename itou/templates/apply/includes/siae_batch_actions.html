@@ -10,7 +10,9 @@
         <div class="form-row align-items-center gx-3">
             <div class="form-group col-12 col-lg-auto">
                 {% if can_accept %}
-                    {% accept_button acceptable_job_application acceptable_job_application.geiq_eligibility_diagnosis next_url=list_url %}
+                    <div id="introjsBatchActions01">
+                        {% accept_button acceptable_job_application acceptable_job_application.geiq_eligibility_diagnosis next_url=list_url %}
+                    </div>
                 {% else %}
                     <button type="button"
                             class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center"
@@ -145,6 +147,7 @@
 {% else %}
     <div id="batch-action-box" class="selection-indicator" {% if request.htmx %}hx-swap-oob="true"{% endif %}></div>
 {% endif %}
+
 {% if request.htmx %}
     {% include "apply/includes/selected_job_applications.html" with selected_nb=selected_nb request=request only %}
     {% include "apply/includes/siae_batch_actions_modals.html" %}
