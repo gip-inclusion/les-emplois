@@ -22,11 +22,13 @@ from pytest_django.asserts import (
 from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership
+from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User
 from itou.utils.models import PkSupportRemark
+from itou.www.gps.enums import EndReason
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -36,7 +38,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.gps.factories import FollowUpGroupMembershipFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
@@ -641,7 +643,7 @@ class TestMergeUsers:
             f"{prefix}itou.approvals.models.Suspension.updated_by : [{suspension.pk}]",
             f"{prefix}itou.eligibility.models.geiq.GEIQEligibilityDiagnosis.author : [{geiq_diagnosis.pk}]",
             f"{prefix}itou.eligibility.models.iae.EligibilityDiagnosis.author : [{iae_diagnosis.pk}]",
-            f"{prefix}itou.gps.models.FollowUpGroupMembership.member : [{gps_group.pk}]",
+            f"{prefix}itou.gps.models.FollowUpGroupMembership.user moved : [{gps_group.pk}]",
             f"{prefix}itou.invitations.models.EmployerInvitation.sender : [{invitation.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.approval_manually_refused_by : [{job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.archived_by : [{job_app.pk}]",
@@ -666,6 +668,55 @@ class TestMergeUsers:
         assert not User.objects.filter(pk=employer_2.pk).exists()
 
         assert caplog.messages == [
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_followupmembership(self, client, caplog):
+        employer_1 = EmployerFactory()
+        employer_2 = EmployerFactory()
+        follow_up_group = FollowUpGroupFactory()
+        membership_1 = FollowUpGroupMembershipFactory(
+            member=employer_1,
+            follow_up_group=follow_up_group,
+            is_referent_certified=False,
+            is_active=False,
+            can_view_personal_information=False,
+            reason="",
+            ended_at=None,
+            end_reason=None,
+        )
+        membership_2 = FollowUpGroupMembershipFactory(
+            member=employer_2,
+            follow_up_group=follow_up_group,
+            is_referent_certified=True,
+            is_active=True,
+            can_view_personal_information=True,
+            reason="Parce que",
+            ended_at=timezone.localdate(),
+            end_reason=EndReason.MANUAL,
+        )
+
+        with freeze_time() as frozen_now:
+            client.force_login(ItouStaffFactory(is_superuser=True))
+            url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.public_id, employer_2.public_id))
+            client.post(url, data={"user_to_keep": "to_user"})
+            membership = FollowUpGroupMembership.objects.get()
+            assert membership.member == employer_1
+            assert membership.updated_at == frozen_now().replace(tzinfo=datetime.UTC)
+            assert membership.is_referent_certified is True
+            assert membership.is_active is True
+            assert membership.created_at == membership_1.created_at
+            assert membership.last_contact_at == membership_2.last_contact_at
+            assert membership.started_at == membership_1.started_at
+            assert membership.can_view_personal_information is True
+            assert membership.reason == "Parce que"
+            assert membership.ended_at == membership_2.ended_at
+            assert membership.end_reason == EndReason.MANUAL
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — "
+            f"itou.gps.models.FollowUpGroupMembership.user updated : [{membership_1.pk}]",
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
             "HTTP 302 Found",
         ]

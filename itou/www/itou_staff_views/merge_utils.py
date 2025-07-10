@@ -12,6 +12,7 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.gps.models import FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -82,6 +83,47 @@ def handle_membership(model, from_user, to_user, org_field_name=None):
     return len(from_user_memberships)
 
 
+def handle_follow_up_group_membership(model, from_user, to_user):
+    from_user_memberships = model.objects.filter(member=from_user)
+    to_user_memberships = {
+        membership.follow_up_group_id: membership for membership in model.objects.filter(member=to_user)
+    }
+    updated_pks = []
+    moved_pks = []
+    for from_user_membership in from_user_memberships:
+        if to_user_membership := to_user_memberships.get(from_user_membership.follow_up_group_id):
+            updated_pks.append(to_user_membership.pk)
+            to_user_membership.is_referent_certified |= from_user_membership.is_referent_certified
+            to_user_membership.is_active |= from_user_membership.is_active
+            to_user_membership.created_at = min(to_user_membership.created_at, from_user_membership.created_at)
+            to_user_membership.last_contact_at = max(
+                to_user_membership.last_contact_at, from_user_membership.last_contact_at
+            )
+            to_user_membership.started_at = min(to_user_membership.started_at, from_user_membership.started_at)
+            to_user_membership.can_view_personal_information |= from_user_membership.can_view_personal_information
+            to_user_membership.reason = to_user_membership.reason or from_user_membership.reason
+            to_user_membership.ended_at = to_user_membership.ended_at or from_user_membership.ended_at
+            to_user_membership.end_reason = to_user_membership.end_reason or from_user_membership.end_reason
+            # It's not perfect since we compare a date with the date of a datetime, but it's not a real issue
+            if to_user_membership.ended_at and (
+                to_user_membership.last_contact_at.date() > to_user_membership.ended_at
+            ):
+                to_user_membership.ended_at = None
+                to_user_membership.end_reason = None
+            to_user_membership.save()
+        else:
+            moved_pks.append(from_user_membership.pk)
+            from_user_membership.member = to_user
+            from_user_membership.save()
+
+    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.user"
+    if updated_pks:
+        logger.info(f"{base_log} updated : {updated_pks}")
+    if moved_pks:
+        logger.info(f"{base_log} moved : {moved_pks}")
+    return len(from_user_memberships)
+
+
 def handle_token(model, from_user, to_user):
     if Token.objects.filter(user=to_user).exists():
         # We can't have more than one token per user so there's nothing to do
@@ -100,6 +142,7 @@ MODEL_MAPPING = {
     (EmailAddress, "user"): noop,
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
+    (FollowUpGroupMembership, "member"): handle_follow_up_group_membership,
 }
 
 MODEL_REPR_MAPPING = {
@@ -174,6 +217,7 @@ def merge_users(to_user, from_user, update_personal_data):
     if forbidden_models := deleted_models - {
         "account.EmailAddress",
         "users.User",
+        "gps.FollowUpGroupMembership",
         "communications.NotificationSettings",
         "prescribers.PrescriberMembership",
         "companies.CompanyMembership",
