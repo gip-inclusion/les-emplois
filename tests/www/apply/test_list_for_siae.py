@@ -1730,13 +1730,18 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
         )
 
     # Test with unacceptable batches
-    for app_list in [
-        [unacceptable_app.pk],
-        [acceptable_app_1.pk, acceptable_app_2.pk, acceptable_app_3.pk],
-    ]:
-        simulate_applications_selection(app_list)
-        accept_button = get_accept_button()
-        assert pretty_indented(accept_button) == snapshot(name="inactive accept button")
+    simulate_applications_selection([acceptable_app_1.pk, acceptable_app_2.pk, acceptable_app_3.pk])
+    accept_button = get_accept_button()
+    assert pretty_indented(accept_button) == snapshot(name="inactive accept button multiple job applications")
+
+    # the "unnacceptable" job application tooltip only works if the only unnaceptable state is accepted.
+    # update the tooltip if this assert breaks
+    assert set(JobApplicationState) - set(JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES) == {
+        JobApplicationState.ACCEPTED
+    }
+    simulate_applications_selection([unacceptable_app.pk])
+    accept_button = get_accept_button()
+    assert pretty_indented(accept_button) == snapshot(name="inactive accept button already accepted")
 
 
 def test_order(client, subtests):
