@@ -433,6 +433,29 @@ def warn_select_for_update_with_select_related():
     )
 
 
+@pytest.fixture(scope="session", autouse=True)
+def strict_excel_rendering():
+    from xlsx_streaming.render import update_cell
+
+    patchy.patch(
+        update_cell,
+        """\
+        @@ -13,10 +13,5 @@
+                 'b': _update_boolean_cell,
+             }.get(cell_type, _update_text_cell)
+
+        -    try:
+        -        update_function(cell, value)
+        -    except Exception as e:  # pylint: disable=broad-except
+        -        args = e.args or ['']
+        -        msg = f"(column '{column}', line '{line}') data does not match template: {args[0]}"
+        -        logger.debug(msg)
+        +    update_function(cell, value)
+             cell.set('r', f'{column}{line}')
+         """,
+    )
+
+
 @pytest.fixture
 def pdf_file():
     with open("tests/data/empty.pdf", "rb") as pdf:
