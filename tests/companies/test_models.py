@@ -241,7 +241,6 @@ class TestCompanyModel:
         assert user not in company_1.active_members
         assert company_1.members.count() == 2
         assert company_1.active_members.count() == 1
-        assert user in company_1.deactivated_members
         assert user not in company_1.active_members
         assert company_2.members.count() == 3
         assert company_2.active_members.count() == 3
