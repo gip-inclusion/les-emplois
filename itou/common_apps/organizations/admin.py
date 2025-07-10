@@ -96,7 +96,7 @@ class OrganizationAdmin(ItouModelAdmin):
         had_admin = change and form.instance.active_admin_members.exists()
         super().save_related(request, form, formsets, change)
         if had_admin:
-            active_memberships = form.instance.memberships.all()
+            active_memberships = form.instance.memberships.active()
             if active_memberships and not any(membership.is_admin for membership in active_memberships):
                 messages.warning(
                     request,
