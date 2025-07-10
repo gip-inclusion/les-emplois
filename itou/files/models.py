@@ -1,7 +1,7 @@
 import pathlib
 import uuid
 
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, storages
 from django.db import models
 from django.utils import timezone
 
@@ -27,3 +27,11 @@ class File(models.Model):
         with default_storage.open(self.key) as file:
             default_storage.save(new_key, file)
         return self.__class__.objects.create(key=new_key)
+
+    @property
+    def url(self):
+        return default_storage.url(self.key)
+
+    @property
+    def public_url(self):
+        return storages["public"].url(self.key)
