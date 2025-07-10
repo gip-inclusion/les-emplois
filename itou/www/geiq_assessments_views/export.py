@@ -169,7 +169,7 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "CDD/CDI refusé": with_format(Format.TEXT, lambda contract: oui_non(contract.other_data.get("is_refus_cdd_cdi"))),
     "Date de rupture anticipée": with_format(
         Format.DATE,
-        lambda contract: contract.end_at if contract.end_at and contract.end_at < contract.planned_end_at else "",
+        lambda contract: contract.end_at if contract.end_at and contract.end_at < contract.planned_end_at else None,
     ),
     "Type de rupture anticipée": with_format(Format.TEXT, lambda contract: contract.rupture_kind_display()),
     "Situation post-contrat": with_format(

@@ -782,12 +782,14 @@ class TestAssessmentContractsExportView:
         assert response["Content-Disposition"] == 'attachment; filename="Contrats - Un Joli GEIQ - 2025-06-01.xlsx"'
         assert len(excel_export) == 4  # 3 contracts + header
         assert excel_export[0] == snapshot(name="excel export headers for the employer")
+        rupture_anticipee_idx = excel_export[0].index("Date de rupture anticipée")
         assert excel_export[1][:4] == [
             "Dupond",
             "Jean-Pierre",
             "H",
             datetime.datetime(1993, 3, 3, 0, 0),
         ]
+        assert excel_export[1][rupture_anticipee_idx] == ""
         assert excel_export[1][-1] == "Oui"  # allowance requested
         assert excel_export[2][:4] == [
             "Dupont",
@@ -795,6 +797,7 @@ class TestAssessmentContractsExportView:
             "H",
             datetime.datetime(1990, 1, 1, 0, 0),
         ]
+        assert excel_export[2][rupture_anticipee_idx] == datetime.datetime(2024, 4, 30)
         assert excel_export[2][-1] == "Non"  # allowance requested
         assert excel_export[3][:4] == [
             "Martin",
@@ -802,6 +805,8 @@ class TestAssessmentContractsExportView:
             "F",
             datetime.datetime(1992, 2, 2, 0, 0),
         ]
+        assert excel_export[3][rupture_anticipee_idx] == datetime.datetime(2024, 3, 30)
+        assert excel_export[2][-1] == "Non"  # allowance requested
         assert excel_export[3][-1] == "Oui"  # allowance requested
 
         client.force_login(ddets_membership.user)
