@@ -32,7 +32,7 @@
                         <tr>
                             <td>
                                 <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
-                                {% if job_seeker.jobseeker_profile.is_stalled %}
+                                {% if job_seeker.jobseeker_profile.is_considered_stalled %}
                                     <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning" aria-label="Candidat sans solution"><i class="ri-user-forbid-line" aria-hidden="true" data-bs-title="Candidat sans solution" data-bs-toggle="tooltip"></i></span>
                                 {% endif %}
                             </td>
@@ -59,18 +59,31 @@
                                             aria-haspopup="true"
                                             aria-expanded="false"
                                             aria-label="Plus d'actions"
-                                            {% if job_seeker.has_valid_approval %}disabled{% endif %}>
+                                            {% if not job_seeker.show_more_actions %}disabled{% endif %}>
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
-                                    {% if not job_seeker.has_valid_approval %}
+                                    {% if job_seeker.show_more_actions %}
                                         <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                            <a href=" {% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
-                                                {% if job_seeker.valid_eligibility_diagnosis %}
-                                                    Mettre à jour son éligibilité IAE
-                                                {% else %}
-                                                    Valider son éligibilité IAE
-                                                {% endif %}
-                                            </a>
+                                            {% if not job_seeker.has_valid_approval %}
+                                                <a href=" {% url 'eligibility_views:update_iae' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="dropdown-item">
+                                                    {% if job_seeker.valid_eligibility_diagnosis %}
+                                                        Mettre à jour son éligibilité IAE
+                                                    {% else %}
+                                                        Valider son éligibilité IAE
+                                                    {% endif %}
+                                                </a>
+                                            {% endif %}
+                                            {% if job_seeker.jobseeker_profile.is_stalled %}
+                                                <form method="post" action="{% url "job_seekers_views:switch_stalled_status" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="is_not_stalled_anymore" value="{{ job_seeker.jobseeker_profile.is_not_stalled_anymore|yesno:"0,1" }}">
+                                                    {% if job_seeker.jobseeker_profile.is_not_stalled_anymore %}
+                                                        <button type="submit" class="dropdown-item">Le candidat est sans solution</button>
+                                                    {% else %}
+                                                        <button type="submit" class="dropdown-item">Le candidat n'est plus sans solution</button>
+                                                    {% endif %}
+                                                </form>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% endif %}
