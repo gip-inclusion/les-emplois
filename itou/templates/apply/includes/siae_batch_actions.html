@@ -101,22 +101,24 @@
                             </button>
                         {% endif %}
                         <hr class="dropdown-divider m-0">
-                        {% if can_transfer %}
-                            <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
-                                <i class="ri-arrow-left-right-line me-2"></i>
-                                <span>Transférer vers</span>
-                            </button>
-                        {% else %}
-                            <button type="button"
-                                    class="btn justify-content-start dropdown-item"
-                                    disabled
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    data-bs-custom-class="c-box--action-tooltip"
-                                    data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées.">
-                                <i class="ri-arrow-left-right-line me-2"></i>
-                                <span>Transférer vers</span>
-                            </button>
+                        {% if enable_transfer %}
+                            {% if can_transfer %}
+                                <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">
+                                    <i class="ri-arrow-left-right-line me-2"></i>
+                                    <span>Transférer vers</span>
+                                </button>
+                            {% else %}
+                                <button type="button"
+                                        class="btn justify-content-start dropdown-item"
+                                        disabled
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        data-bs-custom-class="c-box--action-tooltip"
+                                        data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées.">
+                                    <i class="ri-arrow-left-right-line me-2"></i>
+                                    <span>Transférer vers</span>
+                                </button>
+                            {% endif %}
                         {% endif %}
                         {% if can_archive %}
                             <button type="button"

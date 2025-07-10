@@ -1302,9 +1302,9 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
 
     assert get_transfer_button() is None
 
-    # Select 1 transferable application
+    # Select 1 transferable application but user in not member of multiple companies
     simulate_applications_selection([transferable_app_1.pk])
-    assert "disabled" in get_transfer_button().attrs
+    assert get_transfer_button() is None
 
     # The employer needs at least an other Company to be able to transfer an application
     CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company

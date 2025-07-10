@@ -431,9 +431,9 @@ def list_for_siae_actions(request):
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)
     can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
-    can_transfer = (
+    enable_transfer = len(request.organizations) > 1
+    can_transfer = enable_transfer and (
         all(job_application.transfer.is_available() for job_application in selected_job_applications)
-        and len(request.organizations) > 1
     )
     can_accept = len(selected_job_applications) == 1 and selected_job_applications[0].accept.is_available()
     if can_accept and company.kind == CompanyKind.GEIQ:
@@ -450,6 +450,7 @@ def list_for_siae_actions(request):
         "can_postpone": can_postpone,
         "can_refuse": can_refuse,
         "can_transfer": can_transfer,
+        "enable_transfer": enable_transfer,
         "other_actions_count": sum([can_process, can_postpone, can_archive, can_transfer]),
         "transfer_form": JobApplicationInternalTransferForm(request, job_app_count=selected_nb),
         "postpone_form": BatchPostponeForm(
