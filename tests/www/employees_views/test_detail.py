@@ -152,7 +152,6 @@ class TestEmployeeDetailView:
             assertContains(response, new_number)
             assertNotContains(response, expired_number)
 
-    @override_settings(TALLY_URL="https://tally.so")
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
@@ -177,13 +176,19 @@ class TestEmployeeDetailView:
         assertContains(response, user_info_edit_url)
         assertNotContains(response, user_info_not_allowed)
 
-        # Check that the edit user link correctly displays the Tally link (thanks to from_application= parameter)
+        # Check that the edit user link correctly displays the NIR modification link
         response = client.get(user_info_edit_url)
         assertContains(
             response,
             (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                f'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+                '<a href="'
+                f'{
+                    reverse(
+                        "job_seekers_views:nir_modification_request",
+                        kwargs={"public_id": job_application.job_seeker.public_id},
+                        query={"back_url": user_info_edit_url},
+                    )
+                }">Demander la correction du numéro de sécurité sociale</a>'
             ),
             html=True,
         )

@@ -21,7 +21,7 @@ from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 
 class TestEditUserInfoView:
-    NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    NIR_UPDATE_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
     NIR_FIELD_ID = "id_nir"
     LACK_OF_NIR_FIELD_ID = "id_lack_of_nir"
@@ -66,7 +66,6 @@ class TestEditUserInfoView:
             assert user.address_filled_at == datetime(2023, 3, 10, tzinfo=UTC)
             assert user.geocoding_updated_at == datetime(2023, 3, 10, tzinfo=UTC)
 
-    @override_settings(TALLY_URL="https://tally.so")
     @freeze_time("2023-03-10")
     def test_edit_with_nir(self, client, mocker, snapshot):
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
@@ -85,8 +84,14 @@ class TestEditUserInfoView:
         assertContains(
             response,
             (
-                f'<a href="https://tally.so/r/wzxQlg?jobseeker={user.pk}" target="_blank" rel="noopener">'
-                f"{self.NIR_UPDATE_TALLY_LINK_LABEL}</a>"
+                '<a href="'
+                f'{
+                    reverse(
+                        "job_seekers_views:nir_modification_request",
+                        kwargs={"public_id": user.public_id},
+                        query={"back_url": url},
+                    )
+                }">{self.NIR_UPDATE_LINK_LABEL}</a>'
             ),
             html=True,
         )
@@ -368,7 +373,7 @@ class TestEditUserInfoView:
         # Check that the NIR field is disabled (it can be reenabled via lack_of_nir check box)
         assertContains(response, DISABLED_NIR)
         assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
-        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 781 22978200508"
@@ -404,7 +409,7 @@ class TestEditUserInfoView:
         response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
 
         NEW_NIR = "1 781 22978200508"
         birthdate = date(1978, 12, 20)
@@ -437,7 +442,7 @@ class TestEditUserInfoView:
         response = client.get(url)
         # Check that the NIR field is enabled
         assert not response.context["form"]["nir"].field.disabled
-        assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
 
         birthdate = date(1978, 12, 20)
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
