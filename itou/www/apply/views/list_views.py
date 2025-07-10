@@ -435,7 +435,12 @@ def list_for_siae_actions(request):
     can_transfer = enable_transfer and (
         all(job_application.transfer.is_available() for job_application in selected_job_applications)
     )
-    can_accept = len(selected_job_applications) == 1 and selected_job_applications[0].accept.is_available()
+    cannot_accept_reason = None
+    if len(selected_job_applications) != 1:
+        cannot_accept_reason = "Une seule candidature doit être séléctionnée pour être acceptée."
+    elif not selected_job_applications[0].accept.is_available():
+        cannot_accept_reason = "Cette candidature est déjà acceptée."
+    can_accept = cannot_accept_reason is None
     if can_accept and company.kind == CompanyKind.GEIQ:
         selected_job_applications[0].geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(
             selected_job_applications[0], only_prescriber=False
@@ -445,6 +450,7 @@ def list_for_siae_actions(request):
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
         "can_accept": can_accept,
+        "cannot_accept_reason": cannot_accept_reason,
         "can_archive": can_archive,
         "can_process": can_process,
         "can_postpone": can_postpone,

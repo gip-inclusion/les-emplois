@@ -6408,7 +6408,19 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_accept[inactive accept button]
+# name: test_list_for_siae_select_applications_batch_accept[inactive accept button already accepted]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Cette candidature est déjà acceptée." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_accept[inactive accept button multiple job applications]
   '''
   <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Une seule candidature doit être séléctionnée pour être acceptée." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-close-line">
