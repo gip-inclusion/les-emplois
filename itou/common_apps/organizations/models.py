@@ -68,10 +68,6 @@ class OrganizationAbstract(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-    def get_admins(self):
-        memberships = self.memberships.admin()
-        return MembershipQuerySet.to_users_qs(memberships=memberships)
-
     def has_member(self, user):
         return self.active_members.filter(pk=user.pk).exists()
 
@@ -185,14 +181,6 @@ class OrganizationAbstract(models.Model):
     @property
     def active_admin_members(self):
         memberships = self.memberships.active_admin()
-        return MembershipQuerySet.to_users_qs(memberships=memberships)
-
-    @property
-    def deactivated_members(self):
-        """
-        List of organization removed members but still active as users.
-        """
-        memberships = self.memberships.inactive()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
