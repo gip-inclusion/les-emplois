@@ -23,8 +23,7 @@ from tests.geiq_assessments.factories import (
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
-from tests.utils.test_s3 import default_storage_ls_files
+from tests.utils.test import assertSnapshotQueries, default_storage_ls_files, parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture
