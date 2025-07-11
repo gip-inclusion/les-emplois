@@ -5,14 +5,14 @@ updates:
     schedule:
       interval: "weekly"
 
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "requirement"
       prefix-development: "dev requirement"
-    # Only allow updates to the lockfile for pip and
+    # Only allow updates to the lockfile for uv and
     # ignore any version updates that affect the manifest
     versioning-strategy: lockfile-only
     # Allow up to 20 concurrent open PRs
