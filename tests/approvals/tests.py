@@ -244,6 +244,8 @@ class TestApprovalModel:
             Approval.get_next_number()
 
     def test_cannot_mass_delete_approvals(self):
+        Approval.objects.all().delete(enable_mass_delete=True)
+
         with pytest.raises(NotImplementedError):
             Approval.objects.all().delete()
 

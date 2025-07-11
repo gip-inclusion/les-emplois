@@ -1,6 +1,7 @@
 import datetime
 import random
 import re
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import httpx
@@ -12,20 +13,32 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
+from itou.approvals.enums import Origin
+from itou.approvals.models import Approval
+from itou.archive.models import (
+    AnonymizedApplication,
+    AnonymizedApproval,
+    AnonymizedGEIQEligibilityDiagnosis,
+    AnonymizedJobSeeker,
+    AnonymizedProfessional,
+    AnonymizedSIAEEligibilityDiagnosis,
+)
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.companies.models import CompanyMembership
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
-from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.jobs.models import Appellation, Rome
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
@@ -45,6 +58,17 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
+
+
+@contextmanager
+def allow_manual_updated_at(model_class, field_name="updated_at"):
+    field = model_class._meta.get_field(field_name)
+    original_auto_now = field.auto_now
+    field.auto_now = False
+    try:
+        yield
+    finally:
+        field.auto_now = original_auto_now
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -231,6 +255,113 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
 
 class TestAnonymizeJobseekersManagementCommand:
+    def _get_anonymized_jobseeker(self):
+        return list(
+            AnonymizedJobSeeker.objects.all().values(
+                "date_joined",
+                "first_login",
+                "last_login",
+                "user_signup_kind",
+                "department",
+                "title",
+                "identity_provider",
+                "had_pole_emploi_id",
+                "had_nir",
+                "lack_of_nir_reason",
+                "nir_sex",
+                "nir_year",
+                "birth_year",
+                "count_accepted_applications",
+                "count_IAE_applications",
+                "count_total_applications",
+                "count_approvals",
+                "first_approval_start_at",
+                "last_approval_end_at",
+                "count_eligibility_diagnoses",
+            )
+        )
+
+    def _get_anonymized_application(self):
+        return list(
+            AnonymizedApplication.objects.all().values(
+                "job_seeker_birth_year",
+                "job_seeker_department_same_as_company_department",
+                "sender_kind",
+                "sender_company_kind",
+                "sender_prescriber_organization_kind",
+                "sender_prescriber_organization_authorization_status",
+                "company_kind",
+                "company_department",
+                "company_naf",
+                "company_has_convention",
+                "applied_at",
+                "processed_at",
+                "last_transition_at",
+                "had_resume",
+                "origin",
+                "state",
+                "refusal_reason",
+                "has_been_transferred",
+                "number_of_jobs_applied_for",
+                "has_diagoriente_invitation",
+                "hiring_rome",
+                "hiring_contract_type",
+                "hiring_contract_nature",
+                "hiring_start_date",
+                "has_approval",
+            )
+        )
+
+    def _get_anonymized_approval(self):
+        return list(
+            AnonymizedApproval.objects.all().values(
+                "origin",
+                "origin_company_kind",
+                "origin_sender_kind",
+                "origin_prescriber_organization_kind",
+                "start_at",
+                "end_at",
+                "had_eligibility_diagnosis",
+                "number_of_prolongations",
+                "duration_of_prolongations",
+                "number_of_suspensions",
+                "duration_of_suspensions",
+                "number_of_job_applications",
+                "number_of_accepted_job_applications",
+            )
+        )
+
+    def _get_anonymized_diagnosis(self, model=None):
+        common_fields = [
+            "created_at",
+            "expired_at",
+            "job_seeker_birth_year",
+            "job_seeker_department",
+            "job_seeker_had_pole_emploi_id",
+            "job_seeker_had_nir",
+            "author_kind",
+            "author_prescriber_organization_kind",
+            "number_of_administrative_criteria",
+            "number_of_administrative_criteria_level_1",
+            "number_of_administrative_criteria_level_2",
+            "number_of_certified_administrative_criteria",
+            "selected_administrative_criteria",
+            "number_of_job_applications",
+            "number_of_accepted_job_applications",
+        ]
+        siae_extra_fields = [
+            "author_siae_kind",
+            "number_of_approvals",
+            "first_approval_start_at",
+            "last_approval_end_at",
+        ]
+
+        if model is EligibilityDiagnosis:
+            return list(AnonymizedSIAEEligibilityDiagnosis.objects.values(*common_fields, *siae_extra_fields))
+        if model is GEIQEligibilityDiagnosis:
+            return list(AnonymizedGEIQEligibilityDiagnosis.objects.values(*common_fields))
+        return []
+
     @pytest.mark.parametrize("suspended", [True, False])
     @pytest.mark.parametrize("wet_run", [True, False])
     def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
@@ -239,12 +370,18 @@ class TestAnonymizeJobseekersManagementCommand:
         assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
 
     def test_dry_run(self, respx_mock):
-        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+        job_application = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=30, with_approval=True
+        )
         call_command("anonymize_jobseekers")
 
-        User.objects.get()
+        User.objects.get(id=job_application.job_seeker.id)
+        JobApplication.objects.get()
+        Approval.objects.get()
+
         assert not AnonymizedJobSeeker.objects.exists()
         assert not AnonymizedApplication.objects.exists()
+        assert not AnonymizedApproval.objects.exists()
         assert not respx_mock.calls.called
 
     def test_archive_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
@@ -303,6 +440,34 @@ class TestAnonymizeJobseekersManagementCommand:
                 lambda jobseeker: ApprovalFactory(user=jobseeker),
                 True,
                 id="notified_jobseeker_with_recent_approval",
+            ),
+            pytest.param(
+                lambda: JobSeekerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY,
+                    notified_days_ago=1,
+                ),
+                lambda jobseeker: ApprovalFactory(
+                    user=jobseeker,
+                    expired=True,
+                    updated_at=timezone.now() - relativedelta(years=3),
+                    eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                ),
+                False,
+                id="notified_jobseeker_with_expired_approval_not_recently_updated",
+            ),
+            pytest.param(
+                lambda: JobSeekerFactory(
+                    joined_days_ago=DAYS_OF_INACTIVITY,
+                    notified_days_ago=1,
+                ),
+                lambda jobseeker: ApprovalFactory(
+                    user=jobseeker,
+                    expired=True,
+                    updated_at=timezone.now(),
+                    eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                ),
+                True,
+                id="notified_jobseeker_with_expired_approval_recently_updated",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
@@ -533,28 +698,9 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
-
-        archived_jobseeker = AnonymizedJobSeeker.objects.all().values(
-            "date_joined",
-            "first_login",
-            "last_login",
-            "user_signup_kind",
-            "department",
-            "title",
-            "identity_provider",
-            "had_pole_emploi_id",
-            "had_nir",
-            "lack_of_nir_reason",
-            "nir_sex",
-            "nir_year",
-            "birth_year",
-            "count_accepted_applications",
-            "count_IAE_applications",
-            "count_total_applications",
-        )
-        assert list(archived_jobseeker) == snapshot(name="archived_jobseeker")
-
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
         assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
+
         if jobseeker.is_active:
             [mail] = mailoutbox
             assert jobseeker.email == mail.to[0]
@@ -706,6 +852,7 @@ class TestAnonymizeJobseekersManagementCommand:
             notified_days_ago=30,
             jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
             post_code="76160",
+            for_snapshot=True,
         )
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
@@ -736,37 +883,235 @@ class TestAnonymizeJobseekersManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
-        archived_application = AnonymizedApplication.objects.all().values(
-            "job_seeker_birth_year",
-            "job_seeker_department_same_as_company_department",
-            "sender_kind",
-            "sender_company_kind",
-            "sender_prescriber_organization_kind",
-            "sender_prescriber_organization_authorization_status",
-            "company_kind",
-            "company_department",
-            "company_naf",
-            "company_has_convention",
-            "applied_at",
-            "processed_at",
-            "last_transition_at",
-            "had_resume",
-            "origin",
-            "state",
-            "refusal_reason",
-            "has_been_transferred",
-            "number_of_jobs_applied_for",
-            "has_diagoriente_invitation",
-            "hiring_rome",
-            "hiring_contract_type",
-            "hiring_contract_nature",
-            "hiring_start_date",
-        )
-        assert list(archived_application) == snapshot(name="archived_application")
+        assert self._get_anonymized_application() == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
         assert respx_mock.calls.call_count == 1
+
+    @pytest.mark.parametrize(
+        "approval_kwargs,prolongation_kwargs_list,suspension_kwargs_list,job_application_kwargs_list",
+        [
+            pytest.param(
+                {
+                    "for_snapshot": True,
+                    "origin_sender_kind": SenderKind.EMPLOYER,
+                    "origin_siae_kind": CompanyKind.EA,
+                    "origin_prescriber_organization_kind": PrescriberOrganizationKind.MSA,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                },
+                [],
+                [],
+                [],
+                id="jobseeker_with_few_datas",
+            ),
+            pytest.param(
+                {
+                    "origin_sender_kind": SenderKind.PRESCRIBER,
+                    "origin_prescriber_organization_kind": PrescriberOrganizationKind.CCAS,
+                    "origin_siae_kind": None,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                    "eligibility_diagnosis__updated_at": timezone.now() - relativedelta(years=3),
+                },
+                [
+                    {
+                        "for_snapshot": True,
+                        "start_at": datetime.date(2022, 5, 17),
+                    }
+                ],
+                [
+                    {
+                        "start_at": datetime.date(2020, 5, 17),
+                        "end_at": datetime.date(2020, 6, 10),
+                    }
+                ],
+                [{"state": JobApplicationState.ACCEPTED}],
+                id="jobseeker_with_some_datas",
+            ),
+            pytest.param(
+                {
+                    "origin": Origin.ADMIN,
+                    "origin_siae_kind": CompanyKind.EA,
+                    "origin_sender_kind": SenderKind.EMPLOYER,
+                    "start_at": datetime.date(2020, 4, 18),
+                    "end_at": datetime.date(2023, 4, 18),
+                    "eligibility_diagnosis__updated_at": timezone.now() - relativedelta(years=3),
+                },
+                [
+                    {
+                        "start_at": datetime.date(2022, 5, 17),
+                    },
+                    {
+                        "start_at": datetime.date(2022, 7, 16),
+                    },
+                    {
+                        "start_at": datetime.date(2022, 9, 16),
+                    },
+                ],
+                [
+                    {
+                        "start_at": datetime.date(2020, 5, 17),
+                        "end_at": datetime.date(2020, 5, 20),
+                    },
+                    {
+                        "start_at": datetime.date(2020, 9, 17),
+                        "end_at": datetime.date(2020, 9, 20),
+                    },
+                ],
+                [
+                    {"state": JobApplicationState.ACCEPTED},
+                    {"state": JobApplicationState.NEW},
+                ],
+                id="jobseeker_with_lot_of_datas",
+            ),
+        ],
+    )
+    def test_archive_jobseeker_with_approval(
+        self,
+        approval_kwargs,
+        prolongation_kwargs_list,
+        suspension_kwargs_list,
+        job_application_kwargs_list,
+        snapshot,
+    ):
+        job_seeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+        )
+        approval = ApprovalFactory(user=job_seeker, **approval_kwargs)
+        [ProlongationFactory(approval=approval, **kwargs) for kwargs in prolongation_kwargs_list]
+        [SuspensionFactory(approval=approval, **kwargs) for kwargs in suspension_kwargs_list]
+        [
+            JobApplicationFactory(
+                job_seeker=job_seeker,
+                approval=approval,
+                eligibility_diagnosis=approval.eligibility_diagnosis,
+                updated_at=timezone.now() - relativedelta(years=3),
+                to_company__department=76,
+                to_company__naf="4567A",
+                **kwargs,
+            )
+            for kwargs in job_application_kwargs_list
+        ]
+
+        with allow_manual_updated_at(Approval):
+            approval.updated_at = timezone.now() - relativedelta(years=3)
+            approval.save()
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not Approval.objects.exists()
+
+        assert self._get_anonymized_approval() == snapshot(name="anonymized_approval")
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
+        assert self._get_anonymized_application() == snapshot(name="anonymized_application")
+
+    def test_archive_jobseeker_with_several_approvals(self, snapshot):
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+        )
+        for start_at in [datetime.date(2019, 4, 18), datetime.date(2022, 5, 17)]:
+            ApprovalFactory(
+                user=jobseeker,
+                start_at=start_at,
+                end_at=start_at + relativedelta(years=2),
+                eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+            )
+
+        with allow_manual_updated_at(Approval):
+            jobseeker.approvals.update(updated_at=timezone.now() - relativedelta(years=3))
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not Approval.objects.exists()
+        assert AnonymizedApproval.objects.count() == 2
+        assert self._get_anonymized_jobseeker() == snapshot(name="anonymized_jobseeker")
+
+    @pytest.mark.parametrize(
+        "eligibility_factory,eligibility_kwargs,jobseeker_kwargs,job_application_kwargs_list",
+        [
+            pytest.param(
+                IAEEligibilityDiagnosisFactory,
+                {
+                    "from_employer": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 2, 16, 0, 0, 0)),
+                    "author_siae__kind": CompanyKind.ACI,
+                },
+                {},
+                [
+                    {
+                        "with_approval": True,
+                        "approval__start_at": datetime.date(2020, 4, 18),
+                        "approval__end_at": datetime.date(2023, 4, 17),
+                    }
+                ],
+                id="iae_diag_from_employer_with_approval",
+            ),
+            pytest.param(
+                IAEEligibilityDiagnosisFactory,
+                {
+                    "from_prescriber": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 5, 23, 0, 0, 0)),
+                },
+                {"with_pole_emploi_id": True, "jobseeker_profile__nir": ""},
+                [{"state": JobApplicationState.ACCEPTED}, {"state": JobApplicationState.POSTPONED}],
+                id="iae_diag_from_prescriber_with_several_job_applications",
+            ),
+            pytest.param(
+                GEIQEligibilityDiagnosisFactory,
+                {
+                    "from_employer": True,
+                    "created_at": timezone.make_aware(datetime.datetime(2020, 9, 21, 0, 0, 0)),
+                },
+                {},
+                [],
+                id="geiq_diag_from_employer_without_job_application",
+            ),
+        ],
+    )
+    def test_archive_jobseeker_with_eligibility_diagnosis(
+        self, eligibility_factory, eligibility_kwargs, jobseeker_kwargs, job_application_kwargs_list, snapshot
+    ):
+        # TODO . add criteria, certified criteria, and administrative criteria factories
+        jobseeker = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=30,
+            for_snapshot=True,
+            **jobseeker_kwargs,
+        )
+        eligibility_diagnosis = eligibility_factory(
+            job_seeker=jobseeker,
+            updated_at=timezone.now() - relativedelta(years=3),
+            **eligibility_kwargs,
+        )
+        [
+            JobApplicationFactory(
+                job_seeker=jobseeker,
+                eligibility_diagnosis=eligibility_diagnosis,
+                updated_at=timezone.now() - relativedelta(years=3),
+                **kwargs,
+            )
+            for kwargs in job_application_kwargs_list
+        ]
+
+        with allow_manual_updated_at(Approval):
+            jobseeker.approvals.update(updated_at=timezone.now() - relativedelta(years=3))
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not EligibilityDiagnosis.objects.exists()
+        assert not GEIQEligibilityDiagnosis.objects.exists()
+
+        model = (
+            EligibilityDiagnosis if eligibility_factory is IAEEligibilityDiagnosisFactory else GEIQEligibilityDiagnosis
+        )
+        assert self._get_anonymized_diagnosis(model) == snapshot(name="anonymized_diagnosis")
 
 
 class TestNotifyInactiveProfessionalsManagementCommand:
