@@ -1350,7 +1350,7 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
         return choices[self.to_state]
 
 
-class JobApplicationComment(models.Model):
+class JobApplicationThreadedComment(models.Model):
     job_application = models.ForeignKey(
         JobApplication,
         verbose_name="candidature",

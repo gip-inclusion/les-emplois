@@ -1,0 +1,41 @@
+{% load django_bootstrap5 %}
+<div id="comments_tab">
+    <div class="c-box c-box--note mb-3 mb-md-4">
+        {% bootstrap_form_errors form type=all %}
+        <form hx-post="{% url 'apply:threaded_comment_for_company' job_application_id=job_application.id %}"
+              hx-target="#comments_tab"
+              hx-indicator="#comments_tab"
+              hx-swap="outerHTML"
+              hx-vals='{"tab": "True"}'
+              class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            {% bootstrap_field form.message %}
+            <button class="btn btn-sm btn-ico-only">
+                <span class="visually-hidden">Annuler l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+            <button type="submit" class="btn btn-sm btn-ico-only">
+                <span class="visually-hidden">Valider l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+                <i class="ri-check-line" aria-hidden="true"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="c-box mb-3 mb-md-4">
+        <h3>
+            Liste des commentaires
+            {% if comments %}({{ comments|length }}){% endif %}
+        </h3>
+        {% for comment in comments %}
+            <div>
+
+                <div>Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</div>
+                <div>
+                    {{ comment.created_by.get_full_name }}
+                    {% if comment.created_by == request.user %}(vous){% endif %}
+                </div>
+                <div>{{ comment.message|linebreaksbr }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -25,7 +25,12 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.job_applications.models import (
+    JobApplication,
+    JobApplicationThreadedComment,
+    JobApplicationWorkflow,
+    PriorAction,
+)
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
@@ -37,6 +42,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
+    JobApplicationAddCommentForCompanyForm,
     JobApplicationInternalTransferForm,
     PriorActionForm,
     TransferJobApplicationForm,
@@ -224,6 +230,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "selected_jobs__appellation",
             "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
             "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
+            "threaded_comments",
         )
         .annotate(
             has_pending_rdv_insertion_invitation_request=Exists(
@@ -287,28 +294,70 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             to_company=job_application.to_company,
         )
 
-    context = {
-        "can_be_cancelled": can_be_cancelled,
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
-        "display_refusal_info": False,
-        "eligibility_diagnosis": eligibility_diagnosis,
-        "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
-        "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
-        "job_application": job_application,
-        "invitation_requests": invitation_requests,
-        "participations": participations,
-        "transition_logs": transition_logs,
-        "back_url": back_url,
-        "add_prior_action_form": (
-            PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
-        ),
-        "matomo_custom_title": "Candidature",
-        "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,
-    } | get_siae_actions_context(request, job_application)
+    comments = job_application.threaded_comments.order_by("-created_at")
+
+    context = (
+        {
+            "can_be_cancelled": can_be_cancelled,
+            "can_view_personal_information": True,  # SIAE members have access to personal info
+            "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
+            "display_refusal_info": False,
+            "eligibility_diagnosis": eligibility_diagnosis,
+            "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
+            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+            "job_application": job_application,
+            "invitation_requests": invitation_requests,
+            "participations": participations,
+            "transition_logs": transition_logs,
+            "back_url": back_url,
+            "add_prior_action_form": (
+                PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
+            ),
+            "comments": comments,
+            "last_comments": comments[:3],
+            "add_comment_form": JobApplicationAddCommentForCompanyForm(
+                job_application=job_application, created_by=request.user
+            ),
+            "matomo_custom_title": "Candidature",
+            "job_application_sender_left_org": job_application_sender_left_org(job_application),
+            "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,
+        }
+        | get_siae_actions_context(request, job_application)
+    )
 
     return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def threaded_comment_for_company(request, job_application_id):
+    queryset = JobApplication.objects.is_active_company_member(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+    tab_view = request.POST.get("tab", False)
+
+    form = JobApplicationAddCommentForCompanyForm(
+        request.POST or None, job_application=job_application, created_by=request.user
+    )
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        # Serve an empty form
+        form = JobApplicationAddCommentForCompanyForm(job_application=job_application, created_by=request.user)
+
+    comments = JobApplicationThreadedComment.objects.filter(job_application=job_application.id).order_by("-created_at")
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "comments": comments if tab_view else comments[:3],
+    }
+
+    return render(
+        request,
+        "apply/includes/job_application_comments_tab.html"
+        if tab_view
+        else "apply/includes/job_application_comments_box.html",
+        context,
+    )
 
 
 @check_user(lambda u: u.is_prescriber or u.is_employer)
