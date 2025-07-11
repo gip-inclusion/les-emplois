@@ -27,6 +27,19 @@ class TestMembers:
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+    def test_members_pagination(self, client):
+        institution = InstitutionFactory()
+        InstitutionMembershipFactory.create_batch(50, institution=institution)
+        user = institution.members.first()
+        client.force_login(user)
+        url = reverse("institutions_views:members")
+        response = client.get(url)
+        assertNotContains(response, url + "?page=1")
+
+        InstitutionMembershipFactory(institution=institution)
+        response = client.get(url)
+        assertContains(response, url + "?page=1")
+
     def test_active_members(self, client):
         institution = InstitutionFactory()
         active_member_active_user = InstitutionMembershipFactory(institution=institution)
