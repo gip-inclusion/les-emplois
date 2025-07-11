@@ -15,6 +15,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiApiClient,
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
+    PoleEmploiRoyaumeAgentAPIClient,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from tests.job_applications.factories import JobApplicationFactory
@@ -252,3 +253,28 @@ class TestPoleEmploiAPIClient:
         )
         assert self.api_client.agences() == [expected_agence, other_agence]
         assert self.api_client.agences(safir=82001) == expected_agence
+
+
+class TestPoleEmploiRoyaumeAgentAPIClient:
+    CACHE_EXPIRY = 1499
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        self.api_client = PoleEmploiRoyaumeAgentAPIClient(
+            base_url="https://pe.fake",
+            auth_base_url="https://auth.fr",
+            key="client_id",
+            secret="client_secret",
+        )
+        json_response = {
+            "token_type": "Bearer",
+            "access_token": "catwoman",
+            "scope": "client_id h2a rechercheusager profil_accedant api_donnees-rqthv1 api_rechercher-usagerv2",
+            "expires_in": self.CACHE_EXPIRY,
+        }
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent").respond(200, json=json_response)
+
+    @respx.mock
+    def test_refresh_token(self):
+        token = self.api_client._refresh_token()
+        assert token == "Bearer catwoman"
