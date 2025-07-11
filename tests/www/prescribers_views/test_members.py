@@ -28,6 +28,14 @@ class TestMembers:
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+        # Check invitation link
+        invite_url = reverse("invitations_views:invite_prescriber_with_org")
+        assertContains(response, invite_url)
+
+        PrescriberWithOrgInvitationFactory.create_batch(50, organization=organization)
+        response = client.get(url)
+        assertNotContains(response, invite_url)
+
     def test_members_pagination(self, client):
         organization = PrescriberOrganizationFactory()
         PrescriberMembershipFactory.create_batch(50, organization=organization)

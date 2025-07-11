@@ -26,6 +26,14 @@ class TestMembers:
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+        # Check invitation link
+        invite_url = reverse("invitations_views:invite_employer")
+        assertContains(response, invite_url)
+
+        EmployerInvitationFactory.create_batch(50, company=company)
+        response = client.get(url)
+        assertNotContains(response, invite_url)
+
     def test_members_pagination(self, client):
         company = CompanyFactory()
         CompanyMembershipFactory.create_batch(50, company=company)

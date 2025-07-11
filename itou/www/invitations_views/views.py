@@ -4,6 +4,7 @@ from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
+from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
@@ -23,10 +24,13 @@ from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
-    EmployerInvitationFormSet,
-    LaborInspectorInvitationFormSet,
+    BaseEmployerInvitationFormSet,
+    BaseLaborInspectorInvitationFormSet,
+    BasePrescriberWithOrgInvitationFormSet,
+    EmployerInvitationForm,
+    LaborInspectorInvitationForm,
     NewUserInvitationForm,
-    PrescriberWithOrgInvitationFormSet,
+    PrescriberWithOrgInvitationForm,
 )
 from itou.www.invitations_views.helpers import (
     handle_employer_invitation,
@@ -34,6 +38,9 @@ from itou.www.invitations_views.helpers import (
     handle_prescriber_intivation,
 )
 from itou.www.signup import forms as signup_forms
+
+
+MAX_ACTIVE_INVITATION = 50
 
 
 def handle_invited_user_registration_with_django(request, invitation, invitation_type):
@@ -127,7 +134,9 @@ def _toast_invitation_sent(invitations):
 
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
+    form_post_url = reverse("invitations_views:invite_prescriber_with_org")
     form_kwargs = {"sender": request.user, "organization": organization}
+    back_url = reverse("prescribers_views:members")
 
     # Initial data can be passed by GET params to ease invitation of new members
     request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=request.GET)
@@ -143,6 +152,20 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
         ]
     else:
         initial_data = None
+
+    max_invitation = MAX_ACTIVE_INVITATION - organization.invitations.pending().count()
+    if max_invitation < 1:
+        messages.error(request, f"Vous ne pouvez avoir plus de {MAX_ACTIVE_INVITATION} invitations.")
+        return HttpResponseRedirect(back_url)
+
+    PrescriberWithOrgInvitationFormSet = modelformset_factory(
+        PrescriberWithOrgInvitation,
+        form=PrescriberWithOrgInvitationForm,
+        formset=BasePrescriberWithOrgInvitationFormSet,
+        extra=1,
+        max_num=max_invitation,
+        absolute_max=max_invitation,
+    )
 
     formset = PrescriberWithOrgInvitationFormSet(
         data=request.POST or None, initial=initial_data, form_kwargs=form_kwargs
@@ -162,8 +185,6 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
             )
             return redirect(request.path)
 
-    form_post_url = reverse("invitations_views:invite_prescriber_with_org")
-    back_url = reverse("prescribers_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": organization}
 
     return render(request, template_name, context)
@@ -178,10 +199,25 @@ def join_prescriber_organization(request, invitation_id):
 
 
 def invite_employer(request, template_name="invitations_views/create.html"):
-    form_post_url = reverse("invitations_views:invite_employer")
-    back_url = reverse("companies_views:members")
     company = get_current_company_or_404(request)
+    form_post_url = reverse("invitations_views:invite_employer")
     form_kwargs = {"sender": request.user, "company": company}
+    back_url = reverse("companies_views:members")
+
+    max_invitation = MAX_ACTIVE_INVITATION - company.invitations.pending().count()
+    if max_invitation < 1:
+        messages.error(request, f"Vous ne pouvez avoir plus de {MAX_ACTIVE_INVITATION} invitations.")
+        return HttpResponseRedirect(back_url)
+
+    EmployerInvitationFormSet = modelformset_factory(
+        EmployerInvitation,
+        form=EmployerInvitationForm,
+        formset=BaseEmployerInvitationFormSet,
+        extra=1,
+        max_num=max_invitation,
+        absolute_max=max_invitation,
+    )
+
     formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -213,7 +249,23 @@ def join_company(request, invitation_id):
 
 def invite_labor_inspector(request, template_name="invitations_views/create.html"):
     institution = get_current_institution_or_404(request)
+    form_post_url = reverse("invitations_views:invite_labor_inspector")
     form_kwargs = {"sender": request.user, "institution": institution}
+    back_url = reverse("institutions_views:members")
+
+    max_invitation = MAX_ACTIVE_INVITATION - institution.invitations.pending().count()
+    if max_invitation < 1:
+        messages.error(request, f"Vous ne pouvez avoir plus de {MAX_ACTIVE_INVITATION} invitations.")
+        return HttpResponseRedirect(back_url)
+
+    LaborInspectorInvitationFormSet = modelformset_factory(
+        LaborInspectorInvitation,
+        form=LaborInspectorInvitationForm,
+        formset=BaseLaborInspectorInvitationFormSet,
+        extra=1,
+        max_num=max_invitation,
+        absolute_max=max_invitation,
+    )
     formset = LaborInspectorInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -230,8 +282,6 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
             )
             return redirect(request.path)
 
-    form_post_url = reverse("invitations_views:invite_labor_inspector")
-    back_url = reverse("institutions_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": institution}
 
     return render(request, template_name, context)

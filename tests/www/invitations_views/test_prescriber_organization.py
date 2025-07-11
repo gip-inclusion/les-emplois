@@ -23,6 +23,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params
+from itou.www.invitations_views.views import MAX_ACTIVE_INVITATION
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
@@ -120,6 +121,24 @@ class TestSendPrescriberWithOrgInvitation:
         assertRedirects(response, INVITATION_URL)
         invitations_count = PrescriberWithOrgInvitation.objects.filter(organization=self.organization).count()
         assert invitations_count == 2
+
+    def test_too_many_invitations(self, client):
+        PrescriberWithOrgInvitationFactory.create_batch(MAX_ACTIVE_INVITATION, organization=self.organization)
+        response = client.get(INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
+        assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez avoir plus de 50 invitations.")])
+
+    def test_limit_new_invitations(self, client):
+        PrescriberWithOrgInvitationFactory.create_batch(MAX_ACTIVE_INVITATION - 1, organization=self.organization)
+        guest = PrescriberFactory.build()
+        self.post_data["form-TOTAL_FORMS"] = "2"
+        self.post_data["form-1-first_name"] = guest.first_name
+        self.post_data["form-1-last_name"] = guest.last_name
+        self.post_data["form-1-email"] = guest.email
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assert response.status_code == 200
+        assertContains(response, "Veuillez soumettre au plus 1 formulaire")
+        assert PrescriberWithOrgInvitation.objects.count() == 49
 
 
 class TestSendPrescriberWithOrgInvitationExceptions:
