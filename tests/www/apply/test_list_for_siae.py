@@ -1248,6 +1248,109 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
         assert pretty_indented(archive_button) == snapshot(name="inactive archive button")
 
 
+def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
+    MODAL_ID = "unarchive_confirmation_modal"
+
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    archived_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
+        archived_at=timezone.now(),
+        archived_by=employer,
+    )
+    archived_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.REFUSED,
+        archived_at=timezone.now(),
+        archived_by=employer,
+    )
+    not_archived_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+
+    client.force_login(employer)
+    table_url = reverse(
+        "apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01", "archived": "archived"}
+    )
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_unarchive_modal():
+        return simulated_page.find(id=MODAL_ID)
+
+    def get_unarchive_button():
+        unarchive_buttons = [
+            span.parent
+            for span in simulated_page.find(id="batch-action-box").select("button > span")
+            if span.contents == ["Désarchiver"]
+        ]
+        if not unarchive_buttons:
+            return None
+        [unarchive_button] = unarchive_buttons
+        return unarchive_button
+
+    assert get_unarchive_modal() is None
+    assert get_unarchive_button() is None
+
+    # Select 1 archived application
+    simulate_applications_selection([archived_app_1.pk])
+    archive_button = get_unarchive_button()
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(archive_button) == snapshot(name="active unarchive button")
+
+    modal = get_unarchive_modal()
+    assert pretty_indented(modal) == snapshot(name="modal with 1 unarchivable application")
+    # Check that the next_url is correctly transmitted
+    modal_form_action = urlsplit(modal.find("form")["action"])
+    assert modal_form_action.path == reverse("apply:batch_unarchive")
+    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 archived applications
+    simulate_applications_selection([archived_app_1.pk, archived_app_2.pk])
+    archive_button = get_unarchive_button()
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(archive_button) == snapshot(name="active unarchive button")
+    assert pretty_indented(get_unarchive_modal()) == snapshot(name="modal with 2 archivable applications")
+
+    # with at least one archived job app, the button is available
+    simulate_applications_selection([not_archived_app.pk, archived_app_1])
+    archive_button = get_unarchive_button()
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(archive_button) == snapshot(name="active unarchive button")
+
+    # But with only not archived job app, the button is disabled
+    simulate_applications_selection([not_archived_app.pk])
+    # No modal & linked button
+    assert get_unarchive_modal() is None
+    archive_button = get_unarchive_button()
+    assert pretty_indented(archive_button) == snapshot(name="inactive unarchive button")
+
+
 def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
     company = CompanyFactory(pk=1111, with_membership=True)
     employer = company.members.first()
