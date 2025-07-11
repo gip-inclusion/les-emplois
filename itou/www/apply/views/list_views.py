@@ -427,7 +427,19 @@ def list_for_siae_actions(request):
         response = HttpResponse()
         response["HX-Refresh"] = "true"
         return response
-    can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
+    can_archive = any(job_application.can_be_archived for job_application in selected_job_applications)
+    cannot_archive_reason = None
+    if can_archive is False:
+        if all(
+            not job_application.can_be_archived and job_application.archived_at is None
+            for job_application in selected_job_applications
+        ):
+            cannot_archive_reason = (
+                "Seules les candidatures au statut « Déclinée », « Embauché ailleurs » "
+                "et « Embauche annulée » peuvent être archivées."
+            )
+        else:
+            cannot_archive_reason = "La sélection ne peut pas être archivée."
     can_unarchive = any(job_application.archived_at is not None for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)
@@ -446,6 +458,7 @@ def list_for_siae_actions(request):
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
         "can_accept": can_accept,
+        "cannot_archive_reason": cannot_archive_reason,
         "can_archive": can_archive,
         "can_process": can_process,
         "can_postpone": can_postpone,

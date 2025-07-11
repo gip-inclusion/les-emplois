@@ -6432,9 +6432,21 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_archive[inactive archive button]
+# name: test_list_for_siae_select_applications_batch_archive[inactive archive button - bad status]
   '''
   <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+      </i>
+      <span>
+          Archiver
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_archive[inactive archive button - default]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="La sélection ne peut pas être archivée." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
       </i>
       <span>
