@@ -2,6 +2,7 @@ from functools import partial
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
@@ -12,18 +13,41 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestMembers:
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
 
-    def test_members(self, client):
-        organization = PrescriberOrganizationWithMembershipFactory()
+    @freeze_time("2025-07-12 10:40")
+    def test_members(self, client, snapshot):
+        organization = PrescriberOrganizationFactory()
+        user = PrescriberMembershipFactory(user__for_snapshot=True, organization=organization).user
+        client.force_login(user)
+        url = reverse("prescribers_views:members")
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+        # Check invitation link
+        invite_url = reverse("invitations_views:invite_prescriber_with_org")
+        assertContains(response, invite_url)
+
+        PrescriberWithOrgInvitationFactory.create_batch(50, organization=organization)
+        response = client.get(url)
+        assertNotContains(response, invite_url)
+
+    def test_members_pagination(self, client):
+        organization = PrescriberOrganizationFactory()
+        PrescriberMembershipFactory.create_batch(50, organization=organization)
         user = organization.members.first()
         client.force_login(user)
         url = reverse("prescribers_views:members")
         response = client.get(url)
-        assert response.status_code == 200
+        assertNotContains(response, url + "?page=1")
+
+        PrescriberMembershipFactory(organization=organization)
+        response = client.get(url)
+        assertContains(response, url + "?page=1")
 
     def test_active_members(self, client):
         organization = PrescriberOrganizationFactory()
@@ -38,11 +62,11 @@ class TestMembers:
         url = reverse("prescribers_views:members")
         response = client.get(url)
         assert response.status_code == 200
-        assert len(response.context["members"]) == 1
-        assert active_member_active_user in response.context["members"]
-        assert active_member_inactive_user not in response.context["members"]
-        assert inactive_member_active_user not in response.context["members"]
-        assert inactive_member_inactive_user not in response.context["members"]
+        assert len(response.context["object_list"]) == 1
+        assert active_member_active_user in response.context["object_list"]
+        assert active_member_inactive_user not in response.context["object_list"]
+        assert inactive_member_active_user not in response.context["object_list"]
+        assert inactive_member_inactive_user not in response.context["object_list"]
 
     def test_members_admin_warning_one_user(self, client):
         organization = PrescriberOrganizationWithMembershipFactory()

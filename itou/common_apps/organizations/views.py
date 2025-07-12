@@ -4,8 +4,43 @@ Functions used in organization views.
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.views.generic import ListView
+
+from itou.utils.pagination import ItouPaginator
+from itou.www.invitations_views.views import MAX_ACTIVE_INVITATION
+
+
+class BaseMemberList(ListView):
+    paginate_by = 50  # Most organizations will have only one page
+    paginator_class = ItouPaginator
+
+    def get_queryset(self):
+        memberships = getattr(self.organization, self.membership_related_name)
+        return memberships.active().select_related("user").all().order_by("user__first_name", "user__last_name")
+
+    def get_invitation_url(self):
+        raise NotImplementedError
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        active_company_members_stats = self.get_queryset().aggregate(
+            total_count=Count("pk"),
+            admin_count=Count("pk", filter=Q(is_admin=True)),
+        )
+        pending_invitations = self.organization.invitations.pending()
+
+        context[self.context_object_name] = self.organization
+        context["members_stats"] = active_company_members_stats
+        context["pending_invitations"] = pending_invitations
+        context["invitation_url"] = (
+            self.get_invitation_url() if len(pending_invitations) < MAX_ACTIVE_INVITATION else None
+        )
+        context["active_admin_members"] = self.organization.active_admin_members
+        return context
 
 
 def deactivate_org_member(request, user_id, *, success_url, template_name):

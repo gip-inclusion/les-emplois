@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
@@ -10,18 +11,41 @@ from tests.companies.factories import (
     EmployerFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestMembers:
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
 
-    def test_members(self, client):
-        company = CompanyFactory(with_membership=True)
+    @freeze_time("2025-07-12 10:40")
+    def test_members(self, client, snapshot):
+        company = CompanyFactory()
+        user = CompanyMembershipFactory(user__for_snapshot=True, company=company).user
+        client.force_login(user)
+        url = reverse("companies_views:members")
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+        # Check invitation link
+        invite_url = reverse("invitations_views:invite_employer")
+        assertContains(response, invite_url)
+
+        EmployerInvitationFactory.create_batch(50, company=company)
+        response = client.get(url)
+        assertNotContains(response, invite_url)
+
+    def test_members_pagination(self, client):
+        company = CompanyFactory()
+        CompanyMembershipFactory.create_batch(50, company=company)
         user = company.members.first()
         client.force_login(user)
         url = reverse("companies_views:members")
         response = client.get(url)
-        assert response.status_code == 200
+        assertNotContains(response, url + "?page=1")
+
+        CompanyMembershipFactory(company=company)
+        response = client.get(url)
+        assertContains(response, url + "?page=1")
 
     def test_active_members(self, client):
         company = CompanyFactory()
@@ -36,11 +60,11 @@ class TestMembers:
         url = reverse("companies_views:members")
         response = client.get(url)
         assert response.status_code == 200
-        assert len(response.context["members"]) == 1
-        assert active_member_active_user in response.context["members"]
-        assert active_member_inactive_user not in response.context["members"]
-        assert inactive_member_active_user not in response.context["members"]
-        assert inactive_member_inactive_user not in response.context["members"]
+        assert len(response.context["object_list"]) == 1
+        assert active_member_active_user in response.context["object_list"]
+        assert active_member_inactive_user not in response.context["object_list"]
+        assert inactive_member_active_user not in response.context["object_list"]
+        assert inactive_member_inactive_user not in response.context["object_list"]
 
     def test_members_admin_warning_one_user(self, client):
         company = CompanyFactory(with_membership=True)

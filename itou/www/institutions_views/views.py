@@ -1,41 +1,29 @@
 from django.core.exceptions import BadRequest
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 
-from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.perms.institution import get_current_institution_or_404
 
 
-def member_list(request, template_name="institutions/members.html"):
-    """
-    List members of an institution.
-    """
-    institution = get_current_institution_or_404(request)
+class MemberList(BaseMemberList):
+    template_name = "institutions/members.html"
+    membership_related_name = "institutionmembership_set"
+    context_object_name = "institution"
 
-    members = (
-        institution.institutionmembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
-    )
-    members_stats = members.aggregate(
-        total_count=Count("pk"),
-        admin_count=Count("pk", filter=Q(is_admin=True)),
-    )
+    def setup(self, request, *args, **kwargs):
+        self.organization = get_current_institution_or_404(request)
+        return super().setup(request, *args, **kwargs)
 
-    pending_invitations = None
-    # Institution members can only be labor inspectors for the moment,
-    # but this is likely to change in the future.
-    if request.user.is_labor_inspector:
-        pending_invitations = institution.invitations.pending()
+    def get_invitation_url(self):
+        return reverse("invitations_views:invite_labor_inspector")
 
-    context = {
-        "institution": institution,
-        "members": members,
-        "members_stats": members_stats,
-        "pending_invitations": pending_invitations,
-    }
-    return render(request, template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_url"] = "institutions_views"
+        return context
 
 
 @check_user(lambda user: user.is_labor_inspector)

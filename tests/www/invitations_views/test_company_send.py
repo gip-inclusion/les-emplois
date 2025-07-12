@@ -3,12 +3,14 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
 from itou.www.invitations_views.forms import EmployerInvitationForm
+from itou.www.invitations_views.views import MAX_ACTIVE_INVITATION
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.invitations.factories import EmployerInvitationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 
@@ -125,6 +127,26 @@ class TestSendSingleCompanyInvitation:
         assert invitation.first_name == self.guest_data["first_name"]
         assert invitation.last_name == self.guest_data["last_name"]
         assert invitation.email == self.guest_data["email"]
+
+    def test_too_many_invitations(self, client):
+        EmployerInvitationFactory.create_batch(MAX_ACTIVE_INVITATION, company=self.company)
+        client.force_login(self.sender)
+        response = client.get(INVITATION_URL)
+        assertRedirects(response, reverse("companies_views:members"))
+        assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez avoir plus de 50 invitations.")])
+
+    def test_limit_new_invitations(self, client):
+        EmployerInvitationFactory.create_batch(MAX_ACTIVE_INVITATION - 1, company=self.company)
+        guest = EmployerFactory.build()
+        self.post_data["form-TOTAL_FORMS"] = "2"
+        self.post_data["form-1-first_name"] = guest.first_name
+        self.post_data["form-1-last_name"] = guest.last_name
+        self.post_data["form-1-email"] = guest.email
+        client.force_login(self.sender)
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assert response.status_code == 200
+        assertContains(response, "Veuillez soumettre au plus 1 formulaire")
+        assert EmployerInvitation.objects.count() == 49
 
 
 class TestSendMultipleCompanyInvitation:
