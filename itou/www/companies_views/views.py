@@ -734,9 +734,13 @@ class MemberList(BaseMemberList):
             raise PermissionDenied
         return super().setup(request, *args, **kwargs)
 
+    def get_invitation_url(self):
+        return reverse("invitations_views:invite_employer")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["can_show_financial_annexes"] = self.organization.convention_can_be_accessed_by(self.request.user)
+        context["base_url"] = "companies_views"
         return context
 
 
