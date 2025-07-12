@@ -11,11 +11,18 @@ from itou.utils.perms.institution import get_current_institution_or_404
 class MemberList(BaseMemberList):
     template_name = "institutions/members.html"
     membership_related_name = "institutionmembership_set"
-    context_object_name = "institution"
 
     def setup(self, request, *args, **kwargs):
         self.organization = get_current_institution_or_404(request)
         return super().setup(request, *args, **kwargs)
+
+    def get_invitation_url(self):
+        return reverse("invitations_views:invite_labor_inspector")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_url"] = "institutions_views"
+        return context
 
 
 @check_user(lambda user: user.is_labor_inspector)

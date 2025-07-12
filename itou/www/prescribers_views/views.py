@@ -68,11 +68,18 @@ def overview(request, template_name="prescribers/overview.html"):
 class MemberList(BaseMemberList):
     template_name = "prescribers/members.html"
     membership_related_name = "prescribermembership_set"
-    context_object_name = "organization"
 
     def setup(self, request, *args, **kwargs):
         self.organization = get_current_org_or_404(request)
         return super().setup(request, *args, **kwargs)
+
+    def get_invitation_url(self):
+        return reverse("invitations_views:invite_prescriber_with_org")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_url"] = "prescribers_views"
+        return context
 
 
 @check_user(lambda user: user.is_prescriber)

@@ -729,7 +729,6 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
 class MemberList(BaseMemberList):
     template_name = "companies/members.html"
     membership_related_name = "companymembership_set"
-    context_object_name = "siae"
 
     def setup(self, request, *args, **kwargs):
         self.organization = get_current_company_or_404(request)
@@ -737,9 +736,13 @@ class MemberList(BaseMemberList):
             raise PermissionDenied
         return super().setup(request, *args, **kwargs)
 
+    def get_invitation_url(self):
+        return reverse("invitations_views:invite_employer")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["can_show_financial_annexes"] = self.organization.convention_can_be_accessed_by(self.request.user)
+        context["base_url"] = "companies_views"
         return context
 
 
