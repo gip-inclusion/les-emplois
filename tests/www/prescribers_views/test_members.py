@@ -2,6 +2,7 @@ from functools import partial
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
@@ -12,18 +13,21 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestMembers:
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
 
-    def test_members(self, client):
-        organization = PrescriberOrganizationWithMembershipFactory()
-        user = organization.members.first()
+    @freeze_time("2025-07-12 10:40")
+    def test_members(self, client, snapshot):
+        organization = PrescriberOrganizationFactory()
+        user = PrescriberMembershipFactory(user__for_snapshot=True, organization=organization).user
         client.force_login(user)
         url = reverse("prescribers_views:members")
         response = client.get(url)
         assert response.status_code == 200
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_active_members(self, client):
         organization = PrescriberOrganizationFactory()
