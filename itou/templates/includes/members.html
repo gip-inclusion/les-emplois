@@ -1,3 +1,9 @@
+{% load str_filters %}
+
+<p class="mb-0">
+    {{ members_stats.total_count }} collaborateur{{ members_stats.total_count|pluralizefr }} (dont {{ members_stats.admin_count }} administrateur{{ members_stats.admin_count|pluralizefr }})
+</p>
+
 {% if members_stats.admin_count == 1 and members_stats.total_count > 1 %}
     <p class="mt-3">
         Nous vous recommandons de nommer plusieurs administrateurs
