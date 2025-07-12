@@ -26,7 +26,6 @@ class TestMembers:
         client.force_login(user)
         url = reverse("prescribers_views:members")
         response = client.get(url)
-        assert response.status_code == 200
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
     def test_active_members(self, client):

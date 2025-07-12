@@ -2,7 +2,6 @@
 {% load components %}
 {% load matomo %}
 {% load static %}
-{% load str_filters %}
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
@@ -56,9 +55,6 @@
                         </div>
                         <p>
                             Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
-                        </p>
-                        <p class="mb-0">
-                            {{ siae.active_members.count }} collaborateur{{ siae.active_members.count|pluralizefr }} (dont {{ siae.active_admin_members.count }} administrateur{{ siae.active_admin_members.count|pluralizefr }})
                         </p>
 
                         {% with active_admin_members=siae.active_admin_members base_url="companies_views" %}
