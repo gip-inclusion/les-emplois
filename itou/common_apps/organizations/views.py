@@ -15,6 +15,9 @@ class BaseMemberList(ListView):
         memberships = getattr(self.organization, self.membership_related_name)
         return memberships.active().select_related("user").all().order_by("joined_at")
 
+    def get_invitation_url(self):
+        raise NotImplementedError
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -24,9 +27,10 @@ class BaseMemberList(ListView):
         )
         pending_invitations = self.organization.invitations.pending()
 
-        context[self.context_object_name] = self.organization
         context["members_stats"] = members_stats
         context["pending_invitations"] = pending_invitations
+        context["invitation_url"] = self.get_invitation_url()
+        context["active_admin_members"] = self.organization.active_admin_members
         return context
 
 
