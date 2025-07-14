@@ -384,9 +384,9 @@ django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
     --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
     # via -r requirements/base.in
-django-otp==1.6.0 \
-    --hash=sha256:13762d5d0ce52f68a9250ab186d36d9971d67271c05f15f533d73b09f2014667 \
-    --hash=sha256:34d9c478ced2d8c8d952428066565c7a9a96722b7f4ec8e041d161e82a85528f
+django-otp==1.6.1 \
+    --hash=sha256:68dafa008921fd418382492d81b717636d8cc1364e24e8f9222b72264adf3c5d \
+    --hash=sha256:a632e126c9e6ffc5f961a1e0c2452ee0d7ed589073141a729f33915957177916
     # via -r requirements/base.in
 django-pgtrigger==4.15.3 \
     --hash=sha256:235e07487d7953e85d9a9ecd8079d04072650ccad119148da96267cb2be80e09 \
