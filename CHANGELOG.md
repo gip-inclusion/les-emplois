@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2025-07-14
+
+### Ajouté
+
+- [Admin : ajout du champ historique des valeurs provenant de systèmes externes](https://github.com/gip-inclusion/les-emplois/pull/6345) 🖼
+
+### Modifié
+
+- [Candidature : Permettre les mêmes actions sur une nouvelle candidature que sur une candidature à l'étude](https://github.com/gip-inclusion/les-emplois/pull/6401)
+- [Candidatures : Petites améliorations des actions par lot](https://github.com/gip-inclusion/les-emplois/pull/6511)
+- [Employeur : Désactivation des fiches de poste non mises à jour depuis plus de 1 an](https://github.com/gip-inclusion/les-emplois/pull/6508)
+- [Interface : Annoncer le fonctionnement de la barre d’actions avec les "nouvelles" candidatures](https://github.com/gip-inclusion/les-emplois/pull/6519)
+- [Interface : Corrections des écrans de création de fiche de poste](https://github.com/gip-inclusion/les-emplois/pull/6487) 🖼
+- [Interface : Corrections des écrans du parcours de modification d'une fiche structure](https://github.com/gip-inclusion/les-emplois/pull/6427) 🖼
+- [Interface : Mise à jour des illustrations de la page d’accueil](https://github.com/gip-inclusion/les-emplois/pull/6503)
+- [Interface : Retirer le badge “Nouveau” de l’encart “Orienter” affiché aux employeurs](https://github.com/gip-inclusion/les-emplois/pull/6501)
+
+### Tech
+
+- [Fichiers : Ranger les fichiers GEIQ dans un « dossier » S3](https://github.com/gip-inclusion/les-emplois/pull/6486)
+- [Tech : Ajout de données contextuelles dynamique pour les trigger `FieldsHistory()`](https://github.com/gip-inclusion/les-emplois/pull/6368)
+- [Tech : Correction pour les tests utilisant `temporary_bucket` échouant "aléatoirement" sur la CI](https://github.com/gip-inclusion/les-emplois/pull/6510)
+
 ## 2025-07-07
 
 ### Ajouté
