@@ -735,7 +735,7 @@ def view_proof(request, evaluated_administrative_criteria_id):
         proof__isnull=False,
         **org_filter,
     )
-    return HttpResponseRedirect(default_storage.url(criteria.proof.key))
+    return HttpResponseRedirect(criteria.proof.url())
 
 
 @login_not_required

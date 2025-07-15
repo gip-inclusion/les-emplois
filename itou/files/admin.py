@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.files.storage import default_storage
 from django.utils.html import format_html
 
 from itou.files.models import File
@@ -17,5 +16,5 @@ class FileAdmin(ItouModelAdmin):
     def link(self, obj):
         return format_html(
             "<a href='{}' target='_blank'>Télécharger</a>",
-            default_storage.url(obj.key),
+            obj.url(),
         )

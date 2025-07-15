@@ -463,7 +463,7 @@ class TestViewProof:
         # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
         with freeze_time():
             response = client.get(url)
-            assertRedirects(response, default_storage.url(crit.proof.key), fetch_redirect_response=False)
+            assertRedirects(response, crit.proof.url(), fetch_redirect_response=False)
         pdf_file.seek(0)
         assert httpx.get(response.url).content == pdf_file.read()
 
@@ -494,7 +494,7 @@ class TestViewProof:
         # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
         with freeze_time():
             response = client.get(url)
-            assertRedirects(response, default_storage.url(crit.proof.key), fetch_redirect_response=False)
+            assertRedirects(response, crit.proof.url(), fetch_redirect_response=False)
         pdf_file.seek(0)
         assert httpx.get(response.url).content == pdf_file.read()
 

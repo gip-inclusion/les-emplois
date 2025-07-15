@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.core.files.storage import default_storage
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -508,7 +507,7 @@ class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     def report_file_link(self, obj):
         return format_html(
             "<a href='{}'>{}</a>",
-            default_storage.url(obj.report_file.key),
+            obj.report_file.url(),
             obj.report_file.key,
         )
 
