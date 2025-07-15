@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobseekerprofile",
             name="is_not_stalled_anymore",
-            field=models.BooleanField(blank=True, null=True),
+            field=models.BooleanField(blank=True, null=True, db_default=None),
         ),
         migrations.AddIndex(
             model_name="jobseekerprofile",
