@@ -205,14 +205,9 @@ class EmployerSearchView(EmployerSearchBaseView):
                     to_attr="active_job_descriptions",
                 )
             )
-            # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
-            # If we sort naively by `-_total_active_members` we would show
-            # siaes with 10 members (where 10 is the max), then siaes
-            # with 9 members, then siaes with 8 members etc...
-            # This is clearly not what we want. We want to show siaes with members
-            # (whatever the number of members is) then siaes without members.
             .with_has_active_members()
-            # Sort in 4 subgroups in the following order, each subgroup being sorted by job_app_score.
+            # Split results into 4 buckets shown in the following order, each bucket being internally sorted
+            # by job_app_score.
             # 1) has_active_members and not block_job_applications
             # These are the siaes which can currently hire, and should be on top.
             # 2) has_active_members and block_job_applications
@@ -223,7 +218,12 @@ class EmployerSearchView(EmployerSearchBaseView):
             # 4) not has_active_members and block_job_applications
             # This group is supposed to be empty. But itou staff may have
             # detached members from their siae so it could still happen.
-            .order_by("-has_active_members", "block_job_applications", "job_app_score", "pk")
+            .order_by(
+                "-has_active_members",
+                "block_job_applications",
+                "job_app_score",
+                "pk",  # ensure a deterministic order for tests and pagination
+            )
         )
 
         page = pager(siaes, self.request.GET.get("page"), items_per_page=10)
