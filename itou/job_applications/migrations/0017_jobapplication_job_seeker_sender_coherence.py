@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             "eligibility",
             "0015_geiqselectedadministrativecriteria_empty_certification_period",
         ),
-        ("files", "0002_file_deleted_at"),
+        ("files", "0001_initial"),
         ("job_applications", "0016_update_sender"),
         ("prescribers", "0012_remove_prescriberorganization_is_authorized"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
