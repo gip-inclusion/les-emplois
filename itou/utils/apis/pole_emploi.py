@@ -109,7 +109,8 @@ class BasePoleEmploiApiClient:
         )
         return token
 
-    def _request(self, url, data=None, params=None, method="POST"):
+    def _request(self, url, data=None, params=None, headers=None, method="POST"):
+        additional_headers = headers if headers else {}
         try:
             token = caches["failsafe"].get(CACHE_API_TOKEN_KEY)
             if not token:
@@ -120,7 +121,7 @@ class BasePoleEmploiApiClient:
                 url,
                 params=params,
                 json=data,
-                headers={"Authorization": token, "Content-Type": "application/json"},
+                headers={"Authorization": token, "Content-Type": "application/json", **additional_headers},
                 timeout=API_TIMEOUT_SECONDS,
             )
             if response.status_code == 204:
@@ -256,3 +257,54 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         "h2a",
     ]
     REALM = "/agent"
+
+    def rechercher_usager(self, birthdate, nir):
+        # TODO(cms): add FT code option.
+        """Example data:
+        {
+            "nir":"1800813800217",
+            "dateNaissance":"1979-07-25"
+        }
+
+        Example response:
+        {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "something_very_long",
+            "topIdentiteCertifiee": "O"
+        }
+        """
+        data = self._request(
+            f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            {
+                "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
+                "nir": nir if nir else "",
+            },
+            # TODO(cms): use real names.
+            # These headers MUST be provided.
+            # - if not: a 302 will be returned.
+            # - if value is an empty string: a 401 will be returned.
+            # As of today, no verification seems to be done on FT's side. Any value is good,
+            # as far as there is one.
+            headers={
+                "pa-nom-agent": "<string>",
+                "pa-prenom-agent": "<string>",
+                "pa-identifiant-agent": "toto",
+            },
+        )
+        code_sortie = data.get("codeRetour")
+        if code_sortie == "S002":
+            raise PoleEmploiAPIException("user_not_found")
+        elif code_sortie == "S001":
+            pass
+        else:
+            raise PoleEmploiAPIBadResponse(code_sortie)
+
+        # TODO(cms): harmonize with API Particulier.
+        if data.get("topIdentiteCertifiee") != "O":
+            raise PoleEmploiAPIException("Identity not certified")
+
+        jeton_usager = data.get("jetonUsager")
+        if not jeton_usager:
+            raise PoleEmploiAPIException("No jeton usager")
+        return jeton_usager

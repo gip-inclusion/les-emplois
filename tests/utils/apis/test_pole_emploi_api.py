@@ -281,3 +281,56 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         # This method is already tested on TestPoleEmploiRoyaumePartenaireApiClient.
         token = self.api_client._refresh_token()
         assert token == "Bearer catwoman"
+
+    @respx.mock
+    def test_rechercher_usager(self):
+        job_seeker = JobSeekerFactory()
+        # Nominal case
+        json_response = {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=json_response
+        )
+        jeton_usager = self.api_client.rechercher_usager(
+            birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+        )
+        assert jeton_usager == "a_long_token"
+
+    @respx.mock
+    def test_rechercher_usager_found_but_not_certified(self):
+        job_seeker = JobSeekerFactory()
+        # Nominal case
+        json_response = {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "N",
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=json_response
+        )
+        with pytest.raises(PoleEmploiAPIException, match="Identity not certified"):
+            self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+
+    @respx.mock
+    def test_rechercher_usager_not_found(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S002",
+            "message": "Aucun approchant trouvé",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=json_response
+        )
+        with pytest.raises(PoleEmploiAPIException, match="code=User not found"):
+            self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
