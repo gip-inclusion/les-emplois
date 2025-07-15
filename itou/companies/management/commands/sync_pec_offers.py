@@ -6,7 +6,7 @@ from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
-from itou.utils.apis import pe_api_enums, pole_emploi_api_client
+from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
@@ -109,7 +109,7 @@ class Command(BaseCommand):
         parser.add_argument("--delay", action="store", dest="delay", default=1, type=int, choices=range(0, 5))
 
     def handle(self, *, wet_run, delay, **options):
-        pe_client = pole_emploi_api_client()
+        pe_client = pole_emploi_partenaire_api_client()
         pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
 
         # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,

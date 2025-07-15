@@ -29,7 +29,7 @@ from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
-from itou.utils.apis import enums as api_enums, pole_emploi_api_client
+from itou.utils.apis import enums as api_enums, pole_emploi_partenaire_api_client
 from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.db import or_queries
 from itou.utils.models import DateRange
@@ -344,7 +344,7 @@ class PENotificationMixin(models.Model):
         self._pe_log("!", fmt, *args, **kwargs)
 
     def pe_maj_pass(self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at):
-        pe_client = pole_emploi_api_client()
+        pe_client = pole_emploi_partenaire_api_client()
 
         typologie_prescripteur = None
         if prescriber_kind:
@@ -455,7 +455,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             )
 
         if not self.user_id_national_pe:
-            pe_client = pole_emploi_api_client()
+            pe_client = pole_emploi_partenaire_api_client()
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user_first_name,
@@ -988,7 +988,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
 
         if not self.user.jobseeker_profile.pe_obfuscated_nir:
-            pe_client = pole_emploi_api_client()
+            pe_client = pole_emploi_partenaire_api_client()
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user.first_name,
@@ -1990,7 +1990,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus:
         now = timezone.now()
 
-        pe_client = pole_emploi_api_client()
+        pe_client = pole_emploi_partenaire_api_client()
         try:
             id_national = pe_client.recherche_individu_certifie(
                 first_name=self.first_name,
