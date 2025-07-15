@@ -2,7 +2,6 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.storage import storages
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, Func, Max, OuterRef, Prefetch, Q, Subquery, When
@@ -888,7 +887,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def resume_link(self):
         if self.resume_id:
-            return storages["public"].url(self.resume.key)
+            return self.resume.public_url()
         return ""
 
     def get_sender_kind_display(self):

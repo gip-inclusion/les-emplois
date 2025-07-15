@@ -8,7 +8,7 @@ import httpx
 import pytest
 from botocore.config import Config
 from django.conf import settings
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.utils import timezone
 
@@ -23,6 +23,16 @@ from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
 from tests.utils.test_s3 import default_storage_ls_files
+
+
+@pytest.mark.usefixtures("temporary_bucket")
+def test_urls():
+    file = FileFactory()
+    with io.BytesIO() as content:
+        default_storage.save("test_file.pdf", content)
+
+    assert file.url() == default_storage.url(file.key)
+    assert file.public_url() == storages["public"].url(file.key)
 
 
 @pytest.mark.usefixtures("temporary_bucket")

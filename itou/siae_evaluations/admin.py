@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -302,7 +301,7 @@ class EvaluatedAdministrativeCriteriaAdmin(ReadonlyMixin, ItouModelAdmin):
         if obj.proof_id:
             return format_html(
                 "<a href='{}'>{}</a>",
-                default_storage.url(obj.proof.key),
+                obj.proof.url(),
                 obj.proof.key,
             )
         return ""

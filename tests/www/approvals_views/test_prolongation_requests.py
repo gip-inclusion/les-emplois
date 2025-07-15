@@ -379,6 +379,6 @@ class TestProlongationReportFileView:
                     kwargs={"prolongation_request_id": request.pk},
                 )
             )
-            assertRedirects(response, default_storage.url(file.key), fetch_redirect_response=False)
+            assertRedirects(response, file.url(), fetch_redirect_response=False)
         xlsx_file.seek(0)
         assert httpx.get(response.url).content == xlsx_file.read()

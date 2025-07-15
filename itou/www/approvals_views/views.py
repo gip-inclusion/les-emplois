@@ -489,7 +489,7 @@ def prolongation_request_report_file(request, prolongation_request_id):
     )
     if prolongation_request.prescriber_organization_id not in [org.pk for org in request.organizations]:
         raise Http404
-    return HttpResponseRedirect(default_storage.url(prolongation_request.report_file.key))
+    return HttpResponseRedirect(prolongation_request.report_file.url())
 
 
 class ProlongationRequestViewMixin:
