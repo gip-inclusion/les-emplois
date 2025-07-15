@@ -1,6 +1,8 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.files.storage import storages
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -753,6 +755,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 name="job_seeker_sender_coherence",
                 violation_error_message="Le candidat doit être l'émetteur de la candidature",
                 condition=(~models.Q(sender_kind="job_seeker") | models.Q(job_seeker=F("sender"))),
+            ),
+            ExclusionConstraint(
+                name="one_job_seeker_per_approval",
+                expressions=[
+                    ("approval_id", RangeOperators.EQUAL),
+                    ("job_seeker_id", RangeOperators.NOT_EQUAL),
+                ],
+                condition=~Q(approval_id=None),
+                violation_error_message="Le PASS IAE est déjà utilisé par un autre candidat.",
             ),
         ]
         permissions = [
