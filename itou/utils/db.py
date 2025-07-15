@@ -4,6 +4,7 @@ import logging
 
 from django.db import connection
 from django.db.models import Q
+from psycopg import sql
 
 
 logger = logging.getLogger(__name__)
@@ -27,15 +28,24 @@ def dictfetchall(cursor):
 
 
 @contextlib.contextmanager
-def statement_timeout(timeout):
+def set_runtime_parameter(parameter, value):
     with connection.cursor() as cursor:
-        cursor.execute("SHOW statement_timeout")
-        [original_statement_timeout_row] = cursor.fetchall()
-        [original_statement_timeout] = original_statement_timeout_row
+        cursor.execute(sql.SQL(f"SHOW {parameter}").format(parameter=sql.Identifier(parameter)))
+        [original_value_row] = cursor.fetchall()
+        [original_value] = original_value_row
 
-        cursor.execute("SET SESSION statement_timeout TO %s", (timeout,))
+        set_parameter_sql = sql.SQL(f"SET SESSION {parameter} TO {value}")
+        cursor.execute(set_parameter_sql.format(parameter=sql.Identifier(parameter), value=value))
         yield
-        cursor.execute("SET SESSION statement_timeout TO %s", (original_statement_timeout,))
+        cursor.execute(set_parameter_sql.format(parameter=sql.Identifier(parameter), value=original_value))
+
+
+def statement_timeout(timeout):
+    return set_runtime_parameter("statement_timeout", timeout)
+
+
+def lock_timeout(timeout):
+    return set_runtime_parameter("lock_timeout", timeout)
 
 
 @contextlib.contextmanager
