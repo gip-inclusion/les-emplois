@@ -11,7 +11,7 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import JobSeekerProfile, JobSeekerProfileQuerySet, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.perms.utils import can_view_personal_information
@@ -116,7 +116,9 @@ class FilterForm(forms.Form):
             filters.append(pass_status_filter)
 
         if self.cleaned_data.get("is_stalled"):
-            queryset = queryset.filter(jobseeker_profile__is_considered_stalled=True)
+            queryset = queryset.filter(
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
+            )
 
         # Organization members
         if organization_members := self.cleaned_data.get("organization_members"):
