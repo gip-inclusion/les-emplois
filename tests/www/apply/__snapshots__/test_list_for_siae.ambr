@@ -6450,7 +6450,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_archive[inactive archive button]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="La sélection ne peut pas être archivée. Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
       </i>
       <span>
@@ -6942,7 +6942,7 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_unarchive[modal with 1 unarchivable application]
+# name: test_list_for_siae_select_applications_batch_unarchive[modal with 1 archived application]
   '''
   <div aria-hidden="true" aria-labelledby="unarchive_modal_title" class="modal" id="unarchive_confirmation_modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -6981,7 +6981,7 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_unarchive[modal with 2 archivable applications]
+# name: test_list_for_siae_select_applications_batch_unarchive[modal with 2 archived applications]
   '''
   <div aria-hidden="true" aria-labelledby="unarchive_modal_title" class="modal" id="unarchive_confirmation_modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
