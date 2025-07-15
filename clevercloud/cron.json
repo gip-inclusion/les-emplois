@@ -34,11 +34,12 @@
 
   "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
   "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_professionals --wet-run",
+  "0 12 * * 1-5 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
+
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * 1 $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
-  "0 12 * * 1 $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 0 1 * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
   "0 0 2 * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --monthly",

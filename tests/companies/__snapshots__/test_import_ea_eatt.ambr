@@ -109,6 +109,200 @@
     }),
   ])
 # ---
+# name: test_command_errors[friday][logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Connected to "0.0.0.0" as "django_tests"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Current remote dir is "/"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': "Files matching for this week '20250714': ",
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+  ])
+# ---
+# name: test_command_errors[monday][logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Connected to "0.0.0.0" as "django_tests"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Current remote dir is "/"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': "Files matching for this week '20250714': ",
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'handle',
+      'levelno': 20,
+      'message': 'No file found, nothing to be done',
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
+# name: test_command_errors[thursday][logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Connected to "0.0.0.0" as "django_tests"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Current remote dir is "/"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': "Files matching for this week '20250714': ",
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'handle',
+      'levelno': 20,
+      'message': 'No file found, nothing to be done',
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
+# name: test_command_errors[tuesday][logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Connected to "0.0.0.0" as "django_tests"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Current remote dir is "/"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': "Files matching for this week '20250714': ",
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'handle',
+      'levelno': 20,
+      'message': 'No file found, nothing to be done',
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
+# name: test_command_errors[wednesday][logs]
+  list([
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] Opened sftp connection (server version 3)',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Connected to "0.0.0.0" as "django_tests"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': 'Current remote dir is "/"',
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': 'retrieve_archive_of_the_week',
+      'levelno': 20,
+      'message': "Files matching for this week '20250714': ",
+      'module': 'import_ea_eatt',
+    }),
+    dict({
+      'funcName': '_log',
+      'levelno': 20,
+      'message': '[chan 0] sftp session closed.',
+      'module': 'sftp',
+    }),
+    dict({
+      'funcName': 'handle',
+      'levelno': 20,
+      'message': 'No file found, nothing to be done',
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
 # name: test_process_file_from_archive[data]
   list([
     tuple(
@@ -199,7 +393,7 @@
     dict({
       'funcName': 'retrieve_archive_of_the_week',
       'levelno': 20,
-      'message': "Files matching for this monday '20250512': FLUX_EA2_ITOU_20250512.zip",
+      'message': "Files matching for this week '20250512': FLUX_EA2_ITOU_20250512.zip",
       'module': 'import_ea_eatt',
     }),
     dict({

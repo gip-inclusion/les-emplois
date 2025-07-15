@@ -5,6 +5,7 @@ import zipfile
 import pandas as pd
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.cities.models import City
@@ -20,6 +21,10 @@ from itou.utils import asp as asp_utils
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR
 from itou.utils.command import BaseCommand
 from itou.utils.date import monday_of_the_week
+
+
+class FileOfTheWeekNotFound(Exception):
+    pass
 
 
 def build_ea_eatt(row):
@@ -83,9 +88,9 @@ class Command(BaseCommand):
                 for filename in sftp.listdir()
                 if filename.startswith(FILENAME_PREFIX) and filename > f"{FILENAME_PREFIX}{monday}"
             ]
-            self.logger.info("Files matching for this monday '%s': %s", monday, ", ".join(files_of_the_week))
+            self.logger.info("Files matching for this week '%s': %s", monday, ", ".join(files_of_the_week))
             if not files_of_the_week:
-                raise RuntimeError(f"No file for this week: {monday}")
+                raise FileOfTheWeekNotFound()
             if len(files_of_the_week) > 1:
                 raise RuntimeError(f"Too many files for this week: {files_of_the_week}")
 
@@ -215,7 +220,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="import-ea-eatt",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 12 * * 1"},
+            "schedule": {"type": "crontab", "value": "0 12 * * 1-5"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 1,
@@ -224,7 +229,13 @@ class Command(BaseCommand):
         },
     )
     def handle(self, *, from_archive=None, from_asp=False, wet_run=False, **options):
-        archive = self.retrieve_archive_of_the_week() if from_asp else from_archive
+        try:
+            archive = self.retrieve_archive_of_the_week() if from_asp else from_archive
+        except FileOfTheWeekNotFound:
+            if timezone.localdate().isoweekday() >= 5:  # Only raise at end of week (friday)
+                raise RuntimeError("No file for this week")
+            self.logger.info("No file found, nothing to be done")
+            return
 
         with zipfile.ZipFile(archive).open("EA2_ITOU.txt", pwd=settings.ASP_EA2_UNZIP_PASSWORD.encode()) as f:
             self.process_file(io.TextIOWrapper(f, encoding="utf-8", newline="\n"), wet_run=wet_run)

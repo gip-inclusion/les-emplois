@@ -1,11 +1,14 @@
+import contextlib
 import datetime
 import io
+import random
 import zipfile
 
 import pytest
 from freezegun import freeze_time
 
 from itou.companies.management.commands import import_ea_eatt
+from itou.companies.management.commands.import_ea_eatt import FileOfTheWeekNotFound
 from itou.companies.models import Company
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.date import monday_of_the_week
@@ -65,7 +68,8 @@ def archive_file_fixture():
     return archive
 
 
-def extract_logs(caplog, keys):
+def extract_logs(caplog, *, extra_keys=None):
+    keys = ["module", "funcName", "levelno", "message"] + (extra_keys or [])
     return [{key: getattr(record, key) for key in keys if hasattr(record, key)} for record in caplog.records]
 
 
@@ -78,25 +82,35 @@ def test_retrieve_archive_of_the_week(caplog, snapshot, faker, sftp_directory, c
     sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_batch_filename()).touch()
 
     assert command.retrieve_archive_of_the_week().getvalue()
+    assert extract_logs(caplog) == snapshot(name="logs")
 
-    keys_to_extract = [
-        "module",
-        "funcName",
-        "levelno",
-        "message",
-    ]
-    assert extract_logs(caplog, keys_to_extract) == snapshot(name="logs")
+
+@pytest.mark.parametrize(
+    "date",
+    [
+        (datetime.date(2025, 4, 21)),
+        (datetime.date(2025, 6, 9)),
+        (datetime.date(2025, 7, 14)),
+    ],
+    ids=str,
+)
+def test_retrieve_archive_of_the_week_when_monday_is_a_holiday(faker, sftp_directory, command, date):
+    day_after_holiday = date + datetime.timedelta(days=random.randint(1, 6))
+    sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(day_after_holiday)).write_bytes(faker.zip())
+
+    with freeze_time(day_after_holiday):
+        assert command.retrieve_archive_of_the_week().getvalue()
 
 
 def test_retrieve_archive_of_the_week_errors(faker, sftp_directory, command):
     monday = monday_of_the_week()
 
-    with pytest.raises(RuntimeError, match="No file for this week: "):
+    with pytest.raises(FileOfTheWeekNotFound):
         command.retrieve_archive_of_the_week()
 
     sunday_before_monday = monday - datetime.timedelta(days=1)
     sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(sunday_before_monday)).touch()
-    with pytest.raises(RuntimeError, match="No file for this week: "):
+    with pytest.raises(FileOfTheWeekNotFound):
         command.retrieve_archive_of_the_week()
 
     monday_archive = sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, faker.asp_ea2_filename(monday))
@@ -125,9 +139,7 @@ def test_clean_old_archives(caplog, snapshot, faker, mocker, sftp_directory, com
     assert {file.name for file in sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir()} == {
         faker.asp_ea2_filename(datetime.date(2024, 8, 3))
     }
-
-    keys_to_extract = ["module", "funcName", "levelno", "message"]
-    assert extract_logs(caplog, keys_to_extract) == snapshot(name="logs")
+    assert extract_logs(caplog) == snapshot(name="logs")
 
 
 @freeze_time("2025-05-12")
@@ -138,9 +150,7 @@ def test_clean_old_archives_dry_run(caplog, snapshot, faker, mocker, sftp_direct
     assert len(set(sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir())) == 1
     command.clean_old_archives(wet_run=False)
     assert len(set(sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).iterdir())) == 1
-
-    keys_to_extract = ["module", "funcName", "levelno", "message"]
-    assert extract_logs(caplog, keys_to_extract) == snapshot(name="logs")
+    assert extract_logs(caplog) == snapshot(name="logs")
 
 
 def test_process_file_from_archive(caplog, snapshot, settings, command, archive_file):
@@ -148,8 +158,7 @@ def test_process_file_from_archive(caplog, snapshot, settings, command, archive_
 
     command.handle(from_archive=archive_file, wet_run=True)
 
-    keys_to_extract = ["module", "funcName", "levelno", "message", "info_stats"]
-    assert extract_logs(caplog, keys_to_extract) == snapshot(name="logs")
+    assert extract_logs(caplog, extra_keys=["info_stats"]) == snapshot(name="logs")
 
     filled_fields = [
         "kind",
@@ -167,3 +176,20 @@ def test_process_file_from_archive(caplog, snapshot, settings, command, archive_
         "coords",
     ]
     assert list(Company.objects.all().order_by("pk").values_list(*filled_fields)) == snapshot(name="data")
+
+
+@pytest.mark.parametrize(
+    "day_of_the_week,expectation",
+    [
+        pytest.param(0, contextlib.nullcontext(), id="monday"),
+        pytest.param(1, contextlib.nullcontext(), id="tuesday"),
+        pytest.param(2, contextlib.nullcontext(), id="wednesday"),
+        pytest.param(3, contextlib.nullcontext(), id="thursday"),
+        pytest.param(4, pytest.raises(RuntimeError, match="No file for this week"), id="friday"),
+    ],
+)
+def test_command_errors(caplog, snapshot, sftp_directory, command, day_of_the_week, expectation):
+    with expectation:
+        with freeze_time(monday_of_the_week() + datetime.timedelta(days=day_of_the_week)):
+            command.handle(from_asp=True)
+    assert extract_logs(caplog) == snapshot(name="logs")
