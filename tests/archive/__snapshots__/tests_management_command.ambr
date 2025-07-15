@@ -1,47 +1,9 @@
 # serializer version: 1
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1964,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 0,
-      'count_total_applications': 0,
-      'date_joined': datetime.date(2023, 10, 1),
-      'department': '',
-      'first_login': None,
-      'had_nir': True,
-      'had_pole_emploi_id': False,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_login': None,
-      'nir_sex': 7,
-      'nir_year': 41,
-      'title': 'M',
-      'user_signup_kind': None,
-    }),
-  ])
+  <QuerySet [{'date_joined': datetime.date(2023, 10, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 7, 'nir_year': 41, 'birth_year': 1964, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1990,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 1,
-      'count_total_applications': 2,
-      'date_joined': datetime.date(2021, 12, 1),
-      'department': '',
-      'first_login': datetime.date(2021, 12, 1),
-      'had_nir': True,
-      'had_pole_emploi_id': True,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_login': datetime.date(2021, 12, 1),
-      'nir_sex': 6,
-      'nir_year': 55,
-      'title': 'MME',
-      'user_signup_kind': 'employer',
-    }),
-  ])
+  <QuerySet [{'date_joined': datetime.date(2021, 12, 1), 'first_login': datetime.date(2021, 12, 1), 'last_login': datetime.date(2021, 12, 1), 'user_signup_kind': 'employer', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 6, 'nir_year': 55, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 0, 'count_total_applications': 2}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
   '''
@@ -60,26 +22,7 @@
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1985,
-      'count_IAE_applications': 2,
-      'count_accepted_applications': 1,
-      'count_total_applications': 2,
-      'date_joined': datetime.date(2020, 4, 1),
-      'department': '',
-      'first_login': datetime.date(2020, 4, 1),
-      'had_nir': True,
-      'had_pole_emploi_id': True,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_login': datetime.date(2020, 4, 1),
-      'nir_sex': 8,
-      'nir_year': 55,
-      'title': 'MME',
-      'user_signup_kind': 'prescriber',
-    }),
-  ])
+  <QuerySet [{'date_joined': datetime.date(2020, 4, 1), 'first_login': datetime.date(2020, 4, 1), 'last_login': datetime.date(2020, 4, 1), 'user_signup_kind': 'prescriber', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 8, 'nir_year': 55, 'birth_year': 1985, 'count_accepted_applications': 1, 'count_IAE_applications': 2, 'count_total_applications': 2}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
   '''
@@ -98,26 +41,7 @@
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': None,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 0,
-      'count_total_applications': 0,
-      'date_joined': datetime.date(2022, 11, 1),
-      'department': '',
-      'first_login': None,
-      'had_nir': False,
-      'had_pole_emploi_id': False,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': 'reason',
-      'last_login': None,
-      'nir_sex': None,
-      'nir_year': None,
-      'title': 'M',
-      'user_signup_kind': None,
-    }),
-  ])
+  <QuerySet [{'date_joined': datetime.date(2022, 11, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': False, 'lack_of_nir_reason': 'reason', 'nir_sex': None, 'nir_year': None, 'birth_year': None, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
   '''
@@ -136,184 +60,22 @@
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '14',
-      'company_has_convention': True,
-      'company_kind': 'EITI',
-      'company_naf': '8888Y',
-      'had_resume': True,
-      'has_been_transferred': False,
-      'has_diagoriente_invitation': False,
-      'hiring_contract_nature': None,
-      'hiring_contract_type': None,
-      'hiring_rome': None,
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': False,
-      'last_transition_at': datetime.date(2025, 2, 1),
-      'number_of_jobs_applied_for': 0,
-      'origin': 'default',
-      'processed_at': None,
-      'refusal_reason': '',
-      'sender_company_kind': None,
-      'sender_kind': 'prescriber',
-      'sender_prescriber_organization_authorization_status': 'VALIDATED',
-      'sender_prescriber_organization_kind': 'FT',
-      'state': 'prior_to_hire',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': False, 'sender_kind': 'prescriber', 'sender_company_kind': None, 'sender_prescriber_organization_kind': 'FT', 'sender_prescriber_organization_authorization_status': 'VALIDATED', 'company_kind': 'EITI', 'company_department': '14', 'company_naf': '8888Y', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'prior_to_hire', 'refusal_reason': '', 'has_been_transferred': False, 'number_of_jobs_applied_for': 0, 'has_diagoriente_invitation': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_company][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '76',
-      'company_has_convention': False,
-      'company_kind': 'EI',
-      'company_naf': '4567A',
-      'had_resume': True,
-      'has_been_transferred': False,
-      'has_diagoriente_invitation': False,
-      'hiring_contract_nature': None,
-      'hiring_contract_type': None,
-      'hiring_rome': None,
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': True,
-      'last_transition_at': datetime.date(2025, 2, 1),
-      'number_of_jobs_applied_for': 0,
-      'origin': 'default',
-      'processed_at': None,
-      'refusal_reason': '',
-      'sender_company_kind': 'EI',
-      'sender_kind': 'employer',
-      'sender_prescriber_organization_authorization_status': None,
-      'sender_prescriber_organization_kind': None,
-      'state': 'processing',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': False, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'processing', 'refusal_reason': '', 'has_been_transferred': False, 'number_of_jobs_applied_for': 0, 'has_diagoriente_invitation': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[hired_jobseeker_with_3_jobs][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '76',
-      'company_has_convention': True,
-      'company_kind': 'GEIQ',
-      'company_naf': '1234Z',
-      'had_resume': True,
-      'has_been_transferred': False,
-      'has_diagoriente_invitation': False,
-      'hiring_contract_nature': 'PEC_OFFER',
-      'hiring_contract_type': 'FIXED_TERM_TREMPLIN',
-      'hiring_rome': "Conduite d'engins de déplacement des charges (N1101)",
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': True,
-      'last_transition_at': datetime.date(2025, 3, 1),
-      'number_of_jobs_applied_for': 3,
-      'origin': 'default',
-      'processed_at': datetime.date(2025, 2, 1),
-      'refusal_reason': '',
-      'sender_company_kind': None,
-      'sender_kind': 'job_seeker',
-      'sender_prescriber_organization_authorization_status': None,
-      'sender_prescriber_organization_kind': None,
-      'state': 'accepted',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'GEIQ', 'company_department': '76', 'company_naf': '1234Z', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': datetime.date(2025, 2, 1), 'last_transition_at': datetime.date(2025, 3, 1), 'had_resume': True, 'origin': 'default', 'state': 'accepted', 'refusal_reason': '', 'has_been_transferred': False, 'number_of_jobs_applied_for': 3, 'has_diagoriente_invitation': False, 'hiring_rome': "Conduite d'engins de déplacement des charges (N1101)", 'hiring_contract_type': 'FIXED_TERM_TREMPLIN', 'hiring_contract_nature': 'PEC_OFFER', 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[refused_application_with_1_jobs][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '76',
-      'company_has_convention': True,
-      'company_kind': 'OPCS',
-      'company_naf': '4567A',
-      'had_resume': False,
-      'has_been_transferred': False,
-      'has_diagoriente_invitation': False,
-      'hiring_contract_nature': None,
-      'hiring_contract_type': None,
-      'hiring_rome': None,
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': True,
-      'last_transition_at': datetime.date(2025, 2, 1),
-      'number_of_jobs_applied_for': 1,
-      'origin': 'default',
-      'processed_at': datetime.date(2025, 2, 1),
-      'refusal_reason': 'reason',
-      'sender_company_kind': None,
-      'sender_kind': 'job_seeker',
-      'sender_prescriber_organization_authorization_status': None,
-      'sender_prescriber_organization_kind': None,
-      'state': 'refused',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'OPCS', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': datetime.date(2025, 2, 1), 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': False, 'origin': 'default', 'state': 'refused', 'refusal_reason': 'reason', 'has_been_transferred': False, 'number_of_jobs_applied_for': 1, 'has_diagoriente_invitation': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[sent_by_jobseeker_without_sender][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '76',
-      'company_has_convention': True,
-      'company_kind': 'EI',
-      'company_naf': '7820Z',
-      'had_resume': True,
-      'has_been_transferred': False,
-      'has_diagoriente_invitation': False,
-      'hiring_contract_nature': None,
-      'hiring_contract_type': None,
-      'hiring_rome': None,
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': True,
-      'last_transition_at': datetime.date(2025, 3, 1),
-      'number_of_jobs_applied_for': 3,
-      'origin': 'default',
-      'processed_at': None,
-      'refusal_reason': '',
-      'sender_company_kind': None,
-      'sender_kind': 'job_seeker',
-      'sender_prescriber_organization_authorization_status': None,
-      'sender_prescriber_organization_kind': None,
-      'state': 'new',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'job_seeker', 'sender_company_kind': None, 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '7820Z', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 3, 1), 'had_resume': True, 'origin': 'default', 'state': 'new', 'refusal_reason': '', 'has_been_transferred': False, 'number_of_jobs_applied_for': 3, 'has_diagoriente_invitation': False, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[transferred_application_with_diagoriente_invitation][archived_application]
-  list([
-    dict({
-      'applied_at': datetime.date(2025, 2, 1),
-      'company_department': '76',
-      'company_has_convention': True,
-      'company_kind': 'EI',
-      'company_naf': '4567A',
-      'had_resume': True,
-      'has_been_transferred': True,
-      'has_diagoriente_invitation': True,
-      'hiring_contract_nature': None,
-      'hiring_contract_type': None,
-      'hiring_rome': None,
-      'hiring_start_date': datetime.date(2025, 2, 1),
-      'job_seeker_birth_year': 1978,
-      'job_seeker_department_same_as_company_department': True,
-      'last_transition_at': datetime.date(2025, 2, 1),
-      'number_of_jobs_applied_for': 0,
-      'origin': 'default',
-      'processed_at': None,
-      'refusal_reason': '',
-      'sender_company_kind': 'EI',
-      'sender_kind': 'employer',
-      'sender_prescriber_organization_authorization_status': None,
-      'sender_prescriber_organization_kind': None,
-      'state': 'postponed',
-    }),
-  ])
+  <QuerySet [{'job_seeker_birth_year': 1978, 'job_seeker_department_same_as_company_department': True, 'sender_kind': 'employer', 'sender_company_kind': 'EI', 'sender_prescriber_organization_kind': None, 'sender_prescriber_organization_authorization_status': None, 'company_kind': 'EI', 'company_department': '76', 'company_naf': '4567A', 'company_has_convention': True, 'applied_at': datetime.date(2025, 2, 1), 'processed_at': None, 'last_transition_at': datetime.date(2025, 2, 1), 'had_resume': True, 'origin': 'default', 'state': 'postponed', 'refusal_reason': '', 'has_been_transferred': True, 'number_of_jobs_applied_for': 0, 'has_diagoriente_invitation': True, 'hiring_rome': None, 'hiring_contract_type': None, 'hiring_contract_nature': None, 'hiring_start_date': datetime.date(2025, 2, 1)}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
   'Start anonymizing job seekers in dry_run mode'
@@ -353,31 +115,31 @@
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[authorized_prescriber_admin_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': True}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'prescriber', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': True, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_admin_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'employer', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'employer', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_company_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'employer', 'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_institution_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'labor_inspector', 'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'DJANGO'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_prescriber_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'prescriber', 'number_of_memberships': 1, 'number_of_active_memberships': 0, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_admin_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'labor_inspector', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 1, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'DJANGO'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'labor_inspector', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'DJANGO'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[prescriber_membership][anonymized_professionals_with_annotations]
-  <QuerySet [{'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False}]>
+  <QuerySet [{'date_joined': datetime.date(2025, 7, 1), 'first_login': None, 'last_login': None, 'department': '', 'title': '', 'kind': 'prescriber', 'number_of_memberships': 1, 'number_of_active_memberships': 1, 'number_of_memberships_as_administrator': 0, 'had_memberships_in_authorized_organization': False, 'identity_provider': 'PC'}]>
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
