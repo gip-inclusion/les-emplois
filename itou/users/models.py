@@ -16,7 +16,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, Max, OuterRef, Q, Subquery
-from django.db.models.expressions import RawSQL
 from django.db.models.functions import Greatest, Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -263,12 +262,14 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         )
 
         if stalled is not None:
-            created_job_seekers = created_job_seekers.filter(jobseeker_profile__is_considered_stalled=stalled)
+            created_job_seekers = created_job_seekers.filter(
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "jobseeker_profile__")
+            )
             job_seekers_applications = job_seekers_applications.filter(
-                job_seeker__jobseeker_profile__is_considered_stalled=stalled
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
             )
             job_seekers_eligibility_diagnosis = job_seekers_eligibility_diagnosis.filter(
-                job_seeker__jobseeker_profile__is_considered_stalled=stalled
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
             )
 
         return self.none().union(
@@ -844,7 +845,13 @@ def get_allauth_account_user_display(user):
     return user.email
 
 
-class JobSeekerProfileManager(models.Manager):
+class JobSeekerProfileQuerySet(models.QuerySet):
+    @staticmethod
+    def is_considered_stalled_condition(value, prefix=""):
+        return Q(**{f"{prefix}is_stalled": value}) & ~Q(**{f"{prefix}is_not_stalled_anymore": value})
+
+
+class JobSeekerProfileManager(models.Manager.from_queryset(JobSeekerProfileQuerySet)):
     def get_queryset(self):
         return super().get_queryset().defer("fields_history")
 
@@ -1187,16 +1194,6 @@ class JobSeekerProfile(models.Model):
         ),
     )
     is_not_stalled_anymore = models.BooleanField(null=True, blank=True, db_default=None)
-    is_considered_stalled = models.GeneratedField(
-        # Equivalent to `Q(is_stalled=True) & ~Q(is_not_stalled_anymore=True)`,
-        # we need an expression and found no better way (for now) than `RawSQL()`.
-        expression=RawSQL(
-            '"is_stalled" AND NOT ("is_not_stalled_anymore" AND "is_not_stalled_anymore" IS NOT NULL)', {}
-        ),
-        output_field=models.BooleanField(),
-        verbose_name="candidat considéré comme sans solution (données et utilisateurs)",
-        db_persist=True,
-    )
 
     fields_history = ArrayField(
         models.JSONField(
@@ -1233,9 +1230,9 @@ class JobSeekerProfile(models.Model):
         ]
         indexes = [
             models.Index(
-                fields=["is_considered_stalled"],
+                fields=["is_stalled", "is_not_stalled_anymore"],
                 name="users_jobseeker_stalled_idx",
-                condition=Q(is_considered_stalled=True),
+                condition=Q(is_stalled=True),
             ),
         ]
         triggers = [
@@ -1490,6 +1487,9 @@ class JobSeekerProfile(models.Model):
             return result
 
         return "Adresse HEXA incomplète"
+
+    def is_considered_stalled(self):
+        return self.is_stalled and not self.is_not_stalled_anymore
 
     def readonly_pii_fields(self):
         blocked_fields = set()

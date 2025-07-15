@@ -11,7 +11,8 @@ from tests.utils.test import normalize_fields_history
 def test_view(client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
     profile = JobSeekerProfileFactory(is_stalled=True)
-    assert profile.is_considered_stalled is True
+    assert profile.is_stalled is True
+    assert profile.is_not_stalled_anymore is None
 
     client.force_login(prescriber)
     response = client.post(
@@ -22,7 +23,6 @@ def test_view(client):
     profile.refresh_from_db()
     assert profile.is_stalled is True
     assert profile.is_not_stalled_anymore is True
-    assert profile.is_considered_stalled is False
     assertMessages(response, [messages.Message(messages.SUCCESS, "Modification réussie")])
 
     response = client.post(
@@ -37,7 +37,6 @@ def test_view(client):
     profile.refresh_from_db()
     assert profile.is_stalled is True
     assert profile.is_not_stalled_anymore is False
-    assert profile.is_considered_stalled is True
     assertMessages(response, [messages.Message(messages.SUCCESS, "Modification réussie")] * 2)
 
     # Also check the fields' history

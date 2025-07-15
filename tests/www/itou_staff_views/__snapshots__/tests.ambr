@@ -484,7 +484,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."is_considered_stalled",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -1129,7 +1128,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."is_considered_stalled",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -1774,7 +1772,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."is_considered_stalled",
                  "users_jobseekerprofile"."fields_history",
                  "eligibility_eligibilitydiagnosis"."id",
                  "eligibility_eligibilitydiagnosis"."author_id",
@@ -2528,7 +2525,6 @@
                  "users_jobseekerprofile"."created_by_prescriber_organization_id",
                  "users_jobseekerprofile"."is_stalled",
                  "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."is_considered_stalled",
                  "users_jobseekerprofile"."fields_history"
           FROM "approvals_approval"
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")

@@ -14,7 +14,7 @@ from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfileQuerySet, User
 from itou.utils.brevo import BrevoClient, BrevoListID
 from itou.utils.command import BaseCommand
 
@@ -172,7 +172,9 @@ class Command(BaseCommand):
         if wet_run:
             client.import_users(recently_joined, BrevoListID.CANDIDATS, job_seeker_serializer)
 
-        stalled_autonomous_job_seekers = job_seekers.filter(jobseeker_profile__is_considered_stalled=True)
+        stalled_autonomous_job_seekers = job_seekers.filter(
+            JobSeekerProfileQuerySet.is_considered_stalled_condition(True, "jobseeker_profile__")
+        )
         self.logger.info("Stalled autonomous job seekers count: %d", len(stalled_autonomous_job_seekers))
         if wet_run:
             client.import_users(
