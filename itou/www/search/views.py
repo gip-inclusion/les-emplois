@@ -205,22 +205,24 @@ class EmployerSearchView(EmployerSearchBaseView):
                     to_attr="active_job_descriptions",
                 )
             )
+            .with_is_hiring()
             .with_has_active_members()
             # Split results into 4 buckets shown in the following order, each bucket being internally sorted
             # by job_app_score.
-            # 1) has_active_members and not block_job_applications
+            # 1) has_active_members and is_hiring
             # These are the siaes which can currently hire, and should be on top.
-            # 2) has_active_members and block_job_applications
-            # These are the siaes currently blocking job applications, they should
+            # 2) has_active_members and not is_hiring
+            # These are the siaes not currently hiring, they should
             # be rather high in the list since they are likely to hire again.
-            # 3) not has_active_members and not block_job_applications
-            # These are the siaes with no member, they should show last.
-            # 4) not has_active_members and block_job_applications
+            # 3) not has_active_members and is_hiring
+            # These are the siaes with no member, they should show last because noone
+            # is there to process any job application.
+            # 4) not has_active_members and not is_hiring
             # This group is supposed to be empty. But itou staff may have
             # detached members from their siae so it could still happen.
             .order_by(
                 "-has_active_members",
-                "block_job_applications",
+                "-is_hiring",
                 "job_app_score",
                 "pk",  # ensure a deterministic order for tests and pagination
             )
