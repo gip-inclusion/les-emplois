@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("approvals", "0003_alter_approval_updated_at"),
+        ("approvals", "0001_initial"),
         ("companies", "0002_fix_job_app_contract_type_enum"),
         ("eligibility", "0001_initial"),
         ("job_applications", "0005_fill_jobapplication_processed_at"),
