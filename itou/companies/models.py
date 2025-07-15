@@ -138,12 +138,14 @@ class CompanyQuerySet(OrganizationQuerySet):
 
     def with_is_hiring(self):
         """
-        A company is considered hiring if it is not blocking job applications.
+        A company is considered hiring if it is not blocking job applications and has at least
+        one active job description or accepts spontaneous job applications.
         """
-        return self.annotate(
+        return self.with_count_active_job_descriptions().annotate(
             is_hiring=Case(
                 When(
-                    Q(block_job_applications=False),
+                    Q(block_job_applications=False)
+                    & (Q(count_active_job_descriptions__gt=0) | Q(spontaneous_applications_open_since__isnull=False)),
                     then=True,
                 ),
                 default=False,

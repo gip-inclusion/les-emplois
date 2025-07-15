@@ -863,8 +863,23 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "companies_jobdescription" U0
+                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                             WHERE (U0."company_id" = ("companies_company"."id")
+                                    AND U0."is_active")
+                             GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
-                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     WHEN (NOT "companies_company"."block_job_applications"
+                           AND (COALESCE(
+                                           (SELECT COUNT(U0."id") AS "count"
+                                            FROM "companies_jobdescription" U0
+                                            INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                                   AND U0."is_active")
+                                            GROUP BY U0."company_id"), %s) > %s
+                                OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
                      ELSE %s
                  END AS "is_hiring",
                  EXISTS
@@ -892,8 +907,8 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 39 DESC,
-                   38 DESC,
+          ORDER BY 40 DESC,
+                   39 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 1
@@ -1262,8 +1277,23 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "companies_jobdescription" U0
+                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                             WHERE (U0."company_id" = ("companies_company"."id")
+                                    AND U0."is_active")
+                             GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
-                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     WHEN (NOT "companies_company"."block_job_applications"
+                           AND (COALESCE(
+                                           (SELECT COUNT(U0."id") AS "count"
+                                            FROM "companies_jobdescription" U0
+                                            INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                                   AND U0."is_active")
+                                            GROUP BY U0."company_id"), %s) > %s
+                                OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
                      ELSE %s
                  END AS "is_hiring",
                  EXISTS
@@ -1290,8 +1320,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 39 DESC,
-                   38 DESC,
+          ORDER BY 40 DESC,
+                   39 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 3
@@ -1661,8 +1691,23 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "companies_jobdescription" U0
+                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                             WHERE (U0."company_id" = ("companies_company"."id")
+                                    AND U0."is_active")
+                             GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
-                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     WHEN (NOT "companies_company"."block_job_applications"
+                           AND (COALESCE(
+                                           (SELECT COUNT(U0."id") AS "count"
+                                            FROM "companies_jobdescription" U0
+                                            INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                                   AND U0."is_active")
+                                            GROUP BY U0."company_id"), %s) > %s
+                                OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
                      ELSE %s
                  END AS "is_hiring",
                  EXISTS
@@ -1689,8 +1734,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 39 DESC,
-                   38 DESC,
+          ORDER BY 40 DESC,
+                   39 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 2
@@ -2059,8 +2104,23 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 COALESCE(
+                            (SELECT COUNT(U0."id") AS "count"
+                             FROM "companies_jobdescription" U0
+                             INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                             WHERE (U0."company_id" = ("companies_company"."id")
+                                    AND U0."is_active")
+                             GROUP BY U0."company_id"), %s) AS "count_active_job_descriptions",
                  CASE
-                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     WHEN (NOT "companies_company"."block_job_applications"
+                           AND (COALESCE(
+                                           (SELECT COUNT(U0."id") AS "count"
+                                            FROM "companies_jobdescription" U0
+                                            INNER JOIN "jobs_appellation" ON (U0."appellation_id" = "jobs_appellation"."code")
+                                            WHERE (U0."company_id" = ("companies_company"."id")
+                                                   AND U0."is_active")
+                                            GROUP BY U0."company_id"), %s) > %s
+                                OR "companies_company"."spontaneous_applications_open_since" IS NOT NULL)) THEN %s
                      ELSE %s
                  END AS "is_hiring",
                  EXISTS
@@ -2087,8 +2147,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 39 DESC,
-                   38 DESC,
+          ORDER BY 40 DESC,
+                   39 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 5
