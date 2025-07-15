@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from itou.jobs.models import Appellation, Rome
-from itou.utils.apis import pe_api_enums, pole_emploi_api_client
+from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import yield_sync_diff
 
@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
     def handle(self, *, wet_run, **options):
         now = timezone.now()
-        pe_client = pole_emploi_api_client()
+        pe_client = pole_emploi_partenaire_api_client()
 
         romes_data = pe_client.referentiel(pe_api_enums.REFERENTIEL_ROME)
         for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):

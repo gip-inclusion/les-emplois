@@ -13,7 +13,7 @@ from httpx import RequestError
 
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
-from itou.utils.apis import pole_emploi_api_client
+from itou.utils.apis import pole_emploi_partenaire_api_client
 from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
     PoleEmploiAPIException,
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         parser.add_argument("--chunk-size", action="store", dest="chunk_size", default=200, type=int)
 
     def handle(self, wet_run, chunk_size, **options):
-        pe_client = pole_emploi_api_client()
+        pe_client = pole_emploi_partenaire_api_client()
 
         @tenacity.retry(
             stop=tenacity.stop_after_attempt(10),

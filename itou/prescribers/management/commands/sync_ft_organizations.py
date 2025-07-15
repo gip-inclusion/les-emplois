@@ -5,7 +5,7 @@ from itou.cities.models import City
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, lat_lon_to_coords
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.apis import pole_emploi_api_client
+from itou.utils.apis import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
@@ -141,7 +141,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *, action, wet_run=False, **options):
-        data = pole_emploi_api_client().agences()
+        data = pole_emploi_partenaire_api_client().agences()
         match action:
             case "fix-empty-safir":
                 self.fix_empty_safir(data, wet_run=wet_run)
