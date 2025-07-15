@@ -7,7 +7,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("approvals", "0004_alter_approval_created_by_and_more"),
+        ("approvals", "0001_initial"),
         ("companies", "0006_alter_company_created_by_alter_company_insee_city_and_more"),
         ("eligibility", "0005_alter_administrativecriteria_created_by_and_more"),
         ("job_applications", "0007_jobapplicationtransitionlog_target_company"),

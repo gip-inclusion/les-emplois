@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("approvals", "0011_allow_more_status_for_employee_record_notifications"),
+        ("approvals", "0001_initial"),
         ("companies", "0023_fill_last_employer_update_at"),
         (
             "eligibility",
