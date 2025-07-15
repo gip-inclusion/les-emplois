@@ -269,6 +269,18 @@ class TestJobApplicationModel:
         assert new_job_application.get_geiq_eligibility_diagnosis() == newer_company_diagnosis
         assert new_job_application.get_geiq_eligibility_diagnosis(for_prescriber=True) == expired_prescriber_diagnosis
 
+    def test_multiple_jobseekers_for_approval(self):
+        job_application = JobApplicationFactory(with_approval=True, sent_by_job_seeker=True)
+        with pytest.raises(
+            IntegrityError,
+            match=r'conflicting key value violates exclusion constraint "one_job_seeker_per_approval"',
+        ):
+            JobApplicationFactory(
+                approval=job_application.approval,
+                sent_by_employer=True,
+                state=JobApplicationState.ACCEPTED,
+            )
+
 
 @pytest.mark.parametrize(
     "factory,constraint_name",
@@ -977,6 +989,7 @@ class TestJobApplicationQuerySet:
             state=JobApplicationState.ACCEPTED,
             to_company=job_app_with_employee_record.to_company,
             approval=job_app_with_employee_record.approval,
+            job_seeker=job_app_with_employee_record.approval.user,
         )
         assert_job_app_not_in_queryset(job_app_on_same_siae)
 
@@ -987,6 +1000,7 @@ class TestJobApplicationQuerySet:
             to_company__convention=job_app_with_employee_record.to_company.convention,
             to_company__source=CompanySource.USER_CREATED,
             approval=job_app_with_employee_record.approval,
+            job_seeker=job_app_with_employee_record.approval.user,
         )
         assert_job_app_not_in_queryset(job_app_on_same_convention)
 

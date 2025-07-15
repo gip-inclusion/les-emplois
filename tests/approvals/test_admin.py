@@ -1178,6 +1178,7 @@ class TestCustomApprovalAdminViews:
         # When an employee record already exists for the candidate
         employee_record = EmployeeRecordFactory(status=Status.READY)
         job_application = JobApplicationFactory(
+            job_seeker=employee_record.job_application.approval.user,
             sent_by_prescriber_alone=True,
             state=JobApplicationState.ACCEPTED,
             to_company=employee_record.job_application.to_company,
