@@ -974,7 +974,8 @@ def test_pe_certify_users_retry(caplog, snapshot):
         jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(seconds=90),
     )  # recent failure that should not be called
     with mock.patch(
-        "itou.utils.apis.PoleEmploiApiClient.recherche_individu_certifie", side_effect=PoleEmploiAPIBadResponse("R010")
+        "itou.utils.apis.PoleEmploiRoyaumePartenaireApiClient.recherche_individu_certifie",
+        side_effect=PoleEmploiAPIBadResponse("R010"),
     ) as recherche:
         call_command("pe_certify_users", wet_run=True)
 

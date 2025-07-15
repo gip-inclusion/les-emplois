@@ -47,19 +47,6 @@ API_TIMEOUT_SECONDS = 60  # this API is pretty slow, let's give it a chance
 
 CACHE_API_TOKEN_KEY = "pole_emploi_api_client_token"
 
-# Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
-AUTHORIZED_SCOPES = [
-    "api_maj-pass-iaev1",
-    "api_offresdemploiv2",
-    "api_rechercheindividucertifiev1",
-    "api_rome-metiersv1",
-    "nomenclatureRome",
-    "o2dsoffre",
-    "passIAE",
-    "rechercherIndividuCertifie",
-    "api_referentielagencesv1",
-    "organisationpe",
-]
 API_MAJ_PASS_SUCCESS = "S000"
 API_RECH_INDIVIDU_SUCCESS = "S001"
 DATE_FORMAT = "%Y-%m-%d"
@@ -82,19 +69,26 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
     return replaced[:max_len]
 
 
-class PoleEmploiApiClient:
+class BasePoleEmploiApiClient:
+    AUTHORIZED_SCOPES = []
+    REALM = ""
+
     def __init__(self, base_url, auth_base_url, key, secret):
+        if not self.AUTHORIZED_SCOPES:
+            raise NotImplementedError("Authorized scopes missing.")
+        if not self.REALM:
+            raise NotImplementedError("Realm missing.")
         self.base_url = base_url
         self.auth_base_url = auth_base_url
         self.key = key
         self.secret = secret
 
     def _refresh_token(self):
-        scopes = " ".join(AUTHORIZED_SCOPES)
+        scopes = " ".join(self.AUTHORIZED_SCOPES)
         auth_data = (
             httpx.post(
                 f"{self.auth_base_url}/connexion/oauth2/access_token",
-                params={"realm": "/partenaire"},
+                params={"realm": self.REALM},
                 data={
                     "client_id": self.key,
                     "client_secret": self.secret,
@@ -148,6 +142,23 @@ class PoleEmploiApiClient:
             return data
         except httpx.RequestError as exc:
             raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
+
+
+class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
+    # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
+    AUTHORIZED_SCOPES = [
+        "api_maj-pass-iaev1",
+        "api_offresdemploiv2",
+        "api_rechercheindividucertifiev1",
+        "api_rome-metiersv1",
+        "nomenclatureRome",
+        "o2dsoffre",
+        "passIAE",
+        "rechercherIndividuCertifie",
+        "api_referentielagencesv1",
+        "organisationpe",
+    ]
+    REALM = "/partenaire"
 
     def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
         """Example data:
