@@ -605,12 +605,16 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
 
 @check_request(can_create_antenna)
 def create_company(request, template_name="companies/create_siae.html"):
-    current_compny = request.current_organization
+    current_company = request.current_organization
     form = companies_forms.CreateCompanyForm(
-        current_company=current_compny,
+        current_company=current_company,
         current_user=request.user,
         data=request.POST or None,
-        initial={"siret": current_compny.siret, "kind": current_compny.kind, "department": current_compny.department},
+        initial={
+            "siret": current_company.siret,
+            "kind": current_company.kind,
+            "department": current_company.department,
+        },
     )
 
     if request.method == "POST" and form.is_valid():
