@@ -427,7 +427,7 @@ def list_for_siae_actions(request):
         response = HttpResponse()
         response["HX-Refresh"] = "true"
         return response
-    can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
+    can_archive = any(job_application.can_be_archived for job_application in selected_job_applications)
     can_unarchive = any(job_application.archived_at is not None for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)

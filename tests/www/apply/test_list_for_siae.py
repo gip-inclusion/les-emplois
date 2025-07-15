@@ -1234,12 +1234,24 @@ def test_list_for_siae_select_applications_batch_archive(client, snapshot):
     assert pretty_indented(archive_button) == snapshot(name="active archive button")
     assert pretty_indented(get_archive_modal()) == snapshot(name="modal with 2 archivable applications")
 
-    # Test with unarchivable batches
+    # mishmash job applications
+    # -------------------------
+
+    # At least one archivable job application
     for app_list in [
-        [archived_app.pk],
-        [unarchivable_app.pk],
         [archived_app.pk, archivable_app_1.pk],
         [unarchivable_app.pk, archivable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+    assert archive_button is not None
+    assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(archive_button) == snapshot(name="active archive button")
+
+    # No archivable job app
+    for app_list in [
+        [unarchivable_app.pk],
+        [archived_app.pk],
+        [archived_app.pk, unarchivable_app.pk],
     ]:
         simulate_applications_selection(app_list)
         # No modal & linked button
@@ -1322,7 +1334,7 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
     assert pretty_indented(archive_button) == snapshot(name="active unarchive button")
 
     modal = get_unarchive_modal()
-    assert pretty_indented(modal) == snapshot(name="modal with 1 unarchivable application")
+    assert pretty_indented(modal) == snapshot(name="modal with 1 archived application")
     # Check that the next_url is correctly transmitted
     modal_form_action = urlsplit(modal.find("form")["action"])
     assert modal_form_action.path == reverse("apply:batch_unarchive")
@@ -1334,7 +1346,7 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
     assert archive_button is not None
     assert archive_button["data-bs-target"] == f"#{MODAL_ID}"
     assert pretty_indented(archive_button) == snapshot(name="active unarchive button")
-    assert pretty_indented(get_unarchive_modal()) == snapshot(name="modal with 2 archivable applications")
+    assert pretty_indented(get_unarchive_modal()) == snapshot(name="modal with 2 archived applications")
 
     # with at least one archived job app, the button is available
     simulate_applications_selection([not_archived_app.pk, archived_app_1])
