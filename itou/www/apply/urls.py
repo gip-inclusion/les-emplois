@@ -133,6 +133,7 @@ urlpatterns = [
         name="batch_refuse_steps",
     ),
     path("company/batch/transfer", batch_views.transfer, name="batch_transfer"),
+    path("company/batch/unarchive", batch_views.unarchive, name="batch_unarchive"),
     # Process.
     path(
         "<uuid:job_application_id>/jobseeker/details",

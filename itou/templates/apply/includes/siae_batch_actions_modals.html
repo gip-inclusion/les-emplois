@@ -105,6 +105,43 @@
                 </div>
             </div>
         {% endif %}
+        {% if can_unarchive %}
+            <div id="unarchive_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="unarchive_modal_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="unarchive_modal_title">
+                                Désarchiver {{ selected_nb }} candidature{{ selected_nb|pluralizefr }}
+                            </h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Êtes-vous sûr de vouloir désarchiver
+                                {% if selected_nb > 1 %}
+                                    les {{ selected_nb }} candidatures sélectionnées
+                                {% else %}
+                                    la candidature sélectionnée
+                                {% endif %}
+                                ?
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                            <form method="post" action="{% url 'apply:batch_unarchive' %}?next_url={{ list_url|urlencode }}">
+                                {% csrf_token %}
+                                {% for application_id in selected_application_ids %}
+                                    <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                                {% endfor %}
+                                <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-unarchive-applications-submit" %}>
+                                    Confirmer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {% if can_transfer %}
             <div id="transfer_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="transfer_modal_title" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">

@@ -6918,6 +6918,109 @@
   
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_unarchive[active unarchive button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-target="#unarchive_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-unarchive-applications-open-modal" type="button">
+      <i aria-hidden="true" class="ri-arrow-go-back-line fw-medium me-2">
+      </i>
+      <span>
+          Désarchiver
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_unarchive[inactive unarchive button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="La sélection ne peut pas être désarchivée. Seules les candidatures archivées peuvent être désarchivées." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-arrow-go-back-line fw-medium me-2">
+      </i>
+      <span>
+          Désarchiver
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_unarchive[modal with 1 unarchivable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="unarchive_modal_title" class="modal" id="unarchive_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="unarchive_modal_title">
+                      Désarchiver 1 candidature
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir désarchiver
+                                  
+                                      la candidature sélectionnée
+                                  
+                                  ?
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/unarchive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01%26archived%3Darchived" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-unarchive-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_unarchive[modal with 2 archivable applications]
+  '''
+  <div aria-hidden="true" aria-labelledby="unarchive_modal_title" class="modal" id="unarchive_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="unarchive_modal_title">
+                      Désarchiver 2 candidatures
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>
+                      Êtes-vous sûr de vouloir désarchiver
+                                  
+                                      les 2 candidatures sélectionnées
+                                  
+                                  ?
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                      Retour
+                  </button>
+                  <form action="/apply/company/batch/unarchive?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01%26archived%3Darchived" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-unarchive-applications-submit">
+                          Confirmer
+                      </button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_list_snapshot[applications list]
   '''
   <section aria-labelledby="apply-list-count" id="job-applications-section">

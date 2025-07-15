@@ -141,6 +141,27 @@
                                 <span>Archiver</span>
                             </button>
                         {% endif %}
+                        {% if can_unarchive %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    {% matomo_event "candidature" "clic" "batch-unarchive-applications-open-modal" %}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#unarchive_confirmation_modal">
+                                <i class="ri-arrow-go-back-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Désarchiver</span>
+                            </button>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="La sélection ne peut pas être désarchivée. Seules les candidatures archivées peuvent être désarchivées.">
+                                <i class="ri-arrow-go-back-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Désarchiver</span>
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>

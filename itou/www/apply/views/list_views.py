@@ -428,6 +428,7 @@ def list_for_siae_actions(request):
         response["HX-Refresh"] = "true"
         return response
     can_archive = all(job_application.can_be_archived for job_application in selected_job_applications)
+    can_unarchive = any(job_application.archived_at is not None for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)
     can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
@@ -452,6 +453,7 @@ def list_for_siae_actions(request):
         "can_accept": can_accept,
         "cannot_accept_reason": cannot_accept_reason,
         "can_archive": can_archive,
+        "can_unarchive": can_unarchive,
         "can_process": can_process,
         "can_postpone": can_postpone,
         "can_refuse": can_refuse,
