@@ -15,23 +15,6 @@
                   </b>
                   .
               </p>
-              <ul>
-                  <li>
-                      Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton
-                      <b>
-                          «Suivant»
-                      </b>
-                      en bas de page.
-                  </li>
-                  <li>
-                      Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
-                                  sur le bouton
-                      <b>
-                          «Valider cette adresse»
-                      </b>
-                      .
-                  </li>
-              </ul>
               <p>
                   <i aria-hidden="true" class="ri-error-warning-line ri-lg me-1">
                   </i>
