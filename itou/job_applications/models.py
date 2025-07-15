@@ -2,6 +2,8 @@ import logging
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator, MaxValueValidator, MinValueValidator
 from django.db import models
@@ -909,6 +911,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     " doivent être à leur valeur par défaut"
                 ),
                 condition=models.Q(state="accepted") | models.Q(**ACCEPTED_ONLY_FIELDS),
+            ),
+            ExclusionConstraint(
+                name="one_job_seeker_per_approval",
+                expressions=[
+                    ("approval_id", RangeOperators.EQUAL),
+                    ("job_seeker_id", RangeOperators.NOT_EQUAL),
+                ],
+                condition=~Q(approval_id=None),
+                violation_error_message="Le PASS IAE est déjà utilisé par un autre candidat.",
             ),
         ]
         permissions = [

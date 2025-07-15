@@ -87,6 +87,7 @@ def test_update_approval_monitored_field_with_multiple_employee_records():
     another_employee_record = EmployeeRecordFactory(
         status=random.choice([Status.PROCESSED, Status.SENT, Status.DISABLED]),
         job_application__approval=approval,
+        job_application__job_seeker=approval.user,
     )
     assert another_employee_record.watched_data_updated_at is None
 
