@@ -1186,7 +1186,7 @@ class JobSeekerProfile(models.Model):
             "et a émis sa première candidature il y a plus de 30 jours."
         ),
     )
-    is_not_stalled_anymore = models.BooleanField(null=True, blank=True)
+    is_not_stalled_anymore = models.BooleanField(null=True, blank=True, db_default=None)
     is_considered_stalled = models.GeneratedField(
         # Equivalent to `Q(is_stalled=True) & ~Q(is_not_stalled_anymore=True)`,
         # we need an expression and found no better way (for now) than `RawSQL()`.
