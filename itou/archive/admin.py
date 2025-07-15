@@ -1,82 +1,19 @@
 from django.contrib import admin
 
 from itou.archive import models
-from itou.utils.admin import ItouModelAdmin
+from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 
 @admin.register(models.AnonymizedProfessional)
-class AnonymizedProfessionalAdmin(ItouModelAdmin):
-    fields = (
-        "date_joined",
-        "first_login",
-        "last_login",
-        "anonymized_at",
-        "department",
-        "title",
-        "kind",
-        "number_of_memberships",
-        "number_of_active_memberships",
-        "number_of_memberships_as_administrator",
-        "had_memberships_in_authorized_organization",
-        "identity_provider",
-    )
-
-    readonly_fields = fields
+class AnonymizedProfessionalAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
 
 
 @admin.register(models.AnonymizedJobSeeker)
-class AnonymizedJobSeekerAdmin(ItouModelAdmin):
-    fields = (
-        "date_joined",
-        "first_login",
-        "last_login",
-        "anonymized_at",
-        "user_signup_kind",
-        "department",
-        "title",
-        "identity_provider",
-        "had_pole_emploi_id",
-        "had_nir",
-        "lack_of_nir_reason",
-        "nir_sex",
-        "nir_year",
-        "birth_year",
-        "count_accepted_applications",
-        "count_IAE_applications",
-        "count_total_applications",
-    )
-
-    readonly_fields = fields
+class AnonymizedJobSeekerAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
 
 
 @admin.register(models.AnonymizedApplication)
-class AnonymizedApplicationAdmin(ItouModelAdmin):
-    fields = (
-        "job_seeker_birth_year",
-        "job_seeker_department_same_as_company_department",
-        "sender_kind",
-        "sender_company_kind",
-        "sender_prescriber_organization_kind",
-        "sender_prescriber_organization_authorization_status",
-        "company_kind",
-        "company_department",
-        "company_naf",
-        "company_has_convention",
-        "anonymized_at",
-        "applied_at",
-        "processed_at",
-        "last_transition_at",
-        "had_resume",
-        "origin",
-        "state",
-        "refusal_reason",
-        "has_been_transferred",
-        "number_of_jobs_applied_for",
-        "has_diagoriente_invitation",
-        "hiring_rome",
-        "hiring_contract_type",
-        "hiring_contract_nature",
-        "hiring_start_date",
-    )
-
-    readonly_fields = fields
+class AnonymizedApplicationAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
