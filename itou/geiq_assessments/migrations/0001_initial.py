@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("companies", "0023_fill_last_employer_update_at"),
-        ("files", "0002_file_deleted_at"),
+        ("files", "0001_initial"),
         ("institutions", "0008_institution_automatic_geocoding_update"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

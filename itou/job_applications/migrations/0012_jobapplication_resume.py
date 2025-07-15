@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("files", "0002_file_deleted_at"),
+        ("files", "0001_initial"),
         ("job_applications", "0011_drop_hidden_for_company"),
     ]
 
