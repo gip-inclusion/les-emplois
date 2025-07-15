@@ -100,6 +100,46 @@ def archive(request):
 
 @check_user(lambda user: user.is_employer)
 @require_POST
+def unarchive(request):
+    next_url = get_safe_url(request, "next_url")
+    if next_url is None:
+        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        raise Http404
+    applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
+
+    unarchived_ids = []
+
+    for job_application in applications:
+        if job_application.archived_at is not None:
+            unarchived_ids.append(job_application.pk)
+        else:
+            messages.warning(
+                request,
+                f"La candidature de {job_application.job_seeker.get_full_name()} n’est pas archivée.",
+                extra_tags="toast",
+            )
+
+    unarchived_nb = JobApplication.objects.filter(pk__in=unarchived_ids).update(
+        archived_at=None,
+        archived_by=None,
+    )
+
+    if unarchived_nb > 1:
+        messages.success(request, f"{unarchived_nb} candidatures ont bien été désarchivées.", extra_tags="toast")
+    elif unarchived_nb == 1:
+        messages.success(request, "1 candidature a bien été désarchivée.", extra_tags="toast")
+
+    logger.info(
+        "user=%s batch unarchived %s applications: %s",
+        request.user.pk,
+        unarchived_nb,
+        ",".join(str(app_uid) for app_uid in unarchived_ids),
+    )
+    return HttpResponseRedirect(next_url)
+
+
+@check_user(lambda user: user.is_employer)
+@require_POST
 def postpone(request):
     next_url = get_safe_url(request, "next_url")
     if next_url is None:

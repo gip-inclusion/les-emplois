@@ -1627,3 +1627,189 @@ class TestBatchTransfer:
                 messages.Message(messages.SUCCESS, "2 candidatures ont bien été transférées.", extra_tags="toast"),
             ],
         )
+
+
+class TestBatchUnarchive:
+    def test_invalid_access(self, client):
+        unarchivable_app = JobApplicationFactory(state=JobApplicationState.REFUSED, archived_at=timezone.now())
+        for user in [unarchivable_app.job_seeker, unarchivable_app.sender, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.post(reverse("apply:batch_unarchive"), data={"application_ids": [unarchivable_app.pk]})
+            assert response.status_code == 403
+
+    def test_no_next_url(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        unarchivable_app = JobApplicationFactory(state=JobApplicationState.REFUSED, archived_at=timezone.now())
+
+        response = client.post(reverse("apply:batch_unarchive"), data={"application_ids": [unarchivable_app.pk]})
+        assert response.status_code == 404
+
+    def test_single_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
+        client.force_login(employer)
+
+        unarchivable_app = JobApplicationFactory(
+            to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        )
+
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [unarchivable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        unarchivable_app.refresh_from_db()
+        assert unarchivable_app.archived_at is None
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "1 candidature a bien été désarchivée.", extra_tags="toast")],
+        )
+
+    def test_multiple_apps(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        unarchivable_apps = JobApplicationFactory.create_batch(
+            2, to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        )
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
+
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [unarchivable_app.pk for unarchivable_app in unarchivable_apps]},
+        )
+        assertRedirects(response, next_url)
+        for unarchivable_app in unarchivable_apps:
+            unarchivable_app.refresh_from_db()
+            assert unarchivable_app.archived_at is None
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "2 candidatures ont bien été désarchivées.", extra_tags="toast")],
+        )
+
+    def test_sent_application(self, client):
+        unarchivable_app = JobApplicationFactory(
+            sent_by_another_employer=True, state=JobApplicationState.REFUSED, archived_at=timezone.now()
+        )
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
+
+        client.force_login(unarchivable_app.sender)
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [unarchivable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        unarchivable_app.refresh_from_db()
+        assert unarchivable_app.archived_at is not None
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unexisting_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
+        client.force_login(employer)
+
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [uuid.uuid4()]},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_already_unarchived(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "REFUSED", "archived": "archived"})
+        client.force_login(employer)
+
+        archived_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="Bond",
+            to_company=company,
+            state=JobApplicationState.REFUSED,
+        )
+        assert archived_app.archived_at is None
+
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [archived_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        archived_app.refresh_from_db()
+        assert archived_app.archived_at is None
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND n’est pas archivée.",
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_mishmash(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        apps = [
+            # 2 unarchivable applications:
+            JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()),
+            JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED, archived_at=timezone.now()),
+            # 1 already archived application:
+            JobApplicationFactory(
+                job_seeker__first_name="Jean",
+                job_seeker__last_name="Bond",
+                to_company=company,
+                state=JobApplicationState.REFUSED,
+            ),
+        ]
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01", "archived": "archived"})
+
+        response = client.post(
+            reverse("apply:batch_unarchive", query={"next_url": next_url}),
+            data={"application_ids": [app.pk for app in apps] + [uuid.uuid4(), uuid.uuid4()]},
+        )
+        assertRedirects(response, next_url)
+        # 2 archivable apps have been successfully archived despite all the error messages
+        apps[0].refresh_from_db()
+        assert apps[0].archived_at is None
+        apps[1].refresh_from_db()
+        assert apps[1].archived_at is None
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "2 candidatures sélectionnées n’existent plus ou ont été transférées.",
+                ),
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND n’est pas archivée.",
+                    extra_tags="toast",
+                ),
+                messages.Message(messages.SUCCESS, "2 candidatures ont bien été désarchivées.", extra_tags="toast"),
+            ],
+        )
