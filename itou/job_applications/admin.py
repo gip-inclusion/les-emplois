@@ -135,12 +135,16 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "approval_manually_delivered_by",
         "approval_manually_refused_by",
         "approval_manually_refused_at",
+        "message",
+        "answer",
+        "answer_to_prescriber",
         "transferred_by",
         "transferred_at",
         "transferred_from",
         "origin",
         "state",
         "diagoriente_invite_sent_at",
+        "contract_type_details",
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline, EmployeeRecordInline)
 
