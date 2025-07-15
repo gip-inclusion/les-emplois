@@ -5,7 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cities", "0001_initial"),  # Declare UnaccentExtension
         ("utils", "0001_create_supportremark"),
     ]
 
