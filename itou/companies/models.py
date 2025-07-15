@@ -136,6 +136,21 @@ class CompanyQuerySet(OrganizationQuerySet):
         )
         return self.annotate(count_active_job_descriptions=Coalesce(sub_query, 0))
 
+    def with_is_hiring(self):
+        """
+        A company is considered hiring if it is not blocking job applications.
+        """
+        return self.annotate(
+            is_hiring=Case(
+                When(
+                    Q(block_job_applications=False),
+                    then=True,
+                ),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
     def with_computed_job_app_score(self):
         """
         Employer search results continuously boost companies which did not receive enough job applications

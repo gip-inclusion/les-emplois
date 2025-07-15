@@ -863,6 +863,10 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 CASE
+                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     ELSE %s
+                 END AS "is_hiring",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_companymembership" U0
@@ -888,8 +892,8 @@
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable"
                  AND "companies_company"."id" = %s)
-          ORDER BY 38 DESC,
-                   "companies_company"."block_job_applications" ASC,
+          ORDER BY 39 DESC,
+                   38 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 1
@@ -1258,6 +1262,10 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 CASE
+                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     ELSE %s
+                 END AS "is_hiring",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_companymembership" U0
@@ -1282,8 +1290,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
-                   "companies_company"."block_job_applications" ASC,
+          ORDER BY 39 DESC,
+                   38 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 3
@@ -1653,6 +1661,10 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 CASE
+                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     ELSE %s
+                 END AS "is_hiring",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_companymembership" U0
@@ -1677,8 +1689,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
-                   "companies_company"."block_job_applications" ASC,
+          ORDER BY 39 DESC,
+                   38 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 2
@@ -2047,6 +2059,10 @@
                  "companies_company"."is_searchable",
                  "companies_company"."rdv_solidarites_id",
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance",
+                 CASE
+                     WHEN NOT "companies_company"."block_job_applications" THEN %s
+                     ELSE %s
+                 END AS "is_hiring",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_companymembership" U0
@@ -2071,8 +2087,8 @@
                          LIMIT 1))
                  AND ST_DWithin("companies_company"."coords", %s, %s)
                  AND "companies_company"."is_searchable")
-          ORDER BY 38 DESC,
-                   "companies_company"."block_job_applications" ASC,
+          ORDER BY 39 DESC,
+                   38 DESC,
                    "companies_company"."job_app_score" ASC,
                    "companies_company"."id" ASC
           LIMIT 5
