@@ -12,21 +12,23 @@ from itou.utils.apis.pole_emploi import (
     CACHE_API_TOKEN_KEY,
     REFRESH_TOKEN_MARGIN_SECONDS,
     PoleEmploiAPIBadResponse,
-    PoleEmploiApiClient,
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
+    PoleEmploiRoyaumePartenaireApiClient,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
 
 
-class TestPoleEmploiAPIClient:
+class TestPoleEmploiRoyaumePartenaireApiClient:
     CACHE_EXPIRY = 3600
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.api_client = PoleEmploiApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
+        self.api_client = PoleEmploiRoyaumePartenaireApiClient(
+            "https://pe.fake", "https://auth.fr", "foobar", "pe-secret"
+        )
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
         )
