@@ -8,13 +8,13 @@ import httpx
 import pytest
 from botocore.config import Config
 from django.conf import settings
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.utils import timezone
 
 from itou.antivirus.models import Scan
 from itou.approvals.enums import ProlongationReason
-from itou.files.models import File
+from itou.files.models import File, save_file
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 from tests.approvals.factories import ProlongationFactory, ProlongationRequestFactory
 from tests.communications.factories import AnnouncementItemFactory
@@ -187,3 +187,60 @@ def test_delete_unused_files_from_s3(temporary_bucket, caplog, mocker):
     assert sorted(
         obj["Key"] for obj in client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)["Contents"]
     ) == sorted(keys[:2])
+
+
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("resume.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("something-very-long EVEN WITH SPACES! YUK!.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("spreadsheet.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("spreadsheet.pdf.xlsx", "11111111-1111-1111-1111-111111111111.xlsx"),
+        ("open-office.odt", "11111111-1111-1111-1111-111111111111.odt"),
+        ("folder/file.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+        ("folder/subfolder/file.pdf", "11111111-1111-1111-1111-111111111111.pdf"),
+    ],
+)
+def test_anonymised_filename(mocker, filename, expected):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    assert File.anonymized_filename(filename) == expected
+
+
+@pytest.mark.parametrize(
+    "params,expected_filename",
+    [
+        [
+            {"folder": "folder/"},
+            "folder/11111111-1111-1111-1111-111111111111.pdf",
+        ],
+        [
+            {"folder": "folder"},
+            "folder/11111111-1111-1111-1111-111111111111.pdf",
+        ],
+        [
+            {"folder": "folder", "anonymize_filename": False},
+            "folder/empty.pdf",
+        ],
+        [{"folder": "folder/", "storage": storages["public"]}, "folder/11111111-1111-1111-1111-111111111111.pdf"],
+    ],
+)
+@pytest.mark.usefixtures("temporary_bucket")
+def test_save_file(mocker, pdf_file, params, expected_filename):
+    mocker.patch("itou.files.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"))
+    file = save_file(file=pdf_file, **params)
+    assert file.key == expected_filename
+    assert File.objects.get(key=expected_filename)
+    if "storage" in params:
+        assert params["storage"].listdir("folder")[-1] == ["11111111-1111-1111-1111-111111111111.pdf"]
+    else:
+        assert default_storage.listdir("folder")[-1] == [expected_filename.split("/")[-1]]
+
+
+def test_save_file_options(pdf_file):
+    expected_message = "('File tree depth is too deep. Only one level is allowed.', 'folder/subfolder')"
+    with pytest.raises(NotImplementedError, match=expected_message):
+        save_file(folder="folder/subfolder", file=pdf_file)
+
+    expected_message = "('File tree depth is too deep. Only one level is allowed.', 'folder/subfolder/')"
+    with pytest.raises(NotImplementedError, match=expected_message):
+        save_file(folder="folder/subfolder/", file=pdf_file)

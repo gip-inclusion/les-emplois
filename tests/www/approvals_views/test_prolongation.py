@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 import pytest
@@ -512,9 +513,15 @@ class TestApprovalProlongation:
 
 
 @pytest.mark.usefixtures("temporary_bucket")
-def test_prolongation_report_file(client, faker, xlsx_file, mailoutbox):
-    # Check that report file object is saved and linked to prolongation
-    # Bad reason types are checked by UI (JS) and ultimately by DB constraints
+def test_prolongation_report_file(client, mocker, faker, xlsx_file, mailoutbox):
+    """
+    Check that report file object is saved and linked to prolongation
+    Bad reason types are checked by UI (JS) and ultimately by DB constraints
+    """
+    mocker.patch(
+        "itou.files.models.uuid.uuid4",
+        return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+    )
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     prescriber = prescriber_organization.members.first()
 
@@ -560,7 +567,7 @@ def test_prolongation_report_file(client, faker, xlsx_file, mailoutbox):
 
     prolongation_request = approval.prolongationrequest_set.get()
     assert prolongation_request.report_file
-    assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
+    assert prolongation_request.report_file.key == "prolongation_report/11111111-1111-1111-1111-111111111111.xlsx"
 
     [email] = mailoutbox
     assert email.to == [post_data["email"]]
