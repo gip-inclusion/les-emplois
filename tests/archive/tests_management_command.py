@@ -73,6 +73,12 @@ def city_fixture():
     return create_city_saint_andre()
 
 
+def get_fields_list_for_snapshot(model):
+    exclude = {"id", "anonymized_at"}
+    fields = [f.name for f in model._meta.get_fields() if f.concrete and f.name not in exclude]
+    return model.objects.values(*fields)
+
+
 class TestNotifyInactiveJobseekersManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
         user = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
@@ -562,25 +568,7 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not User.objects.filter(id=jobseeker.id).exists()
         assert not JobApplication.objects.filter(job_seeker=jobseeker).exists()
 
-        archived_jobseeker = AnonymizedJobSeeker.objects.all().values(
-            "date_joined",
-            "first_login",
-            "last_login",
-            "user_signup_kind",
-            "department",
-            "title",
-            "identity_provider",
-            "had_pole_emploi_id",
-            "had_nir",
-            "lack_of_nir_reason",
-            "nir_sex",
-            "nir_year",
-            "birth_year",
-            "count_accepted_applications",
-            "count_IAE_applications",
-            "count_total_applications",
-        )
-        assert list(archived_jobseeker) == snapshot(name="archived_jobseeker")
+        assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="archived_jobseeker")
 
         assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
         if jobseeker.is_active:
@@ -764,33 +752,7 @@ class TestAnonymizeJobseekersManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
-        archived_application = AnonymizedApplication.objects.all().values(
-            "job_seeker_birth_year",
-            "job_seeker_department_same_as_company_department",
-            "sender_kind",
-            "sender_company_kind",
-            "sender_prescriber_organization_kind",
-            "sender_prescriber_organization_authorization_status",
-            "company_kind",
-            "company_department",
-            "company_naf",
-            "company_has_convention",
-            "applied_at",
-            "processed_at",
-            "last_transition_at",
-            "had_resume",
-            "origin",
-            "state",
-            "refusal_reason",
-            "has_been_transferred",
-            "number_of_jobs_applied_for",
-            "has_diagoriente_invitation",
-            "hiring_rome",
-            "hiring_contract_type",
-            "hiring_contract_nature",
-            "hiring_start_date",
-        )
-        assert list(archived_application) == snapshot(name="archived_application")
+        assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
         assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert "Anonymized job applications after grace period, count: 1" in caplog.messages
 
@@ -1020,20 +982,7 @@ class TestAnonymizeProfessionalManagementCommand:
         # User should be deleted
         if not has_related_objects:
             assert not User.objects.filter(id=professional.id).exists()
-            anonymized = AnonymizedProfessional.objects.all().values(
-                "date_joined",
-                "first_login",
-                "last_login",
-                "department",
-                "title",
-                "kind",
-                "number_of_memberships",
-                "number_of_active_memberships",
-                "number_of_memberships_as_administrator",
-                "had_memberships_in_authorized_organization",
-                "identity_provider",
-            )
-            assert anonymized == snapshot(name="anonymized_professional")
+            assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(name="anonymized_professional")
             assert respx_mock.calls.call_count == 0 if is_anonymized else 1
             for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
                 assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
@@ -1144,13 +1093,9 @@ class TestAnonymizeProfessionalManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
-        anonymized_professionals = AnonymizedProfessional.objects.values(
-            "number_of_memberships",
-            "number_of_active_memberships",
-            "number_of_memberships_as_administrator",
-            "had_memberships_in_authorized_organization",
+        assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
+            name="anonymized_professionals_with_annotations"
         )
-        assert anonymized_professionals == snapshot(name="anonymized_professionals_with_annotations")
 
     def test_num_queries(self, snapshot):
         for pm in PrescriberMembershipFactory.create_batch(
