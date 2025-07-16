@@ -3,7 +3,6 @@ from urllib.parse import unquote
 
 from django.conf import settings
 from django.core.cache import caches
-from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -15,6 +14,8 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     CACHE_NAME = "stats"
 
     KPI_TO_FETCH = {
@@ -103,7 +104,6 @@ class Command(BaseCommand):
             print(repr(value))
             print()
 
-    @transaction.atomic()
     def fetch_stalled_job_seekers(self, *, wet_run):
         client = Client(settings.METABASE_SITE_URL)
 

@@ -26,6 +26,8 @@ class Command(BaseCommand):
             n'est pas gênant.
     """
 
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser: argparse.ArgumentParser):
         super().add_arguments(parser)
         subparsers = parser.add_subparsers(dest="command", required=True)

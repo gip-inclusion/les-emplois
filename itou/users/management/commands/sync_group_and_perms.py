@@ -1,5 +1,4 @@
 from django.contrib.auth.models import Group, Permission
-from django.db import transaction
 
 from itou.utils.command import BaseCommand
 
@@ -152,9 +151,10 @@ def to_perm_codenames(model, perms_set):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     help = "Synchronize groups and permissions."
 
-    @transaction.atomic
     def handle(self, **options):
         for group, raw_permissions in sorted(get_permissions_dict().items()):
             all_codenames = [

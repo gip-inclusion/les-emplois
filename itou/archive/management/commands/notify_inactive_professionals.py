@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
@@ -12,6 +11,8 @@ BATCH_SIZE = 200
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -28,7 +29,6 @@ class Command(BaseCommand):
             help="Number of professionals to process in a batch",
         )
 
-    @transaction.atomic
     def notify_inactive_professionals(self):
         now = timezone.now()
         inactive_since = now - INACTIVITY_PERIOD
