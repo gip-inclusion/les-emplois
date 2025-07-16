@@ -1,6 +1,7 @@
 import datetime
 import random
 import re
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import httpx
@@ -12,6 +13,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.approvals.models import Approval
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.companies.models import CompanyMembership
@@ -45,6 +47,17 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.test import assertSnapshotQueries
+
+
+@contextmanager
+def allow_manual_updated_at(model_class, field_name="updated_at"):
+    field = model_class._meta.get_field(field_name)
+    original_auto_now = field.auto_now
+    field.auto_now = False
+    try:
+        yield
+    finally:
+        field.auto_now = original_auto_now
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -234,6 +247,90 @@ class TestNotifyInactiveJobseekersManagementCommand:
         else:
             assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
             assert not mailoutbox
+
+    @pytest.mark.parametrize(
+        "end_at_list, updated_notification_date",
+        [
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD],
+                True,
+                id="jobseeker_with_one_expired_approval",
+            ),
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1)],
+                False,
+                id="jobseeker_with_one_expiring_soon_approval",
+            ),
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD, timezone.localdate()],
+                False,
+                id="jobseeker_with_one_expired_approval_and_one_recent_approval",
+            ),
+        ],
+    )
+    def test_notify_inactive_jobseekers_on_approval_expiration_date(self, end_at_list, updated_notification_date):
+        job_seeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+
+        for end_at in end_at_list:
+            approval = ApprovalFactory(
+                user=job_seeker,
+                start_at=end_at - relativedelta(days=4),
+                eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                eligibility_diagnosis__expires_at=timezone.localdate() - relativedelta(years=3),
+                end_at=end_at,
+            )
+            with allow_manual_updated_at(Approval):
+                approval.updated_at = timezone.now() - relativedelta(years=2)
+                approval.save()
+
+        call_command("notify_inactive_jobseekers", wet_run=True)
+
+        job_seeker.refresh_from_db()
+        assert (job_seeker.upcoming_deletion_notified_at is not None) == updated_notification_date
+
+    @pytest.mark.parametrize(
+        "eligibility_model_factory",
+        [
+            pytest.param(IAEEligibilityDiagnosisFactory, id="iae_eligibility_diagnosis"),
+            pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq_eligibility_diagnosis"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "expires_at_list, updated_notification_date",
+        [
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD],
+                True,
+                id="jobseeker_with_one_expired_eligibility_diagnosis",
+            ),
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1)],
+                False,
+                id="jobseeker_with_one_expiring_soon_eligibility_diagnosis",
+            ),
+            pytest.param(
+                [timezone.localdate() - INACTIVITY_PERIOD, timezone.localdate()],
+                False,
+                id="jobseeker_with_one_expired_eligibility_diagnosis_and_one_recent_eligibility_diagnosis",
+            ),
+        ],
+    )
+    def test_notify_inactive_jobseekers_on_eligibility_diagnosis_expiration_date(
+        self, eligibility_model_factory, expires_at_list, updated_notification_date
+    ):
+        job_seeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        for expires_at in expires_at_list:
+            eligibility_model_factory(
+                job_seeker=job_seeker,
+                from_prescriber=True,
+                updated_at=timezone.now() - relativedelta(years=2),
+                expires_at=expires_at,
+            )
+
+        call_command("notify_inactive_jobseekers", wet_run=True)
+
+        job_seeker.refresh_from_db()
+        assert (job_seeker.upcoming_deletion_notified_at is not None) == updated_notification_date
 
 
 class TestAnonymizeJobseekersManagementCommand:
