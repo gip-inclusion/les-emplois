@@ -8,11 +8,12 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.companies.factories import CompanyMembershipFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -33,22 +34,23 @@ DDETS_refusal_comment_txt = "Commentaire de la DDETS"
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
     job_seeker = JobSeekerFactory()
 
-    eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-        job_seeker,
+    eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        from_employer=True,
         author=user,
-        author_organization=siae,
-        administrative_criteria=list(
-            AdministrativeCriteria.objects.filter(
-                level__in=[AdministrativeCriteriaLevel.LEVEL_1 if level_1 else None]
-                + [AdministrativeCriteriaLevel.LEVEL_2 if level_2 else None]
-            )
-        ),
+        author_siae=siae,
+    )
+    eligibility_diagnosis.administrative_criteria.add(
+        *AdministrativeCriteria.objects.filter(
+            level__in=[AdministrativeCriteriaLevel.LEVEL_1 if level_1 else None]
+            + [AdministrativeCriteriaLevel.LEVEL_2 if level_2 else None]
+        )
     )
 
     job_application = JobApplicationFactory(
         with_approval=True,
         to_company=siae,
-        sender_company=siae,
+        sent_by_company=True,
         eligibility_diagnosis=eligibility_diagnosis,
         hiring_start_at=timezone.localdate() - relativedelta(months=2),
     )

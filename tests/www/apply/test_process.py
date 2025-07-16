@@ -3668,7 +3668,11 @@ def test_details_sender_email_display_for_job_seeker(client):
     employer = job_application.to_company.members.first()
     job_application.sender = employer
     job_application.sender_kind = job_applications_enums.SenderKind.EMPLOYER
-    job_application.save(update_fields=["sender", "sender_kind", "updated_at"])
+    job_application.sender_company = job_application.to_company
+    job_application.sender_prescriber_organization = None
+    job_application.save(
+        update_fields=["sender", "sender_kind", "sender_company", "sender_prescriber_organization", "updated_at"]
+    )
     response = client.get(url)
     assertNotContains(
         response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
@@ -4292,8 +4296,8 @@ class TestJobApplicationSenderLeftOrg:
         assert job_application_sender_left_org(job_app) is True
 
     def test_sender_left_org_employer(self):
-        company_membership = CompanyMembershipFactory()
-        job_app = JobApplicationFactory(sender=company_membership.user, sender_company=company_membership.company)
+        job_app = JobApplicationFactory(sent_by_company=True)
+        company_membership = job_app.sender_company.memberships.get()
         assert job_application_sender_left_org(job_app) is False
 
         # membership is inactive

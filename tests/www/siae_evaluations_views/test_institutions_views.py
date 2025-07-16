@@ -10,7 +10,7 @@ from django.utils import dateformat, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import (
@@ -24,6 +24,7 @@ from itou.utils.types import InclusiveDateRange
 from itou.utils.urls import add_url_params
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -33,28 +34,22 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
 
 # fixme vincentporte : convert this method into factory
 def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_siae_kwargs=None):
-    membership = CompanyMembershipFactory(company__department=evaluation_campaign.institution.department)
-    user = membership.user
-    siae = membership.company
-
-    job_seeker = JobSeekerFactory()
-
     administrative_criteria = AdministrativeCriteria.objects.get(pk=1)
-    eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-        job_seeker, author=user, author_organization=siae, administrative_criteria=[administrative_criteria]
+    eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+        from_employer=True, criteria_kinds=[administrative_criteria.kind]
     )
+    siae = eligibility_diagnosis.author_siae
 
     job_application = JobApplicationFactory(
         with_approval=True,
         to_company=siae,
-        sender_company=siae,
+        sent_by_company=True,
         eligibility_diagnosis=eligibility_diagnosis,
         hiring_start_at=timezone.localdate() - relativedelta(months=2),
     )
