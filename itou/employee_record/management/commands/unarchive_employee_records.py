@@ -1,13 +1,12 @@
 import argparse
 
-from django.db import transaction
-
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
     # TODO(rsebille): Delete this management command in 2025
 
     def add_arguments(self, parser):
@@ -20,7 +19,6 @@ class Command(BaseCommand):
         parser.add_argument("siae_id", type=int)
         parser.add_argument("--wet-run", action="store_true")
 
-    @transaction.atomic()
     def handle(self, *, employee_list_file, siae_id, wet_run, **options):
         self.stdout.write("Start moving employee records from archive")
 

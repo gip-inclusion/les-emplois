@@ -1,5 +1,4 @@
 from dateutil.relativedelta import relativedelta
-from django.db import transaction
 from django.db.models import Exists, F, OuterRef, Q
 from django.utils import timezone
 
@@ -10,7 +9,8 @@ from itou.utils.emails import send_email_messages
 
 
 class Command(BaseCommand):
-    @transaction.atomic
+    ATOMIC_HANDLE = True
+
     def handle(self, **options):
         today = timezone.localdate()
         campaigns = EvaluationCampaign.objects.filter(ended_at=None).select_related("institution")

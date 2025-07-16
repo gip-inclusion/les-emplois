@@ -3,6 +3,8 @@ from itou.utils.command import BaseCommand, dry_runnable
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 

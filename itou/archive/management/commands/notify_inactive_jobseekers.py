@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from sentry_sdk.crons import monitor
@@ -39,6 +38,8 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -55,7 +56,6 @@ class Command(BaseCommand):
             help="Number of job seekers to process in a batch",
         )
 
-    @transaction.atomic
     def notify_inactive_jobseekers(self):
         now = timezone.now()
         inactive_since = now - INACTIVITY_PERIOD

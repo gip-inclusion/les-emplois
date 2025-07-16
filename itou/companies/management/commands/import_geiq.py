@@ -113,6 +113,8 @@ class Command(BaseCommand):
         django-admin import_geiq --wet-run
     """
 
+    ATOMIC_HANDLE = True
+
     help = "Import the content of the GEIQ csv file into the database."
 
     def add_arguments(self, parser):

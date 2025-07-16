@@ -4,7 +4,6 @@ from datetime import datetime
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import transaction
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
 
@@ -55,6 +54,8 @@ def guess_commune(code, name, at=None):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     help = "Synchronizes communes with the latest CSV from the ASP and latest known Cities"
 
     def add_arguments(self, parser):
@@ -67,7 +68,6 @@ class Command(BaseCommand):
             help="Path of the ASP CSV file to import",
         )
 
-    @transaction.atomic
     def handle(self, *, file_path, wet_run, **options):
         communes_from_csv = list(csv_import_communes(file_path))
 

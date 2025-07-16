@@ -58,6 +58,8 @@ def _command_info_manager(command, *, wet_run=None):
 
 
 class LoggedCommandMixin:
+    ATOMIC_HANDLE = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(self.__class__.__module__)
@@ -66,6 +68,8 @@ class LoggedCommandMixin:
         with contextlib.ExitStack() as stack:
             command_info = stack.enter_context(_command_info_manager(self, wet_run=kwargs.get("wet_run")))
             stack.enter_context(_command_duration_logger(self))
+            if self.ATOMIC_HANDLE:
+                stack.enter_context(transaction.atomic())
             stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=command_info.run_uid))
             try:
                 return super().execute(*args, **kwargs)

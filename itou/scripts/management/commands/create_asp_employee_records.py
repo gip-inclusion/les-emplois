@@ -2,7 +2,6 @@ import argparse
 import csv
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.utils import timezone
 
 from itou.approvals.models import Approval
@@ -17,6 +16,8 @@ from itou.utils.command import BaseCommand
 class Command(BaseCommand):
     """Used to create employee records for approvals and EITI companies already known by the ASP"""
 
+    ATOMIC_HANDLE = True
+
     CSV_SEPARATOR = ";"
 
     def add_arguments(self, parser):
@@ -27,7 +28,6 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    @transaction.atomic
     def handle(self, file, *, wet_run=False, **options):
         now = timezone.now()
         siret_to_siaes = {}
