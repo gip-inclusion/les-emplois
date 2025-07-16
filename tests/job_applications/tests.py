@@ -60,6 +60,7 @@ from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -204,25 +205,42 @@ class TestJobApplicationModel:
 
 
 @pytest.mark.parametrize(
-    "factory, validation_should_pass",
+    "factory,constraint_name",
     [
-        pytest.param(lambda: JobApplicationSentByJobSeekerFactory(), True, id="job_application_sent_by_job_seeker"),
         pytest.param(
             lambda: JobApplicationSentByJobSeekerFactory(sender=JobSeekerFactory()),
-            False,
-            id="job_application_sent_by_other_job_seeker",
+            "job_seeker_sender_coherence",
+            id="sent_by_other_job_seeker",
         ),
-        pytest.param(lambda: JobApplicationSentByPrescriberFactory(), True, id="job_application_sent_by_prescriber"),
-        pytest.param(lambda: JobApplicationSentByCompanyFactory(), True, id="job_application_sent_by_company"),
+        pytest.param(
+            lambda: JobApplicationSentByCompanyFactory(sender_company=None),
+            "employer_sender_coherence",
+            id="sent_by_employer_without_company",
+        ),
+        pytest.param(
+            lambda: JobApplicationSentByCompanyFactory(sender_prescriber_organization=PrescriberOrganizationFactory()),
+            "employer_sender_coherence",
+            id="sent_by_employer_with_prescriber_organization",
+        ),
+        pytest.param(
+            lambda: JobApplicationSentByCompanyFactory(
+                sender_company=None, sender_prescriber_organization=PrescriberOrganizationFactory()
+            ),
+            "employer_sender_coherence",
+            id="sent_by_employer_without_company_and_with_prescriber_organization",
+        ),
+        pytest.param(
+            lambda: JobApplicationSentByPrescriberFactory(sender_company=CompanyFactory()),
+            "prescriber_sender_coherence",
+            id="sent_by_employer_with_company",
+        ),
     ],
 )
-def test_sender_jobseeker_constraint(factory, validation_should_pass):
-    if validation_should_pass:
-        assert factory().validate_constraints() is None
-
-    else:
-        with pytest.raises(IntegrityError, match="job_seeker_sender_coherence"):
-            factory()
+def test_sender_constraints(factory, constraint_name):
+    with pytest.raises(
+        IntegrityError, match=f'new row for relation ".*" violates check constraint "{constraint_name}"'
+    ):
+        factory()
 
 
 @pytest.mark.parametrize(
@@ -422,7 +440,7 @@ def test_prescriptions_of_for_employer_with_company():
 
 
 def test_prescriptions_of_for_employer_without_company():
-    job_application = JobApplicationFactory(sender_kind=SenderKind.EMPLOYER, sender=EmployerFactory())
+    job_application = JobApplicationFactory(sent_by_company=True)
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.sender_company)) == []
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
@@ -2257,7 +2275,9 @@ class TestJobApplicationAdminForm:
         job_application.sender_company = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["SIAE émettrice manquante."] == form.errors["__all__"]
+        assert ["SIAE émettrice manquante.", "Données incohérentes pour une candidature employeur"] == form.errors[
+            "__all__"
+        ]
         job_application.sender_company = sender_company
 
         job_application.sender = JobSeekerFactory()
@@ -2279,7 +2299,10 @@ class TestJobApplicationAdminForm:
         )
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Organisation du prescripteur émettrice inattendue."] == form.errors["__all__"]
+        assert [
+            "Organisation du prescripteur émettrice inattendue.",
+            "Données incohérentes pour une candidature employeur",
+        ] == form.errors["__all__"]
         job_application.sender_prescriber_organization = None
 
         form = JobApplicationAdminForm(model_to_dict(job_application))
@@ -2313,7 +2336,9 @@ class TestJobApplicationAdminForm:
         job_application.sender_company = JobApplicationSentByCompanyFactory().sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
+        assert ["SIAE émettrice inattendue.", "Données incohérentes pour une candidature prescripteur"] == form.errors[
+            "__all__"
+        ]
         job_application.sender_company = None
 
         form = JobApplicationAdminForm(model_to_dict(job_application))

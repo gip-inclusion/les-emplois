@@ -15,7 +15,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
@@ -128,12 +127,10 @@ def test_candidatures_geiq_nominal(snapshot):
 
     JobApplicationFactory(
         pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9505"),
-        sent_by_authorized_prescriber_organisation=True,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
         was_hired=True,
         to_company__romes=["N1101"],
         job_seeker=job_seeker,
-        sender_kind=UserKind.EMPLOYER,
         to_company__siret="11832575966666",  # same SIREN, different SIRET
         to_company__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=28,

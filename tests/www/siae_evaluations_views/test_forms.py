@@ -42,7 +42,7 @@ class TestAdministrativeCriteriaEvaluationForm:
         job_application = JobApplicationFactory(
             with_approval=True,
             to_company=company,
-            sender_company=company,
+            sent_by_company=True,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.localdate() - relativedelta(months=2),
         )
