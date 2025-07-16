@@ -5,7 +5,7 @@ import operator
 import threading
 from typing import Any
 
-from django.db import connection, models
+from django.db import connection, models, transaction
 from pgtrigger import Condition, core
 
 
@@ -15,6 +15,8 @@ _context = threading.local()
 def _set_context_connection_wrapper(execute, *args, **kwargs):
     context_is_outdated = getattr(_context, "last_data_set", None) != _context.data
     if context_is_outdated:
+        if not transaction.get_connection().in_atomic_block:
+            raise RuntimeError("Can't set the trigger context outside of a transaction")
         # Ideally we should set the last data *after* the completion of the query, but
         # doing it here prevent the connection wrapper to be called recursively without exit
         # condition or any other kind of synchronization because of the `set_config()` query.
