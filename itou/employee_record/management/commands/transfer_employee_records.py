@@ -139,7 +139,7 @@ class Command(EmployeeRecordTransferCommand):
     @monitor(
         monitor_slug="transfer-employee-records-download",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "25 8-18/2 * * 1-5"},
+            "schedule": {"type": "crontab", "value": "25 8-18/2 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
@@ -154,7 +154,7 @@ class Command(EmployeeRecordTransferCommand):
     @monitor(
         monitor_slug="transfer-employee-records-upload",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "55 8-18/2 * * 1-5"},
+            "schedule": {"type": "crontab", "value": "55 8-18/2 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
