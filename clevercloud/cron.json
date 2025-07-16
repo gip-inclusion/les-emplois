@@ -33,6 +33,7 @@
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
   "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
+  "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_professionals --wet-run",
   "0 9-12 * * 1 $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * 1 CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * 1 $ROOT/clevercloud/run_management_command.sh delete_unused_files",
