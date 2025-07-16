@@ -753,6 +753,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 violation_error_message="Le candidat doit être l'émetteur de la candidature",
                 condition=(~models.Q(sender_kind="job_seeker") | models.Q(job_seeker=F("sender"))),
             ),
+            models.CheckConstraint(
+                name="employer_sender_coherence",
+                violation_error_message="Données incohérentes pour une candidature employeur",
+                condition=(
+                    ~models.Q(sender_kind="employer")
+                    | models.Q(
+                        sender_kind="employer", sender_company__isnull=False, sender_prescriber_organization=None
+                    )
+                ),
+            ),
+            models.CheckConstraint(
+                name="prescriber_sender_coherence",
+                violation_error_message="Données incohérentes pour une candidature prescripteur",
+                condition=(
+                    ~models.Q(sender_kind="prescriber") | models.Q(sender_kind="prescriber", sender_company=None)
+                ),
+            ),
         ]
         permissions = [
             ("export_job_applications_unknown_to_ft", "Can export job applications of job seekers unknown to FT")
