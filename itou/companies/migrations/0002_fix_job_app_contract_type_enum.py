@@ -11,7 +11,6 @@ def _fix_contract_type_enum(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("companies", "0001_initial"),
-        ("job_applications", "0001_initial"),
     ]
 
     operations = [
