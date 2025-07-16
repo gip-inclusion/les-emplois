@@ -68,6 +68,8 @@ def fill_organization_from_api_data(obj, siret, data):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     help = "Synchronize 'agences' informations from the FT API."
 
     def add_arguments(self, parser):
@@ -139,7 +141,6 @@ class Command(BaseCommand):
                 if wet_run:
                     item.db_obj.save()
 
-    @transaction.atomic
     def handle(self, *, action, wet_run=False, **options):
         data = pole_emploi_partenaire_api_client().agences()
         match action:

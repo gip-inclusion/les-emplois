@@ -1,5 +1,3 @@
-from django.db import transaction
-
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -7,13 +5,14 @@ from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
         parser.add_argument("siae_id", type=int)
         parser.add_argument("--wet-run", action="store_true")
 
-    @transaction.atomic()
     def handle(self, *, siae_id, wet_run, **options):
         siae = Company.objects.select_related("convention").get(pk=siae_id)
         self.stdout.write(

@@ -1,16 +1,15 @@
-from django.db import transaction
-
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
         parser.add_argument("--wet-run", action="store_true")
 
-    @transaction.atomic()
     def handle(self, *, wet_run, **options):
         self.logger.info("Start archiving employee records")
 

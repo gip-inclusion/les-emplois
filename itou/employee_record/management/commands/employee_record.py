@@ -28,6 +28,8 @@ class Command(BaseCommand):
             n'est pas gênant.
     """
 
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser: argparse.ArgumentParser):
         super().add_arguments(parser)
         subparsers = parser.add_subparsers(dest="command", required=True)
@@ -73,7 +75,6 @@ class Command(BaseCommand):
         else:
             transaction.savepoint_rollback(sid)
 
-    @transaction.atomic()
     def handle(self, *, command, **options):
         match command:
             case "create":
