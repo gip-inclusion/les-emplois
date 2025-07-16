@@ -251,6 +251,113 @@ class TestNotifyInactiveJobseekersManagementCommand:
             assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
             assert not mailoutbox
 
+    def test_notify_inactive_jobseekers_on_approval_expiration_date(self):
+        inactivity_threshold = timezone.localdate() - INACTIVITY_PERIOD
+        long_time_ago = timezone.now() - relativedelta(years=3)
+        approval_kwargs = {
+            "user__joined_days_ago": DAYS_OF_INACTIVITY,
+            "eligibility_diagnosis__updated_at": long_time_ago,
+            "eligibility_diagnosis__expires_at": long_time_ago.date(),
+            "start_at": long_time_ago.date(),
+            "updated_at": long_time_ago,
+        }
+
+        approval_ended_before_inactivity_threshold = ApprovalFactory(
+            end_at=inactivity_threshold,
+            **approval_kwargs,
+        )
+
+        approval_ended_after_inactivity_threshold = ApprovalFactory(
+            end_at=inactivity_threshold + relativedelta(days=1),
+            **approval_kwargs,
+        )
+
+        job_seeker_with_multiple_approvals = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        for end_at in [inactivity_threshold, timezone.localdate()]:
+            ApprovalFactory(
+                user=job_seeker_with_multiple_approvals,
+                end_at=end_at,
+                **approval_kwargs,
+            )
+
+        call_command("notify_inactive_jobseekers", wet_run=True)
+
+        assertQuerySetEqual(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=True),
+            [approval_ended_after_inactivity_threshold.user, job_seeker_with_multiple_approvals],
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=False),
+            [approval_ended_before_inactivity_threshold.user],
+        )
+
+    def test_notify_inactive_jobseekers_on_eligibility_diagnosis_expiration_date(self):
+        inactivity_threshold = timezone.localdate() - INACTIVITY_PERIOD
+        long_time_ago = timezone.now() - relativedelta(years=3)
+        eligibility_kwargs = {
+            "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
+            "from_prescriber": True,
+            "updated_at": long_time_ago,
+        }
+
+        iae_eligibility_diagnosis_expired_before_inactivity_threshold = IAEEligibilityDiagnosisFactory(
+            expires_at=inactivity_threshold,
+            **eligibility_kwargs,
+        )
+        geiq_eligibility_diagnosis_expired_before_inactivity_threshold = GEIQEligibilityDiagnosisFactory(
+            expires_at=inactivity_threshold,
+            **eligibility_kwargs,
+        )
+
+        # Eligibility diagnosis expired after expiration date
+        iae_eligibility_diagnosis_expired_after_inactivity_threshold = IAEEligibilityDiagnosisFactory(
+            expires_at=inactivity_threshold + relativedelta(days=1),
+            **eligibility_kwargs,
+        )
+        geiq_eligibility_diagnosis_expired_after_inactivity_threshold = GEIQEligibilityDiagnosisFactory(
+            expires_at=inactivity_threshold + relativedelta(days=1),
+            **eligibility_kwargs,
+        )
+
+        # Multiple eligibility diag for the same job seeker, one expired before expiration date, one recently expired
+        job_seeker_with_multiple_iae_eligibility_diag = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        for expires_at in [inactivity_threshold, timezone.localdate()]:
+            IAEEligibilityDiagnosisFactory(
+                job_seeker=job_seeker_with_multiple_iae_eligibility_diag,
+                expires_at=expires_at,
+                **eligibility_kwargs,
+            )
+        job_seeker_with_multiple_geiq_eligibility_diag = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        for expires_at in [inactivity_threshold, timezone.localdate()]:
+            GEIQEligibilityDiagnosisFactory(
+                job_seeker=job_seeker_with_multiple_geiq_eligibility_diag,
+                expires_at=expires_at,
+                **eligibility_kwargs,
+            )
+
+        call_command("notify_inactive_jobseekers", wet_run=True)
+
+        assertQuerySetEqual(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=True),
+            [
+                iae_eligibility_diagnosis_expired_after_inactivity_threshold.job_seeker,
+                geiq_eligibility_diagnosis_expired_after_inactivity_threshold.job_seeker,
+                job_seeker_with_multiple_iae_eligibility_diag,
+                job_seeker_with_multiple_geiq_eligibility_diag,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=False),
+            [
+                iae_eligibility_diagnosis_expired_before_inactivity_threshold.job_seeker,
+                geiq_eligibility_diagnosis_expired_before_inactivity_threshold.job_seeker,
+            ],
+            ordered=False,
+        )
+
 
 class TestAnonymizeJobseekersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])

@@ -14,12 +14,12 @@ BATCH_SIZE = 200
 
 
 def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
-    approval = Approval.objects.filter(user_id=OuterRef("pk"))
-    eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"),
+    recent_approval = Approval.objects.filter(user_id=OuterRef("pk"), end_at__gt=inactive_since)
+    recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
+        job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
     )
-    geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"),
+    recent_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
+        job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
     )
 
     return (
@@ -28,9 +28,9 @@ def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
             upcoming_deletion_notified_at__isnull=True,
         )
         .filter(
-            ~Exists(approval),
-            ~Exists(eligibility_diagnosis),
-            ~Exists(geiq_eligibility_diagnosis),
+            ~Exists(recent_approval),
+            ~Exists(recent_eligibility_diagnosis),
+            ~Exists(recent_geiq_eligibility_diagnosis),
         )
         .job_seekers_with_last_activity()
         .filter(last_activity__lt=inactive_since)[:batch_size]
