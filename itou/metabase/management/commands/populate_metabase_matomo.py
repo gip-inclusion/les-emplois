@@ -190,7 +190,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="populate-metabase-matomo",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 2 * * 1"},
+            "schedule": {"type": "crontab", "value": "0 2 * * MON"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 1,

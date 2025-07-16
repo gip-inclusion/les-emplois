@@ -220,7 +220,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="import-ea-eatt",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 12 * * 1-5"},
+            "schedule": {"type": "crontab", "value": "0 12 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 1,
