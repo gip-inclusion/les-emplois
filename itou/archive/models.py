@@ -115,12 +115,12 @@ class AnonymizedApplication(models.Model):
     origin = models.CharField(verbose_name="origine de la candidature")
     state = models.CharField(verbose_name="état de la candidature")
     refusal_reason = models.CharField(verbose_name="raison du refus", blank=True, null=True)
-    has_been_transferred = models.BooleanField(verbose_name="a été transférée", default=False)
+    had_been_transferred = models.BooleanField(verbose_name="avait été transférée", default=False)
     number_of_jobs_applied_for = models.PositiveIntegerField(
         verbose_name="nombre d'offres d'emploi pour lesquelles le candidat a postulé", default=0
     )
-    has_diagoriente_invitation = models.BooleanField(
-        verbose_name="a reçu une invitation à un diagnostic d'orientation", default=False
+    had_diagoriente_invitation = models.BooleanField(
+        verbose_name="avait reçu une invitation à un diagnostic d'orientation", default=False
     )
 
     # hiring
