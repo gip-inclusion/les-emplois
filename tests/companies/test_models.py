@@ -385,7 +385,8 @@ class TestCompanyQuerySet:
         JobApplicationFactory(to_company=company)
         JobApplicationFactory(to_company=company)
 
-        expected_score = company.job_applications_received.count() / company.job_description_through.count()
+        assert company.spontaneous_applications_open_since is not None
+        expected_score = company.job_applications_received.count() / (1 + company.job_description_through.count())
         result = Company.objects.with_computed_job_app_score().get(pk=company.pk)
 
         active_job_descriptions = (
@@ -397,9 +398,12 @@ class TestCompanyQuerySet:
         )
         assert recent_job_apps == 2
         assert expected_score == result.computed_job_app_score
+        assert result.computed_job_app_score == 2 / 5
 
-    def test_with_computed_job_app_score_no_job_description(self):
-        company = CompanyFactory()
+    def test_with_computed_job_app_score_no_job_opening(self):
+        # No job opening means closed spontaneous applications and no active job description.
+        # See `with_computed_job_app_score`.
+        company = CompanyFactory(spontaneous_applications_open_since=None)
         JobApplicationFactory(to_company=company)
         JobApplicationFactory(to_company=company)
 

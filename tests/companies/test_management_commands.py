@@ -138,9 +138,9 @@ def test_update_companies_job_app_score(caplog):
     assert company_1.job_app_score is not None
     assert company_1.job_app_score == company_1.job_applications_received.count()
     assert company_2.job_app_score is not None
-    assert (
-        company_2.job_app_score
-        == company_2.job_applications_received.count() / company_2.job_description_through.count()
+    assert company_2.spontaneous_applications_open_since is not None
+    assert company_2.job_app_score == company_2.job_applications_received.count() / (
+        company_2.job_description_through.count() + 1
     )
 
     # Deleting job descriptions should bring score back to job_applications_received.count().
