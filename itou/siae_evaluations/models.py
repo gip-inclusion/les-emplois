@@ -271,8 +271,9 @@ class EvaluationCampaign(models.Model):
                 for pk in self.eligible_siaes_under_ratio()
             )
 
-            evaluated_siaes_to_notify = []
+            evaluated_siaes_pks = []
             for evaluated_siae in evaluated_siaes:
+                evaluated_siaes_pks.append(evaluated_siae.pk)
                 for job_application in select_min_max_job_applications(
                     self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
                 ).prefetch_related(
@@ -305,6 +306,12 @@ class EvaluationCampaign(models.Model):
                             f"{selected_criterion.administrative_criteria.level}."
                         )
                     EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
+
+            evaluated_siaes_to_notify = []
+            evaluated_siaes = EvaluatedSiae.objects.filter(pk__in=evaluated_siaes_pks).prefetch_related(
+                "evaluated_job_applications__evaluated_administrative_criteria"
+            )
+            for evaluated_siae in evaluated_siaes:
                 if evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                     evaluated_siae.reviewed_at = set_at
                     evaluated_siae.final_reviewed_at = set_at
