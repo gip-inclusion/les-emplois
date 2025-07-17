@@ -5,6 +5,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.common_apps.organizations.views import BaseMemberList
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.companies.factories import (
     CompanyFactory,
@@ -52,6 +53,20 @@ class TestMembers:
         url = reverse("companies_views:members")
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_members_pagination(self, client, monkeypatch):
+        monkeypatch.setattr(BaseMemberList, "paginate_by", 1)
+        company = CompanyFactory()
+        CompanyMembershipFactory(company=company)
+        user = company.members.first()
+        client.force_login(user)
+        url = reverse("companies_views:members")
+        response = client.get(url)
+        assertNotContains(response, url + "?page=1")
+
+        CompanyMembershipFactory(company=company)
+        response = client.get(url)
+        assertContains(response, url + "?page=1")
 
     def test_active_members(self, client):
         company = CompanyFactory()
