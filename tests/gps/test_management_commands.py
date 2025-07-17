@@ -430,14 +430,13 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
         jobseeker_profile__nir="",
     )
     job_seeker_2 = JobSeekerFactory(
-        post_code="30000",
+        post_code="40000",
         jobseeker_profile__birthdate=None,
         jobseeker_profile__nir="188073512757119",
         jobseeker_profile__pole_emploi_id="12345678900",
     )
 
     management.call_command("export_beneficiaries_for_advisor")
-
     path = os.path.join(settings.EXPORT_DIR, "gps_export_beneficiaires_2025-04-03_11:44.csv")
     with open(path) as file:
         data = [line for line in csv.reader(file, delimiter=";")]
@@ -465,5 +464,59 @@ def test_export_beneficiaries_for_advisor_command(tmp_path, settings):
             "188073512757119",
             "12345678900",
             "",
+        ],
+    ]
+
+    management.call_command("export_beneficiaries_for_advisor", "30", "40")
+    path = os.path.join(settings.EXPORT_DIR, "gps_export_beneficiaires_2025-04-03_11:44.csv")
+    with open(path) as file:
+        data = [line for line in csv.reader(file, delimiter=";")]
+    assert data == [
+        [
+            "ID",
+            "prénom",
+            "nom",
+            "nir",
+            "identifiant_ft",
+            "date_de_naissance",
+        ],
+        [
+            str(job_seeker_1.pk),
+            job_seeker_1.first_name,
+            job_seeker_1.last_name.upper(),
+            "",
+            "",
+            "31/12/2000",
+        ],
+        [
+            str(job_seeker_2.pk),
+            job_seeker_2.first_name,
+            job_seeker_2.last_name.upper(),
+            "188073512757119",
+            "12345678900",
+            "",
+        ],
+    ]
+
+    management.call_command("export_beneficiaries_for_advisor", "30")
+    path = os.path.join(settings.EXPORT_DIR, "gps_export_beneficiaires_2025-04-03_11:44.csv")
+    with open(path) as file:
+        data = [line for line in csv.reader(file, delimiter=";")]
+    assert data == [
+        [
+            "ID",
+            "prénom",
+            "nom",
+            "nir",
+            "identifiant_ft",
+            "date_de_naissance",
+        ],
+        [
+            str(job_seeker_1.pk),
+            job_seeker_1.first_name,
+            job_seeker_1.last_name.upper(),
+            "",
+            "",
+            "31/12/2000",
         ],
     ]
