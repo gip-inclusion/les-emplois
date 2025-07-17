@@ -283,7 +283,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         return HttpResponseForbidden()
     form = EditUserEmailForm(request.user, data=request.POST or None)
     if request.method == "POST" and form.is_valid():
-        address = EmailAddress.objects.create(user=request.user, email=form.cleaned_data["email"])
+        address, _ = EmailAddress.objects.get_or_create(user=request.user, email=form.cleaned_data["email"])
         # Do no update the user email : django allauth will do it when confirming the email.
         send_verification_email_to_address(request, address=address)
         return HttpResponseRedirect(reverse("dashboard:index"))

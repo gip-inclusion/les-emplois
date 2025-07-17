@@ -1,4 +1,5 @@
 from allauth.account.fields import PasswordField
+from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -150,7 +151,7 @@ class EditUserEmailForm(forms.Form):
         email = self.cleaned_data["email"]
         if email == self.user.email:
             raise ValidationError("Veuillez indiquer une adresse différente de l'actuelle.")
-        if User.objects.filter(email=email):
+        if EmailAddress.objects.filter(email=email).exclude(user=self.user).exists():
             raise ValidationError("Cette adresse est déjà utilisée par un autre utilisateur.")
         return email
 
