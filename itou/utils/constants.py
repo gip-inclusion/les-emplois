@@ -27,5 +27,7 @@ SUPPORTED_IMAGE_FILE_TYPES = {"image/png": "png", "image/jpeg": "jpeg", "image/j
 # ------------------------------------------------------------------------------
 DAYS_OF_GRACE = 30
 GRACE_PERIOD = datetime.timedelta(days=DAYS_OF_GRACE)
-DAYS_OF_INACTIVITY = 365 * 2 - DAYS_OF_GRACE
-INACTIVITY_PERIOD = datetime.timedelta(DAYS_OF_INACTIVITY)
+EXPIRATION_DAYS = 365 * 2
+EXPIRATION_PERIOD = datetime.timedelta(days=EXPIRATION_DAYS)
+DAYS_OF_INACTIVITY = EXPIRATION_DAYS - DAYS_OF_GRACE
+INACTIVITY_PERIOD = datetime.timedelta(days=DAYS_OF_INACTIVITY)
