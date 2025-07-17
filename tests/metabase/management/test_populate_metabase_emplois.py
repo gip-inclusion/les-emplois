@@ -514,6 +514,7 @@ def test_populate_job_applications():
             (
                 ja.pk,
                 0,  # archived_at
+                False,  # auto rerused
                 ja.created_at.date(),
                 ja.hiring_start_at,
                 ja.processed_at.date(),

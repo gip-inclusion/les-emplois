@@ -1,4 +1,4 @@
-from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
+from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -123,6 +123,12 @@ TABLE.add_columns(
             "type": "boolean",
             "comment": "Candidature archivée coté employeur",
             "fn": lambda o: bool(o.archived_at),
+        },
+        {
+            "name": "candidature_refusée_automatiquement",
+            "type": "boolean",
+            "comment": "Candidature automatiquement refusée car en attente depuis plus de 2 mois",
+            "fn": lambda o: bool(o.refusal_reason == RefusalReason.AUTO),
         },
         {
             "name": "date_candidature",
