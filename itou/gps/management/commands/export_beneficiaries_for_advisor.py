@@ -31,17 +31,19 @@ class Command(BaseCommand, XlsxExportMixin):
             job_seekers = job_seekers.filter(department__in=departments)
 
         headers = [
-            "ID",
-            "prénom",
-            "nom",
-            "nir",
-            "identifiant_ft",
-            "date_de_naissance",
+            "ID - emplois",
+            "ID - FT",
+            "Prénom",
+            "Nom",
+            "NIR",
+            "Identifiant FT",
+            "Date de naissance",
         ]
 
         def serialize_job_seeker(job_seeker):
             return [
                 str(job_seeker.pk),
+                job_seeker.jobseeker_profile.ft_gps_id or "",
                 job_seeker.first_name.capitalize(),
                 job_seeker.last_name.upper(),
                 job_seeker.jobseeker_profile.nir,
