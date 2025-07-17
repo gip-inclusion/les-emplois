@@ -66,8 +66,13 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
-from tests.utils.test_s3 import default_storage_ls_files
+from tests.utils.test import (
+    assertSnapshotQueries,
+    default_storage_ls_files,
+    get_session_name,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
