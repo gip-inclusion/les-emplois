@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -11,11 +13,36 @@ from tests.companies.factories import (
     EmployerFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import parse_response_to_soup, pretty_indented
 
 
 class TestMembers:
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
+
+    @pytest.mark.parametrize(
+        "factory,access",
+        [
+            [JobSeekerFactory, False],
+            [partial(EmployerFactory, with_company=True), True],
+            [partial(PrescriberFactory, membership=True), False],
+            [partial(LaborInspectorFactory, membership=True), False],
+        ],
+        ids=[
+            "job_seeker",
+            "employer",
+            "prescriber",
+            "labor_inspector",
+        ],
+    )
+    def test_permission(self, client, factory, access):
+        user = factory()
+        client.force_login(user)
+        response = client.get(reverse("companies_views:members"))
+        if access:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 404
 
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot):
