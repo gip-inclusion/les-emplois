@@ -73,7 +73,7 @@ class TestSendPrescriberWithOrgInvitation:
     @freeze_time("2025-04-10")
     def test_invite_not_existing_user(self, client, mailoutbox):
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
         assertMessages(
             response,
             [
@@ -123,7 +123,7 @@ class TestSendPrescriberWithOrgInvitation:
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
         self.assert_created_invitation()
 
     def test_invite_former_member(self, client):
@@ -137,7 +137,7 @@ class TestSendPrescriberWithOrgInvitation:
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
         self.assert_created_invitation()
 
         # Deactivate user
@@ -148,7 +148,7 @@ class TestSendPrescriberWithOrgInvitation:
         assert guest not in self.organization.active_members
         # Invite user (the revenge)
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
         assert PrescriberWithOrgInvitation.objects.filter(organization=self.organization).count() == 2
 
     def test_two_prescribers_invite_the_same_guest(self, client):
@@ -238,7 +238,7 @@ class TestPEOrganizationInvitation:
         }
         client.force_login(sender)
         response = client.post(INVITATION_URL, data=post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("prescribers_views:members"))
 
     def test_unsuccessful(self, client):
         organization = PrescriberPoleEmploiFactory()

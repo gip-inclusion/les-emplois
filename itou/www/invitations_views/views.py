@@ -127,7 +127,9 @@ def _toast_invitation_sent(invitations):
 
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
+    form_post_url = reverse("invitations_views:invite_prescriber_with_org")
     form_kwargs = {"sender": request.user, "organization": organization}
+    back_url = reverse("prescribers_views:members")
 
     # Initial data can be passed by GET params to ease invitation of new members
     request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=request.GET)
@@ -160,10 +162,8 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
                 _toast_invitation_sent(invitations),
                 extra_tags="toast",
             )
-            return redirect(request.path)
+            return redirect(back_url)
 
-    form_post_url = reverse("invitations_views:invite_prescriber_with_org")
-    back_url = reverse("prescribers_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": organization}
 
     return render(request, template_name, context)
@@ -178,10 +178,11 @@ def join_prescriber_organization(request, invitation_id):
 
 
 def invite_employer(request, template_name="invitations_views/create.html"):
-    form_post_url = reverse("invitations_views:invite_employer")
-    back_url = reverse("companies_views:members")
     company = get_current_company_or_404(request)
+    form_post_url = reverse("invitations_views:invite_employer")
     form_kwargs = {"sender": request.user, "company": company}
+    back_url = reverse("companies_views:members")
+
     formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -213,7 +214,10 @@ def join_company(request, invitation_id):
 
 def invite_labor_inspector(request, template_name="invitations_views/create.html"):
     institution = get_current_institution_or_404(request)
+    form_post_url = reverse("invitations_views:invite_labor_inspector")
     form_kwargs = {"sender": request.user, "institution": institution}
+    back_url = reverse("institutions_views:members")
+
     formset = LaborInspectorInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -228,10 +232,8 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
                 _toast_invitation_sent(invitations),
                 extra_tags="toast",
             )
-            return redirect(request.path)
+            return redirect(back_url)
 
-    form_post_url = reverse("invitations_views:invite_labor_inspector")
-    back_url = reverse("institutions_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": institution}
 
     return render(request, template_name, context)
