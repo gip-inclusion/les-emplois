@@ -68,6 +68,7 @@
             </tbody>
         </table>
     </div>
+    {% include "includes/pagination.html" with page=page_obj %}
 {% else %}
     <p>Aucun collaborateur pour cette structure.</p>
 {% endif %}

@@ -9,11 +9,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 
+from itou.utils.pagination import ItouPaginator
+
 
 class BaseMemberList(ListView):
+    paginate_by = 50  # Most organizations will have only one page
+    paginator_class = ItouPaginator
+
     def get_queryset(self):
         memberships = getattr(self.organization, self.membership_related_name)
-        return memberships.active().select_related("user").all().order_by("joined_at")
+        return memberships.active().select_related("user").all().order_by("user__first_name", "user__last_name", "pk")
 
     def get_invitation_url(self):
         raise NotImplementedError

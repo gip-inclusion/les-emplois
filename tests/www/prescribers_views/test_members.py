@@ -5,6 +5,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.common_apps.organizations.views import BaseMemberList
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -54,6 +55,20 @@ class TestMembers:
         url = reverse("prescribers_views:members")
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_members_pagination(self, client, monkeypatch):
+        monkeypatch.setattr(BaseMemberList, "paginate_by", 1)
+        organization = PrescriberOrganizationFactory()
+        PrescriberMembershipFactory(organization=organization)
+        user = organization.members.first()
+        client.force_login(user)
+        url = reverse("prescribers_views:members")
+        response = client.get(url)
+        assertNotContains(response, url + "?page=1")
+
+        PrescriberMembershipFactory(organization=organization)
+        response = client.get(url)
+        assertContains(response, url + "?page=1")
 
     def test_active_members(self, client):
         organization = PrescriberOrganizationFactory()
