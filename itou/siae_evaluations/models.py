@@ -299,6 +299,14 @@ class EvaluationCampaign(models.Model):
                                 criteria_certified=True,
                             )
                         )
+                        # TODO: For the 2026 campaign on auto-prescriptions
+                        # hires in 2025, this should be updated to handle
+                        # LEVEL_2.
+                        # Generating an accepted administrative criteria with
+                        # level 2 will significantly break all views in this
+                        # module. Many parts of it rely on the criteria state
+                        # to decide what actions to offer, and the state of the
+                        # evaluated job application.
                         assert (
                             selected_criterion.administrative_criteria.level == AdministrativeCriteriaLevel.LEVEL_1
                         ), (
