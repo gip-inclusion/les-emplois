@@ -8,9 +8,9 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Q, Subquery, Value, When
 from django.db.models.constraints import UniqueConstraint
-from django.db.models.functions import Cast, Coalesce
+from django.db.models.functions import Cast, Coalesce, Greatest
 from django.urls import reverse
 from django.utils import timezone
 
@@ -136,38 +136,71 @@ class CompanyQuerySet(OrganizationQuerySet):
         )
         return self.annotate(count_active_job_descriptions=Coalesce(sub_query, 0))
 
+    def with_is_hiring(self):
+        """
+        A company is considered hiring if it is not blocking job applications and has at least
+        one active job description or accepts spontaneous job applications.
+        """
+        return self.with_count_active_job_descriptions().annotate(
+            is_hiring=Case(
+                When(
+                    Q(block_job_applications=False)
+                    & (Q(count_active_job_descriptions__gt=0) | Q(spontaneous_applications_open_since__isnull=False)),
+                    then=True,
+                ),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
     def with_computed_job_app_score(self):
         """
-        Employers search results boost SIAE which did not receive enough job applications
-        compared to their total job descriptions.
-        To do so, the following score is computed:
-        ** (total of recent job applications) / (total of active job descriptions) **
+        Employer search results continuously boost companies which did not receive enough recent job applications
+        per job opening. In other words, we show on the first page the companies which have not received
+        yet their fair share of recent job applications relative to others.
+
+        What we call "jop opening" here is any active job description (0-n) and any spontaneous
+        application opening (0-1). We strive to send approximately the same amount of applications per job
+        opening. This means we strive to send 10 times more applications to a company with 10 job openings
+        than to another company with just 1 job opening.
+
+        Any hiring company will always by definition have at least 1 job opening (see `with_is_hiring`).
+        Non hiring companies are still shown in later pages of the search results though, some of those
+        have 0 job openings due to having no active job description and having closed spontaneous applications.
+        To sort those companies by received applications anyway and avoid a division by zero error, we will
+        arbitrarily consider that they have 1 job opening instead of 0.
+
+        The following score is used:
+        ** (total of recent job applications) / (total of job openings) **
         """
         # Transform integer into a float to avoid any weird side effect.
-        # See self.with_count_recent_received_job_apps()
+        # See self.with_count_recent_received_job_apps
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=models.FloatField())
-
-        # Check if a job description exists before computing the score.
-        has_active_job_desc = Exists(JobDescription.objects.filter(company=OuterRef("pk"), is_active=True))
 
         # Transform integer into a float to avoid any weird side effect.
         # See self.with_count_active_job_descriptions
         count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=models.FloatField())
 
-        # Score computing.
-        get_score = Cast(
-            count_recent_received_job_apps / count_active_job_descriptions, output_field=models.FloatField()
+        # Transform integer into a float to avoid any weird side effect.
+        # This is either 0 (closed) or 1 (open).
+        count_spontaneous_applications_open = Case(
+            When(spontaneous_applications_open_since__isnull=False, then=Value(1.0)),
+            default=Value(0.0),
+            output_field=models.FloatField(),
         )
+
+        count_job_openings = Cast(
+            count_active_job_descriptions + count_spontaneous_applications_open, output_field=models.FloatField()
+        )
+
+        count_job_openings = Greatest(count_job_openings, Value(1.0))
+
+        get_score = Cast(count_recent_received_job_apps / count_job_openings, output_field=models.FloatField())
 
         return (
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
-            .annotate(
-                computed_job_app_score=Case(
-                    When(has_active_job_desc, then=get_score),
-                    default=None,
-                )
-            )
+            .annotate(computed_job_app_score=get_score)
         )
 
     def with_has_active_members(self):
