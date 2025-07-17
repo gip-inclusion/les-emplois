@@ -1,3 +1,4 @@
+import sys
 from datetime import timedelta
 
 from django.conf import settings
@@ -251,6 +252,10 @@ class Company(AddressMixin, OrganizationAbstract):
     # These kinds of Companies can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.EITI, CompanyKind.ETTI]
 
+    # Large score by default to ensure any new company whose score has not yet been computed
+    # will temporarily be moved to the last page of search results.
+    MAX_DEFAULT_JOB_APP_SCORE = sys.float_info.max
+
     # Companies have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `Company.siret`. It changes rather frequently
     # e.g. each time a Company moves to a new location.
@@ -320,7 +325,8 @@ class Company(AddressMixin, OrganizationAbstract):
     )
 
     job_app_score = models.FloatField(
-        verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
+        verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)",
+        default=MAX_DEFAULT_JOB_APP_SCORE,
     )
     is_searchable = models.BooleanField(verbose_name="peut apparaître dans la recherche", default=True)
 
