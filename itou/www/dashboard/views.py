@@ -1,7 +1,8 @@
 import enum
 import uuid
 
-from allauth.account.utils import send_email_confirmation
+from allauth.account.internal.flows.email_verification import send_verification_email_to_address
+from allauth.account.models import EmailAddress
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
@@ -281,8 +282,9 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         return HttpResponseForbidden()
     form = EditUserEmailForm(request.user, data=request.POST or None)
     if request.method == "POST" and form.is_valid():
+        address = EmailAddress.objects.create(user=request.user, email=form.cleaned_data["email"])
         # Do no update the user email : django allauth will do it when confirming the email.
-        send_email_confirmation(request, request.user, email=form.cleaned_data["email"])
+        send_verification_email_to_address(request, address=address)
         return HttpResponseRedirect(reverse("dashboard:index"))
 
     return render(request, template_name, {"form": form})
