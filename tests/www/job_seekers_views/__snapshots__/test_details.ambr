@@ -1754,7 +1754,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("prescribers_prescribermembership"."organization_id" = %s
+                 AND "users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active")
         ''',
       }),
       dict({
@@ -4253,7 +4256,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("prescribers_prescribermembership"."organization_id" = %s
+                 AND "users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active")
         ''',
       }),
       dict({
