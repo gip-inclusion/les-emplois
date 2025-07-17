@@ -63,7 +63,7 @@ class TestSendInstitutionInvitation:
     @freeze_time("2025-04-10")
     def test_invite_not_existing_user(self, client, mailoutbox):
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("institutions_views:members"))
         assertMessages(
             response,
             [
@@ -89,7 +89,7 @@ class TestSendInstitutionInvitation:
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("institutions_views:members"))
         self.assert_created_invitation()
 
     def test_invite_multiple_users(self, client):
@@ -120,7 +120,7 @@ class TestSendInstitutionInvitation:
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("institutions_views:members"))
         self.assert_created_invitation()
 
         # Deactivate user
@@ -131,7 +131,7 @@ class TestSendInstitutionInvitation:
         assert guest not in self.institution.active_members
         # Invite user (the revenge)
         response = client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assertRedirects(response, INVITATION_URL)
+        assertRedirects(response, reverse("institutions_views:members"))
         assert LaborInspectorInvitation.objects.filter(institution=self.institution).count() == 2
 
     def test_two_institutions_invite_the_same_guest(self, client):
