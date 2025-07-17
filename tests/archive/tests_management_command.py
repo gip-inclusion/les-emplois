@@ -484,7 +484,7 @@ class TestAnonymizeJobseekersManagementCommand:
                     "last_login": timezone.make_aware(datetime.datetime(2021, 12, 14, 0, 0)),
                     "created_by": EmployerFactory,
                     "jobseeker_profile__pole_emploi_id": "45678123",
-                    "jobseeker_profile__nir": "655456789012345",
+                    "jobseeker_profile__nir": "255456789012345",
                     "jobseeker_profile__lack_of_nir_reason": "",
                     "jobseeker_profile__birthdate": datetime.date(1990, 12, 15),
                 },

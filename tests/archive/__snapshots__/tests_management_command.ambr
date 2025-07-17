@@ -1,9 +1,9 @@
 # serializer version: 1
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
-  <QuerySet [{'date_joined': datetime.date(2023, 10, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 7, 'nir_year': 41, 'birth_year': 1964, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0}]>
+  <QuerySet [{'date_joined': datetime.date(2023, 10, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': None, 'nir_year': 41, 'birth_year': 1964, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
-  <QuerySet [{'date_joined': datetime.date(2021, 12, 1), 'first_login': datetime.date(2021, 12, 1), 'last_login': datetime.date(2021, 12, 1), 'user_signup_kind': 'employer', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 6, 'nir_year': 55, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 0, 'count_total_applications': 2}]>
+  <QuerySet [{'date_joined': datetime.date(2021, 12, 1), 'first_login': datetime.date(2021, 12, 1), 'last_login': datetime.date(2021, 12, 1), 'user_signup_kind': 'employer', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 55, 'birth_year': 1990, 'count_accepted_applications': 1, 'count_IAE_applications': 0, 'count_total_applications': 2}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
   '''
@@ -22,7 +22,7 @@
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
-  <QuerySet [{'date_joined': datetime.date(2020, 4, 1), 'first_login': datetime.date(2020, 4, 1), 'last_login': datetime.date(2020, 4, 1), 'user_signup_kind': 'prescriber', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 8, 'nir_year': 55, 'birth_year': 1985, 'count_accepted_applications': 1, 'count_IAE_applications': 2, 'count_total_applications': 2}]>
+  <QuerySet [{'date_joined': datetime.date(2020, 4, 1), 'first_login': datetime.date(2020, 4, 1), 'last_login': datetime.date(2020, 4, 1), 'user_signup_kind': 'prescriber', 'department': '', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': True, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': None, 'nir_year': 55, 'birth_year': 1985, 'count_accepted_applications': 1, 'count_IAE_applications': 2, 'count_total_applications': 2}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
   '''

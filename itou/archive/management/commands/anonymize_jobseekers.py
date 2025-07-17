@@ -23,6 +23,8 @@ BATCH_SIZE = 100
 
 
 def anonymized_jobseeker(user):
+    profile = user.jobseeker_profile
+
     return AnonymizedJobSeeker(
         date_joined=get_year_month_or_none(user.date_joined),
         first_login=get_year_month_or_none(user.first_login),
@@ -31,12 +33,12 @@ def anonymized_jobseeker(user):
         department=user.department,
         title=user.title,
         identity_provider=user.identity_provider,
-        had_pole_emploi_id=bool(user.jobseeker_profile.pole_emploi_id),
-        had_nir=bool(user.jobseeker_profile.nir),
-        lack_of_nir_reason=user.jobseeker_profile.lack_of_nir_reason,
-        nir_sex=user.jobseeker_profile.nir[0] if user.jobseeker_profile.nir else None,
-        nir_year=user.jobseeker_profile.nir[1:3] if user.jobseeker_profile.nir else None,
-        birth_year=user.jobseeker_profile.birthdate.year if user.jobseeker_profile.birthdate else None,
+        had_pole_emploi_id=bool(profile.pole_emploi_id),
+        had_nir=bool(profile.nir),
+        lack_of_nir_reason=profile.lack_of_nir_reason,
+        nir_sex=profile.nir[0] if profile.nir and profile.nir[0] in ("1", "2") else None,
+        nir_year=profile.nir[1:3] if profile.nir else None,
+        birth_year=profile.birthdate.year if profile.birthdate else None,
         count_accepted_applications=user.count_accepted_applications,
         count_IAE_applications=user.count_IAE_applications,
         count_total_applications=user.count_total_applications,
