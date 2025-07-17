@@ -513,7 +513,7 @@ def test_populate_job_applications():
         assert rows == [
             (
                 ja.pk,
-                0,  # archived_at
+                False,  # archived_at
                 False,  # auto rerused
                 ja.created_at.date(),
                 ja.hiring_start_at,
@@ -539,7 +539,7 @@ def test_populate_job_applications():
                 None,
                 None,
                 None,
-                0,
+                False,
                 "",
                 ja.contract_type,
                 True,
