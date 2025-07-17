@@ -250,16 +250,12 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
     if not is_running_on_ci:
         return
 
-    from django.template import base, defaulttags, loader, loader_tags
+    from django.template import base, defaulttags, loader_tags
+    from django.template.backends.django import Template
 
-    original_render = loader.render_to_string
+    original_render = Template.render
 
-    def assertive_render(template_name, context=None, request=None, using=None):
-        if isinstance(template_name, list | tuple):
-            template = loader.select_template(template_name, using=using)
-        else:
-            template = loader.get_template(template_name, using=using)
-
+    def assertive_render(self, context=None, request=None):
         def _walk_template_nodes(nodelist, condition_fn):
             for node in nodelist:
                 if isinstance(node, loader_tags.ExtendsNode | defaulttags.IfNode):
@@ -275,17 +271,17 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
                 isinstance(node, base.VariableNode) and "block.super" not in str(node) and "CSP_NONCE" not in str(node)
             )
 
-        title_node = _walk_template_nodes(template.template.nodelist, is_title_node)
+        title_node = _walk_template_nodes(self.template.nodelist, is_title_node)
         if title_node:
             var_node = _walk_template_nodes(title_node.nodelist, is_variable_node)
             if var_node and "matomo_custom_title" not in context:
                 raise AssertionError(
-                    f"template={template_name} uses a variable title; "
-                    "please provide a `matomo_custom_title` in the context !"
+                    f"template={self.origin} uses a variable title; "
+                    "please provide a `matomo_custom_title` in the context!"
                 )
-        return original_render(template_name, context, request, using)
+        return original_render(self, context, request)
 
-    monkeypatch.setattr(loader, "render_to_string", assertive_render)
+    monkeypatch.setattr(Template, "render", assertive_render)
 
 
 def _fail_for_invalid_template_variable(var):
