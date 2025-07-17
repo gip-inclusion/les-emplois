@@ -43,7 +43,7 @@ class TestMembers:
         if access:
             assert response.status_code == 200
         else:
-            assert response.status_code == 404
+            assert response.status_code == 403
 
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot):

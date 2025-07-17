@@ -5,16 +5,14 @@ from django.urls import reverse, reverse_lazy
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.users.models import User
 from itou.utils.auth import check_user
-from itou.utils.perms.institution import get_current_institution_or_404
 
 
 class MemberList(BaseMemberList):
     template_name = "institutions/members.html"
     membership_related_name = "institutionmembership_set"
 
-    def setup(self, request, *args, **kwargs):
-        self.organization = get_current_institution_or_404(request)
-        return super().setup(request, *args, **kwargs)
+    def test_func(self):
+        return self.request.user.is_labor_inspector
 
     def get_invitation_url(self):
         return reverse("invitations_views:invite_labor_inspector")

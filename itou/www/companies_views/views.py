@@ -730,11 +730,14 @@ class MemberList(BaseMemberList):
     template_name = "companies/members.html"
     membership_related_name = "companymembership_set"
 
+    def test_func(self):
+        return self.request.user.is_employer
+
     def setup(self, request, *args, **kwargs):
-        self.organization = get_current_company_or_404(request)
-        if not self.organization.is_active:
+        super().setup(request, *args, **kwargs)
+        # test_func is called in super().dispatch so we can have a PrescriberOrganization or institution here...
+        if not getattr(self.organization, "is_active", True):
             raise PermissionDenied
-        return super().setup(request, *args, **kwargs)
 
     def get_invitation_url(self):
         return reverse("invitations_views:invite_employer")
