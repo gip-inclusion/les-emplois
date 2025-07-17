@@ -10,7 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import JobDescription
+from itou.companies.models import Company, JobDescription
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
@@ -125,8 +125,8 @@ def test_update_companies_job_app_score(caplog):
     company_1 = companies_factories.CompanyFactory()
     company_2 = JobApplicationFactory(to_company__with_jobs=True).to_company
 
-    assert company_1.job_app_score is None
-    assert company_2.job_app_score is None
+    assert company_1.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
+    assert company_2.job_app_score == Company.MAX_DEFAULT_JOB_APP_SCORE
 
     stdout = io.StringIO()
     management.call_command("update_companies_job_app_score")
@@ -135,9 +135,9 @@ def test_update_companies_job_app_score(caplog):
     company_1.refresh_from_db()
     company_2.refresh_from_db()
 
-    assert company_1.job_app_score is not None
+    assert company_1.job_app_score != Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_1.job_app_score == company_1.job_applications_received.count()
-    assert company_2.job_app_score is not None
+    assert company_2.job_app_score != Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_2.spontaneous_applications_open_since is not None
     assert company_2.job_app_score == company_2.job_applications_received.count() / (
         company_2.job_description_through.count() + 1
@@ -154,9 +154,9 @@ def test_update_companies_job_app_score(caplog):
     company_1.refresh_from_db()
     company_2.refresh_from_db()
 
-    assert company_1.job_app_score is not None
+    assert company_1.job_app_score != Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_1.job_app_score == company_1.job_applications_received.count()
-    assert company_2.job_app_score is not None
+    assert company_2.job_app_score != Company.MAX_DEFAULT_JOB_APP_SCORE
     assert company_2.job_app_score == company_2.job_applications_received.count()
 
 
