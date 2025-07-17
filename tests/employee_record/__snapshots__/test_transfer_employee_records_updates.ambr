@@ -270,6 +270,7 @@
                  "users_jobseekerprofile"."lack_of_nir_reason",
                  "users_jobseekerprofile"."pole_emploi_id",
                  "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
                  "users_jobseekerprofile"."asp_uid",
                  "users_jobseekerprofile"."education_level",
                  "users_jobseekerprofile"."resourceless",

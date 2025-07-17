@@ -972,6 +972,12 @@ class JobSeekerProfile(models.Model):
         choices=LackOfPoleEmploiId.choices,
         blank=True,
     )
+    # This is currently only used for GPS and comes from FT datalake (it might be a user pk)
+    ft_gps_id = models.TextField(
+        verbose_name="identifiant unique France Travail pour GPS",
+        blank=True,
+        null=True,
+    )
 
     asp_uid = models.TextField(
         verbose_name="ID unique envoyé à l'ASP",
