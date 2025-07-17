@@ -730,10 +730,10 @@ def prescriber_join_org(request):
 
     try:
         with transaction.atomic():
-            if session_data["kind"] in ["PE", "FT"]:  # FIXME(alaurent) remove PE in a week
-                # Organization creation is not allowed for PE.
+            if session_data["kind"] == "FT":
+                # Organization creation is not allowed for FT.
                 pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-                # We should not have errors here since we have a PE organization pk from the database.
+                # We should not have errors here since we have a FT organization pk from the database.
                 prescriber_org = PrescriberOrganization.objects.get(
                     pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.FT.value
                 )
