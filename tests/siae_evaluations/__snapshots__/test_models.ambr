@@ -174,7 +174,23 @@
       }),
       dict({
         'origin': list([
-          'EvaluationCampaign.<genexpr>[siae_evaluations/models.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "siae_evaluations_evaluatedsiae" ("evaluation_campaign_id",
+                                                        "siae_id",
+                                                        "reviewed_at",
+                                                        "final_reviewed_at",
+                                                        "submission_freezed_at",
+                                                        "notified_at",
+                                                        "notification_reason",
+                                                        "notification_text",
+                                                        "reminder_sent_at")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "siae_evaluations_evaluatedsiae"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
         'sql': '''
@@ -213,28 +229,11 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."is_searchable",
-                 "companies_company"."rdv_solidarites_id"
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
           FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND "companies_company"."id" = %s)
+          WHERE "companies_company"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EvaluationCampaign.populate[siae_evaluations/models.py]',
-        ]),
-        'sql': '''
-          INSERT INTO "siae_evaluations_evaluatedsiae" ("evaluation_campaign_id",
-                                                        "siae_id",
-                                                        "reviewed_at",
-                                                        "final_reviewed_at",
-                                                        "submission_freezed_at",
-                                                        "notified_at",
-                                                        "notification_reason",
-                                                        "notification_text",
-                                                        "reminder_sent_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "siae_evaluations_evaluatedsiae"."id"
         ''',
       }),
       dict({
