@@ -560,8 +560,7 @@ class TestModel:
         assert not user.can_edit_email(job_seeker)
 
         # Job seeker has verified his email.
-        job_seeker = JobSeekerFactory(created_by=user)
-        job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
+        job_seeker = JobSeekerFactory(created_by=user, with_verified_email=True)
         assert not user.can_edit_email(job_seeker)
 
     def test_is_account_creator(self):

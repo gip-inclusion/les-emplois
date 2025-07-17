@@ -16,17 +16,13 @@ from tests.users.factories import (
 class TestChangeEmailView:
     @freeze_time()  # the email confirmation token depends on the time
     def test_update_email(self, client, mailoutbox):
-        user = JobSeekerFactory(email="ancien@email.fr")
+        user = JobSeekerFactory(email="ancien@email.fr", with_verified_email=True)
         old_email = user.email
         new_email = "jean@gabin.fr"
 
         client.force_login(user)
         url = reverse("dashboard:edit_user_email")
         response = client.get(url)
-
-        email_address = EmailAddress(email=old_email, verified=True, primary=True)
-        email_address.user = user
-        email_address.save()
 
         post_data = {"email": new_email, "email_confirmation": new_email, "password": DEFAULT_PASSWORD}
         response = client.post(url, data=post_data)
