@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.contrib import messages
 from django.urls import reverse
@@ -14,58 +16,66 @@ from tests.users.factories import (
 
 
 class TestChangeEmailView:
-    @freeze_time()  # the email confirmation token depends on the time
     def test_update_email(self, client, mailoutbox):
-        user = JobSeekerFactory(email="ancien@email.fr", with_verified_email=True)
-        old_email = user.email
-        new_email = "jean@gabin.fr"
+        with freeze_time() as frozen_time:  # the email confirmation token depends on the time
+            user = JobSeekerFactory(email="ancien@email.fr", with_verified_email=True)
+            old_email = user.email
+            new_email = "jean@gabin.fr"
 
-        client.force_login(user)
-        url = reverse("dashboard:edit_user_email")
-        response = client.get(url)
+            client.force_login(user)
+            url = reverse("dashboard:edit_user_email")
+            response = client.get(url)
 
-        post_data = {"email": new_email, "email_confirmation": new_email, "password": DEFAULT_PASSWORD}
-        response = client.post(url, data=post_data)
-        assertRedirects(
-            response,
-            reverse("dashboard:index"),
-            # The user is then redirected to edit_user_info but we don't care about that
-            fetch_redirect_response=False,
-        )
-        assertMessages(
-            response,
-            [messages.Message(messages.INFO, "E-mail de confirmation envoyé à jean@gabin.fr")],
-        )
-        user.refresh_from_db()
-        assert user.email == old_email
-        assert sorted(EmailAddress.objects.values_list("email", "verified", "primary", "user")) == [
-            (old_email, True, True, user.pk),
-            (new_email, False, False, user.pk),
-        ]
+            post_data = {"email": new_email, "email_confirmation": new_email, "password": DEFAULT_PASSWORD}
+            response = client.post(url, data=post_data)
+            assertRedirects(
+                response,
+                reverse("dashboard:index"),
+                # The user is then redirected to edit_user_info but we don't care about that
+                fetch_redirect_response=False,
+            )
+            assertMessages(
+                response,
+                [messages.Message(messages.INFO, "E-mail de confirmation envoyé à jean@gabin.fr")],
+            )
+            user.refresh_from_db()
+            assert user.email == old_email
+            assert sorted(EmailAddress.objects.values_list("email", "verified", "primary", "user")) == [
+                (old_email, True, True, user.pk),
+                (new_email, False, False, user.pk),
+            ]
 
-        # User receives an email to confirm his new address.
-        email = mailoutbox[0]
-        assert "Confirmez votre adresse e-mail" in email.subject
-        assert "Nous avons bien enregistré votre demande de modification d'adresse e-mail." in email.body
-        assert "Afin de finaliser ce changement, cliquez sur le lien suivant" in email.body
-        assert email.to == [new_email]
-        confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.get(email=new_email)).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        assert confirm_email_url in email.body
+            # User receives an email to confirm his new address.
+            [first_email] = mailoutbox
+            assert "Confirmez votre adresse e-mail" in first_email.subject
+            assert "Nous avons bien enregistré votre demande de modification d'adresse e-mail." in first_email.body
+            assert "Afin de finaliser ce changement, cliquez sur le lien suivant" in first_email.body
+            assert first_email.to == [new_email]
+            confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.get(email=new_email)).key
+            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+            assert confirm_email_url in first_email.body
 
-        # Confirm email : email is changed
-        response = client.post(confirm_email_url)
-        assert response.status_code == 302
-        assert response.url == reverse("welcoming_tour:index")
-        response = client.get(response.url)
-        assert response.context.get("user").is_authenticated
+            frozen_time.move_to(frozen_time() + timedelta(minutes=3))  # bypass django-allauth rate limit
+            # Try again : we just send the email again
+            response = client.post(url, data=post_data)
+            [_, second_email] = mailoutbox
+            assert second_email.body != first_email.body  # the confirmation_token changed
+            assert second_email.subject == first_email.subject
+            assert second_email.to == [new_email]
 
-        user.refresh_from_db()
-        assert user.email == new_email
-        assert user.emailaddress_set.count() == 1
-        new_address = user.emailaddress_set.first()
-        assert new_address.email == new_email
-        assert new_address.verified
+            # Confirm email : email is changed
+            response = client.post(confirm_email_url)
+            assert response.status_code == 302
+            assert response.url == reverse("welcoming_tour:index")
+            response = client.get(response.url)
+            assert response.context.get("user").is_authenticated
+
+            user.refresh_from_db()
+            assert user.email == new_email
+            assert user.emailaddress_set.count() == 1
+            new_address = user.emailaddress_set.first()
+            assert new_address.email == new_email
+            assert new_address.verified
 
     def test_update_email_forbidden(self, client):
         url = reverse("dashboard:edit_user_email")
@@ -93,7 +103,7 @@ class TestEditUserEmailForm:
         assert not form.is_valid()
 
         # Email already taken by another user. Bad luck!
-        other_user = JobSeekerFactory()
+        other_user = JobSeekerFactory(with_verified_email=True)
         data = {"email": other_user.email, "email_confirmation": other_user.email, "password": DEFAULT_PASSWORD}
         form = EditUserEmailForm(user, data=data)
         assert not form.is_valid()
