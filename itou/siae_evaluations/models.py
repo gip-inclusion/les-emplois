@@ -9,7 +9,6 @@ from django.db.models import Count, Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.eligibility.utils import iae_has_required_criteria
@@ -267,15 +266,14 @@ class EvaluationCampaign(models.Model):
             self.save(update_fields=["percent_set_at", "evaluations_asked_at"])
 
             evaluated_siaes = EvaluatedSiae.objects.bulk_create(
-                EvaluatedSiae(evaluation_campaign=self, siae=Company.objects.get(pk=pk))
-                for pk in self.eligible_siaes_under_ratio()
+                EvaluatedSiae(evaluation_campaign=self, siae_id=pk) for pk in self.eligible_siaes_under_ratio()
             )
 
             evaluated_siaes_pks = []
             for evaluated_siae in evaluated_siaes:
                 evaluated_siaes_pks.append(evaluated_siae.pk)
                 for job_application in select_min_max_job_applications(
-                    self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
+                    self.eligible_job_applications().filter(to_company_id=evaluated_siae.siae_id)
                 ).prefetch_related(
                     Prefetch(
                         "eligibility_diagnosis__selected_administrative_criteria",
