@@ -1,4 +1,28 @@
 # serializer version: 1
+# name: TestAnonymizeCancelledApprovalsManagementCommand.test_anonymize_cancelled_approvals_content[anonymized_cancelled_approval]
+  list([
+    dict({
+      'birth_year': 1977,
+      'had_nir': True,
+      'had_pole_emploi_id': True,
+      'nir_sex': 2,
+      'nir_year': 77,
+      'origin_company_kind': 'EI',
+      'origin_prescriber_organization_kind': '',
+      'origin_sender_kind': 'employer',
+    }),
+    dict({
+      'birth_year': None,
+      'had_nir': False,
+      'had_pole_emploi_id': False,
+      'nir_sex': None,
+      'nir_year': None,
+      'origin_company_kind': 'EATT',
+      'origin_prescriber_organization_kind': 'CHRS',
+      'origin_sender_kind': 'prescriber',
+    }),
+  ])
+# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
   <QuerySet [{'date_joined': datetime.date(2023, 10, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '', 'title': 'M', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 7, 'nir_year': 41, 'birth_year': 1964, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
 # ---
