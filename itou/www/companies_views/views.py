@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.cache import caches
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count, Q
 from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -18,7 +17,7 @@ from django.views.generic.base import TemplateView
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
-from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
@@ -727,27 +726,21 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
 ### Company memberships views
 
 
-def members(request, template_name="companies/members.html"):
-    company = get_current_company_or_404(request)
-    if not company.is_active:
-        raise PermissionDenied
+class MemberList(BaseMemberList):
+    template_name = "companies/members.html"
+    membership_related_name = "companymembership_set"
+    context_object_name = "siae"
 
-    active_company_members = company.companymembership_set.active().select_related("user").all().order_by("joined_at")
-    active_company_members_stats = active_company_members.aggregate(
-        total_count=Count("pk"),
-        admin_count=Count("pk", filter=Q(is_admin=True)),
-    )
-    pending_invitations = company.invitations.pending()
+    def setup(self, request, *args, **kwargs):
+        self.organization = get_current_company_or_404(request)
+        if not self.organization.is_active:
+            raise PermissionDenied
+        return super().setup(request, *args, **kwargs)
 
-    context = {
-        "siae": company,
-        "members": active_company_members,
-        "members_stats": active_company_members_stats,
-        "pending_invitations": pending_invitations,
-        "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
-        "back_url": reverse("dashboard:index"),
-    }
-    return render(request, template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["can_show_financial_annexes"] = self.organization.convention_can_be_accessed_by(self.request.user)
+        return context
 
 
 @check_user(lambda user: user.is_employer)
