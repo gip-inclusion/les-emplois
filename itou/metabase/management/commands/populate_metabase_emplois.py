@@ -369,6 +369,7 @@ class Command(BaseCommand):
                 "approval_id",
                 "approval_delivery_mode",
                 "contract_type",
+                "refusal_reason",
                 "resume_id",
             )
             .exclude(origin=Origin.PE_APPROVAL)
