@@ -258,8 +258,56 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     ]
     REALM = "/agent"
 
+    def _request(self, url, data=None, params=None, headers=None, method="POST"):
+        """Completely override the parent method to change how errors are handled."""
+        token = caches["failsafe"].get(CACHE_API_TOKEN_KEY)
+        if not token:
+            token = self._refresh_token()
+
+        # TODO(cms): use real names.
+        # These headers MUST be provided.
+        # - if not: a 302 will be returned.
+        # - if value is an empty string: a 401 will be returned.
+        # As of today, no verification seems to be done on FT's side. Any value is good,
+        # as far as there is one.
+        agents_headers = {
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "toto",
+        }
+
+        # TODO(cms): check request is not logged to avoid RGPD problems.
+        return httpx.request(
+            method,
+            url,
+            params=params,
+            json=data,
+            headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
+            timeout=API_TIMEOUT_SECONDS,
+        ).raise_for_status()
+
+    # def _raise_for_status(self, response):
+    #     """
+    #     Raise the `HTTPStatusError` if one occurred.
+    #     """
+    #     request = response.request
+    #     message = (
+    #         "{error_type} '{0.status_code} {0.reason_phrase}' for url '{0.url}'\n"
+    #         "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{0.status_code}"
+    #     )
+
+    #     status_class = response.status_code // 100
+    #     error_types = {
+    #         1: "Informational response",
+    #         3: "Redirect response",
+    #         4: "Client error",
+    #         5: "Server error",
+    #     }
+    #     error_type = error_types.get(status_class, "Invalid status code")
+    #     message = message.format(self, error_type=error_type)
+    #     raise httpx.HTTPStatusError(message, request=request, response=self)
+
     def rechercher_usager(self, birthdate, nir):
-        # TODO(cms): add FT code option.
         """Example data:
         {
             "nir":"1800813800217",
@@ -274,35 +322,29 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "topIdentiteCertifiee": "O"
         }
         """
-        data = self._request(
+        response = self._request(
             f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT) if birthdate else "",
                 "nir": nir if nir else "",
             },
-            # TODO(cms): use real names.
-            # These headers MUST be provided.
-            # - if not: a 302 will be returned.
-            # - if value is an empty string: a 401 will be returned.
-            # As of today, no verification seems to be done on FT's side. Any value is good,
-            # as far as there is one.
-            headers={
-                "pa-nom-agent": "<string>",
-                "pa-prenom-agent": "<string>",
-                "pa-identifiant-agent": "toto",
-            },
         )
-        code_sortie = data.get("codeRetour")
-        if code_sortie == "S002":
-            raise PoleEmploiAPIException("user_not_found")
-        elif code_sortie == "S001":
-            pass
-        else:
-            raise PoleEmploiAPIBadResponse(code_sortie)
+        data = response.json()
+        if (code_sortie := data.get("codeRetour")) and code_sortie != "S001":
+            if code_sortie in ["S002", "S003"]:
+                # S002: user not found.
+                # S003: too many users found.
+                response.status_code = 404
+                # response.extensions["reason_phrase"] = bytes(unaccented_message, "utf8")
+            else:
+                response.status_code = 500
+                response.data["message"] = (
+                    f"Unexpected FranceTravail success code_sortie: {code_sortie=} {response.data['message']}"
+                )
+        response.raise_for_status()
 
-        # TODO(cms): harmonize with API Particulier.
         if data.get("topIdentiteCertifiee") != "O":
-            raise PoleEmploiAPIException("Identity not certified")
+            raise Exception("Identity not certified")
 
         jeton_usager = data.get("jetonUsager")
         if not jeton_usager:

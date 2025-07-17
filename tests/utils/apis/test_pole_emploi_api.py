@@ -318,6 +318,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                 birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
             )
 
+    # TODO(cms): parametrize me
     @respx.mock
     def test_rechercher_usager_not_found(self):
         job_seeker = JobSeekerFactory()
@@ -327,10 +328,62 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             "jetonUsager": None,
             "topIdentiteCertifiee": None,
         }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json=json_response
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '404 Not Found' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
         )
-        with pytest.raises(PoleEmploiAPIException, match="code=User not found"):
-            self.api_client.rechercher_usager(
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
                 birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
             )
+            assert response.json().get("message") == "Plusieurs usagers trouvés"
+            assert response.status_code == 404
+
+    @respx.mock
+    def test_rechercher_usager_too_many_users_found(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S003",
+            "message": "Plusieurs usagers trouvés",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '404 Not Found' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+        )
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+            assert response.json().get("message") == "Plusieurs usagers trouvés"
+            assert response.status_code == 404
+
+    @respx.mock
+    def test_rechercher_usager_unexpected_success_code(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S009",
+            "message": "Nouveau cas non identifié",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '500 Server Error' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+        )
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+            assert (
+                response.json().get("message")
+                == "Unexpected FranceTravail success code_sortie: success_code=S009 Nouveau cas non identifié"
+            )
+            assert response.status_code == 500
