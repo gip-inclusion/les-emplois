@@ -69,9 +69,8 @@ class MemberList(BaseMemberList):
     template_name = "prescribers/members.html"
     membership_related_name = "prescribermembership_set"
 
-    def setup(self, request, *args, **kwargs):
-        self.organization = get_current_org_or_404(request)
-        return super().setup(request, *args, **kwargs)
+    def test_func(self):
+        return self.request.user.is_prescriber
 
     def get_invitation_url(self):
         return reverse("invitations_views:invite_prescriber_with_org")

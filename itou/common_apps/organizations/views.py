@@ -3,6 +3,7 @@ Functions used in organization views.
 """
 
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -12,9 +13,16 @@ from django.views.generic import ListView
 from itou.utils.pagination import ItouPaginator
 
 
-class BaseMemberList(ListView):
+class BaseMemberList(UserPassesTestMixin, ListView):
     paginate_by = 50  # Most organizations will have only one page
     paginator_class = ItouPaginator
+
+    def setup(self, request, *args, **kwargs):
+        # test_func is called in super().dispatch so we can jobseeker here and current_organization won't exist
+        self.organization = getattr(request, "current_organization", None)
+        if self.organization is None:
+            raise PermissionDenied
+        super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
         memberships = getattr(self.organization, self.membership_related_name)
