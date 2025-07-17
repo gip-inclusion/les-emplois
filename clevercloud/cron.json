@@ -33,6 +33,7 @@
   "20 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
+  "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
   "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
