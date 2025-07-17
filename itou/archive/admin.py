@@ -32,3 +32,8 @@ class AnonymizedSIAEEligibilityDiagnosisAdmin(ReadonlyMixin, ItouModelAdmin):
 @admin.register(models.AnonymizedGEIQEligibilityDiagnosis)
 class AnonymizedGEIQEligibilityDiagnosisAdmin(ReadonlyMixin, ItouModelAdmin):
     pass
+
+
+@admin.register(models.AnonymizedCancelledApproval)
+class AnonymizedCancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass
