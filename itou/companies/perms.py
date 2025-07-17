@@ -3,7 +3,7 @@ from itou.companies.enums import CompanyKind
 
 def can_create_antenna(request):
     """
-    Only admin employers can create an antenna for their SIAE.
+    Only admin employers can create an antenna for their company.
 
     For SIAE structures (AI, ACI...) the convention has to be present to link the parent SIAE and its antenna.
     In some edge cases (e.g. SIAE created by staff and not yet officialized) the convention is absent,
