@@ -7,6 +7,7 @@ import uuid
 
 from asgiref.local import Local  # NOQA
 from django.core.management import base
+from django.db import transaction
 
 from itou.utils import triggers
 
@@ -60,6 +61,8 @@ def _command_info_manager(command):
 
 
 class LoggedCommandMixin:
+    ATOMIC_HANDLE = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.run_uid = uuid.uuid4()
@@ -69,6 +72,8 @@ class LoggedCommandMixin:
         with contextlib.ExitStack() as stack:
             stack.enter_context(_command_info_manager(self))
             stack.enter_context(_command_duration_logger(self))
+            if self.ATOMIC_HANDLE:
+                stack.enter_context(transaction.atomic())
             stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=str(self.run_uid)))
             try:
                 return super().execute(*args, **kwargs)

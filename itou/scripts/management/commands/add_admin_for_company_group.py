@@ -1,5 +1,3 @@
-from django.db import transaction
-
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.companies.models import Company, CompanyMembership
 from itou.users.models import User
@@ -14,6 +12,8 @@ def notification_record(name):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         parser.add_argument("user", type=int, help="PK of the user to add to companies")
         parser.add_argument(
@@ -34,7 +34,6 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
-    @transaction.atomic
     def handle(self, user, sirens, *, disabled_notifications=None, wet_run=False, **options):
         user = User.objects.get(pk=user)
         self.stdout.write(f"Add {user=} for {sirens=} with {disabled_notifications=}")

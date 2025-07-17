@@ -4,7 +4,6 @@ import zipfile
 
 import pandas as pd
 from django.conf import settings
-from django.db import transaction
 from sentry_sdk.crons import monitor
 
 from itou.cities.models import City
@@ -55,6 +54,8 @@ class Command(BaseCommand):
     EA = "Entreprise adaptée".
     EATT = "Entreprise adaptée de travail temporaire".
     """
+
+    ATOMIC_HANDLE = True
 
     help = 'Import EA and EATT data into the database using the "flux EA2"'
 
@@ -108,7 +109,6 @@ class Command(BaseCommand):
                     sftp.remove(filename)
                     self.logger.info("Old archive '%s' was deleted", filename)
 
-    @transaction.atomic
     def process_file(self, file, *, wet_run=False):
         header = next(file)
         if not header.startswith("L|ASP|EA|"):  # Start of file header
