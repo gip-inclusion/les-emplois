@@ -17,3 +17,8 @@ class AnonymizedJobSeekerAdmin(ReadonlyMixin, ItouModelAdmin):
 @admin.register(models.AnonymizedApplication)
 class AnonymizedApplicationAdmin(ReadonlyMixin, ItouModelAdmin):
     pass
+
+
+@admin.register(models.AnonymizedCancelledApproval)
+class AnonymizedCancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
+    pass

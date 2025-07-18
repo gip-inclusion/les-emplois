@@ -136,3 +136,27 @@ class AnonymizedApplication(models.Model):
 
     def __str__(self):
         return f"candidature {self.id} anonymisée le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+class AnonymizedCancelledApproval(models.Model):
+    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
+    had_pole_emploi_id = models.BooleanField(verbose_name="ID Pôle emploi", default=False)
+    had_nir = models.BooleanField(verbose_name="NIR", default=False)
+    nir_sex = models.PositiveSmallIntegerField(verbose_name="sexe du NIR", blank=True, null=True)
+    nir_year = models.PositiveSmallIntegerField(verbose_name="année du NIR", blank=True, null=True)
+    birth_year = models.PositiveSmallIntegerField(verbose_name="année de naissance", blank=True, null=True)
+    origin_company_kind = models.CharField(verbose_name="type d'entreprise à l'origine du PASS", blank=True, null=True)
+    origin_sender_kind = models.CharField(
+        verbose_name="type d'emetteur de la candidature à l'origine du PASS", blank=True, null=True
+    )
+    origin_prescriber_organization_kind = models.CharField(
+        verbose_name="typologie du prescripteur à l'origine du PASS", blank=True, null=True
+    )
+
+    class Meta:
+        verbose_name = "PASS annulé anonymisé"
+        verbose_name_plural = "PASS annulés anonymisés"
+        ordering = ["-anonymized_at"]
+
+    def __str__(self):
+        return f"PASS annulé anonymisé le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"

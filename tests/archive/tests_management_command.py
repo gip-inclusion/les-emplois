@@ -12,7 +12,13 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
+from itou.approvals.models import CancelledApproval
+from itou.archive.models import (
+    AnonymizedApplication,
+    AnonymizedCancelledApproval,
+    AnonymizedJobSeeker,
+    AnonymizedProfessional,
+)
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.companies.models import CompanyMembership
 from itou.files.models import File
@@ -21,11 +27,12 @@ from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
 from itou.jobs.models import Appellation, Rome
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.constants import DAYS_OF_INACTIVITY, GRACE_PERIOD, INACTIVITY_PERIOD
-from tests.approvals.factories import ApprovalFactory
+from itou.utils.constants import DAYS_OF_INACTIVITY, EXPIRATION_PERIOD, GRACE_PERIOD, INACTIVITY_PERIOD
+from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
@@ -1109,3 +1116,75 @@ class TestAnonymizeProfessionalManagementCommand:
 
         with assertSnapshotQueries(snapshot(name="anonymize_professionals_queries")):
             call_command("anonymize_professionals", wet_run=True)
+
+
+class TestAnonymizeCancelledApprovalsManagementCommand:
+    @pytest.mark.parametrize(
+        "suspended,expected_message",
+        [
+            (True, "Anonymizing cancelled approvals is suspended, exiting command"),
+            (False, "Start anonymizing cancelled approvals in wet_run mode"),
+        ],
+    )
+    def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
+        settings.SUSPEND_ANONYMIZE_CANCELLED_APPROVALS = suspended
+        call_command("anonymize_cancelled_approvals", wet_run=True)
+        assert expected_message in caplog.messages
+
+    def test_dry_run(self):
+        expiration_date = timezone.localdate() - EXPIRATION_PERIOD
+        CancelledApprovalFactory(
+            start_at=expiration_date - datetime.timedelta(days=1),
+            end_at=expiration_date,
+        )
+        call_command("anonymize_cancelled_approvals")
+        CancelledApproval.objects.get()
+        assert not AnonymizedCancelledApproval.objects.exists()
+
+    def test_anonymize_cancelled_approvals_content(self, snapshot):
+        expiration_date = timezone.localdate() - EXPIRATION_PERIOD
+        kwargs_list = [
+            {
+                "user_birthdate": datetime.date(1977, 7, 16),
+                "user_nir": "277071456789012",
+                "user_id_national_pe": "89012345",
+                "origin_siae_kind": CompanyKind.EI,
+            },
+            {
+                "user_birthdate": None,
+                "user_nir": "",
+                "user_id_national_pe": None,
+                "origin_siae_kind": CompanyKind.EATT,
+                "origin_sender_kind": UserKind.PRESCRIBER,
+                "origin_prescriber_organization_kind": PrescriberOrganizationKind.CHRS,
+            },
+        ]
+        for kwargs in kwargs_list:
+            CancelledApprovalFactory(
+                start_at=expiration_date - datetime.timedelta(days=1), end_at=expiration_date, **kwargs
+            )
+
+        call_command("anonymize_cancelled_approvals", wet_run=True)
+
+        assert get_fields_list_for_snapshot(AnonymizedCancelledApproval) == snapshot(
+            name="anonymized_cancelled_approval"
+        )
+        assert not CancelledApproval.objects.exists()
+
+    def test_anonymize_cancelled_approvals_on_expiration_date(self):
+        expiration_date = timezone.localdate() - EXPIRATION_PERIOD
+        start_at = expiration_date - datetime.timedelta(days=30)
+
+        # recently_expired_cancelled_approval
+        CancelledApprovalFactory(start_at=start_at, end_at=expiration_date)
+
+        # expiring_soon_cancelled_approval
+        expected_cancelled_approval = CancelledApprovalFactory(
+            start_at=start_at,
+            end_at=expiration_date + datetime.timedelta(days=1),
+        )
+
+        call_command("anonymize_cancelled_approvals", wet_run=True)
+
+        assertQuerySetEqual(CancelledApproval.objects.all(), [expected_cancelled_approval])
+        assert AnonymizedCancelledApproval.objects.count() == 1
