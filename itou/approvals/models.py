@@ -586,7 +586,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 "et la présence d'un diagnostic d'éligibilité",
             )
         ]
-        permissions = [("export_ft_api_rejections", "Can export PASS IAE rejected by FT's API")]
+        permissions = [
+            ("export_ft_api_rejections", "Can export PASS IAE rejected by FT's API"),
+            ("handle_manual_approval_requests", "Can handle manual PASS IAE requests"),
+        ]
         triggers = [
             pgtrigger.Trigger(
                 name="create_employee_record_notification",
