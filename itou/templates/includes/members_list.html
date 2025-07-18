@@ -5,10 +5,23 @@
                 <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                     <h2 class="mb-0">Collaborateurs</h2>
                     <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
-                        <a class="btn btn-primary btn-ico" href="{{ invitation_url }}">
-                            <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
-                            <span>Ajouter des collaborateurs</span>
-                        </a>
+                        {% if invitation_url %}
+                            <a class="btn btn-primary btn-ico" href="{{ invitation_url }}">
+                                <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                                <span>Ajouter des collaborateurs</span>
+                            </a>
+                        {% else %}
+                            <button type="button"
+                                    class="btn btn-primary btn-ico"
+                                    disabled
+                                    aria-label="Vous avez atteint le nombre maximal d'invitations, veuillez attendre que certaines invitations soient acceptées ou expirent."
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-title="Vous avez atteint le nombre maximal d'invitations, veuillez attendre que certaines invitations soient acceptées ou expirent.">
+                                <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                                <span>Ajouter des collaborateurs</span>
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
                 <p>

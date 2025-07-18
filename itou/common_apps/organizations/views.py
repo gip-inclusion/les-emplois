@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
 
 from itou.utils.pagination import ItouPaginator
+from itou.www.invitations_views.views import MAX_PENDING_INVITATION
 
 
 class BaseMemberList(UserPassesTestMixin, ListView):
@@ -42,7 +43,9 @@ class BaseMemberList(UserPassesTestMixin, ListView):
 
         context["members_stats"] = members_stats
         context["pending_invitations"] = pending_invitations
-        context["invitation_url"] = self.get_invitation_url()
+        context["invitation_url"] = (
+            self.get_invitation_url() if len(pending_invitations) < MAX_PENDING_INVITATION else None
+        )
         context["active_admin_members"] = self.organization.active_admin_members
         return context
 

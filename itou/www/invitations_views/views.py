@@ -40,6 +40,9 @@ from itou.www.invitations_views.helpers import (
 from itou.www.signup import forms as signup_forms
 
 
+MAX_PENDING_INVITATION = 50
+
+
 def handle_invited_user_registration_with_django(request, invitation, invitation_type):
     # This view is now only used for labor inspectors
     form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
@@ -140,9 +143,17 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         self.organization = request.current_organization
+        self.invitation_left = MAX_PENDING_INVITATION - self.organization.invitations.pending().count()
         if self.organization is None:
             raise PermissionError
         return super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.invitation_left < 1:
+            messages.error(request, f"Vous ne pouvez avoir plus de {MAX_PENDING_INVITATION} invitations.")
+            return HttpResponseRedirect(self.back_url)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         raise NotImplementedError
@@ -156,7 +167,8 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
             form=self.form_class,
             formset=self.formset_class,
             extra=1,
-            max_num=30,
+            max_num=self.invitation_left,
+            absolute_max=self.invitation_left,
         )
         return formset(
             self.request.POST or None,
