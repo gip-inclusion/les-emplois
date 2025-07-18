@@ -105,6 +105,7 @@
     'change_approval',
     'delete_approval',
     'export_ft_api_rejections',
+    'handle_manual_approval_requests',
     'view_approval',
     'view_cancelledapproval',
     'view_poleemploiapproval',
