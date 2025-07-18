@@ -245,3 +245,14 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         if safir:
             return next((agence for agence in agences if agence["codeSafir"] == str(safir)), None)
         return agences
+
+
+class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
+    AUTHORIZED_SCOPES = [
+        "api_rechercher-usagerv2",
+        "rechercheusager",
+        "profil_accedant",
+        "api_donnees-rqthv1",
+        "h2a",
+    ]
+    REALM = "/agent"
