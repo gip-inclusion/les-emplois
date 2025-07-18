@@ -197,10 +197,6 @@ class AbstractAnonymizedEligibilityDiagnosis(models.Model):
     job_seeker_department = models.CharField(
         verbose_name="département du candidat", max_length=3, blank=True, null=True
     )
-    job_seeker_had_pole_emploi_id = models.BooleanField(
-        verbose_name="le candidat avait un identifiant Pôle emploi", default=False
-    )
-    job_seeker_had_nir = models.BooleanField(verbose_name="le candidat avait un NIR", default=False)
     # author
     author_kind = models.CharField(verbose_name="type de l'auteur du diagnostic")
     author_prescriber_organization_kind = models.CharField(

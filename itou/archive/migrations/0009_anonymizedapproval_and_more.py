@@ -156,17 +156,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "job_seeker_had_pole_emploi_id",
-                    models.BooleanField(
-                        default=False,
-                        verbose_name="le candidat avait un identifiant Pôle emploi",
-                    ),
-                ),
-                (
-                    "job_seeker_had_nir",
-                    models.BooleanField(default=False, verbose_name="le candidat avait un NIR"),
-                ),
-                (
                     "author_kind",
                     models.CharField(verbose_name="type de l'auteur du diagnostic"),
                 ),
@@ -278,17 +267,6 @@ class Migration(migrations.Migration):
                         null=True,
                         verbose_name="département du candidat",
                     ),
-                ),
-                (
-                    "job_seeker_had_pole_emploi_id",
-                    models.BooleanField(
-                        default=False,
-                        verbose_name="le candidat avait un identifiant Pôle emploi",
-                    ),
-                ),
-                (
-                    "job_seeker_had_nir",
-                    models.BooleanField(default=False, verbose_name="le candidat avait un NIR"),
                 ),
                 (
                     "author_kind",
