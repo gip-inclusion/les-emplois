@@ -2,7 +2,6 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms.models import modelformset_factory
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -85,18 +84,6 @@ class BasePrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
         self.forms[0].empty_permitted = False
 
 
-#
-# Formset used when a prescriber invites a person to join his structure.
-#
-PrescriberWithOrgInvitationFormSet = modelformset_factory(
-    PrescriberWithOrgInvitation,
-    form=PrescriberWithOrgInvitationForm,
-    formset=BasePrescriberWithOrgInvitationFormSet,
-    extra=1,
-    max_num=30,
-)
-
-
 #############################################################
 ###################### EmployerInvitation ##################
 #############################################################
@@ -154,13 +141,6 @@ class BaseEmployerInvitationFormSet(BaseInvitationFormSet):
         self.forms[0].empty_permitted = False
 
 
-#
-# Formset used when an employer invites other employers to join his structure.
-#
-EmployerInvitationFormSet = modelformset_factory(
-    EmployerInvitation, form=EmployerInvitationForm, formset=BaseEmployerInvitationFormSet, extra=1, max_num=30
-)
-
 #############################################################
 ##################### LaborInspectorInvitation ##############
 #############################################################
@@ -216,18 +196,6 @@ class BaseLaborInspectorInvitationFormSet(BaseInvitationFormSet):
         # otherwise `self.queryset` will have no effect.
         # https://code.djangoproject.com/ticket/31879
         self.forms[0].empty_permitted = False
-
-
-#
-# Formset used when a labor inspector invites other inspectors to join his structure.
-#
-LaborInspectorInvitationFormSet = modelformset_factory(
-    LaborInspectorInvitation,
-    form=LaborInspectorInvitationForm,
-    formset=BaseLaborInspectorInvitationFormSet,
-    extra=1,
-    max_num=30,
-)
 
 
 ###############################################################
