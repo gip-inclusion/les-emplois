@@ -150,6 +150,33 @@ class TestSendInstitutionInvitation:
         assert invitation.last_name == self.guest_data["last_name"]
         assert invitation.email == self.guest_data["email"]
 
+    def test_too_many_invitations(self, client, monkeypatch):
+        monkeypatch.setattr("itou.www.invitations_views.views.MAX_PENDING_INVITATION", 1)
+        LaborInspectorInvitationFactory(institution=self.institution)
+        response = client.get(INVITATION_URL)
+        assertRedirects(response, reverse("institutions_views:members"))
+        assertMessages(response, [messages.Message(messages.ERROR, "Vous ne pouvez avoir plus de 1 invitations.")])
+
+    def test_limit_new_invitations(self, client, monkeypatch):
+        monkeypatch.setattr("itou.www.invitations_views.views.MAX_PENDING_INVITATION", 1)
+        guest = LaborInspectorFactory.build()
+        self.post_data["form-TOTAL_FORMS"] = "2"
+        self.post_data["form-1-first_name"] = guest.first_name
+        self.post_data["form-1-last_name"] = guest.last_name
+        self.post_data["form-1-email"] = guest.email
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assert response.status_code == 200
+        assertContains(response, "Veuillez soumettre au plus 1 formulaire")
+        assert LaborInspectorInvitation.objects.count() == 0
+
+        self.post_data["form-TOTAL_FORMS"] = "1"
+        del self.post_data["form-1-first_name"]
+        del self.post_data["form-1-last_name"]
+        del self.post_data["form-1-email"]
+        response = client.post(INVITATION_URL, data=self.post_data, follow=True)
+        assertRedirects(response, reverse("institutions_views:members"))
+        assert LaborInspectorInvitation.objects.count() == 1
+
 
 class TestSendInstitutionInvitationExceptions:
     @pytest.fixture(autouse=True)

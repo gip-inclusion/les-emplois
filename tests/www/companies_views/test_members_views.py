@@ -46,13 +46,22 @@ class TestMembers:
             assert response.status_code == 403
 
     @freeze_time("2025-07-12 10:40")
-    def test_members(self, client, snapshot):
+    def test_members(self, client, snapshot, monkeypatch):
+        monkeypatch.setattr("itou.common_apps.organizations.views.MAX_PENDING_INVITATION", 1)
         company = CompanyFactory()
         user = CompanyMembershipFactory(user__for_snapshot=True, company=company).user
         client.force_login(user)
         url = reverse("companies_views:members")
         response = client.get(url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+        # Check invitation link
+        invite_url = reverse("invitations_views:invite_employer")
+        assertContains(response, invite_url)
+
+        EmployerInvitationFactory.create_batch(50, company=company)
+        response = client.get(url)
+        assertNotContains(response, invite_url)
 
     def test_members_pagination(self, client, monkeypatch):
         monkeypatch.setattr(BaseMemberList, "paginate_by", 1)
