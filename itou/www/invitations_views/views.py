@@ -4,9 +4,13 @@ from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse_lazy
 from django.utils import formats, safestring
+from django.views.generic import TemplateView
 
 from itou.invitations.models import (
     EmployerInvitation,
@@ -18,15 +22,15 @@ from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
-    EmployerInvitationFormSet,
-    LaborInspectorInvitationFormSet,
+    BaseEmployerInvitationFormSet,
+    BaseLaborInspectorInvitationFormSet,
+    BasePrescriberWithOrgInvitationFormSet,
+    EmployerInvitationForm,
+    LaborInspectorInvitationForm,
     NewUserInvitationForm,
-    PrescriberWithOrgInvitationFormSet,
+    PrescriberWithOrgInvitationForm,
 )
 from itou.www.invitations_views.helpers import (
     handle_employer_invitation,
@@ -125,33 +129,52 @@ def _toast_invitation_sent(invitations):
     )
 
 
-def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
-    organization = get_current_org_or_404(request)
-    form_post_url = reverse("invitations_views:invite_prescriber_with_org")
-    form_kwargs = {"sender": request.user, "organization": organization}
-    back_url = reverse("prescribers_views:members")
+class BaseInviteUserView(UserPassesTestMixin, TemplateView):
+    invitation_model = None
+    form_class = None
+    formset_class = None
+    organization = None
+    form_post_url = None
+    back_url = None
+    template_name = "invitations_views/create.html"
 
-    # Initial data can be passed by GET params to ease invitation of new members
-    request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=request.GET)
-    if request_invitation_form.is_valid():
-        # The prescriber has accepted the request for an invitation of an external user.
-        # The form will be pre-filled with the new user information.
-        initial_data = [
-            {
-                "first_name": request_invitation_form.cleaned_data.get("first_name"),
-                "last_name": request_invitation_form.cleaned_data.get("last_name"),
-                "email": request_invitation_form.cleaned_data.get("email"),
-            }
-        ]
-    else:
-        initial_data = None
+    def setup(self, request, *args, **kwargs):
+        self.organization = request.current_organization
+        if self.organization is None:
+            raise PermissionError
+        return super().setup(request, *args, **kwargs)
 
-    formset = PrescriberWithOrgInvitationFormSet(
-        data=request.POST or None, initial=initial_data, form_kwargs=form_kwargs
-    )
-    if request.POST:
+    def get_form_kwargs(self):
+        raise NotImplementedError
+
+    def get_initial_data(self):
+        return None
+
+    def get_formset(self):
+        formset = modelformset_factory(
+            self.invitation_model,
+            form=self.form_class,
+            formset=self.formset_class,
+            extra=1,
+            max_num=30,
+        )
+        return formset(
+            self.request.POST or None,
+            initial=self.get_initial_data(),
+            form_kwargs=self.get_form_kwargs(),
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["back_url"] = self.back_url
+        context["form_post_url"] = self.form_post_url
+        context["formset"] = self.get_formset()
+        context["organization"] = self.organization
+        return context
+
+    def post(self, request, *args, **kwargs):
+        formset = self.get_formset()
         if formset.is_valid():
-            # We don't need atomicity here (invitations are independent)
             invitations = formset.save()
 
             for invitation in invitations:
@@ -162,11 +185,36 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
                 _toast_invitation_sent(invitations),
                 extra_tags="toast",
             )
-            return redirect(back_url)
+            return redirect(self.back_url)
+        return super().get(request, *args, **kwargs)
 
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": organization}
 
-    return render(request, template_name, context)
+class InvitePrescriberView(BaseInviteUserView):
+    invitation_model = PrescriberWithOrgInvitation
+    form_class = PrescriberWithOrgInvitationForm
+    formset_class = BasePrescriberWithOrgInvitationFormSet
+    form_post_url = reverse_lazy("invitations_views:invite_prescriber_with_org")
+    back_url = reverse_lazy("prescribers_views:members")
+
+    def test_func(self):
+        return self.request.user.is_prescriber
+
+    def get_initial_data(self):
+        request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=self.request.GET)
+        if request_invitation_form.is_valid():
+            # The prescriber has accepted the request for an invitation of an external user.
+            # The form will be pre-filled with the new user information.
+            return [
+                {
+                    "first_name": request_invitation_form.cleaned_data.get("first_name"),
+                    "last_name": request_invitation_form.cleaned_data.get("last_name"),
+                    "email": request_invitation_form.cleaned_data.get("email"),
+                }
+            ]
+        return None
+
+    def get_form_kwargs(self):
+        return {"sender": self.request.user, "organization": self.organization}
 
 
 def join_prescriber_organization(request, invitation_id):
@@ -177,31 +225,18 @@ def join_prescriber_organization(request, invitation_id):
     return HttpResponseRedirect(url)
 
 
-def invite_employer(request, template_name="invitations_views/create.html"):
-    company = get_current_company_or_404(request)
-    form_post_url = reverse("invitations_views:invite_employer")
-    form_kwargs = {"sender": request.user, "company": company}
-    back_url = reverse("companies_views:members")
+class InviteEmployerView(BaseInviteUserView):
+    invitation_model = EmployerInvitation
+    form_class = EmployerInvitationForm
+    formset_class = BaseEmployerInvitationFormSet
+    form_post_url = reverse_lazy("invitations_views:invite_employer")
+    back_url = reverse_lazy("companies_views:members")
 
-    formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
-    if request.POST:
-        if formset.is_valid():
-            # We don't need atomicity here (invitations are independent)
-            invitations = formset.save()
+    def test_func(self):
+        return self.request.user.is_employer
 
-            for invitation in invitations:
-                invitation.send()
-
-            messages.success(
-                request,
-                _toast_invitation_sent(invitations),
-                extra_tags="toast",
-            )
-            return redirect(back_url)
-
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": company}
-
-    return render(request, template_name, context)
+    def get_form_kwargs(self):
+        return {"sender": self.request.user, "company": self.organization}
 
 
 def join_company(request, invitation_id):
@@ -212,31 +247,18 @@ def join_company(request, invitation_id):
     return HttpResponseRedirect(url)
 
 
-def invite_labor_inspector(request, template_name="invitations_views/create.html"):
-    institution = get_current_institution_or_404(request)
-    form_post_url = reverse("invitations_views:invite_labor_inspector")
-    form_kwargs = {"sender": request.user, "institution": institution}
-    back_url = reverse("institutions_views:members")
+class InviteLaborInspectorView(BaseInviteUserView):
+    invitation_model = LaborInspectorInvitation
+    form_class = LaborInspectorInvitationForm
+    formset_class = BaseLaborInspectorInvitationFormSet
+    form_post_url = reverse_lazy("invitations_views:invite_labor_inspector")
+    back_url = reverse_lazy("institutions_views:members")
 
-    formset = LaborInspectorInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
-    if request.POST:
-        if formset.is_valid():
-            # We don't need atomicity here (invitations are independent)
-            invitations = formset.save()
+    def test_func(self):
+        return self.request.user.is_labor_inspector
 
-            for invitation in invitations:
-                invitation.send()
-
-            messages.success(
-                request,
-                _toast_invitation_sent(invitations),
-                extra_tags="toast",
-            )
-            return redirect(back_url)
-
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": institution}
-
-    return render(request, template_name, context)
+    def get_form_kwargs(self):
+        return {"sender": self.request.user, "institution": self.organization}
 
 
 def join_institution(request, invitation_id):
