@@ -781,6 +781,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert respx_mock.calls.call_count == 1
 
+    # WIP vincentporte : refactor this test to remove parametrize
     @pytest.mark.parametrize(
         "approval_kwargs,prolongation_kwargs_list,suspension_kwargs_list,job_application_kwargs_list",
         [
