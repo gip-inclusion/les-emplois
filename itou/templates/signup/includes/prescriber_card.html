@@ -17,8 +17,8 @@
     </div>
     <div class="card-footer">
         {# Organizations can exist without a member  #}
-        {% if prescriber_org.prescribermembership_set.first %}
-            {% with prescriber_org.prescribermembership_set.first as membership %}
+        {% if prescriber_org.memberships.first %}
+            {% with prescriber_org.memberships.first as membership %}
                 {# Ordered by -is_admin and date_joined via prefetch_active_memberships #}
                 {# For security, display only the first char of the last name. #}
                 <i>

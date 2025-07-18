@@ -141,7 +141,7 @@ class TestEditOrganization:
         assert organization.geocoding_score == 0.5197687103594081
 
         # Only admins should be able to edit organization details
-        membership = organization.prescribermembership_set.first()
+        membership = organization.memberships.first()
         membership.is_admin = False
         membership.save()
         url = reverse("prescribers_views:edit_organization")

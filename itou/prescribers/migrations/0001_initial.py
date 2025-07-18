@@ -395,7 +395,9 @@ class Migration(migrations.Migration):
             model_name="prescribermembership",
             name="organization",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="prescribers.prescriberorganization"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="prescribers.prescriberorganization",
+                related_name="memberships",
             ),
         ),
         migrations.AlterUniqueTogether(

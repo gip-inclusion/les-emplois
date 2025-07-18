@@ -70,7 +70,7 @@ TABLE.add_columns(
             "name": "date_inscription",
             "type": "date",
             "comment": "Date inscription du premier compte employeur",
-            "fn": lambda o: get_first_membership_join_date(o.companymembership_set),
+            "fn": lambda o: get_first_membership_join_date(o.memberships),
         },
         {
             "name": "total_membres",

@@ -26,8 +26,12 @@ class BaseMemberList(UserPassesTestMixin, ListView):
         super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
-        memberships = getattr(self.organization, self.membership_related_name)
-        return memberships.active().select_related("user").all().order_by("user__first_name", "user__last_name", "pk")
+        return (
+            self.organization.memberships.active()
+            .select_related("user")
+            .all()
+            .order_by("user__first_name", "user__last_name", "pk")
+        )
 
     def get_invitation_url(self):
         raise NotImplementedError

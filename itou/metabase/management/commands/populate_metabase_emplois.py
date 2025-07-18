@@ -135,11 +135,11 @@ class Command(BaseCommand):
                 "job_description_through",
                 "members",
                 Prefetch(
-                    "companymembership_set",
+                    "memberships",
                     queryset=CompanyMembership.objects.active(),
                     to_attr="active_memberships",
                 ),
-                "companymembership_set",
+                "memberships",
             )
             .annotate(
                 last_job_application_transition_date=Max(
@@ -255,12 +255,12 @@ class Command(BaseCommand):
         queryset = (
             PrescriberOrganization.objects.prefetch_related(
                 Prefetch(
-                    "prescribermembership_set",
+                    "memberships",
                     queryset=PrescriberMembership.objects.active(),
                     to_attr="active_memberships",
                 ),
                 "members",
-                "prescribermembership_set",
+                "memberships",
             )
             .select_related("insee_city")
             .annotate(

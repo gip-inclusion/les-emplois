@@ -1,6 +1,7 @@
+import django.db.models.deletion
 import pgtrigger.compiler
 import pgtrigger.migrations
-from django.db import migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -27,6 +28,13 @@ class Migration(migrations.Migration):
                     table="companies_company",
                     when="BEFORE",
                 ),
+            ),
+        ),
+        migrations.AlterField(
+            model_name="companymembership",
+            name="company",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="companies.company", related_name="memberships"
             ),
         ),
     ]

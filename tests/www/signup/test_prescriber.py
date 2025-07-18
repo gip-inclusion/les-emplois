@@ -718,7 +718,7 @@ class TestPrescriberSignup:
         prescriber_org = PrescriberOrganizationWithMembershipFactory(
             siret=siret, membership__user__for_snapshot=True, for_snapshot=True
         )
-        prescriber_membership = prescriber_org.prescribermembership_set.first()
+        prescriber_membership = prescriber_org.memberships.first()
 
         url = reverse("signup:prescriber_check_already_exists")
         post_data = {
