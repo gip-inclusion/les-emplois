@@ -1,6 +1,7 @@
 import datetime
 import threading
 import time
+import uuid
 
 import factory
 import pytest
@@ -15,7 +16,7 @@ from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertNumQueries, assertQuerySetEqual
+from pytest_django.asserts import assertContains, assertMessages, assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -1031,6 +1032,62 @@ class TestCustomApprovalAdminViews:
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
         assert approval.number_with_spaces in email.body
+
+    def test_manually_refuse_approval(self, client, mailoutbox, snapshot):
+        # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
+        # with a manual verification.
+        job_seeker = JobSeekerFactory(
+            first_name="Jean",
+            last_name="Dupont",
+            jobseeker_profile__nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            pk=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            approval=None,
+            approval_number_sent_by_email=False,
+            with_iae_eligibility_diagnosis=True,
+        )
+        employer = job_application.to_company.members.first()
+        job_application.accept(user=employer)
+
+        add_url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
+        refuse_url = reverse("admin:approvals_approval_manually_refuse_approval", args=[job_application.pk])
+
+        # Not enough perms.
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(refuse_url)
+        assert response.status_code == 302
+
+        # With good perms.
+        user = ItouStaffFactory()
+        client.force_login(user)
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="handle_manual_approval_requests")
+        user.user_permissions.add(permission)
+        response = client.get(add_url)
+        assertContains(response, refuse_url)
+
+        response = client.get(refuse_url)
+        assertContains(response, "PASS IAE refusé pour")
+
+        post_data = {"confirm": "yes"}
+        response = client.post(refuse_url, data=post_data)
+        assert response.status_code == 302
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.approval_manually_refused_by == user
+        assert job_application.approval_manually_refused_at is not None
+        assert job_application.approval is None
+
+        [email] = mailoutbox
+        assert email.to == [employer.email]
+        assert email.subject == snapshot(name="email_subject")
+        assert email.body == snapshot(name="email_body")
 
     def test_employee_record_status(self, subtests):
         inline = JobApplicationInline(JobApplication, AdminSite())
