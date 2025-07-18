@@ -144,3 +144,8 @@ class UpdateIAEEligibilityView(BaseIAEEligibilityViewForPrescriber):
 
     def get_success_url(self):
         return self.back_url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["matomo_custom_title"] = "Mise à jour éligibilité IAE candidat"
+        return context

@@ -733,6 +733,9 @@ class ApplicationEndView(TemplateView):
             ),
             "reset_url": reverse("apply:application_end", kwargs={"application_pk": self.job_application.pk}),
             "page_title": "Auto-prescription enregistrée" if self.auto_prescription_process else "Candidature envoyée",
+            "matomo_custom_title": "Auto-prescription enregistrée"
+            if self.auto_prescription_process
+            else "Candidature soumise",
         }
 
 
