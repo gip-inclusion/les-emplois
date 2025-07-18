@@ -27,7 +27,7 @@ ORG_OF_PRESCRIBERS_WITHOUT_ORG = PrescriberOrganization(
 
 def get_org_first_join_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        return get_first_membership_join_date(memberships=org.prescribermembership_set)
+        return get_first_membership_join_date(memberships=org.memberships)
     return None
 
 

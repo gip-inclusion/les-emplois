@@ -67,7 +67,6 @@ def overview(request, template_name="prescribers/overview.html"):
 
 class MemberList(BaseMemberList):
     template_name = "prescribers/members.html"
-    membership_related_name = "prescribermembership_set"
 
     def test_func(self):
         return self.request.user.is_prescriber

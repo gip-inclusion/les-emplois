@@ -22,12 +22,11 @@ class Command(BaseCommand):
 
     def build_query(self, queryset):
         TODAY = timezone.localdate()
-        membership_attname = queryset.model.members.through._meta.get_field("user").remote_field.name
 
         return (
             queryset.prefetch_related(
                 Prefetch(
-                    f"{membership_attname}_set",
+                    "memberships",
                     queryset=queryset.model.members.through.objects.order_by("pk")
                     .active()
                     .admin()
@@ -40,10 +39,8 @@ class Command(BaseCommand):
                 active_members_count=Count(
                     "members",
                     filter=Q(
-                        **{
-                            f"{membership_attname}__is_active": True,
-                            f"{membership_attname}__user__is_active": True,
-                        }
+                        memberships__is_active=True,
+                        memberships__user__is_active=True,
                     ),
                 ),
             )

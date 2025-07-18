@@ -51,7 +51,7 @@ class InstitutionMembership(MembershipAbstract):
 
     user_kind = UserKind.LABOR_INSPECTOR
 
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_institutionmembership_set",

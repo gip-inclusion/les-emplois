@@ -280,7 +280,11 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True, verbose_name="date de modification")),
                 (
                     "institution",
-                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="institutions.institution"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="institutions.institution",
+                        related_name="memberships",
+                    ),
                 ),
                 (
                     "updated_by",
