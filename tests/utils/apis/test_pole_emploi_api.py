@@ -14,6 +14,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
+    PoleEmploiRoyaumeAgentAPIClient,
     PoleEmploiRoyaumePartenaireApiClient,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
@@ -254,3 +255,135 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         )
         assert self.api_client.agences() == [expected_agence, other_agence]
         assert self.api_client.agences(safir=82001) == expected_agence
+
+
+class TestPoleEmploiRoyaumeAgentAPIClient:
+    CACHE_EXPIRY = 1499
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        self.api_client = PoleEmploiRoyaumeAgentAPIClient(
+            base_url="https://pe.fake",
+            auth_base_url="https://auth.fr",
+            key="client_id",
+            secret="client_secret",
+        )
+        json_response = {
+            "token_type": "Bearer",
+            "access_token": "catwoman",
+            "scope": "client_id h2a rechercheusager profil_accedant api_donnees-rqthv1 api_rechercher-usagerv2",
+            "expires_in": self.CACHE_EXPIRY,
+        }
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent").respond(200, json=json_response)
+
+    @respx.mock
+    def test_refresh_token(self):
+        # This method is already tested on TestPoleEmploiRoyaumePartenaireApiClient.
+        token = self.api_client._refresh_token()
+        assert token == "Bearer catwoman"
+
+    @respx.mock
+    def test_rechercher_usager(self):
+        job_seeker = JobSeekerFactory()
+        # Nominal case
+        json_response = {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=json_response
+        )
+        jeton_usager = self.api_client.rechercher_usager(
+            birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+        )
+        assert jeton_usager == "a_long_token"
+
+    @respx.mock
+    def test_rechercher_usager_found_but_not_certified(self):
+        job_seeker = JobSeekerFactory()
+        # Nominal case
+        json_response = {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "N",
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=json_response
+        )
+        with pytest.raises(PoleEmploiAPIException, match="Identity not certified"):
+            self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+
+    # TODO(cms): parametrize me
+    @respx.mock
+    def test_rechercher_usager_not_found(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S002",
+            "message": "Aucun approchant trouvé",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '404 Not Found' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+        )
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+            assert response.json().get("message") == "Plusieurs usagers trouvés"
+            assert response.status_code == 404
+
+    @respx.mock
+    def test_rechercher_usager_too_many_users_found(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S003",
+            "message": "Plusieurs usagers trouvés",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '404 Not Found' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+        )
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+            assert response.json().get("message") == "Plusieurs usagers trouvés"
+            assert response.status_code == 404
+
+    @respx.mock
+    def test_rechercher_usager_unexpected_success_code(self):
+        job_seeker = JobSeekerFactory()
+        json_response = {
+            "codeRetour": "S009",
+            "message": "Nouveau cas non identifié",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        }
+        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        message = (
+            f"Client error '500 Server Error' for url '{url}'\n"
+            "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404"
+        )
+        respx.post(url).respond(200, json=json_response)
+        with pytest.raises(httpx.HTTPStatusError, match=message):
+            response = self.api_client.rechercher_usager(
+                birthdate=job_seeker.jobseeker_profile.birthdate, nir=job_seeker.jobseeker_profile.nir
+            )
+            assert (
+                response.json().get("message")
+                == "Unexpected FranceTravail success code_sortie: success_code=S009 Nouveau cas non identifié"
+            )
+            assert response.status_code == 500
