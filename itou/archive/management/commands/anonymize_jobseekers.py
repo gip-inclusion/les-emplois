@@ -123,8 +123,6 @@ def anonymized_eligibility_diagnosis(obj):
             obj.job_seeker.jobseeker_profile.birthdate.year if obj.job_seeker.jobseeker_profile.birthdate else None
         ),
         "job_seeker_department": obj.job_seeker.department,
-        "job_seeker_had_pole_emploi_id": bool(obj.job_seeker.jobseeker_profile.pole_emploi_id),
-        "job_seeker_had_nir": bool(obj.job_seeker.jobseeker_profile.nir),
         "author_kind": obj.author_kind,
         "author_prescriber_organization_kind": (
             obj.author_prescriber_organization.kind if obj.author_prescriber_organization else None

@@ -95,8 +95,6 @@
       'expired_at': datetime.date(2021, 3, 1),
       'job_seeker_birth_year': 1956,
       'job_seeker_department': '56',
-      'job_seeker_had_nir': True,
-      'job_seeker_had_pole_emploi_id': False,
       'number_of_accepted_job_applications': 0,
       'number_of_administrative_criteria': 3,
       'number_of_administrative_criteria_level_1': 1,
@@ -122,8 +120,6 @@
       'first_approval_start_at': datetime.date(2020, 4, 1),
       'job_seeker_birth_year': 1985,
       'job_seeker_department': '76',
-      'job_seeker_had_nir': True,
-      'job_seeker_had_pole_emploi_id': False,
       'last_approval_end_at': datetime.date(2023, 4, 1),
       'number_of_accepted_job_applications': 1,
       'number_of_administrative_criteria': 3,
@@ -147,8 +143,6 @@
       'first_approval_start_at': None,
       'job_seeker_birth_year': 1980,
       'job_seeker_department': '14',
-      'job_seeker_had_nir': True,
-      'job_seeker_had_pole_emploi_id': False,
       'last_approval_end_at': None,
       'number_of_accepted_job_applications': 1,
       'number_of_administrative_criteria': 0,
@@ -237,13 +231,13 @@
   <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 2, 'first_approval_start_at': datetime.date(2019, 4, 1), 'last_approval_end_at': datetime.date(2023, 5, 1), 'count_eligibility_diagnoses': 2}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_geiq_eligibility_diagnoses]
-  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0}]>
+  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_jobseeker]
   <QuerySet [{'date_joined': datetime.date(2023, 8, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '35', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1990, 'count_accepted_applications': 0, 'count_IAE_applications': 0, 'count_total_applications': 0, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 3}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_several_eligibility_diagnoses[anonymized_siae_eligibility_diagnoses]
-  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}, {'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'job_seeker_had_pole_emploi_id': False, 'job_seeker_had_nir': True, 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}]>
+  <QuerySet [{'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}, {'created_at': datetime.date(2025, 7, 1), 'expired_at': datetime.date(2026, 1, 1), 'job_seeker_birth_year': 1990, 'job_seeker_department': '35', 'author_kind': 'prescriber', 'author_prescriber_organization_kind': 'FT', 'number_of_administrative_criteria': 0, 'number_of_administrative_criteria_level_1': 0, 'number_of_administrative_criteria_level_2': 0, 'number_of_certified_administrative_criteria': 0, 'selected_administrative_criteria': [None], 'number_of_job_applications': 0, 'number_of_accepted_job_applications': 0, 'author_siae_kind': None, 'number_of_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None}]>
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[application_sent_by_authorized_prescriber][anonymized_jobseeker]
   <QuerySet [{'date_joined': datetime.date(2023, 3, 1), 'first_login': None, 'last_login': None, 'user_signup_kind': None, 'department': '76', 'title': 'MME', 'identity_provider': 'DJANGO', 'had_pole_emploi_id': False, 'had_nir': True, 'lack_of_nir_reason': '', 'nir_sex': 2, 'nir_year': 90, 'birth_year': 1978, 'count_accepted_applications': 0, 'count_IAE_applications': 1, 'count_total_applications': 1, 'count_approvals': 0, 'first_approval_start_at': None, 'last_approval_end_at': None, 'count_eligibility_diagnoses': 0}]>
