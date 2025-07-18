@@ -65,7 +65,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {% for membership in org.prescribermembership_set.all %}
+                                                    {% for membership in org.memberships.all %}
                                                         <tr>
                                                             <th scope="row">{{ forloop.counter }}</th>
                                                             <td>{{ membership.user.last_name|upper }}</td>

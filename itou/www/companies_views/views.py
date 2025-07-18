@@ -728,7 +728,6 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
 
 class MemberList(BaseMemberList):
     template_name = "companies/members.html"
-    membership_related_name = "companymembership_set"
 
     def test_func(self):
         return self.request.user.is_employer

@@ -437,7 +437,14 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
                 ("is_admin", models.BooleanField(default=False, verbose_name="administrateur")),
-                ("company", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="companies.company")),
+                (
+                    "company",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="companies.company",
+                        related_name="memberships",
+                    ),
+                ),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ("is_active", models.BooleanField(default=True, verbose_name="rattachement actif")),
                 (

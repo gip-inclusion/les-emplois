@@ -617,7 +617,7 @@ class CompanyMembership(MembershipAbstract):
 
     user_kind = UserKind.EMPLOYER
 
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_companymembership_set",

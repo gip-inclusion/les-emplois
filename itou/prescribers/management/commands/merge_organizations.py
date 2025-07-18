@@ -35,7 +35,7 @@ def _model_sanity_check():
         "invitations",
         "jobapplication",
         "members",
-        "prescribermembership",
+        "memberships",
         "prolongation",
         "prolongationrequest",
         "notification_settings",

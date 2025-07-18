@@ -430,7 +430,7 @@ class TestCompanyQuerySet:
         # Deactivate members
         company = Company.objects.last()
         assert company.members.count() == 1
-        membership = company.companymembership_set.first()
+        membership = company.memberships.first()
         membership.is_active = False
         membership.save()
 

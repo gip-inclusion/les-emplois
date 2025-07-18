@@ -405,7 +405,9 @@ class Migration(migrations.Migration):
                 (
                     "organization",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="prescribers.prescriberorganization"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="prescribers.prescriberorganization",
+                        related_name="memberships",
                     ),
                 ),
             ],

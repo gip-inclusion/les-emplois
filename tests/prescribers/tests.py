@@ -278,8 +278,8 @@ class TestPrescriberOrganizationAdmin:
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
     FORMSETS_PAYLOAD = {
-        "prescribermembership_set-TOTAL_FORMS": 0,
-        "prescribermembership_set-INITIAL_FORMS": 0,
+        "memberships-TOTAL_FORMS": 0,
+        "memberships-INITIAL_FORMS": 0,
         "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
         "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
     }
@@ -871,15 +871,15 @@ def test_remove_last_admin_status(admin_client, mailoutbox):
             "city": organization.city,
             "department": organization.department,
             "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "1",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            "prescribermembership_set-0-is_active": "on",
-            # prescribermembership_set-0-is_admin is absent
+            "memberships-TOTAL_FORMS": "1",
+            "memberships-INITIAL_FORMS": "1",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-id": membership.pk,
+            "memberships-0-organization": organization.pk,
+            "memberships-0-user": membership.user.pk,
+            "memberships-0-is_active": "on",
+            # memberships-0-is_admin is absent
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
             "_continue": "Enregistrer+et+continuer+les+modifications",
@@ -924,15 +924,15 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
             "city": organization.city,
             "department": organization.department,
             "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "1",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            "prescribermembership_set-0-is_admin": "on",
-            # prescribermembership_set-0-is_active is absent
+            "memberships-TOTAL_FORMS": "1",
+            "memberships-INITIAL_FORMS": "1",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-id": membership.pk,
+            "memberships-0-organization": organization.pk,
+            "memberships-0-user": membership.user.pk,
+            "memberships-0-is_admin": "on",
+            # memberships-0-is_active is absent
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
             "_continue": "Enregistrer+et+continuer+les+modifications",
@@ -979,19 +979,19 @@ def test_add_admin(admin_client, caplog, mailoutbox):
             "city": organization.city,
             "department": organization.department,
             "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            "prescribermembership_set-0-is_admin": "on",
-            "prescribermembership_set-0-is_active": "on",
-            "prescribermembership_set-1-organization": organization.pk,
-            "prescribermembership_set-1-user": prescriber.pk,
-            "prescribermembership_set-1-is_admin": "on",
-            "prescribermembership_set-1-is_active": "on",
+            "memberships-TOTAL_FORMS": "2",
+            "memberships-INITIAL_FORMS": "1",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-id": membership.pk,
+            "memberships-0-organization": organization.pk,
+            "memberships-0-user": membership.user.pk,
+            "memberships-0-is_admin": "on",
+            "memberships-0-is_active": "on",
+            "memberships-1-organization": organization.pk,
+            "memberships-1-user": prescriber.pk,
+            "memberships-1-is_admin": "on",
+            "memberships-1-is_active": "on",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
             "_continue": "Enregistrer+et+continuer+les+modifications",
@@ -1012,7 +1012,7 @@ def test_admin_too_many_memberships(admin_client, mocker):
 
     change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
     response = admin_client.get(change_url)
-    membership_form_field_id = '"id_prescribermembership_set-0-user"'
+    membership_form_field_id = '"id_memberships-0-user"'
     assertContains(response, membership_form_field_id)
 
     mocker.patch("itou.prescribers.admin.PrescriberOrganizationMembersInline.MEMBERSHIP_RO_LIMIT", 1)

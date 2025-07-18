@@ -9,7 +9,6 @@ from itou.utils.auth import check_user
 
 class MemberList(BaseMemberList):
     template_name = "institutions/members.html"
-    membership_related_name = "institutionmembership_set"
 
     def test_func(self):
         return self.request.user.is_labor_inspector
