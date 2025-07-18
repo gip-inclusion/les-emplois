@@ -86,6 +86,11 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
         )
+        sent_by_company = factory.Trait(
+            sender_kind=SenderKind.EMPLOYER,
+            sender_company=factory.SelfAttribute("to_company"),
+            sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
+        )
         sent_by_another_employer = factory.Trait(
             sender_kind=SenderKind.EMPLOYER,
             sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
