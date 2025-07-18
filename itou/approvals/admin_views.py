@@ -10,7 +10,6 @@ https://github.com/django/django/blob/master/django/contrib/admin/templates/admi
 from collections import defaultdict
 
 from django.contrib import admin, messages
-from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -38,8 +37,7 @@ def manually_add_approval(
     admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
-    codename = get_permission_codename("add", opts)
-    has_perm = request.user.has_perm(f"{app_label}.{codename}")
+    has_perm = request.user.has_perm(f"{app_label}.handle_manual_approval_requests")
 
     if not has_perm:
         raise PermissionDenied
@@ -112,8 +110,7 @@ def manually_refuse_approval(
     admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
-    codename = get_permission_codename("add", opts)
-    has_perm = request.user.has_perm(f"{app_label}.{codename}")
+    has_perm = request.user.has_perm(f"{app_label}.handle_manual_approval_requests")
 
     if not has_perm:
         raise PermissionDenied

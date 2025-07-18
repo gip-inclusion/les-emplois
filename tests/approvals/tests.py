@@ -962,7 +962,7 @@ class TestCustomApprovalAdminViews:
         user = ItouStaffFactory()
         client.force_login(user)
         content_type = ContentType.objects.get_for_model(Approval)
-        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
+        permission = Permission.objects.get(content_type=content_type, codename="handle_manual_approval_requests")
         user.user_permissions.add(permission)
         response = client.get(url)
         assert response.status_code == 200
