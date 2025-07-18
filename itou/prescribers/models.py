@@ -365,7 +365,7 @@ class PrescriberMembership(MembershipAbstract):
 
     user_kind = UserKind.PRESCRIBER
 
-    organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
+    organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE, related_name="memberships")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_prescribermembership_set",

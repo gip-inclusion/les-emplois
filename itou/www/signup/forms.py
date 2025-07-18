@@ -309,7 +309,7 @@ class PrescriberChooseOrgKindForm(forms.Form):
             error = "« {} » utilise déjà ce type d'organisation avec le même SIRET ({})."
             error_args = [org.display_name, self.siret]
             # Get the first member to display their name and the link to the invitation request
-            member = org.prescribermembership_set.first()
+            member = org.memberships.first()
             if member:
                 error += (
                     " Pour rejoindre cette organisation, vous pouvez être ajouté(e) par : {} {}."

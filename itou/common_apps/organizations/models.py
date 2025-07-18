@@ -21,9 +21,8 @@ class OrganizationQuerySet(models.QuerySet):
 
     def prefetch_active_memberships(self):
         membership_model = self.model.members.through
-        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
         qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
-        return self.prefetch_related(Prefetch(membership_set_related_name, queryset=qs))
+        return self.prefetch_related(Prefetch("memberships", queryset=qs))
 
 
 class OrganizationAbstract(models.Model):
@@ -190,22 +189,6 @@ class OrganizationAbstract(models.Model):
     @property
     def has_members(self):
         return self.active_members.exists()
-
-    @property
-    def memberships(self):
-        """
-        Get memberships linked to this organization.
-        In short, self.memberships.get(user=user.pk)
-        is the same as company.companymembership_set.get(user=user.pk).
-        ---
-        At this level, we don't know the organization model as it is defined later in the child class.
-        Using self.members.though is a trap as it returns the model Manager and not a query set!
-        `self.members.through.objects.get(user=user.pk)` returns every membership for that user
-        but NOT for a couple user / organization.
-        """
-        membership_model = self.members.through
-        membership_set_related_name = membership_model.user.field.remote_field.get_accessor_name()
-        return getattr(self, membership_set_related_name)
 
     #### Emails ####
     def add_admin_email(self, user):

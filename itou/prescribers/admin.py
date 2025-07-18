@@ -93,7 +93,7 @@ class PrescriberOrganizationMembersInline(MembersInline):
         # A few organizations have more than 250 members, which causes the form
         # to have more than 1000 fields (the limit set in DATA_UPLOAD_MAX_NUMBER_FIELDS)
         # we believe that with 200+ members, there's no need to ask the support team to manually add a member
-        return not bool(obj and obj.prescribermembership_set.count() > self.MEMBERSHIP_RO_LIMIT)
+        return not bool(obj and obj.memberships.count() > self.MEMBERSHIP_RO_LIMIT)
 
 
 @admin.register(PrescriberOrganization)
