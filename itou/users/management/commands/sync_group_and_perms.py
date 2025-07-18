@@ -14,6 +14,7 @@ PERMS_READ = {"view"}
 PERMS_EXPORT_FT_API_REJECTIONS = {"export_ft_api_rejections"}
 PERMS_EXPORT_JOB_APPLICATIONS_UNKNOWN_TO_FT = {"export_job_applications_unknown_to_ft"}
 PERMS_EXPORT_CTA = {"export_cta"}
+PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS = {"handle_manual_approval_requests"}
 PERMS_MERGE_USERS = {"merge_users"}
 
 
@@ -47,7 +48,10 @@ def get_permissions_dict():
     group_itou_admin_permissions = {
         account_models.EmailAddress: PERMS_ALL,
         analytics_models.Datum: PERMS_READ,
-        approvals_models.Approval: PERMS_ALL | PERMS_EXPORT_FT_API_REJECTIONS,
+        approvals_models.Approval: PERMS_DELETE
+        | PERMS_EDIT
+        | PERMS_EXPORT_FT_API_REJECTIONS
+        | PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS,
         approvals_models.CancelledApproval: PERMS_READ,
         approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
