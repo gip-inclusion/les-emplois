@@ -22,7 +22,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.files.models import File
-from itou.geiq import sync
+from itou.geiq_assessments import sync
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,

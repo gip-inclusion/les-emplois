@@ -6,7 +6,6 @@ import factory.fuzzy
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
-from itou.geiq.sync import CONTRACT_MAPPING, EMPLOYEE_MAPPING, PREQUALIFICATION_MAPPING, _nb_days_in_year
 from itou.geiq_assessments.models import (
     MIN_DAYS_IN_YEAR_FOR_ALLOWANCE,
     Assessment,
@@ -15,6 +14,7 @@ from itou.geiq_assessments.models import (
     EmployeeContract,
     EmployeePrequalification,
 )
+from itou.geiq_assessments.sync import CONTRACT_MAPPING, EMPLOYEE_MAPPING, PREQUALIFICATION_MAPPING, _nb_days_in_year
 from itou.users.enums import Title
 from tests.files.factories import FileFactory
 from tests.geiq.factories import (

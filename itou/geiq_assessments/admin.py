@@ -5,8 +5,7 @@ from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import format_html
 
-from itou.geiq import sync
-from itou.geiq_assessments import models
+from itou.geiq_assessments import models, sync
 from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,

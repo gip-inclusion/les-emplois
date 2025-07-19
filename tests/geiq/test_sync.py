@@ -2,8 +2,7 @@ import datetime
 
 import pytest
 
-from itou.geiq import sync
-from itou.geiq_assessments import models
+from itou.geiq_assessments import models, sync
 from itou.utils.apis import geiq_label
 from tests.geiq.factories import (
     SalarieContratLabelDataFactory,
