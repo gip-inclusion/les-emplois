@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("companies", "0006_alter_company_created_by_alter_company_insee_city_and_more"),
         ("eligibility", "0004_geiqadministrativecriteria_certifiable"),
         ("prescribers", "0004_poleemploi_to_francetravail"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
