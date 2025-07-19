@@ -77,7 +77,6 @@ def forwards(apps, editor):
 class Migration(migrations.Migration):
     atomic = False
     dependencies = [
-        ("eligibility", "0011_update_geiqeligibilitydiagnosis_author_kind_coherence"),
         ("users", "0026_identitycertification"),
     ]
 
