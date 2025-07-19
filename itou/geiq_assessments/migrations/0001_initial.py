@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("companies", "0023_fill_last_employer_update_at"),
+        ("companies", "0001_initial"),
         ("files", "0001_initial"),
         ("institutions", "0008_institution_automatic_geocoding_update"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

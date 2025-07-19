@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("companies", "0014_company_fields_history_and_more"),
         ("eligibility", "0009_fix_selectedadministrativecriteria_certification_period"),
         ("prescribers", "0007_prescriberorganization_automatic_geocoding_update"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

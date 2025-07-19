@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("companies", "0002_fix_job_app_contract_type_enum"),
+        ("companies", "0001_initial"),
         ("files", "0001_initial"),
         ("institutions", "0002_alter_institution_kind"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
