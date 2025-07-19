@@ -17,21 +17,33 @@ class Command(BaseCommand, XlsxExportMixin):
 
     help = "Export job seekers to give to FT in order to retrieve advisor contact information."
 
-    def handle(self, **options):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "departments",
+            nargs="*",
+            type=str,
+            help="The departments of the beneficiaries",
+        )
+
+    def handle(self, departments, **options):
         job_seekers = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile").order_by("pk")
+        if departments:
+            job_seekers = job_seekers.filter(department__in=departments)
 
         headers = [
-            "ID",
-            "prénom",
-            "nom",
-            "nir",
-            "identifiant_ft",
-            "date_de_naissance",
+            "ID - emplois",
+            "ID - FT",
+            "Prénom",
+            "Nom",
+            "NIR",
+            "Identifiant FT",
+            "Date de naissance",
         ]
 
         def serialize_job_seeker(job_seeker):
             return [
                 str(job_seeker.pk),
+                job_seeker.jobseeker_profile.ft_gps_id or "",
                 job_seeker.first_name.capitalize(),
                 job_seeker.last_name.upper(),
                 job_seeker.jobseeker_profile.nir,
