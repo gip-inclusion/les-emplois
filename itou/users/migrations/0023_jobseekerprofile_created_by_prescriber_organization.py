@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("prescribers", "0007_prescriberorganization_automatic_geocoding_update"),
+        ("prescribers", "0001_initial"),
         ("users", "0022_user_full_name_search_idx"),
     ]
 
