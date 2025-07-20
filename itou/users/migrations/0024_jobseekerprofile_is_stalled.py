@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("asp", "0005_remove_commune_aps_communes_name_gin_trgm_and_more"),
+        ("asp", "0001_initial"),
         ("prescribers", "0001_initial"),
         ("users", "0023_jobseekerprofile_created_by_prescriber_organization"),
     ]
