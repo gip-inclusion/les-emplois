@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("asp", "0008_update_commune_lomme"),
+        ("asp", "0001_initial"),
         ("prescribers", "0001_initial"),
         ("users", "0034_add_context_to_triggers"),
     ]

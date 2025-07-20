@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("asp", "0001_initial"),
-        ("asp", "__first__"),
         ("auth", "0011_update_proxy_permissions"),
         ("cities", "0001_initial"),
     ]
