@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("companies", "0001_initial"),
         ("files", "0001_initial"),
-        ("institutions", "0008_institution_automatic_geocoding_update"),
+        ("institutions", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
