@@ -19,7 +19,7 @@ Récapitulatif de la décision enregistrée par la {{ assessment.reviewed_by_ins
 
 Montant total accordé : {{ assessment.granted_amount|format_int_euros }}
 Montant du premier versement déjà réalisé : {{ assessment.advance_amount|format_int_euros }}
-Montant du {% if assessment.granted_amount >= assessment.advance_amount %}deuxième versement prévu{% else %}remboursement demandé{% endif %} : {{ abs_balance_amount|format_int_euros }}
+Montant {% if assessment.granted_amount >= assessment.advance_amount %}du deuxième versement prévu{% else %}de l’ordre de reversement{% endif %} : {{ abs_balance_amount|format_int_euros }}
 
 Commentaire:
 {{ assessment.review_comment }}

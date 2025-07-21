@@ -293,7 +293,7 @@
                         {% elif assessment.granted_amount == assessment.advance_amount %}
                             Cette décision n'entraîne aucun versement complémentaire, la totalité ayant déjà été réglée lors du premier versement.
                         {% else %}
-                            Cette décision implique la mise en place d’une demande de remboursement de {{ abs_balance_amount|format_int_euros }} adressée au GEIQ, conformément aux modalités habituelles.
+                            Cette décision implique la mise en place d’un ordre de reversement de {{ abs_balance_amount|format_int_euros }} adressé au GEIQ, conformément aux modalités habituelles.
                         {% endif %}
                     </div>
                     <div class="modal-footer">
