@@ -492,9 +492,12 @@ class TestAssessmentReviewView:
             response = client.get(url)
             assert response.status_code == expected_status
 
+    @freeze_time("2025-05-21 12:00")
     def test_review_assessment(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
-        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ, user__first_name="Paul", user__last_name="Martin"
+        )
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             with_submission_requirements=True,
@@ -559,9 +562,19 @@ class TestAssessmentReviewView:
         assert assessment.granted_amount == 80_000
         assert assessment.review_comment == "Bravo !"
 
+    @freeze_time("2025-05-21 12:00")
     def test_review_already_reviewed_assessment(self, client, snapshot):
-        ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
-        geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        ddets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DDETS_GEIQ,
+            institution__name="Un DDETS GEIQ",
+            user__first_name="Jean",
+            user__last_name="Dupont",
+        )
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+        )
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             with_submission_requirements=True,
@@ -607,3 +620,19 @@ class TestAssessmentReviewView:
         assert assessment.advance_amount == 50_000
         assert assessment.granted_amount == 80_000
         assert assessment.review_comment == "Bravo !"
+
+        # Check snapshot with a final review
+        dreets_membership = InstitutionMembershipFactory(
+            institution__kind=InstitutionKind.DREETS_GEIQ,
+            institution__name="Un DREETS GEIQ",
+            user__first_name="Julia",
+            user__last_name="Thomas",
+        )
+        assessment.final_reviewed_at = timezone.now() + datetime.timedelta(hours=7)
+        assessment.final_reviewed_by = dreets_membership.user
+        assessment.final_reviewed_by_institution = dreets_membership.institution
+        assessment.save()
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="disabled assessments review form with final review"
+        )
