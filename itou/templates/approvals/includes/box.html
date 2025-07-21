@@ -9,12 +9,14 @@ Arguments:
     detail_view_version (defaults to False)
     job_seeker_dashboard_version (defaults to False)
     link_from_current_url (defauts to None - hence no link to detail view)
-    extra_class (defaults to "")
+    extra_classes (defaults to "")
 
 {% endcomment %}
 {% enums "approvals" "Origin" as ApprovalOrigin %}
-<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_class|default:'' }}">
-    <div class="mb-3 mb-md-4">{% approval_state_badge approval in_approval_box=True span_extra_class="badge-base" %}</div>
+<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_classes|default:'' }}">
+    <div class="mb-3 mb-md-4">
+        {% approval_state_badge approval in_approval_box=True span_extra_classes="badge-base" %}
+    </div>
     <ul class="list-data">
         <li>
             <small>Numéro {{ approval.is_pass_iae|yesno:"de PASS IAE,d’agrément" }}</small>

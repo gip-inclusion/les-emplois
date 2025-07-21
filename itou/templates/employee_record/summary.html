@@ -49,7 +49,7 @@
             <div class="form-row align-items-center gx-3">
                 {% if employee_record.status == "PROCESSED" %}
                     <div class="form-group col-12 col-lg-auto">
-                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_class="btn-lg btn-white btn-block w-lg-auto" only %}
+                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_classes="btn-lg btn-white btn-block w-lg-auto" only %}
                     </div>
                 {% elif employee_record.status == "NEW" %}
                     <div class="form-group col-12 col-lg-auto">

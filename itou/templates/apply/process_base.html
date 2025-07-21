@@ -14,7 +14,7 @@
                 {% else %}
                     {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
                 {% endif %}
-                {% job_application_state_badge job_application extra_class="badge-base" %}
+                {% job_application_state_badge job_application extra_classes="badge-base" %}
             </h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
@@ -92,7 +92,7 @@
                                 {% with common_approval=job_application.job_seeker.latest_common_approval %}
                                     {% if common_approval %}
                                         {% if common_approval.is_valid or job_application.state.is_accepted %}
-                                            {% include "approvals/includes/box.html" with approval=common_approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                                            {% include "approvals/includes/box.html" with approval=common_approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' only %}
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}
@@ -100,9 +100,9 @@
                             {% elif request.user.is_prescriber %}
                                 {# Approval status. #}
                                 {% if job_application.approval %}
-                                    {% include "approvals/includes/box.html" with approval=job_application.approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                                    {% include "approvals/includes/box.html" with approval=job_application.approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' only %}
                                 {% elif job_application.job_seeker.has_valid_approval %}
-                                    {% include "approvals/includes/box.html" with approval=job_application.job_seeker.latest_approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                                    {% include "approvals/includes/box.html" with approval=job_application.job_seeker.latest_approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' only %}
                                 {% elif job_application.approval_manually_refused_at %}
                                     <div class="c-box mb-4">PASS IAE refusé (délai de carence non respecté).</div>
                                 {% elif job_application.manual_approval_delivery_required %}

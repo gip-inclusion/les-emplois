@@ -13,7 +13,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
-            <h1>Bilan d’exécution - {{ assessment.name_for_geiq }} {% state_for_geiq assessment extra_class="badge-base" %}</h1>
+            <h1>Bilan d’exécution - {{ assessment.name_for_geiq }} {% state_for_geiq assessment extra_classes="badge-base" %}</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             <button class="btn btn-lg btn-ico-only btn-link" type="button" data-it-action="print" aria-label="Imprimer la page">

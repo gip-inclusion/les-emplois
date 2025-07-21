@@ -42,7 +42,7 @@
     {% endif %}
 
     <td>{{ job_application.created_at|date:"d/m/Y" }}</td>
-    <td>{% job_application_state_badge job_application extra_class="badge-xs" %}</td>
+    <td>{% job_application_state_badge job_application extra_classes="badge-xs" %}</td>
 
     {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
         <td>{{ job_application.to_company.display_name }}</td>

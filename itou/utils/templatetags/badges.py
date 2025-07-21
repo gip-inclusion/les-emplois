@@ -9,7 +9,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-1"):
+def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_classes="badge-sm mb-1"):
     state_classes = {
         JobApplicationState.ACCEPTED: "bg-success",
         JobApplicationState.CANCELLED: "bg-primary",
@@ -22,14 +22,14 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
     }[job_application.state]
     attrs = [
         f'id="state_{job_application.pk}"',
-        f'class="badge rounded-pill text-nowrap {extra_class} {state_classes}"',
+        f'class="badge rounded-pill text-nowrap {extra_classes} {state_classes}"',
     ]
     if hx_swap_oob:
         attrs.append('hx-swap-oob="true"')
     badge = f"<span {' '.join(attrs)}>{job_application.get_state_display()}</span>"
     if job_application.archived_at:
         badge = f"""\
-            <span class="badge rounded-pill {extra_class} bg-light text-primary"
+            <span class="badge rounded-pill {extra_classes} bg-light text-primary"
                   aria-label="candidature archivée"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
@@ -41,7 +41,7 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
 
 @register.simple_tag
 def approval_state_badge(
-    approval, *, force_valid=False, in_approval_box=False, span_extra_class="badge-sm", icon_extra_class=""
+    approval, *, force_valid=False, in_approval_box=False, span_extra_classes="badge-sm", icon_extra_classes=""
 ):
     # If force_valid is set to True & approval.is_valid(), ignore the provided approval and display a VALID state
     # It is mainly used to show a VALID state to employers instead of SUSPENDED
@@ -68,12 +68,12 @@ def approval_state_badge(
         ApprovalStatus.SUSPENDED: "ri-pass-pending-line",
         ApprovalStatus.VALID: "ri-pass-valid-line",
     }[approval_state]
-    if icon_extra_class:
-        icon_class = f"{icon_class} {icon_extra_class}"
+    if icon_extra_classes:
+        icon_class = f"{icon_class} {icon_extra_classes}"
     approval_type = "PASS IAE" if approval.is_pass_iae else "Agrément"
     return mark_safe(
         f"""\
-            <span class="badge {span_extra_class} rounded-pill {span_class}">
+            <span class="badge {span_extra_classes} rounded-pill {span_class}">
                 <i class="{icon_class}" aria-hidden="true"></i>
                 {approval_type} {approval_state.label.lower()}
             </span>"""
@@ -81,34 +81,34 @@ def approval_state_badge(
 
 
 @register.simple_tag
-def iae_eligibility_badge(*, is_eligible, extra_class="", for_job_seeker=False):
+def iae_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=False):
     if is_eligible:
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
+        <span class="badge {extra_classes} rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>
             Éligible à l’IAE
         </span>""")
     else:
         span_class = "bg-accent-02-lighter text-primary" if for_job_seeker else "bg-warning-lighter text-warning"
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill {span_class}">
+        <span class="badge {extra_classes} rounded-pill {span_class}">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité IAE à valider
         </span>""")
 
 
 @register.simple_tag
-def geiq_eligibility_badge(*, is_eligible, extra_class="", for_job_seeker=False):
+def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=False):
     if is_eligible:
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill bg-success-lighter text-success">
+        <span class="badge {extra_classes} rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>
             Éligibilité GEIQ confirmée
         </span>""")
     else:
         span_class = "bg-accent-02-lighter text-primary" if for_job_seeker else "bg-warning-lighter text-warning"
         return mark_safe(f"""\
-        <span class="badge {extra_class} rounded-pill {span_class}">
+        <span class="badge {extra_classes} rounded-pill {span_class}">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité GEIQ non confirmée
         </span>""")

@@ -48,7 +48,7 @@
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}
-                        {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path extra_class='mb-3 mb-md-4' only %}
+                        {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' only %}
                     {% endif %}
                     {% if link_immersion_facile %}
                         {# Immersion Facilitée proposal #}

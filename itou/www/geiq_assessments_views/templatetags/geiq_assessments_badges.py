@@ -8,7 +8,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def state_for_institution(assessment, *, extra_class="badge-sm"):
+def state_for_institution(assessment, *, extra_classes="badge-sm"):
     if not assessment.submitted_at:
         text = "En attente"
         state_classes = "bg-warning"
@@ -22,12 +22,12 @@ def state_for_institution(assessment, *, extra_class="badge-sm"):
         text = "Validé"
         state_classes = "bg-success"
 
-    class_attr = f"badge rounded-pill text-nowrap {extra_class} {state_classes}"
+    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes}"
     return format_html('<span class="{}">{}</span>', class_attr, text)
 
 
 @register.simple_tag
-def state_for_geiq(assessment, *, extra_class="badge-sm"):
+def state_for_geiq(assessment, *, extra_classes="badge-sm"):
     if not assessment.submitted_at:
         text = "À compléter"
         state_classes = "bg-info"
@@ -38,18 +38,18 @@ def state_for_geiq(assessment, *, extra_class="badge-sm"):
         text = "Traité"
         state_classes = "text-success bg-success-lightest"
 
-    class_attr = f"badge rounded-pill text-nowrap {extra_class} {state_classes}"
+    class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes}"
     return format_html('<span class="{}">{}</span>', class_attr, text)
 
 
 @register.simple_tag
-def grant_percentage_badge(assessment, *, extra_class="badge-sm"):
+def grant_percentage_badge(assessment, *, extra_classes="badge-sm"):
     if assessment.convention_amount:
         grant_percentage = 100 * assessment.granted_amount / assessment.convention_amount
         if grant_percentage == 100:
             state_classes = "bg-success-lighter text-success"
         else:
             state_classes = "bg-warning-lighter text-warning"
-        class_attr = f"badge rounded-pill text-nowrap {extra_class} {state_classes}"
+        class_attr = f"badge rounded-pill text-nowrap {extra_classes} {state_classes}"
         return format_html('<span class="{}">{}</span>', class_attr, formatfloat_with_unit(grant_percentage, "%"))
     return "-"
