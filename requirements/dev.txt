@@ -4,13 +4,13 @@ anyio==4.9.0 \
     --hash=sha256:673c0c244e15788651a4ff38710fea9675823028a6f08a5eda409e0c9840a028 \
     --hash=sha256:9f76d541cad6e36af7beb62e978876f3b41e3e04f2c1fbf0884604c0a9c4d93c
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   httpx
 asgiref==3.9.1 \
     --hash=sha256:a5ab6582236218e5ef1648f242fd9f10626cfd4de8dc377db215d5d5098e3142 \
     --hash=sha256:f3bba7092a48005b5f5bacd747d36ee4a5a61f4a269a6df590b43144355ebd2c
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django
     #   django-allauth
     #   django-htmx
@@ -22,7 +22,7 @@ attrs==25.3.0 \
     --hash=sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3 \
     --hash=sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   jsonschema
     #   pytest-subtests
     #   referencing
@@ -79,34 +79,34 @@ bcrypt==4.3.0 \
     --hash=sha256:f6746e6fec103fcd509b96bacdfdaa2fbde9a553245dbada284435173a6f1aef \
     --hash=sha256:f81b0ed2639568bf14749112298f9e4e2b28853dab50a8b357e31798686a036d
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   paramiko
 beautifulsoup4==4.13.4 \
     --hash=sha256:9bbbb14bfde9d79f38b8cd5f8c7c85f4b8f2523190ebed90e950a8dea4cb1c4b \
     --hash=sha256:dbb3c4e1ceae6aefebdaf2423247260cd062430a410e38c66f2baa50a8437195
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 bleach[css]==6.2.0 \
     --hash=sha256:117d9c6097a7c3d22fd578fcd8d35ff1e125df6736f554da4e432fdd63f31e5e \
     --hash=sha256:123e894118b8a599fd80d3ec1a6d4cc7ce4e5882b1317a7e1ba69b56e95f991f
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-markdownify
 boto3==1.37.38 \
     --hash=sha256:88c02910933ab7777597d1ca7c62375f52822e0aa1a8e0c51b2598a547af42b2 \
     --hash=sha256:b6d42803607148804dff82389757827a24ce9271f0583748853934c86310999f
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 botocore==1.37.38 \
     --hash=sha256:23b4097780e156a4dcaadfc1ed156ce25cb95b6087d010c4bb7f7f5d9bc9d219 \
     --hash=sha256:c3ea386177171f2259b284db6afc971c959ec103fa2115911c4368bea7cbbc5d
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   boto3
     #   s3transfer
 certifi==2025.7.14 \
     --hash=sha256:6b31f564a415d79ee77df69d757bb49a5bb53bd9f756cbbe24394ffd6fc1f4b2 \
     --hash=sha256:8ea99dbdfaaf2ba2f9bac77b9249ef62ec5218e7c2b2e903378ed5fccf765995
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   httpcore
     #   httpx
     #   requests
@@ -180,7 +180,7 @@ cffi==1.17.1 \
     --hash=sha256:f7f5baafcc48261359e14bcd6d9bff6d4b28d9103847c9e136694cb0501aef87 \
     --hash=sha256:fc48c783f9c87e60831201f2cce7f3b2e4846bf4d8728eabe54d60700b318a0b
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   cryptography
     #   pynacl
 cfgv==3.4.0 \
@@ -294,19 +294,19 @@ charset-normalizer==3.4.0 \
     --hash=sha256:fe9f97feb71aa9896b81973a7bbada8c49501dc73e58a10fcef6663af95e5079 \
     --hash=sha256:ffc519621dce0c767e96b9c53f09c5d215578e10b02c285809f76509a3931482
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   requests
 click==8.2.1 \
     --hash=sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202 \
     --hash=sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 colorama==0.4.6 \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 cryptography==45.0.5 \
     --hash=sha256:0027d566d65a38497bc37e0dd7c2f8ceda73597d2ac9ba93810204f56f52ebc7 \
@@ -347,13 +347,13 @@ cryptography==45.0.5 \
     --hash=sha256:e74d30ec9c7cb2f404af331d5b4099a9b322a8a6b25c4632755c8757345baac5 \
     --hash=sha256:f3562c2f23c612f2e4a6964a61d942f891d29ee320edb62ff48ffb99f3de9ae8
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   paramiko
 cssbeautifier==1.15.4 \
     --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
     --hash=sha256:9bb08dc3f64c101a01677f128acf01905914cf406baf87434dcde05b74c0acf5
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 decorator==5.2.1 \
     --hash=sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360 \
@@ -369,7 +369,7 @@ django==5.2.4 \
     --hash=sha256:60c35bd96201b10c6e7a78121bd0da51084733efa303cc19ead021ab179cef5e \
     --hash=sha256:a1228c384f8fa13eebc015196db7b3e08722c5058d4758d20cb287503a540d8f
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-allauth
     #   django-anymail
     #   django-appconf
@@ -394,33 +394,33 @@ django==5.2.4 \
     #   slippers
 django-allauth==65.10.0 \
     --hash=sha256:47daa3b0e11a1d75724ea32995de37bd2b8963e9e4cce2b3a7fd64eb6d3b3c48
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-anymail==13.0 \
     --hash=sha256:6da4465eff18f679955f74332501a3a4299e34079015d91e1fce9c049d784d6c \
     --hash=sha256:87f42d9ff12a9a029d5e88edaaf62a4b880aa9a6a7ef937042b7e96579e6db07
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-appconf==1.1.0 \
     --hash=sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f \
     --hash=sha256:9fcead372f82a0f21ee189434e7ae9c007cbb29af1118c18251720f3d06243e4
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-select2
 django-bootstrap5==25.1 \
     --hash=sha256:964ad2d970d0495b030b86f31b33033dfdfe839a67b32ea599fa02eb39988ae7 \
     --hash=sha256:e81c77eb710356f94e426a51f4f469890d5720f5e7e53d650f4405d4cc94da04
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-citext==1.0.2 \
     --hash=sha256:375a2d6a06133ad9e375f0db62d4d606fa43428de14751d03856b9c702c0000f \
     --hash=sha256:6ae71eb36442a61f1b2df5355c8ead9722b283a7b726cdfabcf0ff873a6b7613
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-csp==4.0 \
     --hash=sha256:b27010bb702eb20a3dad329178df2b61a2b82d338b70fbdc13c3a3bd28712833 \
     --hash=sha256:d5a0a05463a6b75a4f1fc1828c58c89af8db9364d09fc6e12f122b4d7f3d00dc
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-datadog-logger==0.7.3 \
     --hash=sha256:4361bb068a4b188fa14135398f9b747728464a291757e6adf8c95c9215dcd602 \
     --hash=sha256:87838cd868f407e050831c536413de6b2ece31433b28c952c0fd90be1d66486a
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-debug-toolbar==5.2.0 \
     --hash=sha256:15627f4c2836a9099d795e271e38e8cf5204ccd79d5dbcd748f8a6c284dcd195 \
     --hash=sha256:9e7f0145e1a1b7d78fcc3b53798686170a5b472d9cf085d88121ff823e900821
@@ -428,52 +428,52 @@ django-debug-toolbar==5.2.0 \
 django-filter==25.1 \
     --hash=sha256:1ec9eef48fa8da1c0ac9b411744b16c3f4c31176c867886e4c48da369c407153 \
     --hash=sha256:4fa48677cf5857b9b1347fed23e355ea792464e0fe07244d1fdfb8a806215b80
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-formtools==2.5.1 \
     --hash=sha256:47cb34552c6efca088863d693284d04fc36eaaf350eb21e1a1d935e0df523c93 \
     --hash=sha256:bce9b64eda52cc1eef6961cc649cf75aacd1a707c2fff08d6c3efcbc8e7e761a
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-hijack==3.7.3 \
     --hash=sha256:e5deb66e84f223d4d3aef38bdfb11c9cef1a8507c0e6ddb691d8a16428575ebd \
     --hash=sha256:f60186911efbab1d0e3bffab312206d1aa540360cde36025a27265655f3fffe2
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-htmx==1.23.2 \
     --hash=sha256:65a8c8825fcae983b94aedce26af96a70717ab185d55cdb8a7a4bb68863ab079 \
     --hash=sha256:c288fe92bdcfa7c2ed9665d6d23cc55c6693a7cc8d22cf0a01e1e38318874030
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
     --hash=sha256:34c34eba4a797282a5c5bd97b13cec84d6a4c0673ad47ce1c1d000d74dd8d4ab
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-otp==1.6.1 \
     --hash=sha256:68dafa008921fd418382492d81b717636d8cc1364e24e8f9222b72264adf3c5d \
     --hash=sha256:a632e126c9e6ffc5f961a1e0c2452ee0d7ed589073141a729f33915957177916
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-pgtrigger==4.15.3 \
     --hash=sha256:235e07487d7953e85d9a9ecd8079d04072650ccad119148da96267cb2be80e09 \
     --hash=sha256:f710514e6eba28b5db4e5a27ed83abc18eae26cf9a82e0201b0c8d5d29b46c46
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-redis==6.0.0 \
     --hash=sha256:20bf0063a8abee567eb5f77f375143c32810c8700c0674ced34737f8de4e36c0 \
     --hash=sha256:2d9cb12a20424a4c4dde082c6122f486628bae2d9c2bee4c0126a4de7fda00dd
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-select2==8.4.1 \
     --hash=sha256:1df5e6788cc032795c1be0f2e2a2ea7a5a1dd89878575217a2c23f25d7301fbf \
     --hash=sha256:e6cdc0ae647b91b1bed610628893d10dea50a96fffba8e83af27f35dd6003572
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-storages==1.14.6 \
     --hash=sha256:11b7b6200e1cb5ffcd9962bd3673a39c7d6a6109e8096f0e03d46fab3d3aabd9 \
     --hash=sha256:7a25ce8f4214f69ac9c7ce87e2603887f7ae99326c316bc8d2d75375e09341c9
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
     --hash=sha256:dc7c68e786b5392abf556f6dcd7182e947f77d1a964043868d4d8615fdd760e4
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 djangorestframework==3.16.0 \
     --hash=sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361 \
     --hash=sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-datadog-logger
     #   drf-spectacular
 djlint==1.36.4 \
@@ -499,29 +499,29 @@ djlint==1.36.4 \
     --hash=sha256:e9699b8ac3057a6ed04fb90835b89bee954ed1959c01541ce4f8f729c938afdd \
     --hash=sha256:ead475013bcac46095b1bbc8cf97ed2f06e83422335734363f8a76b4ba7e47c2 \
     --hash=sha256:ff9faffd7d43ac20467493fa71d5355b5b330a00ade1c4d1e859022f4195223b
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 drf-spectacular==0.28.0 \
     --hash=sha256:2c778a47a40ab2f5078a7c42e82baba07397bb35b074ae4680721b2805943061 \
     --hash=sha256:856e7edf1056e49a4245e87a61e8da4baff46c83dbc25be1da2df77f354c7cb4
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 editorconfig==0.17.1 \
     --hash=sha256:1eda9c2c0db8c16dbd50111b710572a5e6de934e39772de1959d41f64fc17c82 \
     --hash=sha256:23c08b00e8e08cc3adcddb825251c497478df1dada6aefeb01e626ad37303745
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   cssbeautifier
     #   jsbeautifier
 et-xmlfile==2.0.0 \
     --hash=sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa \
     --hash=sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   openpyxl
 execnet==2.1.1 \
     --hash=sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc \
     --hash=sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pytest-xdist
 executing==2.2.0 \
     --hash=sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa \
@@ -530,12 +530,12 @@ executing==2.2.0 \
 factory-boy==3.3.3 \
     --hash=sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc \
     --hash=sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 faker==37.4.0 \
     --hash=sha256:7f69d579588c23d5ce671f3fa872654ede0e67047820255f43a4aa1925b89780 \
     --hash=sha256:cb81c09ebe06c32a10971d1bbdb264bb0e22b59af59548f011ac4809556ce533
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   factory-boy
 filelock==3.18.0 \
     --hash=sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2 \
@@ -544,12 +544,12 @@ filelock==3.18.0 \
 freezegun==1.5.3 \
     --hash=sha256:1ce20ee4be61349ba52c3af64f5eaba8d08ff51acfcf1b3ea671f03e54c818f1 \
     --hash=sha256:d7c6204e33a50affd7c7aa284f4f92e04e96f72d63313b89ceaaf60d9c64bc5e
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 h11==0.16.0 \
     --hash=sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1 \
     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   httpcore
 hiredis==3.2.1 \
     --hash=sha256:0079ef1e03930b364556b78548e67236ab3def4e07e674f6adfc52944aa972dd \
@@ -661,26 +661,26 @@ hiredis==3.2.1 \
     --hash=sha256:f9ad63cd9065820a43fb1efb8ed5ae85bb78f03ef5eb53f6bde47914708f5718 \
     --hash=sha256:fec453a038c262e18d7de4919220b2916e0b17d1eadd12e7a800f09f78f84f39 \
     --hash=sha256:ffd982c419f48e3a57f592678c72474429465bb4bfc96472ec805f5d836523f0
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 html5lib==1.1 \
     --hash=sha256:0d78f8fde1c230e99fe37986a60526d7049ed4bf8a9fadbad5f00e22e58e041d \
     --hash=sha256:b2e5b40261e20f354d198eae92afc10d750afb487ed5e50f9c4eaf07c184146f
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 httpcore==1.0.9 \
     --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55 \
     --hash=sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   httpx
 httpx==0.28.1 \
     --hash=sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   respx
 huey==2.5.3 \
     --hash=sha256:089fc72b97fd26a513f15b09925c56fad6abe4a699a1f0e902170b37e85163c7
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 identify==2.6.12 \
     --hash=sha256:ad9672d5a72e0d2ff7c5c8809b62dfa60458626352fb0eb7b55e69bdc45334a2 \
     --hash=sha256:d8de45749f1efb108badef65ee8386f0f7bb19a7f26185f74de6367bffbaf0e6
@@ -689,7 +689,7 @@ idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   anyio
     #   httpx
     #   requests
@@ -697,13 +697,13 @@ inflection==0.5.1 \
     --hash=sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417 \
     --hash=sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   drf-spectacular
 iniconfig==2.1.0 \
     --hash=sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7 \
     --hash=sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pytest
 ipdb==0.13.13 \
     --hash=sha256:45529994741c4ab6d2388bfa5d7b725c2cf7fe9deffabdb8a6113aa5ed449ed4 \
@@ -725,38 +725,38 @@ jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
     --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   boto3
     #   botocore
 jsbeautifier==1.15.4 \
     --hash=sha256:5bb18d9efb9331d825735fbc5360ee8f1aac5e52780042803943aa7f854f7592 \
     --hash=sha256:72f65de312a3f10900d7685557f84cb61a9733c50dcc27271a39f5b0051bf528
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   cssbeautifier
     #   djlint
 json-log-formatter==1.1.1 \
     --hash=sha256:0815e3b4469e5c79cf3f6dc8a0613ba6601f4a7464f85ba03655cfa6e3e17d10
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-datadog-logger
 json5==0.12.0 \
     --hash=sha256:0b4b6ff56801a1c7dc817b0241bca4ce474a0e6a163bfef3fc594d3fd263ff3a \
     --hash=sha256:6d37aa6c08b0609f16e1ec5ff94697e2cbbfbad5ac112afa05794da9ab7810db
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 jsonschema==4.24.0 \
     --hash=sha256:0b4e8069eb12aedfa881333004bccaec24ecef5a8a6a4b6df142b2cc9599d196 \
     --hash=sha256:a462455f19f5faf404a7902952b6f0e3ce868f3ee09a359b05eca6673bd8412d
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   drf-spectacular
 jsonschema-specifications==2025.4.1 \
     --hash=sha256:4653bffbd6584f7de83a67e0d620ef16900b390ddc7939d56684d6c81e33f1af \
     --hash=sha256:630159c9f4dbea161a6a2205c3011cc4f18ff381b189fff48bb39b9bf26ae608
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   jsonschema
 lxml==5.3.2 \
     --hash=sha256:00a4463ca409ceacd20490a893a7e08deec7870840eff33dc3093067b559ce3e \
@@ -897,12 +897,12 @@ lxml==5.3.2 \
     --hash=sha256:ef926e9f11e307b5a7c97b17c5c609a93fb59ffa8337afac8f89e6fe54eb0b37 \
     --hash=sha256:f79a63289dbaba964eb29ed3c103b7911f2dce28c36fe87c36a114e6bd21d7ad \
     --hash=sha256:f8695752cf5d639b4e981afe6c99e060621362c416058effd5c704bede9cb5d1
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 markdown==3.8.2 \
     --hash=sha256:247b9a70dd12e27f67431ce62523e675b866d254f900c4fe75ce3dda62237c45 \
     --hash=sha256:5c83764dbd4e00bdd94d85a19b8d55ccca20fe35b2e678a1422b380324dd5f24
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-markdownify
 matplotlib-inline==0.1.7 \
     --hash=sha256:8423b23ec666be3d16e16b60bdd8ac4e86e840ebd1dd11a30b9f117f2fa0ab90 \
@@ -969,17 +969,17 @@ numpy==2.2.6 \
     --hash=sha256:fe27749d33bb772c80dcd84ae7e8df2adc920ae8297400dabec45f0dedb3f6de \
     --hash=sha256:fee4236c876c4e8369388054d02d0e9bb84821feb1a64dd59e137e6511a551f8
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pandas
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
     --hash=sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 packaging==25.0 \
     --hash=sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484 \
     --hash=sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-csp
     #   pytest
 pandas==2.3.1 \
@@ -1025,11 +1025,11 @@ pandas==2.3.1 \
     --hash=sha256:fe37e757f462d31a9cd7580236a82f353f5713a80e059a29753cf938c6775d96 \
     --hash=sha256:fe67dc676818c186d5a3d5425250e40f179c2a89145df477dd82945eaea89e97 \
     --hash=sha256:fe7317f578c6a153912bd2292f02e40c1d8f253e93c599e82620c7f69755c74f
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 paramiko==3.5.1 \
     --hash=sha256:43b9a0501fc2b5e70680388d9346cf252cfb7d00b0667c39e80eb43a408b8f61 \
     --hash=sha256:b2c665bc45b2b215bd7d7f039901b14b067da00f3a11e6640995fd58f2664822
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 parso==0.8.4 \
     --hash=sha256:a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18 \
     --hash=sha256:eb3a7b58240fb99099a345571deecc0f9540ea5f4dd2fe14c2a99d6b281ab92d
@@ -1037,12 +1037,12 @@ parso==0.8.4 \
 patchy==2.9.0 \
     --hash=sha256:cb1329b9fc4156fb8a4279a8298ec646b64daf3bdf24d24294142a3b7686e334 \
     --hash=sha256:f4364bbe9d0281d12fe92690e79ef3c86c317294b3ae9d33405e7a4b6e8d9d5f
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pathspec==0.12.1 \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
     --hash=sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 pexpect==4.9.0 \
     --hash=sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523 \
@@ -1155,7 +1155,7 @@ pillow==11.3.0 \
     --hash=sha256:f944255db153ebb2b19c51fe85dd99ef0ce494123f21b9db4877ffdfc5590c7c \
     --hash=sha256:fdae223722da47b024b867c1ea0be64e0df702c5e0a60e27daad39bf960dd1e4 \
     --hash=sha256:fe27fb049cdcca11f11a7bfda64043c37b30e6b91f10cb5bab275806c32f6ab3
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 platformdirs==4.3.8 \
     --hash=sha256:3d512d96e16bcb959a814c9f348431070822a6496326a4be0911c40b5a74c2bc \
     --hash=sha256:ff7059bb7eb1179e2685604f4aaf157cfd9535242bd23742eadc3c13542139b4
@@ -1164,7 +1164,7 @@ pluggy==1.6.0 \
     --hash=sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3 \
     --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pytest
 pre-commit==4.2.0 \
     --hash=sha256:601283b9757afd87d40c4c4a9b2b5de9637a8ea02eaff7adc2d0fb4e04841146 \
@@ -1178,7 +1178,7 @@ psycopg[binary]==3.2.3 \
     --hash=sha256:644d3973fe26908c73d4be746074f6e5224b03c1101d302d9a53bf565ad64907 \
     --hash=sha256:a5764f67c27bec8bfac85764d23c534af2c27b893550377e37ce59c12aac47a2
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-citext
 psycopg-binary==3.2.3 \
     --hash=sha256:0463a11b1cace5a6aeffaf167920707b912b8986a9c7920341c75e3686277920 \
@@ -1246,7 +1246,7 @@ psycopg-binary==3.2.3 \
     --hash=sha256:fd65774ed7d65101b314808b6893e1a75b7664f680c3ef18d2e5c84d570fa393 \
     --hash=sha256:fda0162b0dbfa5eaed6cdc708179fa27e148cb8490c7d62e5cf30713909658ea
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   psycopg
 ptyprocess==0.7.0 \
     --hash=sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35 \
@@ -1260,7 +1260,7 @@ pycparser==2.22 \
     --hash=sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6 \
     --hash=sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   cffi
 pycryptodomex==3.23.0 \
     --hash=sha256:02d87b80778c171445d67e23d1caef279bf4b25c3597050ccd2e13970b57fd51 \
@@ -1305,20 +1305,20 @@ pycryptodomex==3.23.0 \
     --hash=sha256:fdfac7cda115bca3a5abb2f9e43bc2fb66c2b65ab074913643803ca7083a79ea \
     --hash=sha256:febec69c0291efd056c65691b6d9a339f8b4bc43c6635b8699471248fe897fea
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pyzipper
 pygments==2.19.2 \
     --hash=sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887 \
     --hash=sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   ipython
     #   ipython-pygments-lexers
     #   pytest
 pyjwt==2.10.1 \
     --hash=sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953 \
     --hash=sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pynacl==1.5.0 \
     --hash=sha256:06b8f6fa7f5de8d5d2f7573fe8c863c051225a27b61e6860fd047b1775807858 \
     --hash=sha256:0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d \
@@ -1331,17 +1331,17 @@ pynacl==1.5.0 \
     --hash=sha256:a422368fc821589c228f4c49438a368831cb5bbc0eab5ebe1d7fac9dded6567b \
     --hash=sha256:e46dae94e34b085175f8abb3b0aaa7da40767865ac82c928eeb9e57e1ea8a543
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   paramiko
 pypdf==5.8.0 \
     --hash=sha256:bfe861285cd2f79cceecefde2d46901e4ee992a9f4b42c56548c4a6e9236a0d1 \
     --hash=sha256:f8332f80606913e6f0ce65488a870833c9d99ccdb988c17bb6c166f7c8e140cb
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytest==8.4.1 \
     --hash=sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7 \
     --hash=sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pytest-django
     #   pytest-mock
     #   pytest-randomly
@@ -1351,44 +1351,44 @@ pytest==8.4.1 \
 pytest-django==4.11.1 \
     --hash=sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10 \
     --hash=sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytest-mock==3.14.1 \
     --hash=sha256:159e9edac4c451ce77a5cdb9fc5d1100708d2dd4ba3c3df572f14097351af80e \
     --hash=sha256:178aefcd11307d874b4cd3100344e7e2d888d9791a6a1d9bfe90fbc1b74fd1d0
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytest-randomly==3.16.0 \
     --hash=sha256:11bf4d23a26484de7860d82f726c0629837cf4064b79157bd18ec9d41d7feb26 \
     --hash=sha256:8633d332635a1a0983d3bba19342196807f6afb17c3eef78e02c2f85dade45d6
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytest-subtests==0.14.2 \
     --hash=sha256:7154a8665fd528ee70a76d00216a44d139dc3c9c83521a0f779f7b0ad4f800de \
     --hash=sha256:8da0787c994ab372a13a0ad7d390533ad2e4385cac167b3ac501258c885d0b66
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytest-xdist==3.8.0 \
     --hash=sha256:202ca578cfeb7370784a8c33d6d05bc6e13b4f25b5053c30a152269fd10f0b88 \
     --hash=sha256:7e578125ec9bc6050861aa93f2d59f1d8d085595d6551c2c90b6f4fad8d3a9f1
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 python-crontab==3.3.0 \
     --hash=sha256:007c8aee68dddf3e04ec4dce0fac124b93bd68be7470fc95d2a9617a15de291b \
     --hash=sha256:739a778b1a771379b75654e53fd4df58e5c63a9279a63b5dfe44c0fcc3ee7884
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   botocore
     #   freezegun
     #   pandas
 python-dotenv==1.1.1 \
     --hash=sha256:31f23644fe2602f88ff55e1f5c79ba497e01224ee7737937930c448e4d0e24dc \
     --hash=sha256:a8a6399716257f45be6a007360200409fce5cda2661e3dec71d23dc15f6189ab
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 pytz==2025.2 \
     --hash=sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3 \
     --hash=sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   pandas
 pyyaml==6.0.2 \
     --hash=sha256:01179a4a8559ab5de078078f37e5c1a30d76bb88519906844fd7bdea1b7729ff \
@@ -1445,7 +1445,7 @@ pyyaml==6.0.2 \
     --hash=sha256:f753120cb8181e736c57ef7636e83f31b9c0d1722c516f7e86cf15b7aa57ff12 \
     --hash=sha256:ff3824dc5261f50c9b0dfb3be22b4567a6f938ccce4587b38952d85fd9e9afe4
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
     #   drf-spectacular
     #   pre-commit
@@ -1453,18 +1453,18 @@ pyyaml==6.0.2 \
 pyzipper==0.3.6 \
     --hash=sha256:0adca90a00c36a93fbe49bfa8c5add452bfe4ef85a1b8e3638739dd1c7b26bfc \
     --hash=sha256:6d097f465bfa47796b1494e12ea65d1478107d38e13bc56f6e58eedc4f6c1a87
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 redis==6.2.0 \
     --hash=sha256:c8ddf316ee0aab65f04a11229e94a64b2618451dab7a67cb2f77eb799d872d5e \
     --hash=sha256:e821f129b75dde6cb99dd35e5c76e8c49512a5a0d8dfdc560b2fbd44b85ca977
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-redis
 referencing==0.36.2 \
     --hash=sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa \
     --hash=sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   jsonschema
     #   jsonschema-specifications
 regex==2024.11.6 \
@@ -1563,23 +1563,23 @@ regex==2024.11.6 \
     --hash=sha256:fdd6028445d2460f33136c55eeb1f601ab06d74cb3347132e1c24250187500d9 \
     --hash=sha256:ff590880083d60acc0433f9c3f713c51f7ac6ebb9adf889c79a261ecf541aa91
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 requests==2.32.4 \
     --hash=sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c \
     --hash=sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-anymail
     #   requests-mock
 requests-mock==1.12.1 \
     --hash=sha256:b1e37054004cdd5e56c84454cc7df12b25f90f382159087f4b6915aaeef39563 \
     --hash=sha256:e9e12e333b525156e82a3c852f22016b9158220d2f47454de9cae8a77d371401
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 respx==0.22.0 \
     --hash=sha256:3c8924caa2a50bd71aefc07aa812f2466ff489f1848c96e954a5362d17095d91 \
     --hash=sha256:631128d4c9aba15e56903fb5f66fb1eff412ce28dd387ca3a81339e52dbd3ad0
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 rpds-py==0.26.0 \
     --hash=sha256:0919f38f5542c0a87e7b4afcafab6fd2c15386632d249e9a087498571250abe3 \
     --hash=sha256:093d63b4b0f52d98ebae33b8c50900d3d67e0666094b1be7a12fffd7f65de74b \
@@ -1726,7 +1726,7 @@ rpds-py==0.26.0 \
     --hash=sha256:feac1045b3327a45944e7dcbeb57530339f6b17baff154df51ef8b0da34c8c12 \
     --hash=sha256:ff110acded3c22c033e637dd8896e411c7d3a11289b2edf041f86663dbc791e9
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   jsonschema
     #   referencing
 ruff==0.12.3 \
@@ -1748,33 +1748,33 @@ ruff==0.12.3 \
     --hash=sha256:e2506961bf6ead54887ba3562604d69cb430f59b42133d36976421bc8bd45901 \
     --hash=sha256:f1b5a4b6668fd7b7ea3697d8d98857390b40c1320a63a178eee6be0899ea2d77 \
     --hash=sha256:fa6b24600cf3b750e48ddb6057e901dd5b9aa426e316addb2a1af185a7509882
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 s3transfer==0.11.5 \
     --hash=sha256:757af0f2ac150d3c75bc4177a32355c3862a98d20447b69a0161812992fe0bd4 \
     --hash=sha256:8c8aad92784779ab8688a61aefff3e28e9ebdce43142808eaa3f0b0f402f68b7
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   boto3
 segno==1.6.6 \
     --hash=sha256:28c7d081ed0cf935e0411293a465efd4d500704072cdb039778a2ab8736190c7 \
     --hash=sha256:e60933afc4b52137d323a4434c8340e0ce1e58cec71439e46680d4db188f11b3
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
-sentry-sdk==2.32.0 \
-    --hash=sha256:6cf51521b099562d7ce3606da928c473643abe99b00ce4cb5626ea735f4ec345 \
-    --hash=sha256:9016c75d9316b0f6921ac14c8cd4fb938f26002430ac5be9945ab280f78bec6b
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
+sentry-sdk==2.33.0 \
+    --hash=sha256:a762d3f19a1c240e16c98796f2a5023f6e58872997d5ae2147ac3ed378b23ec2 \
+    --hash=sha256:cdceed05e186846fdf80ceea261fe0a11ebc93aab2f228ed73d076a07804152e
+    # via -r requirements/test.txt
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
     --hash=sha256:48f08965cafbb3363b265c4ef40628ffced19cb6fc7c4bb5ce72d32cbcfb4bb9 \
     --hash=sha256:8f3bf12ee6d0845dd5ac1a7bac8c4b1fec0379e115950986883c9488af40ada7 \
     --hash=sha256:be73a16931c05f79643ff74b6519d1e1203b394583ab8c68a48a8e7f257d1090 \
     --hash=sha256:c1c266f7f54cd286057c592ead3095f93d123acdcabf048879a7d8900c3aac7b
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   cssbeautifier
     #   html5lib
     #   jsbeautifier
@@ -1782,24 +1782,24 @@ six==1.17.0 \
 slippers==0.6.2 \
     --hash=sha256:4cb555b8822ba0d404e5405723f5d723994022c29046008ee917081031bc0cf1 \
     --hash=sha256:739e05f85354becbf0a65daab831eea62557d89e7512042209ab629af4378bca
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 sniffio==1.3.1 \
     --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
     --hash=sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   anyio
 soupsieve==2.7 \
     --hash=sha256:6e60cc5c1ffaf1cebcc12e8188320b72071e922c2e897f737cadce79ad5d30c4 \
     --hash=sha256:ad282f9b6926286d2ead4750552c8a6142bc4c783fd66b0293547c8fe6ae126a
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   beautifulsoup4
 sqlparse==0.5.3 \
     --hash=sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272 \
     --hash=sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django
     #   django-debug-toolbar
 stack-data==0.6.3 \
@@ -1809,22 +1809,22 @@ stack-data==0.6.3 \
 syrupy==4.9.1 \
     --hash=sha256:b7d0fcadad80a7d2f6c4c71917918e8ebe2483e8c703dfc8d49cdbb01081f9a4 \
     --hash=sha256:b94cc12ed0e5e75b448255430af642516842a2374a46936dd2650cfb6dd20eda
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 tenacity==9.1.2 \
     --hash=sha256:1169d376c297e7de388d18b4481760d478b0e99a777cad3a9c86e556f4b697cb \
     --hash=sha256:f77bf36710d8b73a50b2dd155c97b870017ad21afe6ab300326b0371b3b05138
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 tinycss2==1.4.0 \
     --hash=sha256:10c0972f6fc0fbee87c3edb76549357415e94548c1ae10ebccdea16fb404a9b7 \
     --hash=sha256:3a49cf47b7675da0b15d0c6e1df8df4ebd96e9394bb905a5775adb0d884c5289
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   bleach
 tqdm==4.67.1 \
     --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2 \
     --hash=sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   djlint
 traitlets==5.14.3 \
     --hash=sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7 \
@@ -1836,37 +1836,37 @@ typeguard==2.13.3 \
     --hash=sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4 \
     --hash=sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   slippers
 typing-extensions==4.14.1 \
     --hash=sha256:38b39f4aeeab64884ce9f74c94263ef78f3c22467c8724005483154c26648d36 \
     --hash=sha256:d1e1e3b58374dc93031d6eda2420a48ea44a36c2b4766a4fdeb3710755731d76
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   beautifulsoup4
     #   slippers
 tzdata==2025.2 \
     --hash=sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8 \
     --hash=sha256:b60a638fcc0daffadf82fe0f57e53d06bdec2f36c4df66280ae79bce6bd6f2b9
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   faker
     #   pandas
 unidecode==1.4.0 \
     --hash=sha256:c3c7606c27503ad8d501270406e345ddb480a7b5f38827eafe4fa82a137f0021 \
     --hash=sha256:ce35985008338b676573023acc382d62c264f307c8f7963733405add37ea2b23
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 uritemplate==4.2.0 \
     --hash=sha256:480c2ed180878955863323eea31b0ede668795de182617fef9c6ca09e6ec9d0e \
     --hash=sha256:962201ba1c4edcab02e60f9a0d3821e82dfc5d2d6662a21abd533879bdb8a686
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   drf-spectacular
 urllib3==2.5.0 \
     --hash=sha256:3fc47733c7e419d4bc3f6b3dc2b4f890bb743906a30d56ba4a5bfa4bbff92760 \
     --hash=sha256:e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   botocore
     #   django-anymail
     #   requests
@@ -1883,26 +1883,26 @@ webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   bleach
     #   html5lib
     #   tinycss2
 xlrd==2.0.2 \
     --hash=sha256:08b5e25de58f21ce71dc7db3b3b8106c1fa776f3024c54e45b45b374e89234c9 \
     --hash=sha256:ea762c3d29f4cca48d82df517b6d89fbce4db3107f9d78713e48cd321d5c9aa9
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 xlsx-streaming==2.0.0 \
     --hash=sha256:30ac596b383d496c051c339894b5f06779539d1897cdbc3f2b3c247a5cfba28e \
     --hash=sha256:a70b67a3e0b0d93488c6982b4c7a46bb9a43c72b56a2d4dfa8536298fda9570e
-    # via -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    # via -r requirements/test.txt
 xworkflows==1.1.0 \
     --hash=sha256:8e3a9f6e9de6bcd779335f2ce4f87445ad8047771be9c6c96e347fb8622e2f27 \
     --hash=sha256:943571904066e03946016c5710cfea97847c1931c2e07bdd61827a01bce38d80
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   django-xworkflows
 zipstream==1.1.4 \
     --hash=sha256:2ef24b9150c93429b172750c4890b5ab28c1317892e11727afeff986ad2a3506
     # via
-    #   -r /home/dependabot/dependabot-updater/tmp/20250715-1494-rp5fe1/dependabot_20250715-1494-qbn5d5/requirements/test.txt
+    #   -r requirements/test.txt
     #   xlsx-streaming
