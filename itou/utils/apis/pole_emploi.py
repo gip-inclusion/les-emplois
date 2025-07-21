@@ -24,24 +24,30 @@ OFFERS_MAX_RANGE = 150
 class PoleEmploiAPIException(Exception):
     """unexpected exceptions (meaning, "exceptional") that warrant a subsequent retry."""
 
-    def __init__(self, error_code, response_content=None):
+    def __init__(self, error_code=None, response_content=None):
         self.error_code = error_code
         self.response_content = response_content
         super().__init__()
 
     def __str__(self):
-        return f"PoleEmploiAPIException(code={self.error_code})"
+        name = self.__class__.__name__
+        if self.error_code:
+            name = f"{name}(code={self.error_code})"
+        return name
 
 
 class PoleEmploiAPIBadResponse(Exception):
     """errors that can't be recovered from: the API server does not agree."""
 
-    def __init__(self, response_code):
+    def __init__(self, response_code=None):
         self.response_code = response_code
         super().__init__()
 
     def __str__(self):
-        return f"PoleEmploiAPIBadResponse(code={self.response_code})"
+        name = self.__class__.__name__
+        if self.response_code:
+            name = f"{name}(code={self.response_code})"
+        return name
 
 
 class PoleEmploiRateLimitException(PoleEmploiAPIException):
