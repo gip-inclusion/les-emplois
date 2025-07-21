@@ -246,10 +246,6 @@ def itou_faker_provider(_session_faker):
 
 @pytest.fixture(autouse=True)
 def django_ensure_matomo_titles(monkeypatch) -> None:
-    is_running_on_ci = os.getenv("CI", False)
-    if not is_running_on_ci:
-        return
-
     from django.template import base, defaulttags, loader_tags
     from django.template.backends.django import Template
 
