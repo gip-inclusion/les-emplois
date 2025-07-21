@@ -46,6 +46,9 @@ class AnonymizedProfessional(AbstractAnonymizedModel):
         verbose_name_plural = "professionnels anonymisés"
         ordering = ["-anonymized_at", "-date_joined"]
 
+    def __str__(self):
+        return f"professionnel {self.id} anonymisé en {self.anonymized_at.strftime('%Y-%m')}"
+
 
 class AnonymizedJobSeeker(AbstractAnonymizedModel):
     # from User model
