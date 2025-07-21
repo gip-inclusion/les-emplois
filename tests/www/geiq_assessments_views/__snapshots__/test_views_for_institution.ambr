@@ -1876,6 +1876,179 @@
   
   '''
 # ---
+# name: TestAssessmentReviewView.test_review_already_reviewed_assessment[disabled assessments review form with final review]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                  <div class="c-box c-box--summary mb-3 mb-md-4">
+                      <div class="c-box--summary__header">
+                          <h3 class="m-0">
+                              Récapitulatif
+                          </h3>
+                      </div>
+                      <hr class="m-0"/>
+                      <div class="c-box--summary__body">
+                          <div class="c-box--summary__list-data">
+                              <ul class="list-unstyled">
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 814 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides à 1400 €
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Nombre d’aides refusées
+                                      </span>
+                                      <strong>
+                                          0
+                                      </strong>
+                                  </li>
+                                  <li>
+                                      <hr class="my-3"/>
+                                  </li>
+                                  <li class="d-flex gap-2">
+                                      <span class="flex-grow-1">
+                                          Montant total potentiel
+                                      </span>
+                                      <strong>
+                                          -
+                                      </strong>
+                                  </li>
+                              </ul>
+                          </div>
+                          <div class="c-info mt-3 mt-lg-4">
+                              <span class="c-info__summary">
+                                  Ces données ont été calculées suite à la selection que vous avez effectuée
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="c-form">
+                      <form class="js-prevent-multiple-submit" id="review_form" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <fieldset>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Conventionnement
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_convention_amount">
+                                              Montant conventionné (convention initiale + avenants)
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_convention_amount" inputmode="numeric" name="convention_amount" pattern="[0-9 ]+" required="" type="text" value="100 000 €"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <hr/>
+                          <fieldset id="decision-box">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <legend>
+                                          Décision
+                                      </legend>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_granted_amount">
+                                              Montant total accordé
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_granted_amount" inputmode="numeric" name="granted_amount" pattern="[0-9 ]+" required="" type="text" value="80 000 €"/>
+                                      </div>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_advance_amount">
+                                              Premier versement déjà réalisé
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_advance_amount" inputmode="numeric" name="advance_amount" pattern="[0-9 ]+" required="" type="text" value="50 000 €"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_balance_amount">
+                                              Deuxième versement à prévoir
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_balance_amount" name="balance_amount" type="text"/>
+                                      </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_refund_amount">
+                                              Ordre de reversement
+                                          </label>
+                                          <input class="form-control" disabled="" id="id_refund_amount" name="refund_amount" type="text"/>
+                                      </div>
+                                  </div>
+                              </div>
+                          </fieldset>
+                          <div class="form-group form-group-required">
+                              <label class="form-label" for="id_review_comment">
+                                  Commentaire
+                              </label>
+                              <textarea class="form-control" cols="40" disabled="" id="id_review_comment" name="review_comment" required="" rows="10">Bravo !</textarea>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Structures concernées par la convention
+                      </h4>
+                      <ul>
+                          <li>
+                              Siège
+                          </li>
+                          <li>
+                              Une antenne
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Historique
+                      </h4>
+                      <ul class="list-step">
+                          <li>
+                              <time datetime="2025-05-21T19:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Décision validée par Julia THOMAS - Un DREETS GEIQ
+                              </span>
+                          </li>
+                          <li>
+                              <time datetime="2025-05-21T18:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                              </span>
+                          </li>
+                          <li>
+                              <time datetime="2025-05-21T15:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Bilan transmis par Paul MARTIN - GEIQ
+                              </span>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
 # name: TestAssessmentReviewView.test_review_already_reviewed_assessment[disabled assessments review form]
   '''
   <section class="s-section">
@@ -2008,6 +2181,29 @@
                           </li>
                           <li>
                               Une antenne
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Historique
+                      </h4>
+                      <ul class="list-step">
+                          <li>
+                              <time datetime="2025-05-21T18:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Contrôle réalisé par Jean DUPONT - Un DDETS GEIQ
+                              </span>
+                          </li>
+                          <li>
+                              <time datetime="2025-05-21T15:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Bilan transmis par Paul MARTIN - GEIQ
+                              </span>
                           </li>
                       </ul>
                   </div>
@@ -2176,6 +2372,21 @@
                           </li>
                           <li>
                               Une antenne
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="c-box mb-3 mb-md-4">
+                      <h4>
+                          Historique
+                      </h4>
+                      <ul class="list-step">
+                          <li>
+                              <time datetime="2025-05-21T15:00:00+00:00">
+                                  Le 21/05/2025
+                              </time>
+                              <span>
+                                  Bilan transmis par Paul MARTIN - GEIQ
+                              </span>
                           </li>
                       </ul>
                   </div>
