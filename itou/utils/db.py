@@ -2,7 +2,8 @@ import binascii
 import contextlib
 import logging
 
-from django.db import connection
+import psycopg.errors
+from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.db.models import Q
 from psycopg import sql
 
@@ -57,3 +58,46 @@ def pg_advisory_lock(name):
         yield
         cursor.execute("SELECT pg_advisory_unlock(%s)", (lock_id,))
     logger.info("Releasing advisory lock for %s (lock id %s).", name, lock_id)
+
+
+class ExclusionViolationError(IntegrityError):
+    pass
+
+
+def _maybe_constraint_violation(psycopg_error, exception_class):
+    @contextlib.contextmanager
+    def f(model, constraint_name):
+        def find_constraint():
+            for constraint in model._meta.constraints:
+                if constraint.name == constraint_name:
+                    return constraint
+            raise ProgrammingError(
+                f"No constraint named {constraint_name}, "
+                f"choices are: {', '.join(c.name for c in model._meta.constraints)}"
+            )
+
+        try:
+            # The integrity error will cause:
+            #
+            # An error occurred in the current transaction. You can't execute
+            # queries until the end of the 'atomic' block.
+            #
+            # This inner atomic allows rolling back to the previous savepoint
+            # in case of exception, and issuing SQL queries for the rest of the
+            # view when a constraint has been violated.
+            with transaction.atomic():
+                yield
+        except IntegrityError as e:
+            psycopg_exception = e.__cause__
+            if (
+                isinstance(psycopg_exception, psycopg_error)
+                and psycopg_exception.diag.constraint_name == constraint_name
+            ):
+                constraint = find_constraint()
+                raise exception_class(constraint.get_violation_error_message()) from e
+            raise
+
+    return f
+
+
+maybe_exclusion_violation = _maybe_constraint_violation(psycopg.errors.ExclusionViolation, ExclusionViolationError)

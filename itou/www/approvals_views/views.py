@@ -7,7 +7,6 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db import IntegrityError
 from django.db.models import Max, Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -23,6 +22,7 @@ from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.models import (
     SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
     Approval,
+    Prolongation,
     ProlongationRequest,
     ProlongationRequestDenyInformation,
     Suspension,
@@ -33,6 +33,10 @@ from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
+from itou.utils.db import (
+    ExclusionViolationError,
+    maybe_exclusion_violation,
+)
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -529,10 +533,10 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
             return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
 
         try:
-            self.prolongation_request.grant(request.user)
-        except IntegrityError:
-            messages.error(request, "Erreur: veuillez contacter le support.", extra_tags="toast")
-            logger.exception("Failed to accept approval prolongation request")
+            with maybe_exclusion_violation(Prolongation, "exclude_prolongation_overlapping_dates"):
+                self.prolongation_request.grant(request.user)
+        except ExclusionViolationError as e:
+            messages.error(request, str(e), extra_tags="toast")
             return HttpResponseRedirect(
                 reverse(
                     "approvals:prolongation_request_show",

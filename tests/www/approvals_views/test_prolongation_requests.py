@@ -192,7 +192,7 @@ def test_grant_view_invalid_dates(client):
     assertRedirects(response, expected_url, fetch_redirect_response=False)
     assertMessages(
         response,
-        [messages.Message(messages.ERROR, "Erreur: veuillez contacter le support.")],
+        [messages.Message(messages.ERROR, "La période chevauche une prolongation existante pour ce PASS\xa0IAE.")],
     )
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.PENDING
