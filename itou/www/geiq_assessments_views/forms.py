@@ -169,7 +169,7 @@ class ReviewForm(forms.ModelForm):
     )
 
     balance_amount = forms.CharField(label="Deuxième versement à prévoir", required=False, disabled=True)
-    refund_amount = forms.CharField(label="Remboursement attendu", required=False, disabled=True)
+    refund_amount = forms.CharField(label="Ordre de reversement", required=False, disabled=True)
 
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
