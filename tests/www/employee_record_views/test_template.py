@@ -20,7 +20,7 @@ def test_send_back_dropdown(snapshot, factory_kwargs):
     )
 
     html = template.render(
-        Context({"csrf_token": "CSRF_TOKEN", "employee_record": employee_record, "extra_class": ""})
+        Context({"csrf_token": "CSRF_TOKEN", "employee_record": employee_record, "extra_classes": ""})
     )
     normalized_html = (
         html.replace(

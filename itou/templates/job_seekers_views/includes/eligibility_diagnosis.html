@@ -11,12 +11,12 @@
         </div>
         <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
             {% if kind == "IAE" %}
-                {% iae_eligibility_badge is_eligible=True extra_class="badge-sm" %}
+                {% iae_eligibility_badge is_eligible=True extra_classes="badge-sm" %}
             {% elif kind == "GEIQ" %}
                 {% if eligibility_diagnosis.allowance_amount %}
-                    {% geiq_eligibility_badge is_eligible=True extra_class="badge-sm" %}
+                    {% geiq_eligibility_badge is_eligible=True extra_classes="badge-sm" %}
                 {% else %}
-                    {% geiq_eligibility_badge is_eligible=False extra_class="badge-sm" %}
+                    {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
                 {% endif %}
             {% endif %}
         </div>

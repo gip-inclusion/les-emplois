@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div>
-                {% include 'employee_record/includes/_status.html' with employee_record=employee_record extra_class="badge-sm" only %}
+                {% include 'employee_record/includes/_status.html' with employee_record=employee_record extra_classes="badge-sm" only %}
             </div>
         </div>
     </div>
@@ -158,7 +158,7 @@
                    aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Voir la fiche salarié</a>
                 {% if employee_record.status == "PROCESSED" %}
                     <div class="dropdown w-md-auto">
-                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_class="btn-primary w-100 w-md-auto dropdown-toggle" only %}
+                        {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_classes="btn-primary w-100 w-md-auto dropdown-toggle" only %}
                     </div>
                 {% endif %}
                 {% if employee_record.status == "NEW" %}
