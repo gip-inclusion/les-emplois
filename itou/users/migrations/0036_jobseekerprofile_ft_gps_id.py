@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("users", "0035_add_is_not_stalled_anymore_field"),
+        ("users", "0002_jobseekerprofile_created_by_prescriber_organization"),
     ]
 
     operations = [
