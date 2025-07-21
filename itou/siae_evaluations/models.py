@@ -313,18 +313,18 @@ class EvaluationCampaign(models.Model):
                         )
                     EvaluatedAdministrativeCriteria.objects.bulk_create(criteria)
 
-            evaluated_siaes_to_notify = []
             evaluated_siaes = EvaluatedSiae.objects.filter(pk__in=evaluated_siaes_pks).prefetch_related(
                 "evaluated_job_applications__evaluated_administrative_criteria"
             )
+            emails = []
             for evaluated_siae in evaluated_siaes:
                 if evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                     evaluated_siae.reviewed_at = set_at
                     evaluated_siae.final_reviewed_at = set_at
                     evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
+                    emails.append(SIAEEmailFactory(evaluated_siae).accepted_from_certified_criteria())
                 else:
-                    evaluated_siaes_to_notify.append(evaluated_siae)
-            emails = [SIAEEmailFactory(evaluated_siae).selected() for evaluated_siae in evaluated_siaes_to_notify]
+                    emails.append(SIAEEmailFactory(evaluated_siae).selected())
             emails += [CampaignEmailFactory(self).selected_siae()]
             send_email_messages(emails)
 

@@ -1,0 +1,10 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+Votre structure {{ siae.kind }} (ID : {{ siae.pk }} – {{ siae.name }}, SIRET : {{ siae.convention.siret_signature }}) a été sélectionnée de manière aléatoire dans le cadre de la procédure de contrôle a posteriori portant sur les embauches réalisées en auto-prescription entre le {{ evaluation_campaign.evaluated_period_start_at|date:"d E Y" }} et le {{ evaluation_campaign.evaluated_period_end_at|date:"d E Y" }}.
+
+Les justificatifs associés aux auto-prescriptions soumises à ce contrôle ont pu être automatiquement certifiés par les services de l’État. En conséquence, votre dossier est validé et aucune action n’est attendue de votre part.
+
+Cordialement,
+{% endblock %}
