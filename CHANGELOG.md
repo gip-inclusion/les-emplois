@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2025-07-21
+
+### Ajouté
+
+- [Candidature : Permettre de désarchiver les candidatures par lot](https://github.com/gip-inclusion/les-emplois/pull/6430)
+- [Pilotage : Ajouter les candidatures refusées automatiquement](https://github.com/gip-inclusion/les-emplois/pull/6485)
+- [Prescripteur : Signaler que le candidat n’est plus sans solution](https://github.com/gip-inclusion/les-emplois/pull/6374) 🖼
+- [Vie privée : Activer la notification des professionnels sans activité récente](https://github.com/gip-inclusion/les-emplois/pull/6545)
+
+### Modifié
+
+- [Interface : Déplacer le lien vers la création d'une nouvelle structure dans la liste déroulante des structures du menu principal](https://github.com/gip-inclusion/les-emplois/pull/6123) 🖼
+- [Invitations : Limiter le nombre d'invitations](https://github.com/gip-inclusion/les-emplois/pull/6535)
+- [Invitations : Paginer la page des collaborateurs d’une structure](https://github.com/gip-inclusion/les-emplois/pull/6521)
+- [Tableau de bord : Correction d’un bug lors du changement d’email](https://github.com/gip-inclusion/les-emplois/pull/6555)
+
 ## 2025-07-14
 
 ### Ajouté
