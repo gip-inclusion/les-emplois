@@ -491,7 +491,10 @@ class User(AbstractUser, AddressMixin):
             if self.has_data_changed(["last_name", "first_name"]) and not self._state.adding:
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
-                self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
+                self.jobseeker_profile.ft_gps_id = None
+                self.jobseeker_profile.save(
+                    update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at", "ft_gps_id"]
+                )
                 self.jobseeker_profile.identity_certifications.filter(
                     certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
                 ).delete()
@@ -1251,8 +1254,13 @@ class JobSeekerProfile(models.Model):
         if self.has_data_changed(["birthdate", "nir"]) and not self._state.adding:
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
+            self.ft_gps_id = None
             if update_fields is not None:
-                update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
+                update_fields = set(update_fields) | {
+                    "pe_obfuscated_nir",
+                    "pe_last_certification_attempt_at",
+                    "ft_gps_id",
+                }
             self.identity_certifications.filter(
                 certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
             ).delete()
