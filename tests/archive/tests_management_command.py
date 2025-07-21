@@ -757,6 +757,21 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert respx_mock.calls.call_count == 1
 
+    def test_anonymized_at_is_the_first_day_of_the_month(self):
+        JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_seeker__notified_days_ago=30,
+            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            approval=None,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=None,
+        )
+
+        call_command("anonymize_jobseekers", wet_run=True)
+        for model in [AnonymizedJobSeeker, AnonymizedApplication]:
+            obj = model.objects.get()
+            assert obj.anonymized_at == timezone.localdate().replace(day=1)
+
 
 class TestNotifyInactiveProfessionalsManagementCommand:
     def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
@@ -1108,3 +1123,14 @@ class TestAnonymizeProfessionalManagementCommand:
 
         with assertSnapshotQueries(snapshot(name="anonymize_professionals_queries")):
             call_command("anonymize_professionals", wet_run=True)
+
+    def test_anonymized_at_is_the_first_day_of_the_month(self):
+        EmployerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY,
+            notified_days_ago=31,
+        )
+
+        call_command("anonymize_professionals", wet_run=True)
+
+        anonymized_professional = AnonymizedProfessional.objects.get()
+        assert anonymized_professional.anonymized_at == timezone.localdate().replace(day=1)

@@ -1,16 +1,28 @@
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 
-class AnonymizedProfessional(models.Model):
+def current_year_month():
+    return timezone.localdate().replace(day=1)
+
+
+class AbstractAnonymizedModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    anonymized_at = models.DateField(
+        verbose_name="anonymisé en année-mois", default=current_year_month, editable=False
+    )
 
+    class Meta:
+        abstract = True
+
+
+class AnonymizedProfessional(AbstractAnonymizedModel):
     # from User model
     date_joined = models.DateField(verbose_name="année et mois d'inscription")
     first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
     last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
-    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
     department = models.CharField(max_length=3, verbose_name="département", blank=True, null=True)
     title = models.CharField(
         max_length=3,
@@ -32,17 +44,14 @@ class AnonymizedProfessional(models.Model):
     class Meta:
         verbose_name = "professionnel anonymisé"
         verbose_name_plural = "professionnels anonymisés"
-        ordering = ["-anonymized_at"]
+        ordering = ["-anonymized_at", "-date_joined"]
 
 
-class AnonymizedJobSeeker(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
+class AnonymizedJobSeeker(AbstractAnonymizedModel):
     # from User model
     date_joined = models.DateField(verbose_name="année et mois d'inscription")
     first_login = models.DateField(verbose_name="année et mois de première connexion", blank=True, null=True)
     last_login = models.DateField(verbose_name="année et mois de dernière connexion", blank=True, null=True)
-    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
     user_signup_kind = models.CharField(
         max_length=50, verbose_name="créé par un utilisateur de type", blank=True, null=True
     )
@@ -71,15 +80,13 @@ class AnonymizedJobSeeker(models.Model):
     class Meta:
         verbose_name = "candidat anonymisé"
         verbose_name_plural = "candidats anonymisés"
-        ordering = ["-anonymized_at"]
+        ordering = ["-anonymized_at", "-date_joined"]
 
     def __str__(self):
-        return f"candidat {self.id} anonymisé le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"candidat {self.id} anonymisé en {self.anonymized_at.strftime('%Y-%m')}"
 
 
-class AnonymizedApplication(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
+class AnonymizedApplication(AbstractAnonymizedModel):
     # job_seeker
     job_seeker_birth_year = models.PositiveSmallIntegerField(
         verbose_name="année de naissance du candidat", blank=True, null=True
@@ -105,7 +112,6 @@ class AnonymizedApplication(models.Model):
     company_has_convention = models.BooleanField(verbose_name="l'entreprise a une convention", default=False)
 
     # application
-    anonymized_at = models.DateTimeField(auto_now_add=True, verbose_name="anonymisé le")
     applied_at = models.DateField(verbose_name="année et mois de la candidature")
     processed_at = models.DateField(verbose_name="année et mois de traitement", blank=True, null=True)
     last_transition_at = models.DateField(
@@ -131,7 +137,7 @@ class AnonymizedApplication(models.Model):
     class Meta:
         verbose_name = "candidature anonymisée"
         verbose_name_plural = "candidatures anonymisées"
-        ordering = ["-anonymized_at"]
+        ordering = ["-anonymized_at", "-applied_at"]
 
     def __str__(self):
-        return f"candidature {self.id} anonymisée le {self.anonymized_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"candidature {self.id} anonymisée en {self.anonymized_at.strftime('%Y-%m')}"
