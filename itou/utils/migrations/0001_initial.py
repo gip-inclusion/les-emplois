@@ -12,6 +12,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+    replaces = [("utils", "0001_create_supportremark")]
+
     initial = True
 
     dependencies = [
@@ -27,7 +29,8 @@ class Migration(migrations.Migration):
         TrigramExtension(),
         CreateExtension("postgis"),
         UnaccentExtension(),
-        migrations.RunSQL("DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent"),
+        # ---------------------------------------
+        # Create new search configuration
         migrations.RunSQL("CREATE TEXT SEARCH CONFIGURATION french_unaccent (COPY = french)"),
         migrations.RunSQL(
             """
@@ -36,6 +39,27 @@ class Migration(migrations.Migration):
                     WITH unaccent, french_stem
             """
         ),
+        migrations.RunSQL(
+            "CREATE TEXT SEARCH CONFIGURATION simple_unaccent (COPY=simple);",
+        ),
+        migrations.RunSQL(
+            "ALTER TEXT SEARCH CONFIGURATION simple_unaccent "
+            "ALTER MAPPING FOR hword, hword_part, word "
+            "WITH unaccent,simple;",
+        ),
+        # ---------------------------------------
+        # Create immutable unaccent function to be used in GeneratedField
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION slyly_immutable_unaccent(text)
+                RETURNS text
+                LANGUAGE sql IMMUTABLE PARALLEL SAFE AS
+              $func$
+                SELECT public.unaccent($1)
+              $func$
+            """,
+        ),
+        # ---------------------------------------
         migrations.CreateModel(
             name="PkSupportRemark",
             fields=[
