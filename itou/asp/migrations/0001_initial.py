@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("cities", "0001_initial"),
-        ("utils", "0002_slyly_immutable_unaccent"),
+        ("utils", "0001_initial"),
     ]
 
     operations = [

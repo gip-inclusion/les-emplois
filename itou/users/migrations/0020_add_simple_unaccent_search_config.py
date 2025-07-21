@@ -8,15 +8,4 @@ class Migration(migrations.Migration):
         ("users", "0019_drop_jobseekerprofile_ata_allocation_since"),
     ]
 
-    operations = [
-        migrations.RunSQL(
-            "CREATE TEXT SEARCH CONFIGURATION simple_unaccent (COPY=simple);",
-            reverse_sql="DROP TEXT SEARCH CONFIGURATION simple_unaccent;",
-        ),
-        migrations.RunSQL(
-            "ALTER TEXT SEARCH CONFIGURATION simple_unaccent "
-            "ALTER MAPPING FOR hword, hword_part, word "
-            "WITH unaccent,simple;",
-            reverse_sql=migrations.RunSQL.noop,
-        ),
-    ]
+    operations = []
