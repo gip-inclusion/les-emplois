@@ -80,7 +80,7 @@ def update_org_admin_role(request, action, user_id, *, success_url, template_nam
         raise PermissionDenied
 
     membership = get_object_or_404(
-        request.current_organization.memberships.select_related("user"),
+        request.current_organization.memberships.active().select_related("user"),
         user_id=user_id,
         is_active=True,
     )

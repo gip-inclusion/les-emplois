@@ -288,9 +288,11 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     if request.organizations and request.user.kind == target_participant.kind:
         org_ids = [org.pk for org in request.organizations]
         if request.user.is_employer:
-            are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
+            are_colleagues = target_participant.companymembership_set.active().filter(company__in=org_ids).exists()
         if request.user.is_prescriber:
-            are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
+            are_colleagues = (
+                target_participant.prescribermembership_set.active().filter(organization__in=org_ids).exists()
+            )
 
     logger.info(
         "GPS display_contact_information",
