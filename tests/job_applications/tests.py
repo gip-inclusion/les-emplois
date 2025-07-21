@@ -202,6 +202,14 @@ class TestJobApplicationModel:
         assert membership.member == user
         assert membership.creator == user
 
+    def test_multiple_jobseekers_for_approval(self):
+        job_application = JobApplicationFactory(with_approval=True)
+        with pytest.raises(
+            IntegrityError,
+            match=r'conflicting key value violates exclusion constraint "one_job_seeker_per_approval"',
+        ):
+            JobApplicationFactory(approval=job_application.approval)
+
 
 @pytest.mark.parametrize(
     "factory, validation_should_pass",
