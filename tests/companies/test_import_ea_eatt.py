@@ -190,6 +190,6 @@ def test_process_file_from_archive(caplog, snapshot, settings, command, archive_
 )
 def test_command_errors(caplog, snapshot, sftp_directory, command, day_of_the_week, expectation):
     with expectation:
-        with freeze_time(monday_of_the_week() + datetime.timedelta(days=day_of_the_week)):
+        with freeze_time(datetime.date(2025, 7, 14) + datetime.timedelta(days=day_of_the_week)):
             command.handle(from_asp=True)
     assert extract_logs(caplog) == snapshot(name="logs")
