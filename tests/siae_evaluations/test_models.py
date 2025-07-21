@@ -547,9 +547,14 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
         assert evaluated_siae.reviewed_at == now
         assert evaluated_siae.final_reviewed_at == now
-        [email] = mailoutbox
-        assert email.subject == "[DEV] [Contrôle a posteriori] Ouverture de la phase de transmission des justificatifs"
-        assert email.to == [institution_membership.user.email]
+        [siae_email, ddets_email] = mailoutbox
+        assert siae_email.subject == "[DEV] Validation automatique de votre dossier de contrôle a posteriori"
+        assert siae_email.to == list(company.memberships.values_list("user__email", flat=True))
+        assert (
+            ddets_email.subject
+            == "[DEV] [Contrôle a posteriori] Ouverture de la phase de transmission des justificatifs"
+        )
+        assert ddets_email.to == [institution_membership.user.email]
 
     @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):

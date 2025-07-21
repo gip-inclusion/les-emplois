@@ -107,6 +107,15 @@ class SIAEEmailFactory:
         body = "siae_evaluations/email/to_siae_accepted_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
+    def accepted_from_certified_criteria(self):
+        context = {
+            "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
+            "siae": self.evaluated_siae.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_accepted_from_certified_criteria_subject.txt"
+        body = "siae_evaluations/email/to_siae_accepted_from_certified_criteria_body.txt"
+        return get_email_message(self.recipients, context, subject, body)
+
     def force_accepted(self):
         context = {
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
