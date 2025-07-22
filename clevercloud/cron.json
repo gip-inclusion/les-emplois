@@ -17,6 +17,7 @@
   "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
   "25 8-18/2 * * MON-FRI $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * MON-FRI $ROOT/clevercloud/transfer_employee_records.sh --upload",
+  "0 7,10,13 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_professionals --wet-run",
 
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
@@ -33,7 +34,6 @@
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
   "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
-  "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_professionals --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 9-12 * * MON $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
