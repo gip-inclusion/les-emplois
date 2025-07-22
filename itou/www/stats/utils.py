@@ -86,10 +86,11 @@ def can_view_stats_ft(request):
 
 
 def can_view_stats_ph(request):
-    return (
-        request.from_authorized_prescriber
-        and request.current_organization.kind in STATS_PH_ORGANISATION_KIND_WHITELIST
-    )
+    return request.from_authorized_prescriber
+
+
+def can_view_stats_ph_whitelisted(request):
+    return can_view_stats_ph(request) and request.current_organization.kind in STATS_PH_ORGANISATION_KIND_WHITELIST
 
 
 def can_view_stats_ddets_iae(request):
