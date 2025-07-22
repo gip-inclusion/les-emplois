@@ -19,7 +19,7 @@ def label_settings(settings):
 
 
 def test_sync_employee_and_contracts(caplog, label_settings, mocker):
-    assessment = AssessmentFactory(campaign__year=2023, label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}])
+    assessment = AssessmentFactory(campaign__year=2023, with_main_geiq=True, label_antennas=[])
 
     prequal_only = SalariePreQualificationLabelDataFactory(
         salarie__geiq_id=assessment.label_geiq_id,
