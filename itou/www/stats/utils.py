@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.cache import caches
-from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.companies.models import Company
@@ -170,17 +169,15 @@ def can_view_stats_staff(request):
     return request.user.is_authenticated and (request.user.kind == UserKind.ITOU_STAFF or request.user.is_staff)
 
 
-def get_stats_ft_departments(request):
-    if not can_view_stats_ft(request):
-        raise PermissionDenied
-    if request.current_organization.is_dgft:
+def get_stats_ft_departments(current_organization):
+    if current_organization.is_dgft:
         return DEPARTMENTS.keys()
-    if request.current_organization.is_drft:
-        return REGIONS[request.current_organization.region]
-    if request.current_organization.is_dtft:
-        departments = DTFT_SAFIR_CODE_TO_DEPARTMENTS[request.current_organization.code_safir_pole_emploi]
-        return [request.current_organization.department] if departments is None else departments
-    return [request.current_organization.department]
+    if current_organization.is_drft:
+        return REGIONS[current_organization.region]
+    if current_organization.is_dtft:
+        departments = DTFT_SAFIR_CODE_TO_DEPARTMENTS[current_organization.code_safir_pole_emploi]
+        return [current_organization.department] if departments is None else departments
+    return [current_organization.department]
 
 
 def get_stats_for_institution(institution: Institution, datum_key: DatumKey, *, is_percentage=False):
