@@ -24,11 +24,39 @@ def test_index_stats_for_employer(snapshot, client):
     assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
 
 
-@pytest.mark.parametrize(
-    "kind",
-    {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT, *STATS_PH_ORGANISATION_KIND_WHITELIST},
-)
-def test_index_stats_for_authorized_prescriber(snapshot, client, kind):
+def test_index_stats_for_authorized_prescriber(snapshot, client):
+    possible_kinds = (
+        set(PrescriberOrganizationKind)
+        - set(STATS_PH_ORGANISATION_KIND_WHITELIST)
+        - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT}  # Custom layout
+        - {PrescriberOrganizationKind.OTHER}  # Can't be authorized
+    )
+    client.force_login(
+        PrescriberFactory(
+            membership__organization__authorized=True,
+            membership__organization__kind=random.choice(list(possible_kinds)),
+        )
+    )
+
+    response = client.get(reverse("dashboard:index_stats"))
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+
+
+@pytest.mark.parametrize("kind", STATS_PH_ORGANISATION_KIND_WHITELIST)
+def test_index_stats_for_authorized_prescriber_whitelist(snapshot, client, kind):
+    client.force_login(
+        PrescriberFactory(
+            membership__organization__authorized=True,
+            membership__organization__kind=kind,
+        )
+    )
+
+    response = client.get(reverse("dashboard:index_stats"))
+    assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()
+
+
+@pytest.mark.parametrize("kind", {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.DEPT})
+def test_index_stats_for_authorized_prescriber_with_custom_layout(snapshot, client, kind):
     client.force_login(
         PrescriberFactory(
             membership__organization__authorized=True,

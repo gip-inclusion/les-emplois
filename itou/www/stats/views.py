@@ -476,7 +476,7 @@ def render_stats_ph(request, page_title, *, extra_params=None, extra_context=Non
     return render_stats(request=request, context=context, params=params)
 
 
-@check_request(utils.can_view_stats_ph)
+@check_request(utils.can_view_stats_ph_whitelisted)
 def stats_ph_state_main(request):
     allowed_org_pks = list(
         PrescriberOrganization.objects.filter(

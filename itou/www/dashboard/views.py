@@ -221,6 +221,12 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
         elif stats_utils.can_view_stats_ft(request):
             context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER_FT
         elif stats_utils.can_view_stats_ph(request):
+            context.update(
+                {
+                    "layout_kind": DashboardStatsLayoutKind.PRESCRIBER,
+                    "can_view_stats_ph_whitelisted": stats_utils.can_view_stats_ph_whitelisted(request),
+                }
+            )
             context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER
     elif request.user.is_labor_inspector:
         if request.current_organization.kind in [

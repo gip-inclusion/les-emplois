@@ -142,13 +142,13 @@ def test_can_view_stats_ft_as_dgft():
         PrescriberOrganizationKind.RS_FJT,
     ],
 )
-def test_can_view_stats_ph_full_access_organization_kind_whitelist(kind):
+def can_view_stats_ph_whitelisted(kind):
     organization = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=kind,
     )
     request = get_request(organization.members.get())
-    assert utils.can_view_stats_ph(request)
+    assert utils.can_view_stats_ph_whitelisted(request)
 
 
 @pytest.mark.parametrize(
