@@ -1820,7 +1820,6 @@ class TestJoinGroupFromNameAndEmail:
             "birth_country": Country.france_id,
         }
         response = client.post(next_url, data=post_data)
-        assert response.status_code == 200
         assertContains(response, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")
 
         # With a other NIR
