@@ -5,7 +5,7 @@ from django.db import transaction
 from django.forms import models
 from django.utils import timezone
 
-from itou.analytics import api_usage, approvals, employee_record, tech, users
+from itou.analytics import api_usage, approvals, archive, employee_record, tech, users
 from itou.analytics.models import Datum
 from itou.utils.command import BaseCommand
 
@@ -38,6 +38,7 @@ class Command(BaseCommand):
             **users.collect_analytics_data(before),
             **api_usage.collect_analytics_data(before),
             **tech.collect_analytics_data(before),
+            **archive.collect_archive_data(),
         }
 
     def show_data(self, data):
