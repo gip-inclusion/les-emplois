@@ -66,7 +66,7 @@ def get_permissions_dict():
         companies_models.SiaeFinancialAnnex: PERMS_READ,
         companies_models.Company: PERMS_ALL,
         companies_models.SiaeConvention: PERMS_EDIT,
-        companies_models.JobDescription: PERMS_READ,
+        companies_models.JobDescription: PERMS_DELETE,
         companies_models.CompanyMembership: PERMS_ADD,
         eligibility_models.AdministrativeCriteria: PERMS_READ,
         eligibility_models.EligibilityDiagnosis: PERMS_ALL,
