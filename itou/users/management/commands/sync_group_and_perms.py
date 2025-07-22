@@ -4,7 +4,7 @@ from itou.utils.command import BaseCommand
 
 
 PERMS_ALL = {"add", "change", "delete", "view"}
-PERMS_DELETE = {"change", "delete", "view"}
+PERMS_DELETE = {"delete", "view"}
 PERMS_ADD = {"add", "change", "view"}
 PERMS_EDIT = {"change", "view"}
 PERMS_HIJACK = {"view", "hijack"}
@@ -85,9 +85,9 @@ def get_permissions_dict():
         gps_models.FollowUpGroupMembership: PERMS_DELETE,
         institution_models.Institution: PERMS_ADD,
         institution_models.InstitutionMembership: PERMS_ADD,
-        invitation_models.EmployerInvitation: PERMS_DELETE,
-        invitation_models.LaborInspectorInvitation: PERMS_DELETE,
-        invitation_models.PrescriberWithOrgInvitation: PERMS_DELETE,
+        invitation_models.EmployerInvitation: PERMS_EDIT | PERMS_DELETE,
+        invitation_models.LaborInspectorInvitation: PERMS_EDIT | PERMS_DELETE,
+        invitation_models.PrescriberWithOrgInvitation: PERMS_EDIT | PERMS_DELETE,
         job_applications_models.JobApplication: PERMS_ALL | PERMS_EXPORT_JOB_APPLICATIONS_UNKNOWN_TO_FT,
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         jobs_models.Appellation: PERMS_READ,
@@ -101,7 +101,7 @@ def get_permissions_dict():
         siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
         siae_evaluations_models.Sanctions: PERMS_READ,
         users_models.User: PERMS_ALL | PERMS_HIJACK | PERMS_EXPORT_CTA | PERMS_MERGE_USERS,
-        users_models.JobSeekerProfile: PERMS_DELETE,
+        users_models.JobSeekerProfile: PERMS_EDIT | PERMS_DELETE,
         utils_models.PkSupportRemark: PERMS_ADD,
         utils_models.UUIDSupportRemark: PERMS_ADD,
     }
