@@ -19,7 +19,6 @@ import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -42,8 +41,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
-from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.auth import check_request
 from itou.www.stats import utils
 
 
@@ -197,15 +195,13 @@ def stats_redirect(request, dashboard_name):
     return HttpResponseRedirect(reverse(f"stats:stats_{normalized_organization_kind}_{dashboard_name}"))
 
 
+@check_request(utils.can_view_stats_siae_etp)
 def stats_siae_etp(request):
     """
     SIAE stats shown to their own members.
     They can only view data for their own SIAE.
     These stats are about ETP data from the ASP.
     """
-    if not utils.can_view_stats_siae_etp(request):
-        raise PermissionDenied
-
     context = {
         "page_title": "Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures",
         "department": request.current_organization.department,
@@ -230,9 +226,6 @@ def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY
     Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
     These stats are built directly from C1 data.
     """
-    if not utils.can_view_stats_siae(request):
-        raise PermissionDenied
-
     context = {
         "page_title": page_title,
         "department": request.current_organization.department,
@@ -260,16 +253,19 @@ def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY
     )
 
 
+@check_request(utils.can_view_stats_siae)
 def stats_siae_hiring(request):
     return render_stats_siae(request=request, page_title="Analyse des candidatures reçues et de leur traitement")
 
 
+@check_request(utils.can_view_stats_siae)
 def stats_siae_auto_prescription(request):
     return render_stats_siae(
         request=request, page_title="Suivi de l’activité d’auto-prescription et du contrôle à posteriori"
     )
 
 
+@check_request(utils.can_view_stats_siae)
 def stats_siae_orga_etp(request):
     """
     SIAE stats shown to their own members.
@@ -283,6 +279,7 @@ def stats_siae_orga_etp(request):
     )
 
 
+@check_request(utils.can_view_stats_siae)
 def stats_siae_beneficiaries(request):
     return render_stats_siae(
         request=request,
@@ -296,45 +293,43 @@ def render_stats_cd(request, page_title, *, params=None, extra_context=None):
     CD ("Conseil Départemental") stats shown to relevant members.
     They can only view data for their own departement.
     """
-    current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_cd(request):
-        raise PermissionDenied
-    department = current_org.department
+    department = request.current_organization.department
     params = get_params_for_departement(department) if params is None else params
     context = {
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
-        "tally_hidden_fields": {"type_prescripteur": current_org.kind},
+        "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
     }
     if extra_context:
         context.update(extra_context)
     return render_stats(request=request, context=context, params=params)
 
 
+@check_request(utils.can_view_stats_cd)
 def stats_cd_iae(request):
     return render_stats_cd(request=request, page_title="Données IAE")
 
 
+@check_request(utils.can_view_stats_cd)
 def stats_cd_hiring(request):
     return render_stats_cd(request=request, page_title="Analyse des candidatures reçues et de leur traitement")
 
 
+@check_request(utils.can_view_stats_cd)
 def stats_cd_brsa(request):
     return render_stats_cd(request=request, page_title="Analyse des prescriptions pour les publics ARSA")
 
 
+@check_request(utils.can_view_stats_cd)
 def stats_cd_orga_etp(request):
-    get_current_org_or_404(request)
-    if not utils.can_view_stats_cd(request):
-        raise PermissionDenied
-
     return render_stats_cd(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels (ETP)",
     )
 
 
+@check_request(utils.can_view_stats_cd)
 def stats_cd_beneficiaries(request):
     return render_stats_cd(
         request=request, page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi"
@@ -350,10 +345,7 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
     `*_main` views are linked directly from the C1 dashboard.
     `*_raw` views are not directly visible on the C1 dashboard but are linked from within their `*_main` counterpart.
     """
-    current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_ft(request):
-        raise PermissionDenied
-    departments = utils.get_stats_ft_departments(current_org)
+    departments = utils.get_stats_ft_departments(request.current_organization)
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
@@ -367,30 +359,33 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
     params.update(extra_params)
     context = {
         "page_title": page_title,
-        "tally_hidden_fields": {"type_prescripteur": current_org.kind},
+        "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
     }
-    if current_org.is_dgft:
+    if request.current_organization.is_dgft:
         context |= {
             "matomo_custom_url_suffix": "dgpe",
         }
-    elif current_org.is_drft:
+    elif request.current_organization.is_drft:
         context |= {
-            "matomo_custom_url_suffix": f"{format_region_for_matomo(current_org.region)}/drpe",
-            "region": current_org.region,
+            "matomo_custom_url_suffix": f"{format_region_for_matomo(request.current_organization.region)}/drpe",
+            "region": request.current_organization.region,
         }
-    elif current_org.is_dtft:
+    elif request.current_organization.is_dtft:
+        matomo_base = format_region_and_department_for_matomo(request.current_organization.department)
         context |= {
-            "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(current_org.department)}/dtpe",
-            "department": current_org.department,
+            "matomo_custom_url_suffix": f"{matomo_base}/dtpe",
+            "department": request.current_organization.department,
         }
     else:
+        matomo_base = format_region_and_department_for_matomo(request.current_organization.department)
         context |= {
-            "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(current_org.department)}/agence",
-            "department": current_org.department,
+            "matomo_custom_url_suffix": f"{matomo_base}/agence",
+            "department": request.current_organization.department,
         }
     return render_stats(request=request, context=context, params=params)
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_delay_raw(request):
     return render_stats_ft(
         request=request,
@@ -399,6 +394,7 @@ def stats_ft_delay_raw(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_conversion_main(request):
     return render_stats_ft(
         request=request,
@@ -409,6 +405,7 @@ def stats_ft_conversion_main(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_conversion_raw(request):
     return render_stats_ft(
         request=request,
@@ -419,6 +416,7 @@ def stats_ft_conversion_raw(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_state_main(request):
     return render_stats_ft(
         request=request,
@@ -429,6 +427,7 @@ def stats_ft_state_main(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_state_raw(request):
     return render_stats_ft(
         request=request,
@@ -439,6 +438,7 @@ def stats_ft_state_raw(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_beneficiaries(request):
     return render_stats_ft(
         request=request,
@@ -447,6 +447,7 @@ def stats_ft_beneficiaries(request):
     )
 
 
+@check_request(utils.can_view_stats_ft)
 def stats_ft_hiring(request):
     return render_stats_ft(
         request=request,
@@ -458,9 +459,6 @@ def stats_ft_hiring(request):
 
 
 def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
-    if not utils.can_view_stats_ph(request):
-        raise PermissionDenied
-
     department = request.current_organization.department
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[department]],
@@ -478,10 +476,8 @@ def render_stats_ph(request, page_title, *, extra_params=None, extra_context=Non
     return render_stats(request=request, context=context, params=params)
 
 
+@check_request(utils.can_view_stats_ph)
 def stats_ph_state_main(request):
-    if not utils.can_view_stats_ph(request):
-        raise PermissionDenied
-
     allowed_org_pks = list(
         PrescriberOrganization.objects.filter(
             kind=request.current_organization.kind,
@@ -511,6 +507,7 @@ def stats_ph_state_main(request):
     )
 
 
+@check_request(utils.can_view_stats_ph)
 def stats_ph_beneficiaries(request):
     return render_stats_ph(
         request=request,
@@ -521,10 +518,9 @@ def stats_ph_beneficiaries(request):
 
 
 def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole_region, params=None):
-    current_org = get_current_institution_or_404(request)
-    department = current_org.department
+    department = request.current_organization.department
     department_label = DEPARTMENTS[department]
-    region = current_org.region
+    region = request.current_organization.region
     context = {
         "page_title": (
             f"{page_title} ({region})" if extend_stats_to_whole_region else f"{page_title} ({department_label})"
@@ -545,9 +541,6 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
 
 
 def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False, params=None):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_iae(request):
-        raise PermissionDenied
     return render_stats_ddets(
         request=request,
         page_title=page_title,
@@ -557,14 +550,17 @@ def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats
     )
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_auto_prescription(request):
     return render_stats_ddets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_ph_prescription(request):
     return render_stats_ddets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_siae_evaluation(request):
     extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
@@ -575,6 +571,7 @@ def stats_ddets_iae_siae_evaluation(request):
     )
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_hiring(request):
     return render_stats_ddets_iae(
         request=request,
@@ -582,6 +579,7 @@ def stats_ddets_iae_hiring(request):
     )
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_state(request):
     return render_stats_ddets_iae(
         request=request,
@@ -590,10 +588,8 @@ def stats_ddets_iae_state(request):
     )
 
 
+@check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_orga_etp(request):
-    if not utils.can_view_stats_ddets_iae(request):
-        raise PermissionDenied
-
     return render_stats_ddets_iae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels (ETP)",
@@ -601,9 +597,6 @@ def stats_ddets_iae_orga_etp(request):
 
 
 def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_log(request):
-        raise PermissionDenied
     return render_stats_ddets(
         request=request,
         page_title=page_title,
@@ -612,6 +605,7 @@ def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
     )
 
 
+@check_request(utils.can_view_stats_ddets_log)
 def stats_ddets_log_state(request):
     return render_stats_ddets_log(
         request=request,
@@ -621,9 +615,6 @@ def stats_ddets_log_state(request):
 
 
 def render_stats_dreets_iae(request, page_title, *, extra_context=None):
-    if not utils.can_view_stats_dreets_iae(request):
-        raise PermissionDenied
-
     region = request.current_organization.region
     context = {
         "page_title": f"{page_title} ({region})",
@@ -634,14 +625,17 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None):
     return render_stats(request=request, context=context, params=get_params_for_region(region))
 
 
+@check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_auto_prescription(request):
     return render_stats_dreets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
 
 
+@check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_ph_prescription(request):
     return render_stats_dreets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
 
 
+@check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_hiring(request):
     return render_stats_dreets_iae(
         request=request,
@@ -649,6 +643,7 @@ def stats_dreets_iae_hiring(request):
     )
 
 
+@check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_state(request):
     return render_stats_dreets_iae(
         request=request,
@@ -656,10 +651,8 @@ def stats_dreets_iae_state(request):
     )
 
 
+@check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_orga_etp(request):
-    if not utils.can_view_stats_dreets_iae(request):
-        raise PermissionDenied
-
     return render_stats_dreets_iae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels (ETP)",
@@ -667,8 +660,6 @@ def stats_dreets_iae_orga_etp(request):
 
 
 def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context=None):
-    if not utils.can_view_stats_dgefp_iae(request):
-        raise PermissionDenied
     extra_context = extra_context or {}
 
     return render_stats(
@@ -681,18 +672,22 @@ def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context
     )
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_auto_prescription(request):
     return render_stats_dgefp_iae(request=request, page_title="Focus auto-prescription")
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_follow_siae_evaluation(request):
     return render_stats_dgefp_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_hiring(request):
     return render_stats_dgefp_iae(request=request, page_title="Données facilitation de l'embauche")
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_state(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -700,6 +695,7 @@ def stats_dgefp_iae_state(request):
     )
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_ph_prescription(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -707,6 +703,7 @@ def stats_dgefp_iae_ph_prescription(request):
     )
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_siae_evaluation(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -715,6 +712,7 @@ def stats_dgefp_iae_siae_evaluation(request):
     )
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_orga_etp(request):
     return render_stats_dgefp_iae(
         request=request,
@@ -722,10 +720,8 @@ def stats_dgefp_iae_orga_etp(request):
     )
 
 
+@check_request(utils.can_view_stats_dgefp_iae)
 def stats_dgefp_iae_showroom(request, dashboard_full_name):
-    if not utils.can_view_stats_dgefp_iae(request):
-        raise PermissionDenied
-
     if f"stats_{dashboard_full_name}" not in mb.METABASE_DASHBOARDS:
         return HttpResponseNotFound()
 
@@ -799,44 +795,36 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
     )
 
 
+@check_request(utils.can_view_stats_dihal)
 def stats_dihal_state(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_dihal(request):
-        raise PermissionDenied
     context = {
         "page_title": "Suivi des prescriptions des AHI",
     }
     return render_stats(request=request, context=context)
 
 
+@check_request(utils.can_view_stats_drihl)
 def stats_drihl_state(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_drihl(request):
-        raise PermissionDenied
     context = {
         "page_title": "Suivi des prescriptions des AHI",
     }
     return render_stats(request=request, context=context, params=get_params_for_region("Île-de-France"))
 
 
+@check_request(utils.can_view_stats_iae_network)
 def stats_iae_network_hiring(request):
-    current_org = get_current_institution_or_404(request)
-    if not utils.can_view_stats_iae_network(request):
-        raise PermissionDenied
     context = {
         "page_title": "Données de candidatures des adhérents de mon réseau IAE",
     }
     return render_stats(
         request=request,
         context=context,
-        params={mb.IAE_NETWORK_FILTER_KEY: current_org.id},
+        params={mb.IAE_NETWORK_FILTER_KEY: request.current_organization.id},
     )
 
 
+@check_request(utils.can_view_stats_convergence)
 def stats_convergence_prescription(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_convergence(request):
-        raise PermissionDenied
     return render_stats(
         request=request,
         context={
@@ -845,10 +833,8 @@ def stats_convergence_prescription(request):
     )
 
 
+@check_request(utils.can_view_stats_convergence)
 def stats_convergence_job_application(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_convergence(request):
-        raise PermissionDenied
     return render_stats(
         request=request,
         context={
@@ -857,8 +843,7 @@ def stats_convergence_job_application(request):
     )
 
 
+@check_request(utils.can_view_stats_staff)
 def stats_staff_service_indicators(request):
     """Indicator statistics for Les Emplois staff"""
-    if not utils.can_view_stats_staff(request):
-        raise PermissionDenied
     return render_stats(request=request, context={"page_title": "Indicateurs à suivre"})
