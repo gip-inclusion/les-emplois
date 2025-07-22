@@ -333,9 +333,17 @@ class Assessment(models.Model):
         return " / ".join(institution.name for institution in self.conventionned_institutions())
 
     def label_antenna_names(self):
-        antenna_names = ["Siège"] if self.with_main_geiq else []
+        antenna_names = (
+            [f"Siège ({department_from_postcode(self.label_geiq_post_code)})"] if self.with_main_geiq else []
+        )
+
         if self.label_antennas:
-            antenna_names.extend([antenna["name"] for antenna in self.label_antennas])
+            antenna_names.extend(
+                [
+                    f"{antenna['name']} ({department_from_postcode(antenna.get('post_code'))})"
+                    for antenna in self.label_antennas
+                ]
+            )
         return antenna_names
 
 

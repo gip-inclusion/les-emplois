@@ -260,7 +260,7 @@
                           <h4>Informations générales</h4>
                           <h5>Structures concernées par la convention</h5>
                           <ul>
-                              <li>Siège</li><li>Une antenne</li>
+                              <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
                       </div>
@@ -1041,7 +1041,7 @@
                           <h4>Informations générales</h4>
                           <h5>Structures concernées par la convention</h5>
                           <ul>
-                              <li>Siège</li><li>Une antenne</li>
+                              <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
                               
@@ -1149,7 +1149,7 @@
   Références du dossier :
   
   Structures concernées par la convention :
-  Une antenne; Une autre antenne
+  Une antenne (12); Une autre antenne (23)
   
   Institution référente sélectionnée par le GEIQ :
   DDETS 29
@@ -1365,10 +1365,10 @@
                       </h5>
                       <ul>
                           <li>
-                              Une antenne
+                              Une antenne (12)
                           </li>
                           <li>
-                              Une autre antenne
+                              Une autre antenne (23)
                           </li>
                       </ul>
                       <h5>
@@ -2058,7 +2058,7 @@
                           <h4>Informations générales</h4>
                           <h5>Structures concernées par la convention</h5>
                           <ul>
-                              <li>Siège</li><li>Une antenne</li>
+                              <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
                       </div>
@@ -2287,7 +2287,7 @@
                           <h4>Informations générales</h4>
                           <h5>Structures concernées par la convention</h5>
                           <ul>
-                              <li>Siège</li><li>Une antenne</li>
+                              <li>Siège (12)</li><li>Une antenne (12)</li>
                           </ul>
                           
                       </div>
@@ -3213,7 +3213,7 @@
                                               </td>
                                               <td>
                                                   <ul class="mb-0">
-                                                      <li>Siège</li><li>Une antenne</li>
+                                                      <li>Siège (12)</li><li>Une antenne (12)</li>
                                                   </ul>
                                               </td>
                                               <td>Jean DUPONT</td>
@@ -3227,7 +3227,7 @@
                                               </td>
                                               <td>
                                                   <ul class="mb-0">
-                                                      <li>Siège</li>
+                                                      <li>Siège (23)</li>
                                                   </ul>
                                               </td>
                                               <td>Marie CURIE</td>
@@ -3241,7 +3241,7 @@
                                               </td>
                                               <td>
                                                   <ul class="mb-0">
-                                                      <li>Un Superbe GEIQ</li>
+                                                      <li>Un Superbe GEIQ (12)</li>
                                                   </ul>
                                               </td>
                                               <td>Marie CURIE</td>

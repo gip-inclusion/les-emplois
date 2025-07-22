@@ -85,6 +85,7 @@ class TestListAssessmentsView:
             created_by__last_name="Dupont",
             with_main_geiq=True,
             label_geiq_name="Un Joli GEIQ",
+            label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         submitted_assessment = AssessmentFactory(
@@ -95,6 +96,7 @@ class TestListAssessmentsView:
             created_by__last_name="Curie",
             with_main_geiq=True,
             label_geiq_name="Un Beau GEIQ",
+            label_geiq_post_code="23456",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=membership.user,
@@ -380,6 +382,7 @@ class TestAssessmentDetailsForGEIQView:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             with_main_geiq=True,
+            label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         AssessmentInstitutionLink.objects.create(
@@ -918,6 +921,7 @@ class TestAssessmentSyncFile:
             created_by__last_name="Dupont",
             label_geiq_id=1234,
             with_main_geiq=True,
+            label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         detail_response = client.get(
@@ -1203,6 +1207,7 @@ class TestAssessmentContractsSync:
             created_by__last_name="Dupont",
             label_geiq_id=1234,
             with_main_geiq=True,
+            label_geiq_post_code="12345",
             label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         detail_response = client.get(
