@@ -353,7 +353,7 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
     current_org = get_current_org_or_404(request)
     if not utils.can_view_stats_ft(request):
         raise PermissionDenied
-    departments = utils.get_stats_ft_departments(request)
+    departments = utils.get_stats_ft_departments(current_org)
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }

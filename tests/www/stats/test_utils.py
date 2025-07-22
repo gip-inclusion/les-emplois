@@ -55,7 +55,7 @@ def test_can_view_stats_ft_as_regular_ft_agency():
     assert not regular_fr_agency.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
-    assert utils.get_stats_ft_departments(request) == ["93"]
+    assert utils.get_stats_ft_departments(regular_fr_agency) == ["93"]
 
 
 def test_can_view_stats_ft_as_dtft_with_single_department():
@@ -71,7 +71,7 @@ def test_can_view_stats_ft_as_dtft_with_single_department():
     assert not dtft_with_single_department.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
-    assert utils.get_stats_ft_departments(request) == ["49"]
+    assert utils.get_stats_ft_departments(dtft_with_single_department) == ["49"]
 
 
 def test_can_view_stats_ft_as_dtft_with_multiple_departments():
@@ -87,7 +87,7 @@ def test_can_view_stats_ft_as_dtft_with_multiple_departments():
     assert not dtft_with_multiple_departments.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
-    assert utils.get_stats_ft_departments(request) == ["72", "53"]
+    assert utils.get_stats_ft_departments(dtft_with_multiple_departments) == ["72", "53"]
 
 
 def test_can_view_stats_ft_as_drft():
@@ -103,7 +103,7 @@ def test_can_view_stats_ft_as_drft():
     assert not drft.is_dtft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
-    assert utils.get_stats_ft_departments(request) == [
+    assert utils.get_stats_ft_departments(drft) == [
         "75",
         "77",
         "78",
@@ -128,7 +128,7 @@ def test_can_view_stats_ft_as_dgft():
     assert dgft.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_ft(request)
-    assert utils.get_stats_ft_departments(request)
+    assert utils.get_stats_ft_departments(dgft)
 
 
 @pytest.mark.parametrize(
