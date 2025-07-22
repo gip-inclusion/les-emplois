@@ -29,6 +29,8 @@ def get_structure_view_link(structure, display_attr="name"):
         format_kwargs["siret"] = structure.siret
     format_string += " ({kind})"
     format_kwargs["kind"] = structure.kind
+    format_string += " — PK: {pk}"
+    format_kwargs["pk"] = structure.pk
     return format_html(format_string, **format_kwargs)
 
 
