@@ -517,7 +517,7 @@ def stats_ph_beneficiaries(request):
     )
 
 
-def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole_region, params=None):
+def render_stats_ddets(request, *, page_title, extra_context=None, extend_stats_to_whole_region=False):
     department = request.current_organization.department
     department_label = DEPARTMENTS[department]
     region = request.current_organization.region
@@ -532,32 +532,18 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
     if extra_context:
         context.update(extra_context)
 
-    if params is None:
-        if extend_stats_to_whole_region:
-            params = get_params_for_region(region)
-        else:
-            params = get_params_for_departement(department)
+    params = get_params_for_region(region) if extend_stats_to_whole_region else get_params_for_departement(department)
     return render_stats(request=request, context=context, params=params)
-
-
-def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False, params=None):
-    return render_stats_ddets(
-        request=request,
-        page_title=page_title,
-        extra_context=extra_context,
-        extend_stats_to_whole_region=extend_stats_to_whole_region,
-        params=params,
-    )
 
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_auto_prescription(request):
-    return render_stats_ddets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
+    return render_stats_ddets(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
 
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_ph_prescription(request):
-    return render_stats_ddets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
+    return render_stats_ddets(request=request, page_title="Analyse des candidatures émises et de leur traitement")
 
 
 @check_request(utils.can_view_stats_ddets_iae)
@@ -566,14 +552,14 @@ def stats_ddets_iae_siae_evaluation(request):
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_siae_evaluation_message": True,
     }
-    return render_stats_ddets_iae(
+    return render_stats_ddets(
         request=request, page_title="Données du contrôle a posteriori", extra_context=extra_context
     )
 
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_hiring(request):
-    return render_stats_ddets_iae(
+    return render_stats_ddets(
         request=request,
         page_title="Analyse des candidatures reçues et de leur traitement",
     )
@@ -581,7 +567,7 @@ def stats_ddets_iae_hiring(request):
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_state(request):
-    return render_stats_ddets_iae(
+    return render_stats_ddets(
         request=request,
         page_title="Analyse des candidatures émises par les acteurs AHI",
         extend_stats_to_whole_region=True,
@@ -590,24 +576,15 @@ def stats_ddets_iae_state(request):
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_orga_etp(request):
-    return render_stats_ddets_iae(
+    return render_stats_ddets(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels (ETP)",
     )
 
 
-def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
-    return render_stats_ddets(
-        request=request,
-        page_title=page_title,
-        extra_context=None,
-        extend_stats_to_whole_region=extend_stats_to_whole_region,
-    )
-
-
 @check_request(utils.can_view_stats_ddets_log)
 def stats_ddets_log_state(request):
-    return render_stats_ddets_log(
+    return render_stats_ddets(
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
         extend_stats_to_whole_region=True,
