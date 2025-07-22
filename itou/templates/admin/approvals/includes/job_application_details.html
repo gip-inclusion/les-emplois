@@ -11,46 +11,44 @@
             <b>Nom : </b>
             {{ job_seeker.last_name|upper }}
             <small>
-                (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">
-                rechercher dans les agréments Pôle emploi
-            </a>)
-        </small>
-    </li>
-    <li>
-        <b>Prénom : </b>
-        {{ job_seeker.first_name|title }}
-    </li>
-    <li>
-        <b>Date de naissance : </b>
-        {{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}
-    </li>
-    <li>
-        <b>Email : </b>
-        {{ job_seeker.email }}
-    </li>
-    {% if job_seeker.phone %}
+                (<a href="{% url "admin:approvals_approval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">Rechercher dans les PASS IAE</a>)
+            </small>
+        </li>
         <li>
-            <b>Téléphone : </b>
-            {{ job_seeker.phone|format_phone }}
+            <b>Prénom : </b>
+            {{ job_seeker.first_name|title }}
+        </li>
+        <li>
+            <b>Date de naissance : </b>
+            {{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}
+        </li>
+        <li>
+            <b>Email : </b>
+            {{ job_seeker.email }}
+        </li>
+        {% if job_seeker.phone %}
+            <li>
+                <b>Téléphone : </b>
+                {{ job_seeker.phone|format_phone }}
+            </li>
+        {% endif %}
+        {% if job_seeker.jobseeker_profile.pole_emploi_id %}
+            <li>
+                <b>Identifiant France Travail : </b>
+                {{ job_seeker.jobseeker_profile.pole_emploi_id }}
+                <small>
+                    (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.jobseeker_profile.pole_emploi_id|urlencode }}" target="_blank">
+                    rechercher dans les agréments Pôle emploi
+                </a>)
+            </small>
         </li>
     {% endif %}
-    {% if job_seeker.jobseeker_profile.pole_emploi_id %}
+    {% if job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason %}
         <li>
-            <b>Identifiant France Travail : </b>
-            {{ job_seeker.jobseeker_profile.pole_emploi_id }}
-            <small>
-                (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.jobseeker_profile.pole_emploi_id|urlencode }}" target="_blank">
-                rechercher dans les agréments Pôle emploi
-            </a>)
-        </small>
-    </li>
-{% endif %}
-{% if job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason %}
-    <li>
-        <b>Raison de l'absence d'identifiant France Travail : </b>
-        {{ job_seeker.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}
-    </li>
-{% endif %}
+            <b>Raison de l'absence d'identifiant France Travail : </b>
+            {{ job_seeker.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}
+        </li>
+    {% endif %}
 </ul>
 
 {% endwith %}
