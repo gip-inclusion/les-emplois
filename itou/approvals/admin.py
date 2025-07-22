@@ -5,7 +5,12 @@ from django.utils.safestring import mark_safe
 
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
-from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval, send_approvals_to_pe_stats
+from itou.approvals.admin_views import (
+    manually_add_approval,
+    manually_refuse_approval,
+    send_approvals_to_pe_stats,
+    terminate_approval,
+)
 from itou.approvals.enums import Origin, ProlongationRequestStatus
 from itou.companies.models import Company
 from itou.employee_record import enums as employee_record_enums
@@ -169,6 +174,7 @@ class StartDateFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin):
+    change_form_template = "admin/approvals/change_approval_form.html"
     form = ApprovalAdminForm
     list_display = (
         "pk",
@@ -341,6 +347,9 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
         """
         return manually_refuse_approval(request, self, job_application_id)
 
+    def terminate_approval(self, request, approval_id):
+        return terminate_approval(request, self, approval_id)
+
     def get_urls(self):
         additional_urls = [
             path(
@@ -352,6 +361,11 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
                 "<uuid:job_application_id>/refuse_approval",
                 self.admin_site.admin_view(self.manually_refuse_approval),
                 name="approvals_approval_manually_refuse_approval",
+            ),
+            path(
+                "<int:approval_id>/terminate",
+                self.admin_site.admin_view(self.terminate_approval),
+                name="approvals_approval_terminate_approval",
             ),
             path(
                 "sent-to-pe-stats",
