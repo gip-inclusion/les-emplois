@@ -140,6 +140,7 @@
     'add_companymembership',
     'change_companymembership',
     'view_companymembership',
+    'delete_jobdescription',
     'view_jobdescription',
     'change_siaeconvention',
     'view_siaeconvention',
