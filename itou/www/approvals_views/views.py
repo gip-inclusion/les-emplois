@@ -35,7 +35,9 @@ from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
 from itou.utils.db import (
     ExclusionViolationError,
+    UniqueViolationError,
     maybe_exclusion_violation,
+    maybe_unique_violation,
 )
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -533,9 +535,12 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
             return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
 
         try:
-            with maybe_exclusion_violation(Prolongation, "exclude_prolongation_overlapping_dates"):
+            with (
+                maybe_exclusion_violation(Prolongation, "exclude_prolongation_overlapping_dates"),
+                maybe_unique_violation(Prolongation, "approvals_prolongation_request_id_key"),
+            ):
                 self.prolongation_request.grant(request.user)
-        except ExclusionViolationError as e:
+        except (ExclusionViolationError, UniqueViolationError) as e:
             messages.error(request, str(e), extra_tags="toast")
             return HttpResponseRedirect(
                 reverse(

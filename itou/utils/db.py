@@ -64,6 +64,10 @@ class ExclusionViolationError(IntegrityError):
     pass
 
 
+class UniqueViolationError(IntegrityError):
+    pass
+
+
 def _maybe_constraint_violation(psycopg_error, exception_class):
     @contextlib.contextmanager
     def f(model, constraint_name):
@@ -101,3 +105,4 @@ def _maybe_constraint_violation(psycopg_error, exception_class):
 
 
 maybe_exclusion_violation = _maybe_constraint_violation(psycopg.errors.ExclusionViolation, ExclusionViolationError)
+maybe_unique_violation = _maybe_constraint_violation(psycopg.errors.UniqueViolation, UniqueViolationError)
