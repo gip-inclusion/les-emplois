@@ -1,5 +1,5 @@
 import itertools
-from datetime import date
+from datetime import date, timedelta
 from functools import partial
 
 import freezegun
@@ -1796,7 +1796,15 @@ class TestJoinGroupFromNameAndEmail:
         assertContains(response, last_name)
 
         geispolsheim = create_city_geispolsheim()
-        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        def other_day_in_month(birthdate):
+            a_day = timedelta(days=1)
+            next_day = birthdate + a_day
+            if next_day.month == birthdate.month:
+                return next_day
+            return birthdate - a_day
+
+        birthdate = other_day_in_month(dummy_job_seeker.jobseeker_profile.birthdate)
 
         # If we use an existing NIR
         existing_nir = JobSeekerFactory().jobseeker_profile.nir
