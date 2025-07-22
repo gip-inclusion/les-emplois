@@ -336,7 +336,7 @@ def stats_cd_beneficiaries(request):
     )
 
 
-def render_stats_ft(request, page_title, extra_params=None, *, with_region_param=False):
+def render_stats_ft(request, page_title, extra_params=None, *, with_region_param=False, with_department_name=True):
     """
     FT ("France Travail") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
@@ -347,7 +347,7 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
     """
     departments = utils.get_stats_ft_departments(request.current_organization)
     params = {
-        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
+        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments] if with_department_name else departments,
     }
     if with_region_param:
         regions = {DEPARTMENT_TO_REGION[d] for d in departments}
@@ -393,6 +393,7 @@ def stats_ft_conversion_main(request):
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
+        with_department_name=False,
     )
 
 
@@ -404,6 +405,7 @@ def stats_ft_state_main(request):
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
+        with_department_name=False,
     )
 
 

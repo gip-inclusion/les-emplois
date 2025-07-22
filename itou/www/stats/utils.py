@@ -172,7 +172,7 @@ def can_view_stats_staff(request):
 
 def get_stats_ft_departments(current_organization):
     if current_organization.is_dgft:
-        return DEPARTMENTS.keys()
+        return list(DEPARTMENTS.keys())
     if current_organization.is_drft:
         return REGIONS[current_organization.region]
     if current_organization.is_dtft:
