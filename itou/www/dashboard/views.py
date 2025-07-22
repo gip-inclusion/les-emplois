@@ -250,18 +250,14 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     if context["layout_kind"] is DashboardStatsLayoutKind.LEGACY:
         context.update(
             {
-                # FIXME(vperron): I think there's a rising need for a revamped permission system.
-                "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
                 "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
-                "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
-                "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
                 "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
                 "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
                 "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
                 "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
             }
         )
-    context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
+        context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
 
     return render(request, template_name, context)
 
