@@ -1,18 +1,21 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.approvals.enums import Origin, ProlongationReason
-from itou.approvals.models import Suspension
+from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.job_applications.enums import JobApplicationState
+from itou.users.models import User
 from itou.utils.admin import get_admin_view_link
+from itou.utils.models import PkSupportRemark
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.files.factories import FileFactory
@@ -162,8 +165,6 @@ class TestApprovalAdmin:
         post_data = {
             "start_at": str(approval.start_at),
             "initial-start_at": str(approval.start_at),
-            "end_at": str(approval.end_at),
-            "initial-end_at": str(approval.end_at),
             "user": str(approval.user.pk),
             "eligibility_diagnosis": "",
             "suspension_set-TOTAL_FORMS": "0",
@@ -266,6 +267,198 @@ class TestApprovalAdmin:
         approval = ApprovalFactory(created_by=staff_user)
         response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
         assertContains(response, staff_user.display_with_pii)
+
+    def test_terminate_approval_without_permission(self, client):
+        user = ItouStaffFactory()
+        start_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        end_at = approval.end_at
+        client.force_login(user)
+        response = client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assert response.status_code == 403
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == end_at
+
+    def test_terminate_expired_approval(self, admin_client):
+        approval = ApprovalFactory(expired=True)
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assert response.status_code == 404
+
+    @freeze_time("2025-08-21")
+    def test_terminate_approval(self, admin_client, caplog):
+        start_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        original_end_at = approval.end_at
+        today = timezone.localdate()
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+        approval_content_type = ContentType.objects.get_for_model(Approval)
+        support_remark = PkSupportRemark.objects.filter(
+            content_type=approval_content_type,
+            object_id=approval.pk,
+        ).get()
+        user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+        assert support_remark.remark == f"2025-08-21 : PASS IAE clôturé par {user.get_full_name()}."
+
+    @freeze_time()
+    def test_terminate_approval_with_future_suspension_and_prolongation(self, admin_client, caplog):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() + timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        suspension_end = today + timedelta(days=10)
+        suspension = SuspensionFactory(approval=approval, start_at=today, end_at=suspension_end)
+        approval.refresh_from_db()
+        prolongation = ProlongationFactory(
+            approval=approval, start_at=approval.end_at, end_at=approval.end_at + timedelta(days=10)
+        )
+        approval.refresh_from_db()
+        original_end_at = approval.end_at
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        with pytest.raises(Prolongation.DoesNotExist):
+            prolongation.refresh_from_db()
+        with pytest.raises(Suspension.DoesNotExist):
+            suspension.refresh_from_db()
+        assert f"Terminating approval pk={approval.pk}, deleting 1 future approvals.Prolongation." in caplog.messages
+        assert f"Terminating approval pk={approval.pk}, deleting 1 future approvals.Suspension." in caplog.messages
+        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+
+    @freeze_time()
+    def test_terminate_approval_with_ongoing_suspension(self, admin_client, caplog):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() + timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        suspension_start = today - timedelta(days=10)
+        suspension_end = today + timedelta(days=10)
+        suspension = SuspensionFactory(approval=approval, start_at=suspension_start, end_at=suspension_end)
+        approval.refresh_from_db()
+        original_end_at = approval.end_at
+        original_suspension_end_at = suspension.end_at
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        suspension.refresh_from_db()
+        assert suspension.start_at == suspension_start
+        assert suspension.end_at == today
+        assert (
+            f"Terminating approval pk={approval.pk}, "
+            f"setting approvals.Suspension pk={suspension.pk} end_at={today} (was {original_suspension_end_at})."
+            in caplog.messages
+        )
+        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+
+    @freeze_time()
+    def test_terminate_approval_with_ongoing_prolongation(self, admin_client, caplog):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        prolongation_start = approval.end_at
+        prolongation_end = today + timedelta(days=10)
+        prolongation = ProlongationFactory(approval=approval, start_at=prolongation_start, end_at=prolongation_end)
+        approval.refresh_from_db()
+        original_end_at = approval.end_at
+        original_prolongation_end_at = prolongation.end_at
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        prolongation.refresh_from_db()
+        assert prolongation.start_at == prolongation_start
+        assert prolongation.end_at == today
+        assert (
+            f"Terminating approval pk={approval.pk}, "
+            f"setting approvals.Prolongation pk={prolongation.pk} end_at={today} (was {original_prolongation_end_at})."
+            in caplog.messages
+        )
+        assert f"Terminating approval pk={approval.pk}, end_at={today} (was {original_end_at})." in caplog.messages
+
+    @freeze_time()
+    def test_terminate_approval_with_ongoing_suspension_during_prolongation(self, admin_client):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        prolongation_start = approval.end_at
+        prolongation_end = today + timedelta(days=10)
+        prolongation = ProlongationFactory(approval=approval, start_at=prolongation_start, end_at=prolongation_end)
+        suspension_start = today - timedelta(days=3)
+        suspension_end = today + timedelta(days=10)
+        suspension = SuspensionFactory(approval=approval, start_at=suspension_start, end_at=suspension_end)
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        prolongation.refresh_from_db()
+        assert prolongation.start_at == prolongation_start
+        assert prolongation.end_at == today
+        suspension.refresh_from_db()
+        assert suspension.start_at == suspension_start
+        assert suspension.end_at == today
+
+    @freeze_time()
+    def test_terminate_approval_with_past_suspension(self, admin_client):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        suspension_start = today - timedelta(days=30)
+        suspension_end = today - timedelta(days=10)
+        suspension = SuspensionFactory(approval=approval, start_at=suspension_start, end_at=suspension_end)
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        suspension.refresh_from_db()
+        assert suspension.start_at == suspension_start
+        assert suspension.end_at == suspension_end
+
+    @freeze_time()
+    def test_terminate_approval_with_past_prolongations(self, admin_client):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        past_prolongation_start = approval.end_at
+        past_prolongation_end = today - timedelta(days=5)
+        past_prolongation = ProlongationFactory(
+            approval=approval, start_at=past_prolongation_start, end_at=past_prolongation_end
+        )
+        prolongation_start = past_prolongation_end
+        prolongation_end = today + timedelta(days=5)
+        prolongation = ProlongationFactory(approval=approval, start_at=prolongation_start, end_at=prolongation_end)
+
+        response = admin_client.post(reverse("admin:approvals_approval_terminate_approval", args=(approval.pk,)))
+        assertRedirects(response, reverse("admin:approvals_approval_change", args=(approval.pk,)))
+        approval.refresh_from_db()
+        assert approval.start_at == start_at
+        assert approval.end_at == today
+        past_prolongation.refresh_from_db()
+        assert past_prolongation.start_at == past_prolongation_start
+        assert past_prolongation.end_at == past_prolongation_end
+        prolongation.refresh_from_db()
+        assert prolongation.start_at == prolongation_start
+        assert prolongation.end_at == today
 
 
 def test_prolongation_report_file_filter(admin_client):

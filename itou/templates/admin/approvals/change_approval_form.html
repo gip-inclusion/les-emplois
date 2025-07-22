@@ -1,0 +1,23 @@
+{% extends 'admin/change_form.html' %}
+{% block object-tools-items %}
+    {% if original.is_valid %}
+        <li>
+            <form method="post" action="{% url "admin:approvals_approval_terminate_approval" original.pk %}" class="js-with-confirm">
+                {% csrf_token %}
+                <input type="submit" value="Clôturer le PASS" />
+            </form>
+        </li>
+    {% endif %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        (function() {
+            Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
+                form.addEventListener("submit", function(e) {
+                    if (!confirm("Voulez-vous clôturer ce PASS IAE ?")) {
+                        e.preventDefault();
+                    }
+                })
+            })
+        }());
+    </script>
+{% endblock %}

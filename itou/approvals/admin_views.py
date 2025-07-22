@@ -7,9 +7,11 @@ https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-s
 https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
 """
 
+import logging
 from collections import defaultdict
 
 from django.contrib import admin, messages
+from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -19,12 +21,16 @@ from django.utils import timezone
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, CancelledApproval
+from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
+from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.apis import enums as api_enums
 from itou.utils.emails import get_email_text_template
 from itou.utils.urls import add_url_params, get_absolute_url
+
+
+logger = logging.getLogger("itou.approvals.admin")
 
 
 def manually_add_approval(
@@ -162,6 +168,64 @@ def manually_refuse_approval(
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
+
+
+def _clip_approval_dependency(approval, model, end_date, acting_user):
+    _, deletions = model.objects.filter(approval=approval, start_at__gte=end_date).delete()
+    if deletions:
+        logger.info(
+            "Terminating approval pk=%(approval_id)d, deleting %(deletions)d future %(model_name)s.",
+            {
+                "approval_id": approval.pk,
+                "deletions": deletions[model._meta.label],
+                "model_name": model._meta.label,
+            },
+        )
+    try:
+        obj = model.objects.in_progress().filter(approval=approval).get()
+    except model.DoesNotExist:
+        pass
+    else:
+        logger.info(
+            "Terminating approval pk=%(approval_id)d, "
+            "setting %(model_name)s pk=%(model_id)d end_at=%(end_at)s "
+            "(was %(initial_end_at)s).",
+            {
+                "approval_id": approval.pk,
+                "model_name": obj._meta.label,
+                "model_id": obj.pk,
+                "end_at": end_date,
+                "initial_end_at": obj.end_at,
+            },
+        )
+        obj.end_at = end_date
+        obj.updated_by = acting_user
+        obj.save(update_fields=["end_at", "updated_at", "updated_by"])
+
+
+def terminate_approval(request, model_admin, approval_id):
+    opts = model_admin.model._meta
+    app_label = opts.app_label
+    codename = get_permission_codename("change", opts)
+    if not request.user.has_perm(f"{app_label}.{codename}"):
+        raise PermissionDenied
+
+    new_end = timezone.localdate()
+    approval = get_object_or_404(Approval, pk=approval_id, end_at__gte=new_end)
+    _clip_approval_dependency(approval, Prolongation, new_end, request.user)
+    _clip_approval_dependency(approval, Suspension, new_end, request.user)
+    logger.info(
+        "Terminating approval pk=%(approval_id)d, end_at=%(end_at)s (was %(initial_end_at)s).",
+        {
+            "approval_id": approval.pk,
+            "initial_end_at": approval.end_at,
+            "end_at": new_end,
+        },
+    )
+    approval.end_at = new_end
+    approval.save(update_fields=["end_at", "updated_at"])
+    add_support_remark_to_obj(approval, f"{new_end} : PASS IAE clôturé par {request.user.get_full_name()}.")
+    return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
 
 
 def _compute_send_approvals_to_pe_stats(model, list_url):
