@@ -53,6 +53,19 @@ class DatumCode(models.TextChoices):
     TECH_UPDOWN_UPTIME = "UPDOWN-001", "Taux de disponibilité"
     TECH_UPDOWN_APDEX = "UPDOWN-002", "Apdex"
     TECH_GH_TOTAL_BUGS = "GITHUB-001", "Total des PR de correctifs fusionnées aujourd'hui"
+    # Archive
+    ANONYMIZED_PROFESSIONALS_DELETED = "ARCH-001", "Archive : Nombre de professionnels anonymisés"
+    ANONYMIZED_PROFESSIONALS_NOT_DELETED = "ARCH-002", "Archive : Nombre de professionnels anonymisés non supprimés"
+    ANONYMIZED_JOB_SEEKERS = "ARCH-003", "Archive : Nombre de demandeurs d'emploi anonymisés"
+    ANONYMIZED_APPLICATIONS = "ARCH-004", "Archive : Nombre de candidatures anonymisées"
+    ANONYMIZED_APPROVALS = "ARCH-005", "Archive : Nombre de PASS IAE anonymisés"
+    ANONYMIZED_CANCELLED_APPROVALS = "ARCH-006", "Archive : Nombre de PASS IAE annulés anonymisés"
+    ANONYMIZED_IAE_ELIGIBILITY_DIAGNOSIS = "ARCH-007", "Archive : Nombre de diagnostics d'éligibilité IAE anonymisés"
+    ANONYMIZED_GEIQ_ELIGIBILITY_DIAGNOSIS = "ARCH-008", "Archive : Nombre de diagnostics d'éligibilité GEIQ anonymisés"
+    NOTIFIED_JOB_SEEKERS = "ARCH-009", "Archive : Nombre de demandeurs d'emploi notifiés"
+    NOTIFIED_PROFESSIONALS = "ARCH-010", "Archive : Nombre de professionnels notifiés"
+    NOTIFIABLE_JOB_SEEKERS = "ARCH-011", "Archive : Nombre de demandeurs d'emploi notifiables"
+    NOTIFIABLE_PROFESSIONALS = "ARCH-012", "Archive : Nombre de professionnels notifiables"
 
 
 PERCENTAGE_DATUM = [
