@@ -61,7 +61,7 @@ class TestListAssessmentsView:
             created_by__last_name="Dupont",
             with_main_geiq=True,
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=new_assessment, institution=membership.institution, with_convention=True
@@ -87,7 +87,7 @@ class TestListAssessmentsView:
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
-            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ"}],
+            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
@@ -109,7 +109,7 @@ class TestListAssessmentsView:
             campaign=campaign,
             created_by__first_name="Marie",
             created_by__last_name="Curie",
-            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ"}],
+            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
@@ -196,7 +196,7 @@ class TestAssessmentDetailsForInstitutionView:
             created_by__last_name="Dupont",
             created_by__email="jean.dupont@example.com",
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             with_submission_requirements=True,
             geiq_comment="Bonjour, merci, au revoir !",
         )
@@ -309,7 +309,7 @@ class TestAssessmentDetailsForInstitutionView:
             created_by__last_name="Dupont",
             created_by__email="jean.dupont@example.com",
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
@@ -393,7 +393,7 @@ class TestAssessmentDetailsForInstitutionView:
             created_by__last_name="Dupont",
             created_by__email="jean.dupont@example.com",
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
@@ -504,7 +504,7 @@ class TestAssessmentReviewView:
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
             with_main_geiq=True,
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -581,7 +581,7 @@ class TestAssessmentReviewView:
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=geiq_membership.user,
             with_main_geiq=True,
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "29000"}],
             grants_selection_validated_at=timezone.now() + datetime.timedelta(hours=4),
             review_comment="Bravo !",
             convention_amount=100_000,

@@ -165,6 +165,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         return render(request, template_name, context)
 
     antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
+    antenna_postcodes = {antenna_info["id"]: antenna_info["cp"] for antenna_info in geiq_info["antennes"]}
     campaign_qs = AssessmentCampaign.objects.filter(pk=campaign_label_infos.campaign_id)
     # Take a lock on the campaign to prevent concurrent creation
     campaign = (
@@ -204,7 +205,9 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
 
         for antenna_id, antenna_name in antenna_names.items():
             if create_form.cleaned_data.get(create_form.get_antenna_field(antenna_id)):
-                label_antennas.append({"id": antenna_id, "name": antenna_name})
+                label_antennas.append(
+                    {"id": antenna_id, "name": antenna_name, "post_code": antenna_postcodes[antenna_id]}
+                )
                 if antenna_siret := antenna_sirets[antenna_id]:
                     sirets.add(antenna_siret)
 
