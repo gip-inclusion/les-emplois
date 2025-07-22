@@ -379,7 +379,8 @@ class TestAssessmentDetailsForGEIQView:
             companies=[membership.company, CompanyFactory(kind=CompanyKind.GEIQ)],
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -415,7 +416,8 @@ class TestAssessmentDetailsForGEIQView:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
         response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
@@ -653,7 +655,8 @@ class TestAssessmentDetailsForGEIQView:
             companies=[membership.company],
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -825,7 +828,8 @@ class TestAssessmentSyncFile:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
 
         # Sync Summary Document
@@ -910,7 +914,8 @@ class TestAssessmentSyncFile:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
         detail_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
@@ -1115,7 +1120,8 @@ class TestAssessmentContractsSync:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
 
         # Retrieve Contracts infos
@@ -1193,7 +1199,8 @@ class TestAssessmentContractsSync:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne"}],
         )
         detail_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
