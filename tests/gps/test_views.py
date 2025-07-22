@@ -1822,22 +1822,23 @@ class TestJoinGroupFromNameAndEmail:
         response = client.post(next_url, data=post_data)
         assertContains(response, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")
 
+        step2_url = reverse(
+            "job_seekers_views:create_job_seeker_step_2_for_sender",
+            kwargs={"session_uuid": job_seeker_session_name},
+        )
         # With a other NIR
         post_data["nir"] = dummy_job_seeker.jobseeker_profile.nir
         response = client.post(next_url, data=post_data)
+        assertRedirects(response, step2_url)
         expected_job_seeker_session["profile"] = {}
         for key in ["nir", "birthdate", "lack_of_nir_reason", "birth_place", "birth_country"]:
             expected_job_seeker_session["profile"][key] = post_data.pop(key)
         expected_job_seeker_session["user"] |= post_data
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        next_url = reverse(
-            "job_seekers_views:create_job_seeker_step_2_for_sender",
-            kwargs={"session_uuid": job_seeker_session_name},
-        )
-        assertRedirects(response, next_url)
+        assertRedirects(response, step2_url)
 
-        response = client.get(next_url)
+        response = client.get(step2_url)
         assert response.status_code == 200
 
         post_data = {
@@ -1856,27 +1857,27 @@ class TestJoinGroupFromNameAndEmail:
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
 
-        response = client.post(next_url, data=post_data)
+        response = client.post(step2_url, data=post_data)
 
         expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        next_url = reverse(
+        step3_url = reverse(
             "job_seekers_views:create_job_seeker_step_3_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assertRedirects(response, next_url)
+        assertRedirects(response, step3_url)
 
-        response = client.get(next_url)
+        response = client.get(step3_url)
         assert response.status_code == 200
 
         post_data = {"education_level": dummy_job_seeker.jobseeker_profile.education_level}
-        response = client.post(next_url, data=post_data)
-        next_url = reverse(
+        response = client.post(step3_url, data=post_data)
+        step_end_url = reverse(
             "job_seekers_views:create_job_seeker_step_end_for_sender",
             kwargs={"session_uuid": job_seeker_session_name},
         )
-        assertRedirects(response, next_url)
+        assertRedirects(response, step_end_url)
 
         expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
@@ -1899,10 +1900,10 @@ class TestJoinGroupFromNameAndEmail:
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
-        response = client.get(next_url)
+        response = client.get(step_end_url)
         assertContains(response, "Créer et suivre le bénéficiaire")
 
-        response = client.post(next_url)
+        response = client.post(step_end_url)
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert_new_beneficiary_toast(response, new_job_seeker)
