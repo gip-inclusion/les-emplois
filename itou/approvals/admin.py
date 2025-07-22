@@ -377,11 +377,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
     def assigned_company(self, obj):
         if obj.assigned_company:
             company = Company.objects.get(pk=obj.assigned_company)
-            return format_html(
-                "{} — SIRET : {}",
-                get_admin_view_link(company, content=company.display_name),
-                company.siret,
-            )
+            return get_structure_view_link(company, display_attr="display_name")
         return self.get_empty_value_display()
 
 
