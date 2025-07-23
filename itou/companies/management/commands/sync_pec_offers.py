@@ -1,4 +1,4 @@
-from time import sleep
+import datetime
 
 from django.db import transaction
 
@@ -10,12 +10,6 @@ from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
-
-# Source:
-# https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
-OFFERS_MIN_INDEX = 0
-OFFERS_MAX_INDEX = 3149
-OFFERS_MAX_RANGE = 150
 
 PE_TYPE_TO_CONTRACT_TYPE = {
     "CDI": ContractType.PERMANENT,
@@ -112,21 +106,14 @@ class Command(BaseCommand):
         pe_client = pole_emploi_partenaire_api_client()
         pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
 
-        # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE PEC offers.
-        # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
-        # by requesting every department one by one. But so far we are not even close from half this quota.
-        raw_offers = []
-        for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
-            max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
-            offers = pe_client.offres(natureContrat=pe_api_enums.NATURE_CONTRAT_PEC, range=f"{i}-{max_range}")
-            self.logger.info(f"retrieved count={len(offers)} PEC offers from PE API")
-            if not offers:
-                break
-            raw_offers.extend(offers)
-            if max_range == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
-                self.logger.error("FT API returned the maximum number of offers: some offers are likely missing")
-
-            sleep(delay)
+        # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,
+        # we will need to setup a much more complicated sync mechanism, for instance by requesting every department one
+        # by one. But so far we are not even close from half this quota.
+        raw_offers = pe_client.retrieve_all_offres(
+            natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
+            delay_between_requests=datetime.timedelta(seconds=delay),
+        )
+        self.logger.info(f"retrieved count={len(raw_offers)} PEC offers from FT API")
 
         added_offers = []
         updated_offers = []

@@ -53,8 +53,9 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
         "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
-        "retrieved count=2 PEC offers from PE API",
-        "retrieved count=0 PEC offers from PE API",
+        "retrieved count=2 offers from FT API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=2 PEC offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
         "successfully created count=1 PE job offers",
         "successfully updated count=0 PE job offers",
@@ -87,8 +88,9 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
         "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
-        "retrieved count=2 PEC offers from PE API",
-        "retrieved count=0 PEC offers from PE API",
+        "retrieved count=2 offers from FT API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=2 PEC offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
         "successfully created count=0 PE job offers",
         "successfully updated count=1 PE job offers",
@@ -108,7 +110,8 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
         "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
-        "retrieved count=0 PEC offers from PE API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=0 PEC offers from FT API",
         "successfully created count=0 PE job offers",
         "successfully updated count=0 PE job offers",
         "successfully deleted count=1 PE job offers",
