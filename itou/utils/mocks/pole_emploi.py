@@ -284,4 +284,24 @@ RESPONSES = {
             "topIdentiteCertifiee": "O",
         },
     },
+    Endpoints.RQTH: {
+        ResponseKind.CERTIFIED: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "2030-01-20",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "dateDebutRqth": "",
+            "dateFinRqth": "",
+            "source": "",
+            "topValiditeRQTH": False,
+        },
+        ResponseKind.CERTIFIED_FOR_EVER: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "9999-12-31",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+    },
 }
