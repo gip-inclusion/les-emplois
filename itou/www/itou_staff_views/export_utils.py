@@ -155,7 +155,6 @@ job_app_export_spec = {
         if _getattrs(job_app, "hired_job", "contract_type") != ContractType.OTHER
         else _getattrs(job_app, "hired_job", "other_contract_type")
     ),
-    "hired_for_job_contract_nature": lambda job_app: _getattrs(job_app, "hired_job", "contract_nature"),
     "hired_for_job_location": lambda job_app: _getattrs(job_app, "hired_job", "location"),
     "hired_for_job_location_hours_per_week": lambda job_app: _getattrs(job_app, "hired_job", "hours_per_week"),
     "hiring_start_at": lambda job_app: job_app.hiring_start_at,
