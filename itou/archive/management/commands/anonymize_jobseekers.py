@@ -77,7 +77,6 @@ def anonymized_jobapplication(obj):
         had_diagoriente_invitation=obj.diagoriente_invite_sent_at is not None,
         hiring_rome=obj.hired_job.appellation.rome if obj.hired_job else None,
         hiring_contract_type=obj.hired_job.contract_type if obj.hired_job else None,
-        hiring_contract_nature=obj.hired_job.contract_nature if obj.hired_job else None,
         hiring_start_date=get_year_month_or_none(obj.hiring_start_at),
     )
 

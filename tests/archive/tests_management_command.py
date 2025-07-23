@@ -13,7 +13,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.archive.models import AnonymizedApplication, AnonymizedJobSeeker, AnonymizedProfessional
-from itou.companies.enums import CompanyKind, ContractNature, ContractType
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -636,7 +636,6 @@ class TestAnonymizeJobseekersManagementCommand:
                     "to_company__convention__is_active": True,
                     "was_hired": True,
                     "hired_job__contract_type": ContractType.FIXED_TERM_TREMPLIN,
-                    "hired_job__contract_nature": ContractNature.PEC_OFFER,
                     "to_company__romes": ["N1101"],
                     "hiring_start_at": datetime.date(2025, 2, 2),
                 },
