@@ -1,6 +1,8 @@
+import datetime
 import json
 import logging
 import re
+import time
 
 import httpx
 from django.core.cache import caches
@@ -11,6 +13,12 @@ logger = logging.getLogger(__name__)
 
 API_CLIENT_HTTP_ERROR_CODE = "http_error"
 REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right* on the expiry time.
+
+# Source:
+# https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
+OFFERS_MIN_INDEX = 0
+OFFERS_MAX_INDEX = 3149
+OFFERS_MAX_RANGE = 150
 
 
 class PoleEmploiAPIException(Exception):
@@ -235,6 +243,24 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         if not data:
             return []
         return data["resultats"]
+
+    def retrieve_all_offres(self, typeContrat="", natureContrat="", *, delay_between_requests=datetime.timedelta(0)):
+        # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE offers.
+        # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
+        # by requesting every department one by one. But so far we are not even close from half this quota.
+        raw_offers = []
+        for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
+            max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
+            offers = self.offres(typeContrat=typeContrat, natureContrat=natureContrat, range=f"{i}-{max_range}")
+            logger.info(f"retrieved count={len(offers)} offers from FT API")
+            if not offers:
+                break
+            raw_offers.extend(offers)
+            if max_range == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
+                logger.error("FT API returned the maximum number of offers: some offers are likely missing")
+
+            time.sleep(delay_between_requests.total_seconds())
+        return raw_offers
 
     def appellations(self):
         return self._request(
