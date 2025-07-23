@@ -1,3 +1,4 @@
+import datetime
 import json
 import math
 import time
@@ -20,6 +21,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRoyaumeAgentAPIClient,
     PoleEmploiRoyaumePartenaireApiClient,
     UserDoesNotExist,
+    pole_emploi_agent_api_client,
 )
 from itou.utils.mocks.pole_emploi import (
     API_APPELLATIONS,
@@ -320,23 +322,18 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     def setup_method(self, settings):
         settings.API_ESD = {
             "BASE_URL": "https://pe.fake",
-            "AUTH_BASE_URL": "https://auth.fr",
+            "AUTH_BASE_URL_AGENT": "https://auth.fr",
             "KEY": "foobar",
             "SECRET": "pe-secret",
         }
-        self.api_client = PoleEmploiRoyaumeAgentAPIClient(
-            settings.API_ESD["BASE_URL"],
-            settings.API_ESD["AUTH_BASE_URL"],
-            settings.API_ESD["KEY"],
-            settings.API_ESD["SECRET"],
-        )
+        self.api_client = pole_emploi_agent_api_client()
         json_response = {
             "token_type": "Bearer",
             "access_token": "Catwoman",
             "scope": "client_id h2a rechercheusager profil_accedant api_donnees-rqthv1 api_rechercher-usagerv2",
             "expires_in": self.CACHE_EXPIRY,
         }
-        respx.post(f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token?realm=%2Fagent").respond(
+        respx.post(f"{settings.API_ESD['AUTH_BASE_URL_AGENT']}/connexion/oauth2/access_token?realm=%2Fagent").respond(
             200, json=json_response
         )
 
@@ -345,6 +342,47 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         # This method is already tested on TestPoleEmploiRoyaumePartenaireApiClient.
         token = self.api_client._refresh_token()
         assert token == "Bearer Catwoman"
+
+    @respx.mock
+    def test_request_caches_token(self):
+        rechercher_usager_url = f"{settings.API_ESD['BASE_URL']}{ENDPOINTS['rechercher-usager-date-naissance-nir']}"
+        respx.post(rechercher_usager_url).respond(200, json={"sample": "data"})
+        self.api_client._request(rechercher_usager_url)
+        assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
+
+    @respx.mock
+    def test_request_http_request_headers(self):
+        rechercher_usager_url = f"{settings.API_ESD['BASE_URL']}{ENDPOINTS['rechercher-usager-date-naissance-nir']}"
+        mock = respx.post(rechercher_usager_url).respond(200, json={"sample": "data"})
+        self.api_client._request(rechercher_usager_url)
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "<string>",
+        }
+        headers = mock.calls[-1].request.headers
+        for key, value in expected_headers.items():
+            assert headers[key] == value
+
+    @respx.mock
+    def test_request_http_additional_request_headers(self):
+        rechercher_usager_url = f"{settings.API_ESD['BASE_URL']}{ENDPOINTS['rechercher-usager-date-naissance-nir']}"
+        mock = respx.post(rechercher_usager_url).respond(200, json={"sample": "data"})
+        additional_headers = {"ft-jeton-usager": "something-very-long"}
+        self.api_client._request(rechercher_usager_url, additional_headers=additional_headers)
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "<string>",
+            **additional_headers,
+        }
+        headers = mock.calls[-1].request.headers
+        for key, value in expected_headers.items():
+            assert headers[key] == value
 
     @respx.mock
     def test_rechercher_usager_by_birthdate_and_nir(self):
@@ -435,3 +473,69 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         assert token == "a_long_token"
         assert not mock_birthdate_nir.called
         assert mock_pole_emploi_id.called
+
+    @pytest.mark.parametrize(
+        "json_response,expected_data",
+        [
+            pytest.param(
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.CERTIFIED],
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": datetime.date(2030, 1, 20),
+                },
+                id="certified",
+            ),
+            pytest.param(
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.NOT_CERTIFIED],
+                {
+                    "is_certified": False,
+                    "start_at": None,
+                    "end_at": None,
+                },
+                id="not_certified",
+            ),
+            pytest.param(
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.CERTIFIED_FOR_EVER],
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": None,
+                },
+                id="certified_for_ever",
+            ),
+            # As for now, the API returns `"dateFinRqth": "9999-12-31"`
+            # if the RQTH has no end but this may change one day.
+            # Be future-proof by testing this possible case.
+            pytest.param(
+                {
+                    "dateDebutRqth": "2024-01-20",
+                    "dateFinRqth": None,
+                    "source": "FRANCE TRAVAIL",
+                    "topValiditeRQTH": True,
+                },
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": None,
+                },
+                id="certified_for_ever_null_end_at",
+            ),
+        ],
+    )
+    @respx.mock
+    def test_certify_rqth(self, json_response, expected_data):
+        respx.post(settings.API_ESD["BASE_URL"] + ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.CERTIFIED]
+        )
+
+        respx.get(settings.API_ESD["BASE_URL"] + ENDPOINTS["rqth"]).respond(200, json=json_response)
+
+        # The RQTH certification calls two endpoints: rechercher_usager and donnees_rqth.
+        # Use a context manager to reuse the same HTTP client.
+        # See BasePoleEmploiApiClient._httpx_client
+        with self.api_client as client:
+            data = client.certify_rqth(jobseeker_profile=JobSeekerProfileFactory())
+        for key, value in expected_data.items():
+            assert data[key] == value
+        assert data["raw_response"] == json_response
