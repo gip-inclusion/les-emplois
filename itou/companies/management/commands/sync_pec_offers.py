@@ -3,7 +3,7 @@ import datetime
 from django.db import transaction
 
 from itou.cities.models import City
-from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource
+from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
@@ -91,6 +91,7 @@ def pe_offer_to_job_description(data, logger):
         market_context_description=data.get("entreprise", {}).get("nom", ""),
         source_id=data["id"],
         source_kind=JobSource.PE_API,
+        source_tags=[JobSourceTag.FT_PEC_OFFER.value],
         source_url=source_url,
     )
 

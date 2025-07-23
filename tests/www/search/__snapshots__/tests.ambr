@@ -94,6 +94,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  EXISTS
@@ -412,6 +413,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  EXISTS
@@ -948,6 +950,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
@@ -1361,6 +1364,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
@@ -1775,6 +1779,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (
@@ -2188,6 +2193,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  COUNT("job_applications_jobapplication_selected_jobs"."jobapplication_id") FILTER (

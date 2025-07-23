@@ -121,6 +121,7 @@
                  "companies_jobdescription"."source_id",
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
                  "companies_jobdescription"."field_history",
                  "companies_jobdescription"."creation_source",
                  "jobs_appellation"."updated_at",
