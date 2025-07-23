@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +12,9 @@ from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL
 from itou.job_applications.models import JobApplication
 from itou.utils.auth import check_user
 from itou.www.apply.forms import EditHiringDateForm
+
+
+logger = logging.getLogger(__name__)
 
 
 @check_user(lambda user: user.is_employer)
@@ -36,6 +41,14 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
         form.save()
 
         messages.success(request, "La période du contrat de travail a bien été mise à jour.", extra_tags="toast")
+
+        logger.info(
+            "user=%s changed job_application=%s hiring dates from %s to %s",
+            request.user.pk,
+            job_application_id,
+            [str(form.initial["hiring_start_at"]), str(form.initial["hiring_end_at"])],
+            [str(form.cleaned_data["hiring_start_at"]), str(form.cleaned_data["hiring_end_at"])],
+        )
 
         if job_application.approval and job_application.approval.update_start_date(job_application.hiring_start_at):
             messages.success(request, "La date de début du PASS IAE a été fixée à la date de début de contrat.")
