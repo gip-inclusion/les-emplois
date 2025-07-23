@@ -45,8 +45,6 @@ API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
 
 API_TIMEOUT_SECONDS = 60  # this API is pretty slow, let's give it a chance
 
-CACHE_API_TOKEN_KEY = "pole_emploi_api_client_token"
-
 API_MAJ_PASS_SUCCESS = "S000"
 API_RECH_INDIVIDU_SUCCESS = "S001"
 DATE_FORMAT = "%Y-%m-%d"
@@ -72,12 +70,15 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
 class BasePoleEmploiApiClient:
     AUTHORIZED_SCOPES = []
     REALM = ""
+    CACHE_API_TOKEN_KEY = ""
 
     def __init__(self, base_url, auth_base_url, key, secret):
         if not self.AUTHORIZED_SCOPES:
             raise NotImplementedError("Authorized scopes missing.")
         if not self.REALM:
             raise NotImplementedError("Realm missing.")
+        if not self.CACHE_API_TOKEN_KEY:
+            raise NotImplementedError("Cache key missing.")
         self.base_url = base_url
         self.auth_base_url = auth_base_url
         self.key = key
@@ -102,7 +103,7 @@ class BasePoleEmploiApiClient:
         )
         token = f"{auth_data['token_type']} {auth_data['access_token']}"
         caches["failsafe"].set(
-            CACHE_API_TOKEN_KEY,
+            self.CACHE_API_TOKEN_KEY,
             token,
             auth_data["expires_in"]
             - REFRESH_TOKEN_MARGIN_SECONDS,  # make the token expire a little sooner than expected
@@ -111,7 +112,7 @@ class BasePoleEmploiApiClient:
 
     def _request(self, url, data=None, params=None, method="POST"):
         try:
-            token = caches["failsafe"].get(CACHE_API_TOKEN_KEY)
+            token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
             if not token:
                 token = self._refresh_token()
 
@@ -159,6 +160,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         "organisationpe",
     ]
     REALM = "/partenaire"
+    CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
 
     def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
         """Example data:
