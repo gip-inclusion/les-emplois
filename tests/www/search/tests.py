@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
-from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
+from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
@@ -1146,8 +1146,8 @@ class TestJobDescriptionSearchView:
         RESERVED_PEC = "Réservé au public éligible au contrat PEC"
         assertNotContains(response, RESERVED_PEC)
 
-        job_pec.contract_nature = ContractNature.PEC_OFFER
-        job_pec.save(update_fields=["contract_nature", "updated_at"])
+        job_pec.source_tags = [JobSourceTag.FT_PEC_OFFER]
+        job_pec.save(update_fields=["source_tags", "updated_at"])
         response = client.get(
             self.URL,
             {"city": city.slug},
@@ -1159,7 +1159,7 @@ class TestJobDescriptionSearchView:
         # no filter: returns everything.
         response = client.get(
             self.URL,
-            {"city": city.slug, "contract_types": ["PEC_OFFER"]},
+            {"city": city.slug, "contract_types": ["FT_PEC_OFFER"]},
         )
         assertContains(
             response,
@@ -1176,7 +1176,7 @@ class TestJobDescriptionSearchView:
         # filter with PEC offer, apprenticeship: returns both
         response = client.get(
             self.URL,
-            {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
+            {"city": city.slug, "contract_types": ["FT_PEC_OFFER", "APPRENTICESHIP"]},
         )
         assertContains(
             response,

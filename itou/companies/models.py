@@ -852,7 +852,7 @@ class JobDescription(models.Model):
 
     @property
     def is_pec_offer(self):
-        return self.is_from_pole_emploi and self.contract_nature == ContractNature.PEC_OFFER
+        return self.is_from_pole_emploi and self.source_tags and JobSourceTag.FT_PEC_OFFER.value in self.source_tags
 
     def get_absolute_url(self):
         if self.is_external:
