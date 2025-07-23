@@ -37,6 +37,10 @@ class TestEditContract:
         self.job_application_1 = JobApplicationFactory(
             with_approval=True, to_company=company_1, hiring_start_at=tomorrow, approval__start_at=tomorrow
         )
+        self.previous_dates = [
+            self.job_application_1.hiring_start_at.strftime("%Y-%m-%d"),
+            self.job_application_1.hiring_end_at.strftime("%Y-%m-%d"),
+        ]
 
         # JA with an old approval
         delta = relativedelta(months=23)
@@ -62,7 +66,7 @@ class TestEditContract:
         assert self.job_application_1.approval.can_postpone_start_date
         assert not self.old_job_application.approval.can_postpone_start_date
 
-    def test_future_contract_date(self, client):
+    def test_future_contract_date(self, client, caplog):
         """
         Checks possibility of changing hiring start date to a future date.
         """
@@ -74,6 +78,7 @@ class TestEditContract:
 
         future_start_date = timezone.localdate() + relativedelta(days=10)
         future_end_date = timezone.localdate() + relativedelta(days=15)
+        new_dates = [future_start_date.strftime("%Y-%m-%d"), future_end_date.strftime("%Y-%m-%d")]
 
         post_data = {
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -83,6 +88,10 @@ class TestEditContract:
         response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         assertRedirects(response, next_url)
+        assert caplog.messages[1] == (
+            f"user={self.user1.pk} changed job_application={self.job_application_1.pk} "
+            f"hiring dates from {self.previous_dates} to {new_dates}"
+        )
 
         self.job_application_1.refresh_from_db()
 
@@ -95,7 +104,7 @@ class TestEditContract:
             response, f"<small>Fin</small><strong>{dateformat.format(future_end_date, 'd F Y')}</strong>", html=True
         )
 
-    def test_future_contract_date_without_hiring_end_at(self, client):
+    def test_future_contract_date_without_hiring_end_at(self, client, caplog):
         """
         Checks possibility of changing hiring start date to a future date, with no hiring_end_at date.
         """
@@ -107,6 +116,7 @@ class TestEditContract:
 
         future_start_date = timezone.localdate() + relativedelta(days=11)
         future_end_date = None
+        new_dates = [future_start_date.strftime("%Y-%m-%d"), "None"]
 
         # empty "hiring_end_at"
         post_data = {
@@ -117,6 +127,10 @@ class TestEditContract:
         response = client.post(self.url, data=post_data)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         assertRedirects(response, next_url)
+        assert caplog.messages[1] == (
+            f"user={self.user1.pk} changed job_application={self.job_application_1.pk} "
+            f"hiring dates from {self.previous_dates} to {new_dates}"
+        )
 
         self.job_application_1.refresh_from_db()
 
