@@ -24,6 +24,7 @@ from itou.companies.enums import (
     ContractType,
     JobDescriptionSource,
     JobSource,
+    JobSourceTag,
 )
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
@@ -757,6 +758,11 @@ class JobDescription(models.Model):
         null=True,
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
+    source_tags = ArrayField(
+        base_field=models.CharField(choices=JobSourceTag.choices),
+        verbose_name="étiquettes de la source",
+        null=True,
+    )
     field_history = models.JSONField(
         verbose_name="historique des champs modifiés sur le modèle",
         null=True,

@@ -433,6 +433,7 @@ class JobDescriptionAdmin(ItouModelAdmin):
         "pk",
         "source_id",
         "source_kind",
+        "source_tags",
         "source_url",
         "last_employer_update_at",
         "field_history",

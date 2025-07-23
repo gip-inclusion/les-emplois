@@ -32,6 +32,10 @@ class ContractNature(models.TextChoices):
     PEC_OFFER = "PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
 
 
+class JobSourceTag(models.TextChoices):
+    FT_PEC_OFFER = "FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
+
+
 class ContractType(models.TextChoices):
     """
     A list of possible work contract types for Companies.
