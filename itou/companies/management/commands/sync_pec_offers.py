@@ -12,9 +12,9 @@ from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 
 # Source:
-# https://pole-emploi.io/data/api/offres-emploi?tabgroup-api=documentation&doc-section=api-doc-section-rechercher-par-crit%C3%A8res
+# https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
 OFFERS_MIN_INDEX = 0
-OFFERS_MAX_INDEX = 1149
+OFFERS_MAX_INDEX = 3149
 OFFERS_MAX_RANGE = 150
 
 PE_TYPE_TO_CONTRACT_TYPE = {
@@ -112,9 +112,9 @@ class Command(BaseCommand):
         pe_client = pole_emploi_partenaire_api_client()
         pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
 
-        # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,
-        # we will need to setup a much more complicated sync mechanism, for instance by requesting every department one
-        # by one. But so far we are not even close from half this quota.
+        # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE PEC offers.
+        # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
+        # by requesting every department one by one. But so far we are not even close from half this quota.
         raw_offers = []
         for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
             max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
@@ -123,6 +123,8 @@ class Command(BaseCommand):
             if not offers:
                 break
             raw_offers.extend(offers)
+            if max_range == OFFERS_MAX_INDEX and len(offers) == OFFERS_MAX_RANGE:
+                self.logger.error("FT API returned the maximum number of offers: some offers are likely missing")
 
             sleep(delay)
 
