@@ -304,7 +304,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
-    def _request(self, url, data=None, params=None, method="POST"):
+    def _request(self, url, data=None, params=None, method="POST", additional_headers=None):
         token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
         if not token:
             token = self._refresh_token()
@@ -320,6 +320,9 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "pa-prenom-agent": "<string>",
             "pa-identifiant-agent": "toto",
         }
+        headers = {"Authorization": token, "Content-Type": "application/json", **agents_headers}
+        if additional_headers:
+            headers = {**headers, **additional_headers}
 
         response = None
         try:
@@ -328,7 +331,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
                 url,
                 params=params,
                 json=data,
-                headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
+                headers=headers,
                 timeout=API_TIMEOUT_SECONDS,
             ).raise_for_status()
         except httpx.HTTPStatusError as exc:

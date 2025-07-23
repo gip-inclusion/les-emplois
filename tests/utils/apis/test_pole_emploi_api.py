@@ -284,6 +284,55 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         token = self.api_client._refresh_token()
         assert token == "Bearer Catwoman"
 
+    @respx.mock
+    def test_request_http_request_cache(self):
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json={"sample": "data"}
+        )
+        assert not caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY)
+
+        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
+
+    @respx.mock
+    def test_request_http_request_headers(self):
+        mock = respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json={"sample": "data"}
+        )
+        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        # NOTE(cms): maybe api_client.request should return a response instead of response.json()
+        headers = mock.calls[-1].request.headers
+
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "toto",
+        }
+        for key, value in expected_headers.items():
+            assert headers[key] == value
+
+        # test additional headers.
+        additional_headers = {"ft-jeton-usager": "something-very-long"}
+        self.api_client._request(
+            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            additional_headers=additional_headers,
+        )
+
+        headers = mock.calls[-1].request.headers
+
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "toto",
+            **additional_headers,
+        }
+        for key, value in expected_headers.items():
+            assert headers[key] == value
+
     @pytest.mark.parametrize(
         "json_response,http_status_code,expected_error,expected_error_message",
         [
