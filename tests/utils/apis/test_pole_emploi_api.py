@@ -1,3 +1,4 @@
+import datetime
 import json
 import math
 import time
@@ -330,6 +331,52 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         token = self.api_client._refresh_token()
         assert token == "Bearer Catwoman"
 
+    @respx.mock
+    def test_request_caches_token(self):
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json={"sample": "data"}
+        )
+        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
+
+    @respx.mock
+    def test_request_http_request_headers(self):
+        mock = respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json={"sample": "data"}
+        )
+        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        headers = mock.calls[-1].request.headers
+
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "<string>",
+        }
+        for key, value in expected_headers.items():
+            assert headers[key] == value
+
+        # test additional headers.
+        additional_headers = {"ft-jeton-usager": "something-very-long"}
+        self.api_client._request(
+            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            additional_headers=additional_headers,
+        )
+
+        headers = mock.calls[-1].request.headers
+
+        expected_headers = {
+            "Authorization": "Bearer Catwoman",
+            "Content-Type": "application/json",
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "<string>",
+            **additional_headers,
+        }
+        for key, value in expected_headers.items():
+            assert headers[key] == value
+
     @pytest.mark.parametrize(
         "json_response,http_status_code,expected_error,expected_error_message",
         [
@@ -518,3 +565,86 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         assert token == "a_long_token"
         assert not mock_birthdate_nir.called
         assert mock_pole_emploi_id.called
+
+    @pytest.mark.parametrize(
+        "json_response,expected_data",
+        [
+            pytest.param(
+                {
+                    "dateDebutRqth": "2024-01-20",
+                    "dateFinRqth": "2030-01-20",
+                    "source": "FRANCE TRAVAIL",
+                    "topValiditeRQTH": True,
+                },
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": datetime.date(2030, 1, 20),
+                },
+                id="certified",
+            ),
+            pytest.param(
+                {
+                    "dateDebutRqth": "",
+                    "dateFinRqth": "",
+                    "source": "",
+                    "topValiditeRQTH": False,
+                },
+                {
+                    "is_certified": False,
+                    "start_at": None,
+                    "end_at": None,
+                },
+                id="not_certified",
+            ),
+            pytest.param(
+                {
+                    "dateDebutRqth": "2024-01-20",
+                    "dateFinRqth": "9999-12-31",
+                    "source": "FRANCE TRAVAIL",
+                    "topValiditeRQTH": True,
+                },
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": None,
+                },
+                id="certified_for_ever",
+            ),
+            # As for now, the API returns `"dateFinRqth": "9999-12-31"`
+            # if the RQTH has no end but this may change one day.
+            # Be future-proof by testing this possible case.
+            pytest.param(
+                {
+                    "dateDebutRqth": "2024-01-20",
+                    "dateFinRqth": None,
+                    "source": "FRANCE TRAVAIL",
+                    "topValiditeRQTH": True,
+                },
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": None,
+                },
+                id="certified_for_ever_null_end_at",
+            ),
+        ],
+    )
+    @respx.mock
+    def test_certify_rqth(self, json_response, expected_data):
+        rechercher_usager_json_response = {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        }
+        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200, json=rechercher_usager_json_response
+        )
+
+        respx.get("https://pe.fake/donnees-rqth/v1/rqth").respond(200, json=json_response)
+
+        data = self.api_client.certify_rqth(jobseeker_profile=JobSeekerProfileFactory())
+        for key, value in expected_data.items():
+            assert data[key] == value
+        assert data["raw_response"] == json_response
