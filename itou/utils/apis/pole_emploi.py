@@ -10,6 +10,8 @@ from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
 
+from itou.utils.types import InclusiveDateRange
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,12 @@ class Endpoints(enum.StrEnum):
     RECHERCHER_USAGER_DATE_NAISSANCE_NIR = "/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
     RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL = "/rechercher-usager/v2/usagers/par-numero-francetravail"
     RQTH = "/donnees-rqth/v1/rqth"
+
+
+class TopIdentiteCertifiee(enum.StrEnum):
+    YES = "O"
+    NO = "N"
+    NA = "null"
 
 
 # Source:
@@ -341,22 +349,28 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
-    def _request(self, url, data=None, params=None, method="POST"):
+    def _request(self, url, data=None, params=None, method="POST", additional_headers=None):
         token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
         if not token:
             token = self._refresh_token()
 
-        # TODO(cms): use real names.
-        # These headers MUST be provided.
-        # - if not: a 302 will be returned.
-        # - if value is an empty string: a 401 will be returned.
-        # As of today, no verification seems to be done on FT's side.
-        # Any value is good, as far as there is one.
-        agents_headers = {
+        headers = {
+            "Authorization": token,
+            "Content-Type": "application/json",
+            # It’s not obvious what values to pass for the following headers.
+            # The requester can be an employer, a prescriber from an
+            # organization that’s not FT.
+            # These headers MUST be provided.
+            # - if not: a 302 will be returned.
+            # - if value is an empty string: a 401 will be returned.
+            # As of today, no verification seems to be done on FT's side.
+            # Any value is good, use these placeholders.
             "pa-nom-agent": "<string>",
             "pa-prenom-agent": "<string>",
             "pa-identifiant-agent": "<string>",
         }
+        if additional_headers:
+            headers.update(additional_headers)
 
         response = (
             self._get_httpx_client()
@@ -365,7 +379,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
                 url,
                 params=params,
                 json=data,
-                headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
+                headers=headers,
                 timeout=API_TIMEOUT_SECONDS,
             )
             .raise_for_status()
@@ -415,22 +429,53 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             case "S001":
                 pass
             case "S002":
-                raise UserDoesNotExist()
+                raise UserDoesNotExist(response_data=data)
             case "S003":
-                raise MultipleUsersReturned()
+                raise MultipleUsersReturned(response_data=data)
             case _ as response_code:
                 raise PoleEmploiAPIBadResponse(response_code=response_code, response_data=data)
 
-        if data["topIdentiteCertifiee"] != "O":
-            raise IdentityNotCertified()
+        if data["topIdentiteCertifiee"] != TopIdentiteCertifiee.YES:
+            raise IdentityNotCertified(response_data=data)
 
         return data["jetonUsager"]
+
+    def rqth(self, jobseeker_profile):
+        jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
+        data = self._request(
+            f"{self.base_url}{Endpoints.RQTH}",
+            method="GET",
+            additional_headers={"ft-jeton-usager": jeton_usager},
+        )
+        if data["topValiditeRQTH"]:
+            start_at = datetime.date.fromisoformat(data["dateDebutRqth"])
+            end_at = data["dateFinRqth"]
+            if end_at is not None:
+                end_at = datetime.date.fromisoformat(end_at)
+                if end_at == datetime.date(9999, 12, 31):
+                    end_at = None
+            certification_period = InclusiveDateRange(start_at, end_at)
+        else:
+            certification_period = InclusiveDateRange(empty=True)
+        return {
+            "certification_period": certification_period,
+            "raw_response": data,
+        }
 
 
 def pole_emploi_partenaire_api_client():
     return PoleEmploiRoyaumePartenaireApiClient(
         settings.API_ESD["BASE_URL"],
         settings.API_ESD["AUTH_BASE_URL_PARTENAIRE"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
+
+
+def pole_emploi_agent_api_client():
+    return PoleEmploiRoyaumeAgentAPIClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL_AGENT"],
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )
