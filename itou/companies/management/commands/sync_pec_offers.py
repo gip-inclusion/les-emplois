@@ -3,7 +3,7 @@ import datetime
 from django.db import transaction
 
 from itou.cities.models import City
-from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, JobSourceTag
+from itou.companies.enums import POLE_EMPLOI_SIRET, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
@@ -78,7 +78,6 @@ def pe_offer_to_job_description(data, logger):
         description=data["description"],
         contract_type=PE_TYPE_TO_CONTRACT_TYPE[data["typeContrat"]],
         other_contract_type=data["typeContratLibelle"],
-        contract_nature=ContractNature.PEC_OFFER,
         location=city,
         # There is no real way to retrieve this information. We could try a regexp-based parsing
         # but it would be error prone and inaccurate.
