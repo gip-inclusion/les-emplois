@@ -366,7 +366,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             match exc.response.status_code:
                 case 429:
                     raise PoleEmploiRateLimitException(error_code=429)
-                case 400 | 403 as error_code:
+                case 400 | 401 | 403 as error_code:
                     # Should not retry
                     raise PoleEmploiAPIBadResponse(
                         response_code=error_code, response_data=exc.response.json()
