@@ -75,7 +75,6 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
     assert job_description.company.siret == POLE_EMPLOI_SIRET
     assert job_description.contract_type == "PERMANENT"
     assert job_description.other_contract_type == "Contrat à durée indéterminée"
-    assert job_description.contract_nature == "PEC_OFFER"
 
     # test the update
     caplog.clear()

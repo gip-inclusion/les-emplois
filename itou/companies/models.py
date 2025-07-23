@@ -20,7 +20,6 @@ from itou.common_apps.organizations.models import MembershipAbstract, Organizati
 from itou.companies.enums import (
     POLE_EMPLOI_SIRET,
     CompanyKind,
-    ContractNature,
     ContractType,
     JobDescriptionSource,
     JobSource,
@@ -727,9 +726,6 @@ class JobDescription(models.Model):
         verbose_name="type de contrat", choices=ContractType.choices, max_length=30, blank=True
     )
     other_contract_type = models.CharField(verbose_name="autre type de contrat", max_length=255, blank=True, null=True)
-    contract_nature = models.CharField(
-        verbose_name="nature du contrat", choices=ContractNature.choices, max_length=64, blank=True, null=True
-    )
     location = models.ForeignKey(
         "cities.City",
         on_delete=models.RESTRICT,

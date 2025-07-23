@@ -3,7 +3,6 @@
     "fields": {
       "appellation": "16464",
       "company": 3850,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -33,7 +32,6 @@
     "fields": {
       "appellation": "12150",
       "company": 3850,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -63,7 +61,6 @@
     "fields": {
       "appellation": "15078",
       "company": 2653,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:38:41Z",
       "creation_source": "MANUALLY",
@@ -93,7 +90,6 @@
     "fields": {
       "appellation": "16235",
       "company": 3851,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-14T16:09:20Z",
       "creation_source": "MANUALLY",
@@ -123,7 +119,6 @@
     "fields": {
       "appellation": "10666",
       "company": 3852,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-12-01T10:31:05Z",
       "creation_source": "MANUALLY",
@@ -153,7 +148,6 @@
     "fields": {
       "appellation": "10571",
       "company": 3852,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-12-01T10:30:23Z",
       "creation_source": "MANUALLY",
@@ -183,7 +177,6 @@
     "fields": {
       "appellation": "16464",
       "company": 3853,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -213,7 +206,6 @@
     "fields": {
       "appellation": "12150",
       "company": 3853,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -243,7 +235,6 @@
     "fields": {
       "appellation": "16464",
       "company": 3854,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -273,7 +264,6 @@
     "fields": {
       "appellation": "12150",
       "company": 3854,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2020-04-09T13:36:58Z",
       "creation_source": "MANUALLY",
@@ -303,7 +293,6 @@
     "fields": {
       "appellation": "11745",
       "company": 3855,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2021-02-22T14:54:17Z",
       "creation_source": "MANUALLY",
@@ -333,7 +322,6 @@
     "fields": {
       "appellation": "16067",
       "company": 857,
-      "contract_nature": null,
       "contract_type": "",
       "created_at": "2021-11-23T16:18:42.985Z",
       "creation_source": "MANUALLY",
