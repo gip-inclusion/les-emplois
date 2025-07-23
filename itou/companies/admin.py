@@ -436,6 +436,7 @@ class JobDescriptionAdmin(ItouModelAdmin):
         "source_url",
         "last_employer_update_at",
         "field_history",
+        "contract_nature",
     )
 
     @admin.display(description="Intitulé du poste")

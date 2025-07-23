@@ -451,7 +451,6 @@ class TestJobDescriptionAdmin:
             "ui_rank": job_description.ui_rank,
             "contract_type": job_description.contract_type,
             "other_contract_type": job_description.other_contract_type or "",
-            "contract_nature": job_description.contract_nature or "",
             "location": job_description.location.pk if job_description.location else "",
             "hours_per_week": job_description.hours_per_week or "",
             "open_positions": job_description.open_positions or "",
