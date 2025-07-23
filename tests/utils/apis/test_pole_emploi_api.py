@@ -9,7 +9,6 @@ from django.core.cache import caches
 from django_redis import get_redis_connection
 
 from itou.utils.apis.pole_emploi import (
-    CACHE_API_TOKEN_KEY,
     REFRESH_TOKEN_MARGIN_SECONDS,
     PoleEmploiAPIBadResponse,
     PoleEmploiAPIException,
@@ -38,9 +37,9 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         start = math.floor(time.time())  # Ignore microseconds.
         self.api_client._refresh_token()
         cache = caches["failsafe"]
-        assert cache.get(CACHE_API_TOKEN_KEY) == "foo batman"
+        assert cache.get(PoleEmploiRoyaumePartenaireApiClient.CACHE_API_TOKEN_KEY) == "foo batman"
         redis_client = get_redis_connection("failsafe")
-        expiry = redis_client.expiretime(cache.make_key(CACHE_API_TOKEN_KEY))
+        expiry = redis_client.expiretime(cache.make_key(PoleEmploiRoyaumePartenaireApiClient.CACHE_API_TOKEN_KEY))
         assert start + self.CACHE_EXPIRY - REFRESH_TOKEN_MARGIN_SECONDS <= expiry <= start + self.CACHE_EXPIRY
 
     @respx.mock
