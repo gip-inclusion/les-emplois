@@ -1,4 +1,3 @@
-import datetime
 import json
 import math
 import time
@@ -22,7 +21,7 @@ from itou.utils.apis.pole_emploi import (
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
 
 
 class TestPoleEmploiRoyaumePartenaireApiClient:
@@ -393,7 +392,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
             200, json=json_response
         )
-        jeton_usager = self.api_client.rechercher_usager(birthdate=datetime.date(1990, 1, 1), nir="141068078200557")
+        jeton_usager = self.api_client.rechercher_usager(js_profile=JobSeekerProfileFactory())
         assert jeton_usager == "a_long_token"
 
     @respx.mock
@@ -407,7 +406,9 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail").respond(
             200, json=json_response
         )
-        jeton_usager = self.api_client.rechercher_usager(pole_emploi_id="12345678910")
+        # TODO: add pole_emploi_id to factory
+        js_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678901")
+        jeton_usager = self.api_client.rechercher_usager(js_profile=js_profile)
         assert jeton_usager == "a_long_token"
 
     @pytest.mark.parametrize(
@@ -464,7 +465,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
         respx.post(url).respond(200, json=json_response)
         with pytest.raises(exception_raised, match=exception_pattern):
-            self.api_client.rechercher_usager(birthdate=datetime.date(1990, 1, 1), nir="141068078200557")
+            self.api_client.rechercher_usager(js_profile=JobSeekerProfileFactory())
 
     @respx.mock
     def test_rechercher_usager_calls_nir_endpoint(self):
@@ -481,7 +482,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
         ).respond(200, json=json_response)
 
-        token = self.api_client.rechercher_usager(birthdate=datetime.date(1990, 1, 1), nir="141068078200557")
+        token = self.api_client.rechercher_usager(js_profile=JobSeekerProfileFactory())
         assert token == "a_long_token"
         assert mock_birthdate_nir.called
         assert not mock_pole_emploi_id.called
@@ -501,7 +502,8 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
         ).respond(200, json=json_response)
 
-        token = self.api_client.rechercher_usager(pole_emploi_id="12345678910")
+        js_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678910")
+        token = self.api_client.rechercher_usager(js_profile=js_profile)
         assert token == "a_long_token"
         assert not mock_birthdate_nir.called
         assert mock_pole_emploi_id.called
