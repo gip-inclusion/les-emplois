@@ -11,7 +11,7 @@ from itou.common_apps.address.departments import (
     DEPARTMENTS_WITH_DISTRICTS,
     format_district,
 )
-from itou.companies.enums import CompanyKind, ContractNature, ContractType
+from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
 from itou.jobs.models import ROME_DOMAINS
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
@@ -102,7 +102,7 @@ class JobDescriptionSearchForm(SiaeSearchForm):
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],
     ) + [
-        (ContractNature.PEC_OFFER, ContractNature.PEC_OFFER.label),
+        (JobSourceTag.FT_PEC_OFFER, JobSourceTag.FT_PEC_OFFER.label),
         (ContractType.BUSINESS_CREATION, ContractType.BUSINESS_CREATION.label),
         (ContractType.OTHER, ContractType.OTHER.label),
         ("", "Contrat non précisé"),

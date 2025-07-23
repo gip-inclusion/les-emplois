@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
-from itou.companies.enums import CompanyKind, ContractNature, JobSource
+from itou.companies.enums import CompanyKind, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
@@ -106,9 +106,9 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             job_descriptions = job_descriptions.filter(company__kind__in=kinds)
 
         if contract_types:
-            clauses = Q(contract_type__in=[c for c in contract_types if c != ContractNature.PEC_OFFER.value])
-            if ContractNature.PEC_OFFER.value in contract_types:
-                clauses |= Q(source_kind=JobSource.PE_API)
+            clauses = Q(contract_type__in=[c for c in contract_types if c != JobSourceTag.FT_PEC_OFFER.value])
+            if JobSourceTag.FT_PEC_OFFER.value in contract_types:
+                clauses |= Q(source_kind=JobSource.PE_API, source_tags__contains=[JobSourceTag.FT_PEC_OFFER])
             job_descriptions = job_descriptions.filter(clauses)
 
         departments = self.request.GET.getlist("departments")
