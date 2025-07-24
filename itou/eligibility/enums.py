@@ -122,5 +122,14 @@ class AdministrativeCriteriaKind(models.TextChoices):
             AdministrativeCriteriaKind.PI,
         ]
 
+    @classmethod
+    def certifiable_by_pole_emploi_api(cls):
+        return [
+            AdministrativeCriteriaKind.TH,
+        ]
 
-CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset(AdministrativeCriteriaKind.certifiable_by_api_particulier())
+
+CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset(
+    AdministrativeCriteriaKind.certifiable_by_api_particulier()
+    + AdministrativeCriteriaKind.certifiable_by_pole_emploi_api()
+)
