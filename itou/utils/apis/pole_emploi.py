@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +96,7 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
     return replaced[:max_len]
 
 
-class BasePoleEmploiApiClient:
+class BasePoleEmploiApiClient(httpx.Client):
     AUTHORIZED_SCOPES = []
     REALM = ""
     CACHE_API_TOKEN_KEY = ""
@@ -438,3 +440,18 @@ def pole_emploi_partenaire_api_client():
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )
+
+
+def pole_emploi_agent_api_client():
+    return PoleEmploiRoyaumeAgentAPIClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
+
+
+def certify_criteria(criteria, js_profile, client=None):
+    client = client or pole_emploi_agent_api_client()
+    if criteria.kind == AdministrativeCriteriaKind.TH:
+        return client.certify_rqth(js_profile=js_profile)
