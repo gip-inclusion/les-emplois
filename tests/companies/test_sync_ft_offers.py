@@ -18,7 +18,7 @@ from itou.utils.mocks.pole_emploi import API_OFFRES
     }
 )
 @pytest.mark.django_db(transaction=True)
-def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
+def test_sync_ft_offers(caplog, respx_mock, monkeypatch):
     city = City.objects.create(
         slug="slug",
         department="89",
@@ -48,9 +48,9 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
     respx_mock.get(f"{base_url}&range=900-1049").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=1050-1149").respond(204)
 
-    management.call_command("sync_pec_offers", wet_run=True, delay=0)
+    management.call_command("sync_ft_offers", wet_run=True, delay=0)
     assert caplog.messages[-1].startswith(
-        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+        "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=2 offers from FT API",
@@ -83,9 +83,9 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
         206,
         json={"resultats": API_OFFRES},
     )
-    management.call_command("sync_pec_offers", wet_run=True, delay=0)
+    management.call_command("sync_ft_offers", wet_run=True, delay=0)
     assert caplog.messages[-1].startswith(
-        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+        "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=2 offers from FT API",
@@ -105,9 +105,9 @@ def test_sync_pec_offers(caplog, respx_mock, monkeypatch):
         206,
         json={"resultats": []},
     )
-    management.call_command("sync_pec_offers", wet_run=True, delay=0)
+    management.call_command("sync_ft_offers", wet_run=True, delay=0)
     assert caplog.messages[-1].startswith(
-        "Management command itou.companies.management.commands.sync_pec_offers succeeded in "
+        "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
     )
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=0 offers from FT API",

@@ -96,7 +96,7 @@ def pe_offer_to_job_description(data, logger):
 
 
 class Command(BaseCommand):
-    help = "Synchronizes the list of PEC offers on a daily basis"
+    help = "Synchronizes the list of PEC offers from FT"
 
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
