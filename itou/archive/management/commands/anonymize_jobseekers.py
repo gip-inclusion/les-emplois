@@ -131,7 +131,7 @@ class Command(BaseCommand):
             .order_by("upcoming_deletion_notified_at")[: self.batch_size]
         )
 
-        archived_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
+        anonymized_jobseekers = [anonymized_jobseeker(user) for user in users_to_archive]
 
         # job applications
         number_of_jobs_applied_for_count = count_related_subquery(
@@ -161,7 +161,7 @@ class Command(BaseCommand):
                 "hired_job__appellation",
             )
         )
-        archived_jobapplications = [
+        anonymized_jobapplications = [
             anonymized_jobapplication(job_application) for job_application in jobapplications_to_archive
         ]
 
@@ -170,13 +170,13 @@ class Command(BaseCommand):
                 user,
             ).send()
 
-        AnonymizedJobSeeker.objects.bulk_create(archived_jobseekers)
-        AnonymizedApplication.objects.bulk_create(archived_jobapplications)
+        AnonymizedJobSeeker.objects.bulk_create(anonymized_jobseekers)
+        AnonymizedApplication.objects.bulk_create(anonymized_jobapplications)
         self._delete_jobapplications_with_related_objects(jobapplications_to_archive)
         self._delete_jobseekers_with_related_objects(users_to_archive)
 
-        self.logger.info("Anonymized jobseekers after grace period, count: %d", len(archived_jobseekers))
-        self.logger.info("Anonymized job applications after grace period, count: %d", len(archived_jobapplications))
+        self.logger.info("Anonymized jobseekers after grace period, count: %d", len(anonymized_jobseekers))
+        self.logger.info("Anonymized job applications after grace period, count: %d", len(anonymized_jobapplications))
 
     def _delete_jobseekers_with_related_objects(self, users):
         FollowUpGroup.objects.filter(beneficiary__in=users).delete()
