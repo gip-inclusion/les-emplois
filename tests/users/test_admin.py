@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from django.contrib.auth import get_user
 from django.contrib.contenttypes.models import ContentType
@@ -12,7 +14,7 @@ from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerProfileFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
 from tests.utils.test import normalize_fields_history
 
 
@@ -406,3 +408,17 @@ def test_nir_modification_request_changelist(admin_client):
     for nir_modification_request in nir_modification_requests:
         assertContains(response, nir_modification_request.jobseeker_profile.user.get_full_name())
         assertContains(response, nir_modification_request.requested_by.get_full_name())
+
+
+def test_nir_modification_request_display_requested_by_kind(admin_client):
+    job_seeker = JobSeekerFactory()
+    (requested_by, display_kind) = random.choice(
+        [(job_seeker, "candidat"), (EmployerFactory(), "employeur"), (PrescriberFactory(), "prescripteur")]
+    )
+    nir_modification_request = NirModificationRequest.objects.create(
+        jobseeker_profile=job_seeker.jobseeker_profile, requested_by=requested_by
+    )
+
+    url = reverse("admin:users_nirmodificationrequest_change", args=[nir_modification_request.pk])
+    response = admin_client.get(url)
+    assertContains(response, f'<div class="readonly">{display_kind}</div>')
