@@ -2,6 +2,7 @@ import logging
 import urllib.parse
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -116,6 +117,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         context["num_rejected_employee_records"] = (
             EmployeeRecord.objects.for_company(self.siae).filter(status=Status.REJECTED).count()
         )
+        context["mon_recap_banner_departments"] = settings.MON_RECAP_BANNER_DEPARTMENTS
         return context
 
 

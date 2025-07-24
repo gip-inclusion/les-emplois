@@ -42,6 +42,7 @@
                 <div class="col-12">
                     <div class="tab-content">
                         <h2 class="mb-3 mb-md-4">Salariés et PASS IAE</h2>
+                        {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
                         <form hx-get="{% url 'approvals:list' %}"
                               hx-trigger="change delay:.5s, change from:#id_job_seeker"
                               hx-indicator="#approvals-list"
