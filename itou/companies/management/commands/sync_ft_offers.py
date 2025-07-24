@@ -74,9 +74,11 @@ def pe_offer_to_job_description(data, logger):
     source_tags = []
     if data["natureContrat"] == pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]:
         source_tags.append(JobSourceTag.FT_PEC_OFFER.value)
-    else:
+    if data["entrepriseAdaptee"]:
+        source_tags.append(JobSourceTag.FT_EA_OFFER.value)
+    if not source_tags:
         # Hopefully this will never happen, but if it does, we want to know about it.
-        raise ValueError(f"Unexpected {data['natureContrat']=} for offer {data['id']=}")
+        raise ValueError(f"Unexpected {data['natureContrat']=} {data['entrepriseAdaptee']=} for offer {data['id']=}")
     return JobDescription(
         appellation=appellation,
         created_at=data["dateCreation"],  # from iso8601
