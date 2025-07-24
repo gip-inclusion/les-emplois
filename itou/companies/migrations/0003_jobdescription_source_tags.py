@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
             model_name="jobdescription",
             name="source_tags",
             field=django.contrib.postgres.fields.ArrayField(
-                base_field=models.CharField(choices=[("FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences")]),
+                base_field=models.CharField(
+                    choices=[
+                        ("FT_EA_OFFER", "Offre Entreprise Adaptée"),
+                        ("FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"),
+                    ]
+                ),
                 null=True,
                 size=None,
                 verbose_name="étiquettes de la source",
