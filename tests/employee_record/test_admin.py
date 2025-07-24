@@ -77,13 +77,30 @@ def test_job_seeker_profile_from_employee_record(admin_client):
     assertContains(response, job_seeker.jobseeker_profile.pk)
 
 
-def test_approval_number_from_employee_record(admin_client):
+def test_related_objects_display(admin_client):
     er = factories.EmployeeRecordFactory()
+    company = er.job_application.to_company
     approval_number = Approval.objects.get(number=er.approval_number)
     employee_record_view_url = reverse("admin:employee_record_employeerecord_change", args=[er.pk])
     approval_number_url = reverse("admin:approvals_approval_change", args=[approval_number.pk])
+    company_url = reverse("admin:companies_company_change", args=(company.pk,))
     response = admin_client.get(employee_record_view_url)
     assertContains(response, f'<a href="{approval_number_url}">{approval_number.number}</a>')
+    assertContains(
+        response,
+        f"""\
+        <div class="flex-container">
+          <label>Structure mère :</label>
+          <div class="readonly">
+              <a href="{company_url}">{company.display_name}</a>
+              — SIRET {company.siret} ({company.kind})
+              — PK: {company.pk}
+          </div>
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
 
 
 def test_employee_record_deletion(admin_client):
