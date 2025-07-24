@@ -116,6 +116,8 @@ API_OFFRES = [
             "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/FOOBAR",
         },
         "offresManqueCandidats": False,
+        "entrepriseAdaptee": False,
+        "employeurHandiEngage": False,
     },
     {
         "id": "OHNOES",
@@ -178,6 +180,8 @@ API_OFFRES = [
             "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/OHNOES",
         },
         "offresManqueCandidats": False,
+        "entrepriseAdaptee": False,
+        "employeurHandiEngage": False,
     },
 ]
 
