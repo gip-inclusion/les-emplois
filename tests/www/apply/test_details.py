@@ -12,6 +12,8 @@ def test_missing_job_seeker_info(client):
         job_seeker__jobseeker_profile__birthdate=None,
         job_seeker__jobseeker_profile__nir="",
         job_seeker__jobseeker_profile__pole_emploi_id="",
+        message="Motivation est mon deuxième prénom.",
+        answer="Réponse au candidat.",
     )
     user = EmployerFactory(with_company=True, with_company__company=job_application.to_company)
     client.force_login(user)
