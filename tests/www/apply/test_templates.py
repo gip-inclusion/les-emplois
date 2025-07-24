@@ -14,7 +14,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
-from itou.eligibility.tasks import certify_criteria
+from itou.eligibility.tasks import certify_criteria_by_api_particulier
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
@@ -304,7 +304,7 @@ class TestIAEEligibilityDetail:
 
         # Certifiable and certified.
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        certify_criteria(diagnosis)
+        certify_criteria_by_api_particulier(diagnosis)
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
 
@@ -356,7 +356,7 @@ class TestGEIQEligibilityDetail:
             criteria_kinds=[criteria_kind],
         )
         self.create_job_application(diagnosis)
-        certify_criteria(diagnosis)
+        certify_criteria_by_api_particulier(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
@@ -386,7 +386,7 @@ class TestGEIQEligibilityDetail:
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        certify_criteria(diagnosis)
+        certify_criteria_by_api_particulier(diagnosis)
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert certified_help_text in rendered
