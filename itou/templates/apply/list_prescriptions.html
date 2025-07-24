@@ -21,6 +21,9 @@
             </a>
         {% endfragment %}
     {% endcomponent_title %}
+    {% if request.user.is_prescriber %}
+        {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
