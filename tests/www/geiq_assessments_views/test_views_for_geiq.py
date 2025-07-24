@@ -85,7 +85,8 @@ class TestListAssessmentsView:
             created_by__last_name="Dupont",
             with_main_geiq=True,
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         submitted_assessment = AssessmentFactory(
             id=uuid.UUID("11111111-0d2c-4f29-ba5b-a27ffb8ecc84"),
@@ -95,6 +96,7 @@ class TestListAssessmentsView:
             created_by__last_name="Curie",
             with_main_geiq=True,
             label_geiq_name="Un Beau GEIQ",
+            label_geiq_post_code="23456",
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=membership.user,
@@ -107,7 +109,7 @@ class TestListAssessmentsView:
             companies=[membership.company],
             created_by__first_name="Marie",
             created_by__last_name="Curie",
-            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ"}],
+            label_antennas=[{"id": 1, "name": "Un Superbe GEIQ", "post_code": "12345"}],
             with_submission_requirements=True,
             submitted_at=timezone.now() + datetime.timedelta(hours=3),
             submitted_by=membership.user,
@@ -255,9 +257,9 @@ class TestCreateAssessmentView:
                     "nom": "Un Joli GEIQ",
                     "siret": membership.company.siret,
                     "antennes": [
-                        {"id": 2345, "nom": "Une antenne", "siret": non_geiq_antenna.siret},
-                        {"id": 3456, "nom": "Une autre antenne", "siret": other_antenna.siret},
-                        {"id": 4567, "nom": "Une dernière antenne", "siret": "12345678904567"},
+                        {"id": 2345, "nom": "Une antenne", "siret": non_geiq_antenna.siret, "cp": "12345"},
+                        {"id": 3456, "nom": "Une autre antenne", "siret": other_antenna.siret, "cp": "12346"},
+                        {"id": 4567, "nom": "Une dernière antenne", "siret": "12345678904567", "cp": "12347"},
                     ],
                     "cp": "12345",
                 }
@@ -285,8 +287,8 @@ class TestCreateAssessmentView:
         assert assessment.label_geiq_post_code == "12345"
         assert assessment.with_main_geiq is True
         assert assessment.label_antennas == [
-            {"id": 2345, "name": "Une antenne"},
-            {"id": 3456, "name": "Une autre antenne"},
+            {"id": 2345, "name": "Une antenne", "post_code": "12345"},
+            {"id": 3456, "name": "Une autre antenne", "post_code": "12346"},
         ]
         assertQuerySetEqual(assessment.institutions.order_by("kind"), [ddets, dreets])
         assert assessment.conventionned_institutions() == [ddets, dreets]
@@ -330,7 +332,7 @@ class TestCreateAssessmentView:
         assert second_assessment.label_geiq_post_code == "12345"
         assert second_assessment.with_main_geiq is False
         assert second_assessment.label_antennas == [
-            {"id": 4567, "name": "Une dernière antenne"},
+            {"id": 4567, "name": "Une dernière antenne", "post_code": "12347"},
         ]
         assertQuerySetEqual(second_assessment.institutions.order_by("kind"), [dreets])
         assert second_assessment.conventionned_institutions() == [dreets]
@@ -379,7 +381,9 @@ class TestAssessmentDetailsForGEIQView:
             companies=[membership.company, CompanyFactory(kind=CompanyKind.GEIQ)],
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -415,7 +419,8 @@ class TestAssessmentDetailsForGEIQView:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
@@ -528,7 +533,7 @@ class TestAssessmentDetailsForGEIQView:
             created_by__last_name="Dupont",
             label_geiq_id=1234,
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}],
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
             action_financial_assessment_file=FileFactory(),
             geiq_comment="Un commentaire",
         )
@@ -582,7 +587,10 @@ class TestAssessmentDetailsForGEIQView:
             created_by__last_name="Dupont",
             label_geiq_id=1234,
             label_geiq_name="Un Joli GEIQ",
-            label_antennas=[{"id": 1234, "name": "Une antenne"}, {"id": 2345, "name": "Une autre antenne"}],
+            label_antennas=[
+                {"id": 1234, "name": "Une antenne", "post_code": "12345"},
+                {"id": 2345, "name": "Une autre antenne", "post_code": "23456"},
+            ],
             with_submission_requirements=True,
             geiq_comment="Un commentaire important qui se trouve dans le snapshot",
         )
@@ -653,7 +661,8 @@ class TestAssessmentDetailsForGEIQView:
             companies=[membership.company],
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         AssessmentInstitutionLink.objects.create(
             assessment=assessment,
@@ -825,7 +834,8 @@ class TestAssessmentSyncFile:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
 
         # Sync Summary Document
@@ -910,7 +920,9 @@ class TestAssessmentSyncFile:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         detail_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),
@@ -1115,7 +1127,8 @@ class TestAssessmentContractsSync:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
 
         # Retrieve Contracts infos
@@ -1193,7 +1206,9 @@ class TestAssessmentContractsSync:
             created_by__first_name="Jean",
             created_by__last_name="Dupont",
             label_geiq_id=1234,
-            label_antennas=[{"id": 0, "name": "Un Joli GEIQ"}, {"id": 1234, "name": "Une antenne"}],
+            with_main_geiq=True,
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
         )
         detail_response = client.get(
             reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk}),

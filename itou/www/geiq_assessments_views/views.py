@@ -165,6 +165,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         return render(request, template_name, context)
 
     antenna_names = {antenna_info["id"]: antenna_info["nom"] for antenna_info in geiq_info["antennes"]}
+    antenna_postcodes = {antenna_info["id"]: antenna_info["cp"] for antenna_info in geiq_info["antennes"]}
     campaign_qs = AssessmentCampaign.objects.filter(pk=campaign_label_infos.campaign_id)
     # Take a lock on the campaign to prevent concurrent creation
     campaign = (
@@ -204,7 +205,9 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
 
         for antenna_id, antenna_name in antenna_names.items():
             if create_form.cleaned_data.get(create_form.get_antenna_field(antenna_id)):
-                label_antennas.append({"id": antenna_id, "name": antenna_name})
+                label_antennas.append(
+                    {"id": antenna_id, "name": antenna_name, "post_code": antenna_postcodes[antenna_id]}
+                )
                 if antenna_siret := antenna_sirets[antenna_id]:
                     sirets.add(antenna_siret)
 
@@ -343,10 +346,10 @@ def assessment_get_file(request, pk, *, file_field):
     assessments = Assessment.objects.filter(**filter_kwargs).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
     match file_field:
-        case "summary_document_file":
-            filename = assessment.summary_document_filename()
-        case "structure_financial_assessment_file":
-            filename = assessment.structure_financial_assessment_filename()
+        # case "summary_document_file":
+        #    filename = assessment.summary_document_filename()
+        # case "structure_financial_assessment_file":
+        #    filename = assessment.structure_financial_assessment_filename()
         case "action_financial_assessment_file":
             filename = assessment.action_financial_assessment_filename()
         case _:

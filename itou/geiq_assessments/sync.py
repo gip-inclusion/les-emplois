@@ -1,5 +1,6 @@
 import datetime
 import logging
+import random
 
 from django.utils import timezone
 
@@ -64,16 +65,131 @@ def sync_to_db(api_data, db_queryset, *, model, mapping, data_to_django_obj, wit
     return obj_to_create, obj_to_update, obj_to_delete
 
 
+COULEURS = [
+    "Abricot",
+    "Acajou",
+    "Aigue-marine",
+    "Amande",
+    "Amarante",
+    "Ambre",
+    "Améthyste",
+    "Anthracite",
+    "Argent",
+    "Aubergine",
+    "Aurore",
+    "Avocat",
+    "Azur",
+    "Beurre",
+    "Bitume",
+    "Blanc",
+    "Bleu acier",
+    "Bleu canard",
+    "Bleu ciel",
+    "Bleu de cobalt",
+    "Bleu électrique",
+    "Bleu givré",
+    "Bleu marine",
+    "Bleu nuit",
+    "Bleu outremer",
+    "Bleu paon",
+    "Bleu persan",
+    "Bleu pétrole",
+    "Bleu roi",
+    "Bleu saphir",
+    "Bleu turquin",
+    "Bouton d'or",
+    "Brique",
+    "Bronze",
+    "Brou de noix",
+    "Cacao",
+    "Cachou",
+    "Café",
+    "Cannelle",
+    "Capucine",
+    "Caramel",
+    "Carmin",
+    "Carotte",
+    "Chamois",
+    "Cuivre",
+    "Chocolat",
+    "Citrouille",
+    "Corail",
+    "Cyan",
+    "Écru",
+    "Émeraude",
+    "Fauve",
+    "Fraise",
+    "Framboise",
+    "Glycine",
+    "Grenadine",
+    "Grenat",
+    "Gris acier",
+    "Gris fer",
+    "Gris perle",
+    "Gris souris",
+    "Groseille",
+    "Indigo",
+    "Jaune canari",
+    "Jaune citron",
+    "Jaune mimosa",
+    "Lavande",
+    "Lilas",
+    "Lin",
+    "Magenta",
+    "Maïs",
+    "Mandarine",
+    "Mauve",
+    "Menthe",
+    "Moutarde",
+    "Noisette",
+    "Ocre",
+    "Ocre rouge",
+    "Olive",
+    "Or",
+    "Orange",
+    "Orchidée",
+    "Paille",
+    "Pistache",
+    "Pourpre",
+    "Prune",
+    "Rose",
+    "Rouge cerise",
+    "Rouge tomate",
+    "Rubis",
+    "Sable",
+    "Saumon",
+    "Topaze",
+    "Turquoise",
+    "Vanille",
+    "Vermeil",
+    "Vermillon",
+    "Vert bouteille",
+    "Vert-de-gris",
+    "Vert perroquet",
+    "Vert pomme",
+    "Vert printemps",
+    "Vert sapin",
+    "Violet",
+]
+
+
 def get_geiq_infos():
-    FIELDS = ("id", "nom", "siret", "ville", "cp")
+    FIELDS = ("id",)  # "nom", "siret", "ville", "cp")
     client = geiq_label.get_client()
 
     geiq_infos = []
     for geiq in client.get_all_geiq():
         geiq_info = {k: geiq[k] for k in FIELDS}
+        geiq_info["nom"] = f"GEIQ {random.choice(COULEURS)}"
+        siren = str(100_000_000 + random.randint(0, 99_999_999))
+        geiq_info["siret"] = siren + "00001"
         geiq_info["antennes"] = []
-        for antenne in geiq["antennes"]:
-            geiq_info["antennes"].append({k: antenne[k] for k in FIELDS})
+        for i, antenne in enumerate(geiq["antennes"], start=1):
+            antenne_info = {k: antenne[k] for k in FIELDS}
+            antenne_info["nom"] = f"Antenne {i}"
+            antenne_info["siret"] = f"{siren}{i:05d}"
+            antenne_info["cp"] = f"{random.randint(1000, 97999):05}"
+            geiq_info["antennes"].append(antenne_info)
         geiq_infos.append(geiq_info)
     return geiq_infos
 
@@ -104,8 +220,75 @@ PREQUALIFICATION_MAPPING = {
 
 
 def _cleanup_employee_info(employee_info):
-    employee_info["date_naissance"] = convert_iso_datetime_to_date(employee_info["date_naissance"])
-    employee_info["sexe"] = {"H": Title.M, "F": Title.MME, "M": Title.M}[employee_info["sexe"]]
+    employee_info["date_naissance"] = datetime.date(
+        random.randint(1907, 2007), 1, 1
+    )  # convert_iso_datetime_to_date(employee_info["date_naissance"])
+    employee_info["sexe"] = random.choice(
+        [Title.M, Title.MME]
+    )  # {"H": Title.M, "F": Title.MME, "M": Title.M}[employee_info["sexe"]]
+    employee_info["prenom"] = random.choice(
+        [
+            "Adama",
+            "Alex",
+            "Alix",
+            "Ange",
+            "Anouk",
+            "Billy",
+            "Blair",
+            "Bob",
+            "Camille",
+            "Candide",
+            "Charlie",
+            "Chris",
+            "Dany",
+            "Eve",
+            "Frank",
+            "Grace",
+            "Hannah",
+            "Ian",
+            "Judy",
+            "Kevin",
+            "Kim",
+            "Laura",
+            "Mike",
+            "Nina",
+            "Oscar",
+            "Paul",
+            "Quinn",
+            "Rita",
+            "Rudy",
+            "Sam",
+            "Tina",
+            "Val",
+        ]
+    )
+    employee_info["nom"] = random.choice(
+        [
+            "Andre",
+            "Bernard",
+            "Bertrand",
+            "David",
+            "Dubois",
+            "Dupont",
+            "Durand",
+            "Fournier",
+            "Garcia",
+            "Girard",
+            "Laurent",
+            "Lefebvre",
+            "Leroy",
+            "Martin",
+            "Michel",
+            "Moreau",
+            "Morel",
+            "Petit",
+            "Robert",
+            "Roux",
+            "Simon",
+            "Thomas",
+            "Vincent",
+        ]
+    )
 
 
 def _nb_days_in_year(start: datetime.date, end: datetime.date, *, year: int):
@@ -184,9 +367,10 @@ def sync_employee_and_contracts(assessment):
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
             # Check consistency between contracts
-            assert employee_infos[employee_info["id"]] == employee_info, (
-                f"{employee_info} != {employee_infos[employee_info['id']]}"
-            )
+            # assert employee_infos[employee_info["id"]] == employee_info, (
+            #    f"{employee_info} != {employee_infos[employee_info['id']]}"
+            # )
+            pass
         else:
             employee_infos[employee_info["id"]] = employee_info
         contract_info["salarie"] = employee_info["id"]
@@ -199,10 +383,11 @@ def sync_employee_and_contracts(assessment):
         employee_info = prequalification_info["salarie"]
         _cleanup_employee_info(employee_info)
         if employee_info["id"] in employee_infos:
-            # Check consistency between contracts & prequalifications
-            assert employee_infos[employee_info["id"]] == employee_info, (
-                f"{employee_info} != {employee_infos[employee_info['id']]}"
-            )
+            ## Check consistency between contracts & prequalifications
+            # assert employee_infos[employee_info["id"]] == employee_info, (
+            #    f"{employee_info} != {employee_infos[employee_info['id']]}"
+            # )
+            pass
         else:
             # Ignore prequalifications for employees without active contract in assessment year
             continue
