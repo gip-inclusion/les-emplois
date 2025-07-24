@@ -19,7 +19,7 @@ from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pret
 
 
 class TestApprovalSuspendView:
-    def test_suspend_approval(self, client):
+    def test_suspend_approval(self, client, caplog):
         """
         Test the creation of a suspension.
         """
@@ -77,6 +77,10 @@ class TestApprovalSuspendView:
         assert 1 == approval.suspension_set.count()
         suspension = approval.suspension_set.first()
         assert suspension.created_by == employer
+        assert caplog.messages[2] == (
+            f"user={employer.pk} created suspension={suspension.pk} (approval={approval.pk}) "
+            f"from {start_at} to {end_at}"
+        )
 
         # Ensure suspension reason is not displayed in details page
         detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -140,7 +144,7 @@ class TestApprovalSuspendView:
         form = SuspensionForm(approval=job_application.approval, siae=job_application.to_company, data=post_data)
         assert not form.is_valid()
 
-    def test_update_suspension(self, client, snapshot):
+    def test_update_suspension(self, client, snapshot, caplog):
         """
         Test the update of a suspension.
         """
@@ -195,7 +199,12 @@ class TestApprovalSuspendView:
         assert suspension.updated_by == employer
         assert suspension.end_at == new_end_at
 
-    def test_delete_suspension(self, client, snapshot):
+        assert caplog.messages[1] == (
+            f"user={employer.pk} updated suspension={suspension.pk} (approval={approval.pk}) dates "
+            f"from {[str(start_at), str(end_at)]} to {[str(start_at), str(new_end_at)]}"
+        )
+
+    def test_delete_suspension(self, client, snapshot, caplog):
         """
         Test the deletion of a suspension.
         """
@@ -251,6 +260,10 @@ class TestApprovalSuspendView:
         assert response.url == redirect_url
 
         assert 0 == approval.suspension_set.count()
+        assert caplog.messages[1] == (
+            f"user={employer.pk} deleted suspension={suspension.pk} (approval={approval.pk}) which ranged "
+            f"from {suspension.start_at} to {suspension.end_at}"
+        )
 
 
 class TestApprovalSuspendActionChoiceView:
@@ -434,14 +447,22 @@ class TestApprovalSuspendUpdateEndDateView:
         form = response.context["form"]
         assert form.initial["first_day_back_to_work"] == timezone.localdate() + relativedelta(days=1)
 
-    def test_post(self, client):
+    def test_post(self, client, caplog):
         client.force_login(self.employer)
+
+        old_end_at = self.suspension.end_at
+        new_end_at = timezone.localdate() - relativedelta(days=1)
 
         response = client.post(self.url, data={"first_day_back_to_work": timezone.localdate()})
         assert response.url == reverse("approvals:details", kwargs={"public_id": self.suspension.approval.public_id})
         self.suspension.refresh_from_db()
-        assert self.suspension.end_at == timezone.localdate() - relativedelta(days=1)
+        assert self.suspension.end_at == new_end_at
         assert self.suspension.updated_by == self.employer
+        assert caplog.messages[0] == (
+            f"user={self.employer.pk} updated suspension={self.suspension.pk} "
+            f"(approval={self.suspension.approval.pk}) end date from "
+            f"{str(old_end_at)} to {str(new_end_at)}"
+        )
 
     def test_post_with_invalid_endate(self, client):
         client.force_login(self.employer)
