@@ -488,10 +488,11 @@ def test_certifiable(AdministrativeCriteriaClass):
 @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
 @freeze_time("2024-09-12")
 def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory, criteria_kind):
-    mocker.patch(
-        "itou.utils.apis.api_particulier._request",
-        return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-    )
+    if criteria_kind in AdministrativeCriteriaKind.certifiable_by_api_particulier():
+        mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+        )
     job_seeker = JobSeekerFactory(certifiable=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]

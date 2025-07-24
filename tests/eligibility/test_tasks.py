@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from json import JSONDecodeError
 
 import httpx
@@ -8,7 +9,7 @@ from freezegun import freeze_time
 from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
@@ -29,11 +30,20 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
     ],
 )
 class TestCertifyCriteria:
-    @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+    @pytest.mark.parametrize(
+        "criteria_kind,responses,certification_authority",
+        [
+            *zip(
+                AdministrativeCriteriaKind.certifiable_by_api_particulier(),
+                itertools.repeat(RESPONSES),
+                itertools.repeat(IdentityCertificationAuthorities.API_PARTICULIER),
+            ),
+        ],
+    )
     @freeze_time("2025-01-06")
-    def test_queue_task(self, criteria_kind, factory, respx_mock):
+    def test_queue_task(self, criteria_kind, responses, certification_authority, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
+        respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=responses[criteria_kind][ResponseKind.CERTIFIED])
 
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
 
@@ -52,13 +62,22 @@ class TestCertifyCriteria:
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(
             jobseeker_profile.identity_certifications.all(),
-            [IdentityCertificationAuthorities.API_PARTICULIER],
+            [certification_authority],
             transform=lambda certification: certification.certifier,
         )
 
-    # The API returns the same error messages for each endpoint called by us.
-    # It would be useless to test them all.
+
+@pytest.mark.parametrize(
+    "factory",
+    [
+        pytest.param(IAEEligibilityDiagnosisFactory, id="iae"),
+        pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
+    ],
+)
+class TestCertifyCriteriaApiParticulier:
     def test_retry_task_rate_limits(self, factory, respx_mock):
+        # The API returns the same error messages for each endpoint called by us.
+        # It would be useless to test them all.
         with freeze_time("2024-09-12T00:00:00Z"):
             eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
             respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(

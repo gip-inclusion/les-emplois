@@ -114,7 +114,13 @@ class AdministrativeCriteriaKind(models.TextChoices):
             cls.SIAE_CUI,
         }
 
+    @classmethod
+    def certifiable_by_api_particulier(cls):
+        return [
+            AdministrativeCriteriaKind.RSA,
+            AdministrativeCriteriaKind.AAH,
+            AdministrativeCriteriaKind.PI,
+        ]
 
-CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset(
-    [AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.PI]
-)
+
+CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = frozenset(AdministrativeCriteriaKind.certifiable_by_api_particulier())
