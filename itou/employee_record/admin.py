@@ -11,7 +11,13 @@ from django.utils.html import format_html
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
 from itou.employee_record.models import EmployeeRecordUpdateNotification
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouTabularInline,
+    ReadonlyMixin,
+    get_admin_view_link,
+    get_structure_view_link,
+)
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -186,7 +192,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "job_application",
         "job_seeker_link",
         "job_seeker_profile_link",
-        "siret",
+        "company_link",
         "asp_id",
         "asp_measure",
         "asp_processing_type",
@@ -224,7 +230,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                     "approval_number_link",
                     "job_seeker_link",
                     "job_seeker_profile_link",
-                    "siret",
+                    "company_link",
                     "asp_measure",
                     "asp_id",
                     "financial_annex",
@@ -271,6 +277,18 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     def job_seeker_profile_link(self, obj):
         job_seeker_profile = obj.job_application.job_seeker.jobseeker_profile
         return get_admin_view_link(job_seeker_profile, content=f"Profil salarié ID:{job_seeker_profile.pk}")
+
+    @admin.display(description="Structure mère")
+    def company_link(self, obj):
+        try:
+            asp_company = companies_models.Company.objects.get(
+                siret=obj.siret,
+                pk=obj.job_application.to_company.canonical_company.pk,
+            )
+        except (companies_models.Company.DoesNotExist, companies_models.Company.MultipleObjectsReturned):
+            return obj.siret
+        else:
+            return get_structure_view_link(asp_company, display_attr="display_name")
 
     @admin.display(description="type de traitement")
     def asp_processing_type(self, obj):
