@@ -164,6 +164,7 @@
     'delete_selectedadministrativecriteria',
     'view_selectedadministrativecriteria',
     'view_email',
+    'change_employeerecord',
     'delete_employeerecord',
     'view_employeerecord',
     'view_employeerecordtransitionlog',
