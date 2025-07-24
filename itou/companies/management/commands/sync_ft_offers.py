@@ -70,6 +70,12 @@ def pe_offer_to_job_description(data, logger):
         city = City.objects.get(code_insee="13055")
     else:
         city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
+    source_tags = []
+    if data["natureContrat"] == pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]:
+        source_tags.append(JobSourceTag.FT_PEC_OFFER.value)
+    else:
+        # Hopefully this will never happen, but if it does, we want to know about it.
+        raise ValueError(f"Unexpected {data['natureContrat']=} for offer {data['id']=}")
     return JobDescription(
         appellation=appellation,
         created_at=data["dateCreation"],  # from iso8601
@@ -90,7 +96,7 @@ def pe_offer_to_job_description(data, logger):
         market_context_description=data.get("entreprise", {}).get("nom", ""),
         source_id=data["id"],
         source_kind=JobSource.PE_API,
-        source_tags=[JobSourceTag.FT_PEC_OFFER.value],
+        source_tags=source_tags,
         source_url=source_url,
     )
 
