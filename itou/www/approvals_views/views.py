@@ -617,6 +617,14 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         elif request.POST.get("save"):
             suspension.save()
             messages.success(request, "Suspension effectuée.", extra_tags="toast")
+            logger.info(
+                "user=%s created suspension=%s (approval=%s) from %s to %s",
+                request.user.pk,
+                suspension.pk,
+                approval.pk,
+                suspension.start_at,
+                suspension.end_at,
+            )
             return HttpResponseRedirect(back_url)
 
     context = {
@@ -699,6 +707,14 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
         suspension.save()
+        logger.info(
+            "user=%s updated suspension=%s (approval=%s) dates from %s to %s",
+            request.user.pk,
+            suspension.pk,
+            suspension.approval.pk,
+            [str(form.initial["start_at"]), str(form.initial["end_at"])],
+            [str(form.cleaned_data["start_at"]), str(form.cleaned_data["end_at"])],
+        )
         messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
@@ -734,9 +750,18 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     )
 
     if request.method == "POST" and form.is_valid():
+        previous_end_at = suspension.end_at
         suspension.end_at = form.cleaned_data["first_day_back_to_work"] - timedelta(days=1)
         suspension.updated_by = request.user
         suspension.save()
+        logger.info(
+            "user=%s updated suspension=%s (approval=%s) end date from %s to %s",
+            request.user.pk,
+            suspension.pk,
+            suspension.approval.pk,
+            previous_end_at,
+            suspension.end_at,
+        )
         messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
@@ -774,7 +799,16 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     )
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
+        old_pk = suspension.pk
         suspension.delete()
+        logger.info(
+            "user=%s deleted suspension=%s (approval=%s) which ranged from %s to %s",
+            request.user.pk,
+            old_pk,
+            suspension.approval.pk,
+            suspension.start_at,
+            suspension.end_at,
+        )
         messages.success(
             request,
             f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
