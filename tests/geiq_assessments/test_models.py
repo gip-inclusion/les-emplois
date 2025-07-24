@@ -197,3 +197,33 @@ def test_employee_contract_antenna_department():
         other_data={"antenne": {"id": 0, "nom": "Le siège"}},
     )
     assert geiq_contract.antenna_department() == "54"
+
+
+def test_assessment_label_antenna_names():
+    assessment = AssessmentFactory.build(
+        label_geiq_post_code="54321",
+        with_main_geiq=True,
+        label_antennas=[
+            {"id": 123, "name": "Antenne de fourmi", "post_code": "12345"},
+            {"id": 456, "name": "Antenne de télévision"},
+        ],
+    )
+    assert assessment.label_antenna_names() == [
+        "Siège (54)",
+        "Antenne de fourmi (12)",
+        "Antenne de télévision (département non disponible)",
+    ]
+
+    assessment.label_geiq_post_code = ""
+    assert assessment.label_antenna_names() == [
+        "Siège (département non disponible)",
+        "Antenne de fourmi (12)",
+        "Antenne de télévision (département non disponible)",
+    ]
+
+    assessment.label_geiq_post_code = "12345"
+    assessment.with_main_geiq = False
+    assert assessment.label_antenna_names() == [
+        "Antenne de fourmi (12)",
+        "Antenne de télévision (département non disponible)",
+    ]

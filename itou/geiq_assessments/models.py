@@ -333,14 +333,19 @@ class Assessment(models.Model):
         return " / ".join(institution.name for institution in self.conventionned_institutions())
 
     def label_antenna_names(self):
+        # A missing department should never happen, but just in case Label API does not return a proper post code
+        # or provide an invalid one, we handle it gracefully and alert the user.
+        MISSING_DEPARTMENT = "département non disponible"
         antenna_names = (
-            [f"Siège ({department_from_postcode(self.label_geiq_post_code)})"] if self.with_main_geiq else []
+            [f"Siège ({department_from_postcode(self.label_geiq_post_code) or MISSING_DEPARTMENT})"]
+            if self.with_main_geiq
+            else []
         )
 
         if self.label_antennas:
             antenna_names.extend(
                 [
-                    f"{antenna['name']} ({department_from_postcode(antenna.get('post_code'))})"
+                    f"{antenna['name']} ({department_from_postcode(antenna.get('post_code')) or MISSING_DEPARTMENT})"
                     for antenna in self.label_antennas
                 ]
             )
