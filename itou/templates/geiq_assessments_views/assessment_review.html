@@ -14,7 +14,7 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>
-                {{ assessment.reviewed_at|yesno:"Décision,Saisir la décision" }}
+                {{ assessment.reviewed_at|yesno:"Décision,Saisir la décision" }} - {{ assessment.label_geiq_name }}
                 {% if assessment.decision_validated_at %}
                     {% include "geiq_assessments_views/includes/badge_completed.html" only %}
                 {% else %}
