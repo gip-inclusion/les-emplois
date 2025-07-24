@@ -75,7 +75,7 @@ def get_permissions_dict():
         eligibility_models.GEIQSelectedAdministrativeCriteria: PERMS_ALL,
         eligibility_models.SelectedAdministrativeCriteria: PERMS_ALL,
         emails_models.Email: PERMS_READ,
-        employee_record_models.EmployeeRecord: PERMS_DELETE,
+        employee_record_models.EmployeeRecord: PERMS_EDIT | PERMS_DELETE,
         employee_record_models.EmployeeRecordUpdateNotification: PERMS_READ,
         employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
         external_data_models.ExternalDataImport: PERMS_DELETE,
