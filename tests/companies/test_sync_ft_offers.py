@@ -6,6 +6,7 @@ from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
+from itou.utils.apis import pe_api_enums
 from itou.utils.mocks.pole_emploi import API_OFFRES
 
 
@@ -18,7 +19,12 @@ from itou.utils.mocks.pole_emploi import API_OFFRES
     }
 )
 @pytest.mark.django_db(transaction=True)
-def test_sync_ft_offers(caplog, respx_mock, monkeypatch):
+def test_sync_ft_offers(caplog, respx_mock):
+    PEC_OFFERS = [
+        {**offer, "natureContrat": pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]}
+        for offer in API_OFFRES
+    ]
+
     city = City.objects.create(
         slug="slug",
         department="89",
@@ -39,7 +45,7 @@ def test_sync_ft_offers(caplog, respx_mock, monkeypatch):
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
     base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT"
-    respx_mock.get(f"{base_url}&range=0-149").respond(206, json={"resultats": API_OFFRES})
+    respx_mock.get(f"{base_url}&range=0-149").respond(206, json={"resultats": PEC_OFFERS})
     respx_mock.get(f"{base_url}&range=150-299").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=300-449").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=450-599").respond(206, json={"resultats": []})
@@ -78,10 +84,10 @@ def test_sync_ft_offers(caplog, respx_mock, monkeypatch):
 
     # test the update
     caplog.clear()
-    monkeypatch.setitem(API_OFFRES[0], "intitule", "NOUVEAU INTITULE")
+    PEC_OFFERS[0]["intitule"] = "NOUVEAU INTITULE"
     respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
         206,
-        json={"resultats": API_OFFRES},
+        json={"resultats": PEC_OFFERS},
     )
     management.call_command("sync_ft_offers", wet_run=True, delay=0)
     assert caplog.messages[-1].startswith(
