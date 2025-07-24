@@ -21,10 +21,10 @@ from itou.utils.types import InclusiveDateRange
 logger = logging.getLogger("APIParticulierClient")
 
 
-def certify_criteria(eligibility_diagnosis):
+def certify_criteria_by_api_particulier(eligibility_diagnosis):
     if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
         logging.info(
-            "API particulier is not configured in %s, certify_criteria was skipped.",
+            "API particulier is not configured in %s, certification was skipped.",
             settings.ITOU_ENVIRONMENT,
         )
         return
@@ -120,7 +120,7 @@ def certify_criteria(eligibility_diagnosis):
         )
 
 
-def _async_certify_criteria(model_name, eligibility_diagnosis_pk):
+def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis_pk):
     model = apps.get_model("eligibility", model_name)
     try:
         eligibility_diagnosis = model.objects.select_related("job_seeker__jobseeker_profile").get(
@@ -135,7 +135,7 @@ def _async_certify_criteria(model_name, eligibility_diagnosis_pk):
         return
     try:
         with transaction.atomic():
-            certify_criteria(eligibility_diagnosis)
+            certify_criteria_by_api_particulier(eligibility_diagnosis)
     except (
         httpx.HTTPError,  # Could not connect, unexpected status code, …
         JSONDecodeError,  # Response was not JSON (text, HTML, …).
@@ -148,7 +148,15 @@ def _async_certify_criteria(model_name, eligibility_diagnosis_pk):
 
 
 # Retry every 10 minutes for 24h.
-async_certify_criteria = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(_async_certify_criteria)
+async_certify_criteria_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
+    _async_certify_criteria_by_api_particulier
+)
+# TODO(François): Legacy task definition, drop at least 24h after it has been deployed.
+async_certify_criteria = on_commit_task(
+    retries=24 * 6,
+    retry_delay=10 * 60,
+    name="_async_certify_criteria",
+)(_async_certify_criteria_by_api_particulier)
 # TODO: Use the decorator and drop assignment of call_local if
 # https://github.com/coleifer/huey/pull/848 is integrated.
-async_certify_criteria.call_local = _async_certify_criteria
+async_certify_criteria_by_api_particulier.call_local = _async_certify_criteria_by_api_particulier

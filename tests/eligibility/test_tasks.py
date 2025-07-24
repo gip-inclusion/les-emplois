@@ -9,7 +9,7 @@ from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import async_certify_criteria, certify_criteria
+from itou.eligibility.tasks import async_certify_criteria_by_api_particulier, certify_criteria_by_api_particulier
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
@@ -29,7 +29,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
     ],
 )
 @pytest.mark.usefixtures("api_particulier_settings")
-class TestCertifyCriteria:
+class TestCertifyCriteriaApiParticulier:
     @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
@@ -38,7 +38,9 @@ class TestCertifyCriteria:
             json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
         )
 
-        async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
+        async_certify_criteria_by_api_particulier.call_local(
+            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+        )
 
         assert len(respx_mock.calls) == 1
         SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -69,7 +71,9 @@ class TestCertifyCriteria:
             )
 
             with pytest.raises(RetryTask) as exc_info:
-                async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
+                async_certify_criteria_by_api_particulier.call_local(
+                    eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+                )
 
             assert exc_info.value.delay == 1
             assert len(respx_mock.calls) == 1
@@ -96,7 +100,9 @@ class TestCertifyCriteria:
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(500, **data)
         with pytest.raises(exception):
-            async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
+            async_certify_criteria_by_api_particulier.call_local(
+                eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+            )
         # Huey catches the exception and retries the task.
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
@@ -106,7 +112,9 @@ class TestCertifyCriteria:
         respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
             side_effect=TypeError("Programming error")
         )
-        async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
+        async_certify_criteria_by_api_particulier.call_local(
+            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+        )
         assert "TypeError: Programming error" in caplog.text
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
@@ -140,7 +148,7 @@ class TestCertifyCriteria:
             status_code, json=json_data, headers=headers
         )
         try:
-            certify_criteria(eligibility_diagnosis)
+            certify_criteria_by_api_particulier(eligibility_diagnosis)
         except RetryTask:
             retry_task = True
         except Exception:
@@ -156,5 +164,5 @@ class TestCertifyCriteria:
     def test_no_retries_when_diag_does_not_exist(self, caplog, factory):
         eligibility_diagnosis_model = factory._meta.model
         modelname = eligibility_diagnosis_model._meta.model_name
-        async_certify_criteria.call_local(modelname, 0)
+        async_certify_criteria_by_api_particulier.call_local(modelname, 0)
         assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]

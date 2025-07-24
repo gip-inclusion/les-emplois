@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from itou.asp.models import Commune
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import certify_criteria
+from itou.eligibility.tasks import certify_criteria_by_api_particulier
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
     RESPONSES,
@@ -57,7 +57,7 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
         json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     )
 
-    certify_criteria(eligibility_diagnosis)
+    certify_criteria_by_api_particulier(eligibility_diagnosis)
 
     assert len(respx_mock.calls) == 1
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -83,7 +83,7 @@ def test_not_found(respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
-    certify_criteria(diag)
+    certify_criteria_by_api_particulier(diag)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     assert crit.certified is None
@@ -103,7 +103,7 @@ def test_service_unavailable(respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
-    certify_criteria(diag)
+    certify_criteria_by_api_particulier(diag)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     assert crit.certified is None
