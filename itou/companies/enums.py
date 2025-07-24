@@ -33,6 +33,7 @@ class ContractNature(models.TextChoices):
 
 
 class JobSourceTag(models.TextChoices):
+    FT_EA_OFFER = "FT_EA_OFFER", "Offre Entreprise Adaptée"
     FT_PEC_OFFER = "FT_PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
 
 
