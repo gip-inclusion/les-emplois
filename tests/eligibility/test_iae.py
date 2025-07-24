@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from functools import partial
 from unittest import mock
 
@@ -485,14 +486,24 @@ def test_certifiable(AdministrativeCriteriaClass):
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
-@pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+@pytest.mark.parametrize(
+    "criteria_kind,responses,certification_authority",
+    [
+        *zip(
+            AdministrativeCriteriaKind.certifiable_by_api_particulier(),
+            itertools.repeat(RESPONSES),
+            itertools.repeat(IdentityCertificationAuthorities.API_PARTICULIER),
+        ),
+    ],
+)
 @freeze_time("2024-09-12")
-def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory, criteria_kind):
-    if criteria_kind in AdministrativeCriteriaKind.certifiable_by_api_particulier():
-        mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-        )
+def test_eligibility_diagnosis_certify_criteria(
+    mocker, EligibilityDiagnosisFactory, criteria_kind, responses, certification_authority
+):
+    mocker.patch(
+        "itou.utils.apis.api_particulier._request",
+        return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+    )
     job_seeker = JobSeekerFactory(certifiable=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
@@ -506,14 +517,14 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     )
     assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
-    assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+    assert criterion.data_returned_by_api == responses[criteria_kind][ResponseKind.CERTIFIED]
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
     certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
-    assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
+    assert certification.certifier == certification_authority
     with freeze_time("2025-10-15"):
         eligibility_diagnosis.certify_criteria()
     updated_certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
-    assert updated_certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
+    assert updated_certification.certifier == certification_authority
     assert updated_certification.certified_at > certification.certified_at
 
 

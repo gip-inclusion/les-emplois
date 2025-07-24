@@ -343,7 +343,7 @@ class TestGEIQEligibilityDetail:
 
     @freeze_time("2024-10-04")
     def test_nominal_case(self, mocker):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(AdministrativeCriteriaKind.certifiable_by_api_particulier())
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
