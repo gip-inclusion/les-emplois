@@ -22,6 +22,7 @@ PE_TYPE_TO_CONTRACT_TYPE = {
     "REP": ContractType.OTHER,
     "TTI": ContractType.TEMPORARY,
     "DDI": ContractType.FIXED_TERM_I,
+    "DDT": ContractType.FIXED_TERM_TREMPLIN,
     "DIN": ContractType.PERMANENT,
 }
 
