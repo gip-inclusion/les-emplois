@@ -29,8 +29,13 @@ from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
-from itou.utils.apis import enums as api_enums, pole_emploi_partenaire_api_client
-from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
+from itou.utils.apis import enums as api_enums
+from itou.utils.apis.pole_emploi import (
+    DATE_FORMAT,
+    PoleEmploiAPIBadResponse,
+    PoleEmploiAPIException,
+    pole_emploi_partenaire_api_client,
+)
 from itou.utils.db import or_queries
 from itou.utils.models import DateRange
 from itou.utils.templatetags.str_filters import pluralizefr

@@ -13,11 +13,11 @@ from httpx import RequestError
 
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
-from itou.utils.apis import pole_emploi_partenaire_api_client
 from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
+    pole_emploi_partenaire_api_client,
 )
 from itou.utils.command import BaseCommand, dry_runnable
 

@@ -6,7 +6,8 @@ from django.utils import timezone
 
 from itou.approvals import models as approvals_models
 from itou.job_applications.enums import JobApplicationState
-from itou.utils.apis import enums as api_enums, pole_emploi_partenaire_api_client
+from itou.utils.apis import enums as api_enums
+from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 
 
