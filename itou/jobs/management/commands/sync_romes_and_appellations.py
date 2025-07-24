@@ -1,7 +1,8 @@
 from django.utils import timezone
 
 from itou.jobs.models import Appellation, Rome
-from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
+from itou.utils.apis import pe_api_enums
+from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import yield_sync_diff
 

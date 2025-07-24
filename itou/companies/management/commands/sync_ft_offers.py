@@ -7,7 +7,8 @@ from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
-from itou.utils.apis import pe_api_enums, pole_emploi_partenaire_api_client
+from itou.utils.apis import pe_api_enums
+from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
