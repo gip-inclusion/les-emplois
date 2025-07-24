@@ -938,8 +938,8 @@ class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
 
 @admin.register(models.NirModificationRequest)
 class NirModificationRequestAdmin(ItouModelAdmin):
-    fields = ("jobseeker_profile", "requested_by", "nir", "created_at", "processed_at")
-    readonly_fields = ("jobseeker_profile", "requested_by", "nir", "created_at")
+    fields = ("jobseeker_profile", "requested_by", "requested_by_type", "nir", "created_at", "processed_at")
+    readonly_fields = ("jobseeker_profile", "requested_by", "requested_by_type", "nir", "created_at")
     list_display = ("pk", "jobseeker_profile", "requested_by", "created_at", "processed_at")
     list_display_links = ("pk", "jobseeker_profile")
     list_filter = ("created_at", "processed_at")
@@ -959,6 +959,10 @@ class NirModificationRequestAdmin(ItouModelAdmin):
                 search_fields.append("jobseeker_profile__user__first_name__unaccent")
                 search_fields.append("jobseeker_profile__user__last_name__unaccent")
         return search_fields
+
+    @admin.display(description="Type de compte de l'auteur")
+    def requested_by_type(self, obj):
+        return obj.requested_by.get_kind_display()
 
 
 admin.site.unregister(EmailAddress)
