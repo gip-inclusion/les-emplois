@@ -5,6 +5,7 @@ import re
 import time
 
 import httpx
+from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
 
@@ -428,3 +429,12 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "end_at": end_at,
             "raw_response": data,
         }
+
+
+def pole_emploi_partenaire_api_client():
+    return PoleEmploiRoyaumePartenaireApiClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
