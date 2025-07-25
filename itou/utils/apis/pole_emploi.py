@@ -24,24 +24,42 @@ OFFERS_MAX_RANGE = 150
 class PoleEmploiAPIException(Exception):
     """unexpected exceptions (meaning, "exceptional") that warrant a subsequent retry."""
 
-    def __init__(self, error_code, response_content=None):
+    def __init__(self, error_code=None, response_content=None):
         self.error_code = error_code
         self.response_content = response_content
         super().__init__()
 
     def __str__(self):
-        return f"PoleEmploiAPIException(code={self.error_code})"
+        name = self.__class__.__name__
+        if self.error_code:
+            name = f"{name}(code={self.error_code})"
+        return name
 
 
 class PoleEmploiAPIBadResponse(Exception):
     """errors that can't be recovered from: the API server does not agree."""
 
-    def __init__(self, response_code):
+    def __init__(self, response_code=None):
         self.response_code = response_code
         super().__init__()
 
     def __str__(self):
-        return f"PoleEmploiAPIBadResponse(code={self.response_code})"
+        name = self.__class__.__name__
+        if self.response_code:
+            name = f"{name}(code={self.response_code})"
+        return name
+
+
+class IdentityNotCertified(PoleEmploiAPIBadResponse):
+    pass
+
+
+class UserDoesNotExist(PoleEmploiAPIBadResponse):
+    pass
+
+
+class MultipleUsersReturned(PoleEmploiAPIBadResponse):
+    pass
 
 
 class PoleEmploiRateLimitException(PoleEmploiAPIException):
@@ -285,3 +303,94 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     ]
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
+
+    def _request(self, url, data=None, params=None, method="POST"):
+        token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
+        if not token:
+            token = self._refresh_token()
+
+        # TODO(cms): use real names.
+        # These headers MUST be provided.
+        # - if not: a 302 will be returned.
+        # - if value is an empty string: a 401 will be returned.
+        # As of today, no verification seems to be done on FT's side.
+        # Any value is good, as far as there is one.
+        agents_headers = {
+            "pa-nom-agent": "<string>",
+            "pa-prenom-agent": "<string>",
+            "pa-identifiant-agent": "toto",
+        }
+
+        response = None
+        try:
+            response = httpx.request(
+                method,
+                url,
+                params=params,
+                json=data,
+                headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
+                timeout=API_TIMEOUT_SECONDS,
+            ).raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            match exc.response.status_code:
+                case 429:
+                    raise PoleEmploiRateLimitException(error_code=429)
+                case 400 | 403 as error_code:
+                    # Should not retry
+                    raise PoleEmploiAPIBadResponse(response_code=error_code) from exc
+                case _ as error_code:
+                    # Should retry
+                    raise PoleEmploiAPIException(error_code=error_code, response_content=exc.response.content) from exc
+
+        return response.json()
+
+    def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
+        if not pole_emploi_id:
+            raise TypeError("`pole_emploi_id` is mandatory.")
+        return self._request(
+            f"{self.base_url}/rechercher-usager/v2/usagers/par-numero-francetravail",
+            {
+                "numeroFranceTravail": pole_emploi_id,
+            },
+        )
+
+    def _rechercher_usager_by_birthdate_and_nir(self, birthdate, nir):
+        if not (birthdate and nir):
+            raise TypeError("`birthdate` and `nir` are mandatory.")
+        return self._request(
+            f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            {
+                "dateNaissance": birthdate.strftime(DATE_FORMAT),
+                "nir": nir,
+            },
+        )
+
+    def rechercher_usager(self, js_profile):
+        """Find a user by pivot data (birthdate and nir or pole_emploi_id)
+        and return a crypted token (`jeton usager`).
+        `profile`: users.models.JobSeekerProfile (not included as a type hint because of a circular import issue).
+        return: "a_long_jeton_usager"
+        """
+        birthdate, nir, pole_emploi_id = js_profile.birthdate, js_profile.nir, js_profile.pole_emploi_id
+        data = None
+        if birthdate and nir:
+            data = self._rechercher_usager_by_birthdate_and_nir(birthdate=birthdate, nir=nir)
+        elif pole_emploi_id:
+            data = self._rechercher_usager_by_pole_emploi_id(pole_emploi_id=pole_emploi_id)
+        else:
+            raise TypeError("Please provide a birthdate and a nir or a pole_emploi_id.")
+
+        match data["codeRetour"]:
+            case "S001":
+                pass
+            case "S002":
+                raise UserDoesNotExist()
+            case "S003":
+                raise MultipleUsersReturned()
+            case _ as response_code:
+                raise PoleEmploiAPIBadResponse(response_code=response_code)
+
+        if data["topIdentiteCertifiee"] != "O":
+            raise IdentityNotCertified()
+
+        return data["jetonUsager"]
