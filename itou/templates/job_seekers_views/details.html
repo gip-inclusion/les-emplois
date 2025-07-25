@@ -79,7 +79,7 @@
                                 </div>
                                 {% if approval %}
                                     <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
-                                        {% approval_details_box approval=approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' %}
+                                        {% approval_details_box approval=approval request=request extra_classes='mb-3 mb-md-4' %}
                                     </div>
                                 {% endif %}
                             </div>

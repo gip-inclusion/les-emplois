@@ -20,6 +20,6 @@
             </a>
         </div>
     {% else %}
-        {% approval_details_box approval=user.latest_common_approval link_from_current_url=request.get_full_path job_seeker_dashboard_version=True extra_classes="h-100" %}
+        {% approval_details_box approval=user.latest_common_approval request=request version='job_seeker_dashboard' extra_classes="h-100" %}
     {% endif %}
 </div>
