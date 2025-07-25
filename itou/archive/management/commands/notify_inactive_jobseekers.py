@@ -1,40 +1,14 @@
-from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
-from itou.approvals.models import Approval
-from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
-from itou.users.models import User, UserKind
+from itou.archive.utils import inactive_jobseekers_without_recent_related_objects
+from itou.users.models import User
 from itou.users.notifications import InactiveUser
 from itou.utils.command import BaseCommand
 from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 BATCH_SIZE = 200
-
-
-def inactive_jobseekers_without_recent_related_objects(inactive_since, batch_size):
-    recent_approval = Approval.objects.filter(user_id=OuterRef("pk"), end_at__gt=inactive_since)
-    recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
-    )
-    recent_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
-        job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
-    )
-
-    return (
-        User.objects.filter(
-            kind=UserKind.JOB_SEEKER,
-            upcoming_deletion_notified_at__isnull=True,
-        )
-        .filter(
-            ~Exists(recent_approval),
-            ~Exists(recent_eligibility_diagnosis),
-            ~Exists(recent_geiq_eligibility_diagnosis),
-        )
-        .job_seekers_with_last_activity()
-        .filter(last_activity__lt=inactive_since)[:batch_size]
-    )
 
 
 class Command(BaseCommand):
