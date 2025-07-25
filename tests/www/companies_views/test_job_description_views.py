@@ -30,8 +30,8 @@ from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pret
 
 POSTULER = "Postuler"
 REMINDER_BANNER = (
-    '<p class="mb-0"><strong>Attention</strong> : Très prochainement, vos fiches de poste qui n’ont pas été '
-    "actualisées depuis plus de 3 mois seront automatiquement dépubliées. "
+    '<p class="mb-0"> Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. '
+    "Elles seront automatiquement dépubliées après 3 mois sans mise à jour. "
     f'<a href="{reverse("companies_views:job_description_list")}">Pensez à les mettre à jour pour maintenir '
     "leur visibilité</a>.</p>"
 )
