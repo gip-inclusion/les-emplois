@@ -455,7 +455,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                     "topIdentiteCertifiee": None,
                 },
                 PoleEmploiAPIBadResponse,
-                r"PoleEmploiAPIBadResponse\(code=unknown_successful_response_code_S009\)",
+                r"PoleEmploiAPIBadResponse\(code=S009\)",
                 id="unknown_successful_response_code",
             ),
         ],
