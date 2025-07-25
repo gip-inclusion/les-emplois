@@ -244,7 +244,7 @@
     "pk": 17,
     "fields": {
       "level": "2",
-      "name": "Maîtrise de la langue française",
+      "name": "Maîtrise de la langue française inférieure au niveau A1",
       "desc": "",
       "written_proof": "Evaluation FLE inférieure au niveau A1",
       "written_proof_url": "",
@@ -259,7 +259,7 @@
     "pk": 18,
     "fields": {
       "level": "2",
-      "name": "Mobilité",
+      "name": "Problème de mobilité",
       "desc": "",
       "written_proof": "Diagnostic mobilité délivré par un prescripteur habilité",
       "written_proof_url": "",
