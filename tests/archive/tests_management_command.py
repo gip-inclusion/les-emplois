@@ -654,7 +654,7 @@ class TestAnonymizeJobseekersManagementCommand:
                     "title": "M",
                     "first_name": "Stephan",
                     "last_name": "Xiao",
-                    "date_joined": timezone.make_aware(datetime.datetime(2023, 10, 30, 0, 0)),
+                    "date_joined": timezone.make_aware(datetime.datetime(2023, 7, 30, 0, 0)),
                     "jobseeker_profile__nir": "74185296365487",
                     "jobseeker_profile__birthdate": datetime.date(1964, 5, 30),
                     "is_active": False,
@@ -717,7 +717,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
         jobseeker = JobSeekerFactory(
-            joined_days_ago=365,
+            joined_days_ago=DAYS_OF_INACTIVITY,
             notified_days_ago=31,
         )
         FollowUpGroupFactory(beneficiary=jobseeker, memberships=2, updated_at=timezone.now() - INACTIVITY_PERIOD)
@@ -738,7 +738,7 @@ class TestAnonymizeJobseekersManagementCommand:
         resume_file = FileFactory()
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
-            job_seeker__date_joined=timezone.make_aware(datetime.datetime(2023, 10, 30, 0, 0)),
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             approval=None,
             eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=None,
@@ -890,7 +890,10 @@ class TestAnonymizeJobseekersManagementCommand:
         assert respx_mock.calls.call_count == 1
 
     def test_archive_jobseeker_with_approval(self, snapshot):
-        job_seeker_kwargs = {
+        kwargs = {
+            "start_at": datetime.date(2020, 1, 18),
+            "end_at": datetime.date(2023, 1, 18),
+            "updated_at": timezone.now() - INACTIVITY_PERIOD,
             "user__joined_days_ago": DAYS_OF_INACTIVITY,
             "user__notified_days_ago": 30,
             "user__for_snapshot": True,
@@ -902,9 +905,7 @@ class TestAnonymizeJobseekersManagementCommand:
             origin_sender_kind=SenderKind.EMPLOYER,
             origin_siae_kind=CompanyKind.EA,
             origin_prescriber_organization_kind=PrescriberOrganizationKind.MSA,
-            start_at=datetime.date(2020, 1, 18),
-            end_at=datetime.date(2023, 1, 18),
-            **job_seeker_kwargs,
+            **kwargs,
             user__email="test@example.com",
             user__jobseeker_profile__nir="2857612352678",
             user__jobseeker_profile__asp_uid=uuid1(),
@@ -916,10 +917,9 @@ class TestAnonymizeJobseekersManagementCommand:
             origin_sender_kind=SenderKind.PRESCRIBER,
             origin_prescriber_organization_kind=PrescriberOrganizationKind.CCAS,
             origin_siae_kind=None,
-            start_at=datetime.date(2020, 1, 18),
-            end_at=datetime.date(2023, 1, 17),
             eligibility_diagnosis__updated_at=timezone.now() - INACTIVITY_PERIOD,
-            **job_seeker_kwargs,
+            eligibility_diagnosis__expires_at=datetime.date(2023, 1, 17),
+            **kwargs,
             user__email="test2@example.com",
             user__jobseeker_profile__nir="2857612352679",
             user__jobseeker_profile__asp_uid=uuid1(),
@@ -944,10 +944,9 @@ class TestAnonymizeJobseekersManagementCommand:
             origin=Origin.ADMIN,
             origin_siae_kind=CompanyKind.EA,
             origin_sender_kind=SenderKind.EMPLOYER,
-            start_at=datetime.date(2020, 1, 18),
-            end_at=datetime.date(2023, 1, 17),
-            eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
-            **job_seeker_kwargs,
+            eligibility_diagnosis__updated_at=timezone.now() - INACTIVITY_PERIOD,
+            eligibility_diagnosis__expires_at=datetime.date(2023, 1, 17),
+            **kwargs,
             user__email="test3@example.com",
             user__jobseeker_profile__nir="2857612352670",
             user__jobseeker_profile__asp_uid=uuid1(),
@@ -998,10 +997,11 @@ class TestAnonymizeJobseekersManagementCommand:
                 user=jobseeker,
                 start_at=start_at,
                 end_at=start_at + relativedelta(years=2),
-                eligibility_diagnosis__updated_at=timezone.now() - relativedelta(years=3),
+                eligibility_diagnosis__updated_at=timezone.now() - INACTIVITY_PERIOD,
+                eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
             )
 
-        jobseeker.approvals.update(updated_at=timezone.now() - relativedelta(years=3))
+        jobseeker.approvals.update(updated_at=timezone.now() - INACTIVITY_PERIOD)
 
         call_command("anonymize_jobseekers", wet_run=True)
 
@@ -1105,7 +1105,10 @@ class TestAnonymizeJobseekersManagementCommand:
             GEIQEligibilityDiagnosisFactory,
         ]:
             eligibility_factory(
-                job_seeker=jobseeker, from_prescriber=True, updated_at=timezone.now() - relativedelta(years=3)
+                job_seeker=jobseeker,
+                from_prescriber=True,
+                updated_at=timezone.now() - relativedelta(years=3),
+                expires_at=datetime.date(2023, 1, 18),
             )
 
         call_command("anonymize_jobseekers", wet_run=True)
@@ -1126,6 +1129,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker__notified_days_ago=30,
             updated_at=timezone.now() - INACTIVITY_PERIOD,
             eligibility_diagnosis__updated_at=timezone.now() - INACTIVITY_PERIOD,
+            eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
         )
         ApprovalFactory(
             for_snapshot=True,
@@ -1135,7 +1139,10 @@ class TestAnonymizeJobseekersManagementCommand:
             updated_at=timezone.now() - INACTIVITY_PERIOD,
         )
         GEIQEligibilityDiagnosisFactory(
-            job_seeker=job_application.job_seeker, from_prescriber=True, updated_at=timezone.now() - INACTIVITY_PERIOD
+            job_seeker=job_application.job_seeker,
+            from_prescriber=True,
+            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            expires_at=datetime.date(2023, 1, 18),
         )
 
         call_command("anonymize_jobseekers", wet_run=True)
