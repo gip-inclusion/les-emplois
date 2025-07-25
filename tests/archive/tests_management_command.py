@@ -239,11 +239,11 @@ class TestNotifyInactiveJobseekersManagementCommand:
                 [mail] = mailoutbox
                 assert [user.email] == mail.to
                 assert mail.subject == snapshot(name="inactive_jobseeker_email_subject")
-                fmt_date_joined = timezone.localdate(user.date_joined).strftime("%d/%m/%Y")
+                fmt_inactive_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
                 fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
                     "%d/%m/%Y"
                 )
-                body = mail.body.replace(fmt_date_joined, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
+                body = mail.body.replace(fmt_inactive_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
                 assert body == snapshot(name="inactive_jobseeker_email_body")
             else:
                 assert not mailoutbox
@@ -1219,11 +1219,11 @@ class TestNotifyInactiveProfessionalsManagementCommand:
                 [mail] = mailoutbox
                 assert [user.email] == mail.to
                 assert mail.subject == snapshot(name="inactive_professional_email_subject")
-                fmt_last_login = timezone.localdate(user.last_login).strftime("%d/%m/%Y")
+                fmt_inactivity_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
                 fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
                     "%d/%m/%Y"
                 )
-                body = mail.body.replace(fmt_last_login, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
+                body = mail.body.replace(fmt_inactivity_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
                 assert body == snapshot(name="inactive_professional_email_body")
             else:
                 assert not mailoutbox
