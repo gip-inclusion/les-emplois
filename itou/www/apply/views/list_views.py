@@ -190,7 +190,7 @@ def annotate_title(base_title, archived_choice):
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
-    List of applications for a prescriber.
+    List of applications for prescribers and employers.
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
