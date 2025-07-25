@@ -14,7 +14,11 @@ from itou.archive.models import (
     AnonymizedSIAEEligibilityDiagnosis,
 )
 from itou.archive.tasks import async_delete_contact
-from itou.archive.utils import count_related_subquery, get_year_month_or_none
+from itou.archive.utils import (
+    count_related_subquery,
+    get_year_month_or_none,
+    inactive_jobseekers_without_recent_related_objects,
+)
 from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -26,7 +30,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand, dry_runnable
-from itou.utils.constants import GRACE_PERIOD
+from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 BATCH_SIZE = 100
@@ -168,14 +172,16 @@ class Command(BaseCommand):
     def reset_notified_jobseekers_with_recent_activity(self):
         self.logger.info("Reseting inactive job seekers with recent activity")
 
-        users_to_reset_qs = (
+        now = timezone.now()
+        inactive_since = now - INACTIVITY_PERIOD
+
+        reset_users_count = (
             User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=False)
-            .job_seekers_with_last_activity()
-            .filter(last_activity__gte=F("upcoming_deletion_notified_at"))
+            .exclude(id__in=inactive_jobseekers_without_recent_related_objects(inactive_since, notified=True))
+            .update(upcoming_deletion_notified_at=None)
         )
 
-        reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
-        self.logger.info("Reset notified job seekers with recent activity: %s", reset_nb)
+        self.logger.info("Reset notified job seekers with recent activity: %s", reset_users_count)
 
     @transaction.atomic
     def archive_jobseekers_after_grace_period(self):
