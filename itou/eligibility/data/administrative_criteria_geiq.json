@@ -307,7 +307,7 @@
 		"model": "eligibility.geiqadministrativecriteria",
 		"pk": 17,
 		"fields": {
-			"name": "Non-maîtrise de la langue française",
+			"name": "Maîtrise de la langue française inférieure au niveau A1",
 			"desc": "",
 			"api_code": "FR non maitrisé",
 			"written_proof": "Evaluation FLE inférieure au niveau A1",
