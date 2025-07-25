@@ -31,9 +31,6 @@
     {% include "apply/includes/siae_batch_actions.html" with display_batch_actions=False %}
 {% endblock %}
 
-{% block title_messages %}
-    {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
-{% endblock title_messages %}
 
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}

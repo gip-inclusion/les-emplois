@@ -34,10 +34,6 @@
     {% endcomponent_title %}
 {% endblock %}
 
-{% block title_messages %}
-    {% include "includes/mon_recap_banner.html" with request=request mon_recap_banner_departments=mon_recap_banner_departments only %}
-{% endblock title_messages %}
-
 {% block title_extra %}
     {% if request.current_organization and request.current_organization.memberships.count > 1 %}
         <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">

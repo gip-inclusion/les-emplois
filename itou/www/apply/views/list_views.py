@@ -190,7 +190,7 @@ def annotate_title(base_title, archived_choice):
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
-    List of applications for a prescriber.
+    List of applications for prescribers and employers.
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
@@ -247,6 +247,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "filters_counter": filters_counter,
         "list_exports_url": reverse("apply:list_prescriptions_exports"),
         "back_url": reverse("dashboard:index"),
+        "mon_recap_banner_departments": settings.MON_RECAP_BANNER_DEPARTMENTS,
     }
     return render(
         request,
@@ -369,7 +370,6 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "list_exports_url": reverse("apply:list_for_siae_exports"),
         "back_url": reverse("dashboard:index"),
         "can_apply": company.kind in CompanyKind.siae_kinds() + [CompanyKind.GEIQ],
-        "mon_recap_banner_departments": settings.MON_RECAP_BANNER_DEPARTMENTS,
     }
     return render(
         request,
