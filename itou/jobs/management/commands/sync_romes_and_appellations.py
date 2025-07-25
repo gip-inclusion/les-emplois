@@ -36,7 +36,10 @@ class Command(BaseCommand):
         now = timezone.now()
         pe_client = pole_emploi_partenaire_api_client()
 
-        romes_data = pe_client.referentiel(pe_api_enums.REFERENTIEL_ROME)
+        with pe_client.httpx_client() as httpx_client:
+            romes_data = pe_client.referentiel(pe_api_enums.REFERENTIEL_ROME, httpx_client=httpx_client)
+            appellations_data = pe_client.appellations(httpx_client=httpx_client)
+
         for item in yield_sync_diff(romes_data, "code", Rome.objects.all(), "code", [("libelle", "name")]):
             self.logger.info(item.label)
 
@@ -51,7 +54,6 @@ class Command(BaseCommand):
             )
             self.logger.info("len=%d ROME entries have been created or updated.", len(romes))
 
-        appellations_data = pe_client.appellations()
         for item in yield_sync_diff(
             appellations_data, "code", Appellation.objects.all(), "code", [("libelle", "name")]
         ):

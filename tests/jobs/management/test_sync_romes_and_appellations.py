@@ -46,6 +46,10 @@ def test_sync_rome_appellation(caplog, respx_mock):
     assert caplog.messages[:-1] == [
         'HTTP Request: POST https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire "HTTP/1.1 200 OK"',
         'HTTP Request: GET https://pe.fake/offresdemploi/v2/referentiel/metiers "HTTP/1.1 200 OK"',
+        (
+            "HTTP Request: GET https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code) "
+            '"HTTP/1.1 200 OK"'
+        ),
         "count=1 label=Rome had the same key in collection and queryset",
         "\tCHANGED name=Patisserie changed to value=Pâtisserie avec accent",
         "count=1 label=Rome added by collection",
@@ -54,10 +58,6 @@ def test_sync_rome_appellation(caplog, respx_mock):
         "\tREMOVED Métiers du corps (B001)",
         "\tREMOVED Arts de la table (F002)",  # not really removed though by our command, see docstring
         "len=2 ROME entries have been created or updated.",
-        (
-            "HTTP Request: GET https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code) "
-            '"HTTP/1.1 200 OK"'
-        ),
         "count=2 label=Appellation had the same key in collection and queryset",
         "\tCHANGED name=Entraîneur sportif changed to value=Entraîneur sportif avéré",
         "\tCHANGED name=Chef cuistot d'élite changed to value=Chef cuistor d'élite",

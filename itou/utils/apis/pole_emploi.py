@@ -3,6 +3,7 @@ import json
 import logging
 import re
 import time
+from contextlib import contextmanager
 
 import httpx
 from django.core.cache import caches
@@ -92,23 +93,33 @@ class BasePoleEmploiApiClient:
         self.key = key
         self.secret = secret
 
+    @contextmanager
+    def httpx_client(self):
+        client = httpx.Client()
+        try:
+            yield client
+        finally:
+            client.close()
+
     def _refresh_token(self):
         scopes = " ".join(self.AUTHORIZED_SCOPES)
-        auth_data = (
-            httpx.post(
-                f"{self.auth_base_url}/connexion/oauth2/access_token",
-                params={"realm": self.REALM},
-                data={
-                    "client_id": self.key,
-                    "client_secret": self.secret,
-                    "grant_type": "client_credentials",
-                    "scope": f"application_{self.key} {scopes}",
-                },
-                headers={"Content-Type": "application/x-www-form-urlencoded"},
+        # This is always a one-shot request.
+        with self.httpx_client() as httpx_client:
+            auth_data = (
+                httpx_client.post(
+                    f"{self.auth_base_url}/connexion/oauth2/access_token",
+                    params={"realm": self.REALM},
+                    data={
+                        "client_id": self.key,
+                        "client_secret": self.secret,
+                        "grant_type": "client_credentials",
+                        "scope": f"application_{self.key} {scopes}",
+                    },
+                    headers={"Content-Type": "application/x-www-form-urlencoded"},
+                )
+                .raise_for_status()
+                .json()
             )
-            .raise_for_status()
-            .json()
-        )
         token = f"{auth_data['token_type']} {auth_data['access_token']}"
         caches["failsafe"].set(
             self.CACHE_API_TOKEN_KEY,
@@ -118,20 +129,26 @@ class BasePoleEmploiApiClient:
         )
         return token
 
-    def _request(self, url, data=None, params=None, method="POST"):
+    def _request(self, url, data=None, params=None, method="POST", httpx_client=None):
         try:
             token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
             if not token:
                 token = self._refresh_token()
 
-            response = httpx.request(
-                method,
-                url,
-                params=params,
-                json=data,
-                headers={"Authorization": token, "Content-Type": "application/json"},
-                timeout=API_TIMEOUT_SECONDS,
-            )
+            params = {
+                "method": method,
+                "url": url,
+                "params": params,
+                "json": data,
+                "headers": {"Authorization": token, "Content-Type": "application/json"},
+                "timeout": API_TIMEOUT_SECONDS,
+            }
+            if not httpx_client:
+                with self.httpx_client() as httpx_client:
+                    response = httpx_client.request(**params)
+            else:
+                response = httpx_client.request(**params)
+
             if response.status_code == 204:
                 return None
             if response.status_code == 429:
@@ -170,7 +187,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     REALM = "/partenaire"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
 
-    def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
+    def recherche_individu_certifie(self, first_name, last_name, birthdate, nir, httpx_client=None):
         """Example data:
         {
             "nirCertifie":"1800813800217",
@@ -194,6 +211,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
                 "nomNaissance": _pole_emploi_name(last_name),
                 "prenom": _pole_emploi_name(first_name, hyphenate=True, max_len=13),
             },
+            httpx_client=httpx_client,
         )
         code_sortie = data.get("codeSortie")
         if code_sortie != API_RECH_INDIVIDU_SUCCESS:
@@ -204,7 +222,14 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         return id_national
 
     def mise_a_jour_pass_iae(
-        self, approval, encrypted_identifier, siae_siret, siae_type, origine_candidature, typologie_prescripteur=None
+        self,
+        approval,
+        encrypted_identifier,
+        siae_siret,
+        siae_type,
+        origine_candidature,
+        typologie_prescripteur=None,
+        httpx_client=None,
     ):
         """Example of a JSON response:
         {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
@@ -227,13 +252,15 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         }
         if typologie_prescripteur is not None:
             params["typologiePrescripteur"] = typologie_prescripteur
-        data = self._request(f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour", params)
+        data = self._request(f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour", params, httpx_client=httpx_client)
         code_sortie = data.get("codeSortie")
         if code_sortie != API_MAJ_PASS_SUCCESS:
             raise PoleEmploiAPIBadResponse(code_sortie)
 
-    def referentiel(self, code):
-        return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
+    def referentiel(self, code, httpx_client=None):
+        return self._request(
+            f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET", httpx_client=httpx_client
+        )
 
     def offres(self, typeContrat="", natureContrat="", range=None):
         params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
@@ -262,10 +289,11 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
             time.sleep(delay_between_requests.total_seconds())
         return raw_offers
 
-    def appellations(self):
+    def appellations(self, httpx_client=None):
         return self._request(
             f"{self.base_url}/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)",
             method="GET",
+            httpx_client=httpx_client,
         )
 
     def agences(self, safir=None):
