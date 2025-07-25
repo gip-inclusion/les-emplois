@@ -90,18 +90,12 @@ from tests.users.factories import (
     PrescriberFactory,
     random_user_kind_factory,
 )
-from tests.utils.testing import create_fake_postcode, parse_response_to_soup, pretty_indented
-
-
-def get_response_for_middlewaremixin(request):
-    """
-    `SessionMiddleware` inherits from `MiddlewareMixin` which requires
-    a `get_response` argument since Django 4.0:
-    https://github.com/django/django/pull/11828
-
-    An empty `HttpResponse` does the trick.
-    """
-    return HttpResponse()
+from tests.utils.testing import (
+    create_fake_postcode,
+    get_response_for_middlewaremixin,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 @pytest.fixture

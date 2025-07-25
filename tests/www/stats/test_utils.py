@@ -1,11 +1,7 @@
 import pytest
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import RequestFactory
 
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
@@ -19,17 +15,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.tests import get_response_for_middlewaremixin
-
-
-def get_request(user):
-    factory = RequestFactory()
-    request = factory.get("/")
-    request.user = user
-    SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-    MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
-    ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
-    return request
+from tests.utils.testing import get_request
 
 
 def test_can_view_stats_siae():
