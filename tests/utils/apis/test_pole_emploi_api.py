@@ -286,12 +286,10 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         assert token == "Bearer Catwoman"
 
     @respx.mock
-    def test_request_http_request_cache(self):
+    def test_request_caches_token(self):
         respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
             200, json={"sample": "data"}
         )
-        assert not caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY)
-
         self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
         assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
 
@@ -301,7 +299,6 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             200, json={"sample": "data"}
         )
         self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
-        # NOTE(cms): maybe api_client.request should return a response instead of response.json()
         headers = mock.calls[-1].request.headers
 
         expected_headers = {
@@ -568,6 +565,20 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                     "end_at": None,
                 },
                 id="certified_for_ever",
+            ),
+            pytest.param(
+                {
+                    "dateDebutRqth": "2024-01-20",
+                    "dateFinRqth": None,
+                    "source": "FRANCE TRAVAIL",
+                    "topValiditeRQTH": True,
+                },
+                {
+                    "is_certified": True,
+                    "start_at": datetime.date(2024, 1, 20),
+                    "end_at": None,
+                },
+                id="certified_for_ever_null_end_at",
             ),
         ],
     )

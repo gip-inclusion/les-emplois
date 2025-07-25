@@ -404,9 +404,11 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             f"{self.base_url}/donnees-rqth/v1/rqth", method="GET", additional_headers={"ft-jeton-usager": jeton_usager}
         )
         certified = data["topValiditeRQTH"] is True
-        end_at = datetime.date.fromisoformat(data["dateFinRqth"]) if certified else None
-        if end_at == datetime.date(9999, 12, 31):
-            end_at = None
+        end_at = data["dateFinRqth"] if certified else None
+        if end_at:
+            end_at = datetime.date.fromisoformat(data["dateFinRqth"])
+            if end_at == datetime.date(9999, 12, 31):
+                end_at = None
         return {
             "is_certified": certified,
             "start_at": datetime.date.fromisoformat(data["dateDebutRqth"]) if certified else None,
