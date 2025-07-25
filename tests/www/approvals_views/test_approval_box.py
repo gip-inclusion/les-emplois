@@ -1,6 +1,6 @@
 import datetime
 
-from django.template import Context
+from django.template import Context, Template
 from freezegun import freeze_time
 
 from itou.asp.models import Commune
@@ -12,7 +12,7 @@ from tests.approvals.factories import (
 )
 from tests.cities.factories import create_city_geispolsheim
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.utils.test import load_template, pretty_indented
+from tests.utils.test import pretty_indented
 
 
 public_id = "997a1eaf-6fad-4256-b371-31bb05c94862"
@@ -22,24 +22,27 @@ approval_number = "XXXXX1234567"
 @freeze_time("2024-08-06")
 def test_expired_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
-
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        "{% load approvals %}{% approval_details_box approval=approval link_from_current_url=link_from_current_url %}"
+    )
     assert pretty_indented(template.render(Context({"approval": approval, "link_from_current_url": "/"}))) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_future_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2025, 1, 1), number=approval_number, public_id=public_id)
-
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        "{% load approvals %}{% approval_details_box approval=approval link_from_current_url=link_from_current_url %}"
+    )
     assert pretty_indented(template.render(Context({"approval": approval, "link_from_current_url": "/"}))) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_valid_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
-
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        "{% load approvals %}{% approval_details_box approval=approval link_from_current_url=link_from_current_url %}"
+    )
     assert pretty_indented(template.render(Context({"approval": approval, "link_from_current_url": ""}))) == snapshot
 
 
@@ -47,8 +50,9 @@ def test_valid_approval(snapshot):
 def test_valid_approval_with_pending_prolongation_request(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
     ProlongationRequestFactory(approval=approval, start_at=approval.end_at)
-
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        "{% load approvals %}{% approval_details_box approval=approval link_from_current_url=link_from_current_url %}"
+    )
     assert pretty_indented(template.render(Context({"approval": approval, "link_from_current_url": "/"}))) == snapshot
 
 
@@ -60,16 +64,16 @@ def test_suspended_approval(snapshot):
         start_at=datetime.date(2024, 8, 1),
         end_at=datetime.date(2024, 8, 31),
     )
-
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        "{% load approvals %}{% approval_details_box approval=approval link_from_current_url=link_from_current_url %}"
+    )
     assert pretty_indented(template.render(Context({"approval": approval, "link_from_current_url": "/"}))) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_expired_pe_approval(snapshot):
     pe_approval = PoleEmploiApprovalFactory(start_at=datetime.date(2022, 1, 1), number="123456789012")
-
-    template = load_template("approvals/includes/box.html")
+    template = Template("{% load approvals %}{% approval_details_box approval=approval %}")
     assert pretty_indented(template.render(Context({"approval": pe_approval}))) == snapshot
 
 
@@ -77,8 +81,7 @@ def test_expired_pe_approval(snapshot):
 def test_valid_pe_approval(snapshot):
     # One of the last 8 valid Pole Emploi
     pe_approval = PoleEmploiApprovalFactory(start_at=datetime.date(2024, 1, 1), number="123456789012")
-
-    template = load_template("approvals/includes/box.html")
+    template = Template("{% load approvals %}{% approval_details_box approval=approval %}")
     assert pretty_indented(template.render(Context({"approval": pe_approval}))) == snapshot
 
 
@@ -87,7 +90,12 @@ def test_expired_approval_in_waiting_period_with_valid_diagnosis(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
     IAEEligibilityDiagnosisFactory(job_seeker=approval.user, from_prescriber=True)
 
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        """
+        {% load approvals %}
+        {% approval_details_box approval=approval link_from_current_url=link_from_current_url job_seeker_dashboard_version=job_seeker_dashboard_version %}
+        """  # noqa: E501
+    )
     assert pretty_indented(
         template.render(
             Context(
@@ -121,7 +129,12 @@ def test_expired_approval_in_waiting_period_with_valid_diagnosis(snapshot):
 def test_expired_approval_in_waiting_period_without_diagnosis(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
 
-    template = load_template("approvals/includes/box.html")
+    template = Template(
+        """
+        {% load approvals %}
+        {% approval_details_box approval=approval link_from_current_url=link_from_current_url job_seeker_dashboard_version=job_seeker_dashboard_version %}
+        """  # noqa: E501
+    )
     assert pretty_indented(
         template.render(
             Context(

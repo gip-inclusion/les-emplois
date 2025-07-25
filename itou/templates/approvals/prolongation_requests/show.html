@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load approvals %}
 {% load components %}
 {% load enums %}
 {% load format_filters %}
@@ -121,7 +122,7 @@
                     {% include "approvals/prolongation_requests/_deny_information_card.html" %}
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% include "approvals/includes/box.html" with approval=prolongation_request.approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' only %}
+                    {% approval_details_box approval=prolongation_request.approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' %}
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}

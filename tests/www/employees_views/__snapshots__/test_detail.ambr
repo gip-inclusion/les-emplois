@@ -1342,7 +1342,7 @@
           'WithNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[employees/detail.html]',
+          'InclusionNode[employees/detail.html]',
           'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',

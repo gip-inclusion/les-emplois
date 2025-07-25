@@ -4265,7 +4265,7 @@
           'WithNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[job_seekers_views/details.html]',
+          'InclusionNode[job_seekers_views/details.html]',
           'IfNode[job_seekers_views/details.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/details.html]',
