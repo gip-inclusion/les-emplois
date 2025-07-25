@@ -41,7 +41,7 @@ def count_related_subquery(model, fk_field, outer_ref_field, extra_filters=None)
     )
 
 
-def inactive_jobseekers_without_recent_related_objects(inactive_since, batch_size):
+def inactive_jobseekers_without_recent_related_objects(inactive_since, notified, batch_size=None):
     recent_approval = Approval.objects.filter(user_id=OuterRef("pk"), end_at__gt=inactive_since)
     recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
         job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
@@ -50,10 +50,10 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, batch_siz
         job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
     )
 
-    return (
+    qs = (
         User.objects.filter(
             kind=UserKind.JOB_SEEKER,
-            upcoming_deletion_notified_at__isnull=True,
+            upcoming_deletion_notified_at__isnull=not notified,
         )
         .filter(
             ~Exists(recent_approval),
@@ -61,5 +61,10 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, batch_siz
             ~Exists(recent_geiq_eligibility_diagnosis),
         )
         .job_seekers_with_last_activity()
-        .filter(last_activity__lt=inactive_since)[:batch_size]
+        .filter(last_activity__lt=inactive_since)
     )
+
+    if batch_size:
+        return qs[:batch_size]
+
+    return qs

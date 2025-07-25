@@ -36,7 +36,7 @@ class Command(BaseCommand):
         self.logger.info("Notifying inactive job seekers without recent related objects before: %s", inactive_since)
         users = list(
             inactive_jobseekers_without_recent_related_objects(
-                inactive_since=inactive_since, batch_size=self.batch_size
+                inactive_since=inactive_since, notified=False, batch_size=self.batch_size
             )
         )
 
