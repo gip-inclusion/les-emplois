@@ -5,8 +5,11 @@ import re
 import time
 
 import httpx
+from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
+
+from itou.eligibility.enums import AdministrativeCriteriaKind
 
 
 logger = logging.getLogger(__name__)
@@ -93,7 +96,11 @@ def _pole_emploi_name(name: str, hyphenate=False, max_len=25) -> str:
     return replaced[:max_len]
 
 
-class BasePoleEmploiApiClient:
+# NOTE(cms): use the httpx Client to better handle connexion opening and closing with a context manager.
+# https://www.python-httpx.org/advanced/clients/#why-use-a-client
+# Problem is, this is not how it was made before.
+# This attempt is not working for the moment as I need to talk about the approach before going further.
+class BasePoleEmploiApiClient(httpx.Client):
     AUTHORIZED_SCOPES = []
     REALM = ""
     CACHE_API_TOKEN_KEY = ""
@@ -415,3 +422,26 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "end_at": end_at,
             "raw_response": data,
         }
+
+
+def pole_emploi_partenaire_api_client():
+    return PoleEmploiRoyaumePartenaireApiClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
+
+
+def pole_emploi_agent_api_client():
+    return PoleEmploiRoyaumeAgentAPIClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
+
+
+def certify_criteria(royaume_agent_client, criteria, js_profile):
+    if criteria.kind == AdministrativeCriteriaKind.TH:
+        return royaume_agent_client.certify_rqth(js_profile=js_profile)
