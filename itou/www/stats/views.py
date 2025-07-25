@@ -386,15 +386,6 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
 
 
 @check_request(utils.can_view_stats_ft)
-def stats_ft_delay_raw(request):
-    return render_stats_ft(
-        request=request,
-        page_title="Données brutes de délai d'entrée en IAE",
-        # No additional locked filter is needed for these PE stats.
-    )
-
-
-@check_request(utils.can_view_stats_ft)
 def stats_ft_conversion_main(request):
     return render_stats_ft(
         request=request,
@@ -406,32 +397,10 @@ def stats_ft_conversion_main(request):
 
 
 @check_request(utils.can_view_stats_ft)
-def stats_ft_conversion_raw(request):
-    return render_stats_ft(
-        request=request,
-        page_title="Données brutes du taux de transformation",
-        extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
-        },
-    )
-
-
-@check_request(utils.can_view_stats_ft)
 def stats_ft_state_main(request):
     return render_stats_ft(
         request=request,
         page_title="Analyse des candidatures émises et de leur traitement",
-        extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
-        },
-    )
-
-
-@check_request(utils.can_view_stats_ft)
-def stats_ft_state_raw(request):
-    return render_stats_ft(
-        request=request,
-        page_title="Données brutes de l’état des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
