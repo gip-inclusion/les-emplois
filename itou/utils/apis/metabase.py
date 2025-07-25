@@ -88,24 +88,15 @@ METABASE_DASHBOARDS = {
     #
     # Prescriber stats - FT.
     #
-    "stats_ft_delay_raw": {
-        "dashboard_id": 180,
-    },
     "stats_ft_conversion_main": {
         "dashboard_id": 169,
         "tally_popup_form_id": "mODeK8",
         "tally_embed_form_id": "3xrPjJ",
     },
-    "stats_ft_conversion_raw": {
-        "dashboard_id": 182,
-    },
     "stats_ft_state_main": {
         "dashboard_id": 496,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
-    },
-    "stats_ft_state_raw": {
-        "dashboard_id": 183,
     },
     "stats_ft_beneficiaries": {
         "dashboard_id": 545,
