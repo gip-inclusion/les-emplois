@@ -59,6 +59,40 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         assert ctx.value.error_code == "http_error"
 
     @respx.mock
+    def test_httpx_client(self):
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
+        )
+        respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
+            200,
+            json=pole_emploi_api_mocks.API_APPELLATIONS,
+        )
+        respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
+            200, json=pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        )
+
+        # Connection pooling
+        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
+        with client:
+            first_client = client._get_httpx_client()
+            assert client._refresh_token() == "foo batman"
+            assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+            assert client.referentiel("naturesContrats") == pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+            assert first_client is client._get_httpx_client()
+
+        # Outside a context manager…
+        # …an error is raised if we try to reuse a client previously created by a context manager…
+        with pytest.raises(RuntimeError, match="Cannot send a request, as the client has been closed"):
+            client.appellations()
+
+        # …but if no context manager was used before, a new HTTPX client is created for each new request.
+        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
+        assert client._refresh_token() == "foo batman"
+        first_client = client._get_httpx_client()
+        assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+        assert first_client is not client._get_httpx_client()
+
+    @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(

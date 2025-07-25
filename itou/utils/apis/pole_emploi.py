@@ -91,11 +91,23 @@ class BasePoleEmploiApiClient:
         self.auth_base_url = auth_base_url
         self.key = key
         self.secret = secret
+        self._httpx_client = None
+
+    def __enter__(self):
+        self._httpx_client = httpx.Client().__enter__()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self._httpx_client.__exit__(type, value, traceback)
+
+    def _get_httpx_client(self):
+        return self._httpx_client or httpx.Client()
 
     def _refresh_token(self):
         scopes = " ".join(self.AUTHORIZED_SCOPES)
         auth_data = (
-            httpx.post(
+            self._get_httpx_client()
+            .post(
                 f"{self.auth_base_url}/connexion/oauth2/access_token",
                 params={"realm": self.REALM},
                 data={
@@ -124,14 +136,15 @@ class BasePoleEmploiApiClient:
             if not token:
                 token = self._refresh_token()
 
-            response = httpx.request(
-                method,
-                url,
+            response = self._get_httpx_client().request(
+                method=method,
+                url=url,
                 params=params,
                 json=data,
                 headers={"Authorization": token, "Content-Type": "application/json"},
                 timeout=API_TIMEOUT_SECONDS,
             )
+
             if response.status_code == 204:
                 return None
             if response.status_code == 429:
