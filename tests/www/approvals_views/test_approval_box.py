@@ -39,6 +39,14 @@ def test_future_approval(snapshot):
 @freeze_time("2024-08-06")
 def test_valid_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
+    request = RequestFactory().get("/")
+    template = Template("{% load approvals %}{% approval_details_box approval=approval request=request %}")
+    assert pretty_indented(template.render(Context({"approval": approval, "request": request}))) == snapshot
+
+
+@freeze_time("2024-08-06")
+def test_approval_no_details_link(snapshot):
+    approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
     template = Template("{% load approvals %}{% approval_details_box approval=approval %}")
     assert pretty_indented(template.render(Context({"approval": approval}))) == snapshot
 
