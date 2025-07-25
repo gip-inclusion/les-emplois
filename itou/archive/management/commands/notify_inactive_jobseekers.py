@@ -13,7 +13,7 @@ from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 BATCH_SIZE = 200
 
 
-def inactive_jobseekers_without_related_objects(inactive_since, batch_size):
+def inactive_jobseekers_without_recent_related_objects(inactive_since, batch_size):
     recent_approval = Approval.objects.filter(user_id=OuterRef("pk"), end_at__gt=inactive_since)
     recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
         job_seeker=OuterRef("pk"), expires_at__gt=inactive_since
@@ -59,9 +59,11 @@ class Command(BaseCommand):
     def notify_inactive_jobseekers(self):
         now = timezone.now()
         inactive_since = now - INACTIVITY_PERIOD
-        self.logger.info("Notifying inactive job seekers without activity before: %s", inactive_since)
+        self.logger.info("Notifying inactive job seekers without recent related objects before: %s", inactive_since)
         users = list(
-            inactive_jobseekers_without_related_objects(inactive_since=inactive_since, batch_size=self.batch_size)
+            inactive_jobseekers_without_recent_related_objects(
+                inactive_since=inactive_since, batch_size=self.batch_size
+            )
         )
 
         if self.wet_run:
