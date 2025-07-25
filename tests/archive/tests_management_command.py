@@ -93,7 +93,7 @@ def city_fixture():
 def get_fields_list_for_snapshot(model):
     exclude = {"id", "anonymized_at"}
     fields = [f.name for f in model._meta.get_fields() if f.concrete and f.name not in exclude]
-    return model.objects.values(*fields)
+    return list(model.objects.values(*fields))
 
 
 class TestNotifyInactiveJobseekersManagementCommand:
@@ -984,8 +984,8 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert not Approval.objects.exists()
 
-        assert list(get_fields_list_for_snapshot(AnonymizedApproval)) == snapshot(name="anonymized_approval")
-        assert list(get_fields_list_for_snapshot(AnonymizedApplication)) == snapshot(name="anonymized_application")
+        assert get_fields_list_for_snapshot(AnonymizedApproval) == snapshot(name="anonymized_approval")
+        assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="anonymized_application")
 
     def test_archive_jobseeker_with_several_approvals(self, snapshot):
         jobseeker = JobSeekerFactory(
@@ -1084,11 +1084,11 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert not EligibilityDiagnosis.objects.exists()
         assert not GEIQEligibilityDiagnosis.objects.exists()
-        assert list(get_fields_list_for_snapshot(AnonymizedJobSeeker)) == snapshot(name="anonymized_jobseeker")
-        assert list(get_fields_list_for_snapshot(AnonymizedSIAEEligibilityDiagnosis)) == snapshot(
+        assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
+        assert get_fields_list_for_snapshot(AnonymizedSIAEEligibilityDiagnosis) == snapshot(
             name="anonymized_iae_diagnosis"
         )
-        assert list(get_fields_list_for_snapshot(AnonymizedGEIQEligibilityDiagnosis)) == snapshot(
+        assert get_fields_list_for_snapshot(AnonymizedGEIQEligibilityDiagnosis) == snapshot(
             name="anonymized_geiq_diagnosis"
         )
 
@@ -1556,7 +1556,7 @@ class TestAnonymizeCancelledApprovalsManagementCommand:
 
         call_command("anonymize_cancelled_approvals", wet_run=True)
 
-        assert list(get_fields_list_for_snapshot(AnonymizedCancelledApproval)) == snapshot(
+        assert get_fields_list_for_snapshot(AnonymizedCancelledApproval) == snapshot(
             name="anonymized_cancelled_approval"
         )
         assert not CancelledApproval.objects.exists()
