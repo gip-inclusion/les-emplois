@@ -16,18 +16,22 @@ import sqlparse
 from bs4 import BeautifulSoup
 from bs4.formatter import HTMLFormatter
 from django.conf import Path, settings
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.files.storage import default_storage
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.backends.utils import CursorDebugWrapper
+from django.http import HttpResponse
 from django.template import Template
 from django.template.base import Node
 from django.template.loader import render_to_string
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.test.utils import CaptureQueriesContext, TestContextDecorator
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
@@ -419,3 +423,24 @@ def default_storage_ls_files(directory=""):
     for subdirectory in subdirectories:
         result += [f"{subdirectory}/{file}" for file in default_storage_ls_files(subdirectory)]
     return sorted(result)
+
+
+def get_response_for_middlewaremixin(request):
+    """
+    `SessionMiddleware` inherits from `MiddlewareMixin` which requires
+    a `get_response` argument since Django 4.0:
+    https://github.com/django/django/pull/11828
+
+    An empty `HttpResponse` does the trick.
+    """
+    return HttpResponse()
+
+
+def get_request(user):
+    factory = RequestFactory()
+    request = factory.get("/")
+    request.user = user
+    SessionMiddleware(get_response_for_middlewaremixin)(request)
+    MessageMiddleware(get_response_for_middlewaremixin)(request)
+    ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
+    return request

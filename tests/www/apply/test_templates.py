@@ -30,14 +30,8 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
-from tests.utils.testing import load_template
+from tests.utils.testing import get_request, load_template
 from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
-
-
-def get_request(path="/"):
-    request = RequestFactory().get(path)
-    request.user = EmployerFactory()
-    return request
 
 
 # Job applications list (company)
@@ -61,7 +55,7 @@ def test_job_application_multiple_jobs():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(),
+                "request": get_request(EmployerFactory()),
             }
         )
     )
@@ -95,7 +89,7 @@ def test_job_application_auto_prescription_badge_in_list():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(),
+                "request": get_request(EmployerFactory()),
             }
         )
     )
@@ -115,7 +109,7 @@ def test_job_application_imported_from_pe_in_list():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(),
+                "request": get_request(EmployerFactory()),
             }
         )
     )
@@ -135,7 +129,7 @@ def test_job_application_job_seeker_in_list():
                 "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
                 "JobApplicationsListKind": JobApplicationsListKind,
                 "display_kind": JobApplicationsDisplayKind.LIST,
-                "request": get_request(),
+                "request": get_request(EmployerFactory()),
             }
         )
     )
