@@ -299,19 +299,19 @@ class TestCouldSiaeBeDeleted:
 
         # No eligibility diagnosis linked
         company = CompanyWith2MembershipsFactory()
-        assert could_siae_be_deleted(company)
+        assert could_siae_be_deleted(company) is True
 
         # An eligibility diagnosis without related approval
         IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, author=company.members.first())
-        assert could_siae_be_deleted(company)
+        assert could_siae_be_deleted(company) is True
 
         # Approval with eligibility diagnosis authored by SIAE
         ApprovalFactory(with_diagnosis_from_employer=True, eligibility_diagnosis__author_siae=company)
-        assert not could_siae_be_deleted(company)
+        assert could_siae_be_deleted(company) is False
 
     def test_with_job_app(self):
         company = JobApplicationFactory().to_company
-        assert not could_siae_be_deleted(company)
+        assert could_siae_be_deleted(company) is False
 
     def test_transferred_job_apps(self):
         company = CompanyFactory()
