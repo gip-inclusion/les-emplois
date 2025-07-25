@@ -5757,10 +5757,10 @@
                               Sortant de détention ou personne placée sous main de justice
                           </option>
                           <option value="17">
-                              Maîtrise de la langue française
+                              Maîtrise de la langue française inférieure au niveau A1
                           </option>
                           <option value="18">
-                              Mobilité
+                              Problème de mobilité
                           </option>
                       </select>
                   </div>
@@ -6006,10 +6006,10 @@
                               Sortant de détention ou personne placée sous main de justice
                           </option>
                           <option value="17">
-                              Maîtrise de la langue française
+                              Maîtrise de la langue française inférieure au niveau A1
                           </option>
                           <option value="18">
-                              Mobilité
+                              Problème de mobilité
                           </option>
                       </select>
                   </div>
@@ -6329,10 +6329,10 @@
                               Sortant de détention ou personne placée sous main de justice
                           </option>
                           <option value="17">
-                              Maîtrise de la langue française
+                              Maîtrise de la langue française inférieure au niveau A1
                           </option>
                           <option value="18">
-                              Mobilité
+                              Problème de mobilité
                           </option>
                       </select>
                   </div>

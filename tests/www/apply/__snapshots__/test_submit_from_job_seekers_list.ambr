@@ -311,7 +311,7 @@
                                           <div class="form-check">
                                               <input class="form-check-input" id="id_level_2_17" name="level_2_17" type="checkbox"/>
                                               <label class="form-check-label" for="id_level_2_17">
-                                                  Maîtrise de la langue française
+                                                  Maîtrise de la langue française inférieure au niveau A1
                                               </label>
                                           </div>
                                       </div>
@@ -319,7 +319,7 @@
                                           <div class="form-check">
                                               <input class="form-check-input" id="id_level_2_18" name="level_2_18" type="checkbox"/>
                                               <label class="form-check-label" for="id_level_2_18">
-                                                  Mobilité
+                                                  Problème de mobilité
                                               </label>
                                           </div>
                                       </div>
