@@ -59,6 +59,30 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         assert ctx.value.error_code == "http_error"
 
     @respx.mock
+    def test_httpx_client(self):
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
+        )
+        respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
+            200,
+            json=pole_emploi_api_mocks.API_APPELLATIONS,
+        )
+        respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
+            200, json=pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        )
+
+        # Make a one-shot call.
+        assert self.api_client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+
+        # Use the same connection.
+        with self.api_client.httpx_client() as httpx_client:
+            assert self.api_client.appellations(httpx_client=httpx_client) == pole_emploi_api_mocks.API_APPELLATIONS
+            assert (
+                self.api_client.referentiel("naturesContrats", httpx_client=httpx_client)
+                == pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+            )
+
+    @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(

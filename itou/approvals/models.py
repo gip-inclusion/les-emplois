@@ -350,7 +350,9 @@ class PENotificationMixin(models.Model):
     def pe_log_err(self, fmt, *args, **kwargs):
         self._pe_log("!", fmt, *args, **kwargs)
 
-    def pe_maj_pass(self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at):
+    def pe_maj_pass(
+        self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at, httpx_client=None
+    ):
         pe_client = pole_emploi_partenaire_api_client()
 
         typologie_prescripteur = None
@@ -369,6 +371,7 @@ class PENotificationMixin(models.Model):
                 companies_enums.siae_kind_to_ft_type_siae(siae_kind),
                 origine_candidature=origine_candidature,
                 typologie_prescripteur=typologie_prescripteur,
+                httpx_client=httpx_client,
             )
         except PoleEmploiAPIException:
             self.pe_log_err("got a recoverable error in maj_pass_iae")
@@ -461,33 +464,37 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
-        if not self.user_id_national_pe:
-            pe_client = pole_emploi_partenaire_api_client()
-            try:
-                id_national = pe_client.recherche_individu_certifie(
-                    first_name=self.user_first_name,
-                    last_name=self.user_last_name,
-                    nir=self.user_nir,
-                    birthdate=self.user_birthdate,
-                )
-            except PoleEmploiAPIException:
-                self.pe_log_err("got a recoverable error in recherche_individu")
-                return self.pe_save_should_retry(at)
-            except PoleEmploiAPIBadResponse as exc:
-                self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-                return self.pe_save_error(
-                    at, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
-                )
-            self.user_id_national_pe = id_national
-            self.save(update_fields=["user_id_national_pe"])
-        return self.pe_maj_pass(
-            id_national_pe=self.user_id_national_pe,
-            siae_siret=self.origin_siae_siret,
-            siae_kind=self.origin_siae_kind,
-            sender_kind=self.origin_sender_kind,
-            prescriber_kind=self.origin_prescriber_organization_kind,
-            at=at,
-        )
+        pe_client = pole_emploi_partenaire_api_client()
+        with pe_client.httpx_client() as httpx_client:
+            if not self.user_id_national_pe:
+                try:
+                    id_national = pe_client.recherche_individu_certifie(
+                        first_name=self.user_first_name,
+                        last_name=self.user_last_name,
+                        nir=self.user_nir,
+                        birthdate=self.user_birthdate,
+                        httpx_client=httpx_client,
+                    )
+                except PoleEmploiAPIException:
+                    self.pe_log_err("got a recoverable error in recherche_individu")
+                    return self.pe_save_should_retry(at)
+                except PoleEmploiAPIBadResponse as exc:
+                    self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
+                    return self.pe_save_error(
+                        at, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                    )
+                self.user_id_national_pe = id_national
+                self.save(update_fields=["user_id_national_pe"])
+            response = self.pe_maj_pass(
+                id_national_pe=self.user_id_national_pe,
+                siae_siret=self.origin_siae_siret,
+                siae_kind=self.origin_siae_kind,
+                sender_kind=self.origin_sender_kind,
+                prescriber_kind=self.origin_prescriber_organization_kind,
+                at=at,
+                httpx_client=httpx_client,
+            )
+        return response
 
 
 class Approval(PENotificationMixin, CommonApprovalMixin):
@@ -997,44 +1004,50 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
-        if not self.user.jobseeker_profile.pe_obfuscated_nir:
-            pe_client = pole_emploi_partenaire_api_client()
-            try:
-                id_national = pe_client.recherche_individu_certifie(
-                    first_name=self.user.first_name,
-                    last_name=self.user.last_name,
-                    nir=self.user.jobseeker_profile.nir,
-                    birthdate=self.user.jobseeker_profile.birthdate,
+        pe_client = pole_emploi_partenaire_api_client()
+        with pe_client.httpx_client() as httpx_client:
+            if not self.user.jobseeker_profile.pe_obfuscated_nir:
+                try:
+                    id_national = pe_client.recherche_individu_certifie(
+                        first_name=self.user.first_name,
+                        last_name=self.user.last_name,
+                        nir=self.user.jobseeker_profile.nir,
+                        birthdate=self.user.jobseeker_profile.birthdate,
+                        httpx_client=httpx_client,
+                    )
+                except PoleEmploiAPIException:
+                    self.pe_log_err("got a recoverable error in recherche_individu")
+                    return self.pe_save_should_retry(now)
+                except PoleEmploiAPIBadResponse as exc:
+                    self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
+                    return self.pe_save_error(
+                        now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                    )
+                self.user.jobseeker_profile.pe_obfuscated_nir = id_national
+                self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+                IdentityCertification.objects.upsert_certifications(
+                    [
+                        IdentityCertification(
+                            certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
+                            jobseeker_profile=self.user.jobseeker_profile,
+                            certified_at=now,
+                        ),
+                    ]
                 )
-            except PoleEmploiAPIException:
-                self.pe_log_err("got a recoverable error in recherche_individu")
-                return self.pe_save_should_retry(now)
-            except PoleEmploiAPIBadResponse as exc:
-                self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-                return self.pe_save_error(
-                    now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                self.user.jobseeker_profile.save(
+                    update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"]
                 )
-            self.user.jobseeker_profile.pe_obfuscated_nir = id_national
-            self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
-            IdentityCertification.objects.upsert_certifications(
-                [
-                    IdentityCertification(
-                        certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE,
-                        jobseeker_profile=self.user.jobseeker_profile,
-                        certified_at=now,
-                    ),
-                ]
-            )
-            self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
-        return self.pe_maj_pass(
-            id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=siae_siret,
-            siae_kind=siae_kind,
-            sender_kind=sender_kind,
-            prescriber_kind=prescriber_organization_kind,
-            at=now,
-        )
+            response = self.pe_maj_pass(
+                id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
+                siae_siret=siae_siret,
+                siae_kind=siae_kind,
+                sender_kind=sender_kind,
+                prescriber_kind=prescriber_organization_kind,
+                at=now,
+                httpx_client=httpx_client,
+            )
+        return response
 
 
 class SuspensionQuerySet(models.QuerySet):
@@ -2001,30 +2014,34 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
         now = timezone.now()
 
         pe_client = pole_emploi_partenaire_api_client()
-        try:
-            id_national = pe_client.recherche_individu_certifie(
-                first_name=self.first_name,
-                last_name=self.last_name,
-                birthdate=self.birthdate,
-                nir=self.nir,
-            )
-        except PoleEmploiAPIException:
-            self.pe_log_err("got a recoverable error in recherche_individu")
-            return self.pe_save_should_retry(now)
-        except PoleEmploiAPIBadResponse as exc:
-            self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-            return self.pe_save_error(
-                now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
-            )
+        with pe_client.httpx_client() as httpx_client:
+            try:
+                id_national = pe_client.recherche_individu_certifie(
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    birthdate=self.birthdate,
+                    nir=self.nir,
+                    httpx_client=httpx_client,
+                )
+            except PoleEmploiAPIException:
+                self.pe_log_err("got a recoverable error in recherche_individu")
+                return self.pe_save_should_retry(now)
+            except PoleEmploiAPIBadResponse as exc:
+                self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
+                return self.pe_save_error(
+                    now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
+                )
 
-        return self.pe_maj_pass(
-            id_national_pe=id_national,
-            siae_siret=self.siae_siret,
-            siae_kind=self.siae_kind,
-            sender_kind=job_application_enums.SenderKind.PRESCRIBER,
-            prescriber_kind=prescribers_enums.PrescriberOrganizationKind.FT,
-            at=now,
-        )
+            response = self.pe_maj_pass(
+                id_national_pe=id_national,
+                siae_siret=self.siae_siret,
+                siae_kind=self.siae_kind,
+                sender_kind=job_application_enums.SenderKind.PRESCRIBER,
+                prescriber_kind=prescribers_enums.PrescriberOrganizationKind.FT,
+                at=now,
+                httpx_client=httpx_client,
+            )
+        return response
 
 
 class OriginalPoleEmploiApproval(CommonApprovalMixin):
