@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.approvals import models as approvals_models
 from itou.job_applications.enums import JobApplicationState
-from itou.utils.apis import enums as api_enums
+from itou.utils.apis import enums as api_enums, pole_emploi_partenaire_api_client
 from itou.utils.command import BaseCommand
 
 
@@ -67,16 +67,17 @@ class Command(BaseCommand):
         self.logger.info("approvals needing to be sent count=%s, batch count=%s", nb_approvals, MAX_APPROVALS_PER_RUN)
         nb_approvals_to_send = min(nb_approvals, MAX_APPROVALS_PER_RUN)
 
-        for approval in queryset[:nb_approvals_to_send]:
-            self.logger.info(
-                "approvals=%s start_at=%s pe_state=%s",
-                approval,
-                approval.start_at,
-                approval.pe_notification_status,
-            )
-            if wet_run:
-                results.append(approval.notify_pole_emploi())
-                sleep(delay)
+        with pole_emploi_partenaire_api_client() as client:
+            for approval in queryset[:nb_approvals_to_send]:
+                self.logger.info(
+                    "approvals=%s start_at=%s pe_state=%s",
+                    approval,
+                    approval.start_at,
+                    approval.pe_notification_status,
+                )
+                if wet_run:
+                    results.append(approval.notify_pole_emploi(client=client))
+                    sleep(delay)
 
         # Send READY CancelledApprovals
         batch_left = MAX_APPROVALS_PER_RUN - nb_approvals_to_send
@@ -91,16 +92,17 @@ class Command(BaseCommand):
             cancelled_queryset.count(),
             batch_left,
         )
-        for cancelled_approval in cancelled_queryset[:batch_left]:
-            self.logger.info(
-                "cancelled_approval=%s start_at=%s pe_state=%s",
-                cancelled_approval,
-                cancelled_approval.start_at,
-                cancelled_approval.pe_notification_status,
-            )
-            if wet_run:
-                results.append(cancelled_approval.notify_pole_emploi())
-                sleep(delay)
+        with pole_emploi_partenaire_api_client() as client:
+            for cancelled_approval in cancelled_queryset[:batch_left]:
+                self.logger.info(
+                    "cancelled_approval=%s start_at=%s pe_state=%s",
+                    cancelled_approval,
+                    cancelled_approval.start_at,
+                    cancelled_approval.pe_notification_status,
+                )
+                if wet_run:
+                    results.append(cancelled_approval.notify_pole_emploi(client=client))
+                    sleep(delay)
 
         status_counter = collections.Counter(results)
         for status, nb in status_counter.items():

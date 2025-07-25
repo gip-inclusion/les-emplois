@@ -350,8 +350,8 @@ class PENotificationMixin(models.Model):
     def pe_log_err(self, fmt, *args, **kwargs):
         self._pe_log("!", fmt, *args, **kwargs)
 
-    def pe_maj_pass(self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at):
-        pe_client = pole_emploi_partenaire_api_client()
+    def pe_maj_pass(self, *, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind, at, client=None):
+        pe_client = client or pole_emploi_partenaire_api_client()
 
         typologie_prescripteur = None
         if prescriber_kind:
@@ -419,7 +419,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
         # For cancelled approval, we send start_at == end_at
         return self.start_at.strftime(DATE_FORMAT)
 
-    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus:
+    def notify_pole_emploi(self, client=None) -> api_enums.PEApiNotificationStatus:
         at = timezone.now()
         today = timezone.localdate(at)
         if self.start_at > today:
@@ -461,8 +461,8 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
                 reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
+        pe_client = client or pole_emploi_partenaire_api_client()
         if not self.user_id_national_pe:
-            pe_client = pole_emploi_partenaire_api_client()
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user_first_name,
@@ -487,6 +487,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             sender_kind=self.origin_sender_kind,
             prescriber_kind=self.origin_prescriber_organization_kind,
             at=at,
+            client=pe_client,
         )
 
 
@@ -938,7 +939,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             - datetime.timedelta(days=1)
         )
 
-    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus:
+    def notify_pole_emploi(self, client=None) -> api_enums.PEApiNotificationStatus:
         # We do not send approvals that start in the future to PE, because their IS can't handle them.
         # In this case, do not mark them as "should retry" but leave them pending. The pending ones
         # will be caught by the second pass cron. The "should retry" then assumes:
@@ -997,8 +998,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 reason=api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
             )
 
+        pe_client = client or pole_emploi_partenaire_api_client()
         if not self.user.jobseeker_profile.pe_obfuscated_nir:
-            pe_client = pole_emploi_partenaire_api_client()
             try:
                 id_national = pe_client.recherche_individu_certifie(
                     first_name=self.user.first_name,
@@ -1034,6 +1035,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             sender_kind=sender_kind,
             prescriber_kind=prescriber_organization_kind,
             at=now,
+            client=pe_client,
         )
 
 
@@ -1997,10 +1999,11 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     def number_with_spaces(self):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    def notify_pole_emploi(self) -> api_enums.PEApiNotificationStatus:
+    # NOTE(cms): this seems to be dead code.
+    def notify_pole_emploi(self, client=None) -> api_enums.PEApiNotificationStatus:
         now = timezone.now()
 
-        pe_client = pole_emploi_partenaire_api_client()
+        pe_client = client or pole_emploi_partenaire_api_client()
         try:
             id_national = pe_client.recherche_individu_certifie(
                 first_name=self.first_name,
@@ -2024,6 +2027,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
             sender_kind=job_application_enums.SenderKind.PRESCRIBER,
             prescriber_kind=prescribers_enums.PrescriberOrganizationKind.FT,
             at=now,
+            client=pe_client,
         )
 
 

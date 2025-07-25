@@ -33,15 +33,13 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, chunk_size, **options):
-        pe_client = pole_emploi_partenaire_api_client()
-
         @tenacity.retry(
             stop=tenacity.stop_after_attempt(10),
             wait=tenacity.wait_fixed(1),
             retry=tenacity.retry_if_exception_type(PoleEmploiRateLimitException),
         )
-        def pe_check_user_details(user, swap=False):
-            return pe_client.recherche_individu_certifie(
+        def pe_check_user_details(user, client, *, swap=False):
+            return client.recherche_individu_certifie(
                 user.first_name if not swap else user.last_name,
                 user.last_name if not swap else user.first_name,
                 user.jobseeker_profile.birthdate,
@@ -81,28 +79,29 @@ class Command(BaseCommand):
             certified_profiles.append(user.jobseeker_profile)
             self.logger.info("certified user pk=%d", user.pk)
 
-        for user in eligible_users.order_by(
-            F("jobseeker_profile__pe_last_certification_attempt_at").asc(nulls_first=True)
-        )[:chunk_size]:
-            user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
-            examined_profiles.append(user.jobseeker_profile)
-            try:
-                response = pe_check_user_details(user)
-            except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
-                self.logger.warning(f"could not find a match for pk={user.pk} error={exc}")
+        with pole_emploi_partenaire_api_client() as pe_client:
+            for user in eligible_users.order_by(
+                F("jobseeker_profile__pe_last_certification_attempt_at").asc(nulls_first=True)
+            )[:chunk_size]:
+                user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+                examined_profiles.append(user.jobseeker_profile)
                 try:
-                    response2 = pe_check_user_details(user, swap=True)
+                    response = pe_check_user_details(user, client=pe_client)
                 except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
-                    self.logger.warning(
-                        f"no match found either for pk={user.pk} when swapping last and first names exc={exc}"
-                    )
+                    self.logger.warning(f"could not find a match for pk={user.pk} error={exc}")
+                    try:
+                        response2 = pe_check_user_details(user, client=pe_client, swap=True)
+                    except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
+                        self.logger.warning(
+                            f"no match found either for pk={user.pk} when swapping last and first names exc={exc}"
+                        )
+                    else:
+                        self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
+                        user.last_name, user.first_name = user.first_name, user.last_name
+                        certify_user(user, response2)
+                        swapped_users.append(user)
                 else:
-                    self.logger.info("SWAP DETECTED: user pk=%d", user.pk)
-                    user.last_name, user.first_name = user.first_name, user.last_name
-                    certify_user(user, response2)
-                    swapped_users.append(user)
-            else:
-                certify_user(user, response)
+                    certify_user(user, response)
 
         self.logger.info("count=%d users have been examined.", len(examined_profiles))
 
