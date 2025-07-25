@@ -50,14 +50,24 @@ DGEFP_SHOWROOM_CONVERGENCE_REGION = "Île-de-France"
 DGEFP_SHOWROOM_IAE_NETWORK_NAME = "Unai"
 
 
-def get_params_for_departement(department):
+def get_params_for_departement(department, *, with_department_name=True):
+    if not with_department_name:
+        return {
+            mb.DEPARTMENT_FILTER_KEY: [department],
+        }
+
     return {
         mb.DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
         mb.REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
 
 
-def get_params_for_region(region):
+def get_params_for_region(region, *, with_department_name=True):
+    if not with_department_name:
+        return {
+            mb.DEPARTMENT_FILTER_KEY: REGIONS[region],
+        }
+
     departments = [DEPARTMENTS[dpt] for dpt in REGIONS[region]]
     params = {
         mb.DEPARTMENT_FILTER_KEY: departments,
@@ -288,13 +298,13 @@ def stats_siae_beneficiaries(request):
     )
 
 
-def render_stats_cd(request, page_title, *, params=None, extra_context=None):
+def render_stats_cd(request, page_title, *, extra_context=None, with_department_name=True):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
     They can only view data for their own departement.
     """
     department = request.current_organization.department
-    params = get_params_for_departement(department) if params is None else params
+    params = get_params_for_departement(department, with_department_name=with_department_name)
     context = {
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
@@ -332,7 +342,9 @@ def stats_cd_orga_etp(request):
 @check_request(utils.can_view_stats_cd)
 def stats_cd_beneficiaries(request):
     return render_stats_cd(
-        request=request, page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi"
+        request=request,
+        page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
+        with_department_name=False,
     )
 
 
@@ -414,7 +426,7 @@ def stats_ft_beneficiaries(request):
     return render_stats_ft(
         request=request,
         page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
-        with_region_param=True,
+        with_department_name=False,
     )
 
 
@@ -423,17 +435,19 @@ def stats_ft_hiring(request):
     return render_stats_ft(
         request=request,
         page_title="Analyse de l'ensemble des candidatures reçues par les SIAE",
-        # The Metabase filter is not "locked" so it's not required,
-        # and sending the parameter for DGFT will break because of the max URL length
-        with_region_param=not request.current_organization.is_dgft,
+        with_department_name=False,
     )
 
 
-def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
+def render_stats_ph(
+    request, page_title, *, extra_params=None, extra_context=None, with_region_param=False, with_department_name=True
+):
     department = request.current_organization.department
     params = {
-        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[department]],
+        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[department] if with_department_name else department],
     }
+    if with_region_param:
+        params[mb.REGION_FILTER_KEY] = [DEPARTMENT_TO_REGION[department]]
     if extra_params:
         params.update(extra_params)
 
@@ -483,12 +497,14 @@ def stats_ph_beneficiaries(request):
     return render_stats_ph(
         request=request,
         page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
-        extra_params=get_params_for_departement(request.current_organization.department),
+        with_department_name=False,
         extra_context={"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}},
     )
 
 
-def render_stats_ddets(request, *, page_title, extra_context=None, extend_stats_to_whole_region=False):
+def render_stats_ddets(
+    request, *, page_title, extra_context=None, extend_stats_to_whole_region=False, with_department_name=True
+):
     department = request.current_organization.department
     department_label = DEPARTMENTS[department]
     region = request.current_organization.region
@@ -503,7 +519,11 @@ def render_stats_ddets(request, *, page_title, extra_context=None, extend_stats_
     if extra_context:
         context.update(extra_context)
 
-    params = get_params_for_region(region) if extend_stats_to_whole_region else get_params_for_departement(department)
+    params = (
+        get_params_for_region(region, with_department_name=with_department_name)
+        if extend_stats_to_whole_region
+        else get_params_for_departement(department, with_department_name=with_department_name)
+    )
     return render_stats(request=request, context=context, params=params)
 
 
@@ -533,6 +553,7 @@ def stats_ddets_iae_hiring(request):
     return render_stats_ddets(
         request=request,
         page_title="Analyse des candidatures reçues et de leur traitement",
+        with_department_name=False,
     )
 
 
@@ -562,7 +583,7 @@ def stats_ddets_log_state(request):
     )
 
 
-def render_stats_dreets_iae(request, page_title, *, extra_context=None):
+def render_stats_dreets_iae(request, page_title, *, extra_context=None, with_department_name=True):
     region = request.current_organization.region
     context = {
         "page_title": f"{page_title} ({region})",
@@ -570,7 +591,11 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None):
         "region": region,
     }
     context.update(extra_context or {})
-    return render_stats(request=request, context=context, params=get_params_for_region(region))
+    return render_stats(
+        request=request,
+        context=context,
+        params=get_params_for_region(region, with_department_name=with_department_name),
+    )
 
 
 @check_request(utils.can_view_stats_dreets_iae)
@@ -588,6 +613,7 @@ def stats_dreets_iae_hiring(request):
     return render_stats_dreets_iae(
         request=request,
         page_title="Analyse des candidatures reçues et de leur traitement",
+        with_department_name=False,
     )
 
 
@@ -607,16 +633,17 @@ def stats_dreets_iae_orga_etp(request):
     )
 
 
-def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context=None):
+def render_stats_dgefp_iae(request, *, page_title, extra_context=None, with_department_param=False):
     extra_context = extra_context or {}
 
+    params = {mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.keys())} if with_department_param else {}
     return render_stats(
         request=request,
         context={
             "page_title": page_title,
             **extra_context,
         },
-        params=extra_params,
+        params=params,
     )
 
 
@@ -675,15 +702,18 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
 
     [kind, name] = re.match(r"(cd|convergence|ddets_iae|ft|iae_network|ph|siae)_(\w+)", dashboard_full_name).groups()
     if kind == "cd":
-        params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+        params = get_params_for_departement(
+            DGEFP_SHOWROOM_DEPARTMENT, with_department_name=dashboard_full_name not in {"cd_hiring"}
+        )
     if kind == "ddets_iae":
-        params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+        params = get_params_for_departement(
+            DGEFP_SHOWROOM_DEPARTMENT, with_department_name=dashboard_full_name not in {"ddets_iae_hiring"}
+        )
     if kind == "convergence":
         params = get_params_for_region(DGEFP_SHOWROOM_CONVERGENCE_REGION)
     elif kind == "ft":
         params = {
-            # FIXME: **get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT),
-            mb.DEPARTMENT_FILTER_KEY: DEPARTMENTS[DGEFP_SHOWROOM_DEPARTMENT],
+            **get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT, with_department_name=False),
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         }
     elif kind == "iae_network":
@@ -716,7 +746,7 @@ def stats_dgefp_iae_showroom(request, dashboard_full_name):
                     mb.C1_PRESCRIBER_ORG_FILTER_KEY: list(organization_pks),
                 }
             case "beneficiaries":
-                params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT)
+                params = get_params_for_departement(DGEFP_SHOWROOM_DEPARTMENT, with_department_name=False)
     elif kind == "siae":
         match name:
             case "orga_etp" | "beneficiaries":
