@@ -388,7 +388,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             case "S003":
                 raise MultipleUsersReturned()
             case _ as response_code:
-                raise PoleEmploiAPIBadResponse(response_code=f"unknown_successful_response_code_{response_code}")
+                raise PoleEmploiAPIBadResponse(response_code=response_code)
 
         if data["topIdentiteCertifiee"] != "O":
             raise IdentityNotCertified()
