@@ -2121,7 +2121,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -3115,10 +3115,37 @@
       }),
       dict({
         'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "job_applications_jobapplication"
+          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Approval.is_suspended[approvals/models.py]',
           'Approval.state[approvals/models.py]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',
@@ -3149,7 +3176,7 @@
           'VariableNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',
@@ -3188,7 +3215,7 @@
           'WithNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',
@@ -3331,7 +3358,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -4325,10 +4352,37 @@
       }),
       dict({
         'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'WithNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'IfNode[apply/process_base.html]',
+          'BlockNode',
+          'VariableNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "job_applications_jobapplication"
+          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Approval.is_suspended[approvals/models.py]',
           'Approval.state[approvals/models.py]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',
@@ -4359,7 +4413,7 @@
           'VariableNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',
@@ -4398,7 +4452,7 @@
           'WithNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
           'IfNode[approvals/includes/box.html]',
-          'IncludeNode[apply/process_base.html]',
+          'InclusionNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'IfNode[apply/process_base.html]',
           'WithNode[apply/process_base.html]',

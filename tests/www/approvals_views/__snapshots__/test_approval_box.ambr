@@ -613,6 +613,13 @@
                       </strong>
                   </li>
               </ul>
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                  </i>
+                  <span>
+                      Afficher le PASS IAE
+                  </span>
+              </a>
           </div>
       </body>
   </html>
