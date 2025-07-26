@@ -1,5 +1,7 @@
 from django import template
 
+from itou.approvals.perms import can_view_approval_details
+
 
 register = template.Library()
 
@@ -17,6 +19,6 @@ def approval_details_box(
         "approval": approval,
         "request": request,
         "version": version,
-        "with_details_link": request is not None,
+        "with_details_link": request and can_view_approval_details(request, approval),
         "extra_classes": extra_classes,
     }
