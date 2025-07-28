@@ -26,35 +26,41 @@ class TestAnnouncementCampaignCache:
         request.user = random_user_kind_factory()
 
         with assertNumQueries(0):
-            active_announcement_campaign(request)["active_campaign_announce"] == campaign
+            context = active_announcement_campaign(request)
+        assert context["display_campaign_announce"] is True
+        assert context["active_campaign_announce"] == campaign
 
         # test cached value is kept up-to-date
         campaign.max_items += 1
         campaign.save()
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request)["active_campaign_announce"].max_items == campaign.max_items
+            context = active_announcement_campaign(request)
+        assert context["active_campaign_announce"].max_items == campaign.max_items
 
         item = AnnouncementItemFactory(campaign=campaign)
         with assertNumQueries(0):
-            assert active_announcement_campaign(request)["active_campaign_announce"].items.count() == 2
+            context = active_announcement_campaign(request)
+        assert context["active_campaign_announce"].items.count() == 2
 
         item.delete()
         with assertNumQueries(0):
-            assert active_announcement_campaign(request)["active_campaign_announce"].items.count() == 1
+            context = active_announcement_campaign(request)
+        assert context["active_campaign_announce"].items.count() == 1
 
         # test cache does not become invalidated when saving a new campaign
         new_campaign = AnnouncementCampaignFactory(
             with_item=True, start_date=(campaign.start_date + timedelta(days=40)).replace(day=1)
         )
         with assertNumQueries(0):
-            active_announcement_campaign(request)["active_campaign_announce"] == campaign
+            context = active_announcement_campaign(request)
+        assert context["active_campaign_announce"] == campaign
 
         # test cached value is removed with the campaign
         campaign.delete()
         new_campaign.delete()
         with assertNumQueries(0):
-            active_announcement_campaign(request)["active_campaign_announce"] is None
+            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
         request = RequestFactory()
@@ -62,17 +68,17 @@ class TestAnnouncementCampaignCache:
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
-            assert active_announcement_campaign(request)["active_campaign_announce"] is None
+            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request)["active_campaign_announce"] is None
+            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_for_anonymous_user(self):
         request = RequestFactory()
         request.user = AnonymousUser()
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(request) == {}
+            assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):

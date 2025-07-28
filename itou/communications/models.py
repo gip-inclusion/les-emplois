@@ -171,7 +171,7 @@ class AnnouncementCampaign(models.Model):
         from itou.communications.cache import get_cached_active_announcement, update_active_announcement_cache
 
         campaign = get_cached_active_announcement()
-        if campaign is None or self.pk == campaign.pk:
+        if (campaign is None or self.pk is None) or self.pk == campaign.pk:
             update_active_announcement_cache()
 
     def save(self, *args, **kwargs):
