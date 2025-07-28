@@ -1150,18 +1150,27 @@ def test_job_seeker_profile_asp_uid_field_history():
 
 
 @pytest.mark.parametrize(
-    "field,value",
+    "obj_attr,field,value",
     [
-        pytest.param("asp_uid", "000000000000000000000000000002", id="asp_uid"),
-        pytest.param("birthdate", datetime.date(2000, 1, 1), id="birthdate"),
-        pytest.param("birth_country_id", "BAHAMAS", id="birth_country"),
-        pytest.param("birth_place_id", "STRASBOURG", id="birth_place"),
-        pytest.param("is_not_stalled_anymore", False, id="is_not_stalled_anymore"),
-        pytest.param("nir", "123456789012311", id="nir"),
-        pytest.param("pole_emploi_id", "12345678944", id="pole_emploi_id"),
+        pytest.param("jobseeker_profile", "asp_uid", "000000000000000000000000000002", id="asp_uid"),
+        pytest.param("jobseeker_profile", "birthdate", datetime.date(2000, 1, 1), id="birthdate"),
+        pytest.param("jobseeker_profile", "birth_country_id", "BAHAMAS", id="birth_country"),
+        pytest.param("jobseeker_profile", "birth_place_id", "STRASBOURG", id="birth_place"),
+        pytest.param("jobseeker_profile", "is_not_stalled_anymore", False, id="is_not_stalled_anymore"),
+        pytest.param("jobseeker_profile", "nir", "123456789012311", id="nir"),
+        pytest.param("jobseeker_profile", "pole_emploi_id", "12345678944", id="pole_emploi_id"),
+        pytest.param(None, "first_name", "Dolorès", id="first_name"),
+        pytest.param(None, "last_name", "Madrigal", id="last_name"),
+        pytest.param(None, "title", "MME", id="title"),
+        pytest.param(None, "email", "hush@madrigal.com", id="email"),
+        pytest.param(None, "phone", "0612345678", id="phone"),
+        pytest.param(None, "address_line_1", "Calle del encanto", id="address_line_1"),
+        pytest.param(None, "address_line_2", "Finca Madrigal", id="address_line_2"),
+        pytest.param(None, "post_code", "34570", id="post_code"),
+        pytest.param(None, "city", "Montarnaud", id="city"),
     ],
 )
-def test_job_seeker_profile_field_history(field, value):
+def test_user_and_job_seeker_profile_field_history(obj_attr, field, value):
     """
     Light version of `test_job_seeker_profile_asp_uid_field_history`
     that only check if keys are present because the whole
@@ -1176,8 +1185,14 @@ def test_job_seeker_profile_field_history(field, value):
         case "birth_place_id":
             factory_kwargs["born_in_france"] = True
             value = Commune.objects.current().get(name=value).pk
+        case "title":
+            # JobSeekerFactory.title being random, force its value
+            # to ensure a change is made.
+            factory_kwargs["title"] = "M"
 
-    obj = JobSeekerFactory(**factory_kwargs).jobseeker_profile
+    obj = JobSeekerFactory(**factory_kwargs)
+    if obj_attr:
+        obj = getattr(obj, obj_attr)
     assert obj.fields_history == []
 
     setattr(obj, field, value)

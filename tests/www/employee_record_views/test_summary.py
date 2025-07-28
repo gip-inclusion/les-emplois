@@ -95,7 +95,8 @@ class TestSummaryEmployeeRecords:
         job_seeker.first_name = "John"
         job_seeker.last_name = "Doe"
         job_seeker.title = Title.M
-        job_seeker.save()
+        with triggers.context():
+            job_seeker.save()
         job_seeker.jobseeker_profile.birthdate = datetime.date(1990, 1, 1)
         job_seeker.jobseeker_profile.birth_country = Country.objects.get(name="BORA-BORA")
         job_seeker.jobseeker_profile.birth_place = None

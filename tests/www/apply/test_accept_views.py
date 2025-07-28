@@ -1951,7 +1951,8 @@ class TestFillJobSeekerInfosForAccept:
         # Remove job seeker address
         for key, value in address_kwargs.items():
             setattr(self.job_seeker, key, value)
-        self.job_seeker.save(update_fields=address_kwargs.keys())
+        with triggers.context():
+            self.job_seeker.save(update_fields=address_kwargs.keys())
 
         client.force_login(self.company.members.first())
 

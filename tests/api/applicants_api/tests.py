@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 
+from itou.utils import triggers
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -205,13 +206,16 @@ class TestApplicantsAPI:
         job_seeker1.address_line_2 = "address 2"
         job_seeker1.post_code = "37000"
         job_seeker1.city = "TOURS"
-        job_seeker1.save()
+
+        with triggers.context():
+            job_seeker1.save()
         job_seeker2 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
         job_seeker2.address_line_1 = "2nd address test"
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
         job_seeker2.city = "LILLE"
-        job_seeker2.save()
+        with triggers.context():
+            job_seeker2.save()
         user = company.members.first()
 
         api_client.force_authenticate(user)

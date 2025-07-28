@@ -262,7 +262,8 @@ class TestFranceConnect:
             certifiable_by_api_particulier=True,
         )
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        user, created = fc_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = fc_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name

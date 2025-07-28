@@ -19,6 +19,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
+from itou.utils import triggers
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_absolute_url
@@ -434,7 +435,8 @@ class TestGroupDetailsMembershipTab:
 
         # Membership card: missing member information.
         participant.phone = ""
-        participant.save()
+        with triggers.context():
+            participant.save()
         response = client.get(url)
         assertContains(response, display_email_txt, count=1)
         assertNotContains(response, display_phone_txt)

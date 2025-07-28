@@ -29,7 +29,7 @@ from itou.openid_connect.pro_connect.models import ProConnectEmployerData, ProCo
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from itou.utils.urls import get_absolute_url, get_safe_url, get_zendesk_form_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
@@ -242,10 +242,14 @@ def pro_connect_callback(request):
         is_successful = False
 
     try:
-        user, _ = pc_user_data.create_or_update_user(
-            enforce_kind=pro_connect_state.data.get("enforce_kind"),
-            login_only=pro_connect_state.data["channel"] == ProConnectChannel.NEXUS,
-        )
+        # This is a GET method, so fields_history middleware is short circuited but we still need a context
+        with triggers.context(
+            request_id=request.request_id if hasattr(request, "request_id") else None,
+        ):
+            user, _ = pc_user_data.create_or_update_user(
+                enforce_kind=pro_connect_state.data.get("enforce_kind"),
+                login_only=pro_connect_state.data["channel"] == ProConnectChannel.NEXUS,
+            )
     except InactiveUserException as e:
         logger.info("ProConnect login attempt with inactive user: %s", e.user)
         messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT))
