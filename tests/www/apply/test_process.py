@@ -4096,7 +4096,7 @@ def test_precriber_details_with_older_valid_approval(client, faker):
         reverse("apply:details_for_prescriber", kwargs={"job_application_id": new_job_application.pk})
     )
     # Must display approval status template (tested in many other places)
-    assertTemplateUsed(response, template_name="approvals/includes/box.html")
+    assertTemplateUsed(response, template_name="utils/templatetags/approval_box.html")
 
 
 @pytest.mark.parametrize(
