@@ -1,4 +1,5 @@
 import datetime
+import time
 
 from django.db import transaction
 
@@ -118,11 +119,25 @@ class Command(BaseCommand):
         # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,
         # we will need to setup a much more complicated sync mechanism, for instance by requesting every department one
         # by one. But so far we are not even close from half this quota.
-        raw_offers = pe_client.retrieve_all_offres(
+        raw_pec_offers = pe_client.retrieve_all_offres(
             natureContrat=pe_api_enums.NATURE_CONTRAT_PEC,
             delay_between_requests=datetime.timedelta(seconds=delay),
         )
-        self.logger.info(f"retrieved count={len(raw_offers)} PEC offers from FT API")
+        self.logger.info(f"retrieved count={len(raw_pec_offers)} PEC offers from FT API")
+        time.sleep(delay)
+        raw_ea_offers = pe_client.retrieve_all_offres(
+            entreprisesAdaptees=True,
+            delay_between_requests=datetime.timedelta(seconds=delay),
+        )
+        self.logger.info(f"retrieved count={len(raw_ea_offers)} EA offers from FT API")
+
+        # Merge the 2 lists, to handle the improbable case where a PEC offer comes from an EA company.
+        raw_offers = list(
+            (
+                {offer["id"]: offer for offer in raw_pec_offers} | {offer["id"]: offer for offer in raw_ea_offers}
+            ).values()
+        )
+        self.logger.info(f"retrieved count={len(raw_offers)} unique offers from FT API")
 
         added_offers = []
         updated_offers = []
