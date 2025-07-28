@@ -2988,7 +2988,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
 
         criterion1 = (
             AdministrativeCriteria.objects.level1().exclude(kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS).first()
@@ -3015,7 +3015,7 @@ class TestDirectHireFullProcess:
         # Hire confirmation
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
@@ -3071,7 +3071,7 @@ class TestDirectHireFullProcess:
         # Get application detail
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assertTemplateUsed(response, "approvals/includes/box.html")
+        assertTemplateUsed(response, "utils/templatetags/approval_box.html")
         assert response.status_code == 200
 
     @freeze_time()
@@ -3117,7 +3117,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
 
         prev_applicaitons_url = reverse(
             "apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session_name}
@@ -3130,7 +3130,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         response = client.get(prev_applicaitons_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         geiq_eligibility_url = reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, geiq_eligibility_url, fetch_redirect_response=False)
 
@@ -3142,7 +3142,7 @@ class TestDirectHireFullProcess:
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
 
         response = client.get(geiq_eligibility_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         response = client.post(
             geiq_eligibility_url,
             data={"choice": "True"},
@@ -3171,7 +3171,7 @@ class TestDirectHireFullProcess:
         # Hire confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Valider l’embauche")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
@@ -4961,7 +4961,7 @@ class TestCheckJobSeekerInformationsForHire:
         )
         response = client.get(url_check_infos)
         assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Éligibilité IAE à valider")
         params = {
             "job_seeker_public_id": job_seeker.public_id,
@@ -4998,7 +4998,7 @@ class TestCheckJobSeekerInformationsForHire:
         )
         response = client.get(url_check_infos)
         assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": url_check_infos,
@@ -5033,7 +5033,7 @@ class TestCheckPreviousApplicationsForHireView:
         # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
@@ -5054,7 +5054,7 @@ class TestCheckPreviousApplicationsForHireView:
         # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
@@ -5076,7 +5076,7 @@ class TestCheckPreviousApplicationsForHireView:
         # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
-        assertTemplateNotUsed(response, "approvals/includes/box.html")
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),

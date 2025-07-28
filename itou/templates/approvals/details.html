@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load approvals %}
 {% load components %}
 {% load format_filters %}
 {% load matomo %}
@@ -45,7 +46,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    {% include "approvals/includes/box.html" with detail_view_version=True extra_classes='mb-3 mb-md-4' %}
+                    {% approval_details_box approval=approval detail_view_version=True extra_classes='mb-3 mb-md-4' %}
                 </div>
             </div>
             <div class="row">

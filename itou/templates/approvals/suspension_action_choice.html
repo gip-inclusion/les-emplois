@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load approvals %}
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
@@ -48,7 +49,7 @@
                     </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% include "approvals/includes/box.html" with approval=suspension.approval extra_classes='mb-3 mb-md-4' only %}
+                    {% approval_details_box approval=suspension.approval extra_classes='mb-3 mb-md-4' %}
                 </div>
             </div>
         </div>
