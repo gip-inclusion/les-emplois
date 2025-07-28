@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
@@ -56,6 +57,7 @@ from itou.utils.admin import (
 )
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import is_france_travail_id_format
+from itou.utils.views import with_triggers_context
 
 
 logger = logging.getLogger(__name__)
@@ -354,6 +356,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         ),
     ]
 
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
@@ -471,6 +477,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "external_data_source_history_formatted",
                 "first_login",
                 "terms_accepted_at",
+                "fields_history_formatted",
             ]
         )
         if not request.user.is_superuser:
@@ -554,9 +561,15 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         fieldsets.append(
             (
                 "Audit",
-                {"fields": ("external_data_source_history_formatted",)},
+                {
+                    "fields": (
+                        "fields_history_formatted",
+                        "external_data_source_history_formatted",
+                    )
+                },
             )
         )
+
         return fieldsets
 
     def get_search_fields(self, request):
@@ -664,6 +677,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def get_change_view_title(self, obj) -> str:
         return f"Modifier l’utilisateur {obj.get_full_name()} · {obj._meta.object_name}(pk={obj.pk})"
 
+    @method_decorator(with_triggers_context())
     def deactivate_view(self, request, user_pk):
         if not self.has_change_permission(request):
             raise PermissionDenied

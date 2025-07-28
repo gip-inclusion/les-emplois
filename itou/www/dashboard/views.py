@@ -292,6 +292,7 @@ class ItouPasswordChangeView(PasswordChangeView):
 
 
 @bypass_terms_acceptance
+@with_triggers_context()
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()
