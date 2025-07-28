@@ -22,7 +22,7 @@ class TestAnnouncementCampaignCache:
 
     def test_active_announcement_campaign_context_processor_cached(self):
         campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
-        request = RequestFactory()
+        request = RequestFactory().get("/")
         request.user = random_user_kind_factory()
 
         with assertNumQueries(0):
@@ -63,7 +63,7 @@ class TestAnnouncementCampaignCache:
             assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
-        request = RequestFactory()
+        request = RequestFactory().get("/")
         request.user = random_user_kind_factory()
         cache_updated_query_cost = 1
 
@@ -74,7 +74,7 @@ class TestAnnouncementCampaignCache:
             assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_for_anonymous_user(self):
-        request = RequestFactory()
+        request = RequestFactory().get("/")
         request.user = AnonymousUser()
 
         with assertNumQueries(0):
@@ -83,7 +83,7 @@ class TestAnnouncementCampaignCache:
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
-        request = RequestFactory()
+        request = RequestFactory().get("/")
         request.user = random_user_kind_factory()
 
         with assertNumQueries(0):
