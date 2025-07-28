@@ -370,9 +370,9 @@ django==5.2.4 \
 django-allauth==65.10.0 \
     --hash=sha256:47daa3b0e11a1d75724ea32995de37bd2b8963e9e4cce2b3a7fd64eb6d3b3c48
     # via -r requirements/base.txt
-django-anymail==13.0 \
-    --hash=sha256:6da4465eff18f679955f74332501a3a4299e34079015d91e1fce9c049d784d6c \
-    --hash=sha256:87f42d9ff12a9a029d5e88edaaf62a4b880aa9a6a7ef937042b7e96579e6db07
+django-anymail==13.0.1 \
+    --hash=sha256:f2c20c9f240d93789aa8da2ee54d701c6b0345d101133d65d67e9355a914af81 \
+    --hash=sha256:fd93b36c167eb968bd68a351218c29ae23a68682e67340ae8554478cf27f9d56
     # via -r requirements/base.txt
 django-appconf==1.1.0 \
     --hash=sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f \
