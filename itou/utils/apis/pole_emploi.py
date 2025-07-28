@@ -248,8 +248,10 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
     def referentiel(self, code):
         return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")
 
-    def offres(self, typeContrat="", natureContrat="", range=None):
+    def offres(self, typeContrat="", natureContrat="", entreprisesAdaptees=None, range=None):
         params = {"typeContrat": typeContrat, "natureContrat": natureContrat}
+        if entreprisesAdaptees is not None:
+            params["entreprisesAdaptees"] = entreprisesAdaptees
         if range:
             params["range"] = range
         data = self._request(f"{self.base_url}/offresdemploi/v2/offres/search", params=params, method="GET")
@@ -257,14 +259,26 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
             return []
         return data["resultats"]
 
-    def retrieve_all_offres(self, typeContrat="", natureContrat="", *, delay_between_requests=datetime.timedelta(0)):
+    def retrieve_all_offres(
+        self,
+        typeContrat="",
+        natureContrat="",
+        *,
+        entreprisesAdaptees=None,
+        delay_between_requests=datetime.timedelta(0),
+    ):
         # NOTE: using this unfiltered API we can only sync at most OFFERS_MAX_RANGE offers.
         # If someday there are more offers, we will need to setup a much more complicated sync mechanism, for instance
         # by requesting every department one by one. But so far we are not even close from half this quota.
         raw_offers = []
         for i in range(OFFERS_MIN_INDEX, OFFERS_MAX_INDEX, OFFERS_MAX_RANGE):
             max_range = min(OFFERS_MAX_INDEX, i + OFFERS_MAX_RANGE - 1)
-            offers = self.offres(typeContrat=typeContrat, natureContrat=natureContrat, range=f"{i}-{max_range}")
+            offers = self.offres(
+                typeContrat=typeContrat,
+                natureContrat=natureContrat,
+                entreprisesAdaptees=entreprisesAdaptees,
+                range=f"{i}-{max_range}",
+            )
             logger.info(f"retrieved count={len(offers)} offers from FT API")
             if not offers:
                 break

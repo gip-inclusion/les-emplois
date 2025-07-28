@@ -228,6 +228,16 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         )
         assert self.api_client.offres(range="100-140") == []
 
+        EA_OFFERS = [{**offer, "entrepriseAdaptee": True} for offer in pole_emploi_api_mocks.API_OFFRES]
+
+        respx.get(
+            "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true&range=0-1"
+        ).respond(
+            206,  # test code 206 as we already know that 200 is tested through the other tests
+            json={"resultats": EA_OFFERS},
+        )
+        assert self.api_client.offres(entreprisesAdaptees=True, range="0-1") == EA_OFFERS
+
     @respx.mock
     def test_appellations(self):
         respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
