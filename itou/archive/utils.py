@@ -44,9 +44,7 @@ def count_related_subquery(model, fk_field, outer_ref_field, extra_filters=None)
 
 
 def inactive_jobseekers_without_recent_related_objects(inactive_since, notified, batch_size=None):
-    recent_approval = Approval.objects.filter(
-        Q(end_at__gt=inactive_since) | Q(updated_at__gt=inactive_since), user_id=OuterRef("pk")
-    )
+    recent_approval = Approval.objects.filter(end_at__gt=inactive_since, user_id=OuterRef("pk"))
     recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
         expires_at__gt=inactive_since, job_seeker_id=OuterRef("pk")
     )
