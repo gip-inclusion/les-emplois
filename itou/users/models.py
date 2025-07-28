@@ -335,6 +335,14 @@ class User(AbstractUser, AddressMixin):
         null=True,
         encoder=DjangoJSONEncoder,
     )
+    fields_history = ArrayField(
+        models.JSONField(
+            encoder=DjangoJSONEncoder,
+        ),
+        verbose_name="historique des champs modifiés sur le modèle",
+        default=list,
+        db_default=[],
+    )
 
     last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
 
@@ -397,6 +405,22 @@ class User(AbstractUser, AddressMixin):
             ("hijack", "Can impersonate (hijack) other accounts"),
             ("export_cta", "Can export CTA file"),
             ("merge_users", "Can merge users"),
+        ]
+        triggers = [
+            FieldsHistory(
+                name="user_fields_history",
+                fields=[
+                    "first_name",
+                    "last_name",
+                    "title",
+                    "email",
+                    "phone",
+                    "address_line_1",
+                    "address_line_2",
+                    "post_code",
+                    "city",
+                ],
+            )
         ]
 
     def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
@@ -1224,7 +1248,17 @@ class JobSeekerProfile(models.Model):
             ),
         ]
         triggers = [
-            FieldsHistory(name="job_seeker_profile_fields_history", fields=["asp_uid", "is_not_stalled_anymore"])
+            FieldsHistory(
+                name="job_seeker_profile_fields_history",
+                fields=[
+                    "asp_uid",
+                    "birthdate",
+                    "birth_place",
+                    "birth_country",
+                    "is_not_stalled_anymore",
+                    "pole_emploi_id",
+                ],
+            )
         ]
 
     def __str__(self):

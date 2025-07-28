@@ -20,7 +20,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, RSAAllocation
+from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import (
@@ -1142,6 +1142,55 @@ def test_job_seeker_profile_asp_uid_field_history():
     assert datetime.datetime.fromisoformat(profile.fields_history[-1]["_timestamp"]).timestamp() == pytest.approx(
         datetime.datetime.now().timestamp()
     )
+
+
+@pytest.mark.parametrize(
+    "factory,field,value",
+    [
+        pytest.param(JobSeekerProfileFactory, "asp_uid", "000000000000000000000000000002", id="asp_uid"),
+        pytest.param(JobSeekerProfileFactory, "birthdate", datetime.date(2000, 1, 1), id="birthdate"),
+        pytest.param(JobSeekerProfileFactory, "birth_country_id", "BAHAMAS", id="birth_country"),
+        pytest.param(JobSeekerProfileFactory, "birth_place_id", "STRASBOURG", id="birth_place"),
+        pytest.param(JobSeekerProfileFactory, "is_not_stalled_anymore", False, id="is_not_stalled_anymore"),
+        pytest.param(JobSeekerProfileFactory, "pole_emploi_id", "12345678944", id="pole_emploi_id"),
+        pytest.param(JobSeekerFactory, "first_name", "Dolorès", id="first_name"),
+        pytest.param(JobSeekerFactory, "last_name", "Madrigal", id="last_name"),
+        pytest.param(JobSeekerFactory, "title", "MME", id="title"),
+        pytest.param(JobSeekerFactory, "email", "hush@madrigal.com", id="email"),
+        pytest.param(JobSeekerFactory, "phone", "0612345678", id="phone"),
+        pytest.param(JobSeekerFactory, "address_line_1", "Calle del encanto", id="address_line_1"),
+        pytest.param(JobSeekerFactory, "address_line_2", "Finca Madrigal", id="address_line_2"),
+        pytest.param(JobSeekerFactory, "post_code", "34570", id="post_code"),
+        pytest.param(JobSeekerFactory, "city", "Montarnaud", id="city"),
+    ],
+)
+def test_job_seeker_profile_field_history(factory, field, value):
+    """
+    Light version of `test_job_seeker_profile_asp_uid_field_history`
+    that only check if keys are present because the whole
+    system is already tested.
+    Also, types of monitored fields are different, making testing their value
+    not that obvious.
+    """
+    attr = {}
+    match field:
+        case "birth_country_id":
+            value = Country.objects.get(name=value).pk
+        case "birth_place_id":
+            value = Commune.objects.current().get(name=value).pk
+        case "title":
+            # JobSeekerFactory.title being random, force its value
+            # to ensure a change is made.
+            attr["title"] = "M"
+
+    obj = factory(**attr)
+    assert obj.fields_history == []
+
+    setattr(obj, field, value)
+    with triggers.context():
+        obj.save(update_fields=[field])
+    obj.refresh_from_db()
+    assert field in obj.fields_history[0]["after"].keys()
 
 
 @pytest.mark.parametrize(

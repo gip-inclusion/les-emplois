@@ -263,7 +263,7 @@ def test_change_asp_uid(admin_client):
             "_continue": "Enregistrer+et+continuer+les+modifications",
             "user": profile.user.pk,
             "asp_uid": "000000000000000000000000000001",
-            "birthdate": "",
+            "birthdate": profile.birthdate.isoformat(),
             "birth_place": "",
             "birth_country": "",
             "education_level": "",
