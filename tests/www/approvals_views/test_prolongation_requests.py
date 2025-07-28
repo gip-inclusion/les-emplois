@@ -19,7 +19,7 @@ from tests.files.factories import FileFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 @pytest.mark.parametrize(

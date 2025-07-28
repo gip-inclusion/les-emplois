@@ -6,7 +6,7 @@ import factory
 import factory.fuzzy
 from django.utils import timezone
 
-from tests.utils.test import create_fake_postcode
+from tests.utils.testing import create_fake_postcode
 
 
 class GeiqLabelDataFactory(factory.DictFactory):

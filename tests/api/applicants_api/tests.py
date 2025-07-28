@@ -8,7 +8,7 @@ from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.testing import BASE_NUM_QUERIES
 
 
 class TestApplicantsAPI:

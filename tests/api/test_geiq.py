@@ -18,7 +18,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 def _api_client():

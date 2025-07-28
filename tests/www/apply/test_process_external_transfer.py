@@ -15,7 +15,7 @@ from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 

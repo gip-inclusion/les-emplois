@@ -5,7 +5,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def tests_employers_without_company(client, snapshot):

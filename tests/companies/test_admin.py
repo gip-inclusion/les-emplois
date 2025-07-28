@@ -22,7 +22,7 @@ from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory
-from tests.utils.test import (
+from tests.utils.testing import (
     BASE_NUM_QUERIES,
     assertSnapshotQueries,
     get_rows_from_streaming_response,

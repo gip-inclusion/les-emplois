@@ -9,7 +9,7 @@ from itou.utils.templatetags.format_filters import format_approval_number, forma
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestSummaryEmployeeRecords:

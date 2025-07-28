@@ -15,7 +15,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 def test_transferable_states(subtests):

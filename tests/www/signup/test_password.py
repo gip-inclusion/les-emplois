@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertRedirects
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestPasswordReset:

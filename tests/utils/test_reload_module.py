@@ -3,7 +3,7 @@ import sys
 from django.conf import settings
 from django.test import override_settings
 
-from tests.utils.test import reload_module
+from tests.utils.testing import reload_module
 
 
 SOME_VALUE = settings.SECRET_KEY  # is mandatory

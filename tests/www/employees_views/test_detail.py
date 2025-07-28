@@ -16,7 +16,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestEmployeeDetailView:

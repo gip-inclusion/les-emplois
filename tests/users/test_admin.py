@@ -15,7 +15,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
-from tests.utils.test import normalize_fields_history
+from tests.utils.testing import normalize_fields_history
 
 
 def test_search(admin_client):

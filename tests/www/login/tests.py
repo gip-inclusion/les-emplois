@@ -32,7 +32,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.test import parse_response_to_soup, pretty_indented, reload_module
+from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
 
 
 PRO_CONNECT_BTN = 'class="proconnect-button"'

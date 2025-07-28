@@ -15,7 +15,7 @@ from itou.utils.mocks.rdv_insertion import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture(autouse=True)

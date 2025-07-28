@@ -90,7 +90,7 @@ from tests.users.factories import (
     PrescriberFactory,
     random_user_kind_factory,
 )
-from tests.utils.test import create_fake_postcode, parse_response_to_soup, pretty_indented
+from tests.utils.testing import create_fake_postcode, parse_response_to_soup, pretty_indented
 
 
 def get_response_for_middlewaremixin(request):

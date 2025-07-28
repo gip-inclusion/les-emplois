@@ -12,7 +12,7 @@ from itou.employee_record.models import EmployeeRecord
 from tests.employee_record import factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_schedule_approval_update_notification_when_notification_do_not_exists(admin_client):

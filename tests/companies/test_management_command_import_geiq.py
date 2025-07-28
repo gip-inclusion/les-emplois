@@ -3,7 +3,7 @@ from faker import Faker
 
 from itou.companies.management.commands.import_geiq import get_geiq_df
 from itou.utils.export import generate_excel_sheet
-from tests.utils.test import create_fake_postcode
+from tests.utils.testing import create_fake_postcode
 
 
 faker = Faker()

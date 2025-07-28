@@ -11,7 +11,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from tests.api.utils import _str_with_tz
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 ENDPOINT_URL = reverse("v1:siaes-list")

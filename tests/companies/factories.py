@@ -14,7 +14,7 @@ from itou.jobs.models import Appellation
 from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory
-from tests.utils.test import create_fake_postcode
+from tests.utils.testing import create_fake_postcode
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]

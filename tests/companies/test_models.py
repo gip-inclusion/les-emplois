@@ -30,7 +30,7 @@ from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import normalize_fields_history
+from tests.utils.testing import normalize_fields_history
 
 
 class TestCompanyFactories:

@@ -49,7 +49,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 def create_batch_of_job_applications(company, *, size=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):

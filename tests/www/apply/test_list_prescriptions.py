@@ -24,7 +24,7 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import (
+from tests.utils.testing import (
     assert_previous_step,
     assertSnapshotQueries,
     get_rows_from_streaming_response,

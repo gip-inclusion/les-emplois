@@ -37,7 +37,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import ItouClient, assert_previous_step
+from tests.utils.testing import ItouClient, assert_previous_step
 
 
 class PrescriberMixin:

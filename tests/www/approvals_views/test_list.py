@@ -13,7 +13,7 @@ from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:

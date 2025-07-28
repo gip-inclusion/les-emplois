@@ -17,7 +17,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response
+from tests.utils.testing import BASE_NUM_QUERIES, get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:

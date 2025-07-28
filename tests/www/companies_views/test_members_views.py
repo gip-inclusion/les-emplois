@@ -15,7 +15,7 @@ from tests.companies.factories import (
 )
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestMembers:

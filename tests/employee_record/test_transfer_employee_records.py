@@ -15,7 +15,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 @pytest.fixture(name="command")

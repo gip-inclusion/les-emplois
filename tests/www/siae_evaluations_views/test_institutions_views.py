@@ -37,7 +37,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
 
@@ -2629,7 +2629,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 "temporary_suspension_to": "invalid",
             },
         )
-        from tests.utils.test import pprint_html
+        from tests.utils.testing import pprint_html
 
         pprint_html(response, name="form")
         assertContains(

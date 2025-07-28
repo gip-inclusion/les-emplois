@@ -16,7 +16,7 @@ from tests.geiq_assessments.factories import (
 )
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestListAssessmentsView:

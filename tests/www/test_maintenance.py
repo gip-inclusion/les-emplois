@@ -2,7 +2,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertNumQueries
 
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_maintenance(client, settings, snapshot):

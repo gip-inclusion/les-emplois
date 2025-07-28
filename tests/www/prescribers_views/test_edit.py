@@ -10,7 +10,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
-from tests.utils.test import assert_previous_step, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assert_previous_step, parse_response_to_soup, pretty_indented
 
 
 class TestCardView:

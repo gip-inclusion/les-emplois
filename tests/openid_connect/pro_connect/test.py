@@ -14,7 +14,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.openid_connect.pro_connect import constants
 from itou.users.enums import IdentityProvider
 from itou.utils.urls import add_url_params
-from tests.utils.test import reload_module
+from tests.utils.testing import reload_module
 
 
 OIDC_USERINFO = {

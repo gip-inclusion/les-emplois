@@ -28,7 +28,7 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestListEmployeeRecords:

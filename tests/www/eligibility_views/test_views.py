@@ -11,7 +11,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestUpdateEligibilityView:
