@@ -1,4 +1,4 @@
-{% load tally %}
+{% load support %}
 
 <a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
    href="{% url "job_seekers_views:nir_modification_request" public_id=job_application.job_seeker.public_id %}?back_url={{ back_url|default:"" }}"

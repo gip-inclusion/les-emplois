@@ -827,7 +827,7 @@ class TestUtilsTemplateTags:
         context = {
             "test_id": test_id,
         }
-        template = Template("{% load tally %}url:{% tally_form_url 'abcde' pk=test_id hard='coded'%}")
+        template = Template("{% load support %}url:{% tally_form_url 'abcde' pk=test_id hard='coded'%}")
         out = template.render(Context(context))
 
         assert f"url:{get_tally_form_url('abcde', pk=test_id, hard='coded')}" == out
