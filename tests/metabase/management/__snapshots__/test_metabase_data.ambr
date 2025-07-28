@@ -1,9 +1,9 @@
 # serializer version: 1
-# name: test_fetch[False][cache]
+# name: test_fetch_kpi[False][cache]
   OrderedDict({
   })
 # ---
-# name: test_fetch[False][logs]
+# name: test_fetch_kpi[False][logs]
   list([
     tuple(
       'itou.metabase.management.commands.metabase_data',
@@ -57,7 +57,7 @@
     ),
   ])
 # ---
-# name: test_fetch[False][stdout and stderr]
+# name: test_fetch_kpi[False][stdout and stderr]
   CaptureResult(
     err='',
     out='''
@@ -76,7 +76,7 @@
     ''',
   )
 # ---
-# name: test_fetch[True][cache]
+# name: test_fetch_kpi[True][cache]
   OrderedDict({
     <DatumKey.DATA_UPDATED_AT: 'data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
     <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
@@ -103,7 +103,7 @@
     }),
   })
 # ---
-# name: test_fetch[True][logs]
+# name: test_fetch_kpi[True][logs]
   list([
     tuple(
       'itou.metabase.management.commands.metabase_data',
@@ -162,7 +162,7 @@
     ),
   ])
 # ---
-# name: test_fetch[True][stdout and stderr]
+# name: test_fetch_kpi[True][stdout and stderr]
   CaptureResult(
     err='',
     out='',
@@ -185,7 +185,7 @@
     'Number of job seekers updated: exiting=3 entering=3 converging=2',
   ])
 # ---
-# name: test_show[stdout and stderr]
+# name: test_show_kpi[stdout and stderr]
   CaptureResult(
     err='',
     out='''
