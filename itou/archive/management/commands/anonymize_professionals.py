@@ -41,14 +41,13 @@ class Command(BaseCommand):
     def reset_notified_professionals_with_recent_activity(self):
         self.logger.info("Reseting inactive professionals with recent activity")
 
-        users_to_reset_qs = User.objects.filter(
+        reset_users_count = User.objects.filter(
             kind__in=UserKind.professionals(),
             upcoming_deletion_notified_at__isnull=False,
             last_login__gte=F("upcoming_deletion_notified_at"),
-        )
+        ).update(upcoming_deletion_notified_at=None)
 
-        reset_nb = users_to_reset_qs.update(upcoming_deletion_notified_at=None)
-        self.logger.info("Reset notified professionals with recent activity: %s", reset_nb)
+        self.logger.info("Reset notified professionals with recent activity: %s", reset_users_count)
 
     @transaction.atomic
     def anonymize_professionals_after_grace_period(self):
