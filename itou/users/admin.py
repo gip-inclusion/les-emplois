@@ -351,6 +351,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         ),
     ]
 
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
@@ -466,6 +470,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "external_data_source_history_formatted",
                 "first_login",
                 "terms_accepted_at",
+                "fields_history_formatted",
             ]
         )
         if not request.user.is_superuser:
@@ -549,9 +554,15 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         fieldsets.append(
             (
                 "Audit",
-                {"fields": ("external_data_source_history_formatted",)},
+                {
+                    "fields": (
+                        "fields_history_formatted",
+                        "external_data_source_history_formatted",
+                    )
+                },
             )
         )
+
         return fieldsets
 
     def get_search_fields(self, request):

@@ -189,7 +189,8 @@ class TestProcessViews:
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.save()
+        with triggers.context():
+            job_application.job_seeker.save()
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
         with triggers.context():
@@ -275,7 +276,8 @@ class TestProcessViews:
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.save()
+        with triggers.context():
+            job_application.job_seeker.save()
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
         with triggers.context():

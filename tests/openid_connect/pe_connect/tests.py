@@ -148,7 +148,8 @@ class TestPoleEmploiConnect:
 
         # Update user
         peamu_user_data.last_name = "DUPUIS"
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
@@ -164,7 +165,8 @@ class TestPoleEmploiConnect:
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.PE_CONNECT,
         )
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert not created
         assert user.last_name == PEAMU_USERINFO["family_name"]
         assert user.first_name == PEAMU_USERINFO["given_name"]
@@ -209,7 +211,8 @@ class TestPoleEmploiConnect:
             certifiable_by_api_particulier=True,
         )
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        user, created = peamu_user_data.create_or_update_user()
+        with triggers.context():
+            user, created = peamu_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
         assert user.first_name == job_seeker.first_name

@@ -263,7 +263,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         return users_qs
 
 
-class User(AbstractUser, AddressMixin):
+class User(AbstractUser, AddressMixin, AbstractFieldsHistoryModel):
     """
     Custom user model.
 
@@ -289,6 +289,20 @@ class User(AbstractUser, AddressMixin):
 
     More details in `itou.external_data.models` module
     """
+
+    # Configuration for AbstractHistoryModel
+    FIELDS_HISTORY_TRIGGER_NAME = "user_fields_history"
+    FIELDS_HISTORY_TRIGGER_FIELDS = [
+        "first_name",
+        "last_name",
+        "title",
+        "email",
+        "phone",
+        "address_line_1",
+        "address_line_2",
+        "post_code",
+        "city",
+    ]
 
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
 

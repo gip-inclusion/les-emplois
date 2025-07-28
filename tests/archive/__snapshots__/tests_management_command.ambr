@@ -1016,6 +1016,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1048,7 +1049,7 @@
                                          %s,
                                          %s)
                  AND "users_user"."upcoming_deletion_notified_at" <= %s)
-          ORDER BY 37 ASC,
+          ORDER BY 38 ASC,
                    "users_user"."upcoming_deletion_notified_at" ASC
           LIMIT 200
           FOR
@@ -1076,6 +1077,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1569,6 +1571,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",

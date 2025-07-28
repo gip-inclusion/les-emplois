@@ -728,12 +728,13 @@ class TestEditUserInfoView:
         # Phone but no title and no birthdate
         user.phone = "0123456789"
         user.address_line_1 = "123 rue de"
-        user.save(
-            update_fields=(
-                "address_line_1",
-                "phone",
+        with triggers.context():
+            user.save(
+                update_fields=(
+                    "address_line_1",
+                    "phone",
+                )
             )
-        )
         user.jobseeker_profile.birthdate = None
         with triggers.context():
             user.jobseeker_profile.save(update_fields={"birthdate"})
@@ -744,7 +745,8 @@ class TestEditUserInfoView:
         # No phone but title
         user.phone = ""
         user.title = Title.MME
-        user.save(update_fields=("phone", "title"))
+        with triggers.context():
+            user.save(update_fields=("phone", "title"))
         response = client.get(url)
         assertNotContains(response, MISSING_INFOS_WARNING_ID)
 

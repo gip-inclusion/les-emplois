@@ -27,7 +27,7 @@ from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import Title
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -1015,7 +1015,8 @@ class TestDashboardView:
         assertRedirects(response, reverse("dashboard:edit_user_info"))
 
         setattr(user, field, data)
-        user.save(update_fields=(field,))
+        with triggers.context():
+            user.save(update_fields=(field,))
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
