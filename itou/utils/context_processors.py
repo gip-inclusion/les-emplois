@@ -18,15 +18,12 @@ def matomo(request):
 
 
 def active_announcement_campaign(request):
-    if not (request.user and request.user.is_authenticated):
-        return {}
-    campaign = get_cached_active_announcement()
+    if request.user and request.user.is_authenticated:
+        if campaign := get_cached_active_announcement():
+            return {
+                "display_campaign_announce": True,
+                "active_campaign_announce": campaign,
+                "active_campaign_announce_items": campaign.items_for_template(request.user.kind),
+            }
 
-    return {
-        "active_campaign_announce": (campaign if campaign is not None and campaign.items.count() else None),
-        "active_campaign_announce_items": campaign.items_for_template(
-            request.user.kind if request.user.is_authenticated else None
-        )
-        if campaign is not None
-        else [],
-    }
+    return {"display_campaign_announce": False}

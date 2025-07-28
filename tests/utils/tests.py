@@ -1577,16 +1577,16 @@ def test_geiq_eligibility_badge(snapshot, is_eligible, for_job_seeker):
 
 
 def test_active_announcement_campaign_context_processor(client, empty_active_announcements_cache):
-    campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
+    AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
     response = client.get(reverse("search:employers_home"))
     assert response.status_code == 200
-    assert "active_campaign_announce" not in response.context
+    assert response.context["display_campaign_announce"] is False
 
     client.force_login(random_user_kind_factory())
     response = client.get(reverse("search:employers_home"))
     assert response.status_code == 200
-    assert response.context["active_campaign_announce"] == campaign
+    assert response.context["display_campaign_announce"] is True
 
 
 class TestUtilsParseResponseToSoup:
