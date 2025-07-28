@@ -897,7 +897,7 @@
       }),
       dict({
         'origin': list([
-          'IfNode[companies/job_description_list.html]',
+          'ForNode[companies/job_description_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[companies/job_description_list.html]',
           'job_description_list[www/companies_views/views.py]',
@@ -985,7 +985,7 @@
       }),
       dict({
         'origin': list([
-          'IfNode[companies/job_description_list.html]',
+          'ForNode[companies/job_description_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[companies/job_description_list.html]',
           'job_description_list[www/companies_views/views.py]',
@@ -1002,7 +1002,7 @@
       }),
       dict({
         'origin': list([
-          'IfNode[companies/job_description_list.html]',
+          'ForNode[companies/job_description_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[companies/job_description_list.html]',
           'job_description_list[www/companies_views/views.py]',

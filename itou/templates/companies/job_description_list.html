@@ -73,122 +73,118 @@
                         <p class="mb-0">
                             {{ job_pager.paginator.count }} {{ job_pager.paginator.count|pluralizefr:"métier exercé,métiers exercés" }}
                         </p>
-                        {% if job_pager %}
-                            <div class="table-responsive mt-3 mt-md-4">
-                                <table class="table table-hover">
-                                    <caption class="visually-hidden">Liste des métiers exercés</caption>
-                                    <thead>
+                        <div class="table-responsive mt-3 mt-md-4">
+                            <table class="table table-hover">
+                                <caption class="visually-hidden">Liste des métiers exercés</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Métiers</th>
+                                        <th scope="col">Localisation</th>
+                                        <th scope="col">Nbre de postes</th>
+                                        <th scope="col">Statut</th>
+                                        <th scope="col">Mise à jour</th>
+                                        <th scope="col" class="text-end w-100px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {# Special row for controlling spontaneous applications #}
+                                    <tr>
+                                        <td>
+                                            <strong>Candidatures spontanées</strong>
+                                        </td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>
+                                            {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=siae hx_swap_oob=False only %}
+                                        </td>
+                                        <td>
+                                            <span id="spontaneous_applications_open_since_cell">{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                        </td>
+                                        <td class="w-100px">
+                                            {% include "companies/includes/buttons/spontaneous_applications_refresh.html" with csrf_token=csrf_token request=request company=siae only %}
+                                        </td>
+                                    </tr>
+                                    {% for job_description in job_pager %}
                                         <tr>
-                                            <th scope="col">Métiers</th>
-                                            <th scope="col">Localisation</th>
-                                            <th scope="col">Nbre de postes</th>
-                                            <th scope="col">Statut</th>
-                                            <th scope="col">Mise à jour</th>
-                                            <th scope="col" class="text-end w-100px"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {# Special row for controlling spontaneous applications #}
-                                        <tr>
                                             <td>
-                                                <strong>Candidatures spontanées</strong>
-                                            </td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>
-                                                {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=siae hx_swap_oob=False only %}
+                                                <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                                   class="btn-link"
+                                                   {% matomo_event "candidature" "clic" "clic-metiers" %}
+                                                   aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
+                                                   title="{{ job_description.display_name }}">
+                                                    {{ job_description.display_name|truncatechars:50 }}
+                                                </a>
                                             </td>
                                             <td>
-                                                <span id="spontaneous_applications_open_since_cell">{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                                <span class="d-flex align-items-center">
+                                                    <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
+                                                    <span aria-label="{{ job_description.display_location }}" title="{{ job_description.display_location }}">{{ job_description.display_location|truncatechars:20 }}</span>
+                                                </span>
+                                            </td>
+                                            <td>{{ job_description.open_positions }}</td>
+                                            <td>
+                                                {# Change job description status form #}
+                                                <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="toggle_active" />
+                                                    <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
+                                                    <div class="form-check form-switch has-state-label">
+                                                        <input type="checkbox"
+                                                               class="form-check-input"
+                                                               name="job_description_is_active"
+                                                               id="job_description_is_active_{{ job_description.id }}"
+                                                               {% if job_description.is_active %}checked{% endif %}
+                                                               {% if siae.block_job_applications %}disabled{% endif %} />
+                                                        <label class="form-check-label" for="job_description_is_active_{{ job_description.id }}" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert">
+                                                        </label>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
                                             </td>
                                             <td class="w-100px">
-                                                {% include "companies/includes/buttons/spontaneous_applications_refresh.html" with csrf_token=csrf_token request=request company=siae only %}
-                                            </td>
-                                        </tr>
-                                        {% for job_description in job_pager %}
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
-                                                       class="btn-link"
-                                                       {% matomo_event "candidature" "clic" "clic-metiers" %}
-                                                       aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
-                                                       title="{{ job_description.display_name }}">
-                                                        {{ job_description.display_name|truncatechars:50 }}
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span class="d-flex align-items-center">
-                                                        <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
-                                                        <span aria-label="{{ job_description.display_location }}" title="{{ job_description.display_location }}">{{ job_description.display_location|truncatechars:20 }}</span>
-                                                    </span>
-                                                </td>
-                                                <td>{{ job_description.open_positions }}</td>
-                                                <td>
-                                                    {# Change job description status form #}
-                                                    <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="action" value="toggle_active" />
-                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                        <div class="form-check form-switch has-state-label">
-                                                            <input type="checkbox"
-                                                                   class="form-check-input"
-                                                                   name="job_description_is_active"
-                                                                   id="job_description_is_active_{{ job_description.id }}"
-                                                                   {% if job_description.is_active %}checked{% endif %}
-                                                                   {% if siae.block_job_applications %}disabled{% endif %} />
-                                                            <label class="form-check-label" for="job_description_is_active_{{ job_description.id }}" data-it-state-label-off="Fermé" data-it-state-label-on="Ouvert">
-                                                            </label>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <span id="job_description_{{ job_description.pk }}_list_cell_last_employer_update_at">{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
-                                                </td>
-                                                <td class="w-100px">
-                                                    {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=False job_description=job_description csrf_token=csrf_token request=request only %}
-                                                    <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
-                                                        <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
-                                                    </button>
-                                                    {# Modal for job description deletion #}
-                                                    <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModal{{ job_description.id }}" aria-hidden="true">
-                                                        <div class="modal-dialog modal-dialog-centered">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h3 class="modal-title" id="confirmDeleteModal{{ job_description.id }}">Supprimer la fiche de poste</h3>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <p>
-                                                                        Voulez-vous supprimer la fiche de poste <strong>{{ job_description.display_name }}</strong>&nbsp;?
-                                                                    </p>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <form method="post" hx-boost="true" class="d-block js-prevent-multiple-submit">
-                                                                        {% csrf_token %}
-                                                                        <input type="hidden" name="action" value="delete" />
-                                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                                        <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de la fiche de poste" type="button">
-                                                                            Annuler
-                                                                        </button>
-                                                                        <button class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
-                                                                            <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
-                                                                            <span>Supprimer</span>
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
+                                                {% include "companies/includes/buttons/job_description_refresh.html" with for_detail=False job_description=job_description csrf_token=csrf_token request=request only %}
+                                                <button class="btn btn-sm btn-link btn-ico-only" type="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}">
+                                                    <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce métier"></i>
+                                                </button>
+                                                {# Modal for job description deletion #}
+                                                <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModal{{ job_description.id }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h3 class="modal-title" id="confirmDeleteModal{{ job_description.id }}">Supprimer la fiche de poste</h3>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>
+                                                                    Voulez-vous supprimer la fiche de poste <strong>{{ job_description.display_name }}</strong>&nbsp;?
+                                                                </p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <form method="post" hx-boost="true" class="d-block js-prevent-multiple-submit">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="action" value="delete" />
+                                                                    <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
+                                                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de la fiche de poste" type="button">
+                                                                        Annuler
+                                                                    </button>
+                                                                    <button class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
+                                                                        <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
+                                                                        <span>Supprimer</span>
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% include "includes/pagination.html" with page=job_pager boost=True %}
-                        {% else %}
-                            <p>Aucun poste enregistré pour cette structure.</p>
-                        {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% include "includes/pagination.html" with page=job_pager boost=True %}
                     </div>
                 </div>
             </div>
