@@ -23,7 +23,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
-from tests.utils.test import reload_module
+from tests.utils.testing import reload_module
 
 
 PEAMU_USERINFO = {

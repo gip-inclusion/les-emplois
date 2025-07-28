@@ -5,7 +5,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertMessages, assertRedirects
 
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
-from tests.utils.test import normalize_fields_history
+from tests.utils.testing import normalize_fields_history
 
 
 def test_view(client):

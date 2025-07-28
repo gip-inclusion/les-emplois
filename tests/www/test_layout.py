@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_navigation_not_authenticated(snapshot, client):

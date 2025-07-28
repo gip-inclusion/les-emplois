@@ -9,7 +9,7 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
-from tests.utils.test import assert_previous_step
+from tests.utils.testing import assert_previous_step
 
 
 def test_list_accredited_organizations(client):

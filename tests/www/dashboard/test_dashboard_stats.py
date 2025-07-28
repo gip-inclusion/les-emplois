@@ -9,7 +9,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats.utils import STATS_PH_ORGANISATION_KIND_WHITELIST
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_index_stats_for_employer(snapshot, client):

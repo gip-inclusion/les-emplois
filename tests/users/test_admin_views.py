@@ -25,7 +25,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 def test_add_user(client):

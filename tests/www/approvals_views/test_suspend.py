@@ -15,7 +15,7 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestApprovalSuspendView:

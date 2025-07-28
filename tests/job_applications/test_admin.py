@@ -15,7 +15,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_create_employee_record(admin_client):

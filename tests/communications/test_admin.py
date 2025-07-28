@@ -11,7 +11,7 @@ from pytest_django.asserts import assertRedirects
 from itou.communications.models import AnnouncementCampaign
 from itou.files.models import File
 from tests.communications.factories import AnnouncementItemFactory
-from tests.utils.test import default_storage_ls_files
+from tests.utils.testing import default_storage_ls_files
 
 
 class TestAnnouncementItemAdmin:

@@ -31,7 +31,7 @@ from tests.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.test import ItouClient
+from tests.utils.testing import ItouClient
 
 
 @pytest.fixture(autouse=True)

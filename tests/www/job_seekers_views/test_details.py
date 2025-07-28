@@ -20,7 +20,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 def test_anonymous_user(client):

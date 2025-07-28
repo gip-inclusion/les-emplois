@@ -52,7 +52,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.test import normalize_fields_history
+from tests.utils.testing import normalize_fields_history
 
 
 class TestManager:

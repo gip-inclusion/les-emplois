@@ -66,7 +66,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import (
+from tests.utils.testing import (
     assertSnapshotQueries,
     default_storage_ls_files,
     get_session_name,

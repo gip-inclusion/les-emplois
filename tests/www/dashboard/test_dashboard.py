@@ -49,7 +49,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'

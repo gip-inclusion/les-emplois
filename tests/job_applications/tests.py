@@ -67,7 +67,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import excel_date_format, get_rows_from_streaming_response
+from tests.utils.testing import excel_date_format, get_rows_from_streaming_response
 
 
 class TestJobApplicationModel:

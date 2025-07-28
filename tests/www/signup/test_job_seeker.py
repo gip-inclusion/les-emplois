@@ -20,7 +20,7 @@ from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented, reload_module
+from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
 
 
 class TestJobSeekerSignup:

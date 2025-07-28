@@ -33,7 +33,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
 def gps_logs(caplog):

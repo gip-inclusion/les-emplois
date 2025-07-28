@@ -12,7 +12,7 @@ from tests.approvals.factories import (
 )
 from tests.cities.factories import create_city_geispolsheim
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.utils.test import load_template, pretty_indented
+from tests.utils.testing import load_template, pretty_indented
 
 
 public_id = "997a1eaf-6fad-4256-b371-31bb05c94862"

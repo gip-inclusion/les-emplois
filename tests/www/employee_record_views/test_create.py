@@ -26,7 +26,7 @@ from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 # Helper functions

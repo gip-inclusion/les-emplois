@@ -18,7 +18,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
-from tests.utils.test import reload_module
+from tests.utils.testing import reload_module
 
 
 FC_USERINFO = {

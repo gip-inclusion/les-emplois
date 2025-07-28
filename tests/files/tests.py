@@ -22,7 +22,7 @@ from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory
-from tests.utils.test import default_storage_ls_files
+from tests.utils.testing import default_storage_ls_files
 
 
 @pytest.mark.usefixtures("temporary_bucket")

@@ -16,7 +16,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 

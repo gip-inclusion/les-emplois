@@ -2,7 +2,7 @@ import pytest
 from django.template import Context
 
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
-from tests.utils.test import load_template
+from tests.utils.testing import load_template
 
 
 @pytest.mark.parametrize(

@@ -18,7 +18,7 @@ from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.test import ItouClient, assertSnapshotQueries
+from tests.utils.testing import ItouClient, assertSnapshotQueries
 
 
 class TestCompanySignup:

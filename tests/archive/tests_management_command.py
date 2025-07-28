@@ -61,7 +61,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)

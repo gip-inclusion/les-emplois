@@ -29,7 +29,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
 
 
 DDETS_refusal_comment_txt = "Commentaire de la DDETS"

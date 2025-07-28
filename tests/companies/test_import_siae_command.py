@@ -34,7 +34,7 @@ from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactor
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import normalize_fields_history
+from tests.utils.testing import normalize_fields_history
 
 
 class TestImportSiaeManagementCommands:

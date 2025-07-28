@@ -14,7 +14,7 @@ from itou.utils.templatetags.demo_accounts import (
     prescribers_accounts_tag,
 )
 from itou.utils.templatetags.nav import NAV_ENTRIES
-from tests.utils.test import pretty_indented
+from tests.utils.testing import pretty_indented
 
 
 def test_matomo_event(snapshot):

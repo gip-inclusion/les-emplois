@@ -5,7 +5,7 @@ import httpcore
 from django.urls import reverse
 
 from itou.www.companies_views import views
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_displayable_thematique():

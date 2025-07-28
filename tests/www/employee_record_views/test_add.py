@@ -8,7 +8,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
 def test_wizard(snapshot, client):

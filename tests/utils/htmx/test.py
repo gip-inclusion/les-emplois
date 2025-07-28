@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-from tests.utils.test import ItouClient, parse_response_to_soup
+from tests.utils.testing import ItouClient, parse_response_to_soup
 
 
 class HtmxClient(ItouClient):

@@ -17,7 +17,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     LaborInspectorFactory,
 )
-from tests.utils.test import get_session_name
+from tests.utils.testing import get_session_name
 
 
 class TestBatchArchive:

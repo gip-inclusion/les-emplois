@@ -29,7 +29,7 @@ from tests.prescribers.factories import (
 )
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
 
 

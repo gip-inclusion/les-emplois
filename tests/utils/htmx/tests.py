@@ -6,7 +6,7 @@ from django.urls import reverse
 from django_htmx.middleware import HtmxDetails
 
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import parse_response_to_soup
+from tests.utils.testing import parse_response_to_soup
 
 
 # Test htmx request factory

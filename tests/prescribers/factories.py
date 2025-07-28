@@ -9,7 +9,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from tests.users.factories import PrescriberFactory
-from tests.utils.test import create_fake_postcode
+from tests.utils.testing import create_fake_postcode
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):

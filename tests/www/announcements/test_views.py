@@ -8,7 +8,7 @@ from pytest_django.asserts import assertContains
 from itou.users.enums import UserKind
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestNewsRender:

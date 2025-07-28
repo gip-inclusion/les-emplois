@@ -9,7 +9,7 @@ from itou.employee_record.management.commands import transfer_employee_records_u
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
-from tests.utils.test import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries
 
 
 @pytest.fixture(name="command")

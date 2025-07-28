@@ -25,7 +25,7 @@ from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
-from tests.utils.test import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestApprovalDetailView:

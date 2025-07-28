@@ -8,7 +8,7 @@ from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import EmployerFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.testing import BASE_NUM_QUERIES
 
 
 NUM_QUERIES = BASE_NUM_QUERIES
