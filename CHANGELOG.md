@@ -1,5 +1,34 @@
 # Journal des modifications
 
+## 2025-07-28
+
+### Ajouté
+
+- [Vie privée : Anonymiser les candidats avec un PASS échu depuis plus de 2 ans](https://github.com/gip-inclusion/les-emplois/pull/6182)
+- [Vie privée : Anonymiser les PASS annulés, sans notification](https://github.com/gip-inclusion/les-emplois/pull/6553)
+- [Vie privée : Notifier les candidats avec un PASS échu depuis plus de 2 ans](https://github.com/gip-inclusion/les-emplois/pull/6551)
+- [Vie privée : Intégrer le formulaire de demande de régularisation NIR dans les Emplois à la place de Tally](https://github.com/gip-inclusion/les-emplois/pull/6452)
+
+### Modifié
+
+- [Admin : Autoriser les membres du support à supprimer un candidat qui a des infos dans GPS](https://github.com/gip-inclusion/les-emplois/pull/6577)
+- [Admin : Autoriser le traitement des demandes des PASS IAE manuel](https://github.com/gip-inclusion/les-emplois/pull/6560)
+- [Contrôle a posteriori : Accepter automatiquement les critères administratifs certifiés](https://github.com/gip-inclusion/les-emplois/pull/6252) 🖼
+- [Employeur : Modifier le texte du bandeau d'info avant dépublication des fiches de poste](https://github.com/gip-inclusion/les-emplois/pull/6605)
+- [GEIQ : Ajout de l'historique des actions sur la page de décision](https://github.com/gip-inclusion/les-emplois/pull/6578)
+- [GEIQ : Mise à jour du libellé pour l'ordre de reversement](https://github.com/gip-inclusion/les-emplois/pull/6572)
+- [GPS : Ajout d'un champ pour identifier les bénéficiaires lors des échanges avec FT](https://github.com/gip-inclusion/les-emplois/pull/6554)
+- [GPS : Nettoyage automatique de l'ID unique utilisé lors des échanges avec FT si les informations du compte candidat changent](https://github.com/gip-inclusion/les-emplois/pull/6571)
+- [PASS IAE : Clarification des erreurs d’acceptation d’une demande de prolongation](https://github.com/gip-inclusion/les-emplois/pull/6574)
+- [Pilotage : Ouvrir le TB "Suivi des bénéficiaires, taux d’encadrement et présence en emploi" à tous les PH](https://github.com/gip-inclusion/les-emplois/pull/6589)
+- [Recherche employeur : Fin de la pénalisation des entreprises recrutant sans fiche de poste dans les résultats de la recherche employeur](https://github.com/gip-inclusion/les-emplois/pull/6027)
+- [Vie privée : Ajuster le nombre de professionnels notifiés par jour](https://github.com/gip-inclusion/les-emplois/pull/6579)
+- [Vie privée : Réduire les possibilités de désanonymisation](https://github.com/gip-inclusion/les-emplois/pull/6573)
+
+### Supprimé
+
+- [Prescripteur : Supprimer le bandeau de prise de rendez-vous d'entretiens utilisateur](https://github.com/gip-inclusion/les-emplois/pull/6604)
+
 ## 2025-07-21
 
 ### Ajouté
