@@ -254,12 +254,11 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
     def test_notify_inactive_jobseekers_on_approval_expiration_date(self):
         inactivity_threshold = timezone.localdate() - INACTIVITY_PERIOD
-        long_time_ago = timezone.now() - relativedelta(years=3)
+        long_time_ago = timezone.localdate() - relativedelta(years=3)
         approval_kwargs = {
             "user__joined_days_ago": DAYS_OF_INACTIVITY,
-            "eligibility_diagnosis__expires_at": long_time_ago.date(),
-            "start_at": long_time_ago.date(),
-            "updated_at": long_time_ago,
+            "eligibility_diagnosis__expires_at": long_time_ago,
+            "start_at": long_time_ago,
         }
 
         approval_ended_before_inactivity_threshold = ApprovalFactory(
@@ -445,11 +444,10 @@ class TestAnonymizeJobseekersManagementCommand:
                 lambda jobseeker: ApprovalFactory(
                     user=jobseeker,
                     expired=True,
-                    updated_at=timezone.now() - relativedelta(years=3),
                     eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
                 ),
                 False,
-                id="notified_jobseeker_with_expired_approval_not_recently_updated",
+                id="notified_jobseeker_with_expired_approval",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(
@@ -459,10 +457,10 @@ class TestAnonymizeJobseekersManagementCommand:
                 lambda jobseeker: ApprovalFactory(
                     user=jobseeker,
                     expired=True,
-                    updated_at=timezone.now(),
+                    end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
                 ),
                 True,
-                id="notified_jobseeker_with_expired_approval_recently_updated",
+                id="notified_jobseeker_with_recently_expired_approval",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
@@ -891,7 +889,6 @@ class TestAnonymizeJobseekersManagementCommand:
         kwargs = {
             "start_at": datetime.date(2020, 1, 18),
             "end_at": datetime.date(2023, 1, 18),
-            "updated_at": timezone.now() - INACTIVITY_PERIOD,
             "user__joined_days_ago": DAYS_OF_INACTIVITY,
             "user__notified_days_ago": 30,
             "user__for_snapshot": True,
@@ -973,8 +970,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 state=state,
             )
 
-        Approval.objects.update(updated_at=timezone.now() - relativedelta(years=3))
-
         call_command("anonymize_jobseekers", wet_run=True)
 
         assert not Approval.objects.exists()
@@ -995,8 +990,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 end_at=start_at + relativedelta(years=2),
                 eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
             )
-
-        jobseeker.approvals.update(updated_at=timezone.now() - INACTIVITY_PERIOD)
 
         call_command("anonymize_jobseekers", wet_run=True)
 
@@ -1072,8 +1065,6 @@ class TestAnonymizeJobseekersManagementCommand:
             **kwargs,
         )
 
-        Approval.objects.update(updated_at=timezone.now() - relativedelta(years=3))
-
         call_command("anonymize_jobseekers", wet_run=True)
 
         assert not EligibilityDiagnosis.objects.exists()
@@ -1129,7 +1120,6 @@ class TestAnonymizeJobseekersManagementCommand:
             user=job_application.job_seeker,
             start_at=datetime.date(2020, 1, 18),
             end_at=datetime.date(2023, 1, 18),
-            updated_at=timezone.now() - INACTIVITY_PERIOD,
         )
         GEIQEligibilityDiagnosisFactory(
             job_seeker=job_application.job_seeker,
