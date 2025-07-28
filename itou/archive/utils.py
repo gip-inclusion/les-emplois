@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
-from itou.gps.models import FollowUpGroup
+from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
 from itou.users.models import User, UserKind
 
@@ -54,7 +54,9 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
         Q(expires_at__gt=inactive_since) | Q(updated_at__gt=inactive_since), job_seeker_id=OuterRef("pk")
     )
     recent_job_application = JobApplication.objects.filter(job_seeker_id=OuterRef("pk"), updated_at__gt=inactive_since)
-    recent_followup_group = FollowUpGroup.objects.filter(beneficiary_id=OuterRef("pk"), updated_at__gt=inactive_since)
+    recent_followup_group_contact = FollowUpGroupMembership.objects.filter(
+        follow_up_group__beneficiary_id=OuterRef("pk"), last_contact_at__gt=inactive_since
+    )
 
     qs = (
         User.objects.filter(
@@ -68,7 +70,7 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
             ~Exists(recent_eligibility_diagnosis),
             ~Exists(recent_geiq_eligibility_diagnosis),
             ~Exists(recent_job_application),
-            ~Exists(recent_followup_group),
+            ~Exists(recent_followup_group_contact),
         )
         .order_by("date_joined", "pk")
     )
