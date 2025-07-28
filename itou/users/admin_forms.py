@@ -25,7 +25,11 @@ class UserAdminForm(UserChangeForm):
     class Meta:
         model = User
         fields = "__all__"
-        exclude = ("public_id", "address_filled_at")
+        exclude = (
+            "public_id",
+            "address_filled_at",
+            "fields_history",
+        )
 
     def clean(self):
         self.cleaned_data["is_staff"] = self.instance.kind == UserKind.ITOU_STAFF
