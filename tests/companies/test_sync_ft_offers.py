@@ -24,6 +24,7 @@ def test_sync_ft_offers(caplog, respx_mock):
         {**offer, "natureContrat": pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]}
         for offer in API_OFFRES
     ]
+    EA_OFFERS = [{**offer, "id": offer["id"][::-1], "entrepriseAdaptee": True} for offer in API_OFFRES]
 
     city = City.objects.create(
         slug="slug",
@@ -54,6 +55,10 @@ def test_sync_ft_offers(caplog, respx_mock):
     respx_mock.get(f"{base_url}&range=900-1049").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=1050-1149").respond(204)
 
+    ea_base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true"
+    respx_mock.get(f"{ea_base_url}&range=0-149").respond(206, json={"resultats": EA_OFFERS})
+    respx_mock.get(f"{ea_base_url}&range=150-299").respond(206, json={"resultats": []})
+
     management.call_command("sync_ft_offers", wet_run=True, delay=0)
     assert caplog.messages[-1].startswith(
         "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
@@ -62,25 +67,43 @@ def test_sync_ft_offers(caplog, respx_mock):
         "retrieved count=2 offers from FT API",
         "retrieved count=0 offers from FT API",
         "retrieved count=2 PEC offers from FT API",
+        "retrieved count=2 offers from FT API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=2 EA offers from FT API",
+        "retrieved count=4 unique offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
-        "successfully created count=1 PE job offers",
+        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
+        "successfully created count=2 PE job offers",
         "successfully updated count=0 PE job offers",
         "successfully deleted count=0 PE job offers",
     ]
 
-    job_description = JobDescription.objects.get()
-    assert job_description.custom_name == "Mécanicien de maintenance (F/H)."
-    assert job_description.location == city
-    assert job_description.appellation == appellation
-    assert job_description.description == "Sous la responsabilité, vous avez une mission"
-    assert job_description.market_context_description == "RANDSTAD"
-    assert job_description.source_kind == "PE_API"
-    assert job_description.source_url == "https://candidat.pole-emploi.fr/offres/recherche/detail/FOOBAR"
-    assert job_description.source_id == "FOOBAR"
-    assert job_description.source_tags == ["FT_PEC_OFFER"]
-    assert job_description.company.siret == POLE_EMPLOI_SIRET
-    assert job_description.contract_type == "PERMANENT"
-    assert job_description.other_contract_type == "Contrat à durée indéterminée"
+    [pec_job_description, ea_job_description] = JobDescription.objects.order_by("source_id").all()
+    assert pec_job_description.custom_name == "Mécanicien de maintenance (F/H)."
+    assert pec_job_description.location == city
+    assert pec_job_description.appellation == appellation
+    assert pec_job_description.description == "Sous la responsabilité, vous avez une mission"
+    assert pec_job_description.market_context_description == "RANDSTAD"
+    assert pec_job_description.source_kind == "PE_API"
+    assert pec_job_description.source_url == "https://candidat.pole-emploi.fr/offres/recherche/detail/FOOBAR"
+    assert pec_job_description.source_id == "FOOBAR"
+    assert pec_job_description.source_tags == ["FT_PEC_OFFER"]
+    assert pec_job_description.company.siret == POLE_EMPLOI_SIRET
+    assert pec_job_description.contract_type == "PERMANENT"
+    assert pec_job_description.other_contract_type == "Contrat à durée indéterminée"
+
+    assert ea_job_description.custom_name == "Mécanicien de maintenance (F/H)."
+    assert ea_job_description.location == city
+    assert ea_job_description.appellation == appellation
+    assert ea_job_description.description == "Sous la responsabilité, vous avez une mission"
+    assert ea_job_description.market_context_description == "RANDSTAD"
+    assert ea_job_description.source_kind == "PE_API"
+    assert ea_job_description.source_url == "https://candidat.pole-emploi.fr/offres/recherche/detail/FOOBAR"
+    assert ea_job_description.source_id == "RABOOF"
+    assert ea_job_description.source_tags == ["FT_EA_OFFER"]
+    assert ea_job_description.company.siret == POLE_EMPLOI_SIRET
+    assert ea_job_description.contract_type == "PERMANENT"
+    assert ea_job_description.other_contract_type == "Contrat à durée indéterminée"
 
     # test the update
     caplog.clear()
@@ -97,13 +120,18 @@ def test_sync_ft_offers(caplog, respx_mock):
         "retrieved count=2 offers from FT API",
         "retrieved count=0 offers from FT API",
         "retrieved count=2 PEC offers from FT API",
+        "retrieved count=2 offers from FT API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=2 EA offers from FT API",
+        "retrieved count=4 unique offers from FT API",
         "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
+        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
         "successfully created count=0 PE job offers",
-        "successfully updated count=1 PE job offers",
+        "successfully updated count=2 PE job offers",
         "successfully deleted count=0 PE job offers",
     ]
-    job_description.refresh_from_db()
-    assert job_description.custom_name == "NOUVEAU INTITULE"
+    pec_job_description.refresh_from_db()
+    assert pec_job_description.custom_name == "NOUVEAU INTITULE"
 
     # test the deletion
     caplog.clear()
@@ -118,8 +146,13 @@ def test_sync_ft_offers(caplog, respx_mock):
     assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
         "retrieved count=0 offers from FT API",
         "retrieved count=0 PEC offers from FT API",
+        "retrieved count=2 offers from FT API",
+        "retrieved count=0 offers from FT API",
+        "retrieved count=2 EA offers from FT API",
+        "retrieved count=2 unique offers from FT API",
+        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
         "successfully created count=0 PE job offers",
-        "successfully updated count=0 PE job offers",
+        "successfully updated count=1 PE job offers",
         "successfully deleted count=1 PE job offers",
     ]
-    assert JobDescription.objects.count() == 0
+    assert JobDescription.objects.count() == 1
