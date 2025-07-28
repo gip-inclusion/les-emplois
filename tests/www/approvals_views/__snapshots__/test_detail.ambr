@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -293,6 +293,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -467,6 +468,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -648,6 +650,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -750,6 +753,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -822,6 +826,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1052,6 +1057,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -1069,12 +1081,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1124,6 +1143,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1194,6 +1214,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1361,6 +1382,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1463,6 +1485,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -1535,6 +1558,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1602,6 +1626,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -1619,12 +1650,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1674,6 +1712,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1795,6 +1834,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2001,6 +2041,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2103,6 +2144,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -2175,6 +2217,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2242,6 +2285,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -2251,6 +2301,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2555,7 +2612,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -2605,6 +2662,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2779,6 +2837,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3047,6 +3106,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3149,6 +3209,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -3221,6 +3282,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3365,6 +3427,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -3382,12 +3451,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as job_seeker]
   dict({
-    'num_queries': 11,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -3437,6 +3513,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3507,6 +3584,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3674,6 +3752,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3776,6 +3855,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -3848,6 +3928,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -3915,6 +3996,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -3932,12 +4020,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -3987,6 +4082,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -4108,6 +4204,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -4314,6 +4411,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -4416,6 +4514,7 @@
                  T6."has_completed_welcoming_tour",
                  T6."created_by_id",
                  T6."external_data_source_history",
+                 T6."fields_history",
                  T6."last_checked_at",
                  T6."public_id",
                  T6."address_filled_at",
@@ -4488,6 +4587,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -4555,6 +4655,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -4564,6 +4671,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
