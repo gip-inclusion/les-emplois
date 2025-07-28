@@ -127,6 +127,12 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                     count=2,
                 )
 
+    def test_response_content_with_no_job_descriptions(self, client):
+        JobDescription.objects.all().delete()
+        client.force_login(self.user)
+        response = client.get(self.url)
+        assertContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+
     def test_ordering(self, client, subtests):
         self.company.job_description_through.all().delete()
         first = JobDescriptionFactory(company=self.company, last_employer_update_at=None)
