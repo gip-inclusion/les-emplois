@@ -66,6 +66,9 @@ class Command(BaseCommand):
         stalled_job_seekers = subparsers.add_parser("stalled-job-seekers")
         stalled_job_seekers.add_argument("--wet-run", dest="wet_run", action="store_true")
 
+        riae_contracts = subparsers.add_parser("riae-contracts")
+        riae_contracts.add_argument("--wet-run", dest="wet_run", action="store_true")
+
     def fetch_kpi(self):
         cache = caches[self.CACHE_NAME]
         client = Client(settings.METABASE_SITE_URL)
@@ -139,6 +142,47 @@ class Command(BaseCommand):
             converging_update_count,
         )
 
+    def fetch_riae_contracts(self):
+        client = Client(settings.METABASE_SITE_URL)
+
+        # Schema:
+        # [{'Contrat Date Embauche': '2023-01-01',
+        #   'Contrat Date Fin Contrat': '2023-04-30',
+        #   'Contrat Date Sortie Definitive': None,
+        #   'Contrat ID Ctr': ##########,
+        #   'Contrat ID Structure': ###,
+        #   'Contrat Mesure Disp Code': 'ACI_DC',
+        #   'Contrat Parent ID': ##########,
+        #   'Emplois Candidat ID': ##,
+        #   'Type Contrat': 'initial'}]
+        query = client.build_query(
+            table=2150,
+            order_by=[
+                62289,  # Emplois Candidat ID
+                62288,  # Contrat Parent ID
+                61917,  # Contrat ID Ctr
+            ],
+            limit=2,  # TODO: Remove
+        )
+
+        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
+        pprint.pp(contracts, sort_dicts=True)
+
+        # /!\ L'API Metabase ne permet d'exporter que 1_000_000 de lignes au maximum,
+        # il faut donc paginer et il n'y a pas d'OFFSET, mais ceci devrait faire l'affaire :
+        query = client.merge_query(
+            into=query,
+            query={
+                "filter": [
+                    "and",
+                    [">=", ["field", 62289, {"base-type": "type/Integer"}], contracts[-1]["Emplois Candidat ID"]],
+                    [">", ["field", 61917, {"base-type": "type/BigInteger"}], contracts[-1]["Contrat ID Ctr"]],
+                ]
+            },
+        )
+        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
+        pprint.pp(contracts, sort_dicts=True)
+
     @dry_runnable
     def handle(self, *, data, **options):
         match data:
@@ -150,3 +194,5 @@ class Command(BaseCommand):
                 action_function()
             case "stalled-job-seekers":
                 self.fetch_stalled_job_seekers()
+            case "riae-contracts":
+                self.fetch_riae_contracts()
