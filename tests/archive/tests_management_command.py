@@ -50,7 +50,7 @@ from tests.eligibility.factories import (
     IAEEligibilityDiagnosisFactory,
 )
 from tests.files.factories import FileFactory
-from tests.gps.factories import FollowUpGroupFactory
+from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -174,17 +174,17 @@ class TestNotifyInactiveJobseekersManagementCommand:
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
-                lambda jobseeker: FollowUpGroupFactory(
-                    beneficiary=jobseeker, updated_at=timezone.now() - INACTIVITY_PERIOD
+                lambda jobseeker: FollowUpGroupMembershipFactory(
+                    follow_up_group__beneficiary=jobseeker, last_contact_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 True,
-                id="jobseeker_in_followup_group_without_recent_activity",
+                id="jobseeker_in_followup_group_without_recent_contact",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
+                lambda jobseeker: FollowUpGroupMembershipFactory(follow_up_group__beneficiary=jobseeker),
                 False,
-                id="jobseeker_in_followup_group_with_recent_activity",
+                id="jobseeker_in_followup_group_with_recent_contact",
             ),
             pytest.param(
                 lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
@@ -483,9 +483,9 @@ class TestAnonymizeJobseekersManagementCommand:
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: FollowUpGroupFactory(beneficiary=jobseeker),
+                lambda jobseeker: FollowUpGroupMembershipFactory(follow_up_group__beneficiary=jobseeker),
                 True,
-                id="notified_jobseeker_with_recent_follow_up_group",
+                id="notified_jobseeker_with_recent_follow_up_group_contact",
             ),
             pytest.param(
                 lambda: ItouStaffFactory(
@@ -717,11 +717,13 @@ class TestAnonymizeJobseekersManagementCommand:
         assert respx_mock.calls.call_count == 1
 
     def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
-        jobseeker = JobSeekerFactory(
-            joined_days_ago=DAYS_OF_INACTIVITY,
-            notified_days_ago=31,
+        FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=JobSeekerFactory(
+                joined_days_ago=DAYS_OF_INACTIVITY,
+                notified_days_ago=31,
+            ),
+            last_contact_at=timezone.now() - INACTIVITY_PERIOD,
         )
-        FollowUpGroupFactory(beneficiary=jobseeker, memberships=2, updated_at=timezone.now() - INACTIVITY_PERIOD)
 
         assert FollowUpGroup.objects.exists()
         assert FollowUpGroupMembership.objects.exists()
@@ -729,7 +731,7 @@ class TestAnonymizeJobseekersManagementCommand:
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
-        assert not User.objects.filter(id=jobseeker.id).exists()
+        assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
         assert not FollowUpGroup.objects.exists()
         assert not FollowUpGroupMembership.objects.exists()
         assert AnonymizedJobSeeker.objects.exists()

@@ -3277,7 +3277,7 @@
     ]),
   })
 # ---
-# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_body]
+# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_contact][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
   Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
@@ -3290,7 +3290,7 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_activity][inactive_jobseeker_email_subject]
+# name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_contact][inactive_jobseeker_email_subject]
   '[DEV] Information avant suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_body]
