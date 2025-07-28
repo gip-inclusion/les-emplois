@@ -8,6 +8,11 @@
     tuple(
       'itou.metabase.management.commands.metabase_data',
       20,
+      'Command launched with wet_run=False',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
       'Fetching datum_key=flux_iae_data_updated_at',
     ),
     tuple(
@@ -54,6 +59,11 @@
       'itou.metabase.management.commands.metabase_data',
       20,
       'Fetching datum_key=rate_of_auto_prescription group_by=region',
+    ),
+    tuple(
+      'itou.metabase.management.commands.metabase_data',
+      20,
+      'Setting transaction to be rollback as wet_run=False',
     ),
   ])
 # ---
@@ -165,15 +175,31 @@
 # name: test_fetch_kpi[True][stdout and stderr]
   CaptureResult(
     err='',
-    out='',
+    out='''
+      {<DatumKey.DATA_UPDATED_AT: 'data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+       <DatumKey.FLUX_IAE_DATA_UPDATED_AT: 'flux_iae_data_updated_at'>: FakeDatetime(2024, 11, 20, 0, 0, tzinfo=datetime.timezone.utc),
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: 'job_application_with_hiring_difficulty'>: 1175,
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_DEPARTMENTS: 'job_application_with_hiring_difficulty_by_departments'>: {'Département Structure': 1175},
+       <DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY_BY_REGIONS: 'job_application_with_hiring_difficulty_by_regions'>: {'Région Structure': 1175},
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: 'job_seeker_still_seeking_after_30_days'>: 4413,
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_DEPARTMENTS: 'job_seeker_still_seeking_after_30_days_by_departments'>: {'Département': 4413},
+       <DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS_BY_REGIONS: 'job_seeker_still_seeking_after_30_days_by_regions'>: {'Région': 4413},
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION: 'rate_of_auto_prescription'>: 5292,
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_DEPARTMENTS: 'rate_of_auto_prescription_by_departments'>: {'Département Structure': 5292},
+       <DatumKey.RATE_OF_AUTO_PRESCRIPTION_BY_REGIONS: 'rate_of_auto_prescription_by_regions'>: {'Région Structure': 5292}}
+  
+    ''',
   )
 # ---
 # name: test_fetch_stalled_job_seekers[False][logs]
   list([
+    'Command launched with wet_run=False',
     'Number of stalled job seekers: 4',
     'Number of stalled job seekers in database: 4',
     'Number of job seekers exiting stalled status: 3',
     'Number of job seekers entering stalled status: 3',
+    'Number of job seekers updated: exiting=3 entering=3 converging=2',
+    'Setting transaction to be rollback as wet_run=False',
   ])
 # ---
 # name: test_fetch_stalled_job_seekers[True][logs]
