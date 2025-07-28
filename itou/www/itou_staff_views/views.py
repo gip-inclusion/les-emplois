@@ -436,6 +436,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 @http_methods(db_readonly=["GET", "HEAD"], db_write=["POST"])
 @check_user(lambda user: user.is_staff)
 @permission_required("users.merge_users")
+@with_triggers_context()
 def merge_users_confirm(
     request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
 ):

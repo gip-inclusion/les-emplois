@@ -4,11 +4,11 @@ from django.db import ProgrammingError, connection, transaction
 from psycopg.types.json import Jsonb
 
 from itou.companies.models import Company
-from itou.users.models import JobSeekerProfile
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.models import AbstractFieldsHistoryModel
 from tests.companies.factories import CompanyFactory
-from tests.users.factories import JobSeekerProfileFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerProfileFactory
 
 
 FIELDS_HISTORY_MODELS_TO_TEST_PARAMS = {
@@ -23,6 +23,12 @@ FIELDS_HISTORY_MODELS_TO_TEST_PARAMS = {
         "test_field": "asp_uid",
         "initial": "0" * 30,
         "update": "1" * 30,
+    },
+    User: {
+        "factory": ItouStaffFactory,
+        "test_field": "email",
+        "initial": "foo@example.com",
+        "update": "bar@example.com",
     },
 }
 

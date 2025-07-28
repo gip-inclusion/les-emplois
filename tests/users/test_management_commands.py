@@ -24,6 +24,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import ActionKind, IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email, sync_job_seeker_assignments
 from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
+from itou.utils import triggers
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
@@ -264,7 +265,8 @@ class TestCommandSendUsersToBrevo:
             user__identity_provider=IdentityProvider.DJANGO,
         ).user
         changed_email.email = "changed@mailinator.com"
-        changed_email.save(update_fields=["email"])
+        with triggers.connection_wrapper(), triggers.context():
+            changed_email.save(update_fields=["email"])
 
         annie = EmployerFactory(
             first_name="Annie",
@@ -399,7 +401,8 @@ class TestCommandSendUsersToBrevo:
                 user__identity_provider=IdentityProvider.DJANGO,
             ).user
             changed_email.email = f"changed+{organization}@mailinator.com"
-            changed_email.save(update_fields=["email"])
+            with triggers.connection_wrapper(), triggers.context():
+                changed_email.save(update_fields=["email"])
 
         import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})
@@ -472,7 +475,8 @@ class TestCommandSendUsersToBrevo:
         # New email not verified is ignored.
         changed_email = PrescriberFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
         changed_email.email = "changed@mailinator.com"
-        changed_email.save(update_fields=["email"])
+        with triggers.connection_wrapper(), triggers.context():
+            changed_email.save(update_fields=["email"])
 
         import_mock = respx_mock.post(f"{settings.BREVO_API_URL}/contacts/import").mock(
             return_value=httpx.Response(202, json={"processId": 106})

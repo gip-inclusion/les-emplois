@@ -650,6 +650,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -949,6 +950,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1063,9 +1065,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
@@ -1126,6 +1128,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1240,9 +1243,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -1302,6 +1305,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1405,6 +1409,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -1519,11 +1524,11 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 39 DESC,
+          ORDER BY 40 DESC,
                    "users_user"."id" DESC
           LIMIT 4
         ''',
@@ -1883,6 +1888,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2181,6 +2187,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2293,9 +2300,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."last_name" ASC,
                    "users_user"."first_name" ASC
@@ -2355,6 +2362,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2467,9 +2475,9 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -2528,6 +2536,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2631,6 +2640,7 @@
                  "users_user"."is_staff",
                  "users_user"."is_active",
                  "users_user"."date_joined",
+                 "users_user"."fields_history",
                  "users_user"."address_line_1",
                  "users_user"."address_line_2",
                  "users_user"."post_code",
@@ -2743,11 +2753,11 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   37,
                    38,
-                   40,
+                   39,
+                   41,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 39 DESC,
+          ORDER BY 40 DESC,
                    "users_user"."id" DESC
           LIMIT 3
         ''',
