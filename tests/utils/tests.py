@@ -1588,6 +1588,11 @@ def test_active_announcement_campaign_context_processor(client, empty_active_ann
     assert response.status_code == 200
     assert response.context["display_campaign_announce"] is True
 
+    client.force_login(ItouStaffFactory())
+    response = client.get(reverse("login:verify_otp") + "?next=%2Fadmin%2F")
+    assert response.status_code == 200
+    assert response.context["display_campaign_announce"] is False
+
 
 class TestUtilsParseResponseToSoup:
     def test_parse_wo_selector(self):

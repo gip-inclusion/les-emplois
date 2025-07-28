@@ -18,7 +18,7 @@ def matomo(request):
 
 
 def active_announcement_campaign(request):
-    if request.user and request.user.is_authenticated:
+    if request.user and request.user.is_authenticated and not request.path.startswith("/login/verify"):
         if campaign := get_cached_active_announcement():
             return {
                 "display_campaign_announce": True,
