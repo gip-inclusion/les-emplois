@@ -48,10 +48,10 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
         Q(end_at__gt=inactive_since) | Q(updated_at__gt=inactive_since), user_id=OuterRef("pk")
     )
     recent_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
-        Q(expires_at__gt=inactive_since) | Q(updated_at__gt=inactive_since), job_seeker_id=OuterRef("pk")
+        expires_at__gt=inactive_since, job_seeker_id=OuterRef("pk")
     )
     recent_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
-        Q(expires_at__gt=inactive_since) | Q(updated_at__gt=inactive_since), job_seeker_id=OuterRef("pk")
+        expires_at__gt=inactive_since, job_seeker_id=OuterRef("pk")
     )
     recent_job_application = JobApplication.objects.filter(job_seeker_id=OuterRef("pk"), updated_at__gt=inactive_since)
     recent_followup_group_contact = FollowUpGroupMembership.objects.filter(
