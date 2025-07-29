@@ -16,7 +16,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
-from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.files.models import save_file
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
@@ -818,14 +817,9 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.geiq_eligibility_diagnosis:
-            self.geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(
-                self.geiq_eligibility_diagnosis
-            )
         if self.eligibility_diagnosis:
             # The job_seeker object already contains a lot of information: no need to re-retrieve it
             self.eligibility_diagnosis.job_seeker = self.job_seeker
-            self.eligibility_diagnosis.criteria_display = iae_criteria_for_display(self.eligibility_diagnosis)
 
         context["expired_eligibility_diagnosis"] = None
         return context

@@ -20,7 +20,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
@@ -89,12 +88,6 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             )
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
-
-        if geiq_eligibility_diagnosis:
-            geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(geiq_eligibility_diagnosis)
-
-        if iae_eligibility_diagnosis:
-            iae_eligibility_diagnosis.criteria_display = iae_criteria_for_display(iae_eligibility_diagnosis)
 
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,

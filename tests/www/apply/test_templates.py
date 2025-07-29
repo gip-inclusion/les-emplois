@@ -4,7 +4,6 @@ import random
 import pytest
 from django.template import Context
 from django.test.client import RequestFactory
-from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML, assertNotInHTML
@@ -14,9 +13,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
-from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.tasks import certify_criteria
-from itou.eligibility.utils import _criteria_for_display, geiq_criteria_for_display, iae_criteria_for_display
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
@@ -207,10 +204,6 @@ class TestIAEEligibilityDetail:
         if diagnosis.is_from_employer:
             job_application.to_company = diagnosis.author_siae
             job_application.save()
-        # This is the way it's set in views.
-        diagnosis.criteria_display = iae_criteria_for_display(
-            diagnosis, hiring_start_at=job_application.hiring_start_at
-        )
         return {
             "eligibility_diagnosis": diagnosis,
             "request": request,
@@ -321,10 +314,7 @@ class TestGEIQEligibilityDetail:
     def template(self):
         return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
 
-    def default_params_geiq(self, diagnosis, job_application):
-        diagnosis.criteria_display = geiq_criteria_for_display(
-            diagnosis, hiring_start_at=job_application.hiring_start_at
-        )
+    def default_params_geiq(self, diagnosis):
         request = RequestFactory()
         # Force the value to not have to deal with the template heavily relying on user.is_employer
         request.from_authorized_prescriber = True
@@ -362,9 +352,9 @@ class TestGEIQEligibilityDetail:
             certifiable=True,
             criteria_kinds=[criteria_kind],
         )
-        job_application = self.create_job_application(diagnosis)
+        self.create_job_application(diagnosis)
         certify_criteria(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
@@ -376,14 +366,14 @@ class TestGEIQEligibilityDetail:
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
         # No certifiable criteria
-        job_application = self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
+        self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert certified_help_text not in rendered
 
         # Certifiable criteria but not certified.
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        job_application = self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
+        self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert certified_help_text in rendered
 
         # Certifiable and certified.
@@ -393,8 +383,8 @@ class TestGEIQEligibilityDetail:
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         certify_criteria(diagnosis)
-        job_application = self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
+        self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert certified_help_text in rendered
 
 
@@ -419,56 +409,18 @@ class TestCertifiedBadge:
         assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
-    @pytest.mark.parametrize(
-        "hiring_start_at,expected",
-        [
-            pytest.param(datetime.date(2024, 7, 31), False, id="Before validity period"),
-            pytest.param(datetime.date(2024, 8, 1), True, id="Start of validity period"),
-            pytest.param(
-                timezone.localdate()
-                + datetime.timedelta(days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS),
-                True,
-                id="End of validity period",
-            ),
-            pytest.param(
-                timezone.localdate()
-                + datetime.timedelta(days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS + 1),
-                False,
-                id="After validity period",
-            ),
-        ],
-    )
-    def test_certifiable_diagnosis_with_certifiable_criteria(self, mocker, factory, hiring_start_at, expected):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
-        diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-        )
-        certify_criteria(diagnosis)
-
-        [criterion] = _criteria_for_display([diagnosis.selected_administrative_criteria.get()], hiring_start_at)
-        rendered = self._render(criterion=criterion)
-        assert escape(criterion.administrative_criteria.name) in rendered
-        if expected:
-            assertInHTML(CERTIFIED_BADGE_HTML, rendered)
-            assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
-        else:
-            assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
-            assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
-
     @pytest.mark.parametrize("employer", [True, False])
     @pytest.mark.parametrize("authorized_prescriber", [True, False])
-    @pytest.mark.parametrize("is_considered_certified", [True, False])
+    @pytest.mark.parametrize("is_certified", [True, False])
     def test_badge_is_only_displayed_to_employer_or_authorized_prescriber(
-        self, factory, employer, authorized_prescriber, is_considered_certified
+        self, factory, employer, authorized_prescriber, is_certified
     ):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         diagnosis = factory(
             certifiable=True, criteria_kinds=[criteria_kind], from_prescriber=random.choice([None, True])
         )
         criterion = diagnosis.selected_administrative_criteria.get()
-        criterion.is_considered_certified = is_considered_certified
+        criterion.certified = is_certified
 
         rendered = self._render(
             request={"user": {"is_employer": employer}, "from_authorized_prescriber": authorized_prescriber},
@@ -477,7 +429,7 @@ class TestCertifiedBadge:
         if any([employer, authorized_prescriber]):
             expected, not_expected = (
                 (CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML)
-                if is_considered_certified
+                if is_certified
                 else (NOT_CERTIFIED_BADGE_HTML, CERTIFIED_BADGE_HTML)
             )
             assertInHTML(expected, rendered)

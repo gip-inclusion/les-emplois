@@ -22,7 +22,6 @@ from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
-from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
@@ -179,10 +178,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             .prefetch_related("selected_administrative_criteria__administrative_criteria")
             .first()
         )
-        if iae_eligibility_diagnosis:
-            iae_eligibility_diagnosis.criteria_display = iae_criteria_for_display(iae_eligibility_diagnosis)
-        if geiq_eligibility_diagnosis:
-            geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(geiq_eligibility_diagnosis)
 
         context |= {
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
