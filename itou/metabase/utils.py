@@ -1,5 +1,8 @@
 import datetime
+import urllib
 
+import httpx
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -45,3 +48,10 @@ def chunked_queryset(queryset, chunk_size=10000):
         yield queryset.filter(pk__gte=start_pk, pk__lt=end_pk)
         start_pk = end_pk
     yield queryset.filter(pk__gte=start_pk)
+
+
+def build_dbt_daily():
+    httpx.post(
+        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),
+        json={"conf": {}},
+    ).raise_for_status()

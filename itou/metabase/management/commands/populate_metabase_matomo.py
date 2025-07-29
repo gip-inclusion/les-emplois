@@ -12,7 +12,8 @@ from django.conf import settings
 from psycopg import sql
 from sentry_sdk.crons import monitor
 
-from itou.metabase.db import MetabaseDatabaseCursor, build_dbt_daily, create_table
+from itou.metabase.db import MetabaseDatabaseCursor, create_table
+from itou.metabase.utils import build_dbt_daily
 from itou.utils import constants
 from itou.utils.command import BaseCommand
 from itou.utils.date import monday_of_the_week
