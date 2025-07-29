@@ -1405,14 +1405,13 @@ class TestAnonymizeProfessionalManagementCommand:
         )
 
     @pytest.mark.parametrize("is_active", [True, False])
-    @freeze_time("2025-02-15")
     def test_anonymize_professionals_notification(
         self, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot, respx_mock
     ):
         factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
         factory(
-            joined_days_ago=DAYS_OF_INACTIVITY,
-            notified_days_ago=31,
+            date_joined=timezone.make_aware(datetime.datetime(2023, 5, 17)),
+            upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 6, 17)),
             is_active=is_active,
             for_snapshot=True,
             first_name="Micheline",
