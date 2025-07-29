@@ -388,12 +388,9 @@ def test_stats_iae_network_log_visit(client, view_name):
 
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
-@pytest.mark.parametrize(
-    "view_name",
-    ["stats_staff_service_indicators"],
-)
-def test_stats_staff(client, view_name):
+def test_stats_staff(client):
     # Login required
+    view_name = "stats_staff_service_indicators"
     url = reverse(f"stats:{view_name}")
     response = client.get(url)
     assertRedirects(response, reverse("account_login") + f"?next={url}")
