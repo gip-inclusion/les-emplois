@@ -179,14 +179,17 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         - job seekers for whom the user applied as a member of no organization
         - job seekers for whom the current user made a EligibilityDiagnosis as a member of organization
         - job seekers for whom the current user made a EligibilityDiagnosis as a member of no organization
+        - job seekers for whom the current user made a GEIQEligibilityDiagnosis as a member of organization
+        - job seekers for whom the current user made a GEIQEligibilityDiagnosis as a member of no organization
 
         With from_all_coworkers=True:
         - all the previous
         - job seekers created by a member of the organization
         - job seekers for whom a member of the organization applied
-        - job seekers for whom e member of the organization made a EligibilityDiagnosis
+        - job seekers for whom a member of the organization made a EligibilityDiagnosis
+        - job seekers for whom a member of the organization made a GEIQEligibilityDiagnosis
         """
-        from itou.eligibility.models import EligibilityDiagnosis
+        from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 
         job_application_model = apps.get_model("job_applications", "JobApplication")
 
@@ -212,7 +215,10 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
 
         created_job_seekers = self.filter(or_queries(job_seeker_filters))
         job_seekers_applications = job_application_model.objects.filter(or_queries(job_applications_filter))
-        job_seekers_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
+        job_seekers_iae_eligibility_diagnosis = EligibilityDiagnosis.objects.filter(
+            or_queries(eligibility_diagnosis_filters)
+        )
+        job_seekers_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
             or_queries(eligibility_diagnosis_filters)
         )
 
@@ -223,14 +229,18 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
             job_seekers_applications = job_seekers_applications.filter(
                 JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
             )
-            job_seekers_eligibility_diagnosis = job_seekers_eligibility_diagnosis.filter(
+            job_seekers_iae_eligibility_diagnosis = job_seekers_iae_eligibility_diagnosis.filter(
+                JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
+            )
+            job_seekers_geiq_eligibility_diagnosis = job_seekers_geiq_eligibility_diagnosis.filter(
                 JobSeekerProfileQuerySet.is_considered_stalled_condition(stalled, "job_seeker__jobseeker_profile__"),
             )
 
         return self.none().union(
             created_job_seekers.values_list("id", flat=True),
             job_seekers_applications.values_list("job_seeker_id", flat=True),
-            job_seekers_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
+            job_seekers_iae_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
+            job_seekers_geiq_eligibility_diagnosis.values_list("job_seeker_id", flat=True),
         )
 
     def search_by_full_name(self, name):
