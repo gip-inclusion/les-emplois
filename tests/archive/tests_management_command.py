@@ -999,7 +999,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_archive_jobseeker_with_eligibility_diagnosis(self, snapshot):
         kwargs = {
-            "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
+            "job_seeker__date_joined": timezone.make_aware(datetime.datetime(2020, 2, 16)),
             "job_seeker__notified_days_ago": DAYS_OF_GRACE,
         }
         # IAE Diagnosis from employer with approval
