@@ -112,7 +112,6 @@ class Command(BaseCommand):
             "insee_codes": self.populate_insee_codes,
             "departments": self.populate_departments,
             "enums": self.populate_enums,
-            "dbt_daily": self.build_dbt_daily,
             "gps_groups": self.populate_gps_groups,
             "gps_memberships": self.populate_gps_memberships,
         }
@@ -532,9 +531,6 @@ class Command(BaseCommand):
         )
         populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
 
-    def build_dbt_daily(self):
-        build_dbt_daily()
-
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
@@ -568,12 +564,12 @@ class Command(BaseCommand):
             self.populate_memberships()
             self.populate_gps_groups()
             self.populate_gps_memberships()
-            self.build_dbt_daily()
+            build_dbt_daily()
             send_slack_message(":white_check_mark: succès mise à jour de données C1 -> Metabase")
         elif monthly:
             send_slack_message(":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase")
             self.populate_rome_codes()
             self.populate_insee_codes()
             self.populate_departments()
-            self.build_dbt_daily()
+            build_dbt_daily()
             send_slack_message(":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase")
