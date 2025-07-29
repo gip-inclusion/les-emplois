@@ -20,7 +20,7 @@ def test_kind():
 
 def test_email_already_exists():
     # setup existing user
-    email = "quention@django-unchained.com"
+    email = "quentin@django-unchained.com"
     JobSeekerFactory(email=email)
 
     # setup existing user for update tests
