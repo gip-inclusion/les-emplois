@@ -850,6 +850,10 @@ class JobDescription(models.Model):
     def is_pec_offer(self):
         return self.is_from_pole_emploi and self.source_tags and JobSourceTag.FT_PEC_OFFER.value in self.source_tags
 
+    @property
+    def is_ea_offer_from_ft(self):
+        return self.is_from_pole_emploi and self.source_tags and JobSourceTag.FT_EA_OFFER.value in self.source_tags
+
     def get_absolute_url(self):
         if self.is_external:
             return self.source_url
