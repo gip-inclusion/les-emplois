@@ -12,6 +12,7 @@
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 
+  "*/30 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
   "0 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
   "0 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_professionals --wet-run",
   "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
@@ -34,7 +35,6 @@
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
-  "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 9-12 * * MON $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
