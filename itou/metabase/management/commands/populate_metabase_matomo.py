@@ -16,6 +16,7 @@ from itou.metabase.db import MetabaseDatabaseCursor, build_dbt_daily, create_tab
 from itou.utils import constants
 from itou.utils.command import BaseCommand
 from itou.utils.date import monday_of_the_week
+from itou.utils.slack import send_slack_message
 
 
 lock = threading.Lock()
@@ -218,6 +219,7 @@ class Command(BaseCommand):
         threadsafe_print(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
         column_names, all_rows = multiget_matomo_dashboards(last_week_monday, api_call_options)
         if wet_run and column_names:
+            send_slack_message(":rocket: Démarrage de la mise à jour des données Matomo")
             update_table_at_date(
                 METABASE_PUBLIC_DASHBOARDS_TABLE_NAME,
                 column_names,
@@ -225,3 +227,4 @@ class Command(BaseCommand):
                 sorted(all_rows, key=lambda r: r[-1]),  # sort by dashboard name
             )
             build_dbt_daily()
+            send_slack_message(":white_check_mark: Mise à jour des données Matomo terminée")
