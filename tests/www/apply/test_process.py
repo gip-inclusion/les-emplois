@@ -322,14 +322,12 @@ class TestProcessViews:
         )
         created_at = now - certification_grace_period - datetime.timedelta(days=1)
         expires_at = today - datetime.timedelta(days=1)
-        certification_period = InclusiveDateRange(timezone.localdate(created_at), expires_at)
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__author_siae=company,
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__created_at=created_at,
             eligibility_diagnosis__expires_at=expires_at,
             certified=True,
-            certification_period=certification_period,
         )
         eligibility_diagnosis = selected_criteria.eligibility_diagnosis
         job_application = JobApplicationFactory(
@@ -347,10 +345,6 @@ class TestProcessViews:
         tomorrow = today + datetime.timedelta(days=1)
         eligibility_diagnosis.expires_at = tomorrow
         eligibility_diagnosis.save()
-        selected_criteria.certification_period = InclusiveDateRange(
-            selected_criteria.certification_period.lower, tomorrow
-        )
-        selected_criteria.save()
         response = client.get(url)
         assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 
@@ -528,10 +522,6 @@ class TestProcessViews:
             eligibility_diagnosis__from_employer=False,
             eligibility_diagnosis__from_prescriber=True,
             certified=True,
-            certification_period=InclusiveDateRange(
-                datetime.date(2025, 2, 1),
-                datetime.date(2025, 5, 1),
-            ),
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
