@@ -76,6 +76,7 @@ from itou.siae_evaluations.models import (
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
+from itou.utils.slack import send_slack_message
 
 
 def log_retry_attempt(retry_state):
@@ -117,7 +118,10 @@ class Command(BaseCommand):
         }
 
     def add_arguments(self, parser):
-        parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
+        group.add_argument("--daily", action="store_true")
+        group.add_argument("--monthly", action="store_true")
 
     def populate_analytics(self):
         populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
@@ -537,5 +541,39 @@ class Command(BaseCommand):
         wait=tenacity.wait_fixed(5),
         after=log_retry_attempt,
     )
-    def handle(self, mode, **options):
-        self.MODE_TO_OPERATION[mode]()
+    def handle(self, *, mode=None, daily=False, monthly=False, **options):
+        if mode:
+            self.MODE_TO_OPERATION[mode]()
+        elif daily:
+            send_slack_message(":rocket: lancement mise à jour de données C1 -> Metabase")
+            self.populate_enums()
+            self.populate_analytics()
+            self.populate_companies()
+            self.populate_job_descriptions()
+            self.populate_organizations()
+            self.populate_job_seekers()
+            self.populate_criteria()
+            self.populate_job_applications()
+            self.populate_selected_jobs()
+            self.populate_approvals()
+            self.populate_prolongations()
+            self.populate_prolongation_requests()
+            self.populate_suspensions()
+            self.populate_institutions()
+            self.populate_evaluation_campaigns()
+            self.populate_evaluated_siaes()
+            self.populate_evaluated_job_applications()
+            self.populate_evaluated_criteria()
+            self.populate_users()
+            self.populate_memberships()
+            self.populate_gps_groups()
+            self.populate_gps_memberships()
+            self.build_dbt_daily()
+            send_slack_message(":white_check_mark: succès mise à jour de données C1 -> Metabase")
+        elif monthly:
+            send_slack_message(":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase")
+            self.populate_rome_codes()
+            self.populate_insee_codes()
+            self.populate_departments()
+            self.build_dbt_daily()
+            send_slack_message(":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase")
