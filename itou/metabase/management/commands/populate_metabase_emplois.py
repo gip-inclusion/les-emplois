@@ -91,7 +91,7 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.MODE_TO_OPERATION = {
             "analytics": self.populate_analytics,
-            "siaes": self.populate_companies,
+            "companies": self.populate_companies,
             "job_descriptions": self.populate_job_descriptions,
             "organizations": self.populate_organizations,
             "job_seekers": self.populate_job_seekers,

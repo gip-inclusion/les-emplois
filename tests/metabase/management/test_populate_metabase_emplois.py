@@ -1250,7 +1250,7 @@ def test_populate_companies():
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
-        management.call_command("populate_metabase_emplois", mode="siaes")
+        management.call_command("populate_metabase_emplois", mode="companies")
 
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM structures_v0 ORDER BY id")
@@ -1321,7 +1321,7 @@ def test_populate_companies_convergence(settings):
     aci_non_convergence_company = CompanyFactory(kind=CompanyKind.ACI)
     non_convergence_company = CompanyFactory()
 
-    management.call_command("populate_metabase_emplois", mode="siaes")
+    management.call_command("populate_metabase_emplois", mode="companies")
     with connection.cursor() as cursor:
         cursor.execute("SELECT siret, convergence_france FROM structures_v0 ORDER BY id")
         assert cursor.fetchall() == [
