@@ -4,7 +4,6 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 
 import copy
 import gc
-import os
 import urllib
 
 import httpx
@@ -41,10 +40,6 @@ class MetabaseDatabaseCursor:
             self.cursor.close()
         if self.connection:
             self.connection.close()
-
-
-def get_current_dir():
-    return os.path.dirname(os.path.realpath(__file__))
 
 
 def get_new_table_name(table_name):
