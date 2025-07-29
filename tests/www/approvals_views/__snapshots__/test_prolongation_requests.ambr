@@ -1776,13 +1776,6 @@
                                   </strong>
                               </li>
                           </ul>
-                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                              </i>
-                              <span>
-                                  Afficher le PASS IAE
-                              </span>
-                          </a>
                       </div>
                       <div class="c-box c-box--structure">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
@@ -2029,13 +2022,6 @@
                                   </strong>
                               </li>
                           </ul>
-                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                              </i>
-                              <span>
-                                  Afficher le PASS IAE
-                              </span>
-                          </a>
                       </div>
                       <div class="c-box c-box--structure">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
@@ -2312,13 +2298,6 @@
                                   </strong>
                               </li>
                           </ul>
-                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/approvals/prolongation/request/666">
-                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                              </i>
-                              <span>
-                                  Afficher le PASS IAE
-                              </span>
-                          </a>
                       </div>
                       <div class="c-box c-box--structure">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">

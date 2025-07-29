@@ -3662,13 +3662,6 @@
                                                   </strong>
                                               </li>
                                           </ul>
-                                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                                              </i>
-                                              <span>
-                                                  Afficher le PASS IAE
-                                              </span>
-                                          </a>
                                       </div>
                                   </div>
                               </div>
@@ -3684,7 +3677,7 @@
 # ---
 # name: test_with_approval[SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -4256,6 +4249,48 @@
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
           WHERE "prescribers_prescribermembership"."organization_id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          
+            (SELECT %s AS "a"
+             FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+             WHERE (("users_user"."created_by_id" = %s
+                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                    OR ("users_user"."created_by_id" = %s
+                        AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication"
+             WHERE (("job_applications_jobapplication"."sender_id" = %s
+                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                    OR ("job_applications_jobapplication"."sender_id" = %s
+                        AND "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis"
+             WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_eligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis"
+             WHERE (("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = %s)))
+          LIMIT 1
         ''',
       }),
       dict({

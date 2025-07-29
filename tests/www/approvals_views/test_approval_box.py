@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 from django.template import Context, Template
-from django.test import RequestFactory
 from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
@@ -15,7 +14,8 @@ from tests.approvals.factories import (
 )
 from tests.cities.factories import create_city_geispolsheim
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
-from tests.utils.testing import pretty_indented
+from tests.users.factories import PrescriberFactory
+from tests.utils.testing import get_request, pretty_indented
 
 
 public_id = "997a1eaf-6fad-4256-b371-31bb05c94862"
@@ -25,7 +25,7 @@ approval_number = "XXXXX1234567"
 @freeze_time("2024-08-06")
 def test_expired_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
-    request = RequestFactory().get("/")
+    request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -35,7 +35,7 @@ def test_expired_approval(snapshot):
 @freeze_time("2024-08-06")
 def test_future_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2025, 1, 1), number=approval_number, public_id=public_id)
-    request = RequestFactory().get("/")
+    request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -45,7 +45,7 @@ def test_future_approval(snapshot):
 @freeze_time("2024-08-06")
 def test_valid_approval(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
-    request = RequestFactory().get("/")
+    request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -56,7 +56,7 @@ def test_valid_approval(snapshot):
 def test_valid_approval_with_pending_prolongation_request(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number=approval_number, public_id=public_id)
     ProlongationRequestFactory(approval=approval, start_at=approval.end_at)
-    request = RequestFactory().get("/")
+    request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -71,7 +71,7 @@ def test_suspended_approval(snapshot):
         start_at=datetime.date(2024, 8, 1),
         end_at=datetime.date(2024, 8, 31),
     )
-    request = RequestFactory().get("/")
+    request = get_request(approval.eligibility_diagnosis.author)  # an authorized prescriber linked to the job seeker
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -81,7 +81,7 @@ def test_suspended_approval(snapshot):
 @freeze_time("2024-08-06")
 def test_expired_pe_approval(snapshot):
     pe_approval = PoleEmploiApprovalFactory(start_at=datetime.date(2022, 1, 1), number="123456789012")
-    request = RequestFactory().get("/")
+    request = get_request(PrescriberFactory())
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -92,7 +92,7 @@ def test_expired_pe_approval(snapshot):
 def test_valid_pe_approval(snapshot):
     # One of the last 8 valid Pole Emploi
     pe_approval = PoleEmploiApprovalFactory(start_at=datetime.date(2024, 1, 1), number="123456789012")
-    request = RequestFactory().get("/")
+    request = get_request(PrescriberFactory())
     template = Template(
         "{% load approvals %}{% approval_details_box approval=approval version='box' request=request %}"
     )
@@ -123,7 +123,7 @@ def test_details_view_version(snapshot, origin):
 def test_job_seeker_dashboard_expired_approval_in_waiting_period_with_valid_diagnosis(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
     IAEEligibilityDiagnosisFactory(job_seeker=approval.user, from_prescriber=True)
-    request = RequestFactory().get("/")
+    request = get_request(approval.user)
     template = Template(
         "{% load approvals %}"
         "{% approval_details_box approval=approval version='job_seeker_dashboard' request=request %}"
@@ -144,7 +144,7 @@ def test_job_seeker_dashboard_expired_approval_in_waiting_period_with_valid_diag
 @freeze_time("2024-08-06")
 def test_job_seeker_dashboard_expired_approval_in_waiting_period_without_diagnosis(snapshot):
     approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number=approval_number, public_id=public_id)
-    request = RequestFactory().get("/")
+    request = get_request(approval.user)
 
     template = Template(
         "{% load approvals %}"

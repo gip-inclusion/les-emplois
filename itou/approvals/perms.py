@@ -10,7 +10,7 @@ def can_view_approval_details(request, approval):
     """
     To display an approval details, one must either be:
     - the approval job seeker
-    - an authorized prescriber
+    - an authorized prescriber whose job seekers list contains the approval's job seeker
     - an employer with a sent or received job_application
     """
     if request.user.is_employer:
