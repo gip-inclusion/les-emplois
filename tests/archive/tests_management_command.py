@@ -979,7 +979,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_archive_jobseeker_with_several_approvals(self, snapshot):
         jobseeker = JobSeekerFactory(
-            joined_days_ago=DAYS_OF_INACTIVITY,
+            date_joined=timezone.make_aware(datetime.datetime(2019, 4, 18)),
             notified_days_ago=30,
             for_snapshot=True,
         )
