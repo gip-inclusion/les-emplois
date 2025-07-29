@@ -8,9 +8,9 @@ from django.utils.safestring import mark_safe
 from itou.openid_connect.errors import format_error_modal_content
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.urls import get_zendesk_form_url
 
 
 ConflictFields = namedtuple("ConflictFields", ["email", "nir", "first_name", "last_name", "birthdate"])
@@ -142,7 +142,7 @@ class JobSeekerSignupConflictModalResolver:
                 "<li>Si ce NIR est bien le vôtre mais que ce n’est pas votre compte veuillez contacter "
                 '<a href="{}" target="_blank">notre support</a>.</li></ul>',
                 mask_unless(self.existing_user.get_full_name(), False),
-                f"{global_constants.ITOU_HELP_CENTER_URL}/requests/new",
+                get_zendesk_form_url(),
             ),
             "nir_conflict",
         )
@@ -187,7 +187,7 @@ class JobSeekerSignupConflictModalResolver:
                 'n’est pas la vôtre veuillez contacter <a href="{}" target="_blank">notre support</a>.</li></ul>',
                 redact_email_address(self.existing_user.email),
                 reinitialize_pass_option,
-                f"{global_constants.ITOU_HELP_CENTER_URL}/requests/new",
+                get_zendesk_form_url(),
             ),
             "user_exists_without_email",
         )

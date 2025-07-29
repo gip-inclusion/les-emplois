@@ -75,7 +75,7 @@
                 <br>
                 {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
                     Afin de modifier l’adresse postale,
-                    <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new"
+                    <a href="{% zendesk_form_url %}"
                        target="_blank"
                        rel="noopener"
                        class="has-external-link"

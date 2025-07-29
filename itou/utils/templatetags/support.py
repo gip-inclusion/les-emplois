@@ -1,6 +1,6 @@
 from django import template
 
-from itou.utils.urls import get_tally_form_url
+from itou.utils.urls import get_tally_form_url, get_zendesk_form_url
 
 
 register = template.Library()
@@ -15,3 +15,14 @@ def tally_form_url(form_id, **kwargs):
     Usage in template  : {% tally_form_url "tally_form_id" my_param=some_context_var ... %}
     """
     return get_tally_form_url(form_id, **kwargs)
+
+
+@register.simple_tag
+def zendesk_form_url():
+    """
+    Wraps `itou.utils.urls.get_zendersk_form_url` for template usage.
+    Can use context variables.
+
+    Usage in template  : {% zendesk_form_url request=request %}
+    """
+    return get_zendesk_form_url()
