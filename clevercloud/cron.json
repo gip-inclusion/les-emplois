@@ -40,7 +40,7 @@
   "0 9-12 * * MON $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * MON $ROOT/clevercloud/run_management_command.sh delete_unused_files",
-  "0 2 * * MON $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
+  "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
 
   "0 0 1 * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
   "0 0 2 * * $ROOT/clevercloud/run_management_command.sh populate_metabase_emplois --monthly",
