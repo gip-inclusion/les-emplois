@@ -340,13 +340,16 @@ def test_cleanup_siaes_after_grace_period(capsys):
         to_company__kind=CompanyKind.EI,
         to_company__convention__is_active=False,
         to_company__convention__deactivated_at=old_enough,
+        to_company__is_searchable=True,
     ).to_company
 
     cleanup_siaes_after_grace_period()
     assertQuerySetEqual(Company.objects.all(), [company_with_active_convention, undeletable_company], ordered=False)
+    undeletable_company.refresh_from_db()
+    assert undeletable_company.is_searchable is False
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
     assert stdout.splitlines() == [
         "1 siaes past their grace period have been deleted",
-        "1 siaes past their grace period cannot be deleted",
+        "1 siaes past their grace period cannot be deleted but have been removed from the search results",
     ]

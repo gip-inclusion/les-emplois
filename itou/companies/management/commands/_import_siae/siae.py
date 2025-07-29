@@ -196,10 +196,15 @@ def cleanup_siaes_after_grace_period():
             siae.delete()
             deletions += 1
         else:
+            siae.is_searchable = False
+            siae.save(update_fields=["is_searchable", "updated_at"])
             blocked_deletions += 1
 
     print(f"{deletions} siaes past their grace period have been deleted")
-    print(f"{blocked_deletions} siaes past their grace period cannot be deleted")
+    print(
+        f"{blocked_deletions} siaes past their grace period cannot be deleted "
+        "but have been removed from the search results"
+    )
 
 
 def delete_user_created_siaes_without_members():
