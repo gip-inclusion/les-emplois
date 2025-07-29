@@ -46,6 +46,12 @@ class TestCardView:
         soup = parse_response_to_soup(response, selector="#main")
         assert pretty_indented(soup) == snapshot()
 
+    def test_card_is_searchable_false(self, client):
+        company = CompanyFactory(with_membership=True, is_searchable=False)
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
     def test_card_tally_url_with_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -394,6 +400,13 @@ class TestJobDescriptionCardView:
         response = client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
         navinfo = parse_response_to_soup(response, selector=".c-navinfo")
         assert pretty_indented(navinfo) == snapshot(name="navinfo")
+
+    def test_job_description_card_is_searchable_false(self, client):
+        company = CompanyWithMembershipAndJobsFactory(is_searchable=False)
+        job_description = company.job_description_through.first()
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = client.get(url)
+        assert response.status_code == 404
 
     def test_job_description_card_render_markdown(self, client):
         company = CompanyWithMembershipAndJobsFactory()

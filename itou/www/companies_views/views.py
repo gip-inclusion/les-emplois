@@ -151,7 +151,9 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
     def setup(self, request, job_description_id, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.job_description = get_object_or_404(
-            JobDescription.objects.select_related("appellation", "company", "location"), pk=job_description_id
+            JobDescription.objects.select_related("appellation", "company", "location"),
+            pk=job_description_id,
+            company__is_searchable=True,
         )
 
     def get_context_data(self, **kwargs):
@@ -569,7 +571,7 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
 
     def setup(self, request, siae_id, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id, is_searchable=True)
 
     def get_context_data(self, **kwargs):
         back_url = get_safe_url(self.request, "back_url")
