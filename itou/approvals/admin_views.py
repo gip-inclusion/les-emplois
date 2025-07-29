@@ -19,7 +19,7 @@ from django.utils import timezone
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, CancelledApproval
+from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.apis import enums as api_enums
@@ -162,6 +162,34 @@ def manually_refuse_approval(
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
+
+
+def _clip_approval_dependency(approval, model, end_date, acting_user):
+    model.objects.filter(approval=approval, start_at__gte=end_date).delete()
+    try:
+        obj = model.objects.in_progress().filter(approval=approval).get()
+    except model.DoesNotExist:
+        pass
+    else:
+        obj.end_at = end_date
+        obj.updated_by = acting_user
+        obj.save(update_fields=["end_at", "updated_at", "updated_by"])
+
+
+def terminate_approval(request, model_admin, approval_id):
+    opts = model_admin.model._meta
+    app_label = opts.app_label
+    codename = get_permission_codename("change", opts)
+    if not request.user.has_perm(f"{app_label}.{codename}"):
+        raise PermissionDenied
+
+    today = timezone.localdate()
+    approval = Approval.objects.get(pk=approval_id, end_at__gte=today)
+    _clip_approval_dependency(approval, Prolongation, today, request.user)
+    _clip_approval_dependency(approval, Suspension, today, request.user)
+    approval.end_at = today
+    approval.save(update_fields=["end_at", "updated_at"])
+    return HttpResponseRedirect(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
 
 
 def _compute_send_approvals_to_pe_stats(model, list_url):
