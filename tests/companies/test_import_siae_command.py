@@ -9,14 +9,16 @@ import pytest
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
     check_whether_signup_is_possible_for_all_siaes,
+    cleanup_siaes_after_grace_period,
     create_new_siaes,
 )
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
@@ -29,7 +31,7 @@ from itou.companies.management.commands._import_siae.vue_structure import (
     get_siret_to_siae_row,
     get_vue_structure_df,
 )
-from itou.companies.models import Company
+from itou.companies.models import Company, SiaeConvention
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -325,3 +327,26 @@ class TestCouldSiaeBeDeleted:
     def test_prolongation_request(self):
         prolongation_request = ProlongationRequestFactory()
         assert could_siae_be_deleted(prolongation_request.declared_by_siae) is False
+
+
+def test_cleanup_siaes_after_grace_period(capsys):
+    old_enough = timezone.now() - timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS + 1)
+
+    company_with_active_convention = CompanyFactory(subject_to_eligibility=True)
+    CompanyFactory(
+        subject_to_eligibility=True, convention__is_active=False, convention__deactivated_at=old_enough
+    )  # Deletable company
+    undeletable_company = JobApplicationFactory(
+        to_company__kind=CompanyKind.EI,
+        to_company__convention__is_active=False,
+        to_company__convention__deactivated_at=old_enough,
+    ).to_company
+
+    cleanup_siaes_after_grace_period()
+    assertQuerySetEqual(Company.objects.all(), [company_with_active_convention, undeletable_company], ordered=False)
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == [
+        "1 siaes past their grace period have been deleted",
+        "1 siaes past their grace period cannot be deleted",
+    ]
