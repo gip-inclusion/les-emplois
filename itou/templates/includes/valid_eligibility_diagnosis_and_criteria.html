@@ -3,8 +3,8 @@
     <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
 </p>
 
-{% if eligibility_diagnosis.criteria_display %}
-    {% with eligibility_diagnosis.criteria_display as selected_administrative_criteria %}
+{% if eligibility_diagnosis.selected_administrative_criteria_for_display %}
+    {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
         <p class="mb-2">
             <span class="badge badge-sm rounded-pill bg-secondary">
                 {% if is_sent_by_authorized_prescriber %}

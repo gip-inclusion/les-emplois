@@ -63,12 +63,12 @@
                 <p>
                     Éligibilité GEIQ confirmée par <b>{{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }})</b>
                 </p>
-                {% if eligibility_diagnosis.criteria_display %}
+                {% if eligibility_diagnosis.selected_administrative_criteria_for_display %}
                     <p class="mb-2">
                         <span class="badge badge-sm rounded-pill bg-secondary">Critères administratifs</span>
                     </p>
                     <ul>
-                        {% for criterion in eligibility_diagnosis.criteria_display|dictsort:"administrative_criteria.ui_rank" %}
+                        {% for criterion in eligibility_diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
                             {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
                         {% endfor %}
                     </ul>

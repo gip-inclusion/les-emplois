@@ -522,6 +522,31 @@ class TestProcessViews:
         )
         assert pretty_indented(content) == snapshot(name="copy_public_id")
 
+    def test_details_for_prescriber_certified_criteria(self, client):
+        certified_crit = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__from_employer=False,
+            eligibility_diagnosis__from_prescriber=True,
+            certified=True,
+            certification_period=InclusiveDateRange(
+                datetime.date(2025, 2, 1),
+                datetime.date(2025, 5, 1),
+            ),
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=certified_crit.eligibility_diagnosis,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        prescriber = job_application.sender_prescriber_organization.members.get()
+
+        client.force_login(prescriber)
+        response = client.get(
+            reverse(
+                "apply:details_for_prescriber",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        assertContains(response, CERTIFIED_BADGE_HTML, html=True, count=1)
+
     def test_details_for_prescriber_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = PrescriberMembershipFactory(organization=job_application.sender_prescriber_organization).user
