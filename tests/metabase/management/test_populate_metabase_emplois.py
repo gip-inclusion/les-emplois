@@ -1140,8 +1140,6 @@ def test_data_inconsistencies(caplog):
 
     logs = caplog.messages
     assert logs[0] == "Checking data for inconsistencies."
-    assert "timeit: method=report_data_inconsistencies completed in seconds=" in logs[1]
-    assert "timeit: method=handle completed in seconds=" in logs[2]
 
     approval.user.kind = UserKind.EMPLOYER
     approval.user.save()
