@@ -103,7 +103,10 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
-            job_descriptions = job_descriptions.filter(company__kind__in=kinds)
+            job_clauses = Q(company__kind__in=kinds)
+            if CompanyKind.EA.value in kinds:
+                job_clauses |= Q(source_kind=JobSource.PE_API, source_tags__contains=[JobSourceTag.FT_EA_OFFER.value])
+            job_descriptions = job_descriptions.filter(job_clauses)
 
         if contract_types:
             clauses = Q(contract_type__in=[c for c in contract_types if c != JobSourceTag.FT_PEC_OFFER.value])

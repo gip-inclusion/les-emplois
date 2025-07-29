@@ -14,6 +14,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, J
 from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Appellation, Rome
+from itou.utils.templatetags.str_filters import pluralizefr
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import (
     CompanyFactory,
@@ -1217,7 +1218,7 @@ class TestJobDescriptionSearchView:
         assertContains(response, displayed_job_name_1)
         assertNotContains(response, displayed_job_pec)
 
-        # filter with FIXED_TERM : PEC offer displayed because it's its underlying contract type
+        # filter with FIXED_TERM : PEC offer displayed because of its underlying contract type
         response = client.get(
             self.URL,
             {"city": city.slug, "contract_types": ["FIXED_TERM"]},
@@ -1280,6 +1281,142 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug, "distance": 100})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
+
+    def test_ft_ea_offer_display(self, client):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        city = create_city_saint_andre()
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.EI)
+        appellations = Appellation.objects.all()
+        job1 = JobDescriptionFactory(
+            company=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+        )
+        pe_company = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+        job_ea = JobDescriptionFactory(
+            company=pe_company,
+            location=city,
+            source_kind=JobSource.PE_API,
+            source_id="ABCDEF",
+            source_url="https://external.pec.link/",
+            source_tags=[JobSourceTag.FT_EA_OFFER.value],
+            appellation=appellations[2],
+            contract_type=ContractType.FIXED_TERM,
+            other_contract_type="Super catégorie de genre de job",
+            market_context_description="",
+        )
+
+        displayed_job_name_1 = capfirst(job1.display_name)
+        displayed_job_ea = capfirst(job_ea.display_name)
+
+        # no filter: returns everything.
+        response = client.get(
+            self.URL,
+            {"city": city.slug},
+        )
+
+        assertContains(
+            response,
+            """
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
+            """,
+            html=True,
+            count=1,
+        )
+        assert list(response.context["results_page"]) == [job1, job_ea]
+        assertContains(response, displayed_job_name_1)
+        assertContains(response, displayed_job_ea)
+
+        assertContains(response, static("img/logo-france-travail.svg"), count=1)
+        assertContains(
+            response,
+            '<span>Offre proposée et gérée par <span class="visually-hidden">France Travail</span></span>',
+            html=True,
+            count=1,
+        )
+        assertContains(response, "https://external.pec.link/")
+
+        assertContains(response, "Entreprise anonyme")
+        assertContains(response, "Super catégorie de genre de job")
+
+        def assertFilterResults(extra_filter, expected_jobs):
+            response = client.get(
+                self.URL,
+                {"city": city.slug, **extra_filter},
+            )
+            s = pluralizefr(len(expected_jobs))
+            assertContains(
+                response,
+                f"""
+                <span>Poste{s} <span class="d-none d-md-inline">ouvert{s} au recrutement</span></span>
+                <span class="badge badge-sm rounded-pill ms-2">{len(expected_jobs)}</span>
+                """,
+                html=True,
+                count=1,
+            )
+            for displayed_job in [displayed_job_name_1, displayed_job_ea]:
+                if displayed_job in expected_jobs:
+                    assertContains(response, displayed_job)
+                else:
+                    assertNotContains(response, displayed_job)
+            RQTH_PRIORITY = "Priorité aux bénéficiaires de la RQTH"
+            if displayed_job_ea in expected_jobs:
+                assertContains(response, RQTH_PRIORITY)
+            else:
+                assertNotContains(response, RQTH_PRIORITY)
+
+        # no filter: returns everything.
+        assertFilterResults(
+            extra_filter={},
+            expected_jobs=[displayed_job_name_1, displayed_job_ea],
+        )
+
+        # filter with "EA" company kind: only returns the EA offers
+        assertFilterResults(
+            extra_filter={"kinds": [CompanyKind.EA.value]},
+            expected_jobs=[displayed_job_ea],
+        )
+
+        # filter with EA & EI: returns both
+        assertFilterResults(
+            extra_filter={"kinds": [CompanyKind.EA.value, CompanyKind.EI.value]},
+            expected_jobs=[displayed_job_name_1, displayed_job_ea],
+        )
+
+        # filter with only EI: EA offer not displayed
+        assertFilterResults(
+            extra_filter={"kinds": [CompanyKind.EI.value]},
+            expected_jobs=[displayed_job_name_1],
+        )
+
+        # filter with FIXED_TERM : EA offer displayed because of its underlying contract type
+        assertFilterResults(
+            extra_filter={"contract_types": ["FIXED_TERM"]},
+            expected_jobs=[displayed_job_ea],
+        )
+
+        # Switch EI company to EA: both jobs should be displayed for EA filter now
+        company.kind = CompanyKind.EA
+        company.save(update_fields=["kind", "updated_at"])
+        assertFilterResults(
+            extra_filter={"kinds": [CompanyKind.EA.value]},
+            expected_jobs=[displayed_job_name_1, displayed_job_ea],
+        )
+
+        # Show external company name
+        job_ea.market_context_description = "MaPetiteEntreprise"
+        job_ea.save(update_fields=["market_context_description", "updated_at"])
+        response = client.get(self.URL, {"city": city.slug})
+        assertContains(
+            response,
+            """
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
+            """,
+            html=True,
+            count=1,
+        )
+        assertContains(response, displayed_job_ea)
+        assertContains(response, "MaPetiteEntreprise")
 
     def test_results_links_from_job_seeker_list(self, client):
         """
