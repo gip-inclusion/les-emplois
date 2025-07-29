@@ -24,7 +24,7 @@ from tests.companies.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 

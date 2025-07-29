@@ -71,7 +71,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assert_previous_step,
     assertSnapshotQueries,

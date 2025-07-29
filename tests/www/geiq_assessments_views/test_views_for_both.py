@@ -20,7 +20,7 @@ from tests.geiq_assessments.factories import (
 )
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assertSnapshotQueries,
     get_rows_from_streaming_response,
