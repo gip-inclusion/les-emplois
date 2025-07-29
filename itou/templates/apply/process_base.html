@@ -93,7 +93,7 @@
                                 {% with common_approval=job_application.job_seeker.latest_common_approval %}
                                     {% if common_approval %}
                                         {% if common_approval.is_valid or job_application.state.is_accepted %}
-                                            {% approval_details_box approval=common_approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' %}
+                                            {% approval_details_box approval=common_approval request=request extra_classes='mb-3 mb-md-4' %}
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}
@@ -101,9 +101,9 @@
                             {% elif request.user.is_prescriber %}
                                 {# Approval status. #}
                                 {% if job_application.approval %}
-                                    {% approval_details_box approval=job_application.approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' %}
+                                    {% approval_details_box approval=job_application.approval request=request extra_classes='mb-3 mb-md-4' %}
                                 {% elif job_application.job_seeker.has_valid_approval %}
-                                    {% approval_details_box approval=job_application.job_seeker.latest_approval link_from_current_url=request.get_full_path extra_classes='mb-3 mb-md-4' %}
+                                    {% approval_details_box approval=job_application.job_seeker.latest_approval request=request extra_classes='mb-3 mb-md-4' %}
                                 {% elif job_application.approval_manually_refused_at %}
                                     <div class="c-box mb-4">PASS IAE refusé (délai de carence non respecté).</div>
                                 {% elif job_application.manual_approval_delivery_required %}
