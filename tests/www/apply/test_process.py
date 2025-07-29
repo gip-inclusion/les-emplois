@@ -2628,9 +2628,10 @@ class TestProcessAcceptViews:
             html=True,
         )
 
-        job_application.job_seeker.last_login = None
-        job_application.job_seeker.created_by = PrescriberFactory()
-        job_application.job_seeker.save()
+        job_seeker = job_application.job_seeker
+        job_seeker.last_login = None
+        job_seeker.created_by = PrescriberFactory()
+        job_seeker.save()
         response = client.get(url_accept)
         assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is disabled
