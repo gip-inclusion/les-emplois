@@ -308,6 +308,11 @@ class TestSendPrescriberInvitation(PrescriberMixin, BaseTestSendInvitation):
         # The form is prefilled with GET params (if valid)
         assertContains(response, "Emma")
 
+    def test_prescriber_without_organization(self, client):
+        client.force_login(PrescriberFactory())
+        response = client.get(self.invitation_url)
+        assert response.status_code == 403
+
 
 class TestSendCompanyInvitation(CompanyMixin, BaseTestSendInvitation):
     pass
