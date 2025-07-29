@@ -1132,31 +1132,6 @@ def test_populate_enums():
         )
 
 
-def test_data_inconsistencies(caplog):
-    approval = ApprovalFactory()
-
-    with assertNumQueries(2):  # SELECT set_config() + Select the job seekers
-        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
-
-    logs = caplog.messages
-    assert logs[0] == "Checking data for inconsistencies."
-
-    approval.user.kind = UserKind.EMPLOYER
-    approval.user.save()
-
-    caplog.clear()
-    with pytest.raises(RuntimeError):
-        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
-    assert caplog.messages[:-1] == [
-        "Checking data for inconsistencies.",
-        "FATAL ERROR: At least one user has an approval but is not a job seeker",
-        "Error when executing itou.metabase.management.commands.populate_metabase_emplois",
-    ]
-    assert caplog.messages[-1].startswith(
-        "Management command itou.metabase.management.commands.populate_metabase_emplois failed in"
-    )
-
-
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")

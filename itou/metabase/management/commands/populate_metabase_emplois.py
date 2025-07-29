@@ -114,7 +114,6 @@ class Command(BaseCommand):
             "dbt_daily": self.build_dbt_daily,
             "gps_groups": self.populate_gps_groups,
             "gps_memberships": self.populate_gps_memberships,
-            "data_inconsistencies": self.report_data_inconsistencies,
         }
 
     def add_arguments(self, parser):
@@ -528,24 +527,6 @@ class Command(BaseCommand):
             )
         )
         populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
-
-    def report_data_inconsistencies(self):
-        """
-        Report data inconsistencies that were previously ignored during `populate_approvals` method in order to avoid
-        having the script break in the middle. This way, the scripts breaks only at the end with informative
-        fatal errors after having completed its job.
-        """
-        fatal_errors = 0
-        self.logger.info("Checking data for inconsistencies.")
-        if Approval.objects.exclude(user__kind=UserKind.JOB_SEEKER).exists():
-            self.logger.error("FATAL ERROR: At least one user has an approval but is not a job seeker")
-            fatal_errors += 1
-
-        if fatal_errors >= 1:
-            raise RuntimeError(
-                "The command completed all its actions successfully but at least one fatal error needs "
-                "manual resolution, see command output"
-            )
 
     def build_dbt_daily(self):
         build_dbt_daily()
