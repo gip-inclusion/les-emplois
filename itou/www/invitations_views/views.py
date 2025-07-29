@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import PermissionDenied
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.forms import modelformset_factory
@@ -143,9 +144,9 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         self.organization = request.current_organization
-        self.invitation_left = MAX_PENDING_INVITATION - self.organization.invitations.pending().count()
         if self.organization is None:
-            raise PermissionError
+            raise PermissionDenied
+        self.invitation_left = MAX_PENDING_INVITATION - self.organization.invitations.pending().count()
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
