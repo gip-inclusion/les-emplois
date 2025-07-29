@@ -23,7 +23,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
-from itou.eligibility.utils import geiq_criteria_for_display, iae_criteria_for_display
+from itou.eligibility.utils import geiq_criteria_for_display
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
@@ -140,16 +140,11 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
     )
     if geiq_eligibility_diagnosis:
-        geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(
-            geiq_eligibility_diagnosis,
-            hiring_start_at=job_application.hiring_start_at,
-        )
+        # TODO: Can the RelatedManager filter out the NO_ANNEX?
+        geiq_eligibility_diagnosis.criteria_display = geiq_criteria_for_display(geiq_eligibility_diagnosis)
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
     if eligibility_diagnosis:
-        eligibility_diagnosis.criteria_display = iae_criteria_for_display(
-            eligibility_diagnosis,
-            hiring_start_at=job_application.hiring_start_at,
-        )
+        eligibility_diagnosis.criteria_display = eligibility_diagnosis.selected_administrative_criteria.all()
 
     context = {
         "can_view_personal_information": can_view_personal_information(request, job_application.job_seeker),
