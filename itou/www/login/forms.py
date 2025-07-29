@@ -122,7 +122,7 @@ class ItouLoginForm(LoginForm):
 class VerifyOTPForm(forms.Form):
     otp_token = forms.CharField(required=True)
 
-    otp_token.widget.attrs.update({"max_length": 6, "autocomplete": "one-time-code"})
+    otp_token.widget.attrs.update({"max_length": 6, "autocomplete": "one-time-code", "autofocus": True})
 
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
