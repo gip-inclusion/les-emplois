@@ -775,7 +775,7 @@ def github_respx_mock_fixture(respx_mock):
 @pytest.fixture(name="pro_connect")
 def setup_pro_connect():
     # this import requirest the settings to be loaded so we con't put it with the others
-    from tests.openid_connect.pro_connect.test import pro_connect_setup
+    from tests.openid_connect.pro_connect.testing import pro_connect_setup
 
     with pro_connect_setup():
         yield pro_connect_setup
