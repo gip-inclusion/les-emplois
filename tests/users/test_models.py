@@ -36,7 +36,7 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock
 from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -146,7 +146,12 @@ class TestManager:
             sender_prescriber_organization=organization,
             eligibility_diagnosis=None,
         ).job_seeker
-        job_seeker_with_authored_diagnosis_in_organization = IAEEligibilityDiagnosisFactory(
+        job_seeker_with_authored_iae_diagnosis_in_organization = IAEEligibilityDiagnosisFactory(
+            author=prescriber,
+            author_prescriber_organization=organization,
+            from_prescriber=True,
+        ).job_seeker
+        job_seeker_with_authored_geiq_diagnosis_in_organization = GEIQEligibilityDiagnosisFactory(
             author=prescriber,
             author_prescriber_organization=organization,
             from_prescriber=True,
@@ -167,6 +172,11 @@ class TestManager:
             author_prescriber_organization=other_organization,
             from_prescriber=True,
         )
+        GEIQEligibilityDiagnosisFactory(
+            author=prescriber,
+            author_prescriber_organization=other_organization,
+            from_prescriber=True,
+        )
 
         job_seeker_created_by_organization_coworker = JobSeekerFactory(
             jobseeker_profile__created_by_prescriber_organization=organization
@@ -175,7 +185,12 @@ class TestManager:
             sender_prescriber_organization=organization,
             eligibility_diagnosis=None,
         ).job_seeker
-        job_seeker_with_diagnosis_authored_by_organization_coworker = IAEEligibilityDiagnosisFactory(
+        job_seeker_with_iae_diagnosis_authored_by_organization_coworker = IAEEligibilityDiagnosisFactory(
+            author_prescriber_organization=organization,
+            author=PrescriberMembershipFactory(organization=organization).user,
+            from_prescriber=True,
+        ).job_seeker
+        job_seeker_with_geiq_diagnosis_authored_by_organization_coworker = GEIQEligibilityDiagnosisFactory(
             author_prescriber_organization=organization,
             author=PrescriberMembershipFactory(organization=organization).user,
             from_prescriber=True,
@@ -207,7 +222,8 @@ class TestManager:
                 job_seeker_with_sent_job_app_no_organization.pk,
                 job_seeker_created_by_user_in_organization.pk,
                 job_seeker_with_sent_job_app_in_organization.pk,
-                job_seeker_with_authored_diagnosis_in_organization.pk,
+                job_seeker_with_authored_iae_diagnosis_in_organization.pk,
+                job_seeker_with_authored_geiq_diagnosis_in_organization.pk,
             ],
             ordered=False,
         )
@@ -219,10 +235,12 @@ class TestManager:
                 job_seeker_with_sent_job_app_no_organization.pk,
                 job_seeker_created_by_user_in_organization.pk,
                 job_seeker_with_sent_job_app_in_organization.pk,
-                job_seeker_with_authored_diagnosis_in_organization.pk,
+                job_seeker_with_authored_iae_diagnosis_in_organization.pk,
+                job_seeker_with_authored_geiq_diagnosis_in_organization.pk,
                 job_seeker_created_by_organization_coworker.pk,
                 job_seeker_with_job_app_sent_by_organization_coworker.pk,
-                job_seeker_with_diagnosis_authored_by_organization_coworker.pk,
+                job_seeker_with_iae_diagnosis_authored_by_organization_coworker.pk,
+                job_seeker_with_geiq_diagnosis_authored_by_organization_coworker.pk,
             ],
             ordered=False,
         )

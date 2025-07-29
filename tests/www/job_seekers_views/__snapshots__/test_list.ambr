@@ -754,6 +754,14 @@
                     OR ("eligibility_eligibilitydiagnosis"."author_id" = %s
                         AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s))
              ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC)
+          UNION
+            (SELECT "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" AS "job_seeker_id"
+             FROM "eligibility_geiqeligibilitydiagnosis"
+             WHERE (("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = %s))
+             ORDER BY RANDOM() ASC)
         ''',
       }),
       dict({
@@ -1788,6 +1796,13 @@
                      AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
                     OR "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)
              ORDER BY "eligibility_eligibilitydiagnosis"."created_at" DESC)
+          UNION
+            (SELECT "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" AS "job_seeker_id"
+             FROM "eligibility_geiqeligibilitydiagnosis"
+             WHERE (("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = %s)
+             ORDER BY RANDOM() ASC)
         ''',
       }),
       dict({
