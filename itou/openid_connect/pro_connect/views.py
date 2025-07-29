@@ -23,8 +23,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.constants import ITOU_HELP_CENTER_URL
-from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url, get_zendesk_form_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
 
@@ -93,10 +92,10 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
             "Un compte {} existe déjà avec cette adresse e-mail. "
             "Vous devez créer un compte ProConnect avec une autre adresse e-mail pour "
             "devenir {} sur la plateforme. Besoin d'aide ? "
-            "<a href='{}/requests/new' target='_blank'>Contactez-nous</a>.",
+            "<a href='{}' target='_blank'>Contactez-nous</a>.",
             existing_user.get_kind_display(),
             UserKind(new_user_kind).label,
-            ITOU_HELP_CENTER_URL,
+            get_zendesk_form_url(),
         ),
     )
 

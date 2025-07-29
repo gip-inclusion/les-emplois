@@ -12,7 +12,7 @@ from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users.enums import IdentityProvider
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import JobSeekerProfile, User
-from itou.utils import constants as global_constants
+from itou.utils.urls import get_zendesk_form_url
 
 
 class SSOReadonlyMixin:
@@ -79,7 +79,7 @@ class EditJobSeekerInfoForm(
             # If the job seeker uses France Connect, point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
-                f"<a href='{global_constants.ITOU_HELP_CENTER_URL}/requests/new' target='_blank'>"
+                f"<a href='{get_zendesk_form_url()}' target='_blank'>"
                 "contacter notre support technique</a>"
             )
         elif editor and editor.can_edit_email(self.instance):
