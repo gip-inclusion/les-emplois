@@ -6,14 +6,14 @@
 Arguments:
 
     approval
-    detail_view_version
-    job_seeker_dashboard_version
-    link_from_current_url (defauts to None - hence no link to detail view)
-    extra_classes (defaults to "")
+    request
+    version (None, detail_view or job_seeker_dashboard)
+    with_details_link
+    extra_classes
 
 {% endcomment %}
 {% enums "approvals" "Origin" as ApprovalOrigin %}
-<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_classes|default:"" }}">
+<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} {{ extra_classes }}">
     <div class="mb-3 mb-md-4">
         {% approval_state_badge approval in_approval_box=True span_extra_classes="badge-base" %}
     </div>
@@ -65,7 +65,7 @@ Arguments:
             </li>
         {% endif %}
     </ul>
-    {% if detail_view_version|default:False %}
+    {% if version == "detail_view" %}
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
@@ -98,7 +98,7 @@ Arguments:
                 {% endif %}
             {% endwith %}
         {% endif %}
-        {% if job_seeker_dashboard_version|default:False %}
+        {% if version == "job_seeker_dashboard" %}
             {% if approval.user.has_latest_common_approval_in_waiting_period %}
                 <hr class="my-3 my-md-4">
                 {% if approval.user.has_valid_diagnosis %}
@@ -121,8 +121,8 @@ Arguments:
                 {% endif %}
             {% endif %}
         {% endif %}
-        {% if approval.is_pass_iae and link_from_current_url %}
-            <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+        {% if approval.is_pass_iae and with_details_link %}
+            <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
             </a>
