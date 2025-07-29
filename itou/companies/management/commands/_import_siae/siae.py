@@ -198,7 +198,7 @@ def cleanup_siaes_after_grace_period():
         else:
             blocked_deletions += 1
 
-    print(f"{deletions} siaes past their grace period has been deleted")
+    print(f"{deletions} siaes past their grace period have been deleted")
     print(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
 
