@@ -392,7 +392,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="anonymize_jobseekers",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 7-20 * * MON-FRI"},
+            "schedule": {"type": "crontab", "value": "*/30 7-20 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
