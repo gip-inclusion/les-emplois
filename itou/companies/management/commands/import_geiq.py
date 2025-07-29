@@ -12,11 +12,9 @@ from itou.companies.management.commands._import_siae.utils import (
 )
 from itou.companies.models import Company
 from itou.utils.command import BaseCommand
-from itou.utils.python import timeit
 from itou.utils.validators import validate_siret
 
 
-@timeit
 def get_geiq_df(filename):
     info_stats = {}
 
@@ -121,7 +119,6 @@ class Command(BaseCommand):
         parser.add_argument("filename")
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    @timeit
     def handle(self, *, filename, wet_run, **options):
         geiq_df, info_stats = get_geiq_df(filename)
         info_stats |= sync_structures(

@@ -76,7 +76,6 @@ from itou.siae_evaluations.models import (
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.command import BaseCommand
-from itou.utils.python import timeit
 
 
 def log_retry_attempt(retry_state):
@@ -530,7 +529,6 @@ class Command(BaseCommand):
         )
         populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
 
-    @timeit
     def report_data_inconsistencies(self):
         """
         Report data inconsistencies that were previously ignored during `populate_approvals` method in order to avoid
@@ -549,11 +547,9 @@ class Command(BaseCommand):
                 "manual resolution, see command output"
             )
 
-    @timeit
     def build_dbt_daily(self):
         build_dbt_daily()
 
-    @timeit
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
