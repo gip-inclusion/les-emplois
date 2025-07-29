@@ -33,11 +33,6 @@ def get_company_from_approval(approval):
     if isinstance(approval, PoleEmploiApproval):
         return None
     assert isinstance(approval, Approval)
-    if not approval.user.is_job_seeker:
-        # Sometimes we have incorrect data where a user has an approval, thus should be a job seeker,
-        # but actually is a prescriber or an employer.
-        # We ignore this error here and instead report it in the final `report_data_inconsistencies` method.
-        return None
     return get_hiring_company(approval.user)
 
 

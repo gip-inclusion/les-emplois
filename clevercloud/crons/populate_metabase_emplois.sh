@@ -42,7 +42,6 @@ if [[ "$1" == "--daily" ]]; then
     django-admin populate_metabase_emplois --mode=dbt_daily |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=gps_groups |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=gps_memberships |& tee -a "$OUTPUT_LOG"
-    django-admin populate_metabase_emplois --mode=data_inconsistencies |& tee -a "$OUTPUT_LOG"
     django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"
 elif [[ "$1" == "--monthly" ]]; then
     django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
