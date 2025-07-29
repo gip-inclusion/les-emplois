@@ -27,6 +27,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.approvals.perms import can_view_approval_details
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import save_file
@@ -180,32 +181,15 @@ class ApprovalDetailView(UserPassesTestMixin, DetailView):
         return suspensions
 
     def get_context_data(self, **kwargs):
+        if not can_view_approval_details(self.request, self.object):
+            raise PermissionDenied
+
         is_employer_with_accepted_application = False
         if self.request.user.is_employer:
-            if application_states := self.object.user.job_applications.filter(
-                to_company=self.request.current_organization,
-            ).values_list("state", flat=True):
-                # The employer has received an application and can access the approval detail
-                if any(state == JobApplicationState.ACCEPTED for state in application_states):
-                    # The employer has even accepted an application: the action buttons are visible
-                    is_employer_with_accepted_application = True
-            elif not self.object.user.job_applications.prescriptions_of(
-                self.request.user, self.request.current_organization
-            ).exists():
-                # No received or sent applications: no reason to access this page
-                raise PermissionDenied
-        elif self.request.user.is_prescriber:
-            if not self.object.user.job_applications.prescriptions_of(
-                self.request.user, self.request.current_organization
-            ).exists():
-                raise PermissionDenied
-        elif self.request.user.is_job_seeker:
-            if self.object.user != self.request.user:
-                raise PermissionDenied
-        else:
-            # test_func should prevent this case from happening but let's be safe
-            logger.exception("This should never happen")
-            raise PermissionDenied
+            # Display the action buttons if the employer has accepted an application
+            is_employer_with_accepted_application = self.object.user.job_applications.filter(
+                to_company=self.request.current_organization, state=JobApplicationState.ACCEPTED
+            ).exists()
 
         context = super().get_context_data(**kwargs)
         approval = self.object
