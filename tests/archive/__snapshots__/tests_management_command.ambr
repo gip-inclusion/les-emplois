@@ -503,7 +503,7 @@
       'count_approvals': 0,
       'count_eligibility_diagnoses': 3,
       'count_total_applications': 0,
-      'date_joined': datetime.date(2023, 8, 1),
+      'date_joined': datetime.date(2022, 11, 1),
       'department': '35',
       'first_approval_start_at': None,
       'first_login': None,
