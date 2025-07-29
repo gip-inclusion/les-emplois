@@ -39,7 +39,7 @@ from itou.job_applications.enums import JobApplicationState, Origin, RefusalReas
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
-from itou.metabase.db import build_dbt_daily, populate_table
+from itou.metabase.db import populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
@@ -65,6 +65,7 @@ from itou.metabase.tables import (
     users,
 )
 from itou.metabase.tables.utils import get_active_companies_pks
+from itou.metabase.utils import build_dbt_daily
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (

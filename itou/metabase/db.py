@@ -4,9 +4,7 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 
 import copy
 import gc
-import urllib
 
-import httpx
 import psycopg
 from django.conf import settings
 from django.utils import timezone
@@ -99,13 +97,6 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
         )
         cursor.execute(create_table_query)
         conn.commit()
-
-
-def build_dbt_daily():
-    httpx.post(
-        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),
-        json={"conf": {}},
-    ).raise_for_status()
 
 
 def populate_table(table, batch_size, querysets=None, extra_object=None):
