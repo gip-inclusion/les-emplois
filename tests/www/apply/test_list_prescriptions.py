@@ -23,7 +23,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
+from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assert_previous_step,
     assertSnapshotQueries,

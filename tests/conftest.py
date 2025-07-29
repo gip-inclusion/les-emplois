@@ -44,7 +44,7 @@ from itou.utils.storage.s3 import (  # noqa: E402
     delete_all_objects_versions,
     s3_client,
 )
-from tests.utils.htmx.test import HtmxClient  # noqa: E402
+from tests.utils.htmx.testing import HtmxClient  # noqa: E402
 from tests.utils.testing import ItouClient  # noqa: E402
 
 
