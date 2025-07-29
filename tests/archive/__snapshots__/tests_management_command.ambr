@@ -954,7 +954,7 @@
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_body]
   '''
   Bonjour Micheline DUBOIS,
-  Le 15/01/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  Le 17/06/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
   A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
   
