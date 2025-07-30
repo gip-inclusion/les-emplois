@@ -51,7 +51,7 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
     recent_geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.filter(
         expires_at__gt=inactive_since, job_seeker_id=OuterRef("pk")
     )
-    recent_job_application = JobApplication.objects.filter(job_seeker_id=OuterRef("pk"), updated_at__gt=inactive_since)
+    recent_job_application = JobApplication.objects.filter(job_seeker_id=OuterRef("pk"), created_at__gt=inactive_since)
     recent_followup_group_contact = FollowUpGroupMembership.objects.filter(
         follow_up_group__beneficiary_id=OuterRef("pk"), last_contact_at__gt=inactive_since
     )
