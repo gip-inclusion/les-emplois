@@ -860,3 +860,7 @@ SUSPEND_ANONYMIZE_CANCELLED_APPROVALS = os.getenv("SUSPEND_ANONYMIZE_CANCELLED_A
 # ------------------------------------------------------------------------------
 MAINTENANCE_MODE = os.getenv("MAINTENANCE_MODE", "False") == "True"
 MAINTENANCE_DESCRIPTION = os.getenv("MAINTENANCE_DESCRIPTION", None)
+
+# Criteria certification
+# ------------------------------------------------------------------------------
+CERTIFY_CRITERIA_ASYNC_MODE_ONLY = os.getenv("CERTIFY_CRITERIA_ASYNC_MODE_ONLY", "False") == "True"

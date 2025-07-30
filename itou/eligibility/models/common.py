@@ -96,6 +96,10 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             return SenderKind(self.sender_kind).label
 
     def certify_criteria(self):
+        if settings.CERTIFY_CRITERIA_ASYNC_MODE_ONLY:
+            async_certify_criteria(self._meta.model_name, self.pk)
+            return
+
         try:
             # Optimistic call to show certified badge in response immediately.
             certify_criteria(self)
