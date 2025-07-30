@@ -967,10 +967,114 @@
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[authorized_prescriber_admin_membership][anonymized_professionals_with_annotations]
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[anonymized_professionals_with_annotations]
   list([
     dict({
-      'date_joined': datetime.date(2025, 7, 1),
+      'date_joined': datetime.date(2020, 10, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'DJANGO',
+      'kind': 'labor_inspector',
+      'last_login': None,
+      'number_of_active_memberships': 0,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 9, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'DJANGO',
+      'kind': 'labor_inspector',
+      'last_login': None,
+      'number_of_active_memberships': 1,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 8, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'DJANGO',
+      'kind': 'labor_inspector',
+      'last_login': None,
+      'number_of_active_memberships': 1,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 1,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 7, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'PC',
+      'kind': 'employer',
+      'last_login': None,
+      'number_of_active_memberships': 0,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 6, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'PC',
+      'kind': 'employer',
+      'last_login': None,
+      'number_of_active_memberships': 1,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 5, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'PC',
+      'kind': 'employer',
+      'last_login': None,
+      'number_of_active_memberships': 1,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 1,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 4, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'PC',
+      'kind': 'prescriber',
+      'last_login': None,
+      'number_of_active_memberships': 0,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 3, 1),
+      'department': '',
+      'first_login': None,
+      'had_memberships_in_authorized_organization': False,
+      'identity_provider': 'PC',
+      'kind': 'prescriber',
+      'last_login': None,
+      'number_of_active_memberships': 1,
+      'number_of_memberships': 1,
+      'number_of_memberships_as_administrator': 0,
+      'title': '',
+    }),
+    dict({
+      'date_joined': datetime.date(2020, 2, 1),
       'department': '',
       'first_login': None,
       'had_memberships_in_authorized_organization': True,
@@ -980,142 +1084,6 @@
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
       'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_admin_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'PC',
-      'kind': 'employer',
-      'last_login': None,
-      'number_of_active_memberships': 1,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[company_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'PC',
-      'kind': 'employer',
-      'last_login': None,
-      'number_of_active_memberships': 1,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 0,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_company_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'PC',
-      'kind': 'employer',
-      'last_login': None,
-      'number_of_active_memberships': 0,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_institution_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
-      'last_login': None,
-      'number_of_active_memberships': 0,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[disabled_prescriber_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'PC',
-      'kind': 'prescriber',
-      'last_login': None,
-      'number_of_active_memberships': 0,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_admin_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
-      'last_login': None,
-      'number_of_active_memberships': 1,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 1,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[institution_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'DJANGO',
-      'kind': 'labor_inspector',
-      'last_login': None,
-      'number_of_active_memberships': 1,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 0,
-      'title': '',
-    }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymized_professionals_annotations[prescriber_membership][anonymized_professionals_with_annotations]
-  list([
-    dict({
-      'date_joined': datetime.date(2025, 7, 1),
-      'department': '',
-      'first_login': None,
-      'had_memberships_in_authorized_organization': False,
-      'identity_provider': 'PC',
-      'kind': 'prescriber',
-      'last_login': None,
-      'number_of_active_memberships': 1,
-      'number_of_memberships': 1,
-      'number_of_memberships_as_administrator': 0,
       'title': '',
     }),
   ])

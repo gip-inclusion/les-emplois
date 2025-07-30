@@ -1429,46 +1429,63 @@ class TestAnonymizeProfessionalManagementCommand:
             assert mailoutbox == []
         assert respx_mock.calls.call_count == 1
 
-    @pytest.mark.parametrize(
-        "factory",
-        [
-            pytest.param(
-                lambda: PrescriberMembershipFactory(user__notified_days_ago=31, organization__authorized=True),
-                id="authorized_prescriber_admin_membership",
-            ),
-            pytest.param(
-                lambda: PrescriberMembershipFactory(
-                    user__notified_days_ago=31, organization__authorized=False, is_admin=False
-                ),
-                id="prescriber_membership",
-            ),
-            pytest.param(
-                lambda: PrescriberMembershipFactory(user__notified_days_ago=31, is_active=False),
-                id="disabled_prescriber_membership",
-            ),
-            pytest.param(lambda: CompanyMembershipFactory(user__notified_days_ago=31), id="company_admin_membership"),
-            pytest.param(
-                lambda: CompanyMembershipFactory(user__notified_days_ago=31, is_admin=False), id="company_membership"
-            ),
-            pytest.param(
-                lambda: CompanyMembershipFactory(user__notified_days_ago=31, is_active=False),
-                id="disabled_company_membership",
-            ),
-            pytest.param(
-                lambda: InstitutionMembershipFactory(user__notified_days_ago=31), id="institution_admin_membership"
-            ),
-            pytest.param(
-                lambda: InstitutionMembershipFactory(user__notified_days_ago=31, is_admin=False),
-                id="institution_membership",
-            ),
-            pytest.param(
-                lambda: InstitutionMembershipFactory(user__notified_days_ago=31, is_active=False),
-                id="disabled_institution_membership",
-            ),
-        ],
-    )
-    def test_anonymized_professionals_annotations(self, factory, django_capture_on_commit_callbacks, snapshot):
-        factory()
+    def test_anonymized_professionals_annotations(self, django_capture_on_commit_callbacks, snapshot):
+        # authorized_prescriber_admin_membership
+        PrescriberMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 2, 16)),
+            user__notified_days_ago=31,
+            organization__authorized=True,
+        )
+        # prescriber_membership
+        PrescriberMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 3, 16)),
+            user__notified_days_ago=31,
+            organization__authorized=False,
+            is_admin=False,
+        )
+        # disabled_prescriber_membership
+        PrescriberMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 4, 16)),
+            user__notified_days_ago=31,
+            is_admin=False,
+            is_active=False,
+        )
+        # company_admin_membership
+        CompanyMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 5, 16)), user__notified_days_ago=31
+        )
+        # company_membership
+        CompanyMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 6, 16)),
+            user__notified_days_ago=31,
+            is_admin=False,
+        )
+        # disabled_company_membership
+        CompanyMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 7, 16)),
+            user__notified_days_ago=31,
+            is_admin=False,
+            is_active=False,
+        )
+        # institution_admin_membership
+        InstitutionMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 8, 16)),
+            user__notified_days_ago=31,
+            is_admin=True,
+        )
+        # institution_membership
+        InstitutionMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 9, 16)),
+            user__notified_days_ago=31,
+            is_admin=False,
+        )
+        # disabled_institution_membership
+        InstitutionMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2020, 10, 16)),
+            user__notified_days_ago=31,
+            is_admin=False,
+            is_active=False,
+        )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
