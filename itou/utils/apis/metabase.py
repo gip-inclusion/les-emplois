@@ -337,7 +337,7 @@ class Client:
             *filters,
         ]
 
-    def build_query(self, *, select=None, table=None, where=None, group_by=None, limit=None):
+    def build_query(self, *, select=None, table=None, where=None, group_by=None, order_by=None, limit=None):
         query = {}
         if select:
             query["fields"] = [self._build_metabase_field(field) for field in select]
@@ -347,6 +347,8 @@ class Client:
             query["filter"] = [self._build_metabase_filter(field, values) for field, values in where.items()]
         if group_by:
             query["breakout"] = [self._build_metabase_field(field) for field in group_by]
+        if order_by:
+            query["order-by"] = [["asc", self._build_metabase_field(field)] for field in order_by]
         if limit:
             query["limit"] = limit
 
@@ -364,6 +366,9 @@ class Client:
         if "breakout" in query:
             into.setdefault("breakout", [])
             into["breakout"].extend(query["breakout"])
+        if "order-by" in query:
+            into.setdefault("order-by", [])
+            into["order-by"].extend(query["order-by"])
         if "limit" in query:
             into["limit"] = query["limit"]
 
