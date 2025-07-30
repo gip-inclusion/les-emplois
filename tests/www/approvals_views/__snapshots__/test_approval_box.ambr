@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_approval_no_details_link
+# name: test_box_without_link
   '''
   <html>
       <head>
@@ -69,6 +69,149 @@
   
   '''
 # ---
+# name: test_details_view_version[default]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-success-lightest border-success">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-success text-white">
+                      <i aria-hidden="true" class="ri-pass-valid-line">
+                      </i>
+                      PASS IAE valide
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2024
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de fin prévisionnelle
+                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong>
+                          30/12/2025
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Durée de validité
+                          <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong class="text-success">
+                          512 jours (Environ 1 an et 4 mois)
+                          <br/>
+                          <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                              Comment est calculée cette durée ?
+                          </a>
+                      </strong>
+                  </li>
+              </ul>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: test_details_view_version[pe_approval]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-success-lightest border-success">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-success text-white">
+                      <i aria-hidden="true" class="ri-pass-valid-line">
+                      </i>
+                      PASS IAE valide
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2024
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de fin prévisionnelle
+                          <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong>
+                          30/12/2025
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Durée de validité
+                          <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong class="text-success">
+                          512 jours (Environ 1 an et 4 mois)
+                          <br/>
+                          <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                              Comment est calculée cette durée ?
+                          </a>
+                      </strong>
+                  </li>
+              </ul>
+              <p class="fs-sm fst-italic mt-3">
+                  Ce PASS IAE a été importé depuis un agrément Pôle emploi.
+              </p>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
 # name: test_expired_approval
   '''
   <html>
@@ -117,286 +260,6 @@
                       </strong>
                   </li>
               </ul>
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                  </i>
-                  <span>
-                      Afficher le PASS IAE
-                  </span>
-              </a>
-          </div>
-      </body>
-  </html>
-  
-  '''
-# ---
-# name: test_expired_approval_in_waiting_period_with_valid_diagnosis[with city]
-  '''
-  <html>
-      <head>
-      </head>
-      <body>
-          <div class="c-box c-box--pass bg-danger-lightest border-danger">
-              <div class="mb-3 mb-md-4">
-                  <span class="badge badge-base rounded-pill bg-danger text-white">
-                      <i aria-hidden="true" class="ri-pass-expired-line">
-                      </i>
-                      PASS IAE expiré
-                  </span>
-              </div>
-              <ul class="list-data">
-                  <li>
-                      <small>
-                          Numéro de PASS IAE
-                      </small>
-                      <strong>
-                          <span>
-                              XXXXX
-                          </span>
-                          <span class="ms-1">
-                              12
-                          </span>
-                          <span class="ms-1">
-                              34567
-                          </span>
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          Date de début
-                      </small>
-                      <strong>
-                          01/01/2022
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          A expiré le
-                      </small>
-                      <strong class="text-danger">
-                          31/12/2023
-                      </strong>
-                  </li>
-              </ul>
-              <hr class="my-3 my-md-4"/>
-              <p class="fs-sm mb-0">
-                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
-              </p>
-              <p class="fs-sm my-0">
-                  <a href="/search/employers/results?city=geispolsheim-67">
-                      Vous pouvez désormais travailler dans une structure d’insertion.
-                  </a>
-              </p>
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                  </i>
-                  <span>
-                      Afficher le PASS IAE
-                  </span>
-              </a>
-          </div>
-      </body>
-  </html>
-  
-  '''
-# ---
-# name: test_expired_approval_in_waiting_period_with_valid_diagnosis[without city]
-  '''
-  <html>
-      <head>
-      </head>
-      <body>
-          <div class="c-box c-box--pass bg-danger-lightest border-danger">
-              <div class="mb-3 mb-md-4">
-                  <span class="badge badge-base rounded-pill bg-danger text-white">
-                      <i aria-hidden="true" class="ri-pass-expired-line">
-                      </i>
-                      PASS IAE expiré
-                  </span>
-              </div>
-              <ul class="list-data">
-                  <li>
-                      <small>
-                          Numéro de PASS IAE
-                      </small>
-                      <strong>
-                          <span>
-                              XXXXX
-                          </span>
-                          <span class="ms-1">
-                              12
-                          </span>
-                          <span class="ms-1">
-                              34567
-                          </span>
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          Date de début
-                      </small>
-                      <strong>
-                          01/01/2022
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          A expiré le
-                      </small>
-                      <strong class="text-danger">
-                          31/12/2023
-                      </strong>
-                  </li>
-              </ul>
-              <hr class="my-3 my-md-4"/>
-              <p class="fs-sm mb-0">
-                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
-              </p>
-              <p class="fs-sm my-0">
-                  <a href="/search/employers/results">
-                      Vous pouvez désormais travailler dans une structure d’insertion.
-                  </a>
-              </p>
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                  </i>
-                  <span>
-                      Afficher le PASS IAE
-                  </span>
-              </a>
-          </div>
-      </body>
-  </html>
-  
-  '''
-# ---
-# name: test_expired_approval_in_waiting_period_without_diagnosis[with_city]
-  '''
-  <html>
-      <head>
-      </head>
-      <body>
-          <div class="c-box c-box--pass bg-danger-lightest border-danger">
-              <div class="mb-3 mb-md-4">
-                  <span class="badge badge-base rounded-pill bg-danger text-white">
-                      <i aria-hidden="true" class="ri-pass-expired-line">
-                      </i>
-                      PASS IAE expiré
-                  </span>
-              </div>
-              <ul class="list-data">
-                  <li>
-                      <small>
-                          Numéro de PASS IAE
-                      </small>
-                      <strong>
-                          <span>
-                              XXXXX
-                          </span>
-                          <span class="ms-1">
-                              12
-                          </span>
-                          <span class="ms-1">
-                              34567
-                          </span>
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          Date de début
-                      </small>
-                      <strong>
-                          01/01/2022
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          A expiré le
-                      </small>
-                      <strong class="text-danger">
-                          31/12/2023
-                      </strong>
-                  </li>
-              </ul>
-              <hr class="my-3 my-md-4"/>
-              <p class="fs-sm mb-0">
-                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
-              </p>
-              <p class="fs-sm my-0">
-                  <a href="/search/employers/results?city=geispolsheim-67">
-                      Vous pouvez désormais travailler dans une structure d’insertion.
-                  </a>
-              </p>
-              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
-                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
-                  </i>
-                  <span>
-                      Afficher le PASS IAE
-                  </span>
-              </a>
-          </div>
-      </body>
-  </html>
-  
-  '''
-# ---
-# name: test_expired_approval_in_waiting_period_without_diagnosis[without_city]
-  '''
-  <html>
-      <head>
-      </head>
-      <body>
-          <div class="c-box c-box--pass bg-danger-lightest border-danger">
-              <div class="mb-3 mb-md-4">
-                  <span class="badge badge-base rounded-pill bg-danger text-white">
-                      <i aria-hidden="true" class="ri-pass-expired-line">
-                      </i>
-                      PASS IAE expiré
-                  </span>
-              </div>
-              <ul class="list-data">
-                  <li>
-                      <small>
-                          Numéro de PASS IAE
-                      </small>
-                      <strong>
-                          <span>
-                              XXXXX
-                          </span>
-                          <span class="ms-1">
-                              12
-                          </span>
-                          <span class="ms-1">
-                              34567
-                          </span>
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          Date de début
-                      </small>
-                      <strong>
-                          01/01/2022
-                      </strong>
-                  </li>
-                  <li>
-                      <small>
-                          A expiré le
-                      </small>
-                      <strong class="text-danger">
-                          31/12/2023
-                      </strong>
-                  </li>
-              </ul>
-              <hr class="my-3 my-md-4"/>
-              <p class="fs-sm mb-0">
-                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
-              </p>
-              <p class="fs-sm my-0">
-                  <a href="/search/employers/results">
-                      Vous pouvez désormais travailler dans une structure d’insertion.
-                  </a>
-              </p>
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium">
                   </i>
@@ -528,6 +391,286 @@
                       </strong>
                   </li>
               </ul>
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                  </i>
+                  <span>
+                      Afficher le PASS IAE
+                  </span>
+              </a>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: test_job_seeker_dashboard_expired_approval_in_waiting_period_with_valid_diagnosis[with city]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-danger-lightest border-danger">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-danger text-white">
+                      <i aria-hidden="true" class="ri-pass-expired-line">
+                      </i>
+                      PASS IAE expiré
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2022
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          A expiré le
+                      </small>
+                      <strong class="text-danger">
+                          31/12/2023
+                      </strong>
+                  </li>
+              </ul>
+              <hr class="my-3 my-md-4"/>
+              <p class="fs-sm mb-0">
+                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
+              </p>
+              <p class="fs-sm my-0">
+                  <a href="/search/employers/results?city=geispolsheim-67">
+                      Vous pouvez désormais travailler dans une structure d’insertion.
+                  </a>
+              </p>
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                  </i>
+                  <span>
+                      Afficher le PASS IAE
+                  </span>
+              </a>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: test_job_seeker_dashboard_expired_approval_in_waiting_period_with_valid_diagnosis[without city]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-danger-lightest border-danger">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-danger text-white">
+                      <i aria-hidden="true" class="ri-pass-expired-line">
+                      </i>
+                      PASS IAE expiré
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2022
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          A expiré le
+                      </small>
+                      <strong class="text-danger">
+                          31/12/2023
+                      </strong>
+                  </li>
+              </ul>
+              <hr class="my-3 my-md-4"/>
+              <p class="fs-sm mb-0">
+                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
+              </p>
+              <p class="fs-sm my-0">
+                  <a href="/search/employers/results">
+                      Vous pouvez désormais travailler dans une structure d’insertion.
+                  </a>
+              </p>
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                  </i>
+                  <span>
+                      Afficher le PASS IAE
+                  </span>
+              </a>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: test_job_seeker_dashboard_expired_approval_in_waiting_period_without_diagnosis[with_city]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-danger-lightest border-danger">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-danger text-white">
+                      <i aria-hidden="true" class="ri-pass-expired-line">
+                      </i>
+                      PASS IAE expiré
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2022
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          A expiré le
+                      </small>
+                      <strong class="text-danger">
+                          31/12/2023
+                      </strong>
+                  </li>
+              </ul>
+              <hr class="my-3 my-md-4"/>
+              <p class="fs-sm mb-0">
+                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
+              </p>
+              <p class="fs-sm my-0">
+                  <a href="/search/employers/results?city=geispolsheim-67">
+                      Vous pouvez désormais travailler dans une structure d’insertion.
+                  </a>
+              </p>
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                  </i>
+                  <span>
+                      Afficher le PASS IAE
+                  </span>
+              </a>
+          </div>
+      </body>
+  </html>
+  
+  '''
+# ---
+# name: test_job_seeker_dashboard_expired_approval_in_waiting_period_without_diagnosis[without_city]
+  '''
+  <html>
+      <head>
+      </head>
+      <body>
+          <div class="c-box c-box--pass bg-danger-lightest border-danger">
+              <div class="mb-3 mb-md-4">
+                  <span class="badge badge-base rounded-pill bg-danger text-white">
+                      <i aria-hidden="true" class="ri-pass-expired-line">
+                      </i>
+                      PASS IAE expiré
+                  </span>
+              </div>
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              XXXXX
+                          </span>
+                          <span class="ms-1">
+                              12
+                          </span>
+                          <span class="ms-1">
+                              34567
+                          </span>
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          Date de début
+                      </small>
+                      <strong>
+                          01/01/2022
+                      </strong>
+                  </li>
+                  <li>
+                      <small>
+                          A expiré le
+                      </small>
+                      <strong class="text-danger">
+                          31/12/2023
+                      </strong>
+                  </li>
+              </ul>
+              <hr class="my-3 my-md-4"/>
+              <p class="fs-sm mb-0">
+                  Votre PASS IAE a expiré depuis moins de 2 ans mais un prescripteur habilité a réalisé un nouveau diagnostic d’éligibilité IAE.
+              </p>
+              <p class="fs-sm my-0">
+                  <a href="/search/employers/results">
+                      Vous pouvez désormais travailler dans une structure d’insertion.
+                  </a>
+              </p>
               <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/997a1eaf-6fad-4256-b371-31bb05c94862?back_url=/">
                   <i aria-hidden="true" class="ri-eye-line font-weight-medium">
                   </i>

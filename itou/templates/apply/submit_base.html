@@ -22,7 +22,7 @@
                 {% if is_subject_to_eligibility_rules and job_seeker.has_valid_approval %}
                     {# We don't want to show expired approval when applying/hiring #}
                     <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                        {% approval_details_box approval=job_seeker.latest_approval request=request extra_classes='my-3 my-md-4' %}
+                        {% approval_details_box approval=job_seeker.latest_approval version='box' request=request extra_classes='my-3 my-md-4' %}
                     </div>
                 {% endif %}
             </div>
