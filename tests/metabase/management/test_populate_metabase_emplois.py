@@ -7,7 +7,6 @@ from django.db import connection, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 from psycopg.types.range import Range
-from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -49,6 +48,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.utils.testing import assertSnapshotQueries
 
 
 @freeze_time("2023-03-10")
@@ -131,7 +131,7 @@ def test_populate_analytics():
 # return datetime.date objects that are not equal...
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_job_seekers():
+def test_populate_job_seekers(snapshot):
     QPVFactory(code="QP075019")
 
     # Importing this file makes a query so we need to do it inside a test
@@ -227,24 +227,7 @@ def test_populate_job_seekers():
         created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC),
     )
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Get administrative criteria
-    num_queries += 1  # Count rows
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select all elements ids (chunked_queryset)
-    num_queries += 1  # Select last pk for current chunk
-    num_queries += 1  # Select job seekers chunk (with annotations)
-    num_queries += 1  # Prefetch EligibilityDiagnosis with annotations, author_prescriber_organization and author_siae
-    num_queries += 1  # Prefetch EligibilityDiagnosis's selected administrative criteria
-    num_queries += 1  # Prefetch JobApplications with Siaes
-    num_queries += 1  # Get QPV users
-    num_queries += 1  # Select AI stock approvals pks
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="job_seekers")
 
     with connection.cursor() as cursor:
@@ -449,19 +432,8 @@ def test_populate_job_seekers():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_criteria():
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count criteria
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select criteria IDs
-    num_queries += 1  # Select one chunk of criteria IDs
-    num_queries += 1  # Select criteria with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+def test_populate_criteria(snapshot):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="criteria")
 
     with connection.cursor() as cursor:
@@ -474,7 +446,7 @@ def test_populate_criteria():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_job_applications():
+def test_populate_job_applications(snapshot):
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     company = CompanyFactory(
         for_snapshot=True,
@@ -491,20 +463,7 @@ def test_populate_job_applications():
     )
     ja.selected_jobs.add(job)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Select siaes for get_active_companies_pks()
-    num_queries += 1  # Count job applications
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select job application IDs
-    num_queries += 1  # Select one chunk of job application IDs
-    num_queries += 1  # Select job applications with columns
-    num_queries += 1  # Select job application transition logs
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="job_applications")
 
     with connection.cursor() as cursor:
@@ -547,19 +506,7 @@ def test_populate_job_applications():
             ),
         ]
 
-    # no need for a cache clear for the active siae pks, has been done above
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count job applications
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select job application IDs
-    num_queries += 1  # Select one chunk of job application IDs
-    num_queries += 1  # Select job applications with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="selected_jobs")
 
     with connection.cursor() as cursor:
@@ -577,31 +524,11 @@ def test_populate_job_applications():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_approvals():
+def test_populate_approvals(snapshot):
     approval = ApprovalFactory()
     pe_approval = PoleEmploiApprovalFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count approvals
-    num_queries += 1  # Count PE approvals
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select approval IDs
-    num_queries += 1  # Select approvals IDs, chunk by 1000
-    num_queries += 1  # Select approvals with columns
-    num_queries += 1  # Prefetch users
-    num_queries += 1  # Prefetch JobApplications
-    num_queries += 1  # COMMIT (inject_chunk)
-
-    num_queries += 1  # Select PE approval IDs
-    num_queries += 1  # Select PE approvals IDs, chunk by 1000
-    num_queries += 1  # Select PE approvals with columns
-    num_queries += 1  # Select prescriber organizations
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="approvals")
 
     with connection.cursor() as cursor:
@@ -650,22 +577,11 @@ def test_populate_approvals():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_prolongations():
+def test_populate_prolongations(snapshot):
     prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count prolongations
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select prolongation IDs
-    num_queries += 1  # Select one chunk of prolongation IDs
-    num_queries += 1  # Select prolongations with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="prolongations")
 
     with connection.cursor() as cursor:
@@ -693,7 +609,7 @@ def test_populate_prolongations():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_prolongation_requests():
+def test_populate_prolongation_requests(snapshot):
     prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
 
@@ -703,18 +619,7 @@ def test_populate_prolongation_requests():
 
     ProlongationFactory(with_request=True)  # add another one to ensure we don't fail without a deny_information
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count prolongation_requests
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select prolongation_request IDs
-    num_queries += 1  # Select one chunk of prolongation_request IDs
-    num_queries += 1  # Select prolongation_requests with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="prolongation_requests")
 
     with connection.cursor() as cursor:
@@ -745,21 +650,10 @@ def test_populate_prolongation_requests():
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_suspensions():
+def test_populate_suspensions(snapshot):
     suspension = SuspensionFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count Suspensions
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select pks
-    num_queries += 1  # Select one chunk
-    num_queries += 1  # Select queryset with annotations
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="suspensions")
 
     with connection.cursor() as cursor:
@@ -783,21 +677,10 @@ def test_populate_suspensions():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_institutions():
+def test_populate_institutions(snapshot):
     institution = InstitutionFactory(department="14")
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count institutions
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select institution IDs
-    num_queries += 1  # Select one chunk of institution IDs
-    num_queries += 1  # Select institutions with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="institutions")
 
     with connection.cursor() as cursor:
@@ -819,21 +702,10 @@ def test_populate_institutions():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_evaluation_campaigns():
+def test_populate_evaluation_campaigns(snapshot):
     evaluation_campaign = EvaluationCampaignFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count campaigns
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select campaign IDs
-    num_queries += 1  # Select one chunk of campaign IDs
-    num_queries += 1  # Select campaigns with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="evaluation_campaigns")
 
     with connection.cursor() as cursor:
@@ -855,23 +727,10 @@ def test_populate_evaluation_campaigns():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_evaluated_siaes():
+def test_populate_evaluated_siaes(snapshot):
     evaluated_siae = EvaluatedSiaeFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count evaluated siaes
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select evaluated siae IDs
-    num_queries += 1  # Select one chunk of evaluated siae IDs
-    num_queries += 1  # Select evaluated siaes with columns
-    num_queries += 1  # Select related evaluated job applications
-    num_queries += 1  # Select related campaigns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="evaluated_siaes")
 
     with connection.cursor() as cursor:
@@ -893,22 +752,10 @@ def test_populate_evaluated_siaes():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_evaluated_job_applications():
+def test_populate_evaluated_job_applications(snapshot):
     evaluated_job_application = EvaluatedJobApplicationFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count evaluated job applications
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select evaluated job application IDs
-    num_queries += 1  # Select one chunk of evaluated job application IDs
-    num_queries += 1  # Select evaluated job applications with columns
-    num_queries += 1  # Select related evaluated siaes
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="evaluated_job_applications")
 
     with connection.cursor() as cursor:
@@ -928,22 +775,11 @@ def test_populate_evaluated_job_applications():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_evaluated_criteria():
+def test_populate_evaluated_criteria(snapshot):
     evaluated_job_application = EvaluatedJobApplicationFactory()
     evaluated_criteria = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count evaluated criteria
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select evaluated criteria IDs
-    num_queries += 1  # Select one chunk of evaluated criteria IDs
-    num_queries += 1  # Select evaluated criteria with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="evaluated_criteria")
 
     with connection.cursor() as cursor:
@@ -981,21 +817,10 @@ def test_populate_users_exclude_job_seekers():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_users():
+def test_populate_users(snapshot):
     pro_user = EmployerFactory()
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count users
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select user IDs
-    num_queries += 1  # Select one chunk of user IDs
-    num_queries += 1  # Select users with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="users")
 
     with connection.cursor() as cursor:
@@ -1016,7 +841,7 @@ def test_populate_users():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_memberships():
+def test_populate_memberships(snapshot):
     company_membership = CompanyMembershipFactory()
     CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
     CompanyMembershipFactory(user__is_active=False)  # memberships of inactive users are also ignored
@@ -1027,33 +852,7 @@ def test_populate_memberships():
     InstitutionMembershipFactory(is_active=False, institution=institution_membership.institution)
     InstitutionMembershipFactory(user__is_active=False, institution=institution_membership.institution)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count siae memberships
-    num_queries += 1  # Count prescriber memberships
-    num_queries += 1  # Count institution memberships
-
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-
-    num_queries += 1  # Select siae memberships IDs
-    num_queries += 1  # Select one chunk of siae memberships IDs
-    num_queries += 1  # Select siae memberships with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-
-    num_queries += 1  # Select prescriber memberships IDs
-    num_queries += 1  # Select one chunk of prescriber memberships IDs
-    num_queries += 1  # Select prescriber memberships with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-
-    num_queries += 1  # Select institution memberships IDs
-    num_queries += 1  # Select one chunk of institution memberships IDs
-    num_queries += 1  # Select institution memberships with columns
-    num_queries += 1  # COMMIT (inject_chunk)
-
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="memberships")
 
     with connection.cursor() as cursor:
@@ -1090,14 +889,8 @@ def test_populate_memberships():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_enums():
-    num_queries = 1  # COMMIT Create table
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries *= 5  # We inject thus many enums so far.
-    with assertNumQueries(num_queries):
+def test_populate_enums(snapshot):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="enums")
 
     with connection.cursor() as cursor:
@@ -1137,7 +930,7 @@ def test_populate_enums():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_job_descriptions():
+def test_populate_job_descriptions(snapshot):
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     company = CompanyFactory(
         for_snapshot=True,
@@ -1168,19 +961,7 @@ def test_populate_job_descriptions():
         }
     ]
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count total rows for job descriptions
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select all job descriptions
-    num_queries += 1  # Select job descriptions chunk
-    num_queries += 1  # Select job descriptions with columns
-    num_queries += 1  # Annotate job applications count
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="job_descriptions")
 
     with connection.cursor() as cursor:
@@ -1218,7 +999,7 @@ def test_populate_job_descriptions():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_companies():
+def test_populate_companies(snapshot):
     company = CompanyFactory(
         for_snapshot=True,
         siret="17643069438162",
@@ -1234,24 +1015,7 @@ def test_populate_companies():
     CompanyMembershipFactory(company=company, is_active=False)
     CompanyMembershipFactory(company=company, user__is_active=False)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count Siaes
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select active SIAES
-    num_queries += 1  # Select one chunk of siaes
-    num_queries += 1  # Select siaes with annotations and columns
-    num_queries += 1  # Select other siaes with the same convention
-    num_queries += 1  # Prefetch siae job descriptions
-    num_queries += 1  # Prefetch siae active memberships (for total_membres)
-    num_queries += 1  # Prefetch siae memberships (for first_membership_join_date)
-    num_queries += 1  # Prefetch siae members (for members last_login)
-    num_queries += 1  # Prefetch cities
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="companies")
 
     with connection.cursor() as cursor:
@@ -1336,21 +1100,10 @@ def test_populate_companies_convergence(settings):
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_gps_groups():
+def test_populate_gps_groups(snapshot):
     group = FollowUpGroupFactory(for_snapshot=True)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count FollowUpGroups
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select FollowUpGroups pks
-    num_queries += 1  # Select one chunk of FollowUpGroups
-    num_queries += 1  # Select FollowUpGroups with annotations
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="gps_groups")
 
     with connection.cursor() as cursor:
@@ -1371,25 +1124,14 @@ def test_populate_gps_groups():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_gps_memberships():
+def test_populate_gps_memberships(snapshot):
     membership = FollowUpGroupMembershipFactory(follow_up_group__for_snapshot=True, member__for_snapshot=True)
     prescriber = membership.member
     PrescriberMembershipFactory(user=prescriber, organization__department="63")
     PrescriberMembershipFactory(user=prescriber, organization__department="13")
     PrescriberMembershipFactory(user=prescriber, organization__department="75")
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Count FollowUpGroupMemberships
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT Create table
-    num_queries += 1  # Select FollowUpGroupMemberships pks
-    num_queries += 1  # Select one chunk of FollowUpGroupMemberships
-    num_queries += 1  # Select FollowUpGroupMemberships with annotations
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="gps_memberships")
 
     with connection.cursor() as cursor:
@@ -1413,7 +1155,7 @@ def test_populate_gps_memberships():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_organizations():
+def test_populate_organizations(snapshot):
     first_organisation = PrescriberOrganizationWith2MembershipFactory(
         authorized=True,
         post_code="59473",
@@ -1427,27 +1169,7 @@ def test_populate_organizations():
     PrescriberMembershipFactory(organization=first_organisation, is_active=False)
     PrescriberMembershipFactory(organization=first_organisation, user__is_active=False)
 
-    num_queries = 1  # SELECT set_config()
-    num_queries += 1  # Select get_active_companies_pks()
-    num_queries += 1  # Count organization
-    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
-    num_queries += 1  # COMMIT get_active_companies_pks (autocommit mode)
-    num_queries += 1  # Select cities
-    num_queries += 1  # Count memberships
-    num_queries += 2  # Select members/prescribermembership_set for ORG_OF_PRESCRIBERS_WITHOUT_ORG
-    num_queries += 1  # COMMIT Create table
-
-    num_queries += 1  # Select organization IDs
-    num_queries += 1  # Select one chunk of organization IDs
-    num_queries += 1  # Select organization with columns
-    num_queries += 1  # Select prefetch organizations active memberships (for total_membres)
-    num_queries += 1  # Select prefetch organizations memberships (for first_membership_join_date)
-    num_queries += 1  # Select prefetch organizations members (for members last_login)
-    num_queries += 1  # COMMIT (inject_chunk)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
-    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    with assertNumQueries(num_queries):
+    with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="organizations")
 
     with connection.cursor() as cursor:
