@@ -355,6 +355,92 @@ class TestNotifyInactiveJobseekersManagementCommand:
             ordered=False,
         )
 
+    def test_notify_inactive_jobseekers_on_job_application_dates(self):
+        old_job_application_kwargs = {
+            "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
+            "created_at": timezone.now() - relativedelta(days=DAYS_OF_INACTIVITY),
+            "eligibility_diagnosis": None,
+        }
+        recent_job_application_kwargs = {
+            **old_job_application_kwargs,
+            "created_at": old_job_application_kwargs["created_at"] + relativedelta(days=1),
+        }
+        log_kwargs = {
+            "from_state": JobApplicationState.NEW,
+            "to_state": JobApplicationState.PROCESSING,
+        }
+
+        # old job application without transition
+        old_job_application_without_log = JobApplicationFactory(**old_job_application_kwargs)
+
+        # old job application with old transition
+        old_job_application_with_old_log = JobApplicationFactory(**old_job_application_kwargs)
+        JobApplicationTransitionLog.objects.create(
+            user=old_job_application_with_old_log.job_seeker,
+            job_application=old_job_application_with_old_log,
+            timestamp=old_job_application_with_old_log.created_at,
+            **log_kwargs,
+        )
+
+        # old job application with recent transition
+        old_job_application_with_recent_log = JobApplicationFactory(**old_job_application_kwargs)
+        JobApplicationTransitionLog.objects.create(
+            user=old_job_application_with_recent_log.job_seeker,
+            job_application=old_job_application_with_recent_log,
+            timestamp=old_job_application_with_recent_log.created_at + relativedelta(days=1),
+            **log_kwargs,
+        )
+
+        # old job application with one old and one recent transitions
+        old_job_application_with_multiple_logs = JobApplicationFactory(**old_job_application_kwargs)
+        JobApplicationTransitionLog.objects.create(
+            user=old_job_application_with_multiple_logs.job_seeker,
+            job_application=old_job_application_with_multiple_logs,
+            timestamp=old_job_application_with_multiple_logs.created_at,
+            **log_kwargs,
+        )
+        JobApplicationTransitionLog.objects.create(
+            user=old_job_application_with_multiple_logs.job_seeker,
+            job_application=old_job_application_with_multiple_logs,
+            timestamp=old_job_application_with_multiple_logs.created_at + relativedelta(days=1),
+            from_state=JobApplicationState.PROCESSING,
+            to_state=JobApplicationState.PRIOR_TO_HIRE,
+        )
+
+        # recent job application without transition
+        recent_job_application_without_log = JobApplicationFactory(**recent_job_application_kwargs)
+
+        # recent job application with recent transition
+        recent_job_application_with_recent_log = JobApplicationFactory(**recent_job_application_kwargs)
+        JobApplicationTransitionLog.objects.create(
+            user=recent_job_application_with_recent_log.job_seeker,
+            job_application=recent_job_application_with_recent_log,
+            timestamp=recent_job_application_with_recent_log.created_at,
+            **log_kwargs,
+        )
+
+        call_command("notify_inactive_jobseekers", wet_run=True)
+
+        assertQuerySetEqual(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=False),
+            [
+                old_job_application_without_log.job_seeker,
+                old_job_application_with_old_log.job_seeker,
+            ],
+            ordered=False,
+        )
+
+        assertQuerySetEqual(
+            User.objects.filter(kind=UserKind.JOB_SEEKER, upcoming_deletion_notified_at__isnull=True),
+            [
+                old_job_application_with_recent_log.job_seeker,
+                old_job_application_with_multiple_logs.job_seeker,
+                recent_job_application_without_log.job_seeker,
+                recent_job_application_with_recent_log.job_seeker,
+            ],
+            ordered=False,
+        )
+
 
 class TestAnonymizeJobseekersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
