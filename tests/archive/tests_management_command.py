@@ -143,7 +143,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: JobApplicationFactory(
-                    job_seeker=jobseeker, eligibility_diagnosis=None, updated_at=timezone.now() - INACTIVITY_PERIOD
+                    job_seeker=jobseeker, eligibility_diagnosis=None, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 True,
                 id="jobseeker_with_job_application_without_recent_activity",
@@ -682,7 +682,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 approval=None,
                 eligibility_diagnosis=None,
                 geiq_eligibility_diagnosis=None,
-                updated_at=timezone.now() - INACTIVITY_PERIOD,
+                created_at=timezone.now() - INACTIVITY_PERIOD,
                 **jobapplication_kwargs,
             )
 
@@ -738,7 +738,7 @@ class TestAnonymizeJobseekersManagementCommand:
             approval=None,
             eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=None,
-            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            created_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
         other_files = [FileFactory(), JobApplicationFactory().resume]
@@ -843,7 +843,7 @@ class TestAnonymizeJobseekersManagementCommand:
         respx_mock,
     ):
         job_seeker = JobSeekerFactory(
-            joined_days_ago=DAYS_OF_INACTIVITY,
+            date_joined=timezone.make_aware(datetime.datetime(2023, 2, 15)),
             notified_days_ago=30,
             jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
             post_code="76160",
@@ -854,8 +854,10 @@ class TestAnonymizeJobseekersManagementCommand:
             approval=None,
             eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=None,
-            updated_at=timezone.now() - INACTIVITY_PERIOD,
-            **kwargs,
+            to_company__department=14,
+            to_company__naf="1705X",
+            to_company__kind=CompanyKind.EI,
+            created_at=timezone.make_aware(datetime.datetime(2023, 2, 15)),
         )
         if has_transitions:
             for from_state, to_state, months in [
@@ -889,7 +891,7 @@ class TestAnonymizeJobseekersManagementCommand:
         kwargs = {
             "start_at": datetime.date(2020, 1, 18),
             "end_at": datetime.date(2023, 1, 18),
-            "user__joined_days_ago": DAYS_OF_INACTIVITY,
+            "user__date_joined": timezone.make_aware(datetime.datetime(2020, 1, 15)),
             "user__notified_days_ago": 30,
             "user__for_snapshot": True,
         }
@@ -927,9 +929,11 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker=approval_with_few_datas.user,
             approval=approval_with_few_datas,
             eligibility_diagnosis=approval_with_few_datas.eligibility_diagnosis,
-            updated_at=timezone.now() - relativedelta(years=3),
+            created_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
+            processed_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
             to_company__department=76,
             to_company__naf="4567A",
+            to_company__kind=CompanyKind.EI,
             state=JobApplicationState.ACCEPTED,
         )
 
@@ -964,7 +968,10 @@ class TestAnonymizeJobseekersManagementCommand:
                 job_seeker=approval_with_lot_of_datas.user,
                 approval=approval_with_lot_of_datas,
                 eligibility_diagnosis=approval_with_lot_of_datas.eligibility_diagnosis,
-                updated_at=timezone.now() - relativedelta(years=3),
+                created_at=timezone.make_aware(datetime.datetime(2023, 1, 16)),
+                processed_at=timezone.make_aware(datetime.datetime(2023, 1, 16))
+                if state == JobApplicationState.ACCEPTED
+                else None,
                 to_company__department=76,
                 to_company__naf="4567A",
                 state=state,
@@ -1026,7 +1033,7 @@ class TestAnonymizeJobseekersManagementCommand:
         JobApplicationFactory(
             job_seeker=iae_diagnosis_from_employer_with_approval.job_seeker,
             eligibility_diagnosis=iae_diagnosis_from_employer_with_approval,
-            updated_at=timezone.now() - relativedelta(years=3),
+            created_at=timezone.make_aware(datetime.datetime(2021, 5, 17)),
             with_approval=True,
             approval__start_at=datetime.date(2020, 4, 18),
             approval__end_at=datetime.date(2023, 4, 17),
@@ -1046,7 +1053,7 @@ class TestAnonymizeJobseekersManagementCommand:
             JobApplicationFactory(
                 job_seeker=iae_diagnosis_from_prescriber_with_several_job_applications.job_seeker,
                 eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications,
-                updated_at=timezone.now() - relativedelta(years=3),
+                created_at=timezone.make_aware(datetime.datetime(2021, 6, 17)),
                 state=state,
             )
         # GEIQ Diagnosis from employer without job application
@@ -1112,7 +1119,7 @@ class TestAnonymizeJobseekersManagementCommand:
         job_application = JobApplicationFactory(
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
-            updated_at=timezone.now() - INACTIVITY_PERIOD,
+            created_at=timezone.now() - INACTIVITY_PERIOD,
             eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
         )
         ApprovalFactory(
