@@ -39,9 +39,6 @@ def metabase_fixture(monkeypatch, settings):
 
     monkeypatch.setattr(dataframes, "MetabaseDatabaseCursor", FakeMetabase)
     monkeypatch.setattr(db, "MetabaseDatabaseCursor", FakeMetabase)
-    # This setting need to be editable in `dev` to manually test transferring data from "les emplois" to "pilotage",
-    # but the one used in `test` should be fixed, `dev` inheriting from `test` we can't put it in settings.
-    monkeypatch.setattr(settings, "METABASE_HASH_SALT", None)
 
 
 @pytest.fixture(autouse=True)
