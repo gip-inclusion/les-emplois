@@ -31,7 +31,7 @@ def metabase_fixture(monkeypatch, settings):
 
         def __enter__(self):
             self.cursor = connection.cursor().cursor
-            return self.cursor, connection
+            return connection.make_debug_cursor(self.cursor), connection
 
         def __exit__(self, exc_type, exc_value, exc_traceback):
             if self.cursor:
