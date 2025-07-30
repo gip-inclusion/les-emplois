@@ -34,7 +34,7 @@
                     <div class="c-form">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    {% approval_details_box approval=evaluated_job_application.job_application.approval request=request hide_details_link=True extra_classes='mb-3 mb-md-4' %}
+                    {% approval_details_box approval=evaluated_job_application.job_application.approval version='box_without_link' extra_classes='mb-3 mb-md-4' %}
                 </div>
             </div>
         </div>

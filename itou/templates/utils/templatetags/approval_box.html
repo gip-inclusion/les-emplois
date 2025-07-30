@@ -65,7 +65,7 @@ Arguments:
             </li>
         {% endif %}
     </ul>
-    {% if version == "detail_view" %}
+    {% if version == "details_view" %}
         {% if approval.origin == ApprovalOrigin.PE_APPROVAL %}
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
@@ -121,7 +121,7 @@ Arguments:
                 {% endif %}
             {% endif %}
         {% endif %}
-        {% if approval.is_pass_iae and with_details_link %}
+        {% if with_details_link %}
             <a href="{% url 'approvals:details' public_id=approval.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
                 <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
                 <span>Afficher le PASS IAE</span>
