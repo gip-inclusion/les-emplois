@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestSiaeJobApplicationListView.test_access[view queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -51,6 +51,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -374,6 +375,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -513,6 +515,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -522,6 +531,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -622,7 +638,7 @@
 # ---
 # name: TestSiaeSubmitProofsView.test_is_not_submittable_with_submission_freezed[view queries]
   dict({
-    'num_queries': 11,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -672,6 +688,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -839,6 +856,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -856,12 +880,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestSiaeSubmitProofsView.test_is_submittable[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 32,
     'queries': list([
       dict({
         'origin': list([
@@ -911,6 +942,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1149,6 +1181,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'siae_submit_proofs[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'EvaluatedSiae.save[<site-packages>/django/db/models/base.py]',
           'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
@@ -1157,6 +1196,13 @@
           SET "submission_freezed_at" = %s
           WHERE "siae_evaluations_evaluatedsiae"."id" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'siae_submit_proofs[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1257,6 +1303,15 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'siae_submit_proofs[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
@@ -1278,8 +1333,24 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'siae_submit_proofs[www/siae_evaluations_views/views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1299,6 +1370,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1338,6 +1416,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           '_async_send_message[emails/tasks.py]',
         ]),
@@ -1346,6 +1431,13 @@
           SET "esp_response" = NULL
           WHERE "emails_email"."id" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

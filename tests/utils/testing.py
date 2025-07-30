@@ -406,6 +406,8 @@ def normalize_fields_history(fields_history):
             entry["_context"]["request_id"] = "[REQUEST ID]"
         if entry["_context"] and "run_uid" in entry["_context"]:
             entry["_context"]["run_uid"] = "[RUN UID]"
+        if entry["_context"] and "cache_buster" in entry["_context"]:
+            entry["_context"]["cache_buster"] = "[CACHE_BUSTER]"
 
     return normalized_fields_history
 

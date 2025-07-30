@@ -26,7 +26,7 @@ from django.core import management
 from django.core.cache import caches
 from django.core.files.storage import storages
 from django.core.management import call_command
-from django.db import connection
+from django.db import ProgrammingError, connection, transaction
 from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
@@ -37,7 +37,7 @@ from slippers.templatetags.slippers import AttrsNode
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.utils import faker_providers  # noqa: E402
+from itou.utils import faker_providers, triggers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import (  # noqa: E402
     NoObjectsInBucket,
@@ -705,7 +705,21 @@ def detect_missing_auto_now_in_update_fields():
             for auto_now_field in auto_now_fields[self._meta.label]:
                 if auto_now_field not in update_fields:
                     raise ValueError(f"Calling save with update_fields without {auto_now_field}")
-        return original_save(self, *args, update_fields=update_fields, **kwargs)
+
+        error = None
+        obj = None
+        with transaction.atomic():
+            try:
+                obj = original_save(self, *args, update_fields=update_fields, **kwargs)
+            except ProgrammingError as exc:
+                transaction.set_rollback(True)
+                error = str(exc)
+
+        if error and "No context available" in error:
+            with transaction.atomic():
+                with triggers.context(cache_buster=str(uuid.uuid4())):
+                    obj = original_save(self, *args, update_fields=update_fields, **kwargs)
+        return obj
 
     Model.save = strict_save
 

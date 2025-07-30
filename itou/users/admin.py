@@ -328,6 +328,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         ),
     ]
 
+    @admin.display(description="historique des champs modifiés sur le modèle")
+    def fields_history_formatted(self, obj):
+        return format_html("<pre><code>{}</code></pre>", pformat(obj.fields_history, width=120))
+
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
@@ -457,6 +461,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "follow_up_groups_or_members",
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
+                "fields_history_formatted",
             ]
         )
         if not request.user.is_superuser:
@@ -496,7 +501,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "jobseeker_profile_link",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
-                        "external_data_source_history_formatted",
                     ]
                 },
             ),
@@ -525,6 +529,18 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             assert fieldsets[-1][0] == "Informations"
             identity_provider_index = fieldsets[-1][1]["fields"].index("identity_provider")
             fieldsets[-1][1]["fields"].insert(identity_provider_index + 1, "allow_next_sso_sub_update")
+
+        fieldsets.append(
+            (
+                "Audit",
+                {
+                    "fields": (
+                        "fields_history_formatted",
+                        "external_data_source_history_formatted",
+                    )
+                },
+            )
+        )
 
         return fieldsets
 
