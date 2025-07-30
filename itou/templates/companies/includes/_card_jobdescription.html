@@ -38,7 +38,7 @@
                             {{ job_description.display_name | capfirst }}
                             {% if job_description.is_external %}<i class="ri-external-link-line" aria-hidden="true"></i>{% endif %}
                         </a>
-                        {% if job_description.is_unpopular %}
+                        {% if job_description.is_unpopular and not job_description.is_external %}
                             <span class="badge badge-sm rounded-pill bg-info text-white">
                                 <i class="ri-mail-send-line me-1" aria-hidden="true"></i>
                                 <span class="ms-1">Soyez parmi les premiers à postuler</span>

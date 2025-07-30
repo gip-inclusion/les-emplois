@@ -12,6 +12,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
+from itou.job_applications.models import JobApplication
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import (
@@ -868,6 +869,15 @@ class TestJobDescriptionSearchView:
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = client.get(self.URL, {"city": city.slug})
+        assertNotContains(response, unpopular_badge, html=True)
+
+        # Make the job external (and thus, without any application)
+        job.source_kind = JobSource.PE_API
+        job.source_url = "https.//example.com/job/12345"
+        job.save(update_fields=["source_kind", "source_url", "updated_at"])
+        JobApplication.objects.filter(selected_jobs=job).delete()
+        response = client.get(self.URL, {"city": city.slug})
+        # It should not have the unpopular badge
         assertNotContains(response, unpopular_badge, html=True)
 
     def test_no_department(self, client):
