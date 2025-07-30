@@ -1021,6 +1021,7 @@ class TestAnonymizeJobseekersManagementCommand:
             to_company__naf="4567A",
             to_company__kind=CompanyKind.EI,
             state=JobApplicationState.ACCEPTED,
+            hiring_start_at=datetime.date(2023, 2, 2),
         )
 
         # approval with 3 prolongations, 2 suspensions and 2 job applications
@@ -1061,6 +1062,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 to_company__department=76,
                 to_company__naf="4567A",
                 state=state,
+                hiring_start_at=datetime.date(2023, 3, 2),
             )
 
         call_command("anonymize_jobseekers", wet_run=True)
