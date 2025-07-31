@@ -31,7 +31,6 @@ from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.auth import check_user
-from itou.utils.immersion_facile import get_pmsmp_url
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -278,15 +277,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
 
-    immersion_facile_pmsmp_url = None
-    if job_application.is_sent_by_authorized_prescriber and job_application.to_company.kind in (
-        [CompanyKind.AI, CompanyKind.ACI, CompanyKind.EI]
-    ):
-        immersion_facile_pmsmp_url = get_pmsmp_url(
-            prescriber_organization=job_application.sender_prescriber_organization,
-            to_company=job_application.to_company,
-        )
-
     context = {
         "can_be_cancelled": can_be_cancelled,
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -305,7 +295,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         ),
         "matomo_custom_title": "Candidature",
         "job_application_sender_left_org": job_application_sender_left_org(job_application),
-        "immersion_facile_pmsmp_url": immersion_facile_pmsmp_url,
     } | get_siae_actions_context(request, job_application)
 
     return render(request, template_name, context)
