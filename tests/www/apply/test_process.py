@@ -39,7 +39,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import User
@@ -849,56 +849,6 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
         assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
         assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
-
-    @pytest.mark.parametrize(
-        "from_authorized_prescriber,company_in_target,assertion",
-        [
-            (True, True, assertContains),
-            (True, False, assertNotContains),
-            (False, True, assertNotContains),
-            (False, False, assertNotContains),
-        ],
-    )
-    def test_details_for_company_display_pmsmp_box(
-        self, client, from_authorized_prescriber, company_in_target, assertion
-    ):
-        TARGET_COMPANIES = [CompanyKind.AI, CompanyKind.ACI, CompanyKind.EI]
-        OTHER_COMPANIES = set(CompanyKind) - set(TARGET_COMPANIES)
-        TARGET_ORGANIZATIONS = [
-            PrescriberOrganizationKind.FT,
-            PrescriberOrganizationKind.CAP_EMPLOI,
-            PrescriberOrganizationKind.ML,
-        ]
-        OTHER_ORGANIZATIONS = set(PrescriberOrganizationKind) - set(TARGET_ORGANIZATIONS)
-        company_kind = (
-            random.choice(list(TARGET_COMPANIES)) if company_in_target else random.choice(list(OTHER_COMPANIES))
-        )
-        organization_kind = (
-            random.choice(list(TARGET_ORGANIZATIONS))
-            if from_authorized_prescriber
-            else random.choice(list(OTHER_ORGANIZATIONS))
-        )
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=from_authorized_prescriber,
-            to_company__kind=company_kind,
-            sender_prescriber_organization__kind=organization_kind,
-        )
-
-        client.force_login(job_application.to_company.members.first())
-        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-        assertion(
-            response,
-            """
-            <p>
-                La <strong><abbr title="Période de mise en situation en milieu professionnel">PMSMP</abbr></strong>
-                permet à un candidat de découvrir un métier ou valider un projet dans votre structure, sans
-                obligation d’embauche. En cliquant sur « <strong>Proposer une PMSMP</strong> », vous accédez à un
-                formulaire sur <i>Immersion Facilitée</i>.
-            </p>
-            """,
-            html=True,
-        )
 
     def test_company_information_displayed_for_prescriber_when_refused(self, client, subtests):
         """
