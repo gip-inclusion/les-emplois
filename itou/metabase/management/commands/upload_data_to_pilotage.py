@@ -9,6 +9,7 @@ import pathlib
 import threading
 from pathlib import Path
 
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.template.defaultfilters import filesizeformat
 
@@ -26,7 +27,17 @@ class Command(BaseCommand):
         parser.add_argument("directory", type=Path, help="Directory containing FluxIAE files")
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def _upload_file(self, file: pathlib.Path, *, wet_run=False):
+    def _get_key_content_length(self, client, key) -> int | None:
+        try:
+            response = client.head_object(Bucket=settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME, Key=key)
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "404":
+                return None
+            raise e
+        else:
+            return int(response["ContentLength"])
+
+    def _upload_file(self, client, file: pathlib.Path, key):
         lock = threading.Lock()
         file_size = file.stat().st_size
         bytes_transferred = 0
@@ -46,33 +57,44 @@ class Command(BaseCommand):
                     )
                     previous_progress = progress
 
-        if wet_run:
-            pilotage_s3_client().upload_file(
-                Filename=file.absolute(),
-                Bucket=settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME,
-                Key=f"{self.DATASTORE_DIRECTORY}{file.name}",
-                Callback=log_progress,
-            )
+        client.upload_file(
+            Filename=file.absolute(),
+            Bucket=settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME,
+            Key=key,
+            Callback=log_progress,
+        )
 
     def handle(self, *, directory: pathlib.Path, wet_run, **options):
-        client = pilotage_s3_client()
-        response = client.list_objects_v2(
-            Bucket=settings.PILOTAGE_DATASTORE_S3_BUCKET_NAME,
-            Prefix=self.DATASTORE_DIRECTORY,
-        )
-        datastore_files = set()
-        if response["KeyCount"]:
-            datastore_files.update(
-                metadata["Key"].replace(self.DATASTORE_DIRECTORY, "") for metadata in response["Contents"]
-            )
-        self.logger.info(f"Files in datastore's {self.DATASTORE_DIRECTORY!r}: {sorted(datastore_files)}")
-
         local_files = set(file.name for file in directory.glob(f"{self.FILENAME_PREFIX}*.tar.gz"))
         self.logger.info(f"Files in local's {directory.name!r}: {sorted(local_files)}")
 
-        files_to_upload = local_files - datastore_files
-        self.logger.info(f"Files to upload: {sorted(files_to_upload)}")
+        client = pilotage_s3_client()
+        for filename in local_files:
+            local_file = directory / filename
+            datastore_key = f"{self.DATASTORE_DIRECTORY}{filename}"
+            self.logger.info(f"Checking that {filename!r} match with {datastore_key!r}...")
 
-        for filename in files_to_upload:
-            self.logger.info(f"Uploading {filename!r}...")
-            self._upload_file(directory / filename, wet_run=wet_run)
+            local_content_length = local_file.stat().st_size
+            datastore_content_length = self._get_key_content_length(client, datastore_key)
+            tries = 0
+            while datastore_content_length is None or datastore_content_length != local_file.stat().st_size:
+                self.logger.info(
+                    f"{filename!r} doesn't match with {datastore_key!r}: "
+                    f"{datastore_content_length=} {local_content_length=}"
+                )
+                if wet_run:
+                    self.logger.info(f"Uploading {filename!r} to {datastore_key!r}...")
+                    self._upload_file(client, local_file, key=datastore_key)
+                    # Sometime and for some unknown reason the upload doesn't fully complete,
+                    # but it never happens when the command is launched manually :(.
+                    datastore_content_length = self._get_key_content_length(client, datastore_key)
+                    tries += 1
+                    if tries >= 3:
+                        self.logger.warning(
+                            f"{filename!r} still doesn't match with {datastore_key!r} after {tries} tries."
+                        )
+                        break
+                else:
+                    break
+            else:
+                self.logger.info(f"{filename!r} match with {datastore_key!r}!")

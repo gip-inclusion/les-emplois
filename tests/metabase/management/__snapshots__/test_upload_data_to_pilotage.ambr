@@ -1,10 +1,34 @@
 # serializer version: 1
 # name: test_command_call
   list([
-    "Files in datastore's 'flux-iae/': []",
     "Files in local's 'test_command_call0': ['fluxIAE_ITOU_.tar.gz']",
-    "Files to upload: ['fluxIAE_ITOU_.tar.gz']",
-    "Uploading 'fluxIAE_ITOU_.tar.gz'...",
+    "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=11",
+    "Uploading 'fluxIAE_ITOU_.tar.gz' to 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
     '> fluxIAE_ITOU_.tar.gz: 11\xa0octets/11\xa0octets transferred (100%).',
+    "'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'!",
+  ])
+# ---
+# name: test_command_check_content_length
+  list([
+    "Files in local's 'test_command_check_content_len0': ['fluxIAE_ITOU_.tar.gz']",
+    "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=0 local_content_length=11",
+    "Uploading 'fluxIAE_ITOU_.tar.gz' to 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    '> fluxIAE_ITOU_.tar.gz: 11\xa0octets/11\xa0octets transferred (100%).',
+    "'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'!",
+  ])
+# ---
+# name: test_command_retries
+  list([
+    "Files in local's 'test_command_retries0': ['fluxIAE_ITOU_.tar.gz']",
+    "Checking that 'fluxIAE_ITOU_.tar.gz' match with 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=0",
+    "Uploading 'fluxIAE_ITOU_.tar.gz' to 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=0",
+    "Uploading 'fluxIAE_ITOU_.tar.gz' to 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz': datastore_content_length=None local_content_length=0",
+    "Uploading 'fluxIAE_ITOU_.tar.gz' to 'flux-iae/fluxIAE_ITOU_.tar.gz'...",
+    "'fluxIAE_ITOU_.tar.gz' still doesn't match with 'flux-iae/fluxIAE_ITOU_.tar.gz' after 3 tries.",
   ])
 # ---
