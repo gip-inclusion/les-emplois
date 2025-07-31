@@ -513,7 +513,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
         "itou.utils.apis.api_particulier._request",
         return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
     )
-    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
+    job_seeker = JobSeekerFactory(certifiable=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
