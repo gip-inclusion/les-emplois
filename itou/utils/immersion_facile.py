@@ -2,8 +2,6 @@ from urllib.parse import quote, urlencode
 
 from django.conf import settings
 
-from itou.prescribers.enums import PrescriberOrganizationKind
-
 
 def immersion_search_url(user):
     """
@@ -29,27 +27,3 @@ def immersion_search_url(user):
             params["place"] = ", ".join(address_parts)
 
     return f"{settings.IMMERSION_FACILE_SITE_URL}/recherche?{urlencode(params, quote_via=quote)}"
-
-
-def get_pmsmp_url(prescriber_organization, to_company):
-    """
-    Return an URL to a pre-filled form to send a job seeker to a PMSMP
-    (période de mise en situation en milieu professionnel).
-    """
-
-    agency_kind = {
-        PrescriberOrganizationKind.FT: "pole-emploi",
-        PrescriberOrganizationKind.ML: "mission-locale",
-        PrescriberOrganizationKind.CAP_EMPLOI: "cap-emploi",
-    }.get(prescriber_organization.kind, "autre")
-
-    params = {
-        "agencyDepartment": prescriber_organization.department,
-        "agencyKind": agency_kind,
-        "siret": to_company.siret,
-        "skipIntro": "true",
-        "acquisitionCampaign": "emplois",
-        "mtm_kwd": "candidature",
-    }
-
-    return f"{settings.IMMERSION_FACILE_SITE_URL}/demande-immersion?{urlencode(params, quote_via=quote)}"
