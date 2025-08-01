@@ -142,8 +142,9 @@ class Command(BaseCommand):
             converging_update_count,
         )
 
-    def fetch_riae_contracts(self):
+    def _get_riae_contracts_data(self):
         client = Client(settings.METABASE_SITE_URL)
+        QUERY_LIMIT = 100_000  # Limit to <100MB data in ram (estimated with pympler.asizeof.asizeof)
 
         # Schema:
         # [{'Contrat Date Embauche': '2023-01-01',
@@ -155,33 +156,55 @@ class Command(BaseCommand):
         #   'Contrat Parent ID': ##########,
         #   'Emplois Candidat ID': ##,
         #   'Type Contrat': 'initial'}]
-        query = client.build_query(
+        base_query = client.build_query(
             table=2150,
             order_by=[
                 62289,  # Emplois Candidat ID
                 62288,  # Contrat Parent ID
                 61917,  # Contrat ID Ctr
             ],
-            limit=2,  # TODO: Remove
+            limit=QUERY_LIMIT,
         )
 
-        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
-        pprint.pp(contracts, sort_dicts=True)
+        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=base_query))
 
-        # /!\ L'API Metabase ne permet d'exporter que 1_000_000 de lignes au maximum,
-        # il faut donc paginer et il n'y a pas d'OFFSET, mais ceci devrait faire l'affaire :
-        query = client.merge_query(
-            into=query,
-            query={
-                "filter": [
-                    "and",
-                    [">=", ["field", 62289, {"base-type": "type/Integer"}], contracts[-1]["Emplois Candidat ID"]],
-                    [">", ["field", 61917, {"base-type": "type/BigInteger"}], contracts[-1]["Contrat ID Ctr"]],
-                ]
-            },
-        )
-        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
-        pprint.pp(contracts, sort_dicts=True)
+        while contracts:
+            yield from contracts
+
+            query = client.merge_query(
+                into=base_query,
+                query={
+                    "filter": [
+                        "or",
+                        [
+                            "and",
+                            [
+                                "=",
+                                ["field", 62289, {"base-type": "type/Integer"}],
+                                contracts[-1]["Emplois Candidat ID"],
+                            ],
+                            [
+                                ">=",
+                                ["field", 62288, {"base-type": "type/BigInteger"}],
+                                contracts[-1]["Contrat Parent ID"],
+                            ],
+                            [
+                                ">",
+                                ["field", 61917, {"base-type": "type/BigInteger"}],
+                                contracts[-1]["Contrat ID Ctr"],
+                            ],
+                        ],
+                        [">", ["field", 62289, {"base-type": "type/Integer"}], contracts[-1]["Emplois Candidat ID"]],
+                    ],
+                },
+            )
+            contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
+
+    def fetch_riae_contracts(self):
+        count = 0
+        for contract in self._get_riae_contracts_data():
+            count += 1
+        print(count)
 
     @dry_runnable
     def handle(self, *, data, **options):
