@@ -8,6 +8,7 @@ import respx
 from django.core.cache import caches
 from django_redis import get_redis_connection
 
+from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import (
     REFRESH_TOKEN_MARGIN_SECONDS,
     PoleEmploiAPIBadResponse,
@@ -132,7 +133,8 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
                 job_seeker.jobseeker_profile.birthdate,
                 job_seeker.jobseeker_profile.nir,
             )
-        assert ctx.value.response_code == "R010"
+        assert ctx.value.response_code == PEApiRechercheIndividuExitCode.R010
+        assert ctx.value.response_data == pole_emploi_api_mocks.API_RECHERCHE_ERROR
 
     @respx.mock
     def test_recherche_individu_certifie_retryable_errors(self):
