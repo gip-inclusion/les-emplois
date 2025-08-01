@@ -139,6 +139,13 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         response = client.get(self.url)
         assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (self.list_url + "?page=1"), html=True)
 
+    @override_settings(PAGE_SIZE_DEFAULT=1)
+    def test_response_content_page_2(self, client):
+        client.force_login(self.user)
+        url = reverse("companies_views:job_description_list", query={"page": 2})
+        response = client.get(url)
+        assertNotContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+
     def test_response_content_with_no_job_descriptions(self, client):
         JobDescription.objects.all().delete()
         client.force_login(self.user)
