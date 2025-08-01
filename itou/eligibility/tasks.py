@@ -35,6 +35,8 @@ def certify_criteria(eligibility_diagnosis):
     )
     with api_particulier.client() as client:
         for criterion in criteria:
+            # Store certification date first so we know a certification has been tried.
+            criterion.certified_at = timezone.now()
             try:
                 data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
             except httpx.HTTPStatusError as exc:
@@ -48,7 +50,7 @@ def certify_criteria(eligibility_diagnosis):
                 match exc.response.status_code:
                     case 400 | 404:
                         # Job seeker not found or missing profile information.
-                        criterion.certified_at = timezone.now()
+                        pass
                     case 409:
                         # We sometimes get a 409 for some reason and the returned error message is not very helpful:
                         # "Une requête associé à votre jeton est déjà en cours de traitement
@@ -81,7 +83,6 @@ def certify_criteria(eligibility_diagnosis):
                         raise
             else:
                 criterion.certified = data["is_certified"]
-                criterion.certified_at = timezone.now()
                 criterion.data_returned_by_api = data["raw_response"]
                 criterion.certification_period = None
                 if criterion.certified:
