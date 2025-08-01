@@ -25,7 +25,12 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 POSTULER = "Postuler"
@@ -132,6 +137,20 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         client.force_login(self.user)
         response = client.get(self.url)
         assertContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+
+    def test_pagination(self, client):
+        client.force_login(self.user)
+
+        # Reset the job description count
+        JobDescription.objects.all().delete()
+
+        JobDescriptionFactory.create_batch(20, company=self.company)
+        response = client.get(self.list_url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (self.list_url + "?page=1"), html=True)
+
+        JobDescriptionFactory(company=self.company)
+        response = client.get(self.list_url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (self.list_url + "?page=1"), html=True)
 
     def test_ordering(self, client, subtests):
         self.company.job_description_through.all().delete()
