@@ -10,10 +10,10 @@ from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
 from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -42,6 +42,20 @@ class TestApprovalsListView:
         employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assertContains(response, f"{employee_base_url}?approval={approval.pk}&back_url={urlencode(url)}")
         assertContains(response, self.TABS_CLASS)
+
+    def test_pagination(self, client):
+        company = CompanyWith2MembershipsFactory(subject_to_eligibility=True)
+        employer = company.members.first()
+        client.force_login(employer)
+        url = reverse("approvals:list")
+
+        ApprovalFactory.create_batch(10, with_jobapplication=True, with_jobapplication__to_company=company)
+        response = client.get(url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
+
+        ApprovalFactory(with_jobapplication=True, with_jobapplication__to_company=company)
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
     def test_multiple_approvals_for_the_same_user(self, client):
         approval = ApprovalFactory(with_jobapplication=True)

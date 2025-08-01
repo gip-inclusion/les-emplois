@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import AssessmentInstitutionLink
@@ -22,6 +22,7 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
@@ -233,6 +234,53 @@ class TestAssessmentContractsListAndToggle:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments contracts list"
         )
+
+    def test_pagination(self, client):
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+            user__first_name="Paul",
+            user__last_name="Martin",
+            user__email="paul.martin@example.com",
+        )
+        assessment = AssessmentFactory(
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            with_submission_requirements=True,
+            contracts_selection_validated_at=None,
+        )
+        EmployeeContractFactory.create_batch(
+            50,
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+        )
+        # AssessmentInstitutionLink.objects.create(
+        #     assessment=assessment,
+        #     institution=ddets_membership.institution,
+        #     with_convention=True,
+        # )
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+        client.force_login(geiq_membership.user)
+        response = client.get(contracts_list_url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (contracts_list_url + "?page=1"), html=True)
+
+        EmployeeContractFactory(
+            employee__assessment=assessment,
+            employee__last_name="Dupont",
+            employee__first_name="Jean",
+            employee__allowance_amount=0,
+            start_at=datetime.date(2024, 1, 1),
+            end_at=datetime.date(2024, 4, 30),
+            planned_end_at=datetime.date(2024, 5, 31),
+            allowance_requested=True,
+        )
+        response = client.get(contracts_list_url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (contracts_list_url + "?page=1"), html=True)
 
     def test_htmx_toggle_as_geiq(self, client):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)

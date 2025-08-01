@@ -28,7 +28,12 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestListEmployeeRecords:
@@ -81,6 +86,26 @@ class TestListEmployeeRecords:
         record_base_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": record.pk})
         record_url = f"{record_base_url}?back_url={urlencode(url)}"
         assertContains(response, record_url)
+
+    def test_pagination(self, client):
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_company=self.company,
+            job_application__job_seeker__last_name="Aaaaa",
+            job_application__hiring_start_at=timezone.localdate() - relativedelta(days=15),
+        )
+        record.ready()
+        client.force_login(self.user)
+        url = f"{self.URL}?status=READY"
+
+        response = client.get(url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
+
+        other_records = employee_record_factories.EmployeeRecordWithProfileFactory.create_batch(
+            10, job_application__to_company=self.company
+        )
+        [other_record.ready() for other_record in other_records]
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_redirection_with_missing_or_empty_status(self, client):
         client.force_login(self.user)

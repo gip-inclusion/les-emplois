@@ -444,3 +444,9 @@ def get_request(user):
     MessageMiddleware(get_response_for_middlewaremixin)(request)
     ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
     return request
+
+
+PAGINATION_PAGE_ONE_MARKUP = """
+    <li class="page-item active">
+        <a class="page-link" aria-label="Page 1" aria-current="page" href="%s">1</a>
+    </li>"""

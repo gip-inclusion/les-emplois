@@ -13,7 +13,7 @@
             </div>
         {% endfor %}
     </div>
-    {% include "includes/pagination.html" with page=navigation_pages boost=True boost_target="#employee-records-container" boost_indicator="#employee-records-container" %}
+    {% include "includes/pagination.html" with page=navigation_pages boost=True boost_target="#employee-records-container" boost_indicator="#employee-records-container" request=request only %}
 </div>
 
 {% if request.htmx %}

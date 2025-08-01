@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.approvals.enums import (
     ProlongationReason,
@@ -19,7 +19,13 @@ from tests.files.factories import FileFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.testing import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assert_previous_step,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 @pytest.mark.parametrize(
@@ -56,6 +62,25 @@ def test_list_view(snapshot, client):
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
     assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot
+
+
+def test_list_pages(client):
+    pending_prolongation_request = approvals_factories.ProlongationRequestFactory(
+        status=ProlongationRequestStatus.PENDING,
+    )
+    client.force_login(pending_prolongation_request.validated_by)
+    url = reverse("approvals:prolongation_requests_list")
+
+    response = client.get(url)
+    assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
+
+    approvals_factories.ProlongationRequestFactory.create_batch(
+        20,
+        status=ProlongationRequestStatus.PENDING,
+        prescriber_organization=pending_prolongation_request.prescriber_organization,
+    )
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 def test_list_view_no_siae(snapshot, client):
