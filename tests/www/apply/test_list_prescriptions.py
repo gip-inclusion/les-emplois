@@ -25,6 +25,7 @@ from tests.prescribers.factories import (
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
     assert_previous_step,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
@@ -265,6 +266,20 @@ def test_filters(client, snapshot):
     assert response.status_code == 200
     filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
     assert pretty_indented(filter_form) == snapshot()
+
+
+def test_pagination(client):
+    prescriber = PrescriberFactory()
+    client.force_login(prescriber)
+    url = reverse("apply:list_prescriptions")
+
+    JobApplicationFactory.create_batch(20, sender=prescriber)
+    response = client.get(url)
+    assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
+
+    JobApplicationFactory(sender=prescriber)
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 def test_archived(client):

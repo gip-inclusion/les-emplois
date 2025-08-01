@@ -31,7 +31,12 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 from tests.www.apply.test_submit import fake_session_initialization
 
 
@@ -484,6 +489,20 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
 
     # There's no link to the eligibility update view
     assert_update_eligibility(response, can_update=False)
+
+
+def test_pagination(client):
+    prescriber = PrescriberOrganizationWith2MembershipFactory().members.first()
+    client.force_login(prescriber)
+    url = reverse("job_seekers_views:list")
+
+    JobSeekerFactory.create_batch(10, created_by=prescriber)
+    response = client.get(url)
+    assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
+
+    JobSeekerFactory(created_by=prescriber)
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 def test_job_seeker_created_by_prescriber_without_org(client):

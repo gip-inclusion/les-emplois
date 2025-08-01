@@ -27,7 +27,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -532,6 +532,18 @@ class TestSearchCompany:
         )
         assertContains(response, reset_button, html=True)
 
+    def test_pagination(self, client):
+        vannes = create_city_vannes()
+        url = reverse("search:employers_results", query={"city": vannes.slug, "distance": 100})
+        CompanyFactory.create_batch(10, coords=vannes.coords)
+
+        response = client.get(url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
+
+        CompanyFactory(coords=vannes.coords)
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
+
 
 class TestSearchPrescriber:
     def test_home(self, client):
@@ -568,6 +580,18 @@ class TestSearchPrescriber:
             html=True,
             count=1,
         )
+
+    def test_pagination(self, client):
+        vannes = create_city_vannes()
+        url = reverse("search:prescribers_results", query={"city": vannes.slug, "distance": 100})
+        PrescriberOrganizationFactory.create_batch(10, authorized=True, coords=vannes.coords)
+
+        response = client.get(url)
+        assertNotContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
+
+        PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_form_invalid(self, client):
         url = reverse("search:prescribers_results")
