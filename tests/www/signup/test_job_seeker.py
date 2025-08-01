@@ -365,7 +365,7 @@ class TestJobSeekerSignup:
                 "first_name": "Léon",
                 "last_name": "Nettoyeur",
                 "email": "leon@w3.blizz",
-                "birthdate": "1911-11-02",
+                "birthdate": "1933-11-02",
                 "birth_place": Commune.objects.exclude(code=geispolsheim.code_insee).first().pk,
                 "birth_country": Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk,
                 # Actual payload.

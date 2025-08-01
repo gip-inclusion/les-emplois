@@ -338,7 +338,7 @@ class TestGetOrCreateForSender:
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
-        birthdate = datetime.date(1911, 11, 1)
+        birthdate = datetime.date(1933, 11, 1)
         response = client.post(
             reverse(
                 "job_seekers_views:create_job_seeker_step_1_for_sender",
@@ -348,7 +348,7 @@ class TestGetOrCreateForSender:
                 "title": Title.M,
                 "first_name": "Manuel",
                 "last_name": "Calavera",
-                "nir": "111116411111144",
+                "nir": "133116411111133",
                 "birthdate": birthdate.isoformat(),
                 **(
                     {
@@ -376,7 +376,7 @@ class TestGetOrCreateForSender:
         client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.GET_OR_CREATE)
 
-        birthdate = datetime.date(1911, 11, 1)
+        birthdate = datetime.date(1933, 11, 1)
         response = client.post(
             reverse(
                 "job_seekers_views:create_job_seeker_step_1_for_sender",
@@ -386,7 +386,7 @@ class TestGetOrCreateForSender:
                 "title": Title.M,
                 "first_name": "Manuel",
                 "last_name": "Calavera",
-                "nir": "111116411111144",
+                "nir": "133116411111133",
                 "birthdate": birthdate.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
                 "birth_country": Country.objects.exclude(code=Country.INSEE_CODE_FRANCE).order_by("?").first().pk,
@@ -424,8 +424,8 @@ class TestGetOrCreateForSender:
                 "title": Title.M,
                 "first_name": "Manuel",
                 "last_name": "Calavera",
-                "nir": "111111111111120",
-                "birthdate": "1911-11-01",
+                "nir": "133111111111109",
+                "birthdate": "1933-11-01",
                 # No birth_place
                 "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
             },
@@ -1004,7 +1004,7 @@ class TestUpdateForSender:
     def test_update_step_1(self, born_in_france, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="133116411111133")
         client.force_login(user)
 
         # Init session
@@ -1020,7 +1020,7 @@ class TestUpdateForSender:
         url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
         response = client.get(url)
         assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
-        birthdate = datetime.date(1911, 11, 1)
+        birthdate = datetime.date(1933, 11, 1)
         response = client.post(
             url,
             {
@@ -1049,7 +1049,7 @@ class TestUpdateForSender:
     def test_birth_country_not_france_and_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="133116411111133")
         client.force_login(user)
 
         # Init session
@@ -1062,7 +1062,7 @@ class TestUpdateForSender:
         client.get(start_url)
         job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
 
-        birthdate = datetime.date(1911, 11, 1)
+        birthdate = datetime.date(1933, 11, 1)
         response = client.post(
             reverse(
                 "job_seekers_views:update_job_seeker_step_1",
@@ -1095,7 +1095,7 @@ class TestUpdateForSender:
     def test_birth_country_france_and_no_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
-        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="111116411111144")
+        job_seeker = JobSeekerFactory(created_by=user, title=Title.M, jobseeker_profile__nir="133116411111133")
         client.force_login(user)
 
         # Init session
@@ -1117,7 +1117,7 @@ class TestUpdateForSender:
                 "title": Title.M,
                 "first_name": "Manuel",
                 "last_name": "Calavera",
-                "birthdate": "1911-11-01",
+                "birthdate": "1933-11-01",
                 # No birth_place
                 "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
             },
