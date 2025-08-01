@@ -83,7 +83,9 @@ def pe_offer_to_job_description(data, logger):
     return JobDescription(
         appellation=appellation,
         created_at=data["dateCreation"],  # from iso8601
-        updated_at=data["dateActualisation"],  # same
+        # dateActualisation does not seem to be optional but apparently it is not always set...
+        # In such case, fallbacking to dateCreation seems reasonable.
+        updated_at=data.get("dateActualisation", data["dateCreation"]),  # same
         custom_name=data["intitule"],
         description=data["description"],
         contract_type=PE_TYPE_TO_CONTRACT_TYPE[data["typeContrat"]],
