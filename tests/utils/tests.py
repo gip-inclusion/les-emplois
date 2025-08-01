@@ -588,9 +588,10 @@ class TestUtilsValidators:
 
     def test_validate_birthdate(self):
         # Min.
+        min_date = timezone.localdate() - relativedelta(years=100)
         with pytest.raises(ValidationError):
-            validate_birthdate(datetime.date(1899, 12, 31))
-        validate_birthdate(datetime.date(1900, 1, 1))
+            validate_birthdate(min_date - datetime.timedelta(days=1))
+        validate_birthdate(min_date)
         # Max.
         max_date = timezone.localdate() - relativedelta(years=16)
         with pytest.raises(ValidationError):

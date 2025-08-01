@@ -1,4 +1,3 @@
-import datetime
 import re
 
 import html5lib
@@ -76,7 +75,7 @@ def validate_nir(nir):
 
 
 def get_min_birthdate():
-    return datetime.date(1900, 1, 1)
+    return timezone.localdate() - relativedelta(years=100)
 
 
 def get_max_birthdate():
@@ -85,7 +84,7 @@ def get_max_birthdate():
 
 def validate_birthdate(birthdate):
     if birthdate < get_min_birthdate():
-        raise ValidationError("La date de naissance doit être postérieure à 1900.")
+        raise ValidationError("La personne doit avoir moins de 100 ans.")
     if birthdate >= get_max_birthdate():
         raise ValidationError("La personne doit avoir plus de 16 ans.")
 
