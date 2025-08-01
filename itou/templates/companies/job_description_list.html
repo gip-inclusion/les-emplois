@@ -87,23 +87,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {# Special row for controlling spontaneous applications #}
-                                    <tr>
-                                        <td>
-                                            <strong>Candidatures spontanées</strong>
-                                        </td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>
-                                            {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=siae hx_swap_oob=False only %}
-                                        </td>
-                                        <td>
-                                            <span id="spontaneous_applications_open_since_cell">{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
-                                        </td>
-                                        <td class="w-100px">
-                                            {% include "companies/includes/buttons/spontaneous_applications_refresh.html" with csrf_token=csrf_token request=request company=siae only %}
-                                        </td>
-                                    </tr>
+                                    {% if page == 1 %}
+                                        {# Special row for controlling spontaneous applications #}
+                                        <tr>
+                                            <td>
+                                                <strong>Candidatures spontanées</strong>
+                                            </td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>
+                                                {% include "companies/includes/buttons/spontaneous_applications_toggle.html" with csrf_token=csrf_token company=siae hx_swap_oob=False only %}
+                                            </td>
+                                            <td>
+                                                <span id="spontaneous_applications_open_since_cell">{{ siae.spontaneous_applications_open_since|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                            </td>
+                                            <td class="w-100px">
+                                                {% include "companies/includes/buttons/spontaneous_applications_refresh.html" with csrf_token=csrf_token request=request company=siae only %}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
                                     {% for job_description in job_pager %}
                                         <tr>
                                             <td>
