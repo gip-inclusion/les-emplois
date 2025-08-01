@@ -15,82 +15,107 @@
                             <span>Ajouter un intervenant existant</span>
                         </a>
                     </div>
-                    <form>
-                        {% csrf_token %}
-                        {% for membership in gps_memberships %}
-                            <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-{{ membership.member.public_id }}">
-                                <div class="c-box--results__header">
-                                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                                        <div class="c-box--results__summary flex-grow-1">
-                                            {% if membership.member.is_employer %}
-                                                <i class="ri-community-line" aria-hidden="true"></i>
-                                            {% elif membership.member.is_prescriber_with_authorized_org_memberships %}
-                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
-                                            {% else %}
-                                                <i class="ri-user-line" aria-hidden="true"></i>
-                                            {% endif %}
-                                            <div>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <h3>{{ membership.member.get_full_name }}</h3>
-                                                    {% if membership.member_id == request.user.pk %}
-                                                        <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
-                                                    {% endif %}
-                                                </div>
-                                                <span>
-                                                    {{ membership.member.get_kind_display | capfirst }}
-                                                    {% if membership.organization_name %}pour {{ membership.organization_name }}{% endif %}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        {% if membership.is_referent_certified %}
-                                            <div>{% include "gps/includes/badge_is_referent_certified_membership.html" %}</div>
-                                        {% elif membership.ended_at %}
-                                            <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                    <form id="display-contact-info-form">
+                        {% csrf_token %}{# Used by htmx posts #}
+                    </form>
+                    {% for membership in gps_memberships %}
+                        <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-{{ membership.member.public_id }}">
+                            <div class="c-box--results__header">
+                                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                    <div class="c-box--results__summary flex-grow-1">
+                                        {% if membership.member.is_employer %}
+                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                        {% elif membership.member.is_prescriber_with_authorized_org_memberships %}
+                                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                        {% else %}
+                                            <i class="ri-user-line" aria-hidden="true"></i>
                                         {% endif %}
-                                    </div>
-                                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
-                                        <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
-                                            <li>
-                                                <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
-                                                {% if membership.ended_at %}
-                                                    Accompagnateur du {{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}
-                                                {% else %}
-                                                    Accompagnateur depuis le {{ membership.started_at|date:"d/m/Y" }}
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h3>{{ membership.member.get_full_name }}</h3>
+                                                {% if membership.member_id == request.user.pk %}
+                                                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
                                                 {% endif %}
-                                            </li>
-                                        </ul>
-                                        {% if membership.member_id == request.user.pk %}
-                                            <div>
-                                                <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap">
-                                                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
-                                                    <span>Modifier mon intervention</span>
-                                                </a>
                                             </div>
-                                        {% endif %}
+                                            <span>
+                                                {{ membership.member.get_kind_display | capfirst }}
+                                                {% if membership.organization_name %}pour {{ membership.organization_name }}{% endif %}
+                                            </span>
+                                        </div>
                                     </div>
+                                    {% if membership.is_referent_certified %}
+                                        <div>{% include "gps/includes/badge_is_referent_certified_membership.html" %}</div>
+                                    {% elif membership.ended_at %}
+                                        <div>{% include "gps/includes/badge_ended_membership.html" %}</div>
+                                    {% endif %}
                                 </div>
-                                <hr class="m-0">
-                                <div class="c-box--results__body">
-                                    <ul class="list-data">
+                                <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                                    <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                                         <li>
-                                            <small>Motif de l’accompagnement</small>
-                                            {% if membership.reason %}
-                                                <strong>{{ membership.reason }}</strong>
+                                            <i class="ri-calendar-line fw-normal me-1" aria-hidden="true"></i>
+                                            {% if membership.ended_at %}
+                                                Accompagnateur du {{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}
                                             {% else %}
-                                                <i class="text-disabled">Non renseigné</i>
+                                                Accompagnateur depuis le {{ membership.started_at|date:"d/m/Y" }}
                                             {% endif %}
                                         </li>
-                                        <li>
-                                            <small>Adresse e-mail</small>
+                                    </ul>
+                                    {% if membership.member_id == request.user.pk %}
+                                        <div>
+                                            <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap">
+                                                <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                                                <span>Modifier mon intervention</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--results__body">
+                                <ul class="list-data">
+                                    <li>
+                                        <small>Motif de l’accompagnement</small>
+                                        {% if membership.reason %}
+                                            <strong>{{ membership.reason }}</strong>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <small>Adresse e-mail</small>
+                                        {% if membership.member_id != request.user.pk %}
+                                            <button class="btn-link btn-ico"
+                                                    id="email-{{ membership.member_id }}"
+                                                    hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
+                                                    hx-swap="outerHTML"
+                                                    hx-include="#display-contact-info-form"
+                                                    {% matomo_event "gps" "clic" "displayed_member_email" %}>
+                                                <div class="stable-text">
+                                                    <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                                    <span>Afficher l'email</span>
+                                                </div>
+                                                <div class="loading-text">
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    <span>Affichage en cours</span>
+                                                </div>
+                                            </button>
+                                        {% else %}
+                                            {% include "gps/includes/member_email.html" with member=membership.member %}
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <small>Téléphone</small>
+                                        {% if membership.member.phone %}
                                             {% if membership.member_id != request.user.pk %}
                                                 <button class="btn-link btn-ico"
-                                                        id="email-{{ membership.member_id }}"
-                                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
+                                                        id="phone-{{ membership.member_id }}"
+                                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
                                                         hx-swap="outerHTML"
-                                                        {% matomo_event "gps" "clic" "displayed_member_email" %}>
+                                                        hx-include="#display-contact-info-form"
+                                                        {% matomo_event "gps" "clic" "displayed_member_phone" %}>
                                                     <div class="stable-text">
-                                                        <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
-                                                        <span>Afficher l'email</span>
+                                                        <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
+                                                        <span>Afficher le téléphone</span>
                                                     </div>
                                                     <div class="loading-text">
                                                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -98,39 +123,16 @@
                                                     </div>
                                                 </button>
                                             {% else %}
-                                                {% include "gps/includes/member_email.html" with member=membership.member %}
+                                                {% include "gps/includes/member_phone.html" with member=membership.member %}
                                             {% endif %}
-                                        </li>
-                                        <li>
-                                            <small>Téléphone</small>
-                                            {% if membership.member.phone %}
-                                                {% if membership.member_id != request.user.pk %}
-                                                    <button class="btn-link btn-ico"
-                                                            id="phone-{{ membership.member_id }}"
-                                                            hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
-                                                            hx-swap="outerHTML"
-                                                            {% matomo_event "gps" "clic" "displayed_member_phone" %}>
-                                                        <div class="stable-text">
-                                                            <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
-                                                            <span>Afficher le téléphone</span>
-                                                        </div>
-                                                        <div class="loading-text">
-                                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                            <span>Affichage en cours</span>
-                                                        </div>
-                                                    </button>
-                                                {% else %}
-                                                    {% include "gps/includes/member_phone.html" with member=membership.member %}
-                                                {% endif %}
-                                            {% else %}
-                                                <i class="text-disabled">Non renseigné</i>
-                                            {% endif %}
-                                        </li>
-                                    </ul>
-                                </div>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                </ul>
                             </div>
-                        {% endfor %}
-                    </form>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
