@@ -95,7 +95,7 @@ def pe_offer_to_job_description(data, logger):
         # but it would be error prone and inaccurate.
         hours_per_week=None,
         open_positions=data.get("nombrePostes"),  # might be None
-        profile_description=data.get("experienceLibelle"),  # same
+        profile_description=data.get("experienceLibelle", ""),
         # This is a little abusive but I rather use an existing (very much unused at time of writing) field
         # that already exists on the model to store a simple information, than add a complex JSON field or a dedicated
         # field just for the PE specific need.
