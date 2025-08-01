@@ -116,3 +116,12 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
                 certifier=IdentityCertificationAuthorities.API_PARTICULIER,
                 jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
             )
+
+
+class GEIQSelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.GEIQSelectedAdministrativeCriteria
+        skip_postgeneration_save = True
+
+    eligibility_diagnosis = factory.SubFactory(GEIQEligibilityDiagnosisFactory, from_employer=True)
+    administrative_criteria = factory.Iterator(models.GEIQAdministrativeCriteria.objects.certifiable())

@@ -4,6 +4,7 @@ import random
 import pytest
 from django.template import Context
 from django.test.client import RequestFactory
+from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML, assertNotInHTML
@@ -18,10 +19,13 @@ from itou.eligibility.utils import _criteria_for_display, geiq_criteria_for_disp
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
+from itou.utils.types import InclusiveDateRange
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
+    GEIQSelectedAdministrativeCriteriaFactory,
     IAEEligibilityDiagnosisFactory,
+    IAESelectedAdministrativeCriteriaFactory,
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -396,12 +400,12 @@ class TestGEIQEligibilityDetail:
         assert certified_help_text in rendered
 
 
-@pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
 class TestCertifiedBadge:
     def _render(self, **kwargs):
         kwargs.setdefault("request", {"from_authorized_prescriber": True})
         return load_template("apply/includes/selected_administrative_criteria_display.html").render(Context(kwargs))
 
+    @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
     def test_certifiable_diagnosis_without_certifiable_criteria(self, factory):
         # No certifiable criteria
         diagnosis = factory(
@@ -418,33 +422,99 @@ class TestCertifiedBadge:
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
     @pytest.mark.parametrize(
-        "hiring_start_at,expected",
+        "hiring_start_at,factory_params,expected_html_badge",
         [
-            pytest.param(datetime.date(2024, 7, 31), False, id="Before validity period"),
-            pytest.param(datetime.date(2024, 8, 1), True, id="Start of validity period"),
-            pytest.param(datetime.date(2024, 11, 1), True, id="End of validity period"),
-            pytest.param(datetime.date(2025, 11, 2), False, id="After validity period"),
+            pytest.param(
+                datetime.date(2024, 7, 31),
+                {
+                    "certified": True,
+                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certified_at": timezone.now(),
+                },
+                NOT_CERTIFIED_BADGE_HTML,
+                id="Before validity period",
+            ),
+            pytest.param(
+                datetime.date(2024, 8, 1),
+                {
+                    "certified": True,
+                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certified_at": timezone.now(),
+                },
+                CERTIFIED_BADGE_HTML,
+                id="Start of validity period",
+            ),
+            pytest.param(
+                datetime.date(2024, 11, 1),
+                {
+                    "certified": True,
+                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certified_at": timezone.now(),
+                },
+                CERTIFIED_BADGE_HTML,
+                id="End of validity period",
+            ),
+            pytest.param(
+                datetime.date(2025, 11, 2),
+                {
+                    "certified": True,
+                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certified_at": timezone.now(),
+                },
+                NOT_CERTIFIED_BADGE_HTML,
+                id="After validity period",
+            ),
+            pytest.param(
+                datetime.date(2024, 11, 1),
+                {
+                    "certified": False,
+                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certified_at": timezone.now(),
+                },
+                NOT_CERTIFIED_BADGE_HTML,
+                id="Not certified criteria",
+            ),
+            pytest.param(
+                datetime.date(2024, 11, 1),
+                {
+                    "certified": None,
+                    "certification_period": None,
+                    "certified_at": timezone.now(),
+                },
+                NOT_CERTIFIED_BADGE_HTML,
+                id="Provider unknown error",
+            ),
+            pytest.param(
+                datetime.date(2024, 11, 1),
+                {
+                    "certified": None,
+                    "certification_period": None,
+                    "certified_at": timezone.now(),
+                },
+                NOT_CERTIFIED_BADGE_HTML,
+                id="User not found",
+            ),
         ],
     )
-    def test_certifiable_diagnosis_with_certifiable_criteria(self, mocker, factory, hiring_start_at, expected):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
-        diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-        )
-        certify_criteria(diagnosis)
-
-        [criterion] = _criteria_for_display([diagnosis.selected_administrative_criteria.get()], hiring_start_at)
+    @pytest.mark.parametrize(
+        "factory", [IAESelectedAdministrativeCriteriaFactory, GEIQSelectedAdministrativeCriteriaFactory]
+    )
+    def test_certifiable_diagnosis_with_certifiable_criteria(
+        self,
+        factory,
+        hiring_start_at,
+        factory_params,
+        expected_html_badge,
+    ):
+        # Attributes are already tested in tests.utils.apis.test_api_particulier
+        factory_params = {"data_returned_by_api": "Not used for the moment.", **factory_params}
+        criterion = factory(**factory_params)
+        [criterion] = _criteria_for_display([criterion], hiring_start_at)
         rendered = self._render(criterion=criterion)
         assert escape(criterion.administrative_criteria.name) in rendered
-        if expected:
-            assertInHTML(CERTIFIED_BADGE_HTML, rendered)
-            assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
-        else:
-            assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
-            assertInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
+        assertInHTML(expected_html_badge, rendered)
 
+    @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
     @pytest.mark.parametrize("employer", [True, False])
     @pytest.mark.parametrize("authorized_prescriber", [True, False])
     @pytest.mark.parametrize("is_considered_certified", [True, False])

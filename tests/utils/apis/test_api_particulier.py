@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from django.conf import settings
 from django.utils import timezone
@@ -12,6 +14,7 @@ from itou.utils.mocks.api_particulier import (
     RESPONSES,
     ResponseKind,
 )
+from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -69,6 +72,41 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 
 
+@pytest.mark.parametrize(
+    "factory",
+    [
+        pytest.param(IAEEligibilityDiagnosisFactory, id="iae"),
+        pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
+    ],
+)
+@pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+@freeze_time("2025-01-06")
+def test_certified(criteria_kind, factory, respx_mock, caplog):
+    eligibility_diagnosis = factory(
+        certifiable=True,
+        criteria_kinds=[criteria_kind],
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
+    )
+    respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
+
+    eligibility_diagnosis.certify_criteria()
+
+    assert len(respx_mock.calls) == 1
+    SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+    criterion = SelectedAdministrativeCriteria.objects.get(
+        administrative_criteria__kind=criteria_kind,
+        eligibility_diagnosis=eligibility_diagnosis,
+    )
+    assert criterion.certified is True
+    assert criterion.certified_at == timezone.now()
+    assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2025, 4, 8))
+    assert f"{settings.API_PARTICULIER_BASE_URL}v2" in caplog.text
+    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
+
+
+@freeze_time("2025-08-01")
 def test_not_found(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         404, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
