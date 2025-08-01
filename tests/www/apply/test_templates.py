@@ -35,7 +35,13 @@ from tests.job_applications.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.testing import get_request, load_template
-from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
+from tests.www.eligibility_views.utils import (
+    CERTIFIED_BADGE_HTML,
+    IMPOSSIBLE_CERTIFICATION_BADGE_HTML,
+    NOT_CERTIFIED_BADGE_HTML,
+    ONGOING_CERTIFICATION_BADGE_HTML,
+    TEMPORARILY_CERTIFIED_BADGE_HTML,
+)
 
 
 # Job applications list (company)
@@ -461,14 +467,14 @@ class TestCertifiedBadge:
                     "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
                     "certified_at": timezone.now(),
                 },
-                NOT_CERTIFIED_BADGE_HTML,
+                TEMPORARILY_CERTIFIED_BADGE_HTML,
                 id="After validity period",
             ),
             pytest.param(
                 datetime.date(2024, 11, 1),
                 {
                     "certified": False,
-                    "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 11, 1)),
+                    "certification_period": None,
                     "certified_at": timezone.now(),
                 },
                 NOT_CERTIFIED_BADGE_HTML,
@@ -481,8 +487,8 @@ class TestCertifiedBadge:
                     "certification_period": None,
                     "certified_at": timezone.now(),
                 },
-                NOT_CERTIFIED_BADGE_HTML,
-                id="Provider unknown error",
+                IMPOSSIBLE_CERTIFICATION_BADGE_HTML,
+                id="Service unavailable",  # 503
             ),
             pytest.param(
                 datetime.date(2024, 11, 1),
@@ -491,8 +497,18 @@ class TestCertifiedBadge:
                     "certification_period": None,
                     "certified_at": timezone.now(),
                 },
-                NOT_CERTIFIED_BADGE_HTML,
-                id="User not found",
+                IMPOSSIBLE_CERTIFICATION_BADGE_HTML,
+                id="User not found",  # 404
+            ),
+            pytest.param(
+                datetime.date(2024, 11, 1),
+                {
+                    "certified": None,
+                    "certification_period": None,
+                    "certified_at": None,
+                },
+                ONGOING_CERTIFICATION_BADGE_HTML,
+                id="Ongoing certification",
             ),
         ],
     )

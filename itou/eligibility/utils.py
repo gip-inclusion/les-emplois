@@ -19,8 +19,12 @@ def iae_has_required_criteria(criteria, company_kind):
 def _criteria_for_display(selected_criteria, hiring_start_at):
     for criterion in selected_criteria:
         criterion.is_considered_certified = False
+        criterion.is_temporarily_certified = False
         if hiring_start_at and criterion.certified:
-            criterion.is_considered_certified = hiring_start_at in criterion.certification_period
+            if hiring_start_at in criterion.certification_period:
+                criterion.is_considered_certified = True
+            elif hiring_start_at > criterion.certification_period.upper:
+                criterion.is_temporarily_certified = True
     return selected_criteria
 
 

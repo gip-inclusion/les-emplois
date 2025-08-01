@@ -122,11 +122,13 @@ def test_not_found(respx_mock, caplog):
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     assert crit.certified is None
     assert crit.certification_period is None
+    assert crit.certified_at == timezone.now()
     assert "Dossier allocataire inexistant. Le document ne peut être édité." in caplog.text
     assert f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 
 
+@freeze_time("2025-08-01")
 def test_service_unavailable(respx_mock, caplog):
     respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
         503, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
@@ -142,6 +144,7 @@ def test_service_unavailable(respx_mock, caplog):
     assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     assert crit.certified is None
     assert crit.certification_period is None
+    assert crit.certified_at == timezone.now()
     assert (
         "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service." in caplog.text
     )
