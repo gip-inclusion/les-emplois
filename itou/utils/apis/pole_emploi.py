@@ -37,8 +37,9 @@ class PoleEmploiAPIException(Exception):
 class PoleEmploiAPIBadResponse(Exception):
     """errors that can't be recovered from: the API server does not agree."""
 
-    def __init__(self, response_code):
+    def __init__(self, response_code, response_data):
         self.response_code = response_code
+        self.response_data = response_data
         super().__init__()
 
     def __str__(self):
@@ -211,10 +212,10 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         )
         code_sortie = data.get("codeSortie")
         if code_sortie != API_RECH_INDIVIDU_SUCCESS:
-            raise PoleEmploiAPIBadResponse(code_sortie)
+            raise PoleEmploiAPIBadResponse(response_code=code_sortie, response_data=data)
         id_national = data.get("idNationalDE")
         if not id_national:
-            raise PoleEmploiAPIBadResponse(API_CLIENT_EMPTY_NIR_BAD_RESPONSE)
+            raise PoleEmploiAPIBadResponse(response_code=API_CLIENT_EMPTY_NIR_BAD_RESPONSE, response_data=data)
         return id_national
 
     def mise_a_jour_pass_iae(
@@ -244,7 +245,7 @@ class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
         data = self._request(f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour", params)
         code_sortie = data.get("codeSortie")
         if code_sortie != API_MAJ_PASS_SUCCESS:
-            raise PoleEmploiAPIBadResponse(code_sortie)
+            raise PoleEmploiAPIBadResponse(response_code=code_sortie, response_data=data)
 
     def referentiel(self, code):
         return self._request(f"{self.base_url}/offresdemploi/v2/referentiel/{code}", method="GET")

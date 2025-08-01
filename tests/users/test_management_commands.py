@@ -15,6 +15,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
+import itou.utils.mocks.pole_emploi as pole_emploi_api_mocks
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
@@ -22,9 +23,9 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
 from itou.users.management.commands import send_check_authorized_members_email
 from itou.users.models import NirModificationRequest, User
+from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
-from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -865,7 +866,7 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
 
     # user not found at all
     respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=API_RECHERCHE_ERROR
+        200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR
     )
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
@@ -886,7 +887,7 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
     # user found immediately
     caplog.clear()
     respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=API_RECHERCHE_RESULT_KNOWN
+        200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
     )
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
@@ -927,7 +928,7 @@ def test_pe_certify_users_dry_run(settings, respx_mock, caplog, snapshot):
 
     # user found immediately
     respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=API_RECHERCHE_RESULT_KNOWN
+        200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
     )
     call_command("pe_certify_users")
     assert caplog.messages[-1].startswith(
@@ -967,7 +968,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
             "nomNaissance": "DURAND",
             "prenom": "BALTHAZAR",
         },
-    ).respond(200, json=API_RECHERCHE_ERROR)
+    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR)
     respx_mock.post(
         "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
         json={
@@ -976,7 +977,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
             "nomNaissance": "BALTHAZAR",
             "prenom": "DURAND",
         },
-    ).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
+    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN)
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
@@ -1011,7 +1012,9 @@ def test_pe_certify_users_retry(caplog, snapshot):
     )  # recent failure that should not be called
     with mock.patch(
         "itou.utils.apis.pole_emploi.PoleEmploiRoyaumePartenaireApiClient.recherche_individu_certifie",
-        side_effect=PoleEmploiAPIBadResponse("R010"),
+        side_effect=PoleEmploiAPIBadResponse(
+            response_code=PEApiRechercheIndividuExitCode.R010, response_data=pole_emploi_api_mocks.API_RECHERCHE_ERROR
+        ),
     ) as recherche:
         call_command("pe_certify_users", wet_run=True)
 
