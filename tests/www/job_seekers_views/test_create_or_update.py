@@ -15,7 +15,7 @@ from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params
+from itou.utils.urls import add_url_params, get_zendesk_form_url
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
@@ -1019,7 +1019,11 @@ class TestUpdateForSender:
 
         url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
         response = client.get(url)
-        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
+        assertNotContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+        )
         birthdate = datetime.date(1933, 11, 1)
         response = client.post(
             url,
@@ -1166,7 +1170,12 @@ class TestUpdateForSender:
             kwargs={"session_uuid": job_seeker_session_name},
         )
         response = client.get(url)
-        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+            count=1,
+        )
         response = client.post(
             url,
             {

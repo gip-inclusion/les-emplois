@@ -18,6 +18,7 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
 from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
+from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
@@ -192,7 +193,11 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         client.force_login(self.user)
         response = client.get(self.url)
-        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
+        assertNotContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+        )
 
         data = _get_user_form_data(self.job_seeker)
         data.pop("title")
@@ -298,7 +303,12 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=self.job_seeker, certified=True)
         client.force_login(self.user)
         response = client.get(self.url)
-        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+            count=1,
+        )
         response = client.post(
             self.url,
             data={
