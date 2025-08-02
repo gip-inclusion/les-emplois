@@ -98,7 +98,10 @@ class TestJobSeekerSignup:
         url = reverse("signup:job_seeker")
         response = client.get(url)
         assert response.status_code == 200
-        replace_in_attr = [("max", str(DuetDatePickerWidget.max_birthdate()), "2008-10-23")]
+        replace_in_attr = [
+            ("max", str(DuetDatePickerWidget.max_birthdate()), "max-birthdate"),
+            ("min", str(DuetDatePickerWidget.min_birthdate()), "min-birthdate"),
+        ]
         form = parse_response_to_soup(response, selector="form.js-format-nir", replace_in_attr=replace_in_attr)
         assert pretty_indented(form) == snapshot(name="job_seeker_signup_form")
 
