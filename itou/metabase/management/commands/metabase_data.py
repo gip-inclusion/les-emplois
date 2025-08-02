@@ -8,8 +8,10 @@ from django.db.models import F
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from itou.companies.models import Contract
 from itou.metabase.models import DatumKey
-from itou.users.models import JobSeekerProfile
+from itou.users.enums import UserKind
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, Client
 from itou.utils.command import BaseCommand, dry_runnable
 
@@ -65,6 +67,9 @@ class Command(BaseCommand):
 
         stalled_job_seekers = subparsers.add_parser("stalled-job-seekers")
         stalled_job_seekers.add_argument("--wet-run", dest="wet_run", action="store_true")
+
+        riae_contracts = subparsers.add_parser("riae-contracts")
+        riae_contracts.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     def fetch_kpi(self):
         cache = caches[self.CACHE_NAME]
@@ -139,6 +144,129 @@ class Command(BaseCommand):
             converging_update_count,
         )
 
+    def _get_riae_contracts_data(self):
+        client = Client(settings.METABASE_SITE_URL)
+        QUERY_LIMIT = 100_000  # Limit to <10MB data in ram (estimated with pympler.asizeof.asizeof)
+
+        # Schema:
+        # [{'Contrat Date Embauche': '2023-01-01',
+        #   'Contrat Date Fin Contrat': '2023-04-30',
+        #   'Contrat Date Sortie Definitive': None,
+        #   'Contrat ID Ctr': ##########,
+        #   'Contrat ID Structure': ###,
+        #   'Contrat Mesure Disp Code': 'ACI_DC',
+        #   'Contrat Parent ID': ##########,
+        #   'Emplois Candidat ID': ##,
+        #   'Type Contrat': 'initial'}]
+        base_query = client.build_query(
+            table=2150,
+            order_by=[
+                62289,  # Emplois Candidat ID
+                62288,  # Contrat Parent ID
+                61917,  # Contrat ID Ctr
+            ],
+            limit=QUERY_LIMIT,
+        )
+
+        contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=base_query))
+
+        while contracts:
+            yield from contracts
+
+            query = client.merge_query(
+                into=base_query,
+                query={
+                    "filter": [
+                        "or",
+                        [
+                            "and",
+                            [
+                                "=",
+                                ["field", 62289, {"base-type": "type/Integer"}],
+                                contracts[-1]["Emplois Candidat ID"],
+                            ],
+                            [
+                                ">=",
+                                ["field", 62288, {"base-type": "type/BigInteger"}],
+                                contracts[-1]["Contrat Parent ID"],
+                            ],
+                            [
+                                ">",
+                                ["field", 61917, {"base-type": "type/BigInteger"}],
+                                contracts[-1]["Contrat ID Ctr"],
+                            ],
+                        ],
+                        [">", ["field", 62289, {"base-type": "type/Integer"}], contracts[-1]["Emplois Candidat ID"]],
+                    ],
+                },
+            )
+            contracts = client.fetch_dataset_results(client.build_dataset_query(database=2, query=query))
+
+    @transaction.atomic()
+    def _write_contract(self, contracts):
+        Contract.objects.filter(pk__in=contracts).delete()
+        return len(Contract.objects.bulk_create(contracts.values()))
+
+    def fetch_riae_contracts(self):
+        run_time = timezone.now()
+        BATCH_SIZE = 1_000
+        job_seekers_ids = list(User.objects.filter(kind=UserKind.JOB_SEEKER).values_list("pk", flat=True))
+        contracts = {}
+        count = 0
+        synced = 0
+        for contract_data in self._get_riae_contracts_data():
+            count += 1
+            try:
+                contract_id = contract_data["Contrat Parent ID"]
+                start_date = contract_data["Contrat Date Embauche"]
+                if contract_end := contract_data["Contrat Date Fin Contrat"]:
+                    end_date = contract_end
+                    has_ended = False
+                elif contract_end := contract_data["Contrat Date Sortie Definitive"]:
+                    end_date = contract_end
+                    has_ended = True
+                else:
+                    # When does it happen ?
+                    end_date = None
+                    has_ended = False
+
+                if contract := contracts.get(contract_id):
+                    contract.start_date = min(start_date, contract.start_date)
+                    contract.has_ended = contract.has_ended or has_ended
+                    if end_date and contract.end_date:
+                        contract.end_date = max(contract.end_date, end_date)
+                    else:
+                        contract.end_date = contract.end_date or end_date
+                    contract.details.append(contract_data)
+                else:
+                    # New contract
+                    if len(contracts) >= BATCH_SIZE:
+                        synced += self._write_contract(contracts)
+                        print(count, synced)
+                        contracts = {}
+
+                    contracts[contract_id] = Contract(
+                        pk=contract_id,
+                        job_seeker_id=contract_data["Emplois Candidat ID"]
+                        if contract_data["Emplois Candidat ID"] in job_seekers_ids
+                        else None,
+                        company=None,  # FIXME
+                        start_date=start_date,
+                        end_date=end_date,
+                        has_ended=has_ended,
+                        details=[contract_data],
+                    )
+            except Exception as e:
+                print(e)
+                print(contract_data)
+                return
+
+        synced += self._write_contract(contracts)
+
+        # Remove old contracts not updated : they don't exist in metabase anymore
+        Contract.objects.filter(updated_at__lte=run_time).delete()
+        print(f"Synced {synced} Contracts")
+
     @dry_runnable
     def handle(self, *, data, **options):
         match data:
@@ -150,3 +278,5 @@ class Command(BaseCommand):
                 action_function()
             case "stalled-job-seekers":
                 self.fetch_stalled_job_seekers()
+            case "riae-contracts":
+                self.fetch_riae_contracts()
