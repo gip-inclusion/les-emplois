@@ -82,6 +82,8 @@ METABASE_DATABASE = os.getenv("METABASE_DATABASE", os.getenv("PGDATABASE", "meta
 AWS_STORAGE_BUCKET_NAME = "dev"
 CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
+PILOTAGE_DATASTORE_S3_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
+
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 

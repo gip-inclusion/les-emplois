@@ -8,6 +8,7 @@
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
   "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",
   "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
+  "30 * * * * $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=companies",
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
@@ -37,7 +38,6 @@
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
-  "0 9-12 * * MON $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 1 * * MON $ROOT/clevercloud/run_management_command.sh delete_unused_files",
   "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
