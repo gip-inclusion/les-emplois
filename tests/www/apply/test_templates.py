@@ -4,6 +4,7 @@ import random
 import pytest
 from django.template import Context
 from django.test.client import RequestFactory
+from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML, assertNotInHTML
@@ -13,6 +14,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
+from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.tasks import certify_criteria
 from itou.eligibility.utils import _criteria_for_display, geiq_criteria_for_display, iae_criteria_for_display
 from itou.job_applications.enums import Origin
@@ -422,8 +424,18 @@ class TestCertifiedBadge:
         [
             pytest.param(datetime.date(2024, 7, 31), False, id="Before validity period"),
             pytest.param(datetime.date(2024, 8, 1), True, id="Start of validity period"),
-            pytest.param(datetime.date(2024, 11, 1), True, id="End of validity period"),
-            pytest.param(datetime.date(2025, 11, 2), False, id="After validity period"),
+            pytest.param(
+                timezone.localdate()
+                + datetime.timedelta(days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS),
+                True,
+                id="End of validity period",
+            ),
+            pytest.param(
+                timezone.localdate()
+                + datetime.timedelta(days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS + 1),
+                False,
+                id="After validity period",
+            ),
         ],
     )
     def test_certifiable_diagnosis_with_certifiable_criteria(self, mocker, factory, hiring_start_at, expected):
