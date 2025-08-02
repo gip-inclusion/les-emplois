@@ -2,7 +2,7 @@
 {% load enums %}
 {% load matomo %}
 {% load static %}
-{% load tally %}
+{% load support %}
 {% load theme_inclusion %}
 
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
@@ -75,7 +75,7 @@
                 <br>
                 {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
                     Afin de modifier l’adresse postale,
-                    <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new"
+                    <a href="{% zendesk_form_url request=request %}"
                        target="_blank"
                        rel="noopener"
                        class="has-external-link"

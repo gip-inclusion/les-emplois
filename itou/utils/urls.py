@@ -6,6 +6,9 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.utils.safestring import mark_safe
 
+from itou.utils.constants import ITOU_HELP_CENTER_URL
+from itou.utils.zendesk import serialize_zendesk_params
+
 
 def get_safe_url(request, param_name=None, fallback_url=None, url=None):
     url = url or request.GET.get(param_name) or request.POST.get(param_name)
@@ -121,6 +124,15 @@ def get_tally_form_url(form_id, **kwargs):
         url += "?" + urlencode(kwargs)
 
     return mark_safe(url)
+
+
+def get_zendesk_form_url(request=None):
+    url = f"{ITOU_HELP_CENTER_URL}/requests/new"
+
+    if request and request.user and request.user.is_authenticated:
+        url = add_url_params(url, serialize_zendesk_params(request))
+
+    return url
 
 
 def markdown_url_set_target_blank(attrs, new=False):
