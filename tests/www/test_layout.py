@@ -3,7 +3,6 @@ from functools import partial
 import pytest
 from django.urls import reverse
 
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -21,7 +20,7 @@ def test_navigation_not_authenticated(snapshot, client):
             partial(
                 EmployerFactory,
                 with_company=True,
-                with_company__company__name="ACME Inc.",
+                with_company__company__for_snapshot=True,
                 with_company__company__not_in_territorial_experimentation=True,
             ),
             id="Employer",
@@ -39,7 +38,7 @@ def test_navigation_not_authenticated(snapshot, client):
             partial(
                 PrescriberFactory,
                 membership__organization__authorized=False,
-                membership__organization__name="ACME Inc.",
+                membership__organization__for_snapshot=True,
                 membership__organization__not_in_territorial_experimentation=True,
             ),
             id="PrescriberWithUnauthorizedOrganization",
@@ -48,31 +47,19 @@ def test_navigation_not_authenticated(snapshot, client):
             partial(
                 PrescriberFactory,
                 membership__organization__authorized=True,
-                membership__organization__name="ACME Inc.",
+                membership__organization__for_snapshot=True,
                 membership__organization__not_in_territorial_experimentation=True,
             ),
             id="PrescriberWithAuthorizedOrganization",
         ),
         pytest.param(
-            lambda for_snapshot, first_name, last_name, email: PrescriberFactory(
-                for_snapshot=for_snapshot,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                membership__organization=PrescriberOrganizationWithMembershipFactory(
-                    authorized=True, name="ACME Inc.", not_in_territorial_experimentation=True
-                ),
-            ),
-            id="PrescriberWithMultiMemberOrganization",
-        ),
-        pytest.param(
             partial(
                 PrescriberFactory,
                 membership__organization__authorized=True,
-                membership__organization__name="ACME Inc.",
-                membership__organization__not_in_territorial_experimentation=True,
+                membership__organization__for_snapshot=True,
+                membership__organization__with_membership=True,
             ),
-            id="AuthorizedPrescriber",
+            id="PrescriberWithMultiMemberOrganization",
         ),
     ],
 )
