@@ -93,7 +93,7 @@ def city_fixture():
 def get_fields_list_for_snapshot(model):
     exclude = {"id", "anonymized_at"}
     fields = [f.name for f in model._meta.get_fields() if f.concrete and f.name not in exclude]
-    return list(model.objects.values(*fields))
+    return sorted(model.objects.values(*fields), key=lambda d: str(d))
 
 
 class TestNotifyInactiveJobseekersManagementCommand:
