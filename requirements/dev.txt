@@ -1916,9 +1916,9 @@ xlrd==2.0.2 \
     --hash=sha256:08b5e25de58f21ce71dc7db3b3b8106c1fa776f3024c54e45b45b374e89234c9 \
     --hash=sha256:ea762c3d29f4cca48d82df517b6d89fbce4db3107f9d78713e48cd321d5c9aa9
     # via -r requirements/test.txt
-xlsx-streaming==2.0.0 \
-    --hash=sha256:30ac596b383d496c051c339894b5f06779539d1897cdbc3f2b3c247a5cfba28e \
-    --hash=sha256:a70b67a3e0b0d93488c6982b4c7a46bb9a43c72b56a2d4dfa8536298fda9570e
+xlsx-streaming==2.0.1 \
+    --hash=sha256:07f0ab2c9d166679cf57d9e0a6688f9717389a10a57ff2a0a0ea6109cc003cfa \
+    --hash=sha256:da8ce55b4039cb053714068f8e58c8e5e525fe210f77280b54beb6362c7ba0b1
     # via -r requirements/test.txt
 xworkflows==1.1.0 \
     --hash=sha256:8e3a9f6e9de6bcd779335f2ce4f87445ad8047771be9c6c96e347fb8622e2f27 \
