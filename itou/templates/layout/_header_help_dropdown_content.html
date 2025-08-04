@@ -1,4 +1,5 @@
 {% load matomo %}
+{% load support %}
 
 <ul class="list-unstyled">
     <li>
@@ -28,6 +29,14 @@
                    {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
             </li>
         {% endif %}
+        <li>
+            <a href="{% zendesk_form_url %}"
+               rel="noopener"
+               class="dropdown-item has-external-link"
+               target="_blank"
+               aria-label="contacter le support (ouverture dans un nouvel onglet)"
+               {% matomo_event "help" "clic" "zendesk_form" %}>Contacter l’assistance</a>
+        </li>
     {% endif %}
     <li>
         <a href="{% url 'announcements:news' %}" class="dropdown-item" aria-label="Les nouveautés du site des emplois de l'inclusion" {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
