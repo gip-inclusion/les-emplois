@@ -1,5 +1,36 @@
 # Journal des modifications
 
+## 2025-08-04
+
+### Ajouté
+
+- [Fiche de poste : affichage des offres d'entreprise adaptée récupérée via l'API de France Travail](https://github.com/gip-inclusion/les-emplois/pull/6638)
+- [Vie privée : piloter l'archivage par les data collectées dans l'app analytics](https://github.com/gip-inclusion/les-emplois/pull/6586)
+
+### Modifié
+
+- [Certification : Certifier de manière asynchrone via un feature flag](https://github.com/gip-inclusion/les-emplois/pull/6644)
+- [Admin : afficher le type de compte du demandeur dans les demandes de régulation NIR](https://github.com/gip-inclusion/les-emplois/pull/6602)
+- [Admin : autofocus sur le champ de saisie du code OTP](https://github.com/gip-inclusion/les-emplois/pull/6633)
+- [Candidature : Reformulation des critères d'éligibilité Mobilité et Langue française](https://github.com/gip-inclusion/les-emplois/pull/6607)
+- [Interface : Mise à jour du bandeau promotionnel de Mon Récap pour les employeurs et prescripteurs (tous les départements)](https://github.com/gip-inclusion/les-emplois/pull/6597)
+- [Fiche de poste : Afficher le tableau des fiches de poste même s'il ne contient que la ligne des candidatures spontanées](https://github.com/gip-inclusion/les-emplois/pull/6619)
+- [Interface : Arrêter de servir les fiches des entreprises désactivées](https://github.com/gip-inclusion/les-emplois/pull/6632)
+- [Interface : Décocher la case "Peut apparaître dans les résultats de recherche" des entreprises déconventionnées](https://github.com/gip-inclusion/les-emplois/pull/6629)
+- [GPS : Correction de l'affichage des informations personnelles des intervenants](https://github.com/gip-inclusion/les-emplois/pull/6651)
+- [Admin : Correction de l'affichage pour les administrateurs](https://github.com/gip-inclusion/les-emplois/pull/6614)
+- [PASS IAE : Refonte des permissions pour afficher le détail d'un PASS](https://github.com/gip-inclusion/les-emplois/pull/6612)
+- [Employeur : Correctif temporaire permettant d'afficher les menus déroulants (distance, type de structure…) au-dessus du titre et des onglets](https://github.com/gip-inclusion/les-emplois/pull/6615)
+- [Fiche de poste : ne plus afficher le badge "Soyez parmi les premiers à postuler" pour les offres externes de France Travail](https://github.com/gip-inclusion/les-emplois/pull/6643)
+- [Vie privée : accélerer la sélection des candidats à archiver](https://github.com/gip-inclusion/les-emplois/pull/6609)
+- [Vie privée : mise à jour des dates pivot de la notification [1/2]](https://github.com/gip-inclusion/les-emplois/pull/6618)
+- [Vie privée : mise à jour des dates pivot de la notification [2/2]](https://github.com/gip-inclusion/les-emplois/pull/6630)
+- [Vie privée : adapter le nombre de candidats à anonymiser en fonction du stock à traiter](https://github.com/gip-inclusion/les-emplois/pull/6635)
+
+### Supprimé
+
+- [Candidature : Retirer l'encart Immersion Facilitée (PMSMP) dans les pages de détails de candidature](https://github.com/gip-inclusion/les-emplois/pull/6645)
+
 ## 2025-07-28
 
 ### Ajouté
