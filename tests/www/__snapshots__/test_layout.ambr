@@ -247,6 +247,11 @@
                           </a>
                       </li>
                       <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
+                          </a>
+                      </li>
+                      <li>
                           <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">
                               Nouveautés
                           </a>
@@ -550,6 +555,11 @@
                           </a>
                       </li>
                       <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
+                          </a>
+                      </li>
+                      <li>
                           <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">
                               Nouveautés
                           </a>
@@ -817,6 +827,11 @@
                       <li>
                           <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">
                               Qui peut bénéficier des contrats d'IAE ?
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
                           </a>
                       </li>
                       <li>
@@ -1114,6 +1129,11 @@
                       <li>
                           <a aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_prescrire-parcours-iae-guide" href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite" rel="noopener" target="_blank">
                               Prescrire un parcours IAE (guide pratique)
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
                           </a>
                       </li>
                       <li>
@@ -1416,6 +1436,11 @@
                           </a>
                       </li>
                       <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
+                          </a>
+                      </li>
+                      <li>
                           <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">
                               Nouveautés
                           </a>
@@ -1705,6 +1730,11 @@
                           </a>
                       </li>
                       <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
+                          </a>
+                      </li>
+                      <li>
                           <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">
                               Nouveautés
                           </a>
@@ -1968,6 +1998,11 @@
                       <li>
                           <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">
                               Qui peut bénéficier des contrats d'IAE ?
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                              Contacter l’assistance
                           </a>
                       </li>
                       <li>
