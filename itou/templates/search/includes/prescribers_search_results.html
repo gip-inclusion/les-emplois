@@ -36,7 +36,7 @@
         </div>
     {% endfor %}
 
-    {% include "includes/pagination.html" with page=prescriber_orgs_page boost=True boost_target="#prescribers-search-results" boost_indicator="#prescribers-search-results" %}
+    {% include "includes/pagination.html" with page=prescriber_orgs_page boost=True boost_target="#prescribers-search-results" boost_indicator="#prescribers-search-results" request=request only %}
 </div>
 
 {% if request.htmx %}

@@ -12,7 +12,7 @@
         {% for approval in approval_list %}
             {% include "approvals/includes/list_card.html" with approval=approval %}
         {% endfor %}
-        {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#approvals-list" boost_indicator="#approvals-list" %}
+        {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#approvals-list" boost_indicator="#approvals-list" request=request only %}
     {% endif %}
 </div>
 
