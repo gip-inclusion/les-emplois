@@ -207,7 +207,7 @@
                                        href="{% url 'apply:job_application_external_transfer_start_session' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
                                        {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                                        aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
-                                        <i class="ri-draft-line" aria-hidden="true"></i>
+                                        <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                                         <span>Transférer la candidature</span>
                                     </a>
                                 </div>
@@ -218,7 +218,7 @@
                                        href="{% url_add_query apply_url job_seeker_public_id=job_seeker.public_id|default:"" back_url=request.get_full_path %}"
                                        {% matomo_event "candidature" "clic" "start_application" %}
                                        aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                                        <i class="ri-draft-line" aria-hidden="true"></i>
+                                        <i class="ri-draft-line fw-medium" aria-hidden="true"></i>
                                         <span>Postuler</span>
                                     </a>
                                 </div>
