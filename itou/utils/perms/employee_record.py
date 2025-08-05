@@ -1,8 +1,10 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.template import loader
+from django.urls import reverse
 from django.utils.html import format_html
 
+from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
 from itou.utils.perms.company import get_current_company_or_404
@@ -61,7 +63,12 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
                 {}""",
                 loader.render_to_string(
                     "employee_record/includes/_regularize_nir_button.html",
-                    context={"job_application": job_application},
+                    context={
+                        "job_application": job_application,
+                        "back_url": (
+                            reverse("employee_record_views:list") + f"?status={Status.NEW}&status={Status.REJECTED}"
+                        ),
+                    },
                 ),
             )
         )

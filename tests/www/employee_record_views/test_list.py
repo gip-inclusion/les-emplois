@@ -6,7 +6,6 @@ import pgtrigger
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import title, urlencode
-from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -322,7 +321,6 @@ class TestListEmployeeRecords:
         assertNotContains(response, self.HEADER_WARNING_TITLE)
         assertNotContains(response, self.ITEM_WARNING_TITLE)
 
-    @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self, client, snapshot):
         client.force_login(self.user)
         self.job_seeker.jobseeker_profile.nir = ""
@@ -340,11 +338,10 @@ class TestListEmployeeRecords:
                 replace_in_attr=[
                     (
                         "href",
-                        f"https://tally.so/r/wzxQlg?employeerecord={self.employee_record.pk}&jobapplication={self.job_application.pk}",
-                        (
-                            "https://tally.so/r/wzxQlg"
-                            "?employeerecord=[PK of EmployeeRecord]&jobapplication=[PK of JobApplication]"
-                        ),
+                        f"/job-seekers/nir-modification/{self.job_seeker.public_id}"
+                        "?back_url=/employee_record/list%3Fstatus%3DNEW",
+                        "/job-seekers/nir-modification/[Public ID of JobSeeker]"
+                        "?back_url=/employee_record/list%3Fstatus%3DNEW",
                     )
                 ],
             )
