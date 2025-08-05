@@ -94,7 +94,7 @@
             </table>
         </div>
 
-        {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#job-seekers-section" boost_indicator="#job-seekers-section" %}
+        {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#job-seekers-section" boost_indicator="#job-seekers-section" request=request only %}
     {% endif %}
 </section>
 

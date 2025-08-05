@@ -56,7 +56,7 @@
             </table>
         </div>
 
-        {% include "includes/pagination.html" with page=memberships_page boost=True boost_target="#follow-up-groups-section" boost_indicator="#follow-up-groups-section" %}
+        {% include "includes/pagination.html" with page=memberships_page boost=True boost_target="#follow-up-groups-section" boost_indicator="#follow-up-groups-section" request=request only %}
 
     {% endif %}
 </div>
