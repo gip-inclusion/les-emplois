@@ -145,14 +145,14 @@ def test_step_1(client, snapshot):
     assertContains(
         response,
         f"{transfer_start_session_base_url}?back_url={quote(company_card_url)}",
-        count=2,
+        count=1,
     )
     assertContains(response, job_card_url, count=1)
     assertNotContains(response, POSTULER)
     assertContains(
         response,
         "<span>Transférer la candidature</span>",
-        count=2,
+        count=1,
     )
 
     # Check job description card

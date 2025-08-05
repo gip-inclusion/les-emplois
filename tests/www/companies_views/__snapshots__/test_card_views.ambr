@@ -140,15 +140,6 @@
               </li>
           </ul>
       </div>
-      <div class="d-flex justify-content-end mt-3">
-          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-              <i aria-hidden="true" class="ri-draft-line fw-medium">
-              </i>
-              <span>
-                  Postuler
-              </span>
-          </a>
-      </div>
   </div>
   
   '''
@@ -243,15 +234,6 @@
                   </div>
               </li>
           </ul>
-      </div>
-      <div class="d-flex justify-content-end mt-3">
-          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-              <i aria-hidden="true" class="ri-draft-line fw-medium">
-              </i>
-              <span>
-                  Postuler
-              </span>
-          </a>
       </div>
   </div>
   
@@ -464,15 +446,6 @@
                   </div>
               </li>
           </ul>
-      </div>
-      <div class="d-flex justify-content-end mt-3">
-          <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start?back_url=/company/[PK of Company]/card">
-              <i aria-hidden="true" class="ri-draft-line fw-medium">
-              </i>
-              <span>
-                  Postuler
-              </span>
-          </a>
       </div>
   </div>
   

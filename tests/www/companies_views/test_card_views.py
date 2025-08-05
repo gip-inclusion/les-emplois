@@ -346,7 +346,7 @@ class TestCardView:
         apply_url_with_job_seeker_id = reverse(
             "apply:start", kwargs={"company_pk": company.pk}, query={"job_seeker_public_id": job_seeker_public_id}
         )
-        assertContains(response, apply_url_with_job_seeker_id, count=2)
+        assertContains(response, apply_url_with_job_seeker_id, count=1)
 
         # When UUID is broken in GET parameters
         broken_url = reverse("companies_views:card", kwargs={"siae_id": company.pk}) + "?job_seeker_public_id=123"
