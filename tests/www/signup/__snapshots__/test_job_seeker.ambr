@@ -354,13 +354,15 @@
                   </button>
               </div>
           </div>
-          <div class="invalid-feedback">
-              Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
+          <div id="id_password1_error">
+              <div class="invalid-feedback">
+                  Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
+              </div>
+              <div class="invalid-feedback">
+                  Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
+              </div>
           </div>
-          <div class="invalid-feedback">
-              Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
-          </div>
-          <div class="form-text" id="id_password1_helptext id_password1_error">
+          <div class="form-text" id="id_password1_helptext">
               Le mot de passe doit contenir au moins 14 caractères et 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
           </div>
       </div>
