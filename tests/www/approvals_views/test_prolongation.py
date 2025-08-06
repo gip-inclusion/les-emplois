@@ -508,7 +508,7 @@ class TestApprovalProlongation:
         }
         response = client.post(url, data=post_data)
 
-        error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
+        error_msg = parse_response_to_soup(response, selector="div#id_email_error > .invalid-feedback")
         assert pretty_indented(error_msg) == snapshot(name="unknown authorized prescriber")
 
 
