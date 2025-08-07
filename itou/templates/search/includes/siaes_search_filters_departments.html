@@ -1,14 +1,14 @@
 {% load django_bootstrap5 %}
 
 {% if form.departments %}
-    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.departments menu_extra_classes="fix-zindex-1040" only %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.departments only %}
 {% endif %}
 {% if form.districts_13 %}
-    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_13 menu_extra_classes="fix-zindex-1040" only %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_13 only %}
 {% endif %}
 {% if form.districts_69 %}
-    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_69 menu_extra_classes="fix-zindex-1040" only %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_69 only %}
 {% endif %}
 {% if form.districts_75 %}
-    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_75 menu_extra_classes="fix-zindex-1040" only %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_75 only %}
 {% endif %}
