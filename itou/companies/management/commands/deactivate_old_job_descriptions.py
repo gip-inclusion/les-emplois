@@ -12,6 +12,7 @@ class Command(BaseCommand):
     def handle(self, verbosity, **options):
         deactivated_nb = (
             JobDescription.objects.active()
+            .is_internal()  # Exclude external sources such as FT API
             .exclude(last_employer_update_at__gte=timezone.now() - DEACTIVATION_DELAY)
             .update(is_active=False)
         )

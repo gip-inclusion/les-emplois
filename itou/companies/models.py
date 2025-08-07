@@ -691,6 +691,9 @@ class JobDescriptionQuerySet(models.QuerySet):
             )
         )
 
+    def is_internal(self):
+        return self.filter(source_kind__isnull=True)
+
 
 class JobDescription(models.Model):
     """

@@ -8,8 +8,9 @@ from django.contrib.gis.geos import Point
 from django.core import management
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, JobSource
 from itou.companies.models import Company, JobDescription
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
@@ -215,10 +216,19 @@ def test_deactivate_old_job_description():
         last_employer_update_at=None,
         location=None,
     )
+    ft_job_description = companies_factories.JobDescriptionFactory(
+        last_employer_update_at=None,
+        location=None,
+        source_kind=JobSource.PE_API,
+    )
     recently_updated_job_description = companies_factories.JobDescriptionFactory(
         last_employer_update_at=timezone.now() - relativedelta(years=1) + relativedelta(days=1),
         location=None,
     )
-    assert JobDescription.objects.active().count() == 3
+    assert JobDescription.objects.active().count() == 4
     management.call_command("deactivate_old_job_descriptions")
-    assert JobDescription.objects.active().get() == recently_updated_job_description
+    assertQuerySetEqual(
+        JobDescription.objects.active(),
+        [recently_updated_job_description, ft_job_description],
+        ordered=False,
+    )
