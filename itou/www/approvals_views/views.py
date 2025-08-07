@@ -82,7 +82,7 @@ class ApprovalBaseViewMixin:
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
-    paginate_by = 10
+    paginate_by = settings.PAGE_SIZE_SMALL
     paginator_class = ItouPaginator
 
     def __init__(self):
@@ -498,7 +498,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
     context = {
         "form": form,
-        "pager": pager(queryset, request.GET.get("page"), items_per_page=20),
+        "pager": pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT),
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)

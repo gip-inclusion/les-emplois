@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -195,7 +196,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder.FULL_NAME_ASC
     queryset = queryset.order_by(*order.order_by)
 
-    page_obj = pager(queryset, request.GET.get("page"), items_per_page=10)
+    page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
         job_seeker.show_more_actions = not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled

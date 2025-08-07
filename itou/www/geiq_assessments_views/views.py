@@ -561,7 +561,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         .select_related("employee__assessment")
         .order_by("employee__last_name", "employee__first_name"),
         request.GET.get("page"),
-        items_per_page=50,
+        items_per_page=settings.PAGE_SIZE_LARGE,
     )
     context = {
         "assessment": assessment,
