@@ -86,7 +86,7 @@ class TestProcessListSiae:
             f"""
             <div class="dropdown">
             <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown"
-                    data-bs-auto-close="outside" aria-expanded="false">
+                    data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
                 Fiches de poste
             </button>
             <ul class="dropdown-menu">
