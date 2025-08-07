@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
 
 
@@ -32,7 +33,7 @@ class ItouPage(Page):
         self.display_pager = total_pages > 1
 
 
-def pager(queryset, page, items_per_page=10, pages_num=10):
+def pager(queryset, page, items_per_page=settings.PAGE_SIZE_SMALL, pages_num=10):
     """
     A generic pager built on top of Django core's Paginator.
     https://docs.djangoproject.com/en/dev/topics/pagination/

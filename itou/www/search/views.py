@@ -1,6 +1,7 @@
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
@@ -231,7 +232,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             )
         )
 
-        page = pager(siaes, self.request.GET.get("page"), items_per_page=10)
+        page = pager(siaes, self.request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
         return PageAndCounts(
             results_page=page,
             siaes_count=page.paginator.count,
@@ -256,7 +257,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
     def get_results_page_and_counts(self, siaes, job_descriptions):
         job_descriptions = job_descriptions.order_by(F("source_kind").asc(nulls_first=True), "-updated_at")
 
-        page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
+        page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
         # Prefer a prefetch_related over annotating the entire queryset with_annotation_is_unpopular().
         # That annotation is quite expensive and PostgreSQL runs it on the entire queryset, even
         # though we don’t sort or group by that column. It would be smarter to apply the limit
@@ -308,7 +309,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")
         )
-    prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
+    prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
 
     context = {
         "city": city,

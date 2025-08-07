@@ -152,7 +152,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
     ).order_by(*order.order_by)
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
 
     # The candidate has obviously access to its personal info
@@ -229,7 +229,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
             )
         )
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(
         job_applications_page, functools.partial(can_view_personal_information, request)
@@ -346,7 +346,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
     ).order_by(*order.order_by)
 
-    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=20)
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
     _add_pending_for_weeks(job_applications_page)
 
     # SIAE members have access to personal info
