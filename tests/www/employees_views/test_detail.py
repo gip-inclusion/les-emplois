@@ -194,7 +194,7 @@ class TestEmployeeDetailView:
         )
 
     @override_settings(TALLY_URL="https://tally.so")
-    def test_link_immersion_facile(self, client, snapshot):
+    def test_immersion_ad(self, client, snapshot):
         today = timezone.localdate()
         approval = ApprovalFactory(
             with_jobapplication=True,
@@ -207,24 +207,24 @@ class TestEmployeeDetailView:
         client.force_login(employer)
 
         response = client.get(url)
-        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
-        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
+        assert response.context["immersion_search_url"] == immersion_search_url(approval.user)
+        assert response.context["immersion_convention_url"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant bientôt")
 
         approval.end_at = today - datetime.timedelta(days=1)
         approval.save()
         response = client.get(url)
-        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
-        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
+        assert response.context["immersion_search_url"] == immersion_search_url(approval.user)
+        assert response.context["immersion_convention_url"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expiré")
 
         approval.end_at = today + datetime.timedelta(days=90)
         approval.save()
         response = client.get(url)
-        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
-        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
+        assert response.context["immersion_search_url"] == immersion_search_url(approval.user)
+        assert response.context["immersion_convention_url"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(
             name="alerte à l'opportunité immersion facile PASS expirant dans longtemps"
@@ -234,7 +234,7 @@ class TestEmployeeDetailView:
         approval.end_at = today + datetime.timedelta(days=365)
         approval.save()
         response = client.get(url)
-        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
-        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
+        assert response.context["immersion_search_url"] == immersion_search_url(approval.user)
+        assert response.context["immersion_convention_url"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS non démarré")

@@ -122,8 +122,8 @@ class EmployeeDetailView(DetailView):
         context["expired_eligibility_diagnosis"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
 
-        context["link_immersion_facile"] = immersion_search_url(self.object)
-        context["link_immersion_facile_convention"] = immersion_convention_url()
+        context["immersion_search_url"] = immersion_search_url(self.object)
+        context["immersion_convention_url"] = immersion_convention_url()
         context["approval_valid"] = approval and approval.is_valid()
         context["approval_expires_soon"] = approval and approval.remainder.days < 90
 
