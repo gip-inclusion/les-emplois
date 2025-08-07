@@ -61,9 +61,26 @@ Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
 See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
-
-duet-date-picker.is-invalid ~ .invalid-feedback {
+duet-date-picker.is-invalid ~ .invalid-feedback,
+duet-date-picker.is-invalid ~ div > .invalid-feedback {
     display: block;
+}
+
+/*
+Force the display of `.invalid-feedback` for django-bootstrap5 25.2.
+*/
+.was-validated :invalid ~ div > .invalid-feedback,
+.was-validated :invalid ~ div > .invalid-tooltip,
+.is-invalid ~ div > .invalid-feedback,
+.is-invalid ~ div > .invalid-tooltip {
+    display: block;
+}
+/* Also fix the inline positioning of the div[id$=_error] */
+.was-validated :invalid ~ div[id$=_error],
+.was-validated :invalid ~ div[id$=_error],
+.is-invalid ~ div[id$=_error],
+.is-invalid ~ div[id$=_error] {
+    width: 100%;
 }
 
 .form-group.is-invalid > .file-dropzone {
