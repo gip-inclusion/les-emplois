@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.defaultfilters import urlencode
+from django.test.utils import override_settings
 from django.urls import resolve, reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -25,7 +26,12 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 POSTULER = "Postuler"
@@ -126,6 +132,12 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
                     html=True,
                     count=2,
                 )
+
+    @override_settings(PAGE_SIZE_DEFAULT=1)
+    def test_pagination(self, client):
+        client.force_login(self.user)
+        response = client.get(self.url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (self.list_url + "?page=1"), html=True)
 
     def test_response_content_with_no_job_descriptions(self, client):
         JobDescription.objects.all().delete()

@@ -4,6 +4,7 @@ import uuid
 from urllib.parse import unquote
 
 import factory
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -32,6 +33,7 @@ from tests.prescribers.factories import (
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
     assert_previous_step,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
@@ -79,6 +81,16 @@ def test_get(client):
     assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
     assertContains(response, job_application.job_seeker.get_full_name())
+
+
+@override_settings(PAGE_SIZE_DEFAULT=1)
+def test_pagination(client):
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    JobApplicationFactory.create_batch(2, sender_prescriber_organization=organization)
+    client.force_login(organization.members.first())
+    url = reverse("apply:list_prescriptions")
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 def test_queries(client, snapshot):
