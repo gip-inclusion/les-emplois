@@ -121,7 +121,6 @@ class EmployeeDetailView(DetailView):
         context["eligibility_diagnosis"] = eligibility_diagnosis
         context["expired_eligibility_diagnosis"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
-        context["link_immersion_facile"] = None
 
         context["link_immersion_facile"] = immersion_search_url(self.object)
         context["link_immersion_facile_convention"] = immersion_convention_url()
