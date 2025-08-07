@@ -9,7 +9,7 @@
                 {% csrf_token %}
                 <fieldset>
                     <legend class="h3">Etat civil du salarié</legend>
-                    {% include "includes/job_seekers/readonly_form.html" with form=form only %}
+                    {% include "includes/job_seekers/readonly_form.html" with form=form request=request only %}
                     {% bootstrap_form_errors form type="all" %}
 
                     {% bootstrap_field form.title wrapper_class="form-group form-group-input-w-lg-33" %}
