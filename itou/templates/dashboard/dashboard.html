@@ -75,7 +75,7 @@
                 <br>
                 {% if request.current_organization.kind == PrescriberOrganizationKind.FT %}
                     Afin de modifier l’adresse postale,
-                    <a href="{% zendesk_form_url %}"
+                    <a href="{% zendesk_form_url request=request %}"
                        target="_blank"
                        rel="noopener"
                        class="has-external-link"

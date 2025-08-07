@@ -1,0 +1,25 @@
+# serializer version: 1
+# name: TestZendeskUrl.test_anonymous_user
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new'
+# ---
+# name: TestZendeskUrl.test_employer
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40test.local&tf_30473760509585=0606060606&tf_15923279049745=employeur_siae&tf_16096444701329=ei&tf_16096639918353=012345678910&tf_16096931518225=ACME+Inc.'
+# ---
+# name: TestZendeskUrl.test_employer[company_phone]
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40test.local&tf_30473760509585=0612345678&tf_15923279049745=employeur_siae&tf_16096444701329=ei&tf_16096639918353=012345678910&tf_16096931518225=ACME+Inc.'
+# ---
+# name: TestZendeskUrl.test_job_seeker
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=jane.doe%40test.local&tf_30473760509585=0612345678&tf_15923279049745=candidat'
+# ---
+# name: TestZendeskUrl.test_labor_inspector
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40test.local&tf_30473760509585=0606060606&tf_15923279049745=ddets-dreets&tf_16096355658513=ddets&tf_16096931518225=Minist%C3%A8re+des+affaires+%C3%A9tranges'
+# ---
+# name: TestZendeskUrl.test_prescriber[no organization]
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=pierre.dupont%40test.local&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur'
+# ---
+# name: TestZendeskUrl.test_prescriber[organization phone]
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=pierre.dupont%40test.local&tf_30473760509585=0123456789&tf_15923279049745=prescripteur_orienteur&tf_16096272057233=pole-emploi&tf_16096639918353=012345678910&tf_16096931518225=Pres.+Org.'
+# ---
+# name: TestZendeskUrl.test_prescriber[with organization]
+  'https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=pierre.dupont%40test.local&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur&tf_16096272057233=pole-emploi&tf_16096639918353=012345678910&tf_16096931518225=Pres.+Org.'
+# ---

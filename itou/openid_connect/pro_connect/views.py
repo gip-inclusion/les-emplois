@@ -95,7 +95,7 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
             "<a href='{}' target='_blank'>Contactez-nous</a>.",
             existing_user.get_kind_display(),
             UserKind(new_user_kind).label,
-            get_zendesk_form_url(),
+            get_zendesk_form_url(request),
         ),
     )
 

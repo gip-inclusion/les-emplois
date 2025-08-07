@@ -3,7 +3,7 @@ CERTIFIED_FORM_READONLY_HTML = """\
     Certains champs ne sont plus modifiables car ils sont certifiés
     par un système d’information de l’État. Si toutefois vous
     observez une erreur, merci de
-    <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new"
+    <a href="{url}"
        target="_blank"
        rel="noopener"
        class="has-external-link"

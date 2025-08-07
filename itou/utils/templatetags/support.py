@@ -18,11 +18,11 @@ def tally_form_url(form_id, **kwargs):
 
 
 @register.simple_tag
-def zendesk_form_url():
+def zendesk_form_url(request):
     """
-    Wraps `itou.utils.urls.get_zendersk_form_url` for template usage.
+    Wraps `itou.utils.urls.get_zendesk_form_url` for template usage.
     Can use context variables.
 
     Usage in template  : {% zendesk_form_url request=request %}
     """
-    return get_zendesk_form_url()
+    return get_zendesk_form_url(request)

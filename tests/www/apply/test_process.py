@@ -47,6 +47,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
+from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from itou.www.apply.views.batch_views import RefuseWizardView
@@ -2174,7 +2175,11 @@ class TestProcessAcceptViews:
 
         # test how hiring_end_date is displayed
         response = client.get(next_url)
-        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
+        assertNotContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+        )
         # test case hiring_end_at
         if hiring_end_at:
             assertContains(
@@ -3173,7 +3178,12 @@ class TestProcessAcceptViews:
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
-        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+            count=1,
+        )
         post_data = {
             "title": Title.M if job_seeker.title is Title.MME else Title.MME,
             "first_name": "Léon",
@@ -3215,7 +3225,12 @@ class TestProcessAcceptViews:
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
-        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+            count=1,
+        )
         assertNotContains(
             response,
             """<select name="birth_place" class="form-select" disabled=""

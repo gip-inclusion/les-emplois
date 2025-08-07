@@ -13,6 +13,7 @@ from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.urls import get_zendesk_form_url
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -73,7 +74,11 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
         with assertSnapshotQueries(snapshot):
             response = client.get(url)
-        assertNotContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True)
+        assertNotContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+        )
         # There's a specific view to edit the email so we don't show it here
         assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
@@ -588,7 +593,12 @@ class TestEditUserInfoView:
         client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
-        assertContains(response, users_test_constants.CERTIFIED_FORM_READONLY_HTML, html=True, count=1)
+        assertContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+            count=1,
+        )
         birthdate = date(1978, 12, 1)
         response = client.post(
             url,

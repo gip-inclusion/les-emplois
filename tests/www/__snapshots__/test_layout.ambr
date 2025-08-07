@@ -247,7 +247,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0606060606&tf_15923279049745=employeur_siae&tf_16096444701329=ei&tf_16096639918353=012345678910&tf_16096931518225=ACME+Inc." rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -555,7 +555,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=candidat" rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -830,7 +830,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0606060606&tf_15923279049745=ddets-dreets&tf_16096355658513=ddets&tf_16096931518225=ACME+Inc." rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -1132,7 +1132,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_prescripteur-habilit%C3%A9&tf_16096272057233=pole-emploi&tf_16096639918353=012345678910&tf_16096931518225=Pres.+Org." rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -1436,7 +1436,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_prescripteur-habilit%C3%A9&tf_16096272057233=pole-emploi&tf_16096639918353=012345678910&tf_16096931518225=Pres.+Org." rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -1730,7 +1730,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur&tf_16096272057233=pole-emploi&tf_16096639918353=012345678910&tf_16096931518225=Pres.+Org." rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
@@ -2001,7 +2001,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="contactez l’assistance (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noopener" target="_blank">
+                          <a aria-label="contacter le support (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="zendesk_form" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/requests/new?tf_anonymous_requester_email=john.doe%40example.com&tf_30473760509585=0612345678&tf_15923279049745=prescripteur_orienteur" rel="noopener" target="_blank">
                               Contacter l’assistance
                           </a>
                       </li>
