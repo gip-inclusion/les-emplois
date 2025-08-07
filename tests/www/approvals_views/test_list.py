@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import urlencode
@@ -13,7 +14,7 @@ from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -297,6 +298,7 @@ class TestApprovalsListView:
         response = client.get(url)
         assertContains(response, "0 résultat")
 
+    @patch("itou.www.approvals_views.views.ApprovalListView.paginate_by", 1)
     def test_approval_expiry_filter_default(self, client):
         company = CompanyFactory(with_membership=True)
         # Make sure we have access to page 2
@@ -313,6 +315,7 @@ class TestApprovalsListView:
         # Check that the default "Fin du parcours en IAE" value "Tous" is selected
         expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='']")
         assert expiry_all_input.has_attr("checked")
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (list_url + "?page=1"), html=True)
         response = client.get(f"{list_url}?page=2")
         # Check that the default "Fin du parcours en IAE" value "Tous" is selected
         expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='']")
