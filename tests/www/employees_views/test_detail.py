@@ -7,7 +7,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
-from itou.utils.immersion_facile import immersion_search_url
+from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.templatetags import format_filters
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -208,6 +208,7 @@ class TestEmployeeDetailView:
 
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expirant bientôt")
 
@@ -215,6 +216,7 @@ class TestEmployeeDetailView:
         approval.save()
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expiré")
 
@@ -222,6 +224,7 @@ class TestEmployeeDetailView:
         approval.save()
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(
             name="alerte à l'opportunité immersion facile PASS expirant dans longtemps"
@@ -232,5 +235,6 @@ class TestEmployeeDetailView:
         approval.save()
         response = client.get(url)
         assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        assert response.context["link_immersion_facile_convention"] == immersion_convention_url()
         alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
         assert pretty_indented(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS non démarré")
