@@ -51,7 +51,7 @@
                     {% if approval %}
                         {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
                     {% endif %}
-                    {% if link_immersion_facile %}
+                    {% if immersion_search_url %}
                         {# Immersion Facilitée proposal #}
                         <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
                             <div class="c-box__header--immersion-facile p-3 p-lg-4">
@@ -72,12 +72,12 @@
                                     {% endif %}
                                 </p>
                                 <p>
-                                    <a href="{{ link_immersion_facile }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">
+                                    <a href="{{ immersion_search_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">
                                         Rechercher une immersion
                                     </a>
                                 </p>
                                 <p>
-                                    <a href="{{ link_immersion_facile_convention }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Initier une convention (ouverture dans un nouvel onglet)">
+                                    <a href="{{ immersion_convention_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Initier une convention (ouverture dans un nouvel onglet)">
                                         Initier une convention
                                     </a>
                                 </p>
