@@ -133,6 +133,13 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         response = client.get(self.url)
         assertContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
 
+    def test_response_content_page_2(self, client):
+        JobDescriptionFactory.create_batch(20, company=self.company)
+        client.force_login(self.user)
+        url = reverse("companies_views:job_description_list", query={"page": 2})
+        response = client.get(url)
+        assertNotContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+
     def test_ordering(self, client, subtests):
         self.company.job_description_through.all().delete()
         first = JobDescriptionFactory(company=self.company, last_employer_update_at=None)
