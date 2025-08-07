@@ -64,6 +64,38 @@ class TestApprovalDetailView:
         response = client.get(url)
         assert response.status_code == 403
 
+    def test_employer_access(self, client):
+        job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            with_approval=True,
+        )
+        approval = job_application.approval
+        siae = job_application.to_company
+        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
+        client.force_login(siae.members.first())
+
+        PROLONG_BUTTON_LABEL = "<span>Prolonger</span>"
+        SUSPEND_BUTTON_LABEL = "<span>Suspendre</span>"
+
+        # Accepted job applications: employer has access with visible buttons
+        response = client.get(url)
+        assertContains(response, format_approval_number(job_application.approval.number))
+        assertContains(response, PROLONG_BUTTON_LABEL, html=True)
+        assertContains(response, SUSPEND_BUTTON_LABEL, html=True)
+
+        # No accepted job application, but still a job application
+        job_application.state = JobApplicationState.REFUSED
+        job_application.save(update_fields=("state", "updated_at"))
+        response = client.get(url)
+        assertContains(response, format_approval_number(job_application.approval.number))
+        assertNotContains(response, PROLONG_BUTTON_LABEL, html=True)
+        assertNotContains(response, SUSPEND_BUTTON_LABEL, html=True)
+
+        # No job application: no access
+        job_application.delete()
+        response = client.get(url)
+        assert response.status_code == 403
+
     @freeze_time("2024-09-25")
     def test_approval_detail_box(self, client, snapshot):
         approval = ApprovalFactory(for_snapshot=True)
@@ -519,35 +551,3 @@ class TestApprovalDetailView:
             check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_suspend_url_and_reason(employer, with_url=False, expected_reason=EXPIRED)
             check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
-
-    def test_employer_access(self, client):
-        job_application = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            with_approval=True,
-        )
-        approval = job_application.approval
-        siae = job_application.to_company
-        url = reverse("approvals:details", kwargs={"public_id": approval.public_id})
-        client.force_login(siae.members.first())
-
-        PROLONG_BUTTON_LABEL = "<span>Prolonger</span>"
-        SUSPEND_BUTTON_LABEL = "<span>Suspendre</span>"
-
-        # Accepted job applications: employer has access with visible buttons
-        response = client.get(url)
-        assertContains(response, format_approval_number(job_application.approval.number))
-        assertContains(response, PROLONG_BUTTON_LABEL, html=True)
-        assertContains(response, SUSPEND_BUTTON_LABEL, html=True)
-
-        # No accepted job application, but still a job application
-        job_application.state = JobApplicationState.REFUSED
-        job_application.save(update_fields=("state", "updated_at"))
-        response = client.get(url)
-        assertContains(response, format_approval_number(job_application.approval.number))
-        assertNotContains(response, PROLONG_BUTTON_LABEL, html=True)
-        assertNotContains(response, SUSPEND_BUTTON_LABEL, html=True)
-
-        # No job application: no access
-        job_application.delete()
-        response = client.get(url)
-        assert response.status_code == 403
