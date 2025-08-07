@@ -3,6 +3,7 @@ import random
 import uuid
 
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -22,6 +23,7 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
     assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
@@ -138,6 +140,24 @@ class TestAssessmentContractsListAndToggle:
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments contracts list"
         )
+
+    @override_settings(PAGE_SIZE_LARGE=1)
+    def test_pagination(self, client):
+        geiq_membership = CompanyMembershipFactory(
+            company__kind=CompanyKind.GEIQ,
+        )
+        assessment = AssessmentFactory(
+            campaign__year=2024,
+            companies=[geiq_membership.company],
+            with_submission_requirements=True,
+            contracts_selection_validated_at=None,
+        )
+        EmployeeContractFactory.create_batch(2, employee__assessment=assessment)
+
+        client.force_login(geiq_membership.user)
+        contracts_list_url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+        response = client.get(contracts_list_url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (contracts_list_url + "?page=1"), html=True)
 
     def test_access_as_institution(self, client, snapshot):
         ddets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)

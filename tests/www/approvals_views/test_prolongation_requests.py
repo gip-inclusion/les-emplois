@@ -4,9 +4,10 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.files.storage import default_storage
+from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.approvals.enums import (
     ProlongationReason,
@@ -19,7 +20,13 @@ from tests.files.factories import FileFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.users.factories import EmployerFactory
-from tests.utils.testing import assert_previous_step, assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assert_previous_step,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 @pytest.mark.parametrize(
@@ -56,6 +63,16 @@ def test_list_view(snapshot, client):
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
     assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot
+
+
+@override_settings(PAGE_SIZE_DEFAULT=1)
+def test_pagination(client):
+    organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
+    approvals_factories.ProlongationRequestFactory.create_batch(2, prescriber_organization=organization)
+    client.force_login(organization.members.first())
+    url = reverse("approvals:prolongation_requests_list")
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 def test_list_view_no_siae(snapshot, client):

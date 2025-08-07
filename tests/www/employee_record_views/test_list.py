@@ -6,6 +6,7 @@ import pgtrigger
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import title, urlencode
+from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -27,7 +28,12 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestListEmployeeRecords:
@@ -80,6 +86,16 @@ class TestListEmployeeRecords:
         record_base_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": record.pk})
         record_url = f"{record_base_url}?back_url={urlencode(url)}"
         assertContains(response, record_url)
+
+    @override_settings(PAGE_SIZE_SMALL=1)
+    def test_pagination(self, client):
+        employee_record_factories.EmployeeRecordWithProfileFactory.create_batch(
+            1, job_application__to_company=self.company
+        )
+        client.force_login(self.user)
+        url = f"{reverse('employee_record_views:list')}?status={Status.NEW}"
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_redirection_with_missing_or_empty_status(self, client):
         client.force_login(self.user)

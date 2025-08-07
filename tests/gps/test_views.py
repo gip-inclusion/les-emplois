@@ -5,6 +5,7 @@ from functools import partial
 import freezegun
 import pytest
 from django.contrib import messages
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from json_log_formatter import BUILTIN_ATTRS
@@ -33,7 +34,13 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    get_session_name,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 def gps_logs(caplog):
@@ -165,6 +172,20 @@ class TestGroupLists:
         assertContains(response, f'<a class="nav-link active" href="{reverse("gps:group_list")}">')
 
         assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
+
+    @override_settings(PAGE_SIZE_LARGE=1)
+    def test_pagination(self, client):
+        user = PrescriberFactory(membership__organization__authorized=True)
+        groups = FollowUpGroupFactory.create_batch(2)
+        for group in groups:
+            FollowUpGroupMembershipFactory(
+                follow_up_group=group,
+            )
+            FollowUpGroup.objects.follow_beneficiary(group.beneficiary, user)
+        client.force_login(user)
+        url = reverse("gps:group_list")
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
     @freezegun.freeze_time("2024-06-21", tick=True)
     def test_old_group_list(self, snapshot, client, caplog):

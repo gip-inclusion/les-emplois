@@ -5,6 +5,7 @@ from functools import partial
 
 import factory
 import pytest
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -31,7 +32,12 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 from tests.www.apply.test_submit import fake_session_initialization
 
 
@@ -251,6 +257,20 @@ def test_multiple(client, snapshot):
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
     assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False)
+
+
+@override_settings(PAGE_SIZE_SMALL=1)
+def test_pagination(client):
+    url = reverse("job_seekers_views:list")
+    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    prescriber = organization.members.first()
+    JobApplicationFactory.create_batch(
+        2,
+        sender=prescriber,
+    )
+    client.force_login(prescriber)
+    response = client.get(url)
+    assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "?page=1"), html=True)
 
 
 @freeze_time("2024-08-30")
