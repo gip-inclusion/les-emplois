@@ -1,0 +1,51 @@
+{% extends "approvals/base_details.html" %}
+{% load approvals %}
+{% load components %}
+{% load format_filters %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <h2>Suivi des contrats IAE</h2>
+
+            <div class="c-info mb-3 mb-md-4">
+                <span class="c-info__summary">Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                    <br>
+                Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.</span>
+            </div>
+
+            {% for contract in contracts %}
+                <div class="c-box c-box--results mb-3 mb-md-4">
+                    <div class="c-box--results__header">
+                        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                            <div class="c-box--results__summary flex-grow-1">
+                                <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+                                <div>
+                                    <span>{{ contract.company.kind }}</span>
+                                    <h3>{{ contract.company.name }}</h3>
+                                </div>
+                            </div>
+                            <div class="align-self-center">
+                                <span>
+                                    <i class="ri-calendar-line ri-lg fw-normal" aria-hidden="true"></i>
+
+                                    {% if contract.end_date %}
+                                        Du {{ contract.start_date|date:"d/m/Y" }} au {{ contract.end_date|date:"d/m/Y" }}
+                                    {% else %}
+                                        Depuis le {{ contract.start_date|date:"d/m/Y" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+        </div>
+    </section>
+{% endblock %}

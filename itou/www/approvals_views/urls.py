@@ -10,6 +10,7 @@ urlpatterns = [
     # PASS IAE
     path("details/<uuid:public_id>", views.ApprovalDetailView.as_view(), name="details"),
     path("display/<uuid:public_id>", views.ApprovalPrintableDisplay.as_view(), name="display_printable_approval"),
+    path("contracts/<uuid:public_id>", views.ContractsView.as_view(), name="contracts"),
     path("list", views.ApprovalListView.as_view(), name="list"),
     path("declare_prolongation/<int:approval_id>", views.declare_prolongation, name="declare_prolongation"),
     path(
