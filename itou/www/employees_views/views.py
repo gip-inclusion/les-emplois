@@ -14,7 +14,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.immersion_facile import immersion_search_url
+from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_edit_personal_information
 from itou.utils.urls import get_safe_url
@@ -114,9 +114,9 @@ class EmployeeDetailView(DetailView):
         context["eligibility_diagnosis"] = eligibility_diagnosis
         context["expired_eligibility_diagnosis"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
-        context["link_immersion_facile"] = None
 
-        context["link_immersion_facile"] = immersion_search_url(self.object)
+        context["immersion_search_url"] = immersion_search_url(self.object)
+        context["immersion_convention_url"] = immersion_convention_url()
         context["approval_valid"] = approval and approval.is_valid()
         context["approval_expires_soon"] = approval and approval.remainder.days < 90
 

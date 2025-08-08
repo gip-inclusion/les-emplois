@@ -27,3 +27,15 @@ def immersion_search_url(user):
             params["place"] = ", ".join(address_parts)
 
     return f"{settings.IMMERSION_FACILE_SITE_URL}/recherche?{urlencode(params, quote_via=quote)}"
+
+
+def immersion_convention_url():
+    """
+    :return: a URL on Immersion Facilitée's site for initiating a convention
+    """
+    params = {
+        "mtm_campaign": "les-emplois-recherche-immersion",
+        "mtm_kwd": "les-emplois-recherche-immersion",
+    }
+
+    return f"{settings.IMMERSION_FACILE_SITE_URL}/initier-convention?{urlencode(params, quote_via=quote)}"
