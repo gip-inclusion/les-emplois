@@ -86,6 +86,14 @@ class TestDashboardView:
         cities_search = parse_response_to_soup(response, selector="form[method=get]")
         assert pretty_indented(cities_search) == snapshot
 
+    def test_dashboard_for_job_seeker(self, client, snapshot):
+        user = JobSeekerFactory(for_snapshot=True)
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:index"))
+        # Job seeker may copy his ID
+        assert pretty_indented(parse_response_to_soup(response, selector=".c-title__main")) == snapshot
+
     def test_user_with_inactive_company_can_still_login_during_grace_period(self, client):
         company = CompanyPendingGracePeriodFactory(with_membership=True)
         user = EmployerFactory()
