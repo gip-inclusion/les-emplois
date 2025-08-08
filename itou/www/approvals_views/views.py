@@ -28,6 +28,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
+from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import save_file
@@ -125,6 +126,10 @@ class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
     model = Approval
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
+    active_tab = None
+
+    def can_view_contracts(self):
+        return self.request.from_authorized_prescriber or self.request.user.is_employer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -134,6 +139,8 @@ class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
         permissions = can_view_approval_details(self.request, approval)
         if not permissions:
             raise PermissionDenied
+        context["active_tab"] = self.active_tab
+        context["can_view_contracts"] = self.can_view_contracts()
         context["is_employer_with_accepted_application"] = permissions == PERMS_READ_AND_WRITE
         context["can_view_personal_information"] = can_view_personal_information(self.request, approval.user)
         context["matomo_custom_title"] = "Détail PASS IAE"
@@ -193,6 +200,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         ),
     )
     template_name = "approvals/details.html"
+    active_tab = "details"
 
     def test_func(self):
         # More checks are performed in get_context_data method
@@ -243,7 +251,6 @@ class ApprovalDetailView(BaseApprovalDetailView):
         context = super().get_context_data(**kwargs)
         approval = self.object
 
-        context["active_tab"] = "details"
         context["suspensions"] = self.get_suspensions(approval)
         context["prolongations"] = self.get_prolongation_and_requests(approval)
         context["prolongation_request_pending"] = any(
@@ -290,6 +297,28 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
                 "diagnosis_author_org_name": diagnosis_author_org_name,
                 "matomo_custom_title": "Attestation de délivrance d'agrément",
             }
+        )
+        return context
+
+
+class ContractsView(BaseApprovalDetailView):
+    queryset = Approval.objects
+    template_name = "approvals/contracts.html"
+    active_tab = "contracts"
+
+    def test_func(self):
+        return self.can_view_contracts()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["contracts"] = (
+            Contract.objects.filter(job_seeker=self.object.user)
+            .filter(
+                start_date__gte=self.object.start_at,
+                start_date__lte=self.object.end_at,
+            )
+            .select_related("company")
+            .order_by("-start_date")
         )
         return context
 

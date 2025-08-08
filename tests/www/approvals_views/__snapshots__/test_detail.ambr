@@ -5139,7 +5139,128 @@
   
   '''
 # ---
-# name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
+# name: TestContractView.test_view
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  PASS IAE de Jane DOE
+                              </h1>
+                          </div>
+                          <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-primary btn-ico" href="/approvals/display/[Public ID of Approval]" rel="noopener" target="_blank">
+                                  <i aria-hidden="true" class="ri-eye-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Afficher l’attestation
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                          <li class="nav-item">
+                              <a class="nav-link" href="/approvals/details/[Public ID of Approval]?back_url=/dashboard/">
+                                  Vue d'ensemble
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link active" href="/approvals/contracts/[Public ID of Approval]?back_url=/dashboard/">
+                                  Suivi des contrats IAE
+                                  <span class="badge badge-sm rounded-pill bg-important text-white ms-3">
+                                      nouveau
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <h2>
+                  Suivi des contrats IAE
+              </h2>
+              <div class="c-info mb-3 mb-md-4">
+                  <span class="c-info__summary">
+                      Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                      <br/>
+                      Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                  </span>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-home-smile-2-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Tralal’Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Depuis le 01/02/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-home-smile-2-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Tif'any
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/01/2025 au 07/08/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
   <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=Aci+de+la+rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
       <i aria-hidden="true" class="ri-pass-expired-line fw-medium">

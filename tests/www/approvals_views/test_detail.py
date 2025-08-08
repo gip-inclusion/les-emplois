@@ -21,10 +21,10 @@ from tests.approvals.factories import (
     ProlongationRequestFactory,
     SuspensionFactory,
 )
-from tests.companies.factories import CompanyMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, ContractFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
@@ -54,7 +54,8 @@ class TestApprovalDetailView:
 
         client.force_login(approval.user)
         response = client.get(url)
-        assert response.status_code == 200
+        # No contract tab
+        assertNotContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
     def test_non_authorized_prescriber_access(self, client):
         job_application = JobApplicationFactory(with_approval=True)
@@ -63,6 +64,17 @@ class TestApprovalDetailView:
         client.force_login(job_application.sender)
         response = client.get(url)
         assert response.status_code == 403
+
+    def test_authorized_prescriber_access(self, client):
+        job_application = JobApplicationFactory(with_approval=True, sent_by_authorized_prescriber_organisation=True)
+        url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
+
+        client.force_login(job_application.sender)
+        response = client.get(url)
+        # has contract tab
+        assertContains(
+            response, reverse("approvals:contracts", kwargs={"public_id": job_application.approval.public_id})
+        )
 
     def test_employer_access(self, client):
         job_application = JobApplicationFactory(
@@ -82,6 +94,8 @@ class TestApprovalDetailView:
         assertContains(response, format_approval_number(job_application.approval.number))
         assertContains(response, PROLONG_BUTTON_LABEL, html=True)
         assertContains(response, SUSPEND_BUTTON_LABEL, html=True)
+        # has contract tab
+        assertContains(response, reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
 
         # No accepted job application, but still a job application
         job_application.state = JobApplicationState.REFUSED
@@ -413,65 +427,6 @@ class TestApprovalDetailView:
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=TOO_LATE)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
-    @freeze_time("2023-04-26")
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_remove_approval_button(self, client, snapshot):
-        REMOVAL_BUTTON_ID = "approval-deletion-link"
-        membership = CompanyMembershipFactory(
-            user__id=123456,
-            user__email="oph@dewinter.com",
-            user__first_name="Milady",
-            user__last_name="de Winter",
-            company__id=999999,
-            company__name="ACI de la Rochelle",
-        )
-        job_application = JobApplicationFactory(
-            hiring_start_at=datetime.date(2021, 3, 1),
-            to_company=membership.company,
-            job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
-            with_approval=True,
-            # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
-            approval__number="XXXXX1234568",
-        )
-        # Create another accepted application lacking a proper hiring_start_at (like most old applications):
-        # it should not impact the button display, and it should not crash
-        JobApplicationFactory(
-            hiring_start_at=None,
-            to_company=membership.company,
-            job_seeker=job_application.job_seeker,
-            # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
-            approval=job_application.approval,
-            state=JobApplicationState.ACCEPTED,
-        )
-
-        client.force_login(membership.user)
-
-        # suspension still active, more than 1 year old, starting after the accepted job application
-        suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
-        url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
-        response = client.get(url)
-
-        delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
-
-        # suspension now is inactive
-        suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
-        suspension.save(update_fields=["end_at", "updated_at"])
-        response = client.get(url)
-
-        delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
-        assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
-
-        # An accepted job application exists after suspension end
-        JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            job_seeker=job_application.job_seeker,
-            approval=job_application.approval,
-            hiring_start_at=suspension.end_at + datetime.timedelta(days=2),
-        )
-        response = client.get(url)
-        assertNotContains(response, REMOVAL_BUTTON_ID)
-
     def test_suspend_button(self, client):
         ALREADY_SUSPENDED = "La suspension n’est pas possible car une suspension est déjà en cours."
         NOT_STARTED = "La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."
@@ -551,3 +506,146 @@ class TestApprovalDetailView:
             check_suspend_url_and_reason(job_seeker, with_url=False, expected_reason=None)
             check_suspend_url_and_reason(employer, with_url=False, expected_reason=EXPIRED)
             check_suspend_url_and_reason(prescriber, with_url=False, expected_reason=None)
+
+
+class TestContractView:
+    def test_anonymous_user(self, client):
+        approval = JobApplicationFactory(with_approval=True).approval
+        url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    def test_no_access(self, client):
+        job_application = JobApplicationFactory(with_approval=True)
+        approval = job_application.approval
+        url = reverse("approvals:contracts", kwargs={"public_id": approval.public_id})
+
+        for user in [
+            LaborInspectorFactory(membership=True),
+            JobSeekerFactory(),  # random job seeker
+            approval.user,  # The approval job seeker
+            job_application.sender,  # non authorized prescriber linked to the approval's job seeker
+            PrescriberFactory(
+                membership=True, membership__organization__authorized=True
+            ),  # random authorized prescriber
+            EmployerFactory(with_company=True),  # random employer
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == 403
+
+        # Make the linked prescriber authorized
+        PrescriberMembershipFactory(user=job_application.sender, organization__authorized=True)
+        for user in [
+            job_application.sender,  # authorized prescriber linked to the approval's job seeker
+            job_application.to_company.members.first(),  # linked employer
+        ]:
+            client.force_login(user)
+            response = client.get(url)
+            assert response.status_code == 200
+
+    @freeze_time("2025-08-07")
+    def test_view(self, client, snapshot):
+        job_application = JobApplicationFactory(
+            for_snapshot=True,
+            with_approval=True,
+            approval__start_at="2025-01-01",
+            approval__end_at="2025-05-31",
+        )
+        approval = job_application.approval
+        company = job_application.to_company
+
+        # Not displayed contracts
+        ContractFactory()  # Contract on another job seeker
+        ContractFactory(job_seeker=approval.user, start_date="2024-12-31")  # Too old contract
+        ContractFactory(job_seeker=approval.user, start_date="2025-06-01")  # Too recent contract
+
+        # Displayed contracts
+        ContractFactory(
+            company__name="Tif'any", job_seeker=approval.user, start_date="2025-01-01", end_date="2025-08-07"
+        )
+        ContractFactory(company__name="Tralal’Hair", job_seeker=approval.user, start_date="2025-02-01", end_date=None)
+
+        client.force_login(company.members.first())
+        response = client.get(reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response, "#main", replace_in_attr=[("href", str(approval.public_id), "[Public ID of Approval]")]
+                )
+            )
+            == snapshot
+        )
+
+
+@freeze_time("2023-04-26")
+@override_settings(TALLY_URL="https://tally.so")
+def test_remove_approval_button(client, snapshot):
+    REMOVAL_BUTTON_ID = "approval-deletion-link"
+    membership = CompanyMembershipFactory(
+        user__id=123456,
+        user__email="oph@dewinter.com",
+        user__first_name="Milady",
+        user__last_name="de Winter",
+        company__id=999999,
+        company__name="ACI de la Rochelle",
+    )
+    job_application = JobApplicationFactory(
+        hiring_start_at=datetime.date(2021, 3, 1),
+        to_company=membership.company,
+        job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
+        with_approval=True,
+        # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
+        approval__number="XXXXX1234568",
+    )
+    # Create another accepted application lacking a proper hiring_start_at (like most old applications):
+    # it should not impact the button display, and it should not crash
+    JobApplicationFactory(
+        hiring_start_at=None,
+        to_company=membership.company,
+        job_seeker=job_application.job_seeker,
+        # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
+        approval=job_application.approval,
+        state=JobApplicationState.ACCEPTED,
+    )
+
+    client.force_login(membership.user)
+
+    details_url = reverse("approvals:details", kwargs={"public_id": job_application.approval.public_id})
+    contracts_url = reverse("approvals:contracts", kwargs={"public_id": job_application.approval.public_id})
+
+    # suspension still active, more than 1 year old, starting after the accepted job application
+    suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
+
+    response = client.get(details_url)
+    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+
+    response = client.get(contracts_url)
+    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+
+    # suspension now is inactive
+    suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
+    suspension.save(update_fields=["end_at", "updated_at"])
+    response = client.get(details_url)
+
+    response = client.get(details_url)
+    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+
+    response = client.get(contracts_url)
+    delete_button = parse_response_to_soup(response, selector=f"#{REMOVAL_BUTTON_ID}")
+    assert pretty_indented(delete_button) == snapshot(name="bouton de suppression d'un PASS IAE")
+
+    # An accepted job application exists after suspension end
+    JobApplicationFactory(
+        state=JobApplicationState.ACCEPTED,
+        job_seeker=job_application.job_seeker,
+        approval=job_application.approval,
+        hiring_start_at=suspension.end_at + datetime.timedelta(days=2),
+    )
+    response = client.get(details_url)
+    assertNotContains(response, REMOVAL_BUTTON_ID)
+    response = client.get(contracts_url)
+    assertNotContains(response, REMOVAL_BUTTON_ID)
