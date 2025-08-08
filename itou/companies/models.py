@@ -1108,3 +1108,29 @@ class SiaeFinancialAnnex(models.Model):
     @property
     def is_active(self):
         return self.state in SiaeFinancialAnnex.STATES_ACTIVE and self.end_at > timezone.localdate()
+
+
+class Contract(models.Model):
+    id = models.BigAutoField(primary_key=True, editable=False)
+    job_seeker = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # replace with Employee model in a future refactor
+        verbose_name="employé",
+        on_delete=models.SET_NULL,
+        null=True,  # allow to detect inconsistencies in ASP data processing
+        related_name="contracts",
+    )
+    company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise destinataire",
+        on_delete=models.SET_NULL,
+        null=True,  # allow to detect inconsistencies in ASP data processing
+        related_name="contracts",
+    )
+    start_date = models.DateField(verbose_name="date de début du contrat")
+    end_date = models.DateField(verbose_name="date de fin de contrat", null=True)
+    details = models.JSONField(
+        encoder=DjangoJSONEncoder,
+        verbose_name="données reçues",
+        default=list,
+    )
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)

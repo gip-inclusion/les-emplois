@@ -569,3 +569,8 @@ class SiaeFinancialAnnexAdmin(ReadonlyMixin, ItouModelAdmin):
         ),
     )
     search_fields = ("pk", "number")
+
+
+@admin.register(models.Contract)
+class ContractAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = ("pk", "job_seeker", "company", "start_date", "end_date")
