@@ -13,7 +13,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.jobs.models import Appellation
 from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.testing import create_fake_postcode
 
 
@@ -244,3 +244,13 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
     last_employer_update_at = factory.Faker(
         "date_time_between", start_date="-30d", end_date="-3d", tzinfo=datetime.UTC
     )
+
+
+class ContractFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Contract
+
+    job_seeker = factory.SubFactory(JobSeekerFactory)
+    company = factory.SubFactory(CompanyFactory)
+    start_date = factory.Faker("date_between", start_date="-1y", end_date="-1m")
+    end_date = factory.Faker("date_between", start_date="-1m", end_date="+1m")

@@ -1090,7 +1090,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 82,
+    'num_queries': 83,
     'queries': list([
       dict({
         'origin': list([
@@ -1250,34 +1250,35 @@
           LEFT OUTER JOIN "approvals_approval" T5 ON ("users_user"."id" = T5."user_id")
           LEFT OUTER JOIN "approvals_suspension" ON ("users_user"."id" = "approvals_suspension"."created_by_id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("users_user"."id" = "prescribers_prescriberorganization"."authorization_updated_by_id")
+          LEFT OUTER JOIN "companies_contract" ON ("users_user"."id" = "companies_contract"."job_seeker_id")
           LEFT OUTER JOIN "geiq_assessments_assessment" ON ("users_user"."id" = "geiq_assessments_assessment"."created_by_id")
           LEFT OUTER JOIN "companies_company" ON ("users_user"."id" = "companies_company"."created_by_id")
           LEFT OUTER JOIN "gps_followupgroupmembership" ON ("users_user"."id" = "gps_followupgroupmembership"."creator_id")
-          LEFT OUTER JOIN "prescribers_prescriberorganization" T11 ON ("users_user"."id" = T11."created_by_id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" T12 ON ("users_user"."id" = T12."created_by_id")
           LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."author_id")
-          LEFT OUTER JOIN "geiq_assessments_assessment" T13 ON ("users_user"."id" = T13."final_reviewed_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T14 ON ("users_user"."id" = T14."final_reviewed_by_id")
           LEFT OUTER JOIN "eligibility_geiqeligibilitydiagnosis" ON ("users_user"."id" = "eligibility_geiqeligibilitydiagnosis"."author_id")
-          LEFT OUTER JOIN "job_applications_jobapplication" T15 ON ("users_user"."id" = T15."job_seeker_id")
-          LEFT OUTER JOIN "job_applications_jobapplication" T16 ON ("users_user"."id" = T16."sender_id")
-          LEFT OUTER JOIN "job_applications_jobapplication" T17 ON ("users_user"."id" = T17."transferred_by_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T16 ON ("users_user"."id" = T16."job_seeker_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T17 ON ("users_user"."id" = T17."sender_id")
+          LEFT OUTER JOIN "job_applications_jobapplication" T18 ON ("users_user"."id" = T18."transferred_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("users_user"."id" = "job_applications_jobapplicationtransitionlog"."user_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" ON ("users_user"."id" = "approvals_prolongationrequest"."processed_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T20 ON ("users_user"."id" = T20."created_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T21 ON ("users_user"."id" = T21."declared_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."updated_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."validated_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T21 ON ("users_user"."id" = T21."created_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."validated_by_id")
           LEFT OUTER JOIN "approvals_prolongation" ON ("users_user"."id" = "approvals_prolongation"."created_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T25 ON ("users_user"."id" = T25."declared_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T26 ON ("users_user"."id" = T26."updated_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T27 ON ("users_user"."id" = T27."validated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T26 ON ("users_user"."id" = T26."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T27 ON ("users_user"."id" = T27."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T28 ON ("users_user"."id" = T28."validated_by_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("users_user"."id" = "companies_siaeconvention"."reactivated_by_id")
-          LEFT OUTER JOIN "geiq_assessments_assessment" T29 ON ("users_user"."id" = T29."reviewed_by_id")
-          LEFT OUTER JOIN "geiq_assessments_assessment" T30 ON ("users_user"."id" = T30."submitted_by_id")
-          LEFT OUTER JOIN "approvals_suspension" T31 ON ("users_user"."id" = T31."updated_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T30 ON ("users_user"."id" = T30."reviewed_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T31 ON ("users_user"."id" = T31."submitted_by_id")
+          LEFT OUTER JOIN "approvals_suspension" T32 ON ("users_user"."id" = T32."updated_by_id")
           LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."updated_by_id")
           LEFT OUTER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."updated_by_id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."updated_by_id")
-          LEFT OUTER JOIN "users_user" T35 ON ("users_user"."id" = T35."created_by_id")
+          LEFT OUTER JOIN "users_user" T36 ON ("users_user"."id" = T36."created_by_id")
           WHERE ("users_user"."id" IN (%s,
                                        %s,
                                        %s,
@@ -1293,34 +1294,35 @@
                  AND T5."id" IS NULL
                  AND "approvals_suspension"."id" IS NULL
                  AND "prescribers_prescriberorganization"."id" IS NULL
+                 AND "companies_contract"."id" IS NULL
                  AND "geiq_assessments_assessment"."id" IS NULL
                  AND "companies_company"."id" IS NULL
                  AND "gps_followupgroupmembership"."id" IS NULL
-                 AND T11."id" IS NULL
+                 AND T12."id" IS NULL
                  AND "eligibility_eligibilitydiagnosis"."id" IS NULL
-                 AND T13."id" IS NULL
+                 AND T14."id" IS NULL
                  AND "eligibility_geiqeligibilitydiagnosis"."id" IS NULL
-                 AND T15."id" IS NULL
                  AND T16."id" IS NULL
                  AND T17."id" IS NULL
+                 AND T18."id" IS NULL
                  AND "job_applications_jobapplicationtransitionlog"."id" IS NULL
                  AND "approvals_prolongationrequest"."id" IS NULL
-                 AND T20."id" IS NULL
                  AND T21."id" IS NULL
                  AND T22."id" IS NULL
                  AND T23."id" IS NULL
+                 AND T24."id" IS NULL
                  AND "approvals_prolongation"."id" IS NULL
-                 AND T25."id" IS NULL
                  AND T26."id" IS NULL
                  AND T27."id" IS NULL
+                 AND T28."id" IS NULL
                  AND "companies_siaeconvention"."id" IS NULL
-                 AND T29."id" IS NULL
                  AND T30."id" IS NULL
                  AND T31."id" IS NULL
+                 AND T32."id" IS NULL
                  AND "companies_companymembership"."id" IS NULL
                  AND "institutions_institutionmembership"."id" IS NULL
                  AND "prescribers_prescribermembership"."id" IS NULL
-                 AND T35."id" IS NULL)
+                 AND T36."id" IS NULL)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3201,6 +3203,28 @@
                                                                   %s,
                                                                   %s,
                                                                   %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          UPDATE "companies_contract"
+          SET "job_seeker_id" = NULL
+          WHERE "companies_contract"."job_seeker_id" IN (%s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s,
+                                                         %s)
         ''',
       }),
       dict({
