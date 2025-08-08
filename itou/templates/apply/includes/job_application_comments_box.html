@@ -1,0 +1,50 @@
+{% load django_bootstrap5 %}
+<div class="c-box c-box--note mb-3 mb-md-4" id="comments_box">
+    {% bootstrap_form_errors form type=all %}
+    <form hx-post="{% url 'apply:threaded_comment_for_company' job_application_id=job_application.id %}" hx-target="#comments_box" hx-indicator="#comments_box" hx-swap="outerHTML" <!-- hx-boost="true" -->
+        class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% bootstrap_field form.message %}
+        <button class="btn btn-outline-primary btn-sm btn-ico-only" type="reset">
+            <span class="visually-hidden">Annuler l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+            <i class="ri-close-line" aria-hidden="true"></i>
+        </button>
+        <button class="btn btn-outline-primary btn-sm btn-ico-only" type="submit">
+            <span class="visually-hidden">Valider l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+            <i class="ri-check-line" aria-hidden="true"></i>
+        </button>
+    </form>
+</div>
+
+<div class="c-box mb-3 mb-md-4">
+    <h3>Derniers commentaires</h3>
+    <ul class="list-note">
+        {% for comment in last_comments %}
+            <li>
+
+                <time datetime="">Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</time>
+                <strong>
+                    {{ comment.created_by.get_full_name }}
+                    {% if comment.created_by == request.user %}(vous){% endif %}
+                </strong>
+                <blockquote class="blockquote">
+                    <div class="collapse show collapseLastComment">
+                        <p class="mb-0">
+                            {{ comment.message }}
+                            {#comment.message|linebreaksbr|truncatechars:200#}
+                        </p>
+                        {% if comment.message|length > 200 %}
+                            <!-- <a href="#comments" data-bs-toggle="tab" aria-controls="comments"  class="btn btn-link ps-0">Voir +</a> -->
+                            <button class="btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target=".collapseLastComment" aria-expanded="false" aria-controls="collapseLastComment">
+                                Voir +
+                            </button>
+                        {% endif %}
+                    </div>
+                </blockquote>
+            </li>
+        {% endfor %}
+    </ul>
+    <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation">
+        Voir tous les commentaires
+    </button>
+</div>
