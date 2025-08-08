@@ -1345,11 +1345,11 @@
           'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
-          SELECT %s AS "a"
+          SELECT "job_applications_jobapplication"."state" AS "state"
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          LIMIT 1
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
