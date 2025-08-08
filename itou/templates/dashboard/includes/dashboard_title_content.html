@@ -14,7 +14,10 @@
             {% if user.is_prescriber %}
                 <p>Orienteur seul</p>
             {% elif user.is_job_seeker %}
-                <p>Candidat</p>
+                <p>
+                    Copier mon ID candidat
+                    {% include 'includes/copy_to_clipboard.html' with content=user.public_id css_classes="btn-link" only_icon=True %}
+                </p>
             {% endif %}
         {% else %}
             <h1>{{ request.current_organization.display_name }}</h1>
