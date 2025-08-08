@@ -1,0 +1,68 @@
+[
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": "2024-06-01",
+      "job_seeker": 18,
+      "start_date": "2024-01-01"
+    },
+    "model": "companies.contract",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 18,
+      "start_date": "2024-08-23"
+    },
+    "model": "companies.contract",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 17,
+      "start_date": "2024-08-23"
+    },
+    "model": "companies.contract",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 19,
+      "start_date": "2024-08-23"
+    },
+    "model": "companies.contract",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 20,
+      "start_date": "2024-08-23"
+    },
+    "model": "companies.contract",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": null,
+      "job_seeker": 21,
+      "start_date": "2024-08-23"
+    },
+    "model": "companies.contract",
+    "pk": 8
+  }
+]
