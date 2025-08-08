@@ -129,7 +129,7 @@
                             </tbody>
                         </table>
                     </div>
-                    {% include "includes/pagination.html" with page=contracts_page boost=True %}
+                    {% include "includes/pagination.html" with page=contracts_page boost=True request=request only %}
 
                     {% if can_validate %}
 

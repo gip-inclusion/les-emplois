@@ -27,7 +27,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -89,6 +89,14 @@ class TestSearchCompany:
         # Do not get arrondissements when searching the arrondissement directly
         response = client.get(self.URL, {"city": "paris-10eme-75"})
         assertNotContains(response, DISTRICTS)
+
+    @override_settings(PAGE_SIZE_SMALL=1)
+    def test_pagination(self, client):
+        vannes = create_city_vannes()
+        CompanyFactory.create_batch(2, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI)
+        url = reverse("search:employers_results", query={"city": vannes.slug, "distance": 100})
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_kind(self, client):
         city = create_city_saint_andre()
@@ -568,6 +576,16 @@ class TestSearchPrescriber:
             html=True,
             count=1,
         )
+
+    @override_settings(PAGE_SIZE_SMALL=1)
+    def test_pagination(self, client):
+        vannes = create_city_vannes()
+        PrescriberOrganizationFactory.create_batch(
+            2, department="56", coords=vannes.coords, post_code="56760", authorized=True
+        )
+        url = reverse("search:prescribers_results", query={"city": vannes.slug, "distance": 100})
+        response = client.get(url)
+        assertContains(response, PAGINATION_PAGE_ONE_MARKUP % (url + "&page=1"), html=True)
 
     def test_form_invalid(self, client):
         url = reverse("search:prescribers_results")

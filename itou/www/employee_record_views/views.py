@@ -1,6 +1,7 @@
 import enum
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -280,7 +281,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "form": form,
         "filters_form": filters_form,
         "badges": status_badges,
-        "navigation_pages": pager(data, request.GET.get("page"), items_per_page=10),
+        "navigation_pages": pager(data, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
         "feature_availability_date": get_availability_date_for_kind(siae.kind),
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
