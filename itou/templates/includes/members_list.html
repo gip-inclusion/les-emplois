@@ -28,6 +28,35 @@
                     Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
                 </p>
 
+                {% if request.user.is_prescriber %}
+                    <div class="c-info mb-3 mb-md-4">
+                        <span class="c-info__summary">Besoin d’aide</span>
+                        <div class="c-info__detail">
+                            <p>
+                                Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737313097361--Inviter-mes-collaborateurs-%C3%A0-se-rattacher-au-compte-de-l-organisation">ce lien</a>.
+                                {% if request.is_current_organization_admin %}
+                                    <br>
+                                    En tant qu’administrateur, découvrez quelles actions vous pouvez réaliser en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617--Administrateur-de-l-organisation-Prescripteur">ce lien</a>.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% elif request.user.is_employer %}
+                    <div class="c-info mb-3 mb-md-4">
+                        <span class="c-info__summary">Besoin d’aide</span>
+                        <div class="c-info__detail">
+                            <p>
+                                Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738409239825--Inviter-mes-collaborateurs-%C3%A0-rejoindre-le-compte-de-ma-structure">ce lien</a>.
+                                {% if request.is_current_organization_admin %}
+                                    <br>
+                                    En tant qu’administrateur, découvrez quelles actions vous pouvez réaliser en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409--Administrateur-de-la-SIAE">ce lien</a>.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+
+
                 {% include "includes/members.html" %}
 
                 {% if pending_invitations %}

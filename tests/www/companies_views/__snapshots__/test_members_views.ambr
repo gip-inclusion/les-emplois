@@ -66,6 +66,26 @@
                           </b>
                           (john.doe@test.local)
                       </p>
+                      <div class="c-info mb-3 mb-md-4">
+                          <span class="c-info__summary">
+                              Besoin d’aide
+                          </span>
+                          <div class="c-info__detail">
+                              <p>
+                                  Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant
+                                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738409239825--Inviter-mes-collaborateurs-%C3%A0-rejoindre-le-compte-de-ma-structure">
+                                      ce lien
+                                  </a>
+                                  .
+                                  <br/>
+                                  En tant qu’administrateur, découvrez quelles actions vous pouvez réaliser en suivant
+                                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409--Administrateur-de-la-SIAE">
+                                      ce lien
+                                  </a>
+                                  .
+                              </p>
+                          </div>
+                      </div>
                       <p class="mb-0">
                           1 collaborateur (dont 1 administrateur)
                       </p>
