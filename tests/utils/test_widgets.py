@@ -17,6 +17,7 @@ class TestEasyMDEEditor:
             <div>
             <label for="id_description">Description :</label>
             <textarea class="easymde-box" cols="40" id="id_description" name="description" required rows="10">
+            </textarea>
             </div>
             """,
         )
@@ -46,6 +47,7 @@ class TestEasyMDEEditor:
                 name="description"
                 required
                 rows="10">
+            </textarea>
             </div>
             """,
         )
