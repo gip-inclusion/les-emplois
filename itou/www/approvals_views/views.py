@@ -27,11 +27,10 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.approvals.perms import can_view_approval_details
+from itou.approvals.perms import PERMS_READ_AND_WRITE, can_view_approval_details
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import save_file
-from itou.job_applications.enums import JobApplicationState
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
 from itou.utils.db import (
@@ -181,15 +180,12 @@ class ApprovalDetailView(UserPassesTestMixin, DetailView):
         return suspensions
 
     def get_context_data(self, **kwargs):
-        if not can_view_approval_details(self.request, self.object):
+        permissions = can_view_approval_details(self.request, self.object)
+        if not permissions:
             raise PermissionDenied
 
-        is_employer_with_accepted_application = False
-        if self.request.user.is_employer:
-            # Display the action buttons if the employer has accepted an application
-            is_employer_with_accepted_application = self.object.user.job_applications.filter(
-                to_company=self.request.current_organization, state=JobApplicationState.ACCEPTED
-            ).exists()
+        # Display the action buttons if the employer has accepted an application
+        is_employer_with_accepted_application = permissions == PERMS_READ_AND_WRITE
 
         context = super().get_context_data(**kwargs)
         approval = self.object

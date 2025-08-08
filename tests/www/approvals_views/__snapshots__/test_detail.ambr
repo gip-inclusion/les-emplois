@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -586,24 +586,11 @@
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
-          SELECT %s AS "a"
+          SELECT "job_applications_jobapplication"."state" AS "state"
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "job_applications_jobapplication"
-          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND "job_applications_jobapplication"."state" = %s
-                 AND "job_applications_jobapplication"."to_company_id" = %s)
-          LIMIT 1
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
@@ -2686,7 +2673,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 19,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -3029,24 +3016,11 @@
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
-          SELECT %s AS "a"
+          SELECT "job_applications_jobapplication"."state" AS "state"
           FROM "job_applications_jobapplication"
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "job_applications_jobapplication"
-          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND "job_applications_jobapplication"."state" = %s
-                 AND "job_applications_jobapplication"."to_company_id" = %s)
-          LIMIT 1
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
