@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+{% load approvals %}
+{% load components %}
+{% load format_filters %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="sur le PASS IAE" %}
+        {% fragment as c_title__main %}
+            <h1>PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            {% if approval_deletion_form_url %}
+                <a href="{{ approval_deletion_form_url }}"
+                   id="approval-deletion-link"
+                   class="btn btn-lg btn-outline-warning btn-ico"
+                   target="_blank"
+                   rel="noopener"
+                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                    <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </a>
+            {% endif %}
+            {% if is_employer_with_accepted_application %}
+                <a href="{% url 'approvals:display_printable_approval' public_id=approval.public_id %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
+                    <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                    <span>Afficher l’attestation</span>
+                </a>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}

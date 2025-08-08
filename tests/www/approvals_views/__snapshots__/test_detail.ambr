@@ -584,6 +584,7 @@
         'origin': list([
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."state" AS "state"
@@ -1038,6 +1039,7 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -1057,6 +1059,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -1981,6 +1984,7 @@
         'origin': list([
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
           
@@ -2343,6 +2347,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -3014,6 +3019,7 @@
         'origin': list([
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."state" AS "state"
@@ -3469,6 +3475,7 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -3488,6 +3495,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
@@ -4412,6 +4420,7 @@
         'origin': list([
           'can_view_approval_details[approvals/perms.py]',
           'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
+          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
         ]),
         'sql': '''
           
@@ -4774,6 +4783,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[approvals/base_details.html]',
           'ExtendsNode[approvals/details.html]',
         ]),
         'sql': '''
