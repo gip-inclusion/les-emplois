@@ -121,7 +121,67 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         return context
 
 
-class ApprovalDetailView(UserPassesTestMixin, DetailView):
+class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
+    model = Approval
+    slug_field = "public_id"
+    slug_url_kwarg = "public_id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        approval = self.object
+        # Display the action buttons if the employer has accepted an application
+        permissions = can_view_approval_details(self.request, approval)
+        if not permissions:
+            raise PermissionDenied
+        context["is_employer_with_accepted_application"] = permissions == PERMS_READ_AND_WRITE
+        context["can_view_personal_information"] = can_view_personal_information(self.request, approval.user)
+        context["matomo_custom_title"] = "Détail PASS IAE"
+        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
+
+        # Display or not the deletion form link
+        context["approval_deletion_form_url"] = None
+        if self.request.user.is_employer and approval.is_in_progress:
+            approval_can_be_deleted = False
+
+            long_suspensions = [
+                suspension
+                for suspension in approval.suspension_set.all()
+                if (timezone.localdate() - suspension.start_at if suspension.is_in_progress else suspension.duration)
+                > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
+            ]
+
+            if any(suspension.is_in_progress for suspension in long_suspensions):
+                approval_can_be_deleted = True
+            elif long_suspensions:
+                last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
+                    "hiring_start_at__max"
+                ]
+                if last_hiring_start_at is None or any(
+                    suspension.end_at > last_hiring_start_at for suspension in long_suspensions
+                ):
+                    approval_can_be_deleted = True
+
+            if approval_can_be_deleted:
+                # ... and no hiring after this suspension: this approval is eligible for deletion
+                context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
+                    {
+                        "siaeID": self.request.current_organization.pk,
+                        "nomSIAE": self.request.current_organization.display_name,
+                        "prenomemployeur": self.request.user.first_name,
+                        "nomemployeur": self.request.user.last_name,
+                        "emailemployeur": self.request.user.email,
+                        "userID": self.request.user.pk,
+                        "numPASS": approval.number_with_spaces,
+                        "prenomsalarie": approval.user.first_name,
+                        "nomsalarie": approval.user.last_name,
+                    }
+                )
+
+        return context
+
+
+class ApprovalDetailView(BaseApprovalDetailView):
     model = Approval
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
@@ -180,21 +240,10 @@ class ApprovalDetailView(UserPassesTestMixin, DetailView):
         return suspensions
 
     def get_context_data(self, **kwargs):
-        permissions = can_view_approval_details(self.request, self.object)
-        if not permissions:
-            raise PermissionDenied
-
-        # Display the action buttons if the employer has accepted an application
-        is_employer_with_accepted_application = permissions == PERMS_READ_AND_WRITE
-
         context = super().get_context_data(**kwargs)
         approval = self.object
 
-        context["is_employer_with_accepted_application"] = is_employer_with_accepted_application
-        context["can_view_personal_information"] = can_view_personal_information(self.request, approval.user)
-        context["matomo_custom_title"] = "Détail PASS IAE"
-        context["approval_deletion_form_url"] = None
-        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
+        context["active_tab"] = "details"
         context["suspensions"] = self.get_suspensions(approval)
         context["prolongations"] = self.get_prolongation_and_requests(approval)
         context["prolongation_request_pending"] = any(
@@ -209,43 +258,6 @@ class ApprovalDetailView(UserPassesTestMixin, DetailView):
             and self.request.current_organization.is_subject_to_eligibility_rules
             and approval.can_be_prolonged
         )
-
-        if self.request.user.is_employer and approval.is_in_progress:
-            approval_can_be_deleted = False
-
-            long_suspensions = [
-                suspension
-                for suspension in approval.suspension_set.all()
-                if (timezone.localdate() - suspension.start_at if suspension.is_in_progress else suspension.duration)
-                > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-            ]
-
-            if any(suspension.is_in_progress for suspension in long_suspensions):
-                approval_can_be_deleted = True
-            elif long_suspensions:
-                last_hiring_start_at = approval.jobapplication_set.accepted().aggregate(Max("hiring_start_at"))[
-                    "hiring_start_at__max"
-                ]
-                if last_hiring_start_at is None or any(
-                    suspension.end_at > last_hiring_start_at for suspension in long_suspensions
-                ):
-                    approval_can_be_deleted = True
-
-            if approval_can_be_deleted:
-                # ... and no hiring after this suspension: this approval is eligible for deletion
-                context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                    {
-                        "siaeID": self.request.current_organization.pk,
-                        "nomSIAE": self.request.current_organization.display_name,
-                        "prenomemployeur": self.request.user.first_name,
-                        "nomemployeur": self.request.user.last_name,
-                        "emailemployeur": self.request.user.email,
-                        "userID": self.request.user.pk,
-                        "numPASS": approval.number_with_spaces,
-                        "prenomsalarie": approval.user.first_name,
-                        "nomsalarie": approval.user.last_name,
-                    }
-                )
 
         return context
 
