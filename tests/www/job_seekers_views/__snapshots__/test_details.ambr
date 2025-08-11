@@ -2188,9 +2188,14 @@
                                                   <small>
                                                       Critères administratifs sélectionnés
                                                   </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                  </strong>
+                                                  <br/>
+                                                  <strong>
+                                                      Problème de mobilité
+                                                  </strong>
+                                                  <br/>
                                               </li>
                                               <li>
                                                   <small>
@@ -2470,9 +2475,14 @@
                                                   <small>
                                                       Critères administratifs sélectionnés
                                                   </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                  </strong>
+                                                  <br/>
+                                                  <strong>
+                                                      Problème de mobilité
+                                                  </strong>
+                                                  <br/>
                                               </li>
                                               <li>
                                                   <small>
@@ -2924,9 +2934,14 @@
                                                   <small>
                                                       Critères administratifs sélectionnés
                                                   </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                  </strong>
+                                                  <br/>
+                                                  <strong>
+                                                      Résident ZRR
+                                                  </strong>
+                                                  <br/>
                                               </li>
                                               <li>
                                                   <small>
@@ -3182,9 +3197,14 @@
                                                   <small>
                                                       Critères administratifs sélectionnés
                                                   </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                  </strong>
+                                                  <br/>
+                                                  <strong>
+                                                      Résident ZRR
+                                                  </strong>
+                                                  <br/>
                                               </li>
                                               <li>
                                                   <small>
