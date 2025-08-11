@@ -1,3 +1,4 @@
+# A change.
 # Delete target on error.
 # https://www.gnu.org/software/make/manual/html_node/Errors.html#Errors
 # > This is almost always what you want make to do, but it is not historical
@@ -85,7 +86,6 @@ populate_db_with_reference_data: $(VIRTUAL_ENV)
 
 populate_db: populate_db_with_reference_data
 	python manage.py loaddata_bulk itou/fixtures/django/*.json
-	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 # Tests.
 # =============================================================================
