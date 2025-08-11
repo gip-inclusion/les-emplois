@@ -34,12 +34,18 @@
         <li>
             <small>Critères administratifs sélectionnés</small>
             {# Keep ordering from manager (level then ui_rank) #}
-            {% for criteria in eligibility_diagnosis.administrative_criteria.all %}
-                <strong>{{ criteria.name }}</strong>
-                <br>
-            {% empty %}
-                <i class="text-disabled">Non renseigné</i>
-            {% endfor %}
+            {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
+                {% if not criteria %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% else %}
+                    <strong>
+                        {% for criterion in criteria %}
+                            {{ criterion.name }}
+                            {% if not forloop.last %};{% endif %}
+                        {% endfor %}
+                    </strong>
+                {% endif %}
+            {% endwith %}
         </li>
         <li>
             <small>Type</small>
