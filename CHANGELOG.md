@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2025-08-11
+
+### Ajouté
+
+- [Candidat: Permettre de copier son ID candidat depuis le tableau de bord](https://github.com/gip-inclusion/les-emplois/pull/6680)
+- [Support : Préremplir le formulaire d'aide Zendesk](https://github.com/gip-inclusion/les-emplois/pull/6418)
+
+### Modifié
+
+- [Fiches de poste : Désactivation des fiches de poste non mises à jour par l'employeur uniquement si créées depuis les Emplois](https://github.com/gip-inclusion/les-emplois/pull/6677)
+- [Fiches salarié : Utiliser le lien du formulaire interne de demande de régularisation du NIR au lieu du lien Tally](https://github.com/gip-inclusion/les-emplois/pull/6672)
+- [Interface: Supprimer les boutons “postuler/transferer” en doublon dans les fiches structures](https://github.com/gip-inclusion/les-emplois/pull/6673)
+- [Invitations: Ajout de liens vers la documentation sur la page d'invitation de collaborateurs](https://github.com/gip-inclusion/les-emplois/pull/6678)
+- [Recherche employeur: Forcer l'ouverture des menus déroulants (distance, type de structure…) par le dessous](https://github.com/gip-inclusion/les-emplois/pull/6675)
+- [Éligibilité : Afficher la certification des critères administratifs aux prescripteurs habilités](https://github.com/gip-inclusion/les-emplois/pull/6661)
+
 ## 2025-08-04
 
 ### Ajouté
