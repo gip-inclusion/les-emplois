@@ -224,6 +224,19 @@
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
           
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
+          
                (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
                 INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
@@ -258,8 +271,8 @@
              WHERE "job_applications_jobapplication"."job_seeker_id" = %s
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      6,
-                      7) subquery
+                      7,
+                      8) subquery
         ''',
       }),
       dict({
@@ -333,6 +346,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
           
             (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
@@ -619,8 +645,8 @@
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   51,
                    52,
+                   53,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -702,8 +728,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -841,6 +877,19 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                     (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
@@ -848,7 +897,7 @@
              WHERE "job_applications_jobapplication"."job_seeker_id" = %s
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      4) subquery
+                      5) subquery
         ''',
       }),
       dict({
@@ -922,6 +971,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  "users_user"."id",
                  "users_user"."password",
@@ -1180,7 +1242,7 @@
           WHERE "job_applications_jobapplication"."job_seeker_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   49,
+                   50,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -1262,8 +1324,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -1447,9 +1519,6 @@
                           </button>
                       </th>
                       <th scope="col">
-                          Statut
-                      </th>
-                      <th scope="col">
                           Poste
                       </th>
                       <th scope="col">
@@ -1462,17 +1531,15 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
+                          <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_[PK of JobApplication]">
+                              Candidature déclinée
+                          </span>
                       </td>
                       <td>
                           27/11/2024
-                      </td>
-                      <td>
-                          <span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">
-                              Candidature déclinée
-                          </span>
                       </td>
                       <td>
                           Candidature spontanée
@@ -1491,17 +1558,15 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
+                          <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_[PK of JobApplication]">
+                              Nouvelle candidature
+                          </span>
                       </td>
                       <td>
                           27/11/2024
-                      </td>
-                      <td>
-                          <span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">
-                              Nouvelle candidature
-                          </span>
                       </td>
                       <td>
                           Candidature spontanée
@@ -1520,17 +1585,15 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
+                          <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                              Candidature acceptée
+                          </span>
                       </td>
                       <td>
                           27/11/2024
-                      </td>
-                      <td>
-                          <span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">
-                              Candidature acceptée
-                          </span>
                       </td>
                       <td>
                           Candidature spontanée
