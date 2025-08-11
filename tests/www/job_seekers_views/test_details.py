@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -63,6 +64,7 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
         from_prescriber=True,
         author_prescriber_organization=prescriber_membership.organization,
         author=prescriber_membership.user,
+        criteria_kinds=[AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.ZRR],
     )
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
@@ -121,6 +123,7 @@ def test_single_geiq_diag_from_prescriber(client, snapshot):
         from_prescriber=True,
         author_prescriber_organization=prescriber_membership.organization,
         author=prescriber_membership.user,
+        criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.PM],
     )
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
