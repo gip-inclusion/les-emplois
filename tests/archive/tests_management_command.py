@@ -1340,13 +1340,13 @@ class TestAnonymizeProfessionalManagementCommand:
         call_command("anonymize_professionals", wet_run=True)
         assert expected_message in caplog.messages
 
-    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-    def test_reset_notified_professional_dry_run(self, factory):
-        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+    def test_reset_notified_professional_dry_run(self):
+        for factory in [EmployerFactory, PrescriberFactory, LaborInspectorFactory]:
+            factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+
         call_command("anonymize_professionals")
 
-        user.refresh_from_db()
-        assert user.upcoming_deletion_notified_at is not None
+        assert not User.objects.filter(upcoming_deletion_notified_at__isnull=True).exists()
 
     @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
     @pytest.mark.parametrize(
