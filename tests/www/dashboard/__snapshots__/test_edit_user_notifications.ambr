@@ -736,16 +736,8 @@
           INSERT INTO "communications_disablednotification" ("notification_record_id",
                                                              "settings_id",
                                                              "disabled_at")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "communications_disablednotification"."id"
+          SELECT *
+          FROM UNNEST((%s)::bigint[], (%s)::bigint[], (%s)::timestamp WITH TIME ZONE[]) RETURNING "communications_disablednotification"."id"
         ''',
       }),
       dict({
@@ -1464,12 +1456,8 @@
           INSERT INTO "communications_disablednotification" ("notification_record_id",
                                                              "settings_id",
                                                              "disabled_at")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "communications_disablednotification"."id"
+          SELECT *
+          FROM UNNEST((%s)::bigint[], (%s)::bigint[], (%s)::timestamp WITH TIME ZONE[]) RETURNING "communications_disablednotification"."id"
         ''',
       }),
       dict({
@@ -2175,12 +2163,8 @@
           INSERT INTO "communications_disablednotification" ("notification_record_id",
                                                              "settings_id",
                                                              "disabled_at")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "communications_disablednotification"."id"
+          SELECT *
+          FROM UNNEST((%s)::bigint[], (%s)::bigint[], (%s)::timestamp WITH TIME ZONE[]) RETURNING "communications_disablednotification"."id"
         ''',
       }),
       dict({
@@ -2929,11 +2913,8 @@
           INSERT INTO "communications_disablednotification" ("notification_record_id",
                                                              "settings_id",
                                                              "disabled_at")
-          VALUES (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s),
-                 (%s, %s, %s) RETURNING "communications_disablednotification"."id"
+          SELECT *
+          FROM UNNEST((%s)::bigint[], (%s)::bigint[], (%s)::timestamp WITH TIME ZONE[]) RETURNING "communications_disablednotification"."id"
         ''',
       }),
       dict({
