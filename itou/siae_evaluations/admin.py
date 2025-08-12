@@ -111,6 +111,22 @@ def _evaluated_siae_serializer(queryset):
     ]
 
 
+class PercentSetAtIsFilled(admin.SimpleListFilter):
+    title = "Pourcentage renseigné"
+    parameter_name = "percent_set_at_is_filled"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(percent_set_at__isnull=False)
+        if value == "no":
+            return queryset.filter(percent_set_at__isnull=True)
+        return queryset
+
+
 @admin.register(models.EvaluationCampaign)
 class EvaluationCampaignAdmin(ReadonlyMixin, ItouModelAdmin):
     @admin.action(description="Exporter les SIAE des campagnes sélectionnées")
@@ -208,6 +224,7 @@ class EvaluationCampaignAdmin(ReadonlyMixin, ItouModelAdmin):
     list_filter = (
         "evaluations_asked_at",
         "name",
+        PercentSetAtIsFilled,
         "institution__department",
     )
     inlines = [
