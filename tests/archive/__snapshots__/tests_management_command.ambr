@@ -862,18 +862,6 @@
     }),
   ])
 # ---
-# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-False][suspend_anonymize_jobseekers_command_log]
-  'Command launched with wet_run=False'
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[False-True][suspend_anonymize_jobseekers_command_log]
-  'Command launched with wet_run=False'
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-False][suspend_anonymize_jobseekers_command_log]
-  'Start anonymizing job seekers'
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_suspend_command_setting[True-True][suspend_anonymize_jobseekers_command_log]
-  'Anonymizing job seekers is suspended, exiting command'
-# ---
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][user_values_after_anonymization]
   <UserQuerySet [{'is_active': False, 'password': 'pbkdf2_sha256$test$hash', 'phone': '', 'address_line_1': '', 'address_line_2': '', 'post_code': '', 'city': '', 'coords': None, 'insee_city': None, 'upcoming_deletion_notified_at': FakeDatetime(2025, 1, 15, 0, 0, tzinfo=datetime.timezone.utc), 'first_name': 'Pierre', 'last_name': 'Dupont'}]>
 # ---
