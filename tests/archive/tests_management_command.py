@@ -1348,17 +1348,56 @@ class TestAnonymizeProfessionalManagementCommand:
 
         assert not User.objects.filter(upcoming_deletion_notified_at__isnull=True).exists()
 
-    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-    @pytest.mark.parametrize(
-        "last_login, expected",
-        [(None, False), (timezone.now() - relativedelta(days=1), False), (timezone.now(), True)],
-    )
-    def test_reset_notified_professional(self, factory, last_login, expected):
-        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=last_login)
+    def test_reset_notified_professional(self):
+        # professionals who never logged in
+        never_logged_kwargs = {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": None}
+        employer_never_logged = EmployerFactory(**never_logged_kwargs)
+        prescriber_never_logged = PrescriberFactory(**never_logged_kwargs)
+        labor_inspector_never_logged = LaborInspectorFactory(**never_logged_kwargs)
+
+        # professionals who logged before being notified
+        logged_the_day_before_notification_kwargs = {
+            "joined_days_ago": DAYS_OF_INACTIVITY,
+            "notified_days_ago": 1,
+            "last_login": timezone.now() - relativedelta(days=1),
+        }
+        employer_logged_before_notification = EmployerFactory(**logged_the_day_before_notification_kwargs)
+        prescriber_logged_before_notification = PrescriberFactory(**logged_the_day_before_notification_kwargs)
+        labor_inspector_logged_before_notification = LaborInspectorFactory(**logged_the_day_before_notification_kwargs)
+
+        # professionals who logged after being notified
+        logged_after_notification_kwargs = {
+            "joined_days_ago": DAYS_OF_INACTIVITY,
+            "notified_days_ago": 1,
+            "last_login": timezone.now(),
+        }
+        employer_logged_after_notification = EmployerFactory(**logged_after_notification_kwargs)
+        prescriber_logged_after_notification = PrescriberFactory(**logged_after_notification_kwargs)
+        labor_inspector_logged_after_notification = LaborInspectorFactory(**logged_after_notification_kwargs)
+
         call_command("anonymize_professionals", wet_run=True)
 
-        user.refresh_from_db()
-        assert (user.upcoming_deletion_notified_at is None) == expected
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=True),
+            [
+                employer_logged_after_notification,
+                prescriber_logged_after_notification,
+                labor_inspector_logged_after_notification,
+            ],
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=False),
+            [
+                employer_never_logged,
+                prescriber_never_logged,
+                labor_inspector_never_logged,
+                employer_logged_before_notification,
+                prescriber_logged_before_notification,
+                labor_inspector_logged_before_notification,
+            ],
+            ordered=False,
+        )
 
     def test_anonymize_professionals_dry_run(self, respx_mock):
         user = EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
