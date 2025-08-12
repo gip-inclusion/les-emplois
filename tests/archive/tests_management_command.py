@@ -24,7 +24,7 @@ from itou.archive.models import (
     AnonymizedProfessional,
     AnonymizedSIAEEligibilityDiagnosis,
 )
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import (
@@ -837,20 +837,20 @@ class TestAnonymizeJobseekersManagementCommand:
 
     @freeze_time("2025-02-15")
     @pytest.mark.parametrize(
-        "kwargs,has_transitions,selected_jobs_count",
+        "kwargs,birthdate,has_transitions,selected_jobs_count",
         [
             pytest.param(
                 {
                     "sent_by_job_seeker": True,
                     "to_company__kind": CompanyKind.GEIQ,
-                    "to_company__department": 76,
-                    "to_company__naf": "1234Z",
+                    "to_company__department": 70,
+                    "to_company__naf": "4570A",
                     "to_company__convention__is_active": True,
                     "was_hired": True,
-                    "hired_job__contract_type": ContractType.FIXED_TERM_TREMPLIN,
                     "to_company__romes": ["N1101"],
                     "hiring_start_at": datetime.date(2025, 2, 2),
                 },
+                datetime.date(1970, 5, 17),
                 True,
                 3,
                 id="hired_jobseeker_with_3_jobs",
@@ -859,14 +859,15 @@ class TestAnonymizeJobseekersManagementCommand:
                 {
                     "sent_by_job_seeker": True,
                     "to_company__kind": CompanyKind.OPCS,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
+                    "to_company__department": 71,
+                    "to_company__naf": "4571A",
                     "to_company__convention__is_active": False,
                     "to_company__romes": ["N1102"],
                     "state": JobApplicationState.REFUSED,
                     "refusal_reason": "reason",
                     "resume": None,
                 },
+                datetime.date(1971, 5, 17),
                 False,
                 1,
                 id="refused_application_with_1_jobs",
@@ -875,23 +876,25 @@ class TestAnonymizeJobseekersManagementCommand:
                 {
                     "sent_by_another_employer": True,
                     "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
+                    "to_company__department": 72,
+                    "to_company__naf": "4572A",
                     "to_company__convention": None,
                     "state": JobApplicationState.PROCESSING,
                 },
+                datetime.date(1972, 5, 17),
                 False,
                 0,
                 id="application_sent_by_company",
             ),
             pytest.param(
                 {
-                    "to_company__department": 14,
+                    "to_company__department": 73,
                     "to_company__kind": CompanyKind.EITI,
-                    "to_company__naf": "8888Y",
+                    "to_company__naf": "4573A",
                     "sent_by_authorized_prescriber_organisation": True,
                     "state": JobApplicationState.PRIOR_TO_HIRE,
                 },
+                datetime.date(1973, 5, 17),
                 False,
                 0,
                 id="application_sent_by_authorized_prescriber",
@@ -900,18 +903,20 @@ class TestAnonymizeJobseekersManagementCommand:
                 {
                     "sent_by_another_employer": True,
                     "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
+                    "to_company__department": 74,
+                    "to_company__naf": "4574A",
                     "transferred_at": timezone.make_aware(datetime.datetime(2025, 2, 2)),
                     "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2025, 2, 3)),
                     "state": JobApplicationState.POSTPONED,
                 },
+                datetime.date(1974, 5, 17),
                 False,
                 0,
                 id="transferred_application_with_diagoriente_invitation",
             ),
             pytest.param(
-                {"sent_by_job_seeker": True, "sender": None, "to_company__department": 76, "to_company__naf": "7820Z"},
+                {"sent_by_job_seeker": True, "sender": None, "to_company__department": 78, "to_company__naf": "4578A"},
+                datetime.date(1978, 5, 17),
                 True,
                 3,
                 id="sent_by_jobseeker_without_sender",
@@ -921,6 +926,7 @@ class TestAnonymizeJobseekersManagementCommand:
     def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(
         self,
         kwargs,
+        birthdate,
         has_transitions,
         selected_jobs_count,
         django_capture_on_commit_callbacks,
@@ -931,7 +937,7 @@ class TestAnonymizeJobseekersManagementCommand:
         job_seeker = JobSeekerFactory(
             date_joined=timezone.make_aware(datetime.datetime(2023, 2, 15)),
             notified_days_ago=30,
-            jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
+            jobseeker_profile__birthdate=birthdate,
             post_code="76160",
             for_snapshot=True,
         )
@@ -940,9 +946,7 @@ class TestAnonymizeJobseekersManagementCommand:
             approval=None,
             eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=None,
-            to_company__department=14,
-            to_company__naf="1705X",
-            to_company__kind=CompanyKind.EI,
+            **kwargs,
             created_at=timezone.make_aware(datetime.datetime(2023, 2, 15)),
         )
         if has_transitions:
