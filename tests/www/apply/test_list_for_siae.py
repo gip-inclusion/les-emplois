@@ -10,7 +10,11 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
+from itou.eligibility.enums import (
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+    AuthorKind,
+)
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
@@ -23,7 +27,9 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import (
+    PrescriberOrganizationWithMembershipFactory,
+)
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
@@ -1934,3 +1940,148 @@ def test_htmx_order(client):
     assertContains(response, "2 résultats")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
+
+
+@freeze_time("2024-11-27", tick=True)
+def test_table_iae_state_and_criteria(client, snapshot):
+    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("apply:list_for_siae")
+
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True, for_snapshot=True)
+    prescriber = prescriber_org.members.get()
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    common_kwargs = {
+        "to_company": company,
+        "sender_kind": SenderKind.EMPLOYER,
+        "sender": employer,
+        "sender_company": company,
+    }
+    company_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=company,
+        author=company.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+    )
+    no_criteria_prescriber_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+    )
+    prescriber_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+        criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.QPV],
+    )
+
+    prescriber_approval = ApprovalFactory(
+        user__first_name="Martine",
+        user__last_name="Martin",
+    )
+    employer_approval = ApprovalFactory(
+        user__first_name="Aline",
+        user__last_name="Bato",
+        with_diagnosis_from_employer=True,
+    )
+    company_approval_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker__first_name="Béatrice",
+        job_seeker__last_name="Voiture",
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=company,
+        author=company.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+    )
+    ApprovalFactory(
+        user=company_approval_diag.job_seeker,
+        eligibility_diagnosis=company_approval_diag,
+    )
+
+    job_applications = [
+        JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            eligibility_diagnosis=None,
+            job_seeker__first_name="Pas de",
+            job_seeker__last_name="Diagnostique",
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=company_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.REFUSED,
+            eligibility_diagnosis=no_criteria_prescriber_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.POSTPONED,
+            eligibility_diagnosis=prescriber_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=employer_approval.eligibility_diagnosis,
+            job_seeker=employer_approval.user,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
+            job_seeker=prescriber_approval.user,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=company_approval_diag,
+            job_seeker=company_approval_diag.job_seeker,
+            **common_kwargs,
+        ),
+    ]
+
+    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/siae/details",
+                        "/apply/[PK of JobApplication]/siae/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                    (
+                        "value",
+                        str(job_application.pk),
+                        "[PK of JobApplication]",
+                    ),
+                    (
+                        "id",
+                        f"select-{job_application.pk}",
+                        "select-[PK of JobApplication]",
+                    ),
+                    (
+                        "for",
+                        f"select-{job_application.pk}",
+                        "select-[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications table")
