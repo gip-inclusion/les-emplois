@@ -36,7 +36,6 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
-from itou.jobs.models import Appellation, Rome
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
@@ -835,147 +834,194 @@ class TestAnonymizeJobseekersManagementCommand:
         assertQuerySetEqual(File.objects.all(), other_files, ordered=False)
         assert respx_mock.calls.call_count == 1
 
-    @freeze_time("2025-02-15")
-    @pytest.mark.parametrize(
-        "kwargs,birthdate,has_transitions,selected_jobs_count",
-        [
-            pytest.param(
-                {
-                    "sent_by_job_seeker": True,
-                    "to_company__kind": CompanyKind.GEIQ,
-                    "to_company__department": 70,
-                    "to_company__naf": "4570A",
-                    "to_company__convention__is_active": True,
-                    "was_hired": True,
-                    "to_company__romes": ["N1101"],
-                    "hiring_start_at": datetime.date(2025, 2, 2),
-                },
-                datetime.date(1970, 5, 17),
-                True,
-                3,
-                id="hired_jobseeker_with_3_jobs",
-            ),
-            pytest.param(
-                {
-                    "sent_by_job_seeker": True,
-                    "to_company__kind": CompanyKind.OPCS,
-                    "to_company__department": 71,
-                    "to_company__naf": "4571A",
-                    "to_company__convention__is_active": False,
-                    "to_company__romes": ["N1102"],
-                    "state": JobApplicationState.REFUSED,
-                    "refusal_reason": "reason",
-                    "resume": None,
-                },
-                datetime.date(1971, 5, 17),
-                False,
-                1,
-                id="refused_application_with_1_jobs",
-            ),
-            pytest.param(
-                {
-                    "sent_by_another_employer": True,
-                    "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 72,
-                    "to_company__naf": "4572A",
-                    "to_company__convention": None,
-                    "state": JobApplicationState.PROCESSING,
-                },
-                datetime.date(1972, 5, 17),
-                False,
-                0,
-                id="application_sent_by_company",
-            ),
-            pytest.param(
-                {
-                    "to_company__department": 73,
-                    "to_company__kind": CompanyKind.EITI,
-                    "to_company__naf": "4573A",
-                    "sent_by_authorized_prescriber_organisation": True,
-                    "state": JobApplicationState.PRIOR_TO_HIRE,
-                },
-                datetime.date(1973, 5, 17),
-                False,
-                0,
-                id="application_sent_by_authorized_prescriber",
-            ),
-            pytest.param(
-                {
-                    "sent_by_another_employer": True,
-                    "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 74,
-                    "to_company__naf": "4574A",
-                    "transferred_at": timezone.make_aware(datetime.datetime(2025, 2, 2)),
-                    "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2025, 2, 3)),
-                    "state": JobApplicationState.POSTPONED,
-                },
-                datetime.date(1974, 5, 17),
-                False,
-                0,
-                id="transferred_application_with_diagoriente_invitation",
-            ),
-            pytest.param(
-                {"sent_by_job_seeker": True, "sender": None, "to_company__department": 78, "to_company__naf": "4578A"},
-                datetime.date(1978, 5, 17),
-                True,
-                3,
-                id="sent_by_jobseeker_without_sender",
-            ),
-        ],
-    )
     def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(
         self,
-        kwargs,
-        birthdate,
-        has_transitions,
-        selected_jobs_count,
         django_capture_on_commit_callbacks,
         caplog,
         snapshot,
         respx_mock,
     ):
-        job_seeker = JobSeekerFactory(
-            date_joined=timezone.make_aware(datetime.datetime(2023, 2, 15)),
-            notified_days_ago=30,
-            jobseeker_profile__birthdate=birthdate,
-            post_code="76160",
-            for_snapshot=True,
-        )
-        job_application = JobApplicationFactory(
-            job_seeker=job_seeker,
-            approval=None,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
-            **kwargs,
-            created_at=timezone.make_aware(datetime.datetime(2023, 2, 15)),
-        )
-        if has_transitions:
-            for from_state, to_state, months in [
+        def _create_job_seeker_with_application(
+            job_seeker_kwargs, job_application_kwargs, selected_jobs_count=0, transitions=None
+        ):
+            jobseeker = JobSeekerFactory(**job_seeker_kwargs)
+            job_application = JobApplicationFactory(
+                **job_application_kwargs,
+                job_seeker=jobseeker,
+                approval=None,
+                eligibility_diagnosis=None,
+                geiq_eligibility_diagnosis=None,
+            )
+            if transitions:
+                for from_state, to_state, months in transitions:
+                    JobApplicationTransitionLog.objects.create(
+                        user=jobseeker,
+                        from_state=from_state,
+                        to_state=to_state,
+                        job_application=job_application,
+                        timestamp=job_application.created_at + relativedelta(months=months),
+                    )
+            if selected_jobs_count:
+                jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
+                job_application.selected_jobs.set(jobs)
+
+        # hired jobseeker with 3 selected jobs and transition logs
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 1, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1970, 5, 17),
+                "post_code": "70160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27005987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 1, 15)),
+                "sent_by_job_seeker": True,
+                "to_company__kind": CompanyKind.GEIQ,
+                "to_company__department": 70,
+                "to_company__naf": "4570A",
+                "to_company__convention__is_active": True,
+                "was_hired": True,
+                "hired_job__contract_type": "PERMANENT_I",
+                "to_company__romes": ["N1101"],
+                "hiring_start_at": datetime.date(2025, 2, 2),
+                "processed_at": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+            },
+            selected_jobs_count=3,
+            transitions=[
                 (JobApplicationState.NEW, JobApplicationState.PROCESSING, 0),
                 (JobApplicationState.PROCESSING, JobApplicationState.ACCEPTED, 1),
-            ]:
-                JobApplicationTransitionLog.objects.create(
-                    user=job_seeker,
-                    from_state=from_state,
-                    to_state=to_state,
-                    job_application=job_application,
-                    timestamp=job_application.created_at + relativedelta(months=months),
-                )
-        if selected_jobs_count > 0:
-            rome = Rome.objects.create(code="I1304", name="Rome 1304")
-            Appellation.objects.create(code="I13042", name="Doer", rome=rome)
-            selected_jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
-            job_application.selected_jobs.set(selected_jobs)
+            ],
+        )
+
+        # refused job seeker application with 1 job and no transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1971, 5, 17),
+                "post_code": "71160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17105987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+                "sent_by_job_seeker": True,
+                "to_company__kind": CompanyKind.OPCS,
+                "to_company__department": 71,
+                "to_company__naf": "4571A",
+                "to_company__convention__is_active": False,
+                "to_company__romes": ["N1102"],
+                "state": JobApplicationState.REFUSED,
+                "refusal_reason": "reason",
+                "resume": None,
+                "hiring_start_at": None,
+                "processed_at": timezone.make_aware(datetime.datetime(2022, 3, 1)),
+            },
+            selected_jobs_count=1,
+        )
+
+        # application sent by company, no selected job nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 3, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1972, 5, 17),
+                "post_code": "72160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27205987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 3, 15)),
+                "sent_by_another_employer": True,
+                "to_company__kind": CompanyKind.EI,
+                "to_company__department": 72,
+                "to_company__naf": "4572A",
+                "to_company__convention": None,
+                "state": JobApplicationState.PROCESSING,
+                "hiring_start_at": None,
+                "processed_at": None,
+            },
+        )
+
+        # application sent by authorized prescriber, no selected jobs nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 4, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1973, 5, 17),
+                "post_code": "73160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17305987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 4, 15)),
+                "to_company__department": 73,
+                "to_company__kind": CompanyKind.EITI,
+                "to_company__naf": "4573A",
+                "sent_by_authorized_prescriber_organisation": True,
+                "state": JobApplicationState.PRIOR_TO_HIRE,
+                "hiring_start_at": None,
+            },
+        )
+
+        # transferred job application with diagoriente invitation, no selected jobs nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 5, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1974, 5, 17),
+                "post_code": "74160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27405987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 5, 15)),
+                "sent_by_another_employer": True,
+                "to_company__kind": CompanyKind.EI,
+                "to_company__department": 74,
+                "to_company__naf": "4574A",
+                "transferred_at": timezone.make_aware(datetime.datetime(2022, 6, 2)),
+                "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2022, 7, 3)),
+                "state": JobApplicationState.POSTPONED,
+                "hiring_start_at": None,
+            },
+        )
+
+        # job application sent by jobseeker him/herself without sender, with 2 selected jobs and transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1978, 5, 17),
+                "post_code": "78160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17805987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "to_company__department": 78,
+                "to_company__naf": "4578A",
+                "sent_by_job_seeker": True,
+                "sender": None,
+                "hiring_start_at": None,
+            },
+            selected_jobs_count=2,
+            transitions=[
+                (JobApplicationState.NEW, JobApplicationState.PROCESSING, 0),
+            ],
+        )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
+        assert not JobApplication.objects.exists()
         assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
-        assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
-        assert "Anonymized job applications after grace period, count: 1" in caplog.messages
+        assert "Anonymized job applications after grace period, count: 6" in caplog.messages
 
-        assert respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 6
 
     def test_archive_jobseeker_with_approval(self, snapshot):
         kwargs = {
