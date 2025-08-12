@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNumQueries
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries
 
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
@@ -288,4 +288,58 @@ def test_evaluated_job_application_state_display_in_evaluated_siae_admin(admin_c
         """,
         html=True,
         count=1,
+    )
+
+
+def test_percent_set_at_is_filled(admin_client):
+    not_set_campaign = EvaluationCampaignFactory(institution__department="01", percent_set_at=None)
+    set_campaign = EvaluationCampaignFactory(institution__department="02", percent_set_at=timezone.now())
+    response = admin_client.get(reverse("admin:siae_evaluations_evaluationcampaign_changelist"))
+    assertContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": not_set_campaign.pk},
+        ),
+    )
+    assertContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": set_campaign.pk},
+        ),
+    )
+    response = admin_client.get(
+        f"{reverse('admin:siae_evaluations_evaluationcampaign_changelist')}?percent_set_at_is_filled=no"
+    )
+    assertContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": not_set_campaign.pk},
+        ),
+    )
+    assertNotContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": set_campaign.pk},
+        ),
+    )
+    response = admin_client.get(
+        f"{reverse('admin:siae_evaluations_evaluationcampaign_changelist')}?percent_set_at_is_filled=yes"
+    )
+    assertNotContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": not_set_campaign.pk},
+        ),
+    )
+    assertContains(
+        response,
+        reverse(
+            "admin:siae_evaluations_evaluationcampaign_change",
+            kwargs={"object_id": set_campaign.pk},
+        ),
     )
