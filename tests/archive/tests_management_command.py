@@ -442,142 +442,101 @@ class TestAnonymizeJobseekersManagementCommand:
         assert User.objects.count() == 1
         assert respx_mock.calls.call_count == 2
 
-    @pytest.mark.parametrize(
-        "factory, related_object_factory, notification_reset",
-        [
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=29,
-                ),
-                None,
-                False,
-                id="notified_jobseeker",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                True,
-                id="notified_jobseeker_with_recent_login",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    date_joined=timezone.now(),
-                    notified_days_ago=1,
-                ),
-                None,
-                True,
-                id="notified_jobseeker_with_recent_date_joined",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, is_active=False),
-                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
-                True,
-                id="inactive_jobseeker_with_recent_job_application",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_job_application",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: ApprovalFactory(user=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=1,
-                ),
-                lambda jobseeker: ApprovalFactory(
-                    user=jobseeker,
-                    expired=True,
-                    eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
-                ),
-                False,
-                id="notified_jobseeker_with_expired_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=1,
-                ),
-                lambda jobseeker: ApprovalFactory(
-                    user=jobseeker,
-                    expired=True,
-                    end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
-                ),
-                True,
-                id="notified_jobseeker_with_recently_expired_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                True,
-                id="notified_jobseeker_with_recent_eligibility_diagnosis",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                True,
-                id="notified_jobseeker_with_recent_geiq_eligibility_diagnosis",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: FollowUpGroupMembershipFactory(follow_up_group__beneficiary=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_follow_up_group_contact",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="itoustaff_with_recent_login",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="labor_inspector_with_recent_login",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="employer_with_recent_login",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="prescriber_with_recent_login",
-            ),
-        ],
-    )
-    def test_reset_notified_jobseekers_with_recent_activity(
-        self, factory, related_object_factory, notification_reset, respx_mock
-    ):
-        user = factory()
-        if related_object_factory:
-            related_object_factory(user)
+    def test_reset_notified_jobseekers_with_recent_activity(self, respx_mock):
+        # users which notification date is not reset
+        notified_jobseeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29)
+        expired_approval_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY,
+            user__notified_days_ago=1,
+            expired=True,
+            eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
+        )
+        itoustaff_with_recent_login = ItouStaffFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        labor_inspector_with_recent_login = LaborInspectorFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        employer_with_recent_login = EmployerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        prescriber_with_recent_login = PrescriberFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+
+        # users which notification date is reset
+        notified_jobseeker_with_recent_login = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+
+        notified_jobseeker_with_recent_date_joined = JobSeekerFactory(
+            date_joined=timezone.now(),
+            notified_days_ago=1,
+        )
+
+        recent_job_application_of_inactive_jobseeker = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_seeker__notified_days_ago=1,
+            job_seeker__is_active=False,
+        )
+
+        recent_job_application_of_notified_jobseeker = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1
+        )
+
+        recent_approval_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY, user__notified_days_ago=1
+        )
+
+        approval_ending_after_grace_period_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY,
+            user__notified_days_ago=1,
+            expired=True,
+            end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
+        )
+
+        recent_eligibility_diagnosis_of_notified_jobseeker = IAEEligibilityDiagnosisFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1, from_prescriber=True
+        )
+
+        recent_geiq_eligibility_diagnosis_of_notified_jobseeker = GEIQEligibilityDiagnosisFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1, from_prescriber=True
+        )
+
+        recent_follow_up_group_contact_of_notified_jobseeker = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
+            follow_up_group__beneficiary__notified_days_ago=1,
+        )
 
         call_command("anonymize_jobseekers", wet_run=True)
 
-        user.refresh_from_db()
-        assert (user.upcoming_deletion_notified_at is None) == notification_reset
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=False),
+            [
+                notified_jobseeker,
+                expired_approval_of_notified_jobseeker.user,
+                itoustaff_with_recent_login,
+                labor_inspector_with_recent_login,
+                employer_with_recent_login,
+                prescriber_with_recent_login,
+            ],
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=True, kind=UserKind.JOB_SEEKER),
+            [
+                notified_jobseeker_with_recent_login,
+                notified_jobseeker_with_recent_date_joined,
+                recent_job_application_of_inactive_jobseeker.job_seeker,
+                recent_job_application_of_notified_jobseeker.job_seeker,
+                recent_approval_of_notified_jobseeker.user,
+                approval_ending_after_grace_period_of_notified_jobseeker.user,
+                recent_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
+                recent_geiq_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
+                recent_follow_up_group_contact_of_notified_jobseeker.follow_up_group.beneficiary,
+            ],
+            ordered=False,
+        )
         assert not respx_mock.calls.called
 
     def test_exclude_users_when_archiving(self, respx_mock):
