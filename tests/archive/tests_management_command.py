@@ -411,11 +411,14 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
 class TestAnonymizeJobseekersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
-    @pytest.mark.parametrize("wet_run", [True, False])
-    def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
+    def test_suspend_command_setting(self, settings, suspended, caplog):
+        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
-        call_command("anonymize_jobseekers", wet_run=wet_run)
-        assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert ("Anonymizing job seekers is suspended, exiting command" in caplog.messages[0]) is suspended
+        assert User.objects.exists() is suspended
 
     def test_dry_run(self, respx_mock):
         job_application = JobApplicationFactory(
