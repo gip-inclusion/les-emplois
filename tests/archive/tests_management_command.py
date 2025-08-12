@@ -1418,39 +1418,30 @@ class TestAnonymizeProfessionalManagementCommand:
         assert User.objects.filter(email__isnull=False).count() == 1
         assert respx_mock.calls.call_count == 2
 
-    @pytest.mark.parametrize(
-        "factory",
-        [
-            pytest.param(
-                lambda: EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29),
-                id="employer_notified_still_in_grace_period",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
-                ),
-                id="labor_inspector_with_recent_login",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                id="prescriber_never_notified",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
-                id="jobseeker_notified",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
-                id="itou_staff_notified",
-            ),
-        ],
-    )
-    def test_excluded_users_when_anonymizing_professionals(self, factory):
-        user = factory()
+    def test_excluded_users_when_anonymizing_professionals(self):
+        employer_notified_still_in_grace_period = EmployerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29
+        )
+        labor_inspector_with_recent_login = LaborInspectorFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
+        )
+        prescriber_never_notified = PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        jobseeker_notified = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+        itou_staff_notified = ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+
         call_command("anonymize_professionals", wet_run=True)
 
-        expected_user = User.objects.get()
-        assert user == expected_user
+        assertQuerySetEqual(
+            User.objects.all(),
+            [
+                employer_notified_still_in_grace_period,
+                labor_inspector_with_recent_login,
+                prescriber_never_notified,
+                jobseeker_notified,
+                itou_staff_notified,
+            ],
+            ordered=False,
+        )
         assert not AnonymizedProfessional.objects.exists()
 
     @pytest.mark.parametrize(
