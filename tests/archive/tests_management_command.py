@@ -112,6 +112,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
+    # vincentporte TO BE CONTINUED
     @pytest.mark.parametrize(
         "factory, related_object_factory, updated_notification_date",
         [
@@ -599,6 +600,7 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         assert not respx_mock.calls.called
 
+    # vincentporte TO BE CONTINUED
     @pytest.mark.parametrize(
         "kwargs,jobapplication_kwargs_list",
         [
@@ -1251,6 +1253,7 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
+    # vincentporte TO BE CONTINUED
     @pytest.mark.parametrize(
         "factory_kwargs,expected_notification",
         [
@@ -1331,6 +1334,7 @@ class TestAnonymizeProfessionalManagementCommand:
         ],
     )
     def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
+        # vincentporte TO BE CONTINUED : add data and check if it is anonymized or not
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
         assert expected_message in caplog.messages
@@ -1439,6 +1443,7 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         assert not AnonymizedProfessional.objects.exists()
 
+    # vincentporte TO BE CONTINUED
     @pytest.mark.parametrize(
         "factory,has_related_objects,is_anonymized",
         [
