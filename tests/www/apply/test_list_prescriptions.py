@@ -9,13 +9,19 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains
 
+from itou.eligibility.enums import (
+    AdministrativeCriteriaKind,
+    AuthorKind,
+)
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -652,3 +658,113 @@ def test_htmx_order(client):
     assertContains(response, "2 résultats")
     fresh_page = parse_response_to_soup(response)
     assertSoupEqual(simulated_page, fresh_page)
+
+
+@freeze_time("2024-11-27", tick=True)
+def test_table_iae_state_and_criteria(client, snapshot):
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True, for_snapshot=True)
+    prescriber = prescriber_org.members.get()
+    client.force_login(prescriber)
+    url = reverse("apply:list_prescriptions")
+
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    company = CompanyFactory(for_snapshot=True, with_membership=True)
+    common_kwargs = {
+        "to_company": company,
+        "sender_kind": SenderKind.PRESCRIBER,
+        "sender": prescriber,
+    }
+    company_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=company,
+        author=company.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+    )
+    no_criteria_prescriber_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+    )
+    prescriber_diag = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+        criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.QPV],
+    )
+
+    prescriber_approval = ApprovalFactory(
+        user__first_name="Martine",
+        user__last_name="Martin",
+    )
+    employer_approval = ApprovalFactory(
+        user__first_name="Aline",
+        user__last_name="Bato",
+        with_diagnosis_from_employer=True,
+    )
+
+    job_applications = [
+        JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            eligibility_diagnosis=None,
+            job_seeker__first_name="Pas de",
+            job_seeker__last_name="Diagnostique",
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=company_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.REFUSED,
+            eligibility_diagnosis=no_criteria_prescriber_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.POSTPONED,
+            eligibility_diagnosis=prescriber_diag,
+            job_seeker=job_seeker,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=employer_approval.eligibility_diagnosis,
+            job_seeker=employer_approval.user,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
+            job_seeker=prescriber_approval.user,
+            **common_kwargs,
+        ),
+    ]
+
+    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/prescriber/details",
+                        "/apply/[PK of JobApplication]/prescriber/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications table")
