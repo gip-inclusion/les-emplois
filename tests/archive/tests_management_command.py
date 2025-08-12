@@ -580,46 +580,29 @@ class TestAnonymizeJobseekersManagementCommand:
         assert (user.upcoming_deletion_notified_at is None) == notification_reset
         assert not respx_mock.calls.called
 
-    @pytest.mark.parametrize(
-        "user_factory",
-        [
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    notified_days_ago=29,
-                ),
-                id="jobseeker_notified_still_in_grace_period",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    upcoming_deletion_notified_at=None,
-                ),
-                id="jobseeker_never_notified",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(is_active=False, notified_days_ago=30),
-                id="employer",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(notified_days_ago=30),
-                id="prescriber",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(notified_days_ago=30),
-                id="itou_staff",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(notified_days_ago=30),
-                id="laborinspector",
-            ),
-        ],
-    )
-    def test_exclude_users_when_archiving(self, user_factory, respx_mock):
-        user = user_factory()
+    def test_exclude_users_when_archiving(self, respx_mock):
+        jobseeker_notified_still_in_grace_period = JobSeekerFactory(notified_days_ago=29)
+        jobseeker_never_notified = JobSeekerFactory(upcoming_deletion_notified_at=None)
+        employer = EmployerFactory(is_active=False, notified_days_ago=30)
+        prescriber = PrescriberFactory(notified_days_ago=30)
+        itou_staff = ItouStaffFactory(notified_days_ago=30)
+        labor_inspector = LaborInspectorFactory(notified_days_ago=30)
+
         call_command("anonymize_jobseekers", wet_run=True)
 
-        expected_user = User.objects.get()
-        assert user == expected_user
         assert not AnonymizedJobSeeker.objects.exists()
+        assertQuerySetEqual(
+            User.objects.all(),
+            [
+                jobseeker_notified_still_in_grace_period,
+                jobseeker_never_notified,
+                employer,
+                prescriber,
+                itou_staff,
+                labor_inspector,
+            ],
+            ordered=False,
+        )
         assert not respx_mock.calls.called
 
     @pytest.mark.parametrize(
