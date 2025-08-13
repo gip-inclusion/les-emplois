@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestInstitutionEvaluatedJobApplicationView.test_num_queries_in_view
   dict({
-    'num_queries': 16,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -51,6 +51,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -348,6 +349,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -427,6 +429,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -444,12 +453,19 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestInstitutionEvaluatedSiaeDetailView.test_num_queries_in_view
   dict({
-    'num_queries': 14,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -499,6 +515,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -802,6 +819,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -827,6 +845,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -836,6 +861,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -912,7 +944,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeListView.test_num_queries
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -962,6 +994,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1184,6 +1217,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -1193,6 +1233,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1502,7 +1549,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1552,6 +1599,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1819,6 +1867,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -1828,6 +1883,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -1841,7 +1903,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep2.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1891,6 +1953,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2160,6 +2223,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -2169,6 +2239,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -2182,7 +2259,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -2232,6 +2309,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2501,6 +2579,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -2510,6 +2595,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
