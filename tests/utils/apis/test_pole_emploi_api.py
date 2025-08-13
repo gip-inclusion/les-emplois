@@ -644,7 +644,11 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
         respx.get("https://pe.fake/donnees-rqth/v1/rqth").respond(200, json=json_response)
 
-        data = self.api_client.certify_rqth(jobseeker_profile=JobSeekerProfileFactory())
+        # The RQTH certification calls two endpoints: rechercher_usager and donnees_rqth.
+        # Use a context manager to reuse the same HTTP client.
+        # See BasePoleEmploiApiClient._httpx_client
+        with self.api_client as client:
+            data = client.certify_rqth(jobseeker_profile=JobSeekerProfileFactory())
         for key, value in expected_data.items():
             assert data[key] == value
         assert data["raw_response"] == json_response

@@ -354,14 +354,18 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             headers = {**headers, **additional_headers}
 
         try:
-            response = httpx.request(
-                method,
-                url,
-                params=params,
-                json=data,
-                headers=headers,
-                timeout=API_TIMEOUT_SECONDS,
-            ).raise_for_status()
+            response = (
+                self._get_httpx_client()
+                .request(
+                    method,
+                    url,
+                    params=params,
+                    json=data,
+                    headers=headers,
+                    timeout=API_TIMEOUT_SECONDS,
+                )
+                .raise_for_status()
+            )
         except httpx.HTTPStatusError as exc:
             match exc.response.status_code:
                 case 429:
