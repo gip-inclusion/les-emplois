@@ -493,7 +493,9 @@ class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
     search_fields = ["declared_by_siae__siret", "approval__number"]
 
     def get_list_display(self, request):
-        return self.list_display + ("created_at",)  # Put the audit fields after the one added in subclasses
+        return super().get_list_display(request) + (
+            "created_at",
+        )  # Put the audit fields after the one added in subclasses
 
     @admin.display(boolean=True, description="en cours")
     def is_in_progress(self, obj):

@@ -31,6 +31,12 @@ class TestApprovalAdmin:
         response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
         assert response.status_code == 200
 
+    def test_change_approval_user_display_with_pii(self, client):
+        approval = ApprovalFactory()
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        response = client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+        assertContains(response, approval.user.display_with_pii)
+
 
 @pytest.mark.parametrize("field", ["start_at", "end_at"])
 def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, snapshot, field):
@@ -58,15 +64,15 @@ def test_prolongation_report_file_filter(admin_client):
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist"), follow=True)
     assertContains(response, prolongation.approval.number)
-    assertContains(response, prolongation.declared_by)
+    assertContains(response, prolongation.declared_by.display_with_pii)
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=yes", follow=True)
     assertContains(response, prolongation.approval.number)
-    assertContains(response, prolongation.declared_by)
+    assertContains(response, prolongation.declared_by.display_with_pii)
 
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=no", follow=True)
     assertNotContains(response, prolongation.approval.number)
-    assertNotContains(response, prolongation.declared_by)
+    assertNotContains(response, prolongation.declared_by.display_with_pii)
 
 
 def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):
