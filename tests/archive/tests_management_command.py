@@ -111,102 +111,73 @@ class TestNotifyInactiveJobseekersManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
+    def test_users_not_to_notify(self, django_capture_on_commit_callbacks, caplog, mailoutbox):
+        # jobseeker_soon_without_recent_activity
+        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True)
+
+        # jobseeker_with_recent_activity
+        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now())
+
+        # jobseeker_with_recent_job_application
+        JobApplicationFactory(job_seeker__joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # jobseeker_with_recent_approval
+        ApprovalFactory(user__joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # jobseeker_with_recent_eligibility_diagnosis
+        IAEEligibilityDiagnosisFactory(job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, from_prescriber=True)
+
+        # jobseeker_with_recent_geiq_eligibility_diagnosis
+        GEIQEligibilityDiagnosisFactory(job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, from_prescriber=True)
+
+        # jobseeker_in_followup_group_with_recent_contact
+        FollowUpGroupMembershipFactory(follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # prescriber_without_recent_activity
+        PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # employer_without_recent_activity
+        EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # labor_inspector_without_recent_activity
+        LaborInspectorFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # itou_staff_without_recent_activity
+        ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_inactive_jobseekers", wet_run=True)
+
+        assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False).exists()
+        assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
+        assert not mailoutbox
+
     @pytest.mark.parametrize(
-        "factory, related_object_factory, updated_notification_date",
+        "factory, related_object_factory",
         [
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 None,
-                True,
                 id="jobseeker_without_recent_activity",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, is_active=False),
                 None,
-                True,
                 id="deactivated_jobseeker_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True),
-                None,
-                False,
-                id="jobseeker_soon_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, last_login=timezone.now()),
-                None,
-                False,
-                id="jobseeker_with_recent_activity",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: JobApplicationFactory(
                     job_seeker=jobseeker, eligibility_diagnosis=None, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
-                True,
                 id="jobseeker_with_job_application_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
-                False,
-                id="jobseeker_with_recent_job_application",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: ApprovalFactory(user=jobseeker),
-                False,
-                id="jobseeker_with_recent_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                False,
-                id="jobseeker_with_recent_eligibility_diagnosis",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                False,
-                id="jobseeker_with_recent_geiq_eligibility_diagnosis",
             ),
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: FollowUpGroupMembershipFactory(
                     follow_up_group__beneficiary=jobseeker, last_contact_at=timezone.now() - INACTIVITY_PERIOD
                 ),
-                True,
                 id="jobseeker_in_followup_group_without_recent_contact",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                lambda jobseeker: FollowUpGroupMembershipFactory(follow_up_group__beneficiary=jobseeker),
-                False,
-                id="jobseeker_in_followup_group_with_recent_contact",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                None,
-                False,
-                id="prescriber_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                None,
-                False,
-                id="employer_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                None,
-                False,
-                id="labor_inspector_without_recent_activity",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                None,
-                False,
-                id="itou_staff_without_recent_activity",
             ),
         ],
     )
@@ -214,7 +185,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
         self,
         factory,
         related_object_factory,
-        updated_notification_date,
         django_capture_on_commit_callbacks,
         caplog,
         mailoutbox,
@@ -228,26 +198,21 @@ class TestNotifyInactiveJobseekersManagementCommand:
             call_command("notify_inactive_jobseekers", wet_run=True)
 
         user.refresh_from_db()
-        assert (user.upcoming_deletion_notified_at is not None) == updated_notification_date
+        assert user.upcoming_deletion_notified_at is not None
 
-        if updated_notification_date:
-            assert "Notified inactive job seekers without recent activity: 1" in caplog.messages
+        assert "Notified inactive job seekers without recent activity: 1" in caplog.messages
 
-            if user.is_active:
-                [mail] = mailoutbox
-                assert [user.email] == mail.to
-                assert mail.subject == snapshot(name="inactive_jobseeker_email_subject")
-                fmt_inactive_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
-                fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
-                    "%d/%m/%Y"
-                )
-                body = mail.body.replace(fmt_inactive_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
-                assert body == snapshot(name="inactive_jobseeker_email_body")
-            else:
-                assert not mailoutbox
-
+        if user.is_active:
+            [mail] = mailoutbox
+            assert [user.email] == mail.to
+            assert mail.subject == snapshot(name="inactive_jobseeker_email_subject")
+            fmt_inactive_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
+            fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
+                "%d/%m/%Y"
+            )
+            body = mail.body.replace(fmt_inactive_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
+            assert body == snapshot(name="inactive_jobseeker_email_body")
         else:
-            assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
             assert not mailoutbox
 
     def test_notify_inactive_jobseekers_on_approval_expiration_date(self):
