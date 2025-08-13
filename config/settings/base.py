@@ -864,3 +864,10 @@ MAINTENANCE_DESCRIPTION = os.getenv("MAINTENANCE_DESCRIPTION", None)
 # Criteria certification
 # ------------------------------------------------------------------------------
 CERTIFY_CRITERIA_ASYNC_MODE_ONLY = os.getenv("CERTIFY_CRITERIA_ASYNC_MODE_ONLY", "False") == "True"
+
+
+# Page size (lists)
+# ------------------------------------------------------------------------------
+DEFAULT_PAGE_SIZE = 20
+PAGE_SIZE_SMALL = 10
+PAGE_SIZE_LARGE = 50
