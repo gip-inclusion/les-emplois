@@ -1221,30 +1221,38 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
+    def test_professionals_not_to_be_notified(self, django_capture_on_commit_callbacks, caplog, mailoutbox):
+        # professional_soon_without_recent_activity
+        EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY - 1)
+        # professional_never_logged_in
+        PrescriberFactory()
+        # professional_without_recent_activity_already_notified
+        notified_professional = LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("notify_inactive_professionals", wet_run=True)
+
+        assert (
+            not User.objects.exclude(id=notified_professional.id)
+            .filter(upcoming_deletion_notified_at__isnull=False)
+            .exists()
+        )
+        assert not mailoutbox
+        assert "Notified inactive professionals without recent activity: 0" in caplog.messages
+
     @pytest.mark.parametrize(
-        "factory_kwargs,expected_notification",
+        "factory_kwargs",
         [
-            pytest.param({"last_login_days_ago": DAYS_OF_INACTIVITY}, True, id="professional_without_recent_activity"),
+            pytest.param({"last_login_days_ago": DAYS_OF_INACTIVITY}, id="professional_without_recent_activity"),
             pytest.param(
                 {"is_active": False, "last_login_days_ago": DAYS_OF_INACTIVITY},
-                True,
                 id="deactivated_professional_without_recent_activity",
-            ),
-            pytest.param(
-                {"last_login_days_ago": DAYS_OF_INACTIVITY - 1}, False, id="professional_soon_without_recent_activity"
-            ),
-            pytest.param({}, False, id="professional_never_logged_in"),
-            pytest.param(
-                {"last_login_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1},
-                False,
-                id="professional_without_recent_activity_already_notified",
             ),
         ],
     )
     def test_notify_inactive_professionals(
         self,
         factory_kwargs,
-        expected_notification,
         django_capture_on_commit_callbacks,
         caplog,
         mailoutbox,
@@ -1257,29 +1265,22 @@ class TestNotifyInactiveProfessionalsManagementCommand:
             call_command("notify_inactive_professionals", wet_run=True)
 
         updated_user = User.objects.get()
-        assert (
-            updated_user.upcoming_deletion_notified_at is not None
-        ) == expected_notification or user.upcoming_deletion_notified_at is not None
+        assert updated_user.upcoming_deletion_notified_at is not None
 
-        if expected_notification:
-            assert "Notified inactive professionals without recent activity: 1" in caplog.messages
+        assert "Notified inactive professionals without recent activity: 1" in caplog.messages
 
-            if user.is_active:
-                [mail] = mailoutbox
-                assert [user.email] == mail.to
-                assert mail.subject == snapshot(name="inactive_professional_email_subject")
-                fmt_inactivity_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
-                fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
-                    "%d/%m/%Y"
-                )
-                body = mail.body.replace(fmt_inactivity_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
-                assert body == snapshot(name="inactive_professional_email_body")
-            else:
-                assert not mailoutbox
-
+        if user.is_active:
+            [mail] = mailoutbox
+            assert [user.email] == mail.to
+            assert mail.subject == snapshot(name="inactive_professional_email_subject")
+            fmt_inactivity_since = (timezone.localdate() - INACTIVITY_PERIOD).strftime("%d/%m/%Y")
+            fmt_end_of_grace = (timezone.localdate(user.upcoming_deletion_notified_at) + GRACE_PERIOD).strftime(
+                "%d/%m/%Y"
+            )
+            body = mail.body.replace(fmt_inactivity_since, "XX/XX/XXXX").replace(fmt_end_of_grace, "YY/YY/YYYY")
+            assert body == snapshot(name="inactive_professional_email_body")
         else:
             assert not mailoutbox
-            assert "Notified inactive professionals without recent activity: 0" in caplog.messages
 
     def test_excluded_users_kind(
         self,
