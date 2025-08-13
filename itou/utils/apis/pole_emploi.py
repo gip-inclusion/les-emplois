@@ -461,3 +461,12 @@ def pole_emploi_partenaire_api_client():
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )
+
+
+def pole_emploi_agent_api_client():
+    return PoleEmploiRoyaumeAgentAPIClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
