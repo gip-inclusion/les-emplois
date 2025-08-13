@@ -1336,8 +1336,12 @@ class TestAnonymizeProfessionalManagementCommand:
         ],
     )
     def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
+        EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
+
+        assert User.objects.exists() is suspended
         assert expected_message in caplog.messages
 
     def test_reset_notified_professional_dry_run(self):
@@ -1647,9 +1651,17 @@ class TestAnonymizeProfessionalManagementCommand:
 class TestAnonymizeCancelledApprovalsManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
     def test_suspend_command_setting(self, settings, suspended, caplog):
+        expiration_date = timezone.localdate() - EXPIRATION_PERIOD
+        CancelledApprovalFactory(
+            start_at=expiration_date - datetime.timedelta(days=1),
+            end_at=expiration_date,
+        )
+
         settings.SUSPEND_ANONYMIZE_CANCELLED_APPROVALS = suspended
         call_command("anonymize_cancelled_approvals", wet_run=True)
-        assert ("Anonymizing cancelled approvals is suspended, exiting command" in caplog.messages) == suspended
+
+        assert CancelledApproval.objects.exists() is suspended
+        assert ("Anonymizing cancelled approvals is suspended, exiting command" in caplog.messages) is suspended
 
     def test_dry_run(self):
         expiration_date = timezone.localdate() - EXPIRATION_PERIOD
