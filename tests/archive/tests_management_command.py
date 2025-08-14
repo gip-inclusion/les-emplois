@@ -24,7 +24,7 @@ from itou.archive.models import (
     AnonymizedProfessional,
     AnonymizedSIAEEligibilityDiagnosis,
 )
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import (
@@ -36,7 +36,6 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog
-from itou.jobs.models import Appellation, Rome
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
@@ -444,11 +443,14 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
 class TestAnonymizeJobseekersManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
-    @pytest.mark.parametrize("wet_run", [True, False])
-    def test_suspend_command_setting(self, settings, suspended, wet_run, caplog, snapshot):
+    def test_suspend_command_setting(self, settings, suspended, caplog):
+        JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+
         settings.SUSPEND_ANONYMIZE_JOBSEEKERS = suspended
-        call_command("anonymize_jobseekers", wet_run=wet_run)
-        assert caplog.messages[0] == snapshot(name="suspend_anonymize_jobseekers_command_log")
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert ("Anonymizing job seekers is suspended, exiting command" in caplog.messages[0]) == suspended
+        assert User.objects.exists() == suspended
 
     def test_dry_run(self, respx_mock):
         job_application = JobApplicationFactory(
@@ -475,184 +477,126 @@ class TestAnonymizeJobseekersManagementCommand:
         assert User.objects.count() == 1
         assert respx_mock.calls.call_count == 2
 
-    @pytest.mark.parametrize(
-        "factory, related_object_factory, notification_reset",
-        [
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=29,
-                ),
-                None,
-                False,
-                id="notified_jobseeker",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                True,
-                id="notified_jobseeker_with_recent_login",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    date_joined=timezone.now(),
-                    notified_days_ago=1,
-                ),
-                None,
-                True,
-                id="notified_jobseeker_with_recent_date_joined",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, is_active=False),
-                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
-                True,
-                id="inactive_jobseeker_with_recent_job_application",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: JobApplicationFactory(job_seeker=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_job_application",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: ApprovalFactory(user=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=1,
-                ),
-                lambda jobseeker: ApprovalFactory(
-                    user=jobseeker,
-                    expired=True,
-                    eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
-                ),
-                False,
-                id="notified_jobseeker_with_expired_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY,
-                    notified_days_ago=1,
-                ),
-                lambda jobseeker: ApprovalFactory(
-                    user=jobseeker,
-                    expired=True,
-                    end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
-                ),
-                True,
-                id="notified_jobseeker_with_recently_expired_approval",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: IAEEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                True,
-                id="notified_jobseeker_with_recent_eligibility_diagnosis",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: GEIQEligibilityDiagnosisFactory(job_seeker=jobseeker, from_prescriber=True),
-                True,
-                id="notified_jobseeker_with_recent_geiq_eligibility_diagnosis",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1),
-                lambda jobseeker: FollowUpGroupMembershipFactory(follow_up_group__beneficiary=jobseeker),
-                True,
-                id="notified_jobseeker_with_recent_follow_up_group_contact",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="itoustaff_with_recent_login",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="labor_inspector_with_recent_login",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="employer_with_recent_login",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
-                ),
-                None,
-                False,
-                id="prescriber_with_recent_login",
-            ),
-        ],
-    )
-    def test_reset_notified_jobseekers_with_recent_activity(
-        self, factory, related_object_factory, notification_reset, respx_mock
-    ):
-        user = factory()
-        if related_object_factory:
-            related_object_factory(user)
+    def test_reset_notified_jobseekers_with_recent_activity(self, respx_mock):
+        # users which notification date is not reset
+        notified_jobseeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29)
+        expired_approval_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY,
+            user__notified_days_ago=1,
+            expired=True,
+            eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
+        )
+        itoustaff_with_recent_login = ItouStaffFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        labor_inspector_with_recent_login = LaborInspectorFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        employer_with_recent_login = EmployerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+        prescriber_with_recent_login = PrescriberFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+
+        # users which notification date is reset
+        notified_jobseeker_with_recent_login = JobSeekerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now()
+        )
+
+        notified_jobseeker_with_recent_date_joined = JobSeekerFactory(
+            date_joined=timezone.now(),
+            notified_days_ago=1,
+        )
+
+        recent_job_application_of_inactive_jobseeker = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_seeker__notified_days_ago=1,
+            job_seeker__is_active=False,
+        )
+
+        recent_job_application_of_notified_jobseeker = JobApplicationFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1
+        )
+
+        recent_approval_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY, user__notified_days_ago=1
+        )
+
+        approval_ending_after_grace_period_of_notified_jobseeker = ApprovalFactory(
+            user__joined_days_ago=DAYS_OF_INACTIVITY,
+            user__notified_days_ago=1,
+            expired=True,
+            end_at=timezone.localdate() - INACTIVITY_PERIOD + relativedelta(days=1),
+        )
+
+        recent_eligibility_diagnosis_of_notified_jobseeker = IAEEligibilityDiagnosisFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1, from_prescriber=True
+        )
+
+        recent_geiq_eligibility_diagnosis_of_notified_jobseeker = GEIQEligibilityDiagnosisFactory(
+            job_seeker__joined_days_ago=DAYS_OF_INACTIVITY, job_seeker__notified_days_ago=1, from_prescriber=True
+        )
+
+        recent_follow_up_group_contact_of_notified_jobseeker = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
+            follow_up_group__beneficiary__notified_days_ago=1,
+        )
 
         call_command("anonymize_jobseekers", wet_run=True)
 
-        user.refresh_from_db()
-        assert (user.upcoming_deletion_notified_at is None) == notification_reset
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=False),
+            [
+                notified_jobseeker,
+                expired_approval_of_notified_jobseeker.user,
+                itoustaff_with_recent_login,
+                labor_inspector_with_recent_login,
+                employer_with_recent_login,
+                prescriber_with_recent_login,
+            ],
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=True, kind=UserKind.JOB_SEEKER),
+            [
+                notified_jobseeker_with_recent_login,
+                notified_jobseeker_with_recent_date_joined,
+                recent_job_application_of_inactive_jobseeker.job_seeker,
+                recent_job_application_of_notified_jobseeker.job_seeker,
+                recent_approval_of_notified_jobseeker.user,
+                approval_ending_after_grace_period_of_notified_jobseeker.user,
+                recent_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
+                recent_geiq_eligibility_diagnosis_of_notified_jobseeker.job_seeker,
+                recent_follow_up_group_contact_of_notified_jobseeker.follow_up_group.beneficiary,
+            ],
+            ordered=False,
+        )
         assert not respx_mock.calls.called
 
-    @pytest.mark.parametrize(
-        "user_factory",
-        [
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    notified_days_ago=29,
-                ),
-                id="jobseeker_notified_still_in_grace_period",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(
-                    upcoming_deletion_notified_at=None,
-                ),
-                id="jobseeker_never_notified",
-            ),
-            pytest.param(
-                lambda: EmployerFactory(is_active=False, notified_days_ago=30),
-                id="employer",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(notified_days_ago=30),
-                id="prescriber",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(notified_days_ago=30),
-                id="itou_staff",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(notified_days_ago=30),
-                id="laborinspector",
-            ),
-        ],
-    )
-    def test_exclude_users_when_archiving(self, user_factory, respx_mock):
-        user = user_factory()
+    def test_exclude_users_when_archiving(self, respx_mock):
+        jobseeker_notified_still_in_grace_period = JobSeekerFactory(notified_days_ago=29)
+        jobseeker_never_notified = JobSeekerFactory(upcoming_deletion_notified_at=None)
+        employer = EmployerFactory(is_active=False, notified_days_ago=30)
+        prescriber = PrescriberFactory(notified_days_ago=30)
+        itou_staff = ItouStaffFactory(notified_days_ago=30)
+        labor_inspector = LaborInspectorFactory(notified_days_ago=30)
+
         call_command("anonymize_jobseekers", wet_run=True)
 
-        expected_user = User.objects.get()
-        assert user == expected_user
         assert not AnonymizedJobSeeker.objects.exists()
+        assertQuerySetEqual(
+            User.objects.all(),
+            [
+                jobseeker_notified_still_in_grace_period,
+                jobseeker_never_notified,
+                employer,
+                prescriber,
+                itou_staff,
+                labor_inspector,
+            ],
+            ordered=False,
+        )
         assert not respx_mock.calls.called
 
     @pytest.mark.parametrize(
@@ -835,143 +779,194 @@ class TestAnonymizeJobseekersManagementCommand:
         assertQuerySetEqual(File.objects.all(), other_files, ordered=False)
         assert respx_mock.calls.call_count == 1
 
-    @freeze_time("2025-02-15")
-    @pytest.mark.parametrize(
-        "kwargs,has_transitions,selected_jobs_count",
-        [
-            pytest.param(
-                {
-                    "sent_by_job_seeker": True,
-                    "to_company__kind": CompanyKind.GEIQ,
-                    "to_company__department": 76,
-                    "to_company__naf": "1234Z",
-                    "to_company__convention__is_active": True,
-                    "was_hired": True,
-                    "hired_job__contract_type": ContractType.FIXED_TERM_TREMPLIN,
-                    "to_company__romes": ["N1101"],
-                    "hiring_start_at": datetime.date(2025, 2, 2),
-                },
-                True,
-                3,
-                id="hired_jobseeker_with_3_jobs",
-            ),
-            pytest.param(
-                {
-                    "sent_by_job_seeker": True,
-                    "to_company__kind": CompanyKind.OPCS,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
-                    "to_company__convention__is_active": False,
-                    "to_company__romes": ["N1102"],
-                    "state": JobApplicationState.REFUSED,
-                    "refusal_reason": "reason",
-                    "resume": None,
-                },
-                False,
-                1,
-                id="refused_application_with_1_jobs",
-            ),
-            pytest.param(
-                {
-                    "sent_by_another_employer": True,
-                    "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
-                    "to_company__convention": None,
-                    "state": JobApplicationState.PROCESSING,
-                },
-                False,
-                0,
-                id="application_sent_by_company",
-            ),
-            pytest.param(
-                {
-                    "to_company__department": 14,
-                    "to_company__kind": CompanyKind.EITI,
-                    "to_company__naf": "8888Y",
-                    "sent_by_authorized_prescriber_organisation": True,
-                    "state": JobApplicationState.PRIOR_TO_HIRE,
-                },
-                False,
-                0,
-                id="application_sent_by_authorized_prescriber",
-            ),
-            pytest.param(
-                {
-                    "sent_by_another_employer": True,
-                    "to_company__kind": CompanyKind.EI,
-                    "to_company__department": 76,
-                    "to_company__naf": "4567A",
-                    "transferred_at": timezone.make_aware(datetime.datetime(2025, 2, 2)),
-                    "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2025, 2, 3)),
-                    "state": JobApplicationState.POSTPONED,
-                },
-                False,
-                0,
-                id="transferred_application_with_diagoriente_invitation",
-            ),
-            pytest.param(
-                {"sent_by_job_seeker": True, "sender": None, "to_company__department": 76, "to_company__naf": "7820Z"},
-                True,
-                3,
-                id="sent_by_jobseeker_without_sender",
-            ),
-        ],
-    )
     def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(
         self,
-        kwargs,
-        has_transitions,
-        selected_jobs_count,
         django_capture_on_commit_callbacks,
         caplog,
         snapshot,
         respx_mock,
     ):
-        job_seeker = JobSeekerFactory(
-            date_joined=timezone.make_aware(datetime.datetime(2023, 2, 15)),
-            notified_days_ago=30,
-            jobseeker_profile__birthdate=datetime.date(1978, 5, 17),
-            post_code="76160",
-            for_snapshot=True,
-        )
-        job_application = JobApplicationFactory(
-            job_seeker=job_seeker,
-            approval=None,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
-            to_company__department=14,
-            to_company__naf="1705X",
-            to_company__kind=CompanyKind.EI,
-            created_at=timezone.make_aware(datetime.datetime(2023, 2, 15)),
-        )
-        if has_transitions:
-            for from_state, to_state, months in [
+        def _create_job_seeker_with_application(
+            job_seeker_kwargs, job_application_kwargs, selected_jobs_count=0, transitions=None
+        ):
+            jobseeker = JobSeekerFactory(**job_seeker_kwargs)
+            job_application = JobApplicationFactory(
+                **job_application_kwargs,
+                job_seeker=jobseeker,
+                approval=None,
+                eligibility_diagnosis=None,
+                geiq_eligibility_diagnosis=None,
+            )
+            if transitions:
+                for from_state, to_state, months in transitions:
+                    JobApplicationTransitionLog.objects.create(
+                        user=jobseeker,
+                        from_state=from_state,
+                        to_state=to_state,
+                        job_application=job_application,
+                        timestamp=job_application.created_at + relativedelta(months=months),
+                    )
+            if selected_jobs_count:
+                jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
+                job_application.selected_jobs.set(jobs)
+
+        # hired jobseeker with 3 selected jobs and transition logs
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 1, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1970, 5, 17),
+                "post_code": "70160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27005987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 1, 15)),
+                "sent_by_job_seeker": True,
+                "to_company__kind": CompanyKind.GEIQ,
+                "to_company__department": 70,
+                "to_company__naf": "4570A",
+                "to_company__convention__is_active": True,
+                "was_hired": True,
+                "hired_job__contract_type": "PERMANENT_I",
+                "to_company__romes": ["N1101"],
+                "hiring_start_at": datetime.date(2025, 2, 2),
+                "processed_at": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+            },
+            selected_jobs_count=3,
+            transitions=[
                 (JobApplicationState.NEW, JobApplicationState.PROCESSING, 0),
                 (JobApplicationState.PROCESSING, JobApplicationState.ACCEPTED, 1),
-            ]:
-                JobApplicationTransitionLog.objects.create(
-                    user=job_seeker,
-                    from_state=from_state,
-                    to_state=to_state,
-                    job_application=job_application,
-                    timestamp=job_application.created_at + relativedelta(months=months),
-                )
-        if selected_jobs_count > 0:
-            rome = Rome.objects.create(code="I1304", name="Rome 1304")
-            Appellation.objects.create(code="I13042", name="Doer", rome=rome)
-            selected_jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
-            job_application.selected_jobs.set(selected_jobs)
+            ],
+        )
+
+        # refused job seeker application with 1 job and no transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1971, 5, 17),
+                "post_code": "71160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17105987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 2, 15)),
+                "sent_by_job_seeker": True,
+                "to_company__kind": CompanyKind.OPCS,
+                "to_company__department": 71,
+                "to_company__naf": "4571A",
+                "to_company__convention__is_active": False,
+                "to_company__romes": ["N1102"],
+                "state": JobApplicationState.REFUSED,
+                "refusal_reason": "reason",
+                "resume": None,
+                "hiring_start_at": None,
+                "processed_at": timezone.make_aware(datetime.datetime(2022, 3, 1)),
+            },
+            selected_jobs_count=1,
+        )
+
+        # application sent by company, no selected job nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 3, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1972, 5, 17),
+                "post_code": "72160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27205987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 3, 15)),
+                "sent_by_another_employer": True,
+                "to_company__kind": CompanyKind.EI,
+                "to_company__department": 72,
+                "to_company__naf": "4572A",
+                "to_company__convention": None,
+                "state": JobApplicationState.PROCESSING,
+                "hiring_start_at": None,
+                "processed_at": None,
+            },
+        )
+
+        # application sent by authorized prescriber, no selected jobs nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 4, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1973, 5, 17),
+                "post_code": "73160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17305987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 4, 15)),
+                "to_company__department": 73,
+                "to_company__kind": CompanyKind.EITI,
+                "to_company__naf": "4573A",
+                "sent_by_authorized_prescriber_organisation": True,
+                "state": JobApplicationState.PRIOR_TO_HIRE,
+                "hiring_start_at": None,
+            },
+        )
+
+        # transferred job application with diagoriente invitation, no selected jobs nor transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 5, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1974, 5, 17),
+                "post_code": "74160",
+                "title": Title.MME,
+                "jobseeker_profile__nir": "27405987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 5, 15)),
+                "sent_by_another_employer": True,
+                "to_company__kind": CompanyKind.EI,
+                "to_company__department": 74,
+                "to_company__naf": "4574A",
+                "transferred_at": timezone.make_aware(datetime.datetime(2022, 6, 2)),
+                "diagoriente_invite_sent_at": timezone.make_aware(datetime.datetime(2022, 7, 3)),
+                "state": JobApplicationState.POSTPONED,
+                "hiring_start_at": None,
+            },
+        )
+
+        # job application sent by jobseeker him/herself without sender, with 2 selected jobs and transition log
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "notified_days_ago": 30,
+                "jobseeker_profile__birthdate": datetime.date(1978, 5, 17),
+                "post_code": "78160",
+                "title": Title.M,
+                "jobseeker_profile__nir": "17805987654321",
+            },
+            job_application_kwargs={
+                "created_at": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "to_company__department": 78,
+                "to_company__naf": "4578A",
+                "sent_by_job_seeker": True,
+                "sender": None,
+                "hiring_start_at": None,
+            },
+            selected_jobs_count=2,
+            transitions=[
+                (JobApplicationState.NEW, JobApplicationState.PROCESSING, 0),
+            ],
+        )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
 
+        assert not JobApplication.objects.exists()
         assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
-        assert not JobApplication.objects.filter(id=job_application.id).exists()
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
-        assert "Anonymized job applications after grace period, count: 1" in caplog.messages
+        assert "Anonymized job applications after grace period, count: 6" in caplog.messages
 
-        assert respx_mock.calls.call_count == 1
+        assert respx_mock.calls.call_count == 6
 
     def test_archive_jobseeker_with_approval(self, snapshot):
         kwargs = {
