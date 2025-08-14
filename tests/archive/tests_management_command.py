@@ -1454,7 +1454,6 @@ class TestAnonymizeProfessionalManagementCommand:
             pytest.param(CompanyMembershipFactory, False, False, id="no_related_objects_and_not_anonymized"),
         ],
     )
-    @freeze_time("2025-02-15")
     def test_anonymize_professionals_after_grace_period(
         self,
         factory,
@@ -1467,8 +1466,8 @@ class TestAnonymizeProfessionalManagementCommand:
     ):
         city = create_city_saint_andre()
         org = factory(
-            user__joined_days_ago=DAYS_OF_INACTIVITY,
-            user__notified_days_ago=31,
+            user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+            user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
             user__for_snapshot=True,
             user__address_line_1="8 rue du moulin",
             user__address_line_2="Apt 4B",
