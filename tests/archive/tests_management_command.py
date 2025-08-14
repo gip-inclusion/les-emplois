@@ -44,6 +44,7 @@ from itou.users.models import User
 from itou.utils.constants import DAYS_OF_GRACE, DAYS_OF_INACTIVITY, EXPIRATION_PERIOD, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import (
+    create_city_geispolsheim,
     create_city_saint_andre,
 )
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
@@ -1445,59 +1446,69 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         assert not AnonymizedProfessional.objects.exists()
 
-    @pytest.mark.parametrize(
-        "factory,has_related_objects,is_anonymized",
-        [
-            pytest.param(CompanyMembershipFactory, True, True, id="has_related_objects_and_is_anonymized"),
-            pytest.param(PrescriberMembershipFactory, True, False, id="has_related_objects_and_not_anonymized"),
-            pytest.param(InstitutionMembershipFactory, False, True, id="no_related_objects_and_is_anonymized"),
-            pytest.param(CompanyMembershipFactory, False, False, id="no_related_objects_and_not_anonymized"),
-        ],
-    )
     def test_anonymize_professionals_after_grace_period(
         self,
-        factory,
-        has_related_objects,
-        is_anonymized,
         django_capture_on_commit_callbacks,
         snapshot,
         caplog,
         respx_mock,
     ):
-        city = create_city_saint_andre()
-        org = factory(
-            user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
-            user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
-            user__for_snapshot=True,
-            user__address_line_1="8 rue du moulin",
-            user__address_line_2="Apt 4B",
-            user__post_code=city.post_codes[0],
-            user__city="Test City",
-            user__coords=city.coords,
-            user__insee_city=city,
-            user__email=None if is_anonymized else "test@mail.com",
-        )
-        professional = org.user
+        def _create_professional(factory, has_related_objects, city):
+            if city:
+                kwargs = {
+                    "is_active": True,
+                    "user__is_active": True,
+                    "user__phone": f"06060{city.post_codes[0]}",
+                    "user__address_line_1": "8 rue du moulin",
+                    "user__address_line_2": "Apt 4B",
+                    "user__post_code": city.post_codes[0],
+                    "user__city": "Test City",
+                    "user__coords": city.coords,
+                    "user__insee_city": city,
+                    "user__email": f"test{city.post_codes[0]}@mail.com",
+                }
+            else:
+                kwargs = {
+                    "is_active": False,
+                    "user__is_active": False,
+                    "user__phone": "",
+                    "user__address_line_1": "",
+                    "user__address_line_2": "",
+                    "user__post_code": "",
+                    "user__city": "",
+                    "user__coords": None,
+                    "user__insee_city": None,
+                    "user__email": None,
+                }
+            org = factory(
+                user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+                user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+                user__for_snapshot=True,
+                user__public_id=uuid4(),
+                user__title=Title.M,
+                user__first_name="Not Yet Anonymized" if city else "Already Anonymized",
+                user__last_name="Has Related Objects" if has_related_objects else "No Related Objects",
+                **kwargs,
+            )
+            professional = org.user
 
-        if has_related_objects:
-            JobApplicationFactory(sender=professional)
+            if has_related_objects:
+                JobApplicationFactory(sender=professional)
+            return professional
+
+        anonymized_employer = _create_professional(CompanyMembershipFactory, True, None)
+        prescriber = _create_professional(PrescriberMembershipFactory, True, create_city_saint_andre())
+        to_delete_anonymized_labor_inspector = _create_professional(InstitutionMembershipFactory, False, None)
+        to_delete_employer = _create_professional(CompanyMembershipFactory, False, create_city_geispolsheim())
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
-        # User should be deleted
-        if not has_related_objects:
-            assert not User.objects.filter(id=professional.id).exists()
-            assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(name="anonymized_professional")
-            assert respx_mock.calls.call_count == 0 if is_anonymized else 1
-            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
-                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
-
-        # User is not deletable because of related objects and should be anonymized
-        elif not is_anonymized:
-            user = User.objects.filter(id=professional.id).values(
+        users = (
+            User.objects.filter(id__in=[anonymized_employer.id, prescriber.id])
+            .order_by("id")
+            .values_list(
                 "is_active",
-                "password",
                 "phone",
                 "address_line_1",
                 "address_line_2",
@@ -1505,29 +1516,23 @@ class TestAnonymizeProfessionalManagementCommand:
                 "city",
                 "coords",
                 "insee_city",
-                "upcoming_deletion_notified_at",
                 "first_name",
                 "last_name",
+                "title",
             )
-            assert user == snapshot(name="user_values_after_anonymization")
-            assert not AnonymizedProfessional.objects.exists()
-            assert respx_mock.calls.call_count == 1
-            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
-                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
-
-        # User is not deletable because of related objects and is already anonymized
-        else:
-            professional.refresh_from_db()
-            assert professional == User.objects.filter(id=professional.id).first()
-            assert not AnonymizedProfessional.objects.exists()
-            assert not respx_mock.calls.called
-
-        # Check logs
-        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
-        assert (
-            f"Included in this count: {0 if has_related_objects else 1} to delete, {0 if is_anonymized else 1}"
-            " to remove from contact"
         )
+        assert users == snapshot(name="anonymized_professionals_without_deletion")
+        assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
+            name="deleted_anonymized_professionals"
+        )
+        assert not CompanyMembership.objects.filter(user=to_delete_employer).exists()
+        assert not InstitutionMembership.objects.filter(user=to_delete_anonymized_labor_inspector).exists()
+        assert CompanyMembership.objects.filter(user=anonymized_employer, is_active=False).exists()
+        assert PrescriberMembership.objects.filter(user=prescriber, is_active=False).exists()
+
+        assert respx_mock.calls.call_count == 2
+        assert "Anonymized professionals after grace period, count: 4" in caplog.messages
+        assert "Included in this count: 2 to delete, 2 to remove from contact" in caplog.messages
 
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(
