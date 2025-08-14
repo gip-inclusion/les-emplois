@@ -1531,7 +1531,7 @@
               <tbody>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_[PK of JobApplication]">
@@ -1558,7 +1558,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_[PK of JobApplication]">
@@ -1585,7 +1585,7 @@
                   </tr>
                   <tr class="align-top">
                       <td>
-                          <a class="btn-link" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
+                          <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
                               Acme inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
