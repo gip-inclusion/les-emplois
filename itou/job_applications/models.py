@@ -260,6 +260,18 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
+    def with_jobseeker_eligibility_diagnosis_author_kind(self):
+        """
+        Gives the author kind of the jobseeker eligibility diagnosis (cf with_jobseeker_eligibility_diagnosis).
+        """
+        sub_query = Subquery(
+            EligibilityDiagnosis.objects.filter(pk=OuterRef("jobseeker_eligibility_diagnosis")).values("author_kind"),
+            output_field=models.CharField(),
+        )
+        return self.with_jobseeker_eligibility_diagnosis().annotate(
+            jobseeker_eligibility_diagnosis_author_kind=sub_query
+        )
+
     def with_eligibility_diagnosis_criterion(self, criterion):
         """
         Create an annotation by criterion given (used in the filters form).
@@ -289,10 +301,13 @@ class JobApplicationQuerySet(models.QuerySet):
             "selected_jobs__appellation",
             "selected_jobs__location",
             "selected_jobs__company",
-            Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
+            Prefetch(
+                "job_seeker__approvals",
+                queryset=Approval.objects.select_related("eligibility_diagnosis").order_by("-start_at"),
+            ),
         )
 
-        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis()
+        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis_author_kind()
 
         # Adding an annotation by selected criterion
         for criterion in criteria:

@@ -729,6 +729,19 @@
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
           
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
+          
                (SELECT U1."start_at" AS "appointment__start_at"
                 FROM "rdv_insertion_participation" U0
                 INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
@@ -771,8 +784,8 @@
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      7,
-                      8) subquery
+                      8,
+                      9) subquery
         ''',
       }),
       dict({
@@ -845,6 +858,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
           
             (SELECT U1."start_at" AS "appointment__start_at"
              FROM "rdv_insertion_participation" U0
@@ -1139,8 +1165,8 @@
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   52,
                    53,
+                   54,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -1301,8 +1327,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s,
                                                    %s)
@@ -2150,6 +2186,19 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                     (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
@@ -2158,7 +2207,7 @@
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      4) subquery
+                      5) subquery
         ''',
       }),
       dict({
@@ -2231,6 +2280,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  "users_user"."id",
                  "users_user"."password",
@@ -2490,7 +2552,7 @@
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   49,
+                   50,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -2651,8 +2713,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s,
                                                    %s,
                                                    %s)
@@ -3455,6 +3527,19 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                     EXISTS
                (SELECT %s AS "a"
                 FROM "eligibility_selectedadministrativecriteria" U0
@@ -3532,7 +3617,7 @@
                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN (%s))
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      6) subquery
+                      7) subquery
         ''',
       }),
       dict({
@@ -3605,6 +3690,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                  EXISTS
             (SELECT %s AS "a"
              FROM "eligibility_selectedadministrativecriteria" U0
@@ -3932,7 +4030,7 @@
                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN (%s))
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   51,
+                   52,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -4010,8 +4108,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -4869,6 +4977,19 @@
                                        AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                                 ORDER BY U0."created_at" DESC
                                 LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+               (SELECT U0."author_kind" AS "author_kind"
+                FROM "eligibility_eligibilitydiagnosis" U0
+                WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                            (SELECT U0."id" AS "id"
+                                             FROM "eligibility_eligibilitydiagnosis" U0
+                                             WHERE (U0."expires_at" > %s
+                                                    AND (U0."author_kind" = %s
+                                                         OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                             ORDER BY U0."created_at" DESC
+                                             LIMIT 1)))
+                ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                     (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
@@ -4877,7 +4998,7 @@
                     AND "job_applications_jobapplication"."job_seeker_id" = %s)
              GROUP BY "job_applications_jobapplication"."id",
                       3,
-                      4) subquery
+                      5) subquery
         ''',
       }),
       dict({
@@ -4950,6 +5071,19 @@
                                     AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
                              ORDER BY U0."created_at" DESC
                              LIMIT 1)) AS "jobseeker_eligibility_diagnosis",
+          
+            (SELECT U0."author_kind" AS "author_kind"
+             FROM "eligibility_eligibilitydiagnosis" U0
+             WHERE U0."id" = (COALESCE("job_applications_jobapplication"."eligibility_diagnosis_id",
+                                         (SELECT U0."id" AS "id"
+                                          FROM "eligibility_eligibilitydiagnosis" U0
+                                          WHERE (U0."expires_at" > %s
+                                                 AND (U0."author_kind" = %s
+                                                      OR U0."author_siae_id" = ("job_applications_jobapplication"."to_company_id"))
+                                                 AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+                                          ORDER BY U0."created_at" DESC
+                                          LIMIT 1)))
+             ORDER BY U0."created_at" DESC) AS "jobseeker_eligibility_diagnosis_author_kind",
                  (COALESCE(LOWER("users_user"."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER("users_user"."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  "users_user"."id",
                  "users_user"."password",
@@ -5209,7 +5343,7 @@
                  AND "job_applications_jobapplication"."job_seeker_id" = %s)
           GROUP BY "job_applications_jobapplication"."id",
                    48,
-                   49,
+                   50,
                    "users_user"."id",
                    "users_jobseekerprofile"."user_id",
                    T7."id",
@@ -5287,8 +5421,18 @@
                  "approvals_approval"."origin_siae_kind",
                  "approvals_approval"."origin_sender_kind",
                  "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
+                 "approvals_approval"."public_id",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id"
           FROM "approvals_approval"
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -7233,16 +7377,16 @@
                               </button>
                           </th>
                           <th scope="col">
-                              Statut
-                          </th>
-                          <th scope="col">
                               Poste
                           </th>
                           <th scope="col">
-                              Emetteur
+                              Émetteur
                           </th>
                           <th class="text-nowrap" scope="col">
                               Critères administratifs IAE
+                          </th>
+                          <th scope="col">
+                              Statut IAE
                           </th>
                           <th class="text-end w-50px" scope="col">
                           </th>
@@ -7264,19 +7408,12 @@
                                   35 -
                   Rennes
                               </span>
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line">
-                                  </i>
-                                  Éligible à l’IAE
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_[PK of JobApplication]">
+                                  Candidature déclinée
                               </span>
                           </td>
                           <td>
                               27/11/2024
-                          </td>
-                          <td>
-                              <span class="badge rounded-pill text-nowrap badge-xs bg-danger" id="state_[PK of JobApplication]">
-                                  Candidature déclinée
-                              </span>
                           </td>
                           <td>
                               Candidature spontanée
@@ -7287,9 +7424,17 @@
                               Pres. Org.
                           </td>
                           <td>
-                              <i class="text-disabled">
-                                  Aucun critère sélectionné
-                              </i>
+                              Le prescripteur habilité n'a pas renseigné de critères.
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
                           </td>
                           <td class="text-end w-50px align-middle">
                               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
@@ -7313,19 +7458,12 @@
                                   35 -
                   Rennes
                               </span>
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line">
-                                  </i>
-                                  Éligible à l’IAE
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_[PK of JobApplication]">
+                                  Nouvelle candidature
                               </span>
                           </td>
                           <td>
                               27/11/2024
-                          </td>
-                          <td>
-                              <span class="badge rounded-pill text-nowrap badge-xs bg-info" id="state_[PK of JobApplication]">
-                                  Nouvelle candidature
-                              </span>
                           </td>
                           <td>
                               Candidature spontanée
@@ -7334,9 +7472,17 @@
                               Vous
                           </td>
                           <td>
-                              <i class="text-disabled">
-                                  Aucun critère sélectionné
-                              </i>
+                              Le prescripteur habilité n'a pas renseigné de critères.
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
                           </td>
                           <td class="text-end w-50px align-middle">
                               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
@@ -7360,19 +7506,12 @@
                                   35 -
                   Rennes
                               </span>
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line">
-                                  </i>
-                                  Éligible à l’IAE
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                                  Candidature acceptée
                               </span>
                           </td>
                           <td>
                               27/11/2024
-                          </td>
-                          <td>
-                              <span class="badge rounded-pill text-nowrap badge-xs bg-success" id="state_[PK of JobApplication]">
-                                  Candidature acceptée
-                              </span>
                           </td>
                           <td>
                               Candidature spontanée
@@ -7383,9 +7522,17 @@
                               Le candidat lui-même
                           </td>
                           <td>
-                              <i class="text-disabled">
-                                  Aucun critère sélectionné
-                              </i>
+                              Le prescripteur habilité n'a pas renseigné de critères.
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
                           </td>
                           <td class="text-end w-50px align-middle">
                               <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
@@ -7490,6 +7637,411 @@
           </span>
       </a>
   </div>
+  
+  '''
+# ---
+# name: test_table_iae_state_and_criteria[applications table]
+  '''
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
+      <div class="table-responsive mt-3 mt-md-4">
+          <form data-emplois-elements-visibility-on-selection-controller="selected-application" hx-get="/apply/siae/list/actions?list_url=/apply/siae/list%3Fdisplay%3Dtable" hx-indicator=".selection-indicator" hx-swap="none" hx-trigger="change delay:.5">
+              <table class="table table-hover table-sortable">
+                  <caption class="visually-hidden">
+                      Liste des candidatures (les colonnes disposant d’un bouton dans leur entête peuvent être triées en cliquant sur le bouton)
+                  </caption>
+                  <thead>
+                      <tr>
+                          <th class="text-start w-50px" scope="col">
+                              <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
+                              <label class="visually-hidden" for="select-all-applications">
+                                  Sélectionner toutes les candidatures
+                              </label>
+                          </th>
+                          <th aria-sort="none" scope="col">
+                              <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="job_seeker_full_name" type="button">
+                                  Candidature de
+                              </button>
+                          </th>
+                          <th aria-sort="descending" scope="col">
+                              <button data-emplois-elements-visibility-on-selection="disabled" data-emplois-setter-target="#id_order" data-emplois-setter-value="created_at" type="button">
+                                  Émise le
+                              </button>
+                          </th>
+                          <th scope="col">
+                              Poste
+                          </th>
+                          <th scope="col">
+                              Émetteur
+                          </th>
+                          <th class="text-nowrap" scope="col">
+                              Critères administratifs IAE
+                          </th>
+                          <th scope="col">
+                              Statut IAE
+                          </th>
+                          <th class="text-end w-50px" scope="col">
+                          </th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Béatrice VOITURE
+                              </a>
+                              <span class="d-block">
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                                  Candidature acceptée
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <ul class="mb-0">
+                                  <li>
+                                      Allocataire ASS
+                                  </li>
+                                  <li>
+                                      Bénéficiaire du RSA
+                                  </li>
+                              </ul>
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par votre entreprise
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Béatrice VOITURE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Martine MARTIN
+                              </a>
+                              <span class="d-block">
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                                  Candidature acceptée
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              Le prescripteur habilité n'a pas renseigné de critères.
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Martine MARTIN" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Aline BATO
+                              </a>
+                              <span class="d-block">
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                                  Candidature acceptée
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <i class="text-disabled">
+                                  Aucun critère sélectionné
+                              </i>
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                  </i>
+                                  PASS IAE valide
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un employeur
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Aline BATO" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
+                  Rennes
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary" id="state_[PK of JobApplication]">
+                                  Candidature en attente
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <ul class="mb-0">
+                                  <li>
+                                      Allocataire AAH
+                                  </li>
+                                  <li>
+                                      Résident QPV
+                                  </li>
+                              </ul>
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
+                  Rennes
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_[PK of JobApplication]">
+                                  Candidature déclinée
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              Le prescripteur habilité n'a pas renseigné de critères.
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par un prescripteur habilité
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Jane DOE
+                              </a>
+                              <span class="d-block">
+                                  35 -
+                  Rennes
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-accent-03 text-primary" id="state_[PK of JobApplication]">
+                                  Candidature à l'étude
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <ul class="mb-0">
+                                  <li>
+                                      Allocataire ASS
+                                  </li>
+                                  <li>
+                                      Bénéficiaire du RSA
+                                  </li>
+                              </ul>
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                                  Éligible à l’IAE
+                              </span>
+                              <span class="d-block">
+                                  Éligibilité validée par votre entreprise
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                      <tr class="align-top">
+                          <th class="text-start w-50px" scope="row">
+                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <label class="visually-hidden" for="select-[PK of JobApplication]">
+                                  Sélectionner cette candidature
+                              </label>
+                          </th>
+                          <td>
+                              <a class="btn-link" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  Pas De DIAGNOSTIQUE
+                              </a>
+                              <span class="d-block">
+                              </span>
+                              <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_[PK of JobApplication]">
+                                  Nouvelle candidature
+                              </span>
+                          </td>
+                          <td>
+                              27/11/2024
+                          </td>
+                          <td>
+                              Candidature spontanée
+                          </td>
+                          <td>
+                              Vous
+                          </td>
+                          <td>
+                              <i class="text-disabled">
+                                  Aucun critère sélectionné
+                              </i>
+                          </td>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+                                  <i aria-hidden="true" class="ri-error-warning-line">
+                                  </i>
+                                  Éligibilité IAE à valider
+                              </span>
+                              <span class="d-block">
+                                  Un diagnostic doit être réalisé
+                              </span>
+                          </td>
+                          <td class="text-end w-50px align-middle">
+                              <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/[PK of JobApplication]/siae/details?back_url=/apply/siae/list%3Fdisplay%3Dtable">
+                                  <i aria-label="Gérer la candidature de Pas De DIAGNOSTIQUE" class="ri-arrow-drop-right-line fs-lg">
+                                  </i>
+                              </a>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </form>
+      </div>
+  </section>
   
   '''
 # ---
