@@ -869,6 +869,44 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert respx_mock.calls.call_count == 8
 
+    def test_archived_jobseekers_applications_counts(self, snapshot):
+        job_seeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+        job_application_kwargs = {
+            "job_seeker": job_seeker,
+            "approval": None,
+            "eligibility_diagnosis": None,
+            "geiq_eligibility_diagnosis": None,
+            "sent_by_job_seeker": True,
+            "created_at": timezone.make_aware(datetime.datetime(2022, 1, 15)),
+        }
+
+        # 9 kind, including 5 IAE kind
+        for kind in CompanyKind:
+            JobApplicationFactory(
+                **job_application_kwargs,
+                to_company__kind=kind,
+            )
+
+        # +1 IAE kind acceptepd job application
+        JobApplicationFactory(
+            **job_application_kwargs,
+            to_company__kind=CompanyKind.EI,
+            was_hired=True,
+        )
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        anonymized_job_seeker_counts = AnonymizedJobSeeker.objects.values(
+            "count_total_applications", "count_IAE_applications", "count_accepted_applications"
+        )
+        assert list(anonymized_job_seeker_counts) == [
+            {
+                "count_total_applications": 10,
+                "count_IAE_applications": 6,
+                "count_accepted_applications": 1,
+            }
+        ]
+
     def test_archive_jobseeker_with_approval(self, snapshot):
         kwargs = {
             "start_at": datetime.date(2020, 1, 18),
