@@ -4211,6 +4211,7 @@
           'WithNode[apply/includes/eligibility_badge.html]',
           'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
           'ForNode[apply/includes/list_table.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -5522,6 +5523,7 @@
           'IfNode[apply/includes/eligibility_badge.html]',
           'WithNode[apply/includes/eligibility_badge.html]',
           'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
           'ForNode[apply/includes/list_table.html]',
@@ -7771,7 +7773,7 @@
                                   PASS IAE valide
                               </span>
                               <span class="d-block">
-                                  Éligibilité validée par un Prescripteur habilité
+                                  Éligibilité validée par un prescripteur habilité
                               </span>
                           </td>
                           <td class="text-end w-50px align-middle">
@@ -7819,7 +7821,7 @@
                                   PASS IAE valide
                               </span>
                               <span class="d-block">
-                                  Éligibilité validée par un Employeur
+                                  Éligibilité validée par un employeur
                               </span>
                           </td>
                           <td class="text-end w-50px align-middle">
