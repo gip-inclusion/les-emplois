@@ -638,7 +638,7 @@ class TestAnonymizeJobseekersManagementCommand:
         assertQuerySetEqual(File.objects.all(), other_files, ordered=False)
         assert respx_mock.calls.call_count == 1
 
-    def test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period(
+    def test_archive_inactive_jobseekers_after_grace_period(
         self,
         django_capture_on_commit_callbacks,
         caplog,
