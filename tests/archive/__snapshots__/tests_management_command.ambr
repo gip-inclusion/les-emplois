@@ -39,58 +39,6 @@
 # name: TestAnonymizeJobseekersManagementCommand.test_anonymize_notification_of_inactive_jobseekers_after_grace_period[is_active_jobseeker][archived_jobseeker_email_subject]
   '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1964,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 0,
-      'count_approvals': 0,
-      'count_eligibility_diagnoses': 0,
-      'count_total_applications': 0,
-      'date_joined': datetime.date(2023, 7, 1),
-      'department': '',
-      'first_approval_start_at': None,
-      'first_login': None,
-      'had_nir': True,
-      'had_pole_emploi_id': False,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_approval_end_at': None,
-      'last_login': None,
-      'nir_sex': 7,
-      'nir_year': 41,
-      'title': 'M',
-      'user_signup_kind': None,
-    }),
-  ])
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1990,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 1,
-      'count_approvals': 0,
-      'count_eligibility_diagnoses': 0,
-      'count_total_applications': 2,
-      'date_joined': datetime.date(2021, 12, 1),
-      'department': '',
-      'first_approval_start_at': None,
-      'first_login': datetime.date(2021, 12, 1),
-      'had_nir': True,
-      'had_pole_emploi_id': True,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_approval_end_at': None,
-      'last_login': datetime.date(2021, 12, 1),
-      'nir_sex': 6,
-      'nir_year': 55,
-      'title': 'MME',
-      'user_signup_kind': 'employer',
-    }),
-  ])
-# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[anonymized_application]
   list([
     dict({
