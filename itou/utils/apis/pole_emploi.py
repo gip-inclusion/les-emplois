@@ -15,6 +15,12 @@ logger = logging.getLogger(__name__)
 API_CLIENT_HTTP_ERROR_CODE = "http_error"
 REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right* on the expiry time.
 
+ENDPOINTS = {
+    "rechercher-usager-date-naissance-nir": "rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+    "rechercher-usager-numero-france-travail": "rechercher-usager/v2/usagers/par-numero-francetravail",
+    "rqth": "donnees-rqth/v1/rqth",
+}
+
 # Source:
 # https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
 OFFERS_MIN_INDEX = 0
@@ -386,7 +392,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not pole_emploi_id:
             raise TypeError("`pole_emploi_id` is mandatory.")
         return self._request(
-            f"{self.base_url}/rechercher-usager/v2/usagers/par-numero-francetravail",
+            self.base_url + ENDPOINTS["rechercher-usager-numero-france-travail"],
             {
                 "numeroFranceTravail": pole_emploi_id,
             },
@@ -396,7 +402,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not (birthdate and nir):
             raise TypeError("`birthdate` and `nir` are mandatory.")
         return self._request(
-            f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            self.base_url + ENDPOINTS["rechercher-usager-date-naissance-nir"],
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT),
                 "nir": nir,
@@ -439,7 +445,9 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     def certify_rqth(self, jobseeker_profile):
         jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
         data = self._request(
-            f"{self.base_url}/donnees-rqth/v1/rqth", method="GET", additional_headers={"ft-jeton-usager": jeton_usager}
+            self.base_url + ENDPOINTS["rqth"],
+            method="GET",
+            additional_headers={"ft-jeton-usager": jeton_usager},
         )
         certified = data["topValiditeRQTH"] is True
         end_at = data["dateFinRqth"] if certified else None
