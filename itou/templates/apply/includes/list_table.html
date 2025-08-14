@@ -16,7 +16,7 @@
             {% include 'common/tables/th_with_sort.html' with order=order ascending_value=order.CREATED_AT_ASC name="Émise le" extra_button_attributes='data-emplois-elements-visibility-on-selection="disabled"' only %}
             {% if job_applications_list_kind is JobApplicationsListKind.SENT %}<th scope="col">Employeur</th>{% endif %}
             <th scope="col">Poste</th>
-            <th scope="col">Emetteur</th>
+            <th scope="col">Émetteur</th>
             {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED and request.current_organization.is_subject_to_eligibility_rules %}
                 {# prescription or received by IAE employer #}
                 <th scope="col" class="text-nowrap">Critères administratifs IAE</th>
