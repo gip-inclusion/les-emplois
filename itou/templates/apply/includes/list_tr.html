@@ -90,13 +90,13 @@
                     <ul class="mb-0">
                         {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
                     </ul>
+                    {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                        <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
+                    {% endif %}
                 {% elif job_application.jobseeker_eligibility_diagnosis and job_application.jobseeker_eligibility_diagnosis_author_kind == AuthorKind.PRESCRIBER %}
                     Le prescripteur habilité n'a pas renseigné de critères.
                 {% else %}
                     <i class="text-disabled">Aucun critère sélectionné</i>
-                {% endif %}
-                {% if job_application.preloaded_administrative_criteria_extra_nb %}
-                    <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
                 {% endif %}
             </td>
             <td>
