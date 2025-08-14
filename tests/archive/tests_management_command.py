@@ -779,7 +779,7 @@ class TestAnonymizeJobseekersManagementCommand:
         def _create_job_seeker_with_application(
             job_seeker_kwargs, job_application_kwargs, selected_jobs_count=0, transitions=None
         ):
-            jobseeker = JobSeekerFactory(**job_seeker_kwargs)
+            jobseeker = JobSeekerFactory(notified_days_ago=30, **job_seeker_kwargs)
             job_application = JobApplicationFactory(
                 **job_application_kwargs,
                 job_seeker=jobseeker,
@@ -805,7 +805,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 1, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1970, 5, 17),
                 "post_code": "70160",
                 "title": Title.MME,
@@ -836,7 +835,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 2, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1971, 5, 17),
                 "post_code": "71160",
                 "title": Title.M,
@@ -864,7 +862,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 3, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1972, 5, 17),
                 "post_code": "72160",
                 "title": Title.MME,
@@ -888,7 +885,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 4, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1973, 5, 17),
                 "post_code": "73160",
                 "title": Title.M,
@@ -910,7 +906,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 5, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1974, 5, 17),
                 "post_code": "74160",
                 "title": Title.MME,
@@ -934,7 +929,6 @@ class TestAnonymizeJobseekersManagementCommand:
         _create_job_seeker_with_application(
             job_seeker_kwargs={
                 "date_joined": timezone.make_aware(datetime.datetime(2022, 6, 15)),
-                "notified_days_ago": 30,
                 "jobseeker_profile__birthdate": datetime.date(1978, 5, 17),
                 "post_code": "78160",
                 "title": Title.M,
@@ -958,8 +952,10 @@ class TestAnonymizeJobseekersManagementCommand:
             call_command("anonymize_jobseekers", wet_run=True)
 
         assert not JobApplication.objects.exists()
+        assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
         assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
+        assert "Anonymized jobseekers after grace period, count: 6" in caplog.messages
         assert "Anonymized job applications after grace period, count: 6" in caplog.messages
 
         assert respx_mock.calls.call_count == 6
