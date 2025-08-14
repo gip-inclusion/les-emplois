@@ -5333,6 +5333,46 @@
                           27/11/2024
                       </td>
                       <td>
+                          Tartempion
+                      </td>
+                      <td>
+                          Candidature spontanée
+                      </td>
+                      <td>
+                          Vous
+                      </td>
+                      <td>
+                          <i class="text-disabled">
+                              Candidature hors IAE
+                          </i>
+                      </td>
+                      <td>
+                          <i class="text-disabled">
+                              Candidature hors IAE
+                          </i>
+                      </td>
+                      <td class="text-end w-50px align-middle">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir sa candidature" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                              <i aria-label="Gérer la candidature de Martine MARTIN" class="ri-arrow-drop-right-line fs-lg">
+                              </i>
+                          </a>
+                      </td>
+                  </tr>
+                  <tr class="align-top">
+                      <td>
+                          <a class="btn-link" href="/apply/[PK of JobApplication]/prescriber/details?back_url=/apply/prescriptions/list%3Fdisplay%3Dtable">
+                              Martine MARTIN
+                          </a>
+                          <span class="d-block">
+                          </span>
+                          <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
+                              Candidature acceptée
+                          </span>
+                      </td>
+                      <td>
+                          27/11/2024
+                      </td>
+                      <td>
                           Acme inc.
                       </td>
                       <td>

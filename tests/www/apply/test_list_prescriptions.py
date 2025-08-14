@@ -9,6 +9,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains
 
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import (
     AdministrativeCriteriaKind,
     AuthorKind,
@@ -670,7 +671,6 @@ def test_table_iae_state_and_criteria(client, snapshot):
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
     common_kwargs = {
-        "to_company": company,
         "sender_kind": SenderKind.PRESCRIBER,
         "sender": prescriber,
     }
@@ -711,36 +711,50 @@ def test_table_iae_state_and_criteria(client, snapshot):
             eligibility_diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
+            to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=company_diag,
             job_seeker=job_seeker,
+            to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
             eligibility_diagnosis=no_criteria_prescriber_diag,
             job_seeker=job_seeker,
+            to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
             eligibility_diagnosis=prescriber_diag,
             job_seeker=job_seeker,
+            to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=employer_approval.eligibility_diagnosis,
             job_seeker=employer_approval.user,
+            to_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
+            to_company=company,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
+            job_seeker=prescriber_approval.user,
+            to_company__name="Tartempion",
+            to_company__kind=CompanyKind.GEIQ,
             **common_kwargs,
         ),
     ]

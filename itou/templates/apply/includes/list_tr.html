@@ -77,46 +77,55 @@
     </td>
     {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED and request.current_organization.is_subject_to_eligibility_rules %}
         {# prescription or received by IAE employer #}
-        <td>
-            {% if job_application.preloaded_administrative_criteria %}
-                <ul class="mb-0">
-                    {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
-                </ul>
-                {% if job_application.preloaded_administrative_criteria_extra_nb %}
-                    <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
-                {% endif %}
-            {% elif job_application.jobseeker_eligibility_diagnosis and job_application.jobseeker_eligibility_diagnosis_author_kind == AuthorKind.PRESCRIBER %}
-                Le prescripteur habilité n'a pas renseigné de critères.
-            {% else %}
-                <i class="text-disabled">Aucun critère sélectionné</i>
-            {% endif %}
-        </td>
-        <td>
-            {% include "apply/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
-            {% if job_application.job_seeker.has_valid_approval %}
-                {% if job_application.job_seeker.latest_approval.eligibility_diagnosis %}
-                    {% if job_application.job_seeker.latest_approval.eligibility_diagnosis.is_from_employer %}
-                        {% if request.user.is_employer and job_application.job_seeker.latest_approval.eligibility_diagnosis.author_siae_id == request.current_organization.id %}
-                            <span class="d-block">Éligibilité validée par votre entreprise</span>
-                        {% else %}
-                            <span class="d-block">Éligibilité validée par un employeur</span>
-                        {% endif %}
-                    {% else %}
-                        <span class="d-block">Éligibilité validée par un prescripteur habilité</span>
+        {% if job_applications_list_kind is JobApplicationsListKind.SENT and not job_application.to_company.is_subject_to_eligibility_rules %}
+            <td>
+                <i class="text-disabled">Candidature hors IAE</i>
+            </td>
+            <td>
+                <i class="text-disabled">Candidature hors IAE</i>
+            </td>
+        {% else %}
+            <td>
+                {% if job_application.preloaded_administrative_criteria %}
+                    <ul class="mb-0">
+                        {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                    </ul>
+                    {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                        <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
                     {% endif %}
-                {% endif %}
-            {% elif job_application.jobseeker_valid_eligibility_diagnosis %}
-                {% if job_application.jobseeker_eligibility_diagnosis_author_kind == AuthorKind.PRESCRIBER %}
-                    <span class="d-block">Éligibilité validée par un prescripteur habilité</span>
-                {% elif job_applications_list_kind is JobApplicationsListKind.SENT %}
-                    <span class="d-block">Éligibilité validée par l’employeur</span>
+                {% elif job_application.jobseeker_eligibility_diagnosis and job_application.jobseeker_eligibility_diagnosis_author_kind == AuthorKind.PRESCRIBER %}
+                    Le prescripteur habilité n'a pas renseigné de critères.
                 {% else %}
-                    <span class="d-block">Éligibilité validée par votre entreprise</span>
+                    <i class="text-disabled">Aucun critère sélectionné</i>
                 {% endif %}
-            {% else %}
-                <span class="d-block">Un diagnostic doit être réalisé</span>
-            {% endif %}
-        </td>
+            </td>
+            <td>
+                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                {% if job_application.job_seeker.has_valid_approval %}
+                    {% if job_application.job_seeker.latest_approval.eligibility_diagnosis %}
+                        {% if job_application.job_seeker.latest_approval.eligibility_diagnosis.is_from_employer %}
+                            {% if request.user.is_employer and job_application.job_seeker.latest_approval.eligibility_diagnosis.author_siae_id == request.current_organization.id %}
+                                <span class="d-block">Éligibilité validée par votre entreprise</span>
+                            {% else %}
+                                <span class="d-block">Éligibilité validée par un employeur</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="d-block">Éligibilité validée par un prescripteur habilité</span>
+                        {% endif %}
+                    {% endif %}
+                {% elif job_application.jobseeker_valid_eligibility_diagnosis %}
+                    {% if job_application.jobseeker_eligibility_diagnosis_author_kind == AuthorKind.PRESCRIBER %}
+                        <span class="d-block">Éligibilité validée par un prescripteur habilité</span>
+                    {% elif job_applications_list_kind is JobApplicationsListKind.SENT %}
+                        <span class="d-block">Éligibilité validée par l’employeur</span>
+                    {% else %}
+                        <span class="d-block">Éligibilité validée par votre entreprise</span>
+                    {% endif %}
+                {% else %}
+                    <span class="d-block">Un diagnostic doit être réalisé</span>
+                {% endif %}
+            </td>
+        {% endif %}
     {% endif %}
 
     <td class="text-end w-50px align-middle">
