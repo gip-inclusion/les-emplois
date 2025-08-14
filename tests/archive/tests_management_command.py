@@ -707,10 +707,8 @@ class TestAnonymizeJobseekersManagementCommand:
 
     def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
         FollowUpGroupMembershipFactory(
-            follow_up_group__beneficiary=JobSeekerFactory(
-                joined_days_ago=DAYS_OF_INACTIVITY,
-                notified_days_ago=31,
-            ),
+            follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
+            follow_up_group__beneficiary__notified_days_ago=31,
             last_contact_at=timezone.now() - INACTIVITY_PERIOD,
         )
 
