@@ -43,7 +43,10 @@ from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_GRACE, DAYS_OF_INACTIVITY, EXPIRATION_PERIOD, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
-from tests.cities.factories import create_city_saint_andre
+from tests.cities.factories import (
+    create_city_geispolsheim,
+    create_city_saint_andre,
+)
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -83,11 +86,6 @@ def mock_make_password():
         return_value="pbkdf2_sha256$test$hash",
     ):
         yield
-
-
-@pytest.fixture(name="city")
-def city_fixture():
-    return create_city_saint_andre()
 
 
 def get_fields_list_for_snapshot(model):
@@ -1336,29 +1334,72 @@ class TestAnonymizeProfessionalManagementCommand:
         ],
     )
     def test_suspend_command_setting(self, settings, suspended, expected_message, caplog):
+        EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
+
         settings.SUSPEND_ANONYMIZE_PROFESSIONALS = suspended
         call_command("anonymize_professionals", wet_run=True)
+
+        assert User.objects.exists() is suspended
         assert expected_message in caplog.messages
 
-    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-    def test_reset_notified_professional_dry_run(self, factory):
-        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+    def test_reset_notified_professional_dry_run(self):
+        for factory in [EmployerFactory, PrescriberFactory, LaborInspectorFactory]:
+            factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=timezone.now())
+
         call_command("anonymize_professionals")
 
-        user.refresh_from_db()
-        assert user.upcoming_deletion_notified_at is not None
+        assert not User.objects.filter(upcoming_deletion_notified_at__isnull=True).exists()
 
-    @pytest.mark.parametrize("factory", [EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-    @pytest.mark.parametrize(
-        "last_login, expected",
-        [(None, False), (timezone.now() - relativedelta(days=1), False), (timezone.now(), True)],
-    )
-    def test_reset_notified_professional(self, factory, last_login, expected):
-        user = factory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1, last_login=last_login)
+    def test_reset_notified_professional(self):
+        # professionals who never logged in
+        never_logged_kwargs = {"joined_days_ago": DAYS_OF_INACTIVITY, "notified_days_ago": 1, "last_login": None}
+        employer_never_logged = EmployerFactory(**never_logged_kwargs)
+        prescriber_never_logged = PrescriberFactory(**never_logged_kwargs)
+        labor_inspector_never_logged = LaborInspectorFactory(**never_logged_kwargs)
+
+        # professionals who logged before being notified
+        logged_the_day_before_notification_kwargs = {
+            "joined_days_ago": DAYS_OF_INACTIVITY,
+            "notified_days_ago": 1,
+            "last_login": timezone.now() - relativedelta(days=1),
+        }
+        employer_logged_before_notification = EmployerFactory(**logged_the_day_before_notification_kwargs)
+        prescriber_logged_before_notification = PrescriberFactory(**logged_the_day_before_notification_kwargs)
+        labor_inspector_logged_before_notification = LaborInspectorFactory(**logged_the_day_before_notification_kwargs)
+
+        # professionals who logged after being notified
+        logged_after_notification_kwargs = {
+            "joined_days_ago": DAYS_OF_INACTIVITY,
+            "notified_days_ago": 1,
+            "last_login": timezone.now(),
+        }
+        employer_logged_after_notification = EmployerFactory(**logged_after_notification_kwargs)
+        prescriber_logged_after_notification = PrescriberFactory(**logged_after_notification_kwargs)
+        labor_inspector_logged_after_notification = LaborInspectorFactory(**logged_after_notification_kwargs)
+
         call_command("anonymize_professionals", wet_run=True)
 
-        user.refresh_from_db()
-        assert (user.upcoming_deletion_notified_at is None) == expected
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=True),
+            [
+                employer_logged_after_notification,
+                prescriber_logged_after_notification,
+                labor_inspector_logged_after_notification,
+            ],
+            ordered=False,
+        )
+        assertQuerySetEqual(
+            User.objects.filter(upcoming_deletion_notified_at__isnull=False),
+            [
+                employer_never_logged,
+                prescriber_never_logged,
+                labor_inspector_never_logged,
+                employer_logged_before_notification,
+                prescriber_logged_before_notification,
+                labor_inspector_logged_before_notification,
+            ],
+            ordered=False,
+        )
 
     def test_anonymize_professionals_dry_run(self, respx_mock):
         user = EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
@@ -1379,95 +1420,95 @@ class TestAnonymizeProfessionalManagementCommand:
         assert User.objects.filter(email__isnull=False).count() == 1
         assert respx_mock.calls.call_count == 2
 
-    @pytest.mark.parametrize(
-        "factory",
-        [
-            pytest.param(
-                lambda: EmployerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29),
-                id="employer_notified_still_in_grace_period",
-            ),
-            pytest.param(
-                lambda: LaborInspectorFactory(
-                    joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
-                ),
-                id="labor_inspector_with_recent_login",
-            ),
-            pytest.param(
-                lambda: PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY),
-                id="prescriber_never_notified",
-            ),
-            pytest.param(
-                lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
-                id="jobseeker_notified",
-            ),
-            pytest.param(
-                lambda: ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30),
-                id="itou_staff_notified",
-            ),
-        ],
-    )
-    def test_excluded_users_when_anonymizing_professionals(self, factory):
-        user = factory()
+    def test_excluded_users_when_anonymizing_professionals(self):
+        employer_notified_still_in_grace_period = EmployerFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=29
+        )
+        labor_inspector_with_recent_login = LaborInspectorFactory(
+            joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30, last_login=timezone.now()
+        )
+        prescriber_never_notified = PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
+        jobseeker_notified = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+        itou_staff_notified = ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
+
         call_command("anonymize_professionals", wet_run=True)
 
-        expected_user = User.objects.get()
-        assert user == expected_user
+        assertQuerySetEqual(
+            User.objects.all(),
+            [
+                employer_notified_still_in_grace_period,
+                labor_inspector_with_recent_login,
+                prescriber_never_notified,
+                jobseeker_notified,
+                itou_staff_notified,
+            ],
+            ordered=False,
+        )
         assert not AnonymizedProfessional.objects.exists()
 
-    @pytest.mark.parametrize(
-        "factory,has_related_objects,is_anonymized",
-        [
-            pytest.param(CompanyMembershipFactory, True, True, id="has_related_objects_and_is_anonymized"),
-            pytest.param(PrescriberMembershipFactory, True, False, id="has_related_objects_and_not_anonymized"),
-            pytest.param(InstitutionMembershipFactory, False, True, id="no_related_objects_and_is_anonymized"),
-            pytest.param(CompanyMembershipFactory, False, False, id="no_related_objects_and_not_anonymized"),
-        ],
-    )
-    @freeze_time("2025-02-15")
     def test_anonymize_professionals_after_grace_period(
         self,
-        factory,
-        has_related_objects,
-        is_anonymized,
-        city,
         django_capture_on_commit_callbacks,
         snapshot,
         caplog,
         respx_mock,
     ):
-        org = factory(
-            user__joined_days_ago=DAYS_OF_INACTIVITY,
-            user__notified_days_ago=31,
-            user__for_snapshot=True,
-            user__address_line_1="8 rue du moulin",
-            user__address_line_2="Apt 4B",
-            user__post_code=city.post_codes[0],
-            user__city="Test City",
-            user__coords=city.coords,
-            user__insee_city=city,
-            user__email=None if is_anonymized else "test@mail.com",
-        )
-        professional = org.user
+        def _create_professional(factory, has_related_objects, city):
+            if city:
+                kwargs = {
+                    "is_active": True,
+                    "user__is_active": True,
+                    "user__phone": f"06060{city.post_codes[0]}",
+                    "user__address_line_1": "8 rue du moulin",
+                    "user__address_line_2": "Apt 4B",
+                    "user__post_code": city.post_codes[0],
+                    "user__city": "Test City",
+                    "user__coords": city.coords,
+                    "user__insee_city": city,
+                    "user__email": f"test{city.post_codes[0]}@mail.com",
+                }
+            else:
+                kwargs = {
+                    "is_active": False,
+                    "user__is_active": False,
+                    "user__phone": "",
+                    "user__address_line_1": "",
+                    "user__address_line_2": "",
+                    "user__post_code": "",
+                    "user__city": "",
+                    "user__coords": None,
+                    "user__insee_city": None,
+                    "user__email": None,
+                }
+            org = factory(
+                user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+                user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+                user__for_snapshot=True,
+                user__public_id=uuid4(),
+                user__title=Title.M,
+                user__first_name="Not Yet Anonymized" if city else "Already Anonymized",
+                user__last_name="Has Related Objects" if has_related_objects else "No Related Objects",
+                **kwargs,
+            )
+            professional = org.user
 
-        if has_related_objects:
-            JobApplicationFactory(sender=professional)
+            if has_related_objects:
+                JobApplicationFactory(sender=professional)
+            return professional
+
+        anonymized_employer = _create_professional(CompanyMembershipFactory, True, None)
+        prescriber = _create_professional(PrescriberMembershipFactory, True, create_city_saint_andre())
+        to_delete_anonymized_labor_inspector = _create_professional(InstitutionMembershipFactory, False, None)
+        to_delete_employer = _create_professional(CompanyMembershipFactory, False, create_city_geispolsheim())
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
-        # User should be deleted
-        if not has_related_objects:
-            assert not User.objects.filter(id=professional.id).exists()
-            assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(name="anonymized_professional")
-            assert respx_mock.calls.call_count == 0 if is_anonymized else 1
-            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
-                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
-
-        # User is not deletable because of related objects and should be anonymized
-        elif not is_anonymized:
-            user = User.objects.filter(id=professional.id).values(
+        users = (
+            User.objects.filter(id__in=[anonymized_employer.id, prescriber.id])
+            .order_by("id")
+            .values_list(
                 "is_active",
-                "password",
                 "phone",
                 "address_line_1",
                 "address_line_2",
@@ -1475,29 +1516,23 @@ class TestAnonymizeProfessionalManagementCommand:
                 "city",
                 "coords",
                 "insee_city",
-                "upcoming_deletion_notified_at",
                 "first_name",
                 "last_name",
+                "title",
             )
-            assert user == snapshot(name="user_values_after_anonymization")
-            assert not AnonymizedProfessional.objects.exists()
-            assert respx_mock.calls.call_count == 1
-            for model in (CompanyMembership, PrescriberMembership, InstitutionMembership):
-                assert not model.objects.filter(is_active=True, user_id=professional.id).exists()
-
-        # User is not deletable because of related objects and is already anonymized
-        else:
-            professional.refresh_from_db()
-            assert professional == User.objects.filter(id=professional.id).first()
-            assert not AnonymizedProfessional.objects.exists()
-            assert not respx_mock.calls.called
-
-        # Check logs
-        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
-        assert (
-            f"Included in this count: {0 if has_related_objects else 1} to delete, {0 if is_anonymized else 1}"
-            " to remove from contact"
         )
+        assert users == snapshot(name="anonymized_professionals_without_deletion")
+        assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
+            name="deleted_anonymized_professionals"
+        )
+        assert not CompanyMembership.objects.filter(user=to_delete_employer).exists()
+        assert not InstitutionMembership.objects.filter(user=to_delete_anonymized_labor_inspector).exists()
+        assert CompanyMembership.objects.filter(user=anonymized_employer, is_active=False).exists()
+        assert PrescriberMembership.objects.filter(user=prescriber, is_active=False).exists()
+
+        assert respx_mock.calls.call_count == 2
+        assert "Anonymized professionals after grace period, count: 4" in caplog.messages
+        assert "Included in this count: 2 to delete, 2 to remove from contact" in caplog.messages
 
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(
@@ -1617,9 +1652,17 @@ class TestAnonymizeProfessionalManagementCommand:
 class TestAnonymizeCancelledApprovalsManagementCommand:
     @pytest.mark.parametrize("suspended", [True, False])
     def test_suspend_command_setting(self, settings, suspended, caplog):
+        expiration_date = timezone.localdate() - EXPIRATION_PERIOD
+        CancelledApprovalFactory(
+            start_at=expiration_date - datetime.timedelta(days=1),
+            end_at=expiration_date,
+        )
+
         settings.SUSPEND_ANONYMIZE_CANCELLED_APPROVALS = suspended
         call_command("anonymize_cancelled_approvals", wet_run=True)
-        assert ("Anonymizing cancelled approvals is suspended, exiting command" in caplog.messages) == suspended
+
+        assert CancelledApproval.objects.exists() is suspended
+        assert ("Anonymizing cancelled approvals is suspended, exiting command" in caplog.messages) is suspended
 
     def test_dry_run(self):
         expiration_date = timezone.localdate() - EXPIRATION_PERIOD
