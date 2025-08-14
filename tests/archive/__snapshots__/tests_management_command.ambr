@@ -23,6 +23,22 @@
     }),
   ])
 # ---
+# name: TestAnonymizeJobseekersManagementCommand.test_anonymize_notification_of_inactive_jobseekers_after_grace_period[is_active_jobseeker][archived_jobseeker_email_body]
+  '''
+  Bonjour Johanna ANDREWS,
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
+  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestAnonymizeJobseekersManagementCommand.test_anonymize_notification_of_inactive_jobseekers_after_grace_period[is_active_jobseeker][archived_jobseeker_email_subject]
+  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
+# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_not_is_active][archived_jobseeker]
   list([
     dict({
@@ -75,22 +91,6 @@
     }),
   ])
 # ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_body]
-  '''
-  Bonjour Johan ANDERSON,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
-  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
-  
-  ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
-  Les emplois de l'inclusion
-  http://localhost:8000/
-  '''
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_employer][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
-# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
   list([
     dict({
@@ -117,22 +117,6 @@
     }),
   ])
 # ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_body]
-  '''
-  Bonjour Johanna ANDREWS,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
-  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
-  
-  ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
-  Les emplois de l'inclusion
-  http://localhost:8000/
-  '''
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
-# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
   list([
     dict({
@@ -158,22 +142,6 @@
       'user_signup_kind': None,
     }),
   ])
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_body]
-  '''
-  Bonjour Martin JACOBSON,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
-  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
-  En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
-  
-  ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
-  Les emplois de l'inclusion
-  http://localhost:8000/
-  '''
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker_email_subject]
-  '[DEV] Suppression de votre compte sur les Emplois de l’inclusion'
 # ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[anonymized_application]
   list([

@@ -564,6 +564,42 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         assert not respx_mock.calls.called
 
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            pytest.param(
+                {"first_name": "Johanna", "last_name": "Andrews"},
+                id="is_active_jobseeker",
+            ),
+            pytest.param(
+                {"first_name": "Johan", "last_name": "Anderson", "is_active": False},
+                id="not_is_active_jobseeker",
+            ),
+        ],
+    )
+    def test_anonymize_notification_of_inactive_jobseekers_after_grace_period(
+        self, kwargs, django_capture_on_commit_callbacks, mailoutbox, snapshot, respx_mock, caplog
+    ):
+        jobseeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31, **kwargs)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_jobseekers", wet_run=True)
+
+        assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
+        if jobseeker.is_active:
+            [mail] = mailoutbox
+            assert jobseeker.email == mail.to[0]
+            assert mail.subject == snapshot(name="archived_jobseeker_email_subject")
+
+            body = mail.body.replace(
+                timezone.localdate(jobseeker.upcoming_deletion_notified_at).strftime("%d/%m/%Y"), "XX/XX/XXXX"
+            )
+            assert body == snapshot(name="archived_jobseeker_email_body")
+        else:
+            assert not mailoutbox
+
+        assert respx_mock.calls.call_count == 1
+
     # vincentporte TO BE CONTINUED
     @pytest.mark.parametrize(
         "kwargs,jobapplication_kwargs_list",
@@ -660,7 +696,6 @@ class TestAnonymizeJobseekersManagementCommand:
         jobapplication_kwargs_list,
         django_capture_on_commit_callbacks,
         caplog,
-        mailoutbox,
         snapshot,
         respx_mock,
     ):
@@ -691,17 +726,6 @@ class TestAnonymizeJobseekersManagementCommand:
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="archived_jobseeker")
 
         assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
-        if jobseeker.is_active:
-            [mail] = mailoutbox
-            assert jobseeker.email == mail.to[0]
-            assert mail.subject == snapshot(name="archived_jobseeker_email_subject")
-
-            body = mail.body.replace(
-                timezone.localdate(jobseeker.upcoming_deletion_notified_at).strftime("%d/%m/%Y"), "XX/XX/XXXX"
-            )
-            assert body == snapshot(name="archived_jobseeker_email_body")
-        else:
-            assert not mailoutbox
 
         assert respx_mock.calls.call_count == 1
 
