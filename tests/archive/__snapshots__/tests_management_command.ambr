@@ -770,31 +770,27 @@
     }),
   ])
 # ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[has_related_objects_and_not_anonymized][user_values_after_anonymization]
-  <UserQuerySet [{'is_active': False, 'password': 'pbkdf2_sha256$test$hash', 'phone': '', 'address_line_1': '', 'address_line_2': '', 'post_code': '', 'city': '', 'coords': None, 'insee_city': None, 'upcoming_deletion_notified_at': datetime.datetime(2025, 1, 15, 9, 0, tzinfo=datetime.timezone.utc), 'first_name': 'Pierre', 'last_name': 'Dupont'}]>
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[anonymized_professionals_without_deletion]
+  <UserQuerySet [(False, '', '', '', '', '', None, None, 'Already Anonymized', 'Has Related Objects', 'M'), (False, '', '', '', '', '', None, None, 'Not Yet Anonymized', 'Has Related Objects', 'M')]>
 # ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_is_anonymized][anonymized_professional]
+# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[deleted_anonymized_professionals]
   list([
     dict({
       'date_joined': datetime.date(2023, 3, 1),
-      'department': '44',
+      'department': '',
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'DJANGO',
       'kind': 'labor_inspector',
       'last_login': None,
-      'number_of_active_memberships': 1,
+      'number_of_active_memberships': 0,
       'number_of_memberships': 1,
       'number_of_memberships_as_administrator': 1,
-      'title': '',
+      'title': 'M',
     }),
-  ])
-# ---
-# name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_after_grace_period[no_related_objects_and_not_anonymized][anonymized_professional]
-  list([
     dict({
       'date_joined': datetime.date(2023, 3, 1),
-      'department': '44',
+      'department': '67',
       'first_login': None,
       'had_memberships_in_authorized_organization': False,
       'identity_provider': 'PC',
@@ -803,7 +799,7 @@
       'number_of_active_memberships': 1,
       'number_of_memberships': 1,
       'number_of_memberships_as_administrator': 1,
-      'title': '',
+      'title': 'M',
     }),
   ])
 # ---
