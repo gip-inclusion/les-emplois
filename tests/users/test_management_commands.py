@@ -859,8 +859,9 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
     )
 
     # user not found at all
-    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR
+    rechercher_usager_endpoint = pole_emploi_api_mocks.ENDPOINTS["recherche-individu-certifie"]
+    respx_mock.post(rechercher_usager_endpoint).respond(
+        200, json=pole_emploi_api_mocks.RESPONSES[rechercher_usager_endpoint][pole_emploi_api_mocks.ResponseKind.ERROR]
     )
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
@@ -880,8 +881,8 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
 
     # user found immediately
     caplog.clear()
-    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
+    respx_mock.post(rechercher_usager_endpoint).respond(
+        200, json=pole_emploi_api_mocks.RESPONSES[rechercher_usager_endpoint][pole_emploi_api_mocks.ResponseKind.FOUND]
     )
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
@@ -915,8 +916,9 @@ def test_pe_certify_users_dry_run(settings, respx_mock, caplog, snapshot):
     )
 
     # user found immediately
-    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-        200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
+    rechercher_usager_endpoint = pole_emploi_api_mocks.ENDPOINTS["recherche-individu-certifie"]
+    respx_mock.post(rechercher_usager_endpoint).respond(
+        200, json=pole_emploi_api_mocks.RESPONSES[rechercher_usager_endpoint][pole_emploi_api_mocks.ResponseKind.FOUND]
     )
     call_command("pe_certify_users")
     assert caplog.messages[-1].startswith(
@@ -942,24 +944,30 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
+    rechercher_usager_endpoint = pole_emploi_api_mocks.ENDPOINTS["recherche-individu-certifie"]
     respx_mock.post(
-        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        rechercher_usager_endpoint,
         json={
             "dateNaissance": "1987-06-21",
             "nirCertifie": "1870621123456",
             "nomNaissance": "DURAND",
             "prenom": "BALTHAZAR",
         },
-    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR)
+    ).respond(
+        200, json=pole_emploi_api_mocks.RESPONSES[rechercher_usager_endpoint][pole_emploi_api_mocks.ResponseKind.ERROR]
+    )
+
     respx_mock.post(
-        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        rechercher_usager_endpoint,
         json={
             "dateNaissance": "1987-06-21",
             "nirCertifie": "1870621123456",
             "nomNaissance": "BALTHAZAR",
             "prenom": "DURAND",
         },
-    ).respond(200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN)
+    ).respond(
+        200, json=pole_emploi_api_mocks.RESPONSES[rechercher_usager_endpoint][pole_emploi_api_mocks.ResponseKind.FOUND]
+    )
     call_command("pe_certify_users", wet_run=True)
     assert caplog.messages[-1].startswith(
         "Management command itou.users.management.commands.pe_certify_users succeeded in "
@@ -995,7 +1003,10 @@ def test_pe_certify_users_retry(caplog, snapshot):
     with mock.patch(
         "itou.utils.apis.pole_emploi.PoleEmploiRoyaumePartenaireApiClient.recherche_individu_certifie",
         side_effect=PoleEmploiAPIBadResponse(
-            response_code=PEApiRechercheIndividuExitCode.R010, response_data=pole_emploi_api_mocks.API_RECHERCHE_ERROR
+            response_code=PEApiRechercheIndividuExitCode.R010,
+            response_data=pole_emploi_api_mocks.RESPONSES[
+                pole_emploi_api_mocks.ENDPOINTS["recherche-individu-certifie"]
+            ][pole_emploi_api_mocks.ResponseKind.ERROR],
         ),
     ) as recherche:
         call_command("pe_certify_users", wet_run=True)

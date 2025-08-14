@@ -6,16 +6,18 @@ from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
-from itou.utils.mocks.pole_emploi import API_OFFRES
+from itou.utils.mocks.pole_emploi import ENDPOINTS, RESPONSES
 
 
 @pytest.mark.django_db(transaction=True)
 def test_sync_ft_offers(caplog, respx_mock):
     PEC_OFFERS = [
         {**offer, "natureContrat": pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]}
-        for offer in API_OFFRES
+        for offer in RESPONSES[ENDPOINTS["offres"]]
     ]
-    EA_OFFERS = [{**offer, "id": offer["id"][::-1], "entrepriseAdaptee": True} for offer in API_OFFRES]
+    EA_OFFERS = [
+        {**offer, "id": offer["id"][::-1], "entrepriseAdaptee": True} for offer in RESPONSES[ENDPOINTS["offres"]]
+    ]
 
     city = City.objects.create(
         slug="slug",
@@ -36,7 +38,7 @@ def test_sync_ft_offers(caplog, respx_mock):
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
-    base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT"
+    base_url = f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=FT"
     respx_mock.get(f"{base_url}&range=0-149").respond(206, json={"resultats": PEC_OFFERS})
     respx_mock.get(f"{base_url}&range=150-299").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=300-449").respond(206, json={"resultats": []})
@@ -46,7 +48,7 @@ def test_sync_ft_offers(caplog, respx_mock):
     respx_mock.get(f"{base_url}&range=900-1049").respond(206, json={"resultats": []})
     respx_mock.get(f"{base_url}&range=1050-1149").respond(204)
 
-    ea_base_url = "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true"
+    ea_base_url = f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=&entreprisesAdaptees=true"
     respx_mock.get(f"{ea_base_url}&range=0-149").respond(206, json={"resultats": EA_OFFERS})
     respx_mock.get(f"{ea_base_url}&range=150-299").respond(206, json={"resultats": []})
 
@@ -99,7 +101,7 @@ def test_sync_ft_offers(caplog, respx_mock):
     # test the update
     caplog.clear()
     PEC_OFFERS[0]["intitule"] = "NOUVEAU INTITULE"
-    respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
+    respx_mock.get(f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=FT&range=0-149").respond(
         206,
         json={"resultats": PEC_OFFERS},
     )
@@ -126,7 +128,7 @@ def test_sync_ft_offers(caplog, respx_mock):
 
     # test the deletion
     caplog.clear()
-    respx_mock.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-149").respond(
+    respx_mock.get(f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=FT&range=0-149").respond(
         206,
         json={"resultats": []},
     )
