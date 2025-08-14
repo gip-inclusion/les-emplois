@@ -107,10 +107,10 @@
                             {% if request.user.is_employer and job_application.job_seeker.latest_approval.eligibility_diagnosis.author_siae_id == request.current_organization.id %}
                                 <span class="d-block">Éligibilité validée par votre entreprise</span>
                             {% else %}
-                                <span class="d-block">Éligibilité validée par un Employeur</span>
+                                <span class="d-block">Éligibilité validée par un employeur</span>
                             {% endif %}
                         {% else %}
-                            <span class="d-block">Éligibilité validée par un Prescripteur habilité</span>
+                            <span class="d-block">Éligibilité validée par un prescripteur habilité</span>
                         {% endif %}
                     {% endif %}
                 {% elif job_application.jobseeker_valid_eligibility_diagnosis %}
