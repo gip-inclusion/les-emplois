@@ -753,6 +753,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
             state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
+            to_company__name="Tartempion",
             to_company__kind=CompanyKind.GEIQ,
             **common_kwargs,
         ),
