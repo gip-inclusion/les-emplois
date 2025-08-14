@@ -91,58 +91,6 @@
     }),
   ])
 # ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_all_datas_created_by_prescriber][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': 1985,
-      'count_IAE_applications': 2,
-      'count_accepted_applications': 1,
-      'count_approvals': 0,
-      'count_eligibility_diagnoses': 0,
-      'count_total_applications': 2,
-      'date_joined': datetime.date(2020, 4, 1),
-      'department': '',
-      'first_approval_start_at': None,
-      'first_login': datetime.date(2020, 4, 1),
-      'had_nir': True,
-      'had_pole_emploi_id': True,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': '',
-      'last_approval_end_at': None,
-      'last_login': datetime.date(2020, 4, 1),
-      'nir_sex': 8,
-      'nir_year': 55,
-      'title': 'MME',
-      'user_signup_kind': 'prescriber',
-    }),
-  ])
-# ---
-# name: TestAnonymizeJobseekersManagementCommand.test_archive_inactive_jobseekers_after_grace_period[jobseeker_with_very_few_datas][archived_jobseeker]
-  list([
-    dict({
-      'birth_year': None,
-      'count_IAE_applications': 0,
-      'count_accepted_applications': 0,
-      'count_approvals': 0,
-      'count_eligibility_diagnoses': 0,
-      'count_total_applications': 0,
-      'date_joined': datetime.date(2022, 11, 1),
-      'department': '',
-      'first_approval_start_at': None,
-      'first_login': None,
-      'had_nir': False,
-      'had_pole_emploi_id': False,
-      'identity_provider': 'DJANGO',
-      'lack_of_nir_reason': 'reason',
-      'last_approval_end_at': None,
-      'last_login': None,
-      'nir_sex': None,
-      'nir_year': None,
-      'title': 'M',
-      'user_signup_kind': None,
-    }),
-  ])
-# ---
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_jobseeker_with_approval[anonymized_application]
   list([
     dict({
@@ -537,6 +485,28 @@
 # name: TestAnonymizeJobseekersManagementCommand.test_archive_not_eligible_jobapplications_of_inactive_jobseekers_after_grace_period[anonymized_jobseeker]
   list([
     dict({
+      'birth_year': 1985,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 0,
+      'count_approvals': 0,
+      'count_eligibility_diagnoses': 0,
+      'count_total_applications': 0,
+      'date_joined': datetime.date(2020, 4, 1),
+      'department': '',
+      'first_approval_start_at': None,
+      'first_login': datetime.date(2020, 4, 1),
+      'had_nir': True,
+      'had_pole_emploi_id': True,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': '',
+      'last_approval_end_at': None,
+      'last_login': datetime.date(2020, 4, 1),
+      'nir_sex': 8,
+      'nir_year': 55,
+      'title': 'MME',
+      'user_signup_kind': 'prescriber',
+    }),
+    dict({
       'birth_year': 1970,
       'count_IAE_applications': 0,
       'count_accepted_applications': 1,
@@ -556,6 +526,28 @@
       'nir_sex': 2,
       'nir_year': 70,
       'title': 'MME',
+      'user_signup_kind': None,
+    }),
+    dict({
+      'birth_year': None,
+      'count_IAE_applications': 0,
+      'count_accepted_applications': 0,
+      'count_approvals': 0,
+      'count_eligibility_diagnoses': 0,
+      'count_total_applications': 0,
+      'date_joined': datetime.date(2022, 11, 1),
+      'department': '',
+      'first_approval_start_at': None,
+      'first_login': None,
+      'had_nir': False,
+      'had_pole_emploi_id': False,
+      'identity_provider': 'DJANGO',
+      'lack_of_nir_reason': 'reason',
+      'last_approval_end_at': None,
+      'last_login': None,
+      'nir_sex': None,
+      'nir_year': None,
+      'title': 'M',
       'user_signup_kind': None,
     }),
     dict({
