@@ -1,3 +1,8 @@
+import enum
+
+from django.conf import settings
+
+
 API_RECHERCHE_RESULT_KNOWN = {
     "idNationalDE": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
     "codeSortie": "S001",
@@ -205,3 +210,109 @@ API_APPELLATIONS = [
     {"code": "11426", "libelle": "Auteur / Auteure de bande dessinée", "metier": {"code": "E1102"}},
     {"code": "11427", "libelle": "Auteur / Auteure dramatique", "metier": {"code": "E1102"}},
 ]
+
+
+ENDPOINTS = {
+    "rechercher-usager-date-naissance-nir": (
+        f"{settings.API_ESD['BASE_URL']}/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+    ),
+    "rechercher-usager-numero-france-travail": (
+        f"{settings.API_ESD['BASE_URL']}/rechercher-usager/v2/usagers/par-numero-francetravail"
+    ),
+    "rqth": f"{settings.API_ESD['BASE_URL']}/donnees-rqth/v1/rqth",
+}
+
+
+class ResponseKind(enum.Enum):
+    CERTIFIED = "certified"  # 200
+    CERTIFIED_FOR_EVER = "certified_for_ever"  # 200
+    NOT_CERTIFIED = "not_certified"  # 200
+    NOT_FOUND = "not_found"  # 200
+    MULTIPLE_USERS_RETURNED = "multiple_users_returned"  # 200
+    BAD_REQUEST = "validation_error"  # 400
+    FORBIDDEN = "not_allowed"  # 403
+    INTERNAL_SERVER_ERROR = "server_error"  # 500
+    SERVICE_UNAVAILABLE = "service_unavailable"  # 503
+
+
+RESPONSES = {
+    ENDPOINTS["rechercher-usager-date-naissance-nir"]: {
+        ResponseKind.CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "N",
+        },
+        ResponseKind.NOT_FOUND: {
+            "codeRetour": "S002",
+            "message": "Aucun approchant trouvé",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        },
+        ResponseKind.MULTIPLE_USERS_RETURNED: {
+            "codeRetour": "S003",
+            "message": "Plusieurs usagers trouvés",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        },
+        # TODO(cms): check if this is common to all endpoints and, if so, add them too.
+        ResponseKind.BAD_REQUEST: {
+            "codeRetour": "R997",
+            "message": "Une erreur de validation s'est produite",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.FORBIDDEN: {
+            "codeRetour": "R001",
+            "message": "Accès non autorisé",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.INTERNAL_SERVER_ERROR: {
+            "codeRetour": "R998",
+            "message": "Un service a répondu en erreur",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.SERVICE_UNAVAILABLE: {
+            "codeRetour": "R999",
+            "message": "Service indisponible, veuillez réessayer ultérieurement",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+    },
+    ENDPOINTS["rechercher-usager-numero-france-travail"]: {
+        ResponseKind.CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        },
+    },
+    ENDPOINTS["rqth"]: {
+        ResponseKind.CERTIFIED: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "2030-01-20",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "dateDebutRqth": "",
+            "dateFinRqth": "",
+            "source": "",
+            "topValiditeRQTH": False,
+        },
+        ResponseKind.CERTIFIED_FOR_EVER: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "9999-12-31",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+    },
+}
