@@ -42,7 +42,9 @@ from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.constants import DAYS_OF_GRACE, DAYS_OF_INACTIVITY, EXPIRATION_PERIOD, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
-from tests.cities.factories import create_city_saint_andre
+from tests.cities.factories import (
+    create_city_saint_andre,
+)
 from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -82,11 +84,6 @@ def mock_make_password():
         return_value="pbkdf2_sha256$test$hash",
     ):
         yield
-
-
-@pytest.fixture(name="city")
-def city_fixture():
-    return create_city_saint_andre()
 
 
 def get_fields_list_for_snapshot(model):
@@ -1388,22 +1385,22 @@ class TestAnonymizeProfessionalManagementCommand:
         factory,
         has_related_objects,
         is_anonymized,
-        city,
         django_capture_on_commit_callbacks,
         snapshot,
         caplog,
         respx_mock,
     ):
+        city_saint_andre = create_city_saint_andre()
         org = factory(
             user__joined_days_ago=DAYS_OF_INACTIVITY,
             user__notified_days_ago=31,
             user__for_snapshot=True,
             user__address_line_1="8 rue du moulin",
             user__address_line_2="Apt 4B",
-            user__post_code=city.post_codes[0],
+            user__post_code=city_saint_andre.post_codes[0],
             user__city="Test City",
-            user__coords=city.coords,
-            user__insee_city=city,
+            user__coords=city_saint_andre.coords,
+            user__insee_city=city_saint_andre,
             user__email=None if is_anonymized else "test@mail.com",
         )
         professional = org.user
