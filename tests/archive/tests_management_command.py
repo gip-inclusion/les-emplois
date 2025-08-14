@@ -607,32 +607,6 @@ class TestAnonymizeJobseekersManagementCommand:
             pytest.param(
                 {
                     "title": "MME",
-                    "first_name": "Johanna",
-                    "last_name": "Andrews",
-                    "date_joined": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
-                    "first_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
-                    "last_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
-                    "created_by": PrescriberFactory,
-                    "jobseeker_profile__pole_emploi_id": "12345678",
-                    "jobseeker_profile__nir": "855456789012345",
-                    "jobseeker_profile__lack_of_nir_reason": "",
-                    "jobseeker_profile__birthdate": datetime.date(1985, 6, 8),
-                },
-                [
-                    {
-                        "state": JobApplicationState.ACCEPTED,
-                        "sent_by_authorized_prescriber_organisation": True,
-                    },
-                    {
-                        "state": JobApplicationState.POSTPONED,
-                        "sent_by_authorized_prescriber_organisation": True,
-                    },
-                ],
-                id="jobseeker_with_all_datas_created_by_prescriber",
-            ),
-            pytest.param(
-                {
-                    "title": "MME",
                     "first_name": "Johan",
                     "last_name": "Anderson",
                     "date_joined": timezone.make_aware(datetime.datetime(2021, 12, 12, 0, 0)),
@@ -657,23 +631,6 @@ class TestAnonymizeJobseekersManagementCommand:
                     },
                 ],
                 id="jobseeker_with_all_datas_created_by_employer",
-            ),
-            pytest.param(
-                {
-                    "title": "M",
-                    "first_name": "Martin",
-                    "last_name": "Jacobson",
-                    "date_joined": timezone.make_aware(datetime.datetime(2022, 11, 3, 0, 0)),
-                    "first_login": None,
-                    "last_login": None,
-                    "created_by": None,
-                    "jobseeker_profile__pole_emploi_id": "",
-                    "jobseeker_profile__nir": "",
-                    "jobseeker_profile__lack_of_nir_reason": "reason",
-                    "jobseeker_profile__birthdate": None,
-                },
-                [],
-                id="jobseeker_with_very_few_datas",
             ),
             pytest.param(
                 {
@@ -775,28 +732,63 @@ class TestAnonymizeJobseekersManagementCommand:
         respx_mock,
     ):
         def _create_job_seeker_with_application(
-            job_seeker_kwargs, job_application_kwargs, selected_jobs_count=0, transitions=None
+            job_seeker_kwargs, job_application_kwargs=None, selected_jobs_count=0, transitions=None
         ):
             jobseeker = JobSeekerFactory(notified_days_ago=30, **job_seeker_kwargs)
-            job_application = JobApplicationFactory(
-                **job_application_kwargs,
-                job_seeker=jobseeker,
-                approval=None,
-                eligibility_diagnosis=None,
-                geiq_eligibility_diagnosis=None,
-            )
-            if transitions:
-                for from_state, to_state, months in transitions:
-                    JobApplicationTransitionLog.objects.create(
-                        user=jobseeker,
-                        from_state=from_state,
-                        to_state=to_state,
-                        job_application=job_application,
-                        timestamp=job_application.created_at + relativedelta(months=months),
-                    )
-            if selected_jobs_count:
-                jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
-                job_application.selected_jobs.set(jobs)
+            if job_application_kwargs:
+                job_application = JobApplicationFactory(
+                    **job_application_kwargs,
+                    job_seeker=jobseeker,
+                    approval=None,
+                    eligibility_diagnosis=None,
+                    geiq_eligibility_diagnosis=None,
+                )
+                if transitions:
+                    for from_state, to_state, months in transitions:
+                        JobApplicationTransitionLog.objects.create(
+                            user=jobseeker,
+                            from_state=from_state,
+                            to_state=to_state,
+                            job_application=job_application,
+                            timestamp=job_application.created_at + relativedelta(months=months),
+                        )
+                if selected_jobs_count:
+                    jobs = JobDescriptionFactory.create_batch(selected_jobs_count, company=job_application.to_company)
+                    job_application.selected_jobs.set(jobs)
+
+        # jobseeker with very few datas, without jobapplication
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "title": "M",
+                "first_name": "Martin",
+                "last_name": "Jacobson",
+                "date_joined": timezone.make_aware(datetime.datetime(2022, 11, 3, 0, 0)),
+                "first_login": None,
+                "last_login": None,
+                "created_by": None,
+                "jobseeker_profile__pole_emploi_id": "",
+                "jobseeker_profile__nir": "",
+                "jobseeker_profile__lack_of_nir_reason": "reason",
+                "jobseeker_profile__birthdate": None,
+            }
+        )
+
+        # jobseeker with all datas, without jobapplication
+        _create_job_seeker_with_application(
+            job_seeker_kwargs={
+                "title": "MME",
+                "first_name": "Johanna",
+                "last_name": "Andrews",
+                "date_joined": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
+                "first_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
+                "last_login": timezone.make_aware(datetime.datetime(2020, 4, 18, 0, 0)),
+                "created_by": PrescriberFactory(),
+                "jobseeker_profile__pole_emploi_id": "12345678",
+                "jobseeker_profile__nir": "855456789012345",
+                "jobseeker_profile__lack_of_nir_reason": "",
+                "jobseeker_profile__birthdate": datetime.date(1985, 6, 8),
+            },
+        )
 
         # hired jobseeker with 3 selected jobs and transition logs
         _create_job_seeker_with_application(
@@ -947,10 +939,10 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
         assert get_fields_list_for_snapshot(AnonymizedApplication) == snapshot(name="archived_application")
         assert get_fields_list_for_snapshot(AnonymizedJobSeeker) == snapshot(name="anonymized_jobseeker")
-        assert "Anonymized jobseekers after grace period, count: 6" in caplog.messages
+        assert "Anonymized jobseekers after grace period, count: 8" in caplog.messages
         assert "Anonymized job applications after grace period, count: 6" in caplog.messages
 
-        assert respx_mock.calls.call_count == 6
+        assert respx_mock.calls.call_count == 8
 
     def test_archive_jobseeker_with_approval(self, snapshot):
         kwargs = {
