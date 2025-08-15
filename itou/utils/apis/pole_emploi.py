@@ -346,12 +346,13 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not token:
             token = self._refresh_token()
 
-        # TODO(cms): use real names.
         # These headers MUST be provided.
         # - if not: a 302 will be returned.
         # - if value is an empty string: a 401 will be returned.
         # As of today, no verification seems to be done on FT's side.
         # Any value is good, as far as there is one.
+        # NOTE(cms): it should be better to send real data but we don't know which one
+        # to profide for the moment.
         agents_headers = {
             "pa-nom-agent": "<string>",
             "pa-prenom-agent": "<string>",
