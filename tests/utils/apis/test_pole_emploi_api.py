@@ -20,6 +20,8 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRoyaumeAgentAPIClient,
     PoleEmploiRoyaumePartenaireApiClient,
     UserDoesNotExist,
+    pole_emploi_agent_api_client,
+    pole_emploi_partenaire_api_client,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from tests.job_applications.factories import JobApplicationFactory
@@ -31,9 +33,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.api_client = PoleEmploiRoyaumePartenaireApiClient(
-            "https://pe.fake", "https://auth.fr", "foobar", "pe-secret"
-        )
+        self.api_client = pole_emploi_partenaire_api_client()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
         )
@@ -77,8 +77,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         )
 
         # Connection pooling
-        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
-        with client:
+        with pole_emploi_partenaire_api_client() as client:
             first_client = client._get_httpx_client()
             assert client._refresh_token() == "foo batman"
             assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
@@ -91,7 +90,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
             client.appellations()
 
         # …but if no context manager was used before, a new HTTPX client is created for each new request.
-        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
+        client = pole_emploi_partenaire_api_client()
         assert client._refresh_token() == "foo batman"
         first_client = client._get_httpx_client()
         assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
@@ -311,12 +310,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.api_client = PoleEmploiRoyaumeAgentAPIClient(
-            base_url="https://pe.fake",
-            auth_base_url="https://auth.fr",
-            key="client_id",
-            secret="client_secret",
-        )
+        self.api_client = pole_emploi_agent_api_client()
         json_response = {
             "token_type": "Bearer",
             "access_token": "Catwoman",
