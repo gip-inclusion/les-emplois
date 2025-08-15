@@ -22,7 +22,11 @@ OFFERS_MAX_INDEX = 3149
 OFFERS_MAX_RANGE = 150
 
 
-class PoleEmploiAPIException(Exception):
+class PoleEmploiAPIBaseException(Exception):
+    pass
+
+
+class PoleEmploiAPIException(PoleEmploiAPIBaseException):
     """unexpected exceptions (meaning, "exceptional") that warrant a subsequent retry."""
 
     def __init__(self, error_code=None, response_content=None):
@@ -37,7 +41,7 @@ class PoleEmploiAPIException(Exception):
         return name
 
 
-class PoleEmploiAPIBadResponse(Exception):
+class PoleEmploiAPIBadResponse(PoleEmploiAPIBaseException):
     """errors that can't be recovered from: the API server does not agree."""
 
     def __init__(self, response_code=None, response_data=None):
