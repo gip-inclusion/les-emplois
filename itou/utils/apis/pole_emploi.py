@@ -372,6 +372,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             )
         except httpx.HTTPStatusError as exc:
             match exc.response.status_code:
+                # Documentation does not mention a Retry-After header.
                 case 429:
                     raise PoleEmploiRateLimitException(error_code=429)
                 case 400 | 401 | 403 as error_code:
@@ -428,14 +429,14 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             case "S001":
                 pass
             case "S002":
-                raise UserDoesNotExist()
+                raise UserDoesNotExist(response_data=data)
             case "S003":
-                raise MultipleUsersReturned()
+                raise MultipleUsersReturned(response_data=data)
             case _ as response_code:
                 raise PoleEmploiAPIBadResponse(response_code=response_code, response_data=data)
 
         if data["topIdentiteCertifiee"] != "O":
-            raise IdentityNotCertified()
+            raise IdentityNotCertified(response_data=data)
 
         return data["jetonUsager"]
 
