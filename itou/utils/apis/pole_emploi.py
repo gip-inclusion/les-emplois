@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+
 
 logger = logging.getLogger(__name__)
 
@@ -480,3 +482,9 @@ def pole_emploi_agent_api_client():
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )
+
+
+def certify_criteria(criterion_kind, jobseeker_profile, client=None):
+    client = client or pole_emploi_agent_api_client()
+    if criterion_kind == AdministrativeCriteriaKind.TH:
+        return client.certify_rqth(jobseeker_profile=jobseeker_profile)

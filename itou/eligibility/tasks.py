@@ -12,7 +12,7 @@ from huey.exceptions import RetryTask
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
-from itou.utils.apis import api_particulier
+from itou.utils.apis import api_particulier, pole_emploi as pole_emploi_api
 from itou.utils.types import InclusiveDateRange
 
 
@@ -98,7 +98,58 @@ def certify_criteria(eligibility_diagnosis):
                         )
                         criterion.certification_period = InclusiveDateRange(start_at, end_at)
 
-    criteria = [*criteria_certifiable_by_api_particulier]
+    criteria_certifiable_by_pole_emploi_api = [
+        criterion
+        for criterion in criteria
+        if criterion.administrative_criteria.kind in AdministrativeCriteriaKind.certifiable_by_pole_emploi_api()
+    ]
+
+    if criteria_certifiable_by_pole_emploi_api:
+        with pole_emploi_api.pole_emploi_agent_api_client() as pe_client:
+            for criterion in criteria_certifiable_by_pole_emploi_api:
+                try:
+                    data = pole_emploi_api.certify_criteria(
+                        criterion_kind=criterion.administrative_criteria.kind,
+                        jobseeker_profile=job_seeker.jobseeker_profile,
+                        client=pe_client,
+                    )
+                except pole_emploi_api.PoleEmploiAPIBaseException as exc:
+                    logger.error(
+                        "Error certifying criterion %r: exc=%s json=%s",
+                        criterion,
+                        exc,
+                        criterion.data_returned_by_api,
+                    )
+                    match type(exc):
+                        case pole_emploi_api.JobSeekerProfileBadInformationError:
+                            logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
+                            return
+                        case pole_emploi_api.PoleEmploiRateLimitException:
+                            raise RetryTask(delay=3600) from exc
+                        case (
+                            pole_emploi_api.MultipleUsersReturned
+                            | pole_emploi_api.UserDoesNotExist
+                            | pole_emploi_api.IdentityNotCertified
+                        ):
+                            criterion.data_returned_by_api = exc.response_data
+                            criterion.certified_at = timezone.now()
+                        case pole_emploi_api.PoleEmploiAPIBadResponse:
+                            criterion.data_returned_by_api = exc.response_data
+                        case pole_emploi_api.PoleEmploiAPIException:
+                            raise RetryTask(delay=3600) from exc
+                else:
+                    criterion.certified = data["is_certified"]
+                    criterion.certified_at = timezone.now()
+                    criterion.data_returned_by_api = data["raw_response"]
+                    criterion.certification_period = None
+                    if criterion.certified:
+                        start_at = data["start_at"]
+                        end_at = timezone.localdate(criterion.certified_at) + datetime.timedelta(
+                            days=criterion.CERTIFICATION_GRACE_PERIOD_DAYS
+                        )
+                        criterion.certification_period = InclusiveDateRange(start_at, end_at)
+
+    criteria = [*criteria_certifiable_by_api_particulier, *criteria_certifiable_by_pole_emploi_api]
     SelectedAdministrativeCriteria.objects.bulk_update(
         criteria,
         fields=[
@@ -115,6 +166,16 @@ def certify_criteria(eligibility_diagnosis):
                     certifier=IdentityCertificationAuthorities.API_PARTICULIER,
                     jobseeker_profile=job_seeker.jobseeker_profile,
                     certified_at=max(c.certified_at for c in criteria_certifiable_by_api_particulier),
+                ),
+            ]
+        )
+    elif any(c.certified is not None for c in criteria_certifiable_by_pole_emploi_api):
+        IdentityCertification.objects.upsert_certifications(
+            [
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER,
+                    jobseeker_profile=job_seeker.jobseeker_profile,
+                    certified_at=max(c.certified_at for c in criteria_certifiable_by_pole_emploi_api),
                 ),
             ]
         )
