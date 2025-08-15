@@ -1,17 +1,8 @@
 from django.core import management
-from django.test import override_settings
 
 from itou.jobs.models import Appellation, Rome
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
 def test_sync_rome_appellation(caplog, respx_mock):
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}

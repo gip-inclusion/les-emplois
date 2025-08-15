@@ -34,12 +34,6 @@ def mock_api(settings):
     respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
-    settings.API_ESD = {
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
 
 
 class TestApprovalNotifyPoleEmploiIntegration:

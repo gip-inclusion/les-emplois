@@ -1,6 +1,5 @@
 import pytest
 from django.core import management
-from django.test import override_settings
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET
@@ -10,14 +9,6 @@ from itou.utils.apis import pe_api_enums
 from itou.utils.mocks.pole_emploi import API_OFFRES
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
 @pytest.mark.django_db(transaction=True)
 def test_sync_ft_offers(caplog, respx_mock):
     PEC_OFFERS = [

@@ -854,12 +854,6 @@ def test_pe_certify_users(settings, respx_mock, caplog, snapshot):
         jobseeker_profile__birthdate=datetime.date(1994, 2, 22),
         jobseeker_profile__nir="194022734304328",
     )
-    settings.API_ESD = {
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
@@ -916,12 +910,6 @@ def test_pe_certify_users_dry_run(settings, respx_mock, caplog, snapshot):
         jobseeker_profile__birthdate=datetime.date(1994, 2, 22),
         jobseeker_profile__nir="194022734304328",
     )
-    settings.API_ESD = {
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
@@ -951,12 +939,6 @@ def test_pe_certify_users_with_swap(settings, respx_mock, caplog, snapshot):
         jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
         jobseeker_profile__nir="187062112345678",
     )
-    settings.API_ESD = {
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
     )
