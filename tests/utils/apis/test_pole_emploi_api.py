@@ -20,8 +20,14 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRoyaumeAgentAPIClient,
     PoleEmploiRoyaumePartenaireApiClient,
     UserDoesNotExist,
+    pole_emploi_agent_api_client,
+    pole_emploi_partenaire_api_client,
 )
-from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
+from itou.utils.mocks.pole_emploi import (
+    ENDPOINTS,
+    RESPONSES,
+    ResponseKind,
+)
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
 
@@ -31,9 +37,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.api_client = PoleEmploiRoyaumePartenaireApiClient(
-            "https://pe.fake", "https://auth.fr", "foobar", "pe-secret"
-        )
+        self.api_client = pole_emploi_partenaire_api_client()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
         )
@@ -68,21 +72,20 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
         )
-        respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
+        respx.get(ENDPOINTS["appellation"]).respond(
             200,
-            json=pole_emploi_api_mocks.API_APPELLATIONS,
+            json=RESPONSES[ENDPOINTS["appellation"]],
         )
-        respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
-            200, json=pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        respx.get(ENDPOINTS["referentiel-nature-contrats"]).respond(
+            200, json=RESPONSES[ENDPOINTS["referentiel-nature-contrats"]]
         )
 
         # Connection pooling
-        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
-        with client:
+        with pole_emploi_partenaire_api_client() as client:
             first_client = client._get_httpx_client()
             assert client._refresh_token() == "foo batman"
-            assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
-            assert client.referentiel("naturesContrats") == pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+            assert client.appellations() == RESPONSES[ENDPOINTS["appellation"]]
+            assert client.referentiel("naturesContrats") == RESPONSES[ENDPOINTS["referentiel-nature-contrats"]]
             assert first_client is client._get_httpx_client()
 
         # Outside a context manager…
@@ -91,17 +94,17 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
             client.appellations()
 
         # …but if no context manager was used before, a new HTTPX client is created for each new request.
-        client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
+        client = pole_emploi_partenaire_api_client()
         assert client._refresh_token() == "foo batman"
         first_client = client._get_httpx_client()
-        assert client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+        assert client.appellations() == RESPONSES[ENDPOINTS["appellation"]]
         assert first_client is not client._get_httpx_client()
 
     @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
         job_seeker = JobSeekerFactory()
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
+        respx.post(ENDPOINTS["recherche-individu-certifie"]).respond(
+            200, json=RESPONSES[ENDPOINTS["recherche-individu-certifie"]][ResponseKind.FOUND]
         )
         id_national = self.api_client.recherche_individu_certifie(
             job_seeker.first_name,
@@ -127,8 +130,8 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     @respx.mock
     def test_recherche_individu_certifie_individual_api_errors(self):
         job_seeker = JobSeekerFactory()
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR
+        respx.post(ENDPOINTS["recherche-individu-certifie"]).respond(
+            200, json=RESPONSES[ENDPOINTS["recherche-individu-certifie"]][ResponseKind.ERROR]
         )
         with pytest.raises(PoleEmploiAPIBadResponse) as ctx:
             self.api_client.recherche_individu_certifie(
@@ -138,13 +141,13 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
                 job_seeker.jobseeker_profile.nir,
             )
         assert ctx.value.response_code == PEApiRechercheIndividuExitCode.R010
-        assert ctx.value.response_data == pole_emploi_api_mocks.API_RECHERCHE_ERROR
+        assert ctx.value.response_data == RESPONSES[ENDPOINTS["recherche-individu-certifie"]][ResponseKind.ERROR]
 
     @respx.mock
     def test_recherche_individu_certifie_retryable_errors(self):
         job_seeker = JobSeekerFactory()
 
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(401, json="")
+        respx.post(ENDPOINTS["recherche-individu-certifie"]).respond(401, json="")
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name,
@@ -154,7 +157,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
             )
         assert ctx.value.error_code == 401
 
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(429, json="")
+        respx.post(ENDPOINTS["recherche-individu-certifie"]).respond(429, json="")
         with pytest.raises(PoleEmploiRateLimitException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name,
@@ -164,9 +167,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
             )
 
         job_seeker = JobSeekerFactory()
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").mock(
-            side_effect=httpx.ConnectTimeout
-        )
+        respx.post(ENDPOINTS["recherche-individu-certifie"]).mock(side_effect=httpx.ConnectTimeout)
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name,
@@ -183,8 +184,8 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae does not raise.
         """
         job_application = JobApplicationFactory(with_approval=True)
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(
-            200, json=pole_emploi_api_mocks.API_MAJPASS_RESULT_OK
+        respx.post(ENDPOINTS["maj-pass-iae"]).respond(
+            200, json=RESPONSES[ENDPOINTS["maj-pass-iae"]][ResponseKind.MAJ_PASS_IAE_SUCCESS]
         )
         # we really don't care about the arguments there
         self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
@@ -193,52 +194,48 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     def test_mise_a_jour_pass_iae_failure(self):
         job_application = JobApplicationFactory(with_approval=True)
         # non-S001 codeSortie
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(
-            200, json=pole_emploi_api_mocks.API_MAJPASS_RESULT_ERROR
+        respx.post(ENDPOINTS["maj-pass-iae"]).respond(
+            200, json=RESPONSES[ENDPOINTS["maj-pass-iae"]][ResponseKind.MAJ_PASS_IAE_ERROR]
         )
         with pytest.raises(PoleEmploiAPIBadResponse):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
         # timeout
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").mock(side_effect=httpx.ConnectTimeout)
+        respx.post(ENDPOINTS["maj-pass-iae"]).mock(side_effect=httpx.ConnectTimeout)
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
         assert ctx.value.error_code == "http_error"
 
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(429, json={})
+        respx.post(ENDPOINTS["maj-pass-iae"]).respond(429, json={})
         with pytest.raises(PoleEmploiRateLimitException):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
         # auth failed
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(401, json={})
+        respx.post(ENDPOINTS["maj-pass-iae"]).respond(401, json={})
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
         assert ctx.value.error_code == 401
 
     @respx.mock
     def test_referentiel(self):
-        respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
-            200, json=pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        respx.get(ENDPOINTS["referentiel-nature-contrats"]).respond(
+            200, json=RESPONSES[ENDPOINTS["referentiel-nature-contrats"]]
         )
-        assert self.api_client.referentiel("naturesContrats") == pole_emploi_api_mocks.API_REFERENTIEL_NATURE_CONTRATS
+        assert self.api_client.referentiel("naturesContrats") == RESPONSES[ENDPOINTS["referentiel-nature-contrats"]]
 
     @respx.mock
     def test_offres(self):
-        respx.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-1").respond(
+        respx.get(f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=FT&range=0-1").respond(
             206,  # test code 206 as we already know that 200 is tested through the other tests
-            json={"resultats": pole_emploi_api_mocks.API_OFFRES},
+            json={"resultats": RESPONSES[ENDPOINTS["offres"]]},
         )
-        assert self.api_client.offres(natureContrat="FT", range="0-1") == pole_emploi_api_mocks.API_OFFRES
-        respx.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&range=100-140").respond(
-            204
-        )
+        assert self.api_client.offres(natureContrat="FT", range="0-1") == RESPONSES[ENDPOINTS["offres"]]
+        respx.get(f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=&range=100-140").respond(204)
         assert self.api_client.offres(range="100-140") == []
 
-        EA_OFFERS = [{**offer, "entrepriseAdaptee": True} for offer in pole_emploi_api_mocks.API_OFFRES]
+        EA_OFFERS = [{**offer, "entrepriseAdaptee": True} for offer in RESPONSES[ENDPOINTS["offres"]]]
 
-        respx.get(
-            "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true&range=0-1"
-        ).respond(
+        respx.get(f"{ENDPOINTS['offres']}?typeContrat=&natureContrat=&entreprisesAdaptees=true&range=0-1").respond(
             206,  # test code 206 as we already know that 200 is tested through the other tests
             json={"resultats": EA_OFFERS},
         )
@@ -246,11 +243,11 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
 
     @respx.mock
     def test_appellations(self):
-        respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
+        respx.get(ENDPOINTS["appellation"]).respond(
             200,
-            json=pole_emploi_api_mocks.API_APPELLATIONS,
+            json=RESPONSES[ENDPOINTS["appellation"]],
         )
-        assert self.api_client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+        assert self.api_client.appellations() == RESPONSES[ENDPOINTS["appellation"]]
 
     @respx.mock
     def test_agences(self):
@@ -311,12 +308,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.api_client = PoleEmploiRoyaumeAgentAPIClient(
-            base_url="https://pe.fake",
-            auth_base_url="https://auth.fr",
-            key="client_id",
-            secret="client_secret",
-        )
+        self.api_client = pole_emploi_agent_api_client()
         json_response = {
             "token_type": "Bearer",
             "access_token": "Catwoman",
@@ -333,18 +325,14 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @respx.mock
     def test_request_caches_token(self):
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json={"sample": "data"}
-        )
-        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(200, json={"sample": "data"})
+        self.api_client._request(ENDPOINTS["rechercher-usager-date-naissance-nir"])
         assert caches["failsafe"].get(PoleEmploiRoyaumeAgentAPIClient.CACHE_API_TOKEN_KEY) == "Bearer Catwoman"
 
     @respx.mock
     def test_request_http_request_headers(self):
-        mock = respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json={"sample": "data"}
-        )
-        self.api_client._request("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir")
+        mock = respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(200, json={"sample": "data"})
+        self.api_client._request(ENDPOINTS["rechercher-usager-date-naissance-nir"])
         headers = mock.calls[-1].request.headers
 
         expected_headers = {
@@ -360,7 +348,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         # test additional headers.
         additional_headers = {"ft-jeton-usager": "something-very-long"}
         self.api_client._request(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            ENDPOINTS["rechercher-usager-date-naissance-nir"],
             additional_headers=additional_headers,
         )
 
@@ -381,48 +369,28 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         "json_response,http_status_code,expected_error,expected_error_message",
         [
             pytest.param(
-                {
-                    "codeRetour": "R997",
-                    "message": "Une erreur de validation s'est produite",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.BAD_REQUEST],
                 400,
                 PoleEmploiAPIBadResponse,
                 r"PoleEmploiAPIBadResponse\(code=400\)",
                 id="400",
             ),
             pytest.param(
-                {
-                    "codeRetour": "R001",
-                    "message": "Accès non autorisé",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.FORBIDDEN],
                 403,
                 PoleEmploiAPIBadResponse,
                 r"PoleEmploiAPIBadResponse\(code=403\)",
                 id="403",
             ),
             pytest.param(
-                {
-                    "codeRetour": "R998",
-                    "message": "Un service a répondu en erreur",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.INTERNAL_SERVER_ERROR],
                 500,
                 PoleEmploiAPIException,
                 r"PoleEmploiAPIException\(code=500\)",
                 id="500",
             ),
             pytest.param(
-                {
-                    "codeRetour": "R999",
-                    "message": "Service indisponible, veuillez réessayer ultérieurement",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.SERVICE_UNAVAILABLE],
                 503,
                 PoleEmploiAPIException,
                 r"PoleEmploiAPIException\(code=503\)",
@@ -432,38 +400,24 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     )
     @respx.mock
     def test_request_status_codes(self, json_response, http_status_code, expected_error, expected_error_message):
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            http_status_code, json=json_response
-        )
+        respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(http_status_code, json=json_response)
         with pytest.raises(expected_error, match=expected_error_message):
             self.api_client._request(
-                "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+                ENDPOINTS["rechercher-usager-date-naissance-nir"],
             )
 
     @respx.mock
     def test_rechercher_usager_by_birthdate_and_nir(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json=json_response
+        respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.CERTIFIED]
         )
         jeton_usager = self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
         assert jeton_usager == "a_long_token"
 
     @respx.mock
     def test_rechercher_usager_by_pole_emploi_id(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail").respond(
-            200, json=json_response
+        respx.post(ENDPOINTS["rechercher-usager-numero-france-travail"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-numero-france-travail"]][ResponseKind.CERTIFIED]
         )
         jobseeker_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678901")
         jeton_usager = self.api_client.rechercher_usager(jobseeker_profile=jobseeker_profile)
@@ -473,38 +427,24 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         "json_response,exception_raised,exception_pattern",
         [
             pytest.param(
-                {
-                    "codeRetour": "S002",
-                    "message": "Aucun approchant trouvé",
-                    "jetonUsager": None,
-                    "topIdentiteCertifiee": None,
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.NOT_FOUND],
                 UserDoesNotExist,
                 r"UserDoesNotExist",
                 id="user_does_not_exist",
             ),
             pytest.param(
-                {
-                    "codeRetour": "S001",
-                    "message": "Approchant trouvé",
-                    "jetonUsager": "a_long_token",
-                    "topIdentiteCertifiee": "N",
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.NOT_CERTIFIED],
                 IdentityNotCertified,
                 r"IdentityNotCertified",
                 id="identity_not_certified",
             ),
             pytest.param(
-                {
-                    "codeRetour": "S003",
-                    "message": "Plusieurs usagers trouvés",
-                    "jetonUsager": None,
-                    "topIdentiteCertifiee": None,
-                },
+                RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.MULTIPLE_USERS_RETURNED],
                 MultipleUsersReturned,
                 r"MultipleUsersReturned",
                 id="multiple_users_returned",
             ),
+            # Code not documented.
             pytest.param(
                 {
                     "codeRetour": "S009",
@@ -520,25 +460,18 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     )
     @respx.mock
     def test_rechercher_usager_response_exceptions(self, json_response, exception_raised, exception_pattern):
-        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
-        respx.post(url).respond(200, json=json_response)
+        respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(200, json=json_response)
         with pytest.raises(exception_raised, match=exception_pattern):
             self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
 
     @respx.mock
     def test_rechercher_usager_calls_nir_endpoint(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        mock_birthdate_nir = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
-        ).respond(200, json=json_response)
-        mock_pole_emploi_id = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
-        ).respond(200, json=json_response)
+        mock_birthdate_nir = respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.CERTIFIED]
+        )
+        mock_pole_emploi_id = respx.post(ENDPOINTS["rechercher-usager-numero-france-travail"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-numero-france-travail"]][ResponseKind.CERTIFIED]
+        )
 
         token = self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
         assert token == "a_long_token"
@@ -547,18 +480,12 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @respx.mock
     def test_rechercher_usager_calls_pole_emploi_id_endpoint(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        mock_birthdate_nir = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
-        ).respond(200, json=json_response)
-        mock_pole_emploi_id = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
-        ).respond(200, json=json_response)
+        mock_birthdate_nir = respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.CERTIFIED]
+        )
+        mock_pole_emploi_id = respx.post(ENDPOINTS["rechercher-usager-numero-france-travail"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-numero-france-travail"]][ResponseKind.CERTIFIED]
+        )
 
         jobseeker_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678910")
         token = self.api_client.rechercher_usager(jobseeker_profile=jobseeker_profile)
@@ -570,12 +497,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         "json_response,expected_data",
         [
             pytest.param(
-                {
-                    "dateDebutRqth": "2024-01-20",
-                    "dateFinRqth": "2030-01-20",
-                    "source": "FRANCE TRAVAIL",
-                    "topValiditeRQTH": True,
-                },
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.CERTIFIED],
                 {
                     "is_certified": True,
                     "start_at": datetime.date(2024, 1, 20),
@@ -584,12 +506,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                 id="certified",
             ),
             pytest.param(
-                {
-                    "dateDebutRqth": "",
-                    "dateFinRqth": "",
-                    "source": "",
-                    "topValiditeRQTH": False,
-                },
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.NOT_CERTIFIED],
                 {
                     "is_certified": False,
                     "start_at": None,
@@ -598,12 +515,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                 id="not_certified",
             ),
             pytest.param(
-                {
-                    "dateDebutRqth": "2024-01-20",
-                    "dateFinRqth": "9999-12-31",
-                    "source": "FRANCE TRAVAIL",
-                    "topValiditeRQTH": True,
-                },
+                RESPONSES[ENDPOINTS["rqth"]][ResponseKind.CERTIFIED_FOR_EVER],
                 {
                     "is_certified": True,
                     "start_at": datetime.date(2024, 1, 20),
@@ -632,17 +544,11 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     )
     @respx.mock
     def test_certify_rqth(self, json_response, expected_data):
-        rechercher_usager_json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json=rechercher_usager_json_response
+        respx.post(ENDPOINTS["rechercher-usager-date-naissance-nir"]).respond(
+            200, json=RESPONSES[ENDPOINTS["rechercher-usager-date-naissance-nir"]][ResponseKind.CERTIFIED]
         )
 
-        respx.get("https://pe.fake/donnees-rqth/v1/rqth").respond(200, json=json_response)
+        respx.get(ENDPOINTS["rqth"]).respond(200, json=json_response)
 
         # The RQTH certification calls two endpoints: rechercher_usager and donnees_rqth.
         # Use a context manager to reuse the same HTTP client.

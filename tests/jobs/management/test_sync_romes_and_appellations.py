@@ -1,17 +1,9 @@
 from django.core import management
-from django.test import override_settings
 
 from itou.jobs.models import Appellation, Rome
+from itou.utils.mocks.pole_emploi import ENDPOINTS
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
 def test_sync_rome_appellation(caplog, respx_mock):
     respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
         200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
@@ -23,7 +15,7 @@ def test_sync_rome_appellation(caplog, respx_mock):
             {"code": "MET01", "libelle": "Edition"},
         ],
     )
-    respx_mock.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
+    respx_mock.get(ENDPOINTS["appellation"]).respond(
         200,
         json=[
             {"code": "JOB32", "libelle": "Ecriveur de bouquins", "metier": {"code": "MET01"}},

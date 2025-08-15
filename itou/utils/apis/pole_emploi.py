@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.cache import caches
 from unidecode import unidecode
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,11 @@ OFFERS_MAX_INDEX = 3149
 OFFERS_MAX_RANGE = 150
 
 
-class PoleEmploiAPIException(Exception):
+class PoleEmploiAPIBaseException(Exception):
+    pass
+
+
+class PoleEmploiAPIException(PoleEmploiAPIBaseException):
     """unexpected exceptions (meaning, "exceptional") that warrant a subsequent retry."""
 
     def __init__(self, error_code=None, response_content=None):
@@ -37,7 +43,7 @@ class PoleEmploiAPIException(Exception):
         return name
 
 
-class PoleEmploiAPIBadResponse(Exception):
+class PoleEmploiAPIBadResponse(PoleEmploiAPIBaseException):
     """errors that can't be recovered from: the API server does not agree."""
 
     def __init__(self, response_code=None, response_data=None):
@@ -65,6 +71,10 @@ class MultipleUsersReturned(PoleEmploiAPIBadResponse):
 
 
 class PoleEmploiRateLimitException(PoleEmploiAPIException):
+    pass
+
+
+class JobSeekerProfileBadInformationError(PoleEmploiAPIBaseException):
     pass
 
 
@@ -338,12 +348,13 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not token:
             token = self._refresh_token()
 
-        # TODO(cms): use real names.
         # These headers MUST be provided.
         # - if not: a 302 will be returned.
         # - if value is an empty string: a 401 will be returned.
         # As of today, no verification seems to be done on FT's side.
         # Any value is good, as far as there is one.
+        # NOTE(cms): it should be better to send real data but we don't know which one
+        # to profide for the moment.
         agents_headers = {
             "pa-nom-agent": "<string>",
             "pa-prenom-agent": "<string>",
@@ -368,6 +379,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             )
         except httpx.HTTPStatusError as exc:
             match exc.response.status_code:
+                # Documentation does not mention a Retry-After header.
                 case 429:
                     raise PoleEmploiRateLimitException(error_code=429)
                 case 400 | 401 | 403 as error_code:
@@ -383,7 +395,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
     def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
         if not pole_emploi_id:
-            raise TypeError("`pole_emploi_id` is mandatory.")
+            raise JobSeekerProfileBadInformationError("`pole_emploi_id` is mandatory.")
         return self._request(
             f"{self.base_url}/rechercher-usager/v2/usagers/par-numero-francetravail",
             {
@@ -393,7 +405,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
     def _rechercher_usager_by_birthdate_and_nir(self, birthdate, nir):
         if not (birthdate and nir):
-            raise TypeError("`birthdate` and `nir` are mandatory.")
+            raise JobSeekerProfileBadInformationError("`birthdate` and `nir` are mandatory.")
         return self._request(
             f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
             {
@@ -418,20 +430,20 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         elif pole_emploi_id:
             data = self._rechercher_usager_by_pole_emploi_id(pole_emploi_id=pole_emploi_id)
         else:
-            raise TypeError("Please provide a birthdate and a nir or a pole_emploi_id.")
+            raise JobSeekerProfileBadInformationError("Please provide a birthdate and a nir or a pole_emploi_id.")
 
         match data["codeRetour"]:
             case "S001":
                 pass
             case "S002":
-                raise UserDoesNotExist()
+                raise UserDoesNotExist(response_data=data)
             case "S003":
-                raise MultipleUsersReturned()
+                raise MultipleUsersReturned(response_data=data)
             case _ as response_code:
                 raise PoleEmploiAPIBadResponse(response_code=response_code, response_data=data)
 
         if data["topIdentiteCertifiee"] != "O":
-            raise IdentityNotCertified()
+            raise IdentityNotCertified(response_data=data)
 
         return data["jetonUsager"]
 
@@ -470,3 +482,9 @@ def pole_emploi_agent_api_client():
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )
+
+
+def certify_criteria(criterion_kind, jobseeker_profile, client=None):
+    client = client or pole_emploi_agent_api_client()
+    if criterion_kind == AdministrativeCriteriaKind.TH:
+        return client.certify_rqth(jobseeker_profile=jobseeker_profile)

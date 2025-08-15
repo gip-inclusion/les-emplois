@@ -74,3 +74,10 @@ FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
 REQUIRE_OTP_FOR_STAFF = False
 
 BREVO_API_URL = "https://mailer.test.com"
+
+API_ESD = {
+    "AUTH_BASE_URL": "https://auth.fr",
+    "KEY": "foobar",
+    "SECRET": "pe-secret",
+    "BASE_URL": "https://pe.fake",
+}
