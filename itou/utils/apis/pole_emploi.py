@@ -72,6 +72,10 @@ class PoleEmploiRateLimitException(PoleEmploiAPIException):
     pass
 
 
+class JobSeekerProfileBadInformationError(PoleEmploiAPIBaseException):
+    pass
+
+
 API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
 
 
@@ -388,7 +392,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
     def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
         if not pole_emploi_id:
-            raise TypeError("`pole_emploi_id` is mandatory.")
+            raise JobSeekerProfileBadInformationError("`pole_emploi_id` is mandatory.")
         return self._request(
             f"{self.base_url}/rechercher-usager/v2/usagers/par-numero-francetravail",
             {
@@ -398,7 +402,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
     def _rechercher_usager_by_birthdate_and_nir(self, birthdate, nir):
         if not (birthdate and nir):
-            raise TypeError("`birthdate` and `nir` are mandatory.")
+            raise JobSeekerProfileBadInformationError("`birthdate` and `nir` are mandatory.")
         return self._request(
             f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
             {
@@ -423,7 +427,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         elif pole_emploi_id:
             data = self._rechercher_usager_by_pole_emploi_id(pole_emploi_id=pole_emploi_id)
         else:
-            raise TypeError("Please provide a birthdate and a nir or a pole_emploi_id.")
+            raise JobSeekerProfileBadInformationError("Please provide a birthdate and a nir or a pole_emploi_id.")
 
         match data["codeRetour"]:
             case "S001":
