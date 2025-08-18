@@ -932,7 +932,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         return search_fields
 
 
-class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
+class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
     inlines = (PkSupportRemarkInline,)
 
 
