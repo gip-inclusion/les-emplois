@@ -1183,7 +1183,7 @@
                  AND "users_user"."upcoming_deletion_notified_at" <= %s)
           ORDER BY 36 ASC,
                    "users_user"."upcoming_deletion_notified_at" ASC
-          LIMIT 100
+          LIMIT 200
           FOR
           UPDATE OF "users_user" SKIP LOCKED
         ''',
