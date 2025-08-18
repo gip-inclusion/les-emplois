@@ -98,7 +98,7 @@
                                 {% for contract in contracts_page %}
                                     <tr>
                                         <td>
-                                            <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee }}</a>
+                                            <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
                                         </td>
                                         <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
                                         <td>

@@ -408,7 +408,8 @@ class Employee(models.Model):
         full_name = f"{self.last_name.strip().upper()} {self.first_name.title().strip()}"
         return full_name.strip()
 
-    def __str__(self):
+    @property
+    def display_with_pii(self):
         return self.get_full_name()
 
     def get_prior_actions(self):
