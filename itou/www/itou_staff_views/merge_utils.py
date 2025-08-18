@@ -30,17 +30,12 @@ def get_log_prefix(to_user, from_user):
 
 def get_users_relations():
     relations = []
-    for rel in (rel for rel in User._meta.get_fields() if rel.auto_created and not rel.concrete):
-        if getattr(rel, "through", None):
-            # ManyToMany relation, we will use the ManyToOne relation from the through model instead
-            continue
+    for rel in (
+        field for field in User._meta.get_fields(include_hidden=True) if field.one_to_many or field.one_to_one
+    ):
         couple = (rel.related_model, rel.field.name)
         if MODEL_MAPPING.get(couple) != noop:
             relations.append(couple)
-
-    # JobApplication.archived_by does not have a backward relation because of related_name="+"
-    relations.append((JobApplication, "archived_by"))
-
     return sorted(relations, key=lambda t: (t[0].__module__, t[0].__name__, t[1]))
 
 
@@ -143,6 +138,8 @@ MODEL_MAPPING = {
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
     (FollowUpGroupMembership, "member"): handle_follow_up_group_membership,
+    (User._meta.get_field("groups").remote_field.through, "user"): noop,
+    (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,
 }
 
 MODEL_REPR_MAPPING = {
