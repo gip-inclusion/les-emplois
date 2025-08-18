@@ -122,8 +122,10 @@ class Command(BaseCommand):
         parser.add_argument("--mode", required=True, choices=["all", *sorted(self.MODE_TO_OPERATION)])
 
     def populate_analytics(self):
-        populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
-        populate_table(analytics.DashboardVisitTable, batch_size=10_000, querysets=[StatsDashboardVisit.objects.all()])
+        populate_table(analytics.AnalyticsTable, batch_size=100_000, querysets=[Datum.objects.all()])
+        populate_table(
+            analytics.DashboardVisitTable, batch_size=100_000, querysets=[StatsDashboardVisit.objects.all()]
+        )
 
     def populate_companies(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
@@ -206,7 +208,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        populate_table(companies.TABLE, batch_size=100, querysets=[queryset])
+        populate_table(companies.TABLE, batch_size=200, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -330,11 +332,11 @@ class Command(BaseCommand):
         )
         job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers_table, batch_size=1_000, querysets=[queryset])
+        populate_table(job_seekers_table, batch_size=5_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
-        populate_table(criteria.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(criteria.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_job_applications(self):
         queryset = (
@@ -377,7 +379,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        populate_table(job_applications.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(job_applications.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
@@ -407,48 +409,48 @@ class Command(BaseCommand):
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        populate_table(approvals.TABLE, batch_size=1_000, querysets=[queryset1, queryset2])
+        populate_table(approvals.TABLE, batch_size=5_000, querysets=[queryset1, queryset2])
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()
-        populate_table(prolongations.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(prolongations.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_prolongation_requests(self):
         queryset = ProlongationRequest.objects.select_related(
             "prolongation",
             "deny_information",
         ).all()
-        populate_table(prolongation_requests.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(prolongation_requests.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_suspensions(self):
         queryset = Suspension.objects.all()
-        populate_table(suspensions.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(suspensions.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_institutions(self):
         queryset = Institution.objects.all()
-        populate_table(institutions.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(institutions.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_evaluation_campaigns(self):
         queryset = EvaluationCampaign.objects.all()
-        populate_table(evaluation_campaigns.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(evaluation_campaigns.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_evaluated_siaes(self):
         queryset = EvaluatedSiae.objects.prefetch_related(
             "evaluated_job_applications__evaluated_administrative_criteria"
         ).all()
-        populate_table(evaluated_siaes.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset])
 
     def populate_evaluated_job_applications(self):
         queryset = EvaluatedJobApplication.objects.prefetch_related("evaluated_administrative_criteria").all()
-        populate_table(evaluated_job_applications.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(evaluated_job_applications.TABLE, batch_size=20_000, querysets=[queryset])
 
     def populate_evaluated_criteria(self):
         queryset = EvaluatedAdministrativeCriteria.objects.all()
-        populate_table(evaluated_criteria.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_users(self):
         queryset = User.objects.filter(kind__in=UserKind.professionals(), is_active=True)
-        populate_table(users.TABLE, batch_size=1_000, querysets=[queryset])
+        populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_memberships(self):
         siae_queryset = CompanyMembership.objects.active()
@@ -456,13 +458,13 @@ class Command(BaseCommand):
         institution_queryset = InstitutionMembership.objects.active()
 
         populate_table(
-            memberships.TABLE, batch_size=1_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
+            memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
         )
 
     def populate_references(self):
         # DB referential
-        populate_table(rome_codes.TABLE, batch_size=1_000, querysets=[Rome.objects.all()])
-        populate_table(insee_codes.TABLE, batch_size=1_000, querysets=[City.objects.all()])
+        populate_table(rome_codes.TABLE, batch_size=100_000, querysets=[Rome.objects.all()])
+        populate_table(insee_codes.TABLE, batch_size=50_000, querysets=[City.objects.all()])
         # Code referential
         rows = []
         for dpt_code, dpt_name in DEPARTMENTS.items():
