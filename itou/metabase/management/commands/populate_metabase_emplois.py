@@ -89,7 +89,12 @@ class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Order in the dict is the order in which the function are going to be called, hence referential data on top
         self.MODE_TO_OPERATION = {
+            # Referential data
+            "references": self.populate_references,
+            "enums": self.populate_enums,
+            # Business data
             "analytics": self.populate_analytics,
             "companies": self.populate_companies,
             "job_descriptions": self.populate_job_descriptions,
@@ -109,19 +114,12 @@ class Command(BaseCommand):
             "evaluated_criteria": self.populate_evaluated_criteria,
             "users": self.populate_users,
             "memberships": self.populate_memberships,
-            "rome_codes": self.populate_rome_codes,
-            "insee_codes": self.populate_insee_codes,
-            "departments": self.populate_departments,
-            "enums": self.populate_enums,
             "gps_groups": self.populate_gps_groups,
             "gps_memberships": self.populate_gps_memberships,
         }
 
     def add_arguments(self, parser):
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
-        group.add_argument("--daily", action="store_true")
-        group.add_argument("--monthly", action="store_true")
+        parser.add_argument("--mode", required=True, choices=["all", *sorted(self.MODE_TO_OPERATION)])
 
     def populate_analytics(self):
         populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
@@ -461,33 +459,20 @@ class Command(BaseCommand):
             memberships.TABLE, batch_size=1000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
         )
 
-    def populate_rome_codes(self):
-        queryset = Rome.objects.all()
-
-        populate_table(rome_codes.TABLE, batch_size=1000, querysets=[queryset])
-
-    def populate_insee_codes(self):
-        queryset = City.objects.all()
-
-        populate_table(insee_codes.TABLE, batch_size=1000, querysets=[queryset])
-
-    def populate_departments(self):
-        table_name = "departements"
-        self.logger.info("Preparing content for %s table...", table_name)
-
+    def populate_references(self):
+        # DB referential
+        populate_table(rome_codes.TABLE, batch_size=1000, querysets=[Rome.objects.all()])
+        populate_table(insee_codes.TABLE, batch_size=1000, querysets=[City.objects.all()])
+        # Code referential
         rows = []
         for dpt_code, dpt_name in DEPARTMENTS.items():
             # We want to preserve the order of columns.
             row = OrderedDict()
-
             row["code_departement"] = dpt_code
             row["nom_departement"] = dpt_name
             row["nom_region"] = DEPARTMENT_TO_REGION[dpt_code]
-
             rows.append(row)
-
-        df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name)
+        store_df(df=get_df_from_rows(rows), table_name="departements")
 
     def populate_enums(self):
         # TODO(vperron,dejafait): This works as long as we don't have several table creations in the same call.
@@ -538,39 +523,12 @@ class Command(BaseCommand):
         wait=tenacity.wait_fixed(5),
         after=log_retry_attempt,
     )
-    def handle(self, *, mode=None, daily=False, monthly=False, **options):
-        if mode:
-            self.MODE_TO_OPERATION[mode]()
-        elif daily:
+    def handle(self, *, mode, **options):
+        if mode == "all":
             send_slack_message(":rocket: lancement mise à jour de données C1 -> Metabase")
-            self.populate_enums()
-            self.populate_analytics()
-            self.populate_companies()
-            self.populate_job_descriptions()
-            self.populate_organizations()
-            self.populate_job_seekers()
-            self.populate_criteria()
-            self.populate_job_applications()
-            self.populate_selected_jobs()
-            self.populate_approvals()
-            self.populate_prolongations()
-            self.populate_prolongation_requests()
-            self.populate_suspensions()
-            self.populate_institutions()
-            self.populate_evaluation_campaigns()
-            self.populate_evaluated_siaes()
-            self.populate_evaluated_job_applications()
-            self.populate_evaluated_criteria()
-            self.populate_users()
-            self.populate_memberships()
-            self.populate_gps_groups()
-            self.populate_gps_memberships()
+            for operation in self.MODE_TO_OPERATION.values():
+                operation()
             build_dbt_daily()
             send_slack_message(":white_check_mark: succès mise à jour de données C1 -> Metabase")
-        elif monthly:
-            send_slack_message(":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase")
-            self.populate_rome_codes()
-            self.populate_insee_codes()
-            self.populate_departments()
-            build_dbt_daily()
-            send_slack_message(":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase")
+        else:
+            self.MODE_TO_OPERATION[mode]()
