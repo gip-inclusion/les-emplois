@@ -5,7 +5,6 @@ Helper methods for manipulating dataframes used by the populate_metabase_emplois
 import numpy as np
 import pandas as pd
 from psycopg import sql
-from tqdm import tqdm
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
 
@@ -31,59 +30,43 @@ def infer_columns_from_df(df):
     ]
 
 
-def store_df(df, table_name, max_attempts=5):
+def store_df(df, table_name, batch_size=10_000):
     """
     Store dataframe in database.
 
     Do this chunk by chunk to solve
     psycopg.OperationalError "server closed the connection unexpectedly" error.
-
-    Try up to `max_attempts` times.
     """
     # Drop unnamed columns
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
 
-    # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
-    rows_per_chunk = 10 * 1000
-    df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
-
-    print(f"Storing {table_name} in {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
-
-    attempts = 0
+    columns = infer_columns_from_df(df)
+    print(f"Injecting {len(df)} rows with {len(columns)} columns into table {table_name}:")
 
     new_table_name = get_new_table_name(table_name)
-    while attempts < max_attempts:
-        try:
-            columns = infer_columns_from_df(df)
-            create_table(new_table_name, columns, reset=True)
-            for df_chunk in tqdm(df_chunks):
-                rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
-                with MetabaseDatabaseCursor() as (cursor, conn):
-                    with cursor.copy(
-                        sql.SQL("COPY {table_name} FROM STDIN WITH (FORMAT BINARY)").format(
-                            table_name=sql.Identifier(new_table_name),
-                            Fields=sql.SQL(",").join(
-                                [sql.Identifier(col[0]) for col in columns],
-                            ),
-                        )
-                    ) as copy:
-                        copy.set_types([col[1] for col in columns])
-                        for row in rows:
-                            copy.write_row(row)
-                    conn.commit()
-            break
-        except Exception as e:
-            # Catching all exceptions is a generally a code smell but we eventually reraise it so it's ok.
-            attempts += 1
-            print(f"Attempt #{attempts} failed with exception {repr(e)}.")
-            if attempts == max_attempts:
-                print("No more attemps left, giving up and raising the exception.")
-                raise
-            print("New attempt started...")
+    create_table(new_table_name, columns, reset=True)
+
+    with MetabaseDatabaseCursor() as (cursor, conn):
+        written_rows = 0
+        # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
+        for df_chunk in [df[i : i + batch_size] for i in range(0, df.shape[0], batch_size)]:
+            rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
+            with cursor.copy(
+                sql.SQL("COPY {new_table_name} ({fields}) FROM STDIN WITH (FORMAT BINARY)").format(
+                    new_table_name=sql.Identifier(new_table_name),
+                    fields=sql.SQL(",").join(
+                        [sql.Identifier(col[0]) for col in columns],
+                    ),
+                )
+            ) as copy:
+                copy.set_types([col[1] for col in columns])
+                for row in rows:
+                    copy.write_row(row)
+            conn.commit()
+            written_rows += len(df_chunk)
+            print(f"count={written_rows} of total={len(df)} written")
 
     rename_table_atomically(new_table_name, table_name)
-    print(f"Stored {table_name} in database ({len(df)} rows).")
-    print("")
 
 
 def get_df_from_rows(rows):
