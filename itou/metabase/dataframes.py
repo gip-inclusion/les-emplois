@@ -2,6 +2,8 @@
 Helper methods for manipulating dataframes used by the populate_metabase_emplois script.
 """
 
+import time
+
 import numpy as np
 import pandas as pd
 from psycopg import sql
@@ -37,6 +39,8 @@ def store_df(df, table_name, batch_size=10_000):
     Do this chunk by chunk to solve
     psycopg.OperationalError "server closed the connection unexpectedly" error.
     """
+    start_time = time.perf_counter()
+
     # Drop unnamed columns
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
 
@@ -50,6 +54,7 @@ def store_df(df, table_name, batch_size=10_000):
         written_rows = 0
         # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
         for df_chunk in [df[i : i + batch_size] for i in range(0, df.shape[0], batch_size)]:
+            chunk_start_time = time.perf_counter()
             rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
             with cursor.copy(
                 sql.SQL("COPY {new_table_name} ({fields}) FROM STDIN WITH (FORMAT BINARY)").format(
@@ -64,9 +69,13 @@ def store_df(df, table_name, batch_size=10_000):
                     copy.write_row(row)
             conn.commit()
             written_rows += len(df_chunk)
-            print(f"count={written_rows} of total={len(df)} written")
+            print(
+                f"count={written_rows} of total={len(df)} written "
+                f"in {time.perf_counter() - chunk_start_time:0.2f} seconds"
+            )
 
     rename_table_atomically(new_table_name, table_name)
+    print(f"Table {table_name} created in {time.perf_counter() - start_time:0.2f} seconds")
 
 
 def get_df_from_rows(rows):

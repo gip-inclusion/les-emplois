@@ -4,6 +4,7 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 
 import copy
 import gc
+import time
 
 import psycopg
 from django.conf import settings
@@ -110,6 +111,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     Note that psycopg will always automatically open a new transaction when none is open.
     Thus it will open a new one after each such commit.
     """
+    start_time = time.perf_counter()
 
     table_name = table.name
 
@@ -184,11 +186,16 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # A bigger number makes the script faster until a certain point,
             # but it also increases RAM usage.
             for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
+                chunk_start_time = time.perf_counter()
                 inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                 written_rows += chunk_qs.count()
-                print(f"count={written_rows} of total={total_rows} written")
+                print(
+                    f"count={written_rows} of total={total_rows} written "
+                    f"in {time.perf_counter() - chunk_start_time:0.2f} seconds"
+                )
 
             # Trigger garbage collection to optimize memory use.
             gc.collect()
 
     rename_table_atomically(new_table_name, table_name)
+    print(f"Table {table_name} created in {time.perf_counter() - start_time:0.2f} seconds")
