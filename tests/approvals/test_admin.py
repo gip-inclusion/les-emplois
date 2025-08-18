@@ -355,3 +355,10 @@ def test_suspension_form(admin_client):
     assert suspension.start_at == new_start_date.date()
     assert suspension.end_at == new_end_date.date()
     assert suspension.updated_at == timezone.now()
+
+
+def test_created_by_display(admin_client):
+    staff_user = ItouStaffFactory()
+    approval = ApprovalFactory(created_by=staff_user)
+    response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+    assertContains(response, staff_user.display_with_pii)
