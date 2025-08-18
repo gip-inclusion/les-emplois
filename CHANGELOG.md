@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 2025-08-18
+
+### Ajouté
+
+- [Admin : Filtrer les campagnes a posteriori dont le pourcentage a été renseigné](https://github.com/gip-inclusion/les-emplois/pull/6697)
+- [Profil salarié : Ajout d’un lien supplémentaire dans l’encart IF](https://github.com/gip-inclusion/les-emplois/pull/6676)
+
+### Modifié
+
+- [Page candidat : séparation des critères administratifs des diagnostics avec des point-virgules](https://github.com/gip-inclusion/les-emplois/pull/6683)
+
 ## 2025-08-11
 
 ### Ajouté
