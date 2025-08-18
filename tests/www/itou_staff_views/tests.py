@@ -26,7 +26,7 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
-from itou.users.models import User
+from itou.users.models import NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
@@ -38,6 +38,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.employee_record.factories import EmployeeRecordTransitionLogFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -559,77 +560,91 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
-    def test_merge_other_relations(self, client, caplog):
-        prescriber_1 = PrescriberFactory()
-        prescriber_2 = PrescriberFactory()
+    @pytest.mark.parametrize(
+        "factory",
+        [PrescriberFactory, EmployerFactory],
+        ids=["prescriber", "employer"],
+    )
+    def test_merge_other_relations(self, factory, client, caplog):
+        user_1, user_2 = factory.create_batch(2)
         job_app = JobApplicationFactory(
-            sender=prescriber_2,
-            approval_manually_refused_by=prescriber_2,
-            archived_by=prescriber_2,
+            sender=user_2,
+            approval_manually_refused_by=user_2,
+            archived_by=user_2,
             archived_at=timezone.now(),
-            transferred_by=prescriber_2,
+            transferred_by=user_2,
             eligibility_diagnosis=None,
         )
-        log = JobApplicationTransitionLog(job_application=job_app, user=prescriber_2)
-        log.save()
+        job_app_log = JobApplicationTransitionLog(job_application=job_app, user=user_2)
+        job_app_log.save()
         prolongation = ProlongationFactory(
-            created_by=prescriber_2,
-            updated_by=prescriber_2,
-            validated_by=prescriber_2,
-            declared_by=prescriber_2,
+            created_by=user_2,
+            updated_by=user_2,
+            validated_by=user_2,
+            declared_by=user_2,
         )
         prolongation_request = ProlongationRequestFactory(
-            created_by=prescriber_2,
-            updated_by=prescriber_2,
-            assigned_to=prescriber_2,
-            declared_by=prescriber_2,
-            processed_by=prescriber_2,
+            created_by=user_2,
+            updated_by=user_2,
+            assigned_to=user_2,
+            declared_by=user_2,
+            processed_by=user_2,
         )
-        job_seeker = JobSeekerFactory(created_by=prescriber_2)
-        invitation = EmployerInvitationFactory(sender=prescriber_2)
-        gps_group = FollowUpGroupMembershipFactory(member=prescriber_2)
-        iae_diagnosis = IAEEligibilityDiagnosisFactory(author=prescriber_2, from_prescriber=True)
-        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(author=prescriber_2, from_prescriber=True)
-        suspension = SuspensionFactory(created_by=prescriber_2, updated_by=prescriber_2)
+        job_seeker = JobSeekerFactory(created_by=user_2)
+        invitation = EmployerInvitationFactory(sender=user_2)
+        gps_group = FollowUpGroupMembershipFactory(member=user_2)
+        iae_diagnosis = IAEEligibilityDiagnosisFactory(author=user_2, from_prescriber=True)
+        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(author=user_2, from_employer=True)
+        suspension = SuspensionFactory(created_by=user_2, updated_by=user_2)
+        nir_modification_request = NirModificationRequest.objects.create(
+            jobseeker_profile=job_seeker.jobseeker_profile,
+            nir="269054958815780",
+            requested_by=user_2,
+        )
+
+        if user_2.is_employer:
+            employee_record_log = EmployeeRecordTransitionLogFactory(user=user_2)
 
         client.force_login(ItouStaffFactory(is_superuser=True))
-        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(user_1.public_id, user_2.public_id))
         client.post(url, data={"user_to_keep": "to_user"})
 
         job_app.refresh_from_db()
-        assert job_app.sender == prescriber_1
-        assert job_app.approval_manually_refused_by == prescriber_1
-        assert job_app.archived_by == prescriber_1
-        assert job_app.transferred_by == prescriber_1
-        log.refresh_from_db()
-        assert log.user == prescriber_1
+        assert job_app.sender == user_1
+        assert job_app.approval_manually_refused_by == user_1
+        assert job_app.archived_by == user_1
+        assert job_app.transferred_by == user_1
+        job_app_log.refresh_from_db()
+        assert job_app_log.user == user_1
         prolongation.refresh_from_db()
-        assert prolongation.created_by == prescriber_1
-        assert prolongation.updated_by == prescriber_1
-        assert prolongation.validated_by == prescriber_1
-        assert prolongation.declared_by == prescriber_1
+        assert prolongation.created_by == user_1
+        assert prolongation.updated_by == user_1
+        assert prolongation.validated_by == user_1
+        assert prolongation.declared_by == user_1
         prolongation_request.refresh_from_db()
-        assert prolongation_request.created_by == prescriber_1
-        assert prolongation_request.updated_by == prescriber_1
-        assert prolongation_request.assigned_to == prescriber_1
-        assert prolongation_request.declared_by == prescriber_1
-        assert prolongation_request.processed_by == prescriber_1
+        assert prolongation_request.created_by == user_1
+        assert prolongation_request.updated_by == user_1
+        assert prolongation_request.assigned_to == user_1
+        assert prolongation_request.declared_by == user_1
+        assert prolongation_request.processed_by == user_1
         job_seeker.refresh_from_db()
-        assert job_seeker.created_by == prescriber_1
+        assert job_seeker.created_by == user_1
         invitation.refresh_from_db()
-        assert invitation.sender == prescriber_1
+        assert invitation.sender == user_1
         gps_group.refresh_from_db()
-        assert gps_group.member == prescriber_1
+        assert gps_group.member == user_1
         iae_diagnosis.refresh_from_db()
-        assert iae_diagnosis.author == prescriber_1
+        assert iae_diagnosis.author == user_1
         geiq_diagnosis.refresh_from_db()
-        assert geiq_diagnosis.author == prescriber_1
+        assert geiq_diagnosis.author == user_1
         suspension.refresh_from_db()
-        assert suspension.created_by == prescriber_1
-        assert suspension.updated_by == prescriber_1
+        assert suspension.created_by == user_1
+        assert suspension.updated_by == user_1
+        nir_modification_request.refresh_from_db()
+        assert nir_modification_request.requested_by == user_1
 
-        prefix = f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
-        assert caplog.messages == [
+        prefix = f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — "
+        expected_messages = [
             f"{prefix}itou.approvals.models.Prolongation.created_by : [{prolongation.pk}]",
             f"{prefix}itou.approvals.models.Prolongation.declared_by : [{prolongation.pk}]",
             f"{prefix}itou.approvals.models.Prolongation.updated_by : [{prolongation.pk}]",
@@ -649,11 +664,22 @@ class TestMergeUsers:
             f"{prefix}itou.job_applications.models.JobApplication.archived_by : [{job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.sender : [{job_app.pk}]",
             f"{prefix}itou.job_applications.models.JobApplication.transferred_by : [{job_app.pk}]",
-            f"{prefix}itou.job_applications.models.JobApplicationTransitionLog.user : [{log.pk}]",
+            f"{prefix}itou.job_applications.models.JobApplicationTransitionLog.user : [{job_app_log.pk}]",
+            f"{prefix}itou.users.models.NirModificationRequest.requested_by : [{nir_modification_request.pk}]",
             f"{prefix}itou.users.models.User.created_by : [{job_seeker.pk}]",
-            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — Done !",
             "HTTP 302 Found",
         ]
+
+        if user_2.is_employer:
+            expected_messages.insert(
+                13,
+                f"{prefix}itou.employee_record.models.EmployeeRecordTransitionLog.user : [{employee_record_log.pk}]",
+            )
+            employee_record_log.refresh_from_db()
+            assert employee_record_log.user == user_1
+
+        assert caplog.messages == expected_messages
 
     def test_merge_tokens(self, client, caplog):
         employer_1 = EmployerFactory()
