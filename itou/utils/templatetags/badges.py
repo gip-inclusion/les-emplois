@@ -28,14 +28,14 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
         attrs.append('hx-swap-oob="true"')
     badge = f"<span {' '.join(attrs)}>{job_application.get_state_display()}</span>"
     if job_application.archived_at:
-        badge = f"""\
+        badge = f"""{badge}
             <span class="badge rounded-pill {extra_classes} bg-light text-primary"
                   aria-label="candidature archivée"
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                   data-bs-title="Candidature archivée">
               <i class="ri-archive-line mx-0"></i>
-            </span>{badge}"""
+            </span>"""
     return mark_safe(badge)
 
 
