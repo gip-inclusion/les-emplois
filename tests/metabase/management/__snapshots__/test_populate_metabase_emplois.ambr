@@ -1,4 +1,586 @@
 # serializer version: 1
+# name: test_populate_analytics
+  dict({
+    'num_queries': 52,
+    'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "analytics_datum"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_c1_analytics_v0"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_c1_analytics_v0" ("id" varchar,"type" varchar,"date" varchar,"value" integer,"type_detail" varchar,"date_mise_à_jour_metabase" date)',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."id" IS \'ID du point de mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."type" IS \'Type de mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."date" IS \'Date associée à la mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."value" IS \'Valeur de la mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."type_detail" IS \'Type détaillé\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_analytics_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'chunked_queryset[metabase/utils.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_datum"."id" AS "pk"
+          FROM "analytics_datum"
+          ORDER BY 1 ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'chunked_queryset[metabase/utils.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_datum"."id" AS "pk"
+          FROM "analytics_datum"
+          WHERE "analytics_datum"."id" >= %s
+          ORDER BY 1 ASC
+          LIMIT 1
+          OFFSET 100000
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_datum"."id",
+                 "analytics_datum"."code",
+                 "analytics_datum"."bucket",
+                 "analytics_datum"."value",
+                 "analytics_datum"."measured_at"
+          FROM "analytics_datum"
+          WHERE "analytics_datum"."id" >= %s
+          ORDER BY "analytics_datum"."id" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_c1_analytics_v0" ("id",
+                                        "type",
+                                        "date",
+                                        "value",
+                                        "type_detail",
+                                        "date_mise_à_jour_metabase")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_c1_analytics_v0" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "c1_analytics_v0" RENAME TO "z_old_c1_analytics_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_c1_analytics_v0" RENAME TO "c1_analytics_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_c1_analytics_v0" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "analytics_statsdashboardvisit"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_new_c1_private_dashboard_visits_v0"',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          CREATE TABLE IF NOT EXISTS "z_new_c1_private_dashboard_visits_v0" ("id" integer,"measured_at" timestamp WITH TIME ZONE,
+                                                                                                                            "dashboard_id" varchar,"department" varchar,"region" varchar,"current_company_id" integer,"current_prescriber_organization_id" integer,"current_institution_id" integer,"user_kind" varchar,"user_id" integer,"date_mise_à_jour_metabase" date)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'create_table[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."id" IS \'ID du point de mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."measured_at" IS \'Date associée à la mesure\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."dashboard_id" IS \'ID tableau de bord Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."department" IS \'Département\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."region" IS \'Région\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."current_company_id" IS \'ID entreprise courante\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."current_prescriber_organization_id" IS \'ID organisation prescriptrice courante\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."current_institution_id" IS \'ID institution courante\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."user_kind" IS \'Type utilisateur\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."user_id" IS \'ID utilisateur\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'chunked_queryset[metabase/utils.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_statsdashboardvisit"."id" AS "pk"
+          FROM "analytics_statsdashboardvisit"
+          ORDER BY 1 ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'chunked_queryset[metabase/utils.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_statsdashboardvisit"."id" AS "pk"
+          FROM "analytics_statsdashboardvisit"
+          WHERE "analytics_statsdashboardvisit"."id" >= %s
+          ORDER BY 1 ASC
+          LIMIT 1
+          OFFSET 100000
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "analytics_statsdashboardvisit"."id",
+                 "analytics_statsdashboardvisit"."dashboard_id",
+                 "analytics_statsdashboardvisit"."dashboard_name",
+                 "analytics_statsdashboardvisit"."department",
+                 "analytics_statsdashboardvisit"."region",
+                 "analytics_statsdashboardvisit"."current_company_id",
+                 "analytics_statsdashboardvisit"."current_prescriber_organization_id",
+                 "analytics_statsdashboardvisit"."current_institution_id",
+                 "analytics_statsdashboardvisit"."user_kind",
+                 "analytics_statsdashboardvisit"."user_id",
+                 "analytics_statsdashboardvisit"."measured_at"
+          FROM "analytics_statsdashboardvisit"
+          WHERE "analytics_statsdashboardvisit"."id" >= %s
+          ORDER BY "analytics_statsdashboardvisit"."id" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          COPY "z_new_c1_private_dashboard_visits_v0" ("id",
+                                                       "measured_at",
+                                                       "dashboard_id",
+                                                       "department",
+                                                       "region",
+                                                       "current_company_id",
+                                                       "current_prescriber_organization_id",
+                                                       "current_institution_id",
+                                                       "user_kind",
+                                                       "user_id",
+                                                       "date_mise_à_jour_metabase")
+          FROM STDIN WITH (FORMAT BINARY)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_c1_private_dashboard_visits_v0" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'ALTER TABLE IF EXISTS "c1_private_dashboard_visits_v0" RENAME TO "z_old_c1_private_dashboard_visits_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'ALTER TABLE "z_new_c1_private_dashboard_visits_v0" RENAME TO "c1_private_dashboard_visits_v0"',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'DROP TABLE IF EXISTS "z_old_c1_private_dashboard_visits_v0" CASCADE',
+      }),
+      dict({
+        'origin': list([
+          'rename_table_atomically[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMIT',
+      }),
+    ]),
+  })
+# ---
 # name: test_populate_approvals
   dict({
     'num_queries': 43,

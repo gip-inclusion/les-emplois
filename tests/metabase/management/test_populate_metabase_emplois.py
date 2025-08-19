@@ -54,7 +54,7 @@ from tests.utils.testing import assertSnapshotQueries
 @freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_analytics():
+def test_populate_analytics(snapshot):
     date_maj = timezone.localdate() + datetime.timedelta(days=-1)
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
@@ -63,7 +63,9 @@ def test_populate_analytics():
     stats1 = StatsDashboardVisitFactory()
     stats2 = StatsDashboardVisitFactory()
 
-    management.call_command("populate_metabase_emplois", mode="analytics")
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="analytics")
+
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM c1_analytics_v0 ORDER BY date")
         rows = cursor.fetchall()
