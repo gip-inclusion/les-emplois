@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 from itou.approvals.models import Approval
 from itou.job_applications.enums import Origin
@@ -47,6 +48,15 @@ class ApprovalAdminForm(forms.ModelForm):
             )
             if "start_at" in self.fields:
                 self.fields["start_at"].help_text = obnoxious_warning
+
+    def clean_start_at(self):
+        start_at = self.cleaned_data["start_at"]
+        if (
+            self.instance.prolongation_set.filter(start_at__lt=start_at).exists()
+            or self.instance.suspension_set.filter(start_at__lt=start_at).exists()
+        ):
+            raise ValidationError("Cette date ne peut pas être après le début d’une prolongation ou d’une suspension.")
+        return start_at
 
     def clean(self):
         super().clean()
