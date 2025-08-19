@@ -101,5 +101,5 @@ class PoleEmploiAccessManagementUserAuthProbe(HttpProbe):
 
 class FranceConnectAuthProbe(HttpProbe):
     name = "auth.fc"
-    verbose_name = "France Connect"
+    verbose_name = "FranceConnect"
     url = settings.FRANCE_CONNECT_BASE_URL
