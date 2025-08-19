@@ -390,14 +390,11 @@ class Command(BaseCommand):
         """
         Populate associations between job applications and job descriptions.
         """
-        queryset = (
-            JobApplication.objects.exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_companies_pks())
-            .exclude(selected_jobs=None)
-            .values("pk", "selected_jobs__id")
-        )
+        queryset = JobApplication.selected_jobs.through.objects.exclude(
+            jobapplication__origin=Origin.PE_APPROVAL
+        ).filter(jobapplication__to_company_id__in=get_active_companies_pks())
 
-        populate_table(selected_jobs.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_approvals(self):
         """

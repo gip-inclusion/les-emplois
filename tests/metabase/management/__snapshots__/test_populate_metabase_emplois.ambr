@@ -5455,18 +5455,11 @@
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplication_selected_jobs"."jobapplication_id")
+          FROM "job_applications_jobapplication_selected_jobs"
+          INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "job_applications_jobapplication" U0
-                             LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" U1 ON (U0."id" = U1."jobapplication_id")
-                             WHERE (U1."jobdescription_id" IS NULL
-                                    AND U0."id" = ("job_applications_jobapplication"."id"))
-                             LIMIT 1)))
+                                                                           %s))
         ''',
       }),
       dict({
@@ -5546,21 +5539,15 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "job_applications_jobapplication"."id" AS "pk",
-                 "job_applications_jobapplication_selected_jobs"."jobdescription_id" AS "selected_jobs__id"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplication_selected_jobs"."jobapplication_id")
+          SELECT "job_applications_jobapplication_selected_jobs"."id",
+                 "job_applications_jobapplication_selected_jobs"."jobapplication_id",
+                 "job_applications_jobapplication_selected_jobs"."jobdescription_id"
+          FROM "job_applications_jobapplication_selected_jobs"
+          INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "job_applications_jobapplication" U0
-                             LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" U1 ON (U0."id" = U1."jobapplication_id")
-                             WHERE (U1."jobdescription_id" IS NULL
-                                    AND U0."id" = ("job_applications_jobapplication"."id"))
-                             LIMIT 1)))
-          ORDER BY "job_applications_jobapplication"."created_at" DESC
+                                                                           %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
