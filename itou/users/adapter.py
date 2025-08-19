@@ -65,7 +65,7 @@ class UserAdapter(DefaultAccountAdapter):
                 params = {"token": token}
                 pro_connect_base_logout_url = reverse("pro_connect:logout")
                 return f"{pro_connect_base_logout_url}?{urlencode(params)}"
-        # France Connect
+        # FranceConnect
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
         if fc_token:

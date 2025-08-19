@@ -76,7 +76,7 @@ class EditJobSeekerInfoForm(
 
         # Noboby can edit its own email.
         if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
-            # If the job seeker uses France Connect, point them to the modification process
+            # If the job seeker uses FranceConnect, point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
                 f"<a href='{get_zendesk_form_url()}' target='_blank'>"
