@@ -66,7 +66,30 @@ def france_connect_callback(request):
 
     code = request.GET.get("code")
     if code is None:
-        error_msg = "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
+        error = request.GET.get("error")
+        log = logger.info
+        match error:
+            case None:
+                error_msg = "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
+            case "access_denied":
+                error_msg = "Votre connexion à FranceConnect a échoué. Veuillez réessayer."
+            case "server_error" | "temporarily_unavailable":
+                error_msg = "FranceConnect est temporairement indisponible. Veuillez réessayer ultérieurement."
+            case _:
+                # "invalid_scope", "invalid_request" or any other unexpected error:
+                # we either need to fix our settings or add the new error to the match case.
+                error_msg = (
+                    "La connexion avec FranceConnect est actuellement impossible. "
+                    "Veuillez utiliser un autre mode de connexion."
+                )
+                log = logger.error
+        log(
+            "FranceConnect callback with state=%s - code=%s - error=%s - error_description=%s",
+            state,
+            code,
+            error,
+            request.GET.get("error_description"),
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     redirect_uri = get_absolute_url(reverse("france_connect:callback"))

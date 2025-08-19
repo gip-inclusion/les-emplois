@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import httpx
 import pytest
@@ -319,6 +320,73 @@ class TestFranceConnect:
                 )
             ],
         )
+
+    def test_callback_error_access_denied(self, client):
+        state = FranceConnectState.save_state()
+        url = reverse("france_connect:callback")
+        response = client.get(url, data={"state": state, "error": "access_denied"})
+        assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Votre connexion à FranceConnect a échoué. Veuillez réessayer.",
+                )
+            ],
+        )
+
+    def test_callback_error_france_connect_unavailable(self, client):
+        state = FranceConnectState.save_state()
+        url = reverse("france_connect:callback")
+        response = client.get(
+            url, data={"state": state, "error": random.choice(["server_error", "temporarily_unavailable"])}
+        )
+        assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "FranceConnect est temporairement indisponible. Veuillez réessayer ultérieurement.",
+                )
+            ],
+        )
+
+    def test_callback_error_mistake(self, client, caplog):
+        error_code = random.choice(["invalid_scope", "invalid_request", "unknown_error_code"])
+        state = FranceConnectState.save_state()
+        url = reverse("france_connect:callback")
+        response = client.get(
+            url,
+            data={
+                "state": state,
+                "error": error_code,
+                "error_description": "Frobulateur en panne",
+            },
+        )
+        assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La connexion avec FranceConnect est actuellement impossible. "
+                        "Veuillez utiliser un autre mode de connexion."
+                    ),
+                )
+            ],
+        )
+
+        assert [(record.levelname, record.getMessage()) for record in caplog.records] == [
+            (
+                "ERROR",
+                f"FranceConnect callback with state={state} - code=None - error={error_code} "
+                "- error_description=Frobulateur en panne",
+            ),
+            ("INFO", "HTTP 302 Found"),
+        ]
 
     @respx.mock
     def test_callback(self, client):
