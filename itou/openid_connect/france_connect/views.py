@@ -58,7 +58,7 @@ def france_connect_authorize(request):
 def france_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
-        error_msg = ("FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification.",)
+        error_msg = "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     state = request.GET.get("state")
