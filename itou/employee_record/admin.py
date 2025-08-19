@@ -263,7 +263,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
     @admin.display(description="salarié")
     def job_seeker_link(self, obj):
         if job_seeker := obj.job_application.job_seeker:
-            return get_admin_view_link(job_seeker, content=job_seeker)
+            return get_admin_view_link(job_seeker, content=job_seeker.display_with_pii)
 
         return self.get_empty_value_display()
 
