@@ -1,6 +1,3 @@
-import datetime
-
-
 DDETS_HELP_CENTER_URL = "https://plateforme-inclusion-ddets-dreets.zendesk.com/hc/fr"
 ITOU_HELP_CENTER_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_HELP_CENTER_URL = "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr"
@@ -22,12 +19,3 @@ MATOMO_SITE_PILOTAGE_ID = "146"
 MB = 1024 * 1024
 
 SUPPORTED_IMAGE_FILE_TYPES = {"image/png": "png", "image/jpeg": "jpeg", "image/jpg": "jpg", "image/gif": "gif"}
-
-# NOTIFY - ARCHIVE USERS
-# ------------------------------------------------------------------------------
-DAYS_OF_GRACE = 30
-GRACE_PERIOD = datetime.timedelta(days=DAYS_OF_GRACE)
-EXPIRATION_DAYS = 365 * 2
-EXPIRATION_PERIOD = datetime.timedelta(days=EXPIRATION_DAYS)
-DAYS_OF_INACTIVITY = EXPIRATION_DAYS - DAYS_OF_GRACE
-INACTIVITY_PERIOD = datetime.timedelta(days=DAYS_OF_INACTIVITY)

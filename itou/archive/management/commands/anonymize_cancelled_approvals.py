@@ -4,9 +4,9 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import CancelledApproval
+from itou.archive.constants import EXPIRATION_PERIOD
 from itou.archive.models import AnonymizedCancelledApproval
 from itou.utils.command import BaseCommand, dry_runnable
-from itou.utils.constants import EXPIRATION_PERIOD
 
 
 def anonymized_cancelled_approval(obj):

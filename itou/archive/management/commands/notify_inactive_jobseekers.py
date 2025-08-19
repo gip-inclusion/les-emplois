@@ -1,11 +1,11 @@
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
+from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.utils import inactive_jobseekers_without_recent_related_objects
 from itou.users.models import User
 from itou.users.notifications import InactiveUser
 from itou.utils.command import BaseCommand
-from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 BATCH_SIZE = 200

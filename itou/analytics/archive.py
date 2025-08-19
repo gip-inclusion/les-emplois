@@ -2,6 +2,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 
 from itou.analytics.models import DatumCode
+from itou.archive.constants import INACTIVITY_PERIOD
 from itou.archive.management.commands.notify_inactive_jobseekers import (
     inactive_jobseekers_without_recent_related_objects,
 )
@@ -15,7 +16,6 @@ from itou.archive.models import (
     AnonymizedSIAEEligibilityDiagnosis,
 )
 from itou.users.models import User, UserKind
-from itou.utils.constants import INACTIVITY_PERIOD
 
 
 def collect_archive_data():
