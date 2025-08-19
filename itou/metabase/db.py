@@ -4,6 +4,7 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 
 import copy
 import gc
+import logging
 import time
 
 import psycopg
@@ -12,6 +13,9 @@ from django.utils import timezone
 from psycopg import sql
 
 from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_datetime_to_local_date
+
+
+logger = logging.getLogger(__name__)
 
 
 class MetabaseDatabaseCursor:
@@ -141,7 +145,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         if c["type"] == "date":
             c["fn"] = compose(convert_datetime_to_local_date, c["fn"])
 
-    print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
+    logger.info("Injecting %i rows with %i columns into %r", total_rows, len(table.columns), table_name)
 
     new_table_name = get_new_table_name(table_name)
     create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True)
@@ -189,13 +193,16 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 chunk_start_time = time.perf_counter()
                 inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                 written_rows += chunk_qs.count()
-                print(
-                    f"count={written_rows} of total={total_rows} written "
-                    f"in {time.perf_counter() - chunk_start_time:0.2f} seconds"
+                logger.info(
+                    "%r: %i of %i rows written in %0.2f seconds",
+                    table_name,
+                    written_rows,
+                    total_rows,
+                    time.perf_counter() - chunk_start_time,
                 )
 
             # Trigger garbage collection to optimize memory use.
             gc.collect()
 
     rename_table_atomically(new_table_name, table_name)
-    print(f"Table {table_name} created in {time.perf_counter() - start_time:0.2f} seconds")
+    logger.info("%r created in %0.2f seconds", table_name, time.perf_counter() - start_time)
