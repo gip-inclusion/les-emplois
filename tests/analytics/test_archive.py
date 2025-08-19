@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from itou.analytics import archive, models
-from itou.utils.constants import DAYS_OF_INACTIVITY, INACTIVITY_PERIOD
+from itou.archive.constants import DAYS_OF_INACTIVITY, INACTIVITY_PERIOD
 from tests.archive.factories import (
     AnonymizedApplicationFactory,
     AnonymizedApprovalFactory,

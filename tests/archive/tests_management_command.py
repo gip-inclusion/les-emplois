@@ -15,6 +15,13 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, CancelledApproval
+from itou.archive.constants import (
+    DAYS_OF_GRACE,
+    DAYS_OF_INACTIVITY,
+    EXPIRATION_PERIOD,
+    GRACE_PERIOD,
+    INACTIVITY_PERIOD,
+)
 from itou.archive.models import (
     AnonymizedApplication,
     AnonymizedApproval,
@@ -41,7 +48,6 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
-from itou.utils.constants import DAYS_OF_GRACE, DAYS_OF_INACTIVITY, EXPIRATION_PERIOD, GRACE_PERIOD, INACTIVITY_PERIOD
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import (
     create_city_geispolsheim,

@@ -5,6 +5,7 @@ from django.db.models import Exists, F, OuterRef, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
+from itou.archive.constants import GRACE_PERIOD
 from itou.archive.models import AnonymizedProfessional
 from itou.archive.tasks import async_delete_contact
 from itou.archive.utils import get_filter_kwargs_on_user_for_related_objects_to_check, get_year_month_or_none
@@ -15,7 +16,6 @@ from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand, dry_runnable
-from itou.utils.constants import GRACE_PERIOD
 
 
 BATCH_SIZE = 100

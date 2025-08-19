@@ -6,6 +6,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.models import (
     AnonymizedApplication,
     AnonymizedApproval,
@@ -30,7 +31,6 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand, dry_runnable
-from itou.utils.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 
 
 BATCH_SIZE = 100
