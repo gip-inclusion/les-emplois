@@ -56,17 +56,17 @@ def france_connect_authorize(request):
 
 @login_not_required
 def france_connect_callback(request):
-    code = request.GET.get("code")
-    if code is None:
-        error_msg = "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
-
     state = request.GET.get("state")
     fc_state = FranceConnectState.get_from_state(state)
     if not fc_state or not fc_state.is_valid():
         error_msg = (
             "Le paramètre « state » fourni par FranceConnect et nécessaire à votre authentification n’est pas valide."
         )
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
+
+    code = request.GET.get("code")
+    if code is None:
+        error_msg = "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification."
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     redirect_uri = get_absolute_url(reverse("france_connect:callback"))
