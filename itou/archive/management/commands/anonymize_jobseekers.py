@@ -33,7 +33,7 @@ from itou.users.notifications import ArchiveUser
 from itou.utils.command import BaseCommand, dry_runnable
 
 
-BATCH_SIZE = 100
+BATCH_SIZE = 200
 
 
 def anonymized_jobseeker(user):
