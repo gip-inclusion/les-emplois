@@ -388,7 +388,11 @@ def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=F
         yield
     # Enrich last query
     last_query = self.db.queries_log[-1]
-    last_query["raw_sql"] = sql
+    if not isinstance(sql, str):
+        raw_sql = sql.as_string(self.cursor)
+    else:
+        raw_sql = sql
+    last_query["raw_sql"] = raw_sql
     last_query["origin"] = _detect_origin(debug=bool(os.getenv("DEBUG_SQL_SNAPSHOT")))
 
 
