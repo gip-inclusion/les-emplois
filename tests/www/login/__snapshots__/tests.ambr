@@ -79,7 +79,7 @@
               Votre adresse e-mail utilise une connexion via FranceConnect. Veuillez vous connecter en utilisant le bouton ci-dessous.
           </strong>
       </p>
-      <div class="mt-4">
+      <div>
           <p class="text-primary">
               FranceConnect est la solution proposée par l’État pour sécuriser et simplifier la connexion à vos services en ligne.
           </p>
