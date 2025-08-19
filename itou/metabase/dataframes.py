@@ -2,6 +2,7 @@
 Helper methods for manipulating dataframes used by the populate_metabase_emplois script.
 """
 
+import logging
 import time
 
 import numpy as np
@@ -9,6 +10,9 @@ import pandas as pd
 from psycopg import sql
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
+
+
+logger = logging.getLogger(__name__)
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
@@ -45,7 +49,7 @@ def store_df(df, table_name, batch_size=10_000):
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
 
     columns = infer_columns_from_df(df)
-    print(f"Injecting {len(df)} rows with {len(columns)} columns into table {table_name}:")
+    logger.info("Injecting %i rows with %i columns into %r", len(df), len(columns), table_name)
 
     new_table_name = get_new_table_name(table_name)
     create_table(new_table_name, columns, reset=True)
@@ -69,13 +73,16 @@ def store_df(df, table_name, batch_size=10_000):
                     copy.write_row(row)
             conn.commit()
             written_rows += len(df_chunk)
-            print(
-                f"count={written_rows} of total={len(df)} written "
-                f"in {time.perf_counter() - chunk_start_time:0.2f} seconds"
+            logger.info(
+                "%r: %i of %i rows written in %0.2f seconds",
+                table_name,
+                written_rows,
+                len(df),
+                time.perf_counter() - chunk_start_time,
             )
 
     rename_table_atomically(new_table_name, table_name)
-    print(f"Table {table_name} created in {time.perf_counter() - start_time:0.2f} seconds")
+    logger.info("%r created in %0.2f seconds", table_name, time.perf_counter() - start_time)
 
 
 def get_df_from_rows(rows):

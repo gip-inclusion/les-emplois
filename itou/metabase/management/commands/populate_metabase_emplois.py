@@ -18,6 +18,7 @@ We maintain a google sheet with extensive documentation about all tables and fie
 Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
 
+import logging
 from collections import OrderedDict
 
 import tenacity
@@ -80,8 +81,11 @@ from itou.utils.command import BaseCommand
 from itou.utils.slack import send_slack_message
 
 
+logger = logging.getLogger(__name__)
+
+
 def log_retry_attempt(retry_state):
-    print(f"attempt failed with outcome={retry_state.outcome}")
+    logging.info("Attempt failed with outcome=%s", retry_state.outcome)
 
 
 class Command(BaseCommand):
