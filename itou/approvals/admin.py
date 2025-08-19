@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import admin, messages
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
@@ -30,6 +32,9 @@ from itou.utils.admin import (
     get_structure_view_link,
 )
 from itou.utils.templatetags.str_filters import pluralizefr
+
+
+logger = logging.getLogger("itou.approvals.admin")
 
 
 class JobApplicationInline(ReadonlyMixin, ItouStackedInline):
@@ -332,6 +337,18 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
                 ),
             )
             return
+
+        if "start_at" in form.changed_data:
+            delta = form.cleaned_data["start_at"] - form.initial["start_at"]
+            obj.end_at += delta
+            logger.info(
+                "Updating approval pk=%(approval_id)d start_at=%(new_start_at)s (was %(initial_start_at)s).",
+                {
+                    "approval_id": obj.pk,
+                    "initial_start_at": form.initial["start_at"],
+                    "new_start_at": form.cleaned_data["start_at"],
+                },
+            )
 
         super().save_model(request, obj, form, change)
 

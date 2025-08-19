@@ -460,6 +460,185 @@ class TestApprovalAdmin:
         assert prolongation.start_at == prolongation_start
         assert prolongation.end_at == today
 
+    @pytest.mark.parametrize(
+        "get_start_date,has_log",
+        [
+            pytest.param(timezone.localdate, False, id="start_date_not_changed"),
+            pytest.param(lambda: timezone.localdate() - timedelta(days=100), True, id="start_date_changed"),
+        ],
+    )
+    def test_change_start_date(self, admin_client, caplog, get_start_date, has_log):
+        start_date = get_start_date()
+        approval = ApprovalFactory(start_at=start_date)
+        today = timezone.localdate()
+
+        change_url = reverse("admin:approvals_approval_change", args=(approval.pk,))
+        data = {
+            "start_at": str(today),
+            "initial-start_at": str(approval.start_at),
+            "user": str(approval.user.pk),
+            "eligibility_diagnosis": str(approval.eligibility_diagnosis_id),
+            "suspension_set-TOTAL_FORMS": "0",
+            "suspension_set-INITIAL_FORMS": "0",
+            "suspension_set-MIN_NUM_FORMS": "0",
+            "suspension_set-MAX_NUM_FORMS": "0",
+            "prolongation_set-TOTAL_FORMS": "0",
+            "prolongation_set-INITIAL_FORMS": "0",
+            "prolongation_set-MIN_NUM_FORMS": "0",
+            "prolongation_set-MAX_NUM_FORMS": "0",
+            "prolongationrequest_set-TOTAL_FORMS": "0",
+            "prolongationrequest_set-INITIAL_FORMS": "0",
+            "prolongationrequest_set-MIN_NUM_FORMS": "0",
+            "prolongationrequest_set-MAX_NUM_FORMS": "0",
+            "jobapplication_set-TOTAL_FORMS": "0",
+            "jobapplication_set-INITIAL_FORMS": "0",
+            "jobapplication_set-MIN_NUM_FORMS": "0",
+            "jobapplication_set-MAX_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": "",
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            "_continue": "Enregistrer et continuer les modifications",
+        }
+        response = admin_client.post(change_url, data)
+        assertRedirects(response, change_url)
+        msg = f"Updating approval pk={approval.pk} start_at={today} (was {approval.start_at})."
+        if has_log:
+            assert msg in caplog.messages
+        else:
+            assert msg not in caplog.messages
+
+    def test_change_start_date_prolongation(self, admin_client):
+        start_at = timezone.localdate() - timedelta(days=100)
+        end_at = timezone.localdate() - timedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        today = timezone.localdate()
+        prolongation_start = approval.end_at
+        prolongation_end = today + timedelta(days=5)
+        ProlongationFactory(approval=approval, start_at=prolongation_start, end_at=prolongation_end)
+        approval.refresh_from_db()
+        approval_duration = approval.end_at - approval.start_at
+
+        change_url = reverse("admin:approvals_approval_change", args=(approval.pk,))
+        data = {
+            "start_at": str(prolongation_start),
+            "user": str(approval.user.pk),
+            "eligibility_diagnosis": str(approval.eligibility_diagnosis_id),
+            "suspension_set-TOTAL_FORMS": "0",
+            "suspension_set-INITIAL_FORMS": "0",
+            "suspension_set-MIN_NUM_FORMS": "0",
+            "suspension_set-MAX_NUM_FORMS": "0",
+            "prolongation_set-TOTAL_FORMS": "0",
+            "prolongation_set-INITIAL_FORMS": "0",
+            "prolongation_set-MIN_NUM_FORMS": "0",
+            "prolongation_set-MAX_NUM_FORMS": "0",
+            "prolongationrequest_set-TOTAL_FORMS": "0",
+            "prolongationrequest_set-INITIAL_FORMS": "0",
+            "prolongationrequest_set-MIN_NUM_FORMS": "0",
+            "prolongationrequest_set-MAX_NUM_FORMS": "0",
+            "jobapplication_set-TOTAL_FORMS": "0",
+            "jobapplication_set-INITIAL_FORMS": "0",
+            "jobapplication_set-MIN_NUM_FORMS": "0",
+            "jobapplication_set-MAX_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": "",
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            "_continue": "Enregistrer et continuer les modifications",
+        }
+        response = admin_client.post(change_url, data)
+        assertRedirects(response, change_url)
+        approval.refresh_from_db()
+        assert approval.start_at == prolongation_start
+        assert approval.end_at == prolongation_start + approval_duration
+
+        data["start_at"] = str(prolongation_start + timedelta(days=1))
+        response = admin_client.post(change_url, data)
+        assertContains(
+            response,
+            """
+            <ul class="errorlist" id="id_start_at_error">
+                <li>Cette date ne peut pas être après le début d’une prolongation ou d’une suspension.</li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+        approval.refresh_from_db()
+        assert approval.start_at == prolongation_start
+        assert approval.end_at == prolongation_start + approval_duration
+
+    def test_change_start_date_suspension(self, admin_client):
+        start_at = timezone.localdate() - timedelta(days=100)
+        approval = ApprovalFactory(start_at=start_at)
+        today = timezone.localdate()
+        suspension_start = today
+        suspension_end = today + timedelta(days=10)
+        SuspensionFactory(approval=approval, start_at=suspension_start, end_at=suspension_end)
+        approval.refresh_from_db()
+        approval_duration = approval.end_at - approval.start_at
+
+        change_url = reverse("admin:approvals_approval_change", args=(approval.pk,))
+        data = {
+            "start_at": str(suspension_start),
+            "user": str(approval.user.pk),
+            "eligibility_diagnosis": str(approval.eligibility_diagnosis_id),
+            "suspension_set-TOTAL_FORMS": "0",
+            "suspension_set-INITIAL_FORMS": "0",
+            "suspension_set-MIN_NUM_FORMS": "0",
+            "suspension_set-MAX_NUM_FORMS": "0",
+            "prolongation_set-TOTAL_FORMS": "0",
+            "prolongation_set-INITIAL_FORMS": "0",
+            "prolongation_set-MIN_NUM_FORMS": "0",
+            "prolongation_set-MAX_NUM_FORMS": "0",
+            "prolongationrequest_set-TOTAL_FORMS": "0",
+            "prolongationrequest_set-INITIAL_FORMS": "0",
+            "prolongationrequest_set-MIN_NUM_FORMS": "0",
+            "prolongationrequest_set-MAX_NUM_FORMS": "0",
+            "jobapplication_set-TOTAL_FORMS": "0",
+            "jobapplication_set-INITIAL_FORMS": "0",
+            "jobapplication_set-MIN_NUM_FORMS": "0",
+            "jobapplication_set-MAX_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+            "utils-pksupportremark-content_type-object_id-0-remark": "",
+            "utils-pksupportremark-content_type-object_id-0-id": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            "_continue": "Enregistrer et continuer les modifications",
+        }
+        response = admin_client.post(change_url, data)
+        assertRedirects(response, change_url)
+        approval.refresh_from_db()
+        assert approval.start_at == suspension_start
+        assert approval.end_at == suspension_start + approval_duration
+
+        data["start_at"] = str(suspension_start + timedelta(days=1))
+        response = admin_client.post(change_url, data)
+        assertContains(
+            response,
+            """
+            <ul class="errorlist" id="id_start_at_error">
+                <li>Cette date ne peut pas être après le début d’une prolongation ou d’une suspension.</li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+        approval.refresh_from_db()
+        assert approval.start_at == suspension_start
+        assert approval.end_at == suspension_start + approval_duration
+
 
 def test_prolongation_report_file_filter(admin_client):
     prolongation = ProlongationFactory(report_file=FileFactory(), reason=ProlongationReason.SENIOR)
