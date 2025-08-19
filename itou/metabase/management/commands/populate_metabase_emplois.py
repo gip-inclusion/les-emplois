@@ -213,7 +213,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        populate_table(companies.TABLE, batch_size=200, querysets=[queryset])
+        populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -225,7 +225,7 @@ class Command(BaseCommand):
             .with_job_applications_count()
             .all()
         )
-        populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(job_descriptions.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -281,7 +281,7 @@ class Command(BaseCommand):
 
         populate_table(
             organizations.TABLE,
-            batch_size=100,
+            batch_size=10_000,
             querysets=[queryset],
             extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
@@ -414,7 +414,7 @@ class Command(BaseCommand):
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        populate_table(approvals.TABLE, batch_size=5_000, querysets=[queryset1, queryset2])
+        populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset1, queryset2])
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()

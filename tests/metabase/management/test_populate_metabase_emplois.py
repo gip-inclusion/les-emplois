@@ -97,7 +97,7 @@ def test_populate_analytics(snapshot):
         ]
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM c1_private_dashboard_visits_v0 ORDER BY measured_at")
+        cursor.execute("SELECT * FROM c1_private_dashboard_visits_v0 ORDER BY measured_at, id")
         rows = cursor.fetchall()
         assert rows == [
             (
