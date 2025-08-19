@@ -599,7 +599,14 @@
           </span>
          </p>
          <p class="mb-1">
-          Ce critère administratif est certifié par l’État, aucun justificatif n’est requis.
+          Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
+          <br/>
+          Toutefois, conformément à
+          <a aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)" class="has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864" rel="noreferrer noopener" target="_blank">
+           l’Arrêté du 12 avril 2022
+          </a>
+          ,
+                  un justificatif papier pourra être demandé si nécessaire.
          </p>
         </div>
         <div class="text-md-end mt-2">

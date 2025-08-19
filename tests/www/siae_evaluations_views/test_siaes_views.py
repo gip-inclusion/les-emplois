@@ -694,7 +694,18 @@ class TestSiaeJobApplicationListView:
                   <i class="ri-verified-badge-fill" aria-hidden="true"></i> Certifié
                 </span>
               </p>
-              <p class="mb-1">Ce critère administratif est certifié par l’État, aucun justificatif n’est requis.</p>
+              <p class="mb-1">
+                Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
+                <br>
+                Toutefois, conformément à
+                <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864"
+                   target="_blank"
+                   rel="noreferrer noopener"
+                   class="has-external-link"
+                   aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)">
+                    l’Arrêté du 12 avril 2022</a>,
+                un justificatif papier pourra être demandé si nécessaire.
+              </p>
             </div>
             """,
             html=True,
@@ -1554,7 +1565,18 @@ class TestSiaeEvaluatedJobApplicationView:
                   <i class="ri-verified-badge-fill" aria-hidden="true"></i> Certifié
                 </span>
               </p>
-              <p class="mb-1">Ce critère administratif est certifié par l’État, aucun justificatif n’est requis.</p>
+              <p class="mb-1">
+                Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
+                <br>
+                Toutefois, conformément à
+                <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864"
+                   target="_blank"
+                   rel="noreferrer noopener"
+                   class="has-external-link"
+                   aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)">
+                    l’Arrêté du 12 avril 2022</a>,
+                un justificatif papier pourra être demandé si nécessaire.
+              </p>
             </div>
             """,
             html=True,
