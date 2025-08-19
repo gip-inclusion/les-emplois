@@ -20,7 +20,8 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.files.storage import default_storage
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.backends.utils import CursorDebugWrapper
+from django.db.backends.base import base as base_db_module
+from django.db.backends.utils import CursorDebugWrapper, debug_transaction as origin_debug_transaction
 from django.http import HttpResponse
 from django.template import Template
 from django.template.base import Node
@@ -392,6 +393,19 @@ def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=F
 
 
 CursorDebugWrapper.debug_sql = debug_sql
+
+
+@contextmanager
+def debug_transaction(connection, sql):
+    with origin_debug_transaction(connection, sql):
+        yield
+    if connection.queries_log:
+        last_query = connection.queries_log[-1]
+        last_query["raw_sql"] = sql
+        last_query["origin"] = _detect_origin(debug=bool(os.getenv("DEBUG_SQL_SNAPSHOT")))
+
+
+base_db_module.debug_transaction = debug_transaction
 
 
 def load_template(path):
