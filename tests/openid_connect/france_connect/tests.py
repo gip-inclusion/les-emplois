@@ -254,20 +254,71 @@ class TestFranceConnect:
             "because their identity has been certified." in caplog.messages
         )
 
-    def test_callback_no_code(self, client):
+    def test_callback_nothing(self, client):
         url = reverse("france_connect:callback")
         response = client.get(url)
         assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "Le paramètre « state » fourni par FranceConnect et nécessaire à votre authentification "
+                        "n’est pas valide."
+                    ),
+                )
+            ],
+        )
 
     def test_callback_no_state(self, client):
         url = reverse("france_connect:callback")
         response = client.get(url, data={"code": "123"})
         assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "Le paramètre « state » fourni par FranceConnect et nécessaire à votre authentification "
+                        "n’est pas valide."
+                    ),
+                )
+            ],
+        )
 
     def test_callback_invalid_state(self, client):
         url = reverse("france_connect:callback")
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "Le paramètre « state » fourni par FranceConnect et nécessaire à votre authentification "
+                        "n’est pas valide."
+                    ),
+                )
+            ],
+        )
+
+    def test_callback_no_code(self, client):
+        state = FranceConnectState.save_state()
+        url = reverse("france_connect:callback")
+        response = client.get(url, data={"state": state})
+        assert response.status_code == 302
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "FranceConnect n’a pas transmis le paramètre « code » nécessaire à votre authentification.",
+                )
+            ],
+        )
 
     @respx.mock
     def test_callback(self, client):
