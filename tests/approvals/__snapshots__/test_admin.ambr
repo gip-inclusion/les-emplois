@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_approval_form_has_warnings_if_suspension_or_prolongation[obnoxious start_at warning]
+# name: TestApprovalAdmin.test_approval_form_has_warnings_if_suspension_or_prolongation[obnoxious start_at warning]
   '''
   <div class="help" id="id_start_at_helptext">
       <div>
