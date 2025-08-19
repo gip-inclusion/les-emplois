@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_populate_analytics
   dict({
-    'num_queries': 52,
+    'num_queries': 48,
     'queries': list([
       dict({
         'origin': list([
@@ -120,38 +120,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "analytics_datum"."id" AS "pk"
-          FROM "analytics_datum"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "analytics_datum"."id" AS "pk"
-          FROM "analytics_datum"
-          WHERE "analytics_datum"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -164,8 +132,7 @@
                  "analytics_datum"."value",
                  "analytics_datum"."measured_at"
           FROM "analytics_datum"
-          WHERE "analytics_datum"."id" >= %s
-          ORDER BY "analytics_datum"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -421,38 +388,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "analytics_statsdashboardvisit"."id" AS "pk"
-          FROM "analytics_statsdashboardvisit"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "analytics_statsdashboardvisit"."id" AS "pk"
-          FROM "analytics_statsdashboardvisit"
-          WHERE "analytics_statsdashboardvisit"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -471,8 +406,7 @@
                  "analytics_statsdashboardvisit"."user_id",
                  "analytics_statsdashboardvisit"."measured_at"
           FROM "analytics_statsdashboardvisit"
-          WHERE "analytics_statsdashboardvisit"."id" >= %s
-          ORDER BY "analytics_statsdashboardvisit"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -583,7 +517,7 @@
 # ---
 # name: test_populate_approvals
   dict({
-    'num_queries': 43,
+    'num_queries': 39,
     'queries': list([
       dict({
         'origin': list([
@@ -805,38 +739,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id" AS "pk"
-          FROM "approvals_approval"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id" AS "pk"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 5000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -863,13 +765,11 @@
                  "approvals_approval"."origin_prescriber_organization_kind",
                  "approvals_approval"."public_id"
           FROM "approvals_approval"
-          WHERE "approvals_approval"."id" >= %s
-          ORDER BY "approvals_approval"."id" ASC
+          ORDER BY "approvals_approval"."created_at" DESC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -917,7 +817,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -1014,40 +913,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id" AS "pk"
-          FROM "approvals_poleemploiapproval"
-          WHERE "approvals_poleemploiapproval"."start_at" >= %s
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id" AS "pk"
-          FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."start_at" >= %s
-                 AND "approvals_poleemploiapproval"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 5000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -1074,9 +939,8 @@
                  "approvals_poleemploiapproval"."siae_siret",
                  "approvals_poleemploiapproval"."siae_kind"
           FROM "approvals_poleemploiapproval"
-          WHERE ("approvals_poleemploiapproval"."start_at" >= %s
-                 AND "approvals_poleemploiapproval"."id" >= %s)
-          ORDER BY "approvals_poleemploiapproval"."id" ASC
+          WHERE "approvals_poleemploiapproval"."start_at" >= %s
+          ORDER BY "approvals_poleemploiapproval"."start_at" DESC
         ''',
       }),
       dict({
@@ -1239,7 +1103,7 @@
 # ---
 # name: test_populate_companies
   dict({
-    'num_queries': 74,
+    'num_queries': 72,
     'queries': list([
       dict({
         'origin': list([
@@ -1772,70 +1636,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id" AS "pk"
-          FROM "companies_company"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("companies_company"."id" = "job_applications_jobapplication"."to_company_id")
-          LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1)))
-          GROUP BY 1
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id" AS "pk"
-          FROM "companies_company"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("companies_company"."id" = "job_applications_jobapplication"."to_company_id")
-          LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1))
-                 AND "companies_company"."id" >= %s)
-          GROUP BY 1
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 200
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -1939,17 +1739,15 @@
                          FROM "companies_siaeconvention" U0
                          WHERE (U0."id" = ("companies_company"."convention_id")
                                 AND U0."is_active")
-                         LIMIT 1))
-                 AND "companies_company"."id" >= %s)
+                         LIMIT 1)))
           GROUP BY "companies_company"."id",
                    "cities_city"."id",
                    "companies_siaeconvention"."id"
-          ORDER BY "companies_company"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2010,7 +1808,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2051,7 +1848,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2102,7 +1898,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2128,7 +1923,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2321,7 +2115,7 @@
 # ---
 # name: test_populate_criteria
   dict({
-    'num_queries': 23,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -2431,38 +2225,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_administrativecriteria"."id" AS "pk"
-          FROM "eligibility_administrativecriteria"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "eligibility_administrativecriteria"."id" AS "pk"
-          FROM "eligibility_administrativecriteria"
-          WHERE "eligibility_administrativecriteria"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2480,8 +2242,8 @@
                  "eligibility_administrativecriteria"."ui_rank",
                  "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
-          WHERE "eligibility_administrativecriteria"."id" >= %s
-          ORDER BY "eligibility_administrativecriteria"."id" ASC
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
@@ -3214,7 +2976,7 @@
 # ---
 # name: test_populate_evaluated_criteria
   dict({
-    'num_queries': 25,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -3346,38 +3108,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedadministrativecriteria"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedadministrativecriteria"
-          WHERE "siae_evaluations_evaluatedadministrativecriteria"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3393,8 +3123,10 @@
                  "siae_evaluations_evaluatedadministrativecriteria"."review_state",
                  "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
           FROM "siae_evaluations_evaluatedadministrativecriteria"
-          WHERE "siae_evaluations_evaluatedadministrativecriteria"."id" >= %s
-          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."id" ASC
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
       dict({
@@ -3501,7 +3233,7 @@
 # ---
 # name: test_populate_evaluated_job_applications
   dict({
-    'num_queries': 24,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -3614,38 +3346,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedjobapplication"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedjobapplication"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedjobapplication"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedjobapplication"
-          WHERE "siae_evaluations_evaluatedjobapplication"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 20000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3657,13 +3357,11 @@
                  "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
                  "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
           FROM "siae_evaluations_evaluatedjobapplication"
-          WHERE "siae_evaluations_evaluatedjobapplication"."id" >= %s
-          ORDER BY "siae_evaluations_evaluatedjobapplication"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3788,7 +3486,7 @@
 # ---
 # name: test_populate_evaluated_siaes
   dict({
-    'num_queries': 27,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -3920,38 +3618,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedsiae"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedsiae"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluatedsiae"."id" AS "pk"
-          FROM "siae_evaluations_evaluatedsiae"
-          WHERE "siae_evaluations_evaluatedsiae"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 5000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3969,13 +3635,11 @@
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at"
           FROM "siae_evaluations_evaluatedsiae"
-          WHERE "siae_evaluations_evaluatedsiae"."id" >= %s
-          ORDER BY "siae_evaluations_evaluatedsiae"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4124,7 +3788,7 @@
 # ---
 # name: test_populate_evaluation_campaigns
   dict({
-    'num_queries': 25,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -4252,38 +3916,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluationcampaign"."id" AS "pk"
-          FROM "siae_evaluations_evaluationcampaign"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "siae_evaluations_evaluationcampaign"."id" AS "pk"
-          FROM "siae_evaluations_evaluationcampaign"
-          WHERE "siae_evaluations_evaluationcampaign"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4303,8 +3935,9 @@
                  "siae_evaluations_evaluationcampaign"."chosen_percent",
                  "siae_evaluations_evaluationcampaign"."calendar_id"
           FROM "siae_evaluations_evaluationcampaign"
-          WHERE "siae_evaluations_evaluationcampaign"."id" >= %s
-          ORDER BY "siae_evaluations_evaluationcampaign"."id" ASC
+          INNER JOIN "institutions_institution" ON ("siae_evaluations_evaluationcampaign"."institution_id" = "institutions_institution"."id")
+          ORDER BY "siae_evaluations_evaluationcampaign"."name" DESC,
+                   "institutions_institution"."name" ASC
         ''',
       }),
       dict({
@@ -4411,7 +4044,7 @@
 # ---
 # name: test_populate_gps_groups
   dict({
-    'num_queries': 24,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -4535,40 +4168,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id" AS "pk"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroup"."id" AS "pk"
-          FROM "gps_followupgroup"
-          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE "gps_followupgroup"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4583,8 +4182,7 @@
                  "users_user"."department" AS "beneficiary_department"
           FROM "gps_followupgroup"
           INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
-          WHERE "gps_followupgroup"."id" >= %s
-          ORDER BY "gps_followupgroup"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -4690,7 +4288,7 @@
 # ---
 # name: test_populate_gps_memberships
   dict({
-    'num_queries': 27,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -4848,50 +4446,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroupmembership"."id" AS "pk"
-          FROM "gps_followupgroupmembership"
-          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
-          LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
-          LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          GROUP BY 1
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "gps_followupgroupmembership"."id" AS "pk"
-          FROM "gps_followupgroupmembership"
-          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
-          LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
-          LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "gps_followupgroupmembership"."id" >= %s
-          GROUP BY 1
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4925,9 +4479,8 @@
           LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "gps_followupgroupmembership"."id" >= %s
           GROUP BY "gps_followupgroupmembership"."id"
-          ORDER BY "gps_followupgroupmembership"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5036,7 +4589,7 @@
 # ---
 # name: test_populate_institutions
   dict({
-    'num_queries': 25,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -5164,38 +4717,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "institutions_institution"."id" AS "pk"
-          FROM "institutions_institution"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "institutions_institution"."id" AS "pk"
-          FROM "institutions_institution"
-          WHERE "institutions_institution"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5221,8 +4742,7 @@
                  "institutions_institution"."automatic_geocoding_update",
                  "institutions_institution"."kind"
           FROM "institutions_institution"
-          WHERE "institutions_institution"."id" >= %s
-          ORDER BY "institutions_institution"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5329,7 +4849,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 52,
+    'num_queries': 50,
     'queries': list([
       dict({
         'origin': list([
@@ -5714,44 +5234,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id" AS "pk"
-          FROM "job_applications_jobapplication"
-          WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s))
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id" AS "pk"
-          FROM "job_applications_jobapplication"
-          WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND "job_applications_jobapplication"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5798,14 +5280,12 @@
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
                  AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND "job_applications_jobapplication"."id" >= %s)
-          ORDER BY "job_applications_jobapplication"."id" ASC
+                                                                           %s))
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5954,7 +5434,7 @@
 # ---
 # name: test_populate_job_applications.1
   dict({
-    'num_queries': 21,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -6060,60 +5540,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id" AS "pk"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplication_selected_jobs"."jobapplication_id")
-          WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "job_applications_jobapplication" U0
-                             LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" U1 ON (U0."id" = U1."jobapplication_id")
-                             WHERE (U1."jobdescription_id" IS NULL
-                                    AND U0."id" = ("job_applications_jobapplication"."id"))
-                             LIMIT 1)))
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id" AS "pk"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplication_selected_jobs"."jobapplication_id")
-          WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s)
-                 AND NOT (EXISTS
-                            (SELECT %s AS "a"
-                             FROM "job_applications_jobapplication" U0
-                             LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" U1 ON (U0."id" = U1."jobapplication_id")
-                             WHERE (U1."jobdescription_id" IS NULL
-                                    AND U0."id" = ("job_applications_jobapplication"."id"))
-                             LIMIT 1))
-                 AND "job_applications_jobapplication"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -6133,9 +5559,8 @@
                              LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" U1 ON (U0."id" = U1."jobapplication_id")
                              WHERE (U1."jobdescription_id" IS NULL
                                     AND U0."id" = ("job_applications_jobapplication"."id"))
-                             LIMIT 1))
-                 AND "job_applications_jobapplication"."id" >= %s)
-          ORDER BY 1 ASC
+                             LIMIT 1)))
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
       dict({
@@ -6238,7 +5663,7 @@
 # ---
 # name: test_populate_job_descriptions
   dict({
-    'num_queries': 36,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -6490,44 +5915,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_jobdescription"."id" AS "pk"
-          FROM "companies_jobdescription"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
-          WHERE "companies_jobdescription"."company_id" IN (%s)
-          GROUP BY 1
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_jobdescription"."id" AS "pk"
-          FROM "companies_jobdescription"
-          LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
-          WHERE ("companies_jobdescription"."company_id" IN (%s)
-                 AND "companies_jobdescription"."id" >= %s)
-          GROUP BY 1
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 10000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -6610,13 +5997,11 @@
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
-          WHERE ("companies_jobdescription"."company_id" IN (%s)
-                 AND "companies_jobdescription"."id" >= %s)
+          WHERE "companies_jobdescription"."company_id" IN (%s)
           GROUP BY "companies_jobdescription"."id",
                    "jobs_appellation"."code",
                    "jobs_rome"."code",
                    "companies_company"."id"
-          ORDER BY "companies_jobdescription"."id" ASC
         ''',
       }),
       dict({
@@ -6733,7 +6118,7 @@
 # ---
 # name: test_populate_job_seekers
   dict({
-    'num_queries': 85,
+    'num_queries': 83,
     'queries': list([
       dict({
         'origin': list([
@@ -7383,46 +6768,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."job_seeker_id")
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          WHERE "users_user"."kind" = %s
-          GROUP BY 1
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("users_user"."id" = "eligibility_eligibilitydiagnosis"."job_seeker_id")
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" >= %s)
-          GROUP BY 1
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 5000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7549,17 +6894,15 @@
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("users_user"."id" = "job_applications_jobapplication"."job_seeker_id")
           LEFT OUTER JOIN "users_user" T4 ON ("users_user"."created_by_id" = T4."id")
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."id" >= %s)
+          WHERE "users_user"."kind" = %s
           GROUP BY "users_user"."id",
                    T4."id",
                    "users_jobseekerprofile"."user_id"
-          ORDER BY "users_user"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7750,7 +7093,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7775,7 +7117,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8066,7 +7407,7 @@
 # ---
 # name: test_populate_memberships
   dict({
-    'num_queries': 36,
+    'num_queries': 30,
     'queries': list([
       dict({
         'origin': list([
@@ -8218,44 +7559,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_companymembership"."id" AS "pk"
-          FROM "companies_companymembership"
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "companies_companymembership"."is_active")
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_companymembership"."id" AS "pk"
-          FROM "companies_companymembership"
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "companies_companymembership"."is_active"
-                 AND "companies_companymembership"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8274,9 +7577,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
-                 AND "companies_companymembership"."is_active"
-                 AND "companies_companymembership"."id" >= %s)
-          ORDER BY "companies_companymembership"."id" ASC
+                 AND "companies_companymembership"."is_active")
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8309,44 +7611,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescribermembership"."id" AS "pk"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "prescribers_prescribermembership"."is_active")
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescribermembership"."id" AS "pk"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescribermembership"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8365,9 +7629,8 @@
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
-                 AND "prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescribermembership"."id" >= %s)
-          ORDER BY "prescribers_prescribermembership"."id" ASC
+                 AND "prescribers_prescribermembership"."is_active")
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8400,44 +7663,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "institutions_institutionmembership"."id" AS "pk"
-          FROM "institutions_institutionmembership"
-          INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "institutions_institutionmembership"."is_active")
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "institutions_institutionmembership"."id" AS "pk"
-          FROM "institutions_institutionmembership"
-          INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
-          WHERE ("users_user"."is_active"
-                 AND "institutions_institutionmembership"."is_active"
-                 AND "institutions_institutionmembership"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8456,9 +7681,8 @@
           FROM "institutions_institutionmembership"
           INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
-                 AND "institutions_institutionmembership"."is_active"
-                 AND "institutions_institutionmembership"."id" >= %s)
-          ORDER BY "institutions_institutionmembership"."id" ASC
+                 AND "institutions_institutionmembership"."is_active")
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8564,7 +7788,7 @@
 # ---
 # name: test_populate_organizations
   dict({
-    'num_queries': 54,
+    'num_queries': 52,
     'queries': list([
       dict({
         'origin': list([
@@ -9019,42 +8243,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescriberorganization"."id" AS "pk"
-          FROM "prescribers_prescriberorganization"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("prescribers_prescriberorganization"."id" = "job_applications_jobapplication"."sender_prescriber_organization_id")
-          GROUP BY 1
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescriberorganization"."id" AS "pk"
-          FROM "prescribers_prescriberorganization"
-          LEFT OUTER JOIN "job_applications_jobapplication" ON ("prescribers_prescriberorganization"."id" = "job_applications_jobapplication"."sender_prescriber_organization_id")
-          WHERE "prescribers_prescriberorganization"."id" >= %s
-          GROUP BY 1
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9106,15 +8294,13 @@
           FROM "prescribers_prescriberorganization"
           LEFT OUTER JOIN "job_applications_jobapplication" ON ("prescribers_prescriberorganization"."id" = "job_applications_jobapplication"."sender_prescriber_organization_id")
           LEFT OUTER JOIN "cities_city" ON ("prescribers_prescriberorganization"."insee_city_id" = "cities_city"."id")
-          WHERE "prescribers_prescriberorganization"."id" >= %s
           GROUP BY "prescribers_prescriberorganization"."id",
                    "cities_city"."id"
-          ORDER BY "prescribers_prescriberorganization"."id" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9141,7 +8327,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9193,7 +8378,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9338,7 +8522,7 @@
 # ---
 # name: test_populate_prolongation_requests
   dict({
-    'num_queries': 35,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -9560,38 +8744,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongationrequest"."id" AS "pk"
-          FROM "approvals_prolongationrequest"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongationrequest"."id" AS "pk"
-          FROM "approvals_prolongationrequest"
-          WHERE "approvals_prolongationrequest"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 50000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9650,8 +8802,7 @@
           FROM "approvals_prolongationrequest"
           LEFT OUTER JOIN "approvals_prolongationrequestdenyinformation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongationrequestdenyinformation"."request_id")
           LEFT OUTER JOIN "approvals_prolongation" ON ("approvals_prolongationrequest"."id" = "approvals_prolongation"."request_id")
-          WHERE "approvals_prolongationrequest"."id" >= %s
-          ORDER BY "approvals_prolongationrequest"."id" ASC
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
         ''',
       }),
       dict({
@@ -9768,7 +8919,7 @@
 # ---
 # name: test_populate_prolongations
   dict({
-    'num_queries': 30,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -9941,38 +9092,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongation"."id" AS "pk"
-          FROM "approvals_prolongation"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongation"."id" AS "pk"
-          FROM "approvals_prolongation"
-          WHERE "approvals_prolongation"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9999,8 +9118,7 @@
                  "approvals_prolongation"."request_id",
                  "approvals_prolongation"."validated_by_id"
           FROM "approvals_prolongation"
-          WHERE "approvals_prolongation"."id" >= %s
-          ORDER BY "approvals_prolongation"."id" ASC
+          ORDER BY "approvals_prolongation"."start_at" DESC
         ''',
       }),
       dict({
@@ -10112,7 +9230,7 @@
 # ---
 # name: test_populate_suspensions
   dict({
-    'num_queries': 26,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -10252,38 +9370,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id" AS "pk"
-          FROM "approvals_suspension"
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id" AS "pk"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."id" >= %s
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 100000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -10302,8 +9388,7 @@
                  "approvals_suspension"."updated_at",
                  "approvals_suspension"."updated_by_id"
           FROM "approvals_suspension"
-          WHERE "approvals_suspension"."id" >= %s
-          ORDER BY "approvals_suspension"."id" ASC
+          ORDER BY "approvals_suspension"."start_at" DESC
         ''',
       }),
       dict({
@@ -10411,7 +9496,7 @@
 # ---
 # name: test_populate_users
   dict({
-    'num_queries': 24,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -10534,46 +9619,6 @@
       }),
       dict({
         'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          WHERE ("users_user"."is_active"
-                 AND "users_user"."kind" IN (%s,
-                                             %s,
-                                             %s))
-          ORDER BY 1 ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'chunked_queryset[metabase/utils.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id" AS "pk"
-          FROM "users_user"
-          WHERE ("users_user"."is_active"
-                 AND "users_user"."kind" IN (%s,
-                                             %s,
-                                             %s)
-                 AND "users_user"."id" >= %s)
-          ORDER BY 1 ASC
-          LIMIT 1
-          OFFSET 50000
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -10619,9 +9664,8 @@
           WHERE ("users_user"."is_active"
                  AND "users_user"."kind" IN (%s,
                                              %s,
-                                             %s)
-                 AND "users_user"."id" >= %s)
-          ORDER BY "users_user"."id" ASC
+                                             %s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

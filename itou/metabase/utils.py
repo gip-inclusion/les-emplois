@@ -27,29 +27,6 @@ def compose(f, g):
     return lambda *a, **kw: f(g(*a, **kw))
 
 
-def chunked_queryset(queryset, chunk_size=10000):
-    """
-    Slice a queryset into chunks. This is useful to avoid memory issues when
-    iterating through large querysets.
-    Credits go to:
-    https://medium.com/@rui.jorge.rei/today-i-learned-django-memory-leak-and-the-sql-query-cache-1c152f62f64
-    Code initially adapted from https://djangosnippets.org/snippets/10599/
-    """
-    queryset = queryset.order_by("pk")
-    pks = queryset.values_list("pk", flat=True)
-    if not pks:
-        return
-    start_pk = pks[0]
-    while True:
-        try:
-            end_pk = pks.filter(pk__gte=start_pk)[chunk_size]
-        except IndexError:
-            break
-        yield queryset.filter(pk__gte=start_pk, pk__lt=end_pk)
-        start_pk = end_pk
-    yield queryset.filter(pk__gte=start_pk)
-
-
 def build_dbt_daily():
     httpx.post(
         urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),

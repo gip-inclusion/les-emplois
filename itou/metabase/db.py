@@ -4,6 +4,7 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 
 import copy
 import gc
+import itertools
 import logging
 import time
 
@@ -12,7 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from psycopg import sql
 
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_datetime_to_local_date
+from itou.metabase.utils import compose, convert_boolean_to_int, convert_datetime_to_local_date
 
 
 logger = logging.getLogger(__name__)
@@ -190,11 +191,11 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # A bigger number makes the script faster until a certain point,
             # but it also increases RAM usage.
             queryset_start_time = time.perf_counter()
-            for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
+            for chunk in itertools.batched(queryset.iterator(chunk_size=batch_size), batch_size):
                 chunk_start_time = time.perf_counter()
                 logger.info("%r: chunk created in %0.2f seconds", table_name, chunk_start_time - queryset_start_time)
-                inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
-                written_rows += chunk_qs.count()
+                inject_chunk(table_columns=table.columns, chunk=chunk, new_table_name=new_table_name)
+                written_rows += len(chunk)
                 logger.info(
                     "%r: %i of %i rows written in %0.2f seconds",
                     table_name,
