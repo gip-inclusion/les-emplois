@@ -97,7 +97,7 @@
                   <img alt="" class="img-fluid mb-1 itou-france-connect"/>
               </a>
               <br/>
-              <a class="btn btn-link" href="https://franceconnect.gouv.fr/">
+              <a class="btn btn-link has-external-link" href="https://franceconnect.gouv.fr/">
                   Qu’est-ce que FranceConnect ?
               </a>
           </div>
