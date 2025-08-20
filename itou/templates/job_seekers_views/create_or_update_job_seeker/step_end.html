@@ -54,7 +54,7 @@
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
 
-                            {% include "apply/includes/profile_infos.html" %}
+                            {% include "apply/includes/profile_infos.html" with job_seeker=None %}
 
                             {% if update_job_seeker %}
                                 {% itou_buttons_form primary_label="Valider les informations" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
