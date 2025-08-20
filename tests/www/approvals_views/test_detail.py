@@ -311,7 +311,6 @@ class TestApprovalDetailView:
             start_at=second.end_at,
             end_at=second.end_at + datetime.timedelta(days=5),
             reason=ProlongationReason.SENIOR_CDI.value,
-            assigned_to=None,
             declared_by=employer,
             declared_by_siae=None,  # A declaration user without SIAE
         )

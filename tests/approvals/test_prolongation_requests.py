@@ -24,7 +24,11 @@ def test_unique_approval_for_pending_constraint():
     prolongation_request = ProlongationRequestFactory(status=ProlongationRequestStatus.PENDING)
 
     with pytest.raises(IntegrityError, match="unique_prolongationrequest_approval_for_pending"):
-        ProlongationRequest(approval=prolongation_request.approval, status=ProlongationRequestStatus.PENDING).save()
+        ProlongationRequest(
+            approval=prolongation_request.approval,
+            status=ProlongationRequestStatus.PENDING,
+            assigned_to=prolongation_request.assigned_to,
+        ).save()
 
 
 def test_non_empty_proposed_actions_constraint():
