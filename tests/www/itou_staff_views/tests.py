@@ -581,7 +581,7 @@ class TestMergeUsers:
         prolongation_request = ProlongationRequestFactory(
             created_by=prescriber_2,
             updated_by=prescriber_2,
-            validated_by=prescriber_2,
+            assigned_to=prescriber_2,
             declared_by=prescriber_2,
             processed_by=prescriber_2,
         )
@@ -611,7 +611,7 @@ class TestMergeUsers:
         prolongation_request.refresh_from_db()
         assert prolongation_request.created_by == prescriber_1
         assert prolongation_request.updated_by == prescriber_1
-        assert prolongation_request.validated_by == prescriber_1
+        assert prolongation_request.assigned_to == prescriber_1
         assert prolongation_request.declared_by == prescriber_1
         assert prolongation_request.processed_by == prescriber_1
         job_seeker.refresh_from_db()
@@ -634,11 +634,11 @@ class TestMergeUsers:
             f"{prefix}itou.approvals.models.Prolongation.declared_by : [{prolongation.pk}]",
             f"{prefix}itou.approvals.models.Prolongation.updated_by : [{prolongation.pk}]",
             f"{prefix}itou.approvals.models.Prolongation.validated_by : [{prolongation.pk}]",
+            f"{prefix}itou.approvals.models.ProlongationRequest.assigned_to : [{prolongation_request.pk}]",
             f"{prefix}itou.approvals.models.ProlongationRequest.created_by : [{prolongation_request.pk}]",
             f"{prefix}itou.approvals.models.ProlongationRequest.declared_by : [{prolongation_request.pk}]",
             f"{prefix}itou.approvals.models.ProlongationRequest.processed_by : [{prolongation_request.pk}]",
             f"{prefix}itou.approvals.models.ProlongationRequest.updated_by : [{prolongation_request.pk}]",
-            f"{prefix}itou.approvals.models.ProlongationRequest.validated_by : [{prolongation_request.pk}]",
             f"{prefix}itou.approvals.models.Suspension.created_by : [{suspension.pk}]",
             f"{prefix}itou.approvals.models.Suspension.updated_by : [{suspension.pk}]",
             f"{prefix}itou.eligibility.models.geiq.GEIQEligibilityDiagnosis.author : [{geiq_diagnosis.pk}]",

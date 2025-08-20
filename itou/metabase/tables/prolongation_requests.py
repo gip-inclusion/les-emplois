@@ -13,6 +13,7 @@ TABLE = MetabaseTable(name="demandes_de_prolongation")
 TABLE.add_columns(
     get_common_prolongation_columns(model=ProlongationRequest)
     + [
+        get_column_from_field(get_model_field(ProlongationRequest, "assigned_to"), name="id_utilisateur_prescripteur"),
         {
             "name": "id_prolongation",
             "type": "integer",

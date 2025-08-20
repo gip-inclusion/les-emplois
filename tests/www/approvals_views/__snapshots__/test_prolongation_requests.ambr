@@ -1234,7 +1234,6 @@
                  "approvals_prolongationrequest"."reason_explanation",
                  "approvals_prolongationrequest"."declared_by_id",
                  "approvals_prolongationrequest"."declared_by_siae_id",
-                 "approvals_prolongationrequest"."validated_by_id",
                  "approvals_prolongationrequest"."prescriber_organization_id",
                  "approvals_prolongationrequest"."created_at",
                  "approvals_prolongationrequest"."created_by_id",
@@ -1245,6 +1244,7 @@
                  "approvals_prolongationrequest"."contact_email",
                  "approvals_prolongationrequest"."contact_phone",
                  "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."assigned_to_id",
                  "approvals_prolongationrequest"."processed_at",
                  "approvals_prolongationrequest"."processed_by_id",
                  "approvals_prolongationrequest"."reminder_sent_at",
@@ -1378,7 +1378,7 @@
           INNER JOIN "approvals_approval" ON ("approvals_prolongationrequest"."approval_id" = "approvals_approval"."id")
           INNER JOIN "users_user" ON ("approvals_approval"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "companies_company" ON ("approvals_prolongationrequest"."declared_by_siae_id" = "companies_company"."id")
-          LEFT OUTER JOIN "users_user" T6 ON ("approvals_prolongationrequest"."validated_by_id" = T6."id")
+          LEFT OUTER JOIN "users_user" T6 ON ("approvals_prolongationrequest"."assigned_to_id" = T6."id")
           WHERE "approvals_prolongationrequest"."prescriber_organization_id" = %s
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
           LIMIT 1

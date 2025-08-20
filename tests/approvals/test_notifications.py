@@ -5,12 +5,12 @@ from tests.approvals.factories import ProlongationRequestDenyInformationFactory,
 def test_prolongation_request_created(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     email = notifications.ProlongationRequestCreatedForPrescriberNotification(
-        prolongation_request.validated_by,
+        prolongation_request.assigned_to,
         prolongation_request.prescriber_organization,
         prolongation_request=prolongation_request,
     ).build()
 
-    assert email.to == [prolongation_request.validated_by.email]
+    assert email.to == [prolongation_request.assigned_to.email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
 
@@ -18,12 +18,12 @@ def test_prolongation_request_created(snapshot):
 def test_prolongation_request_created_reminder(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     email = notifications.ProlongationRequestCreatedReminderForPrescriberNotification(
-        prolongation_request.validated_by,
+        prolongation_request.assigned_to,
         prolongation_request.prescriber_organization,
         prolongation_request=prolongation_request,
     ).build()
 
-    assert email.to == [prolongation_request.validated_by.email]
+    assert email.to == [prolongation_request.assigned_to.email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
 

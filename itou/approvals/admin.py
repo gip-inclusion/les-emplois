@@ -137,6 +137,8 @@ class ProlongationInline(ReadonlyMixin, ItouTabularInline):
 
 class ProlongationRequestInline(ProlongationInline):
     model = models.ProlongationRequest
+    fields = tuple(f.replace("validated_by", "assigned_to") for f in ProlongationInline.fields)
+    raw_id_fields = tuple(f.replace("validated_by", "assigned_to") for f in ProlongationInline.raw_id_fields)
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -491,22 +493,12 @@ class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
 
 
 class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
-    list_display = (
-        "pk",
-        "approval",
-        "start_at",
-        "end_at",
-        "declared_by",
-        "validated_by",
-        "reason",
-    )
     list_display_links = ("pk", "approval")
     raw_id_fields = (
         "approval",
         "declared_by",
         "declared_by_siae",
         "prescriber_organization",
-        "validated_by",
         "prescriber_organization",
         "created_by",
         "updated_by",
@@ -521,7 +513,7 @@ class ProlongationCommonAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
         "report_file_link",
     )
     inlines = (PkSupportRemarkInline,)
-    list_select_related = ("approval", "declared_by", "validated_by")
+    list_select_related = ("approval", "declared_by")
     search_fields = ["declared_by_siae__siret", "approval__number"]
 
     def get_list_display(self, request):
@@ -551,13 +543,15 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
         "start_at",
         "end_at",
         "declared_by",
-        "validated_by",
+        "assigned_to",
         "reason",
         "status",
         "processed_at",
     )
+    raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("assigned_to",)
 
     list_filter = ("status", "declared_by_siae__kind", "created_at") + ProlongationCommonAdmin.list_filter
+    list_select_related = ProlongationCommonAdmin.list_select_related + ("assigned_to",)
 
     @admin.display(description="prolongation créée")
     def prolongation(self, obj):
@@ -598,9 +592,25 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
 @admin.register(models.Prolongation)
 class ProlongationAdmin(ProlongationCommonAdmin):
-    list_display = ProlongationCommonAdmin.list_display + ("is_in_progress", "from_prolongation_request")
-    list_select_related = ProlongationCommonAdmin.list_select_related + ("request",)
-    raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
+    list_display = (
+        "pk",
+        "approval",
+        "start_at",
+        "end_at",
+        "declared_by",
+        "validated_by",
+        "reason",
+        "is_in_progress",
+        "from_prolongation_request",
+    )
+    list_select_related = ProlongationCommonAdmin.list_select_related + (
+        "validated_by",
+        "request",
+    )
+    raw_id_fields = ProlongationCommonAdmin.raw_id_fields + (
+        "validated_by",
+        "request",
+    )
     list_filter = (
         IsInProgressFilter,
         HasReportFile,

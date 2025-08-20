@@ -33,7 +33,7 @@ class Command(BaseCommand):
         prolongation_reminded = 0
         for prolongation_request in queryset:
             ProlongationRequestCreatedReminderForPrescriberNotification(
-                prolongation_request.validated_by,
+                prolongation_request.assigned_to,
                 prolongation_request.prescriber_organization,
                 prolongation_request=prolongation_request,
             ).send()
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                 membership.user
                 for membership in PrescriberMembership.objects.active()
                 .filter(organization=prolongation_request.prescriber_organization)
-                .exclude(user=prolongation_request.validated_by)
+                .exclude(user=prolongation_request.assigned_to)
                 .select_related("user")
                 # Limit to the last 10 active colleagues, admins take precedence over regular members.
                 # It should cover the ones dedicated to the IAE and some more.

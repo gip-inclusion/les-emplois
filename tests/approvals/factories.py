@@ -138,7 +138,6 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
             approval__for_snapshot=True,
             start_at=factory.SelfAttribute("approval.start_at"),
             declared_by_siae__for_snapshot=True,
-            validated_by__for_snapshot=True,
             reason=ProlongationReason.SENIOR.value,
             report_file=factory.SubFactory(FileFactory, for_snapshot=True),
             require_phone_interview=True,
@@ -154,7 +153,6 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
     declared_by_siae = factory.SubFactory(CompanyFactory, with_membership=True)
-    validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
     created_by = factory.SelfAttribute("declared_by")
 
 
@@ -163,7 +161,7 @@ class ProlongationRequestFactory(BaseProlongationFactory):
         PrescriberOrganizationFactory,
         authorized=True,
     )
-    validated_by = factory.SubFactory(
+    assigned_to = factory.SubFactory(
         PrescriberFactory, membership__organization=factory.SelfAttribute("...prescriber_organization")
     )
 
@@ -172,7 +170,7 @@ class ProlongationRequestFactory(BaseProlongationFactory):
 
     class Params:
         processed = factory.Trait(
-            processed_by=factory.SelfAttribute("validated_by"),
+            processed_by=factory.SelfAttribute("assigned_to"),
             processed_at=factory.Maybe(
                 "for_snapshot",
                 datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC),
@@ -182,6 +180,7 @@ class ProlongationRequestFactory(BaseProlongationFactory):
         for_snapshot = factory.Trait(
             **BaseProlongationFactory._meta.parameters["for_snapshot"].overrides,
             prescriber_organization__for_snapshot=True,
+            assigned_to__for_snapshot=True,
         )
 
 
@@ -211,9 +210,17 @@ class ProlongationRequestDenyInformationFactory(factory.django.DjangoModelFactor
 
 
 class ProlongationFactory(AutoNowOverrideMixin, BaseProlongationFactory):
+    validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
+
     class Meta:
         model = Prolongation
         skip_postgeneration_save = True
+
+    class Params:
+        for_snapshot = factory.Trait(
+            **BaseProlongationFactory._meta.parameters["for_snapshot"].overrides,
+            validated_by__for_snapshot=True,
+        )
 
     @factory.post_generation
     def with_request(self, create, extracted, **kwargs):

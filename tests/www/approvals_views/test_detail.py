@@ -311,7 +311,7 @@ class TestApprovalDetailView:
             start_at=second.end_at,
             end_at=second.end_at + datetime.timedelta(days=5),
             reason=ProlongationReason.SENIOR_CDI.value,
-            validated_by=None,
+            assigned_to=None,
             declared_by=employer,
             declared_by_siae=None,  # A declaration user without SIAE
         )
@@ -323,9 +323,9 @@ class TestApprovalDetailView:
             reason=ProlongationReason.SENIOR.value,
             declared_by=None,
             declared_by_siae=job_application.to_company,  # A declaration SIAE without user
-            validated_by__first_name="Val",
-            validated_by__last_name="Idépar",
-            validated_by__email="val@idepar.fr",
+            assigned_to__first_name="Val",
+            assigned_to__last_name="Idépar",
+            assigned_to__email="val@idepar.fr",
         )
 
         def get_prolongations_section(response):

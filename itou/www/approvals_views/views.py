@@ -216,8 +216,10 @@ class ApprovalDetailView(BaseApprovalDetailView):
             return " - ".join(parts)
 
         prolongations = []
-        select_related = ("declared_by", "declared_by_siae", "validated_by")
-        for prolongation in approval.prolongation_set.select_related("prescriber_organization", *select_related):
+        select_related = ("declared_by", "declared_by_siae")
+        for prolongation in approval.prolongation_set.select_related(
+            "prescriber_organization", "validated_by", *select_related
+        ):
             prolongation.declared_by_for_template = _format_for_template(
                 prolongation.declared_by, prolongation.declared_by_siae
             )
@@ -489,7 +491,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
         raise Http404()
 
     queryset = ProlongationRequest.objects.filter(prescriber_organization=current_organization).select_related(
-        "approval__user", "declared_by_siae", "validated_by"
+        "approval__user", "declared_by_siae", "assigned_to"
     )
 
     form = ProlongationRequestFilterForm(data=request.GET)
