@@ -1603,8 +1603,6 @@ class ProlongationRequest(CommonProlongation):
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="prescripteur habilité qui a reçu la demande de prolongation",
-        null=True,
-        blank=True,
         on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="%(class)ss_assigned",
     )
@@ -1645,7 +1643,7 @@ class ProlongationRequest(CommonProlongation):
 
     def clean(self):
         super().clean()
-        if self.assigned_to and not self.assigned_to.is_prescriber_with_authorized_org_memberships:
+        if self.assigned_to_id and not self.assigned_to.is_prescriber_with_authorized_org_memberships:
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
     def notify_authorized_prescriber(self):
