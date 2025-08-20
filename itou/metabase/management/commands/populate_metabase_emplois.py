@@ -22,6 +22,7 @@ import logging
 from collections import OrderedDict
 
 import tenacity
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, F, Max, Prefetch, Q
 from django.utils import timezone
@@ -531,10 +532,15 @@ class Command(BaseCommand):
     )
     def handle(self, *, mode, **options):
         if mode == "all":
-            send_slack_message(":rocket: lancement mise à jour de données C1 -> Metabase")
+            send_slack_message(
+                ":rocket: lancement mise à jour de données C1 -> Metabase", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
+            )
             for operation in self.MODE_TO_OPERATION.values():
                 operation()
             build_dbt_daily()
-            send_slack_message(":white_check_mark: succès mise à jour de données C1 -> Metabase")
+            send_slack_message(
+                ":white_check_mark: succès mise à jour de données C1 -> Metabase",
+                url=settings.PILOTAGE_SLACK_WEBHOOK_URL,
+            )
         else:
             self.MODE_TO_OPERATION[mode]()

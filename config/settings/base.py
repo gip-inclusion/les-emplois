@@ -832,6 +832,7 @@ BREVO_API_URL = "https://api.brevo.com/v3"
 # ------------------------------------------------------------------------------
 
 PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
+PILOTAGE_SLACK_WEBHOOK_URL = os.getenv("PILOTAGE_SLACK_WEBHOOK_URL")
 
 # Github
 API_GITHUB_BASE_URL = "https://api.github.com"
