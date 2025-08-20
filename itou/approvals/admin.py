@@ -553,6 +553,51 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
     list_filter = ("status", "declared_by_siae__kind", "created_at") + ProlongationCommonAdmin.list_filter
     list_select_related = ProlongationCommonAdmin.list_select_related + ("assigned_to",)
 
+    fieldsets = (
+        (
+            "Informations",
+            {
+                "fields": (
+                    "approval",
+                    "start_at",
+                    "end_at",
+                    "reason",
+                    "reason_explanation",
+                    "declared_by",
+                    "declared_by_siae",
+                    "assigned_to",
+                    "prescriber_organization",
+                    "require_phone_interview",
+                    "contact_email",
+                    "contact_phone",
+                    "report_file_link",
+                )
+            },
+        ),
+        (
+            "Demande",
+            {
+                "fields": (
+                    "status",
+                    "processed_at",
+                    "processed_by",
+                    "prolongation",
+                ),
+            },
+        ),
+        (
+            "Audit",
+            {
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "updated_at",
+                    "updated_by",
+                )
+            },
+        ),
+    )
+
     @admin.display(description="prolongation créée")
     def prolongation(self, obj):
         return obj.prolongation
@@ -589,6 +634,24 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
             )
         return fields
 
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = list(super().get_fieldsets(request, obj))
+        if obj.status == ProlongationRequestStatus.DENIED:
+            fieldsets[2:2] = [
+                (
+                    "Refus",
+                    {
+                        "fields": (
+                            "denied_reason",
+                            "denied_reason_explanation",
+                            "denied_proposed_actions",
+                            "denied_proposed_actions_explanation",
+                        ),
+                    },
+                )
+            ]
+        return tuple(fieldsets)
+
 
 @admin.register(models.Prolongation)
 class ProlongationAdmin(ProlongationCommonAdmin):
@@ -617,6 +680,41 @@ class ProlongationAdmin(ProlongationCommonAdmin):
         FromProlongationRequest,
     ) + ProlongationCommonAdmin.list_filter
     date_hierarchy = "start_at"
+
+    fieldsets = (
+        (
+            "Informations",
+            {
+                "fields": (
+                    "approval",
+                    "start_at",
+                    "end_at",
+                    "reason",
+                    "reason_explanation",
+                    "declared_by",
+                    "declared_by_siae",
+                    "validated_by",
+                    "prescriber_organization",
+                    "require_phone_interview",
+                    "contact_email",
+                    "contact_phone",
+                    "report_file_link",
+                )
+            },
+        ),
+        ("Demande", {"fields": ("request",)}),
+        (
+            "Audit",
+            {
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "updated_at",
+                    "updated_by",
+                )
+            },
+        ),
+    )
 
     @admin.display(boolean=True, description="demande")
     def from_prolongation_request(self, obj):
