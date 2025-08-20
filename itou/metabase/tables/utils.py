@@ -281,19 +281,19 @@ def get_establishment_is_active_column():
 
 @functools.cache
 def get_ai_stock_job_seeker_pks():
-    return Approval.objects.filter(origin=Origin.AI_STOCK).values_list("user_id", flat=True).distinct()
+    return set(Approval.objects.filter(origin=Origin.AI_STOCK).values_list("user_id", flat=True))
 
 
 @functools.cache
 def get_active_companies_pks():
     """
     Load once and for all the list of all active company pks in memory and reuse them multiple times in various
-    queries to avoid additional joins of the SiaeConvention model and the non trivial use of the
-    `Company.objects.active()` queryset on a related model of a queryset on another model. This is a list of less
+    queries to avoid additional joins of the SiaeConvention model and the non-trivial use of the
+    `Company.objects.active()` queryset on a related model of a queryset on another model. This is a set of less
     than 10k integers thus should not use much memory. The end result being both simpler code
     and better performance.
     """
-    return list(Company.objects.active().values_list("pk", flat=True))
+    return set(Company.objects.active().values_list("pk", flat=True))
 
 
 @functools.cache
@@ -301,8 +301,8 @@ def get_qpv_job_seeker_pks():
     """
     Load once and for all the list of all job seeker pks which are located in a QPV zone.
 
-    The alternative would have been to naively compute `QPV.in_qpv(u, geom_field="coords")` for each and every one
-    of the ~700k job seekers, which would have resulted in a undesirable deluge of 700k micro SQL requests.
+    The alternative would have been to naively compute `QPV.in_qpv(u, geom_field="coords")` for each one
+    of the job seekers, which would have resulted in an undesirable deluge of micro SQL requests.
 
     Unfortunately we failed so far at finding a clean ORM friendly way to do this in a single SQL request.
     """
@@ -312,10 +312,10 @@ def get_qpv_job_seeker_pks():
         "INNER JOIN geo_qpv gq ON ST_Contains(gq.geometry, uu.coords::geometry) "
         f"WHERE uu.coords IS NOT NULL AND uu.geocoding_score > {BAN_API_RELIANCE_SCORE}"
     )
-    # A list of ~100k integers is permanently loaded in memory. It is fortunately not a very high volume of data.
-    # Objects returned by `raw` are defered which means their fields are not preloaded unless they have been
-    # explicitely specified in the SQL request. We did specify and thus preload `id` fields.
-    return [job_seeker.pk for job_seeker in qpv_job_seekers]
+    # A set of ~240k integers is permanently loaded in memory. It is fortunately not a very high volume of data (~8MB).
+    # Objects returned by `raw` are deferred which means their fields are not preloaded unless they have been
+    # explicitly specified in the SQL request. We did specify and thus preload `id` fields.
+    return {job_seeker.pk for job_seeker in qpv_job_seekers}
 
 
 def hash_content(content):
