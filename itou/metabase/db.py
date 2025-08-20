@@ -189,8 +189,10 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # Insert rows by batch of batch_size.
             # A bigger number makes the script faster until a certain point,
             # but it also increases RAM usage.
+            queryset_start_time = time.perf_counter()
             for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
                 chunk_start_time = time.perf_counter()
+                logger.info("%r: chunk created in %0.2f seconds", table_name, chunk_start_time - queryset_start_time)
                 inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
                 written_rows += chunk_qs.count()
                 logger.info(
@@ -200,6 +202,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                     total_rows,
                     time.perf_counter() - chunk_start_time,
                 )
+                queryset_start_time = time.perf_counter()
 
             # Trigger garbage collection to optimize memory use.
             gc.collect()
