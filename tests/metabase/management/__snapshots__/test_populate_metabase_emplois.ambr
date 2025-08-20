@@ -7235,7 +7235,7 @@
         'origin': list([
           'get_ai_stock_job_seeker_pks[metabase/tables/utils.py]',
           '<lambda>[metabase/tables/job_seekers.py]',
-          '<lambda>[metabase/utils.py]',
+          'convert_boolean_to_int[metabase/utils.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8160,7 +8160,7 @@
       dict({
         'origin': list([
           '<lambda>[metabase/tables/utils.py]',
-          '<lambda>[metabase/utils.py]',
+          'convert_datetime_to_local_date[metabase/utils.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8178,7 +8178,7 @@
       dict({
         'origin': list([
           '<lambda>[metabase/tables/utils.py]',
-          '<lambda>[metabase/utils.py]',
+          'convert_boolean_to_int[metabase/utils.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',

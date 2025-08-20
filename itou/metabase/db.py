@@ -3,6 +3,7 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 """
 
 import copy
+import functools
 import gc
 import itertools
 import logging
@@ -13,7 +14,7 @@ from django.conf import settings
 from django.utils import timezone
 from psycopg import sql
 
-from itou.metabase.utils import compose, convert_boolean_to_int, convert_datetime_to_local_date
+from itou.metabase.utils import convert_boolean_to_int, convert_datetime_to_local_date
 
 
 logger = logging.getLogger(__name__)
@@ -142,9 +143,9 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     for c in table.columns:
         if c["type"] == "boolean":
             c["type"] = "integer"
-            c["fn"] = compose(convert_boolean_to_int, c["fn"])
+            c["fn"] = functools.partial(convert_boolean_to_int, c["fn"])
         if c["type"] == "date":
-            c["fn"] = compose(convert_datetime_to_local_date, c["fn"])
+            c["fn"] = functools.partial(convert_datetime_to_local_date, c["fn"])
 
     logger.info("Injecting %i rows with %i columns into %r", total_rows, len(table.columns), table_name)
 
