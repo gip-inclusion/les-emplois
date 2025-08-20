@@ -464,6 +464,714 @@
   
   '''
 # ---
+# name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_not_born_in_france][personal-infos]
+  '''
+  <div class="personal-infos">
+      <h2>Informations personnelles</h2>
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">État civil</h3>
+          </div>
+          
+              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&amp;from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
+          
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Civilité</small>
+              <strong>Madame</strong>
+          </li>
+          <li>
+              <small>Prénom</small>
+              <strong>Jane</strong>
+          </li>
+          <li>
+              <small>Nom</small>
+              <strong>DOE</strong>
+          </li>
+          <li>
+              <small>Date de naissance</small>
+              
+                  <strong>01/01/1990</strong>
+              
+          </li>
+          <li>
+              <small>Pays de naissance</small>
+              
+                  <strong>Pays-Bas</strong>
+              
+          </li>
+          
+          <li>
+              <small>Numéro de sécurité sociale</small>
+              
+                  <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Coordonnées</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Adresse e-mail</small>
+              
+                  <strong>jane.doe@test.local</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Téléphone</small>
+              
+                  <strong>06 12 34 56 78</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Adresse</small>
+              
+                  <address>12 rue Georges Bizet, 35000 Rennes</address>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Situation</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Inscrit à France Travail depuis</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Identifiant France Travail</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Niveau de formation</small>
+              
+                  <strong>Formation de niveau BAC</strong>
+              
+          </li>
+          <li>
+              
+                  <small>Autres</small>
+              
+          </li>
+      </ul>
+  </div>
+  '''
+# ---
+# name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_all_datas][personal-infos]
+  '''
+  <div class="personal-infos">
+      <h2>Informations personnelles</h2>
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">État civil</h3>
+          </div>
+          
+              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&amp;from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
+          
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Civilité</small>
+              <strong>Madame</strong>
+          </li>
+          <li>
+              <small>Prénom</small>
+              <strong>Jane</strong>
+          </li>
+          <li>
+              <small>Nom</small>
+              <strong>DOE</strong>
+          </li>
+          <li>
+              <small>Date de naissance</small>
+              
+                  <strong>01/01/1990</strong>
+              
+          </li>
+          <li>
+              <small>Pays de naissance</small>
+              
+                  <strong>France</strong>
+              
+          </li>
+          
+              <li>
+  
+                  <small>Commune de naissance</small>
+                  
+                      <strong>Dunkerque</strong>
+                  
+              </li>
+          
+          <li>
+              <small>Numéro de sécurité sociale</small>
+              
+                  <strong><span>2</span><span class="ms-1">90</span><span class="ms-1">01</span><span class="ms-1">01</span><span class="ms-1">010</span><span class="ms-1">101</span><span class="ms-1">25</span></strong>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Coordonnées</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Adresse e-mail</small>
+              
+                  <strong>jane.doe@test.local</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Téléphone</small>
+              
+                  <strong>06 12 34 56 78</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Adresse</small>
+              
+                  <address>12 rue Georges Bizet, 35000 Rennes</address>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Situation</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Inscrit à France Travail depuis</small>
+              
+                  <strong>24 mois et plus</strong>
+              
+          </li>
+          <li>
+              <small>Identifiant France Travail</small>
+              
+                  <strong>09443041</strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="09443041" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Niveau de formation</small>
+              
+                  <strong>Formation de niveau BAC</strong>
+              
+          </li>
+          <li>
+              
+                  
+                      <small class="align-self-start">Autres</small>
+                      <strong>
+                      
+                      
+                      
+                          Sans ressources
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Sans emploi depuis de 12 à 23 mois
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Titulaire de la RQTH
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Bénéficiaire de la loi handicap (OETH)
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Bénéficiaire du RSA depuis 24 mois et plus
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Bénéficiaire de l'ASS depuis de 6 à 11 mois
+                      
+                      
+              
+                  
+                      <br/>
+                      
+                          Bénéficiaire de l'AAH depuis moins de 6 mois
+                      
+                      </strong>
+              
+          </li>
+      </ul>
+  </div>
+  '''
+# ---
+# name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_few_datas][personal-infos]
+  '''
+  <div class="personal-infos">
+      <h2>Informations personnelles</h2>
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">État civil</h3>
+          </div>
+          
+              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                  <a aria-label="Modifier les informations personnelles de " class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&amp;from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
+          
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Civilité</small>
+              <strong></strong>
+          </li>
+          <li>
+              <small>Prénom</small>
+              <strong></strong>
+          </li>
+          <li>
+              <small>Nom</small>
+              <strong></strong>
+          </li>
+          <li>
+              <small>Date de naissance</small>
+              
+                  <i class="text-warning">À renseigner</i>
+              
+          </li>
+          <li>
+              <small>Pays de naissance</small>
+              
+                  <i class="text-warning">À renseigner</i>
+              
+          </li>
+          
+              <li>
+  
+                  <small>Commune de naissance</small>
+                  
+                      <i class="text-warning">À renseigner obligatoirement si le pays est "France"</i>
+                  
+              </li>
+          
+          <li>
+              <small>Numéro de sécurité sociale</small>
+              
+                  <strong>Numéro temporaire (NIA/NTT)</strong>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Coordonnées</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Adresse e-mail</small>
+              
+                  <i class="text-disabled">Non renseignée</i>
+              
+          </li>
+          <li>
+              <small>Téléphone</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Adresse</small>
+              
+                  <i class="text-warning">À renseigner</i>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Situation</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Inscrit à France Travail depuis</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Identifiant France Travail</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Niveau de formation</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              
+                  <small>Autres</small>
+              
+          </li>
+      </ul>
+  </div>
+  '''
+# ---
+# name: TestCheckJobSeekerInformationsForHire.test_geiq[personal-infos]
+  '''
+  <div class="personal-infos">
+      <h2>Informations personnelles</h2>
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">État civil</h3>
+          </div>
+          
+              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&amp;from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium"></i>
+                      <span>Modifier</span>
+                  </a>
+              </div>
+          
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Civilité</small>
+              <strong>Madame</strong>
+          </li>
+          <li>
+              <small>Prénom</small>
+              <strong>Jane</strong>
+          </li>
+          <li>
+              <small>Nom</small>
+              <strong>DOE</strong>
+          </li>
+          <li>
+              <small>Date de naissance</small>
+              
+                  <strong>01/01/1990</strong>
+              
+          </li>
+          <li>
+              <small>Pays de naissance</small>
+              
+                  <i class="text-warning">À renseigner</i>
+              
+          </li>
+          
+              <li>
+  
+                  <small>Commune de naissance</small>
+                  
+                      <i class="text-warning">À renseigner obligatoirement si le pays est "France"</i>
+                  
+              </li>
+          
+          <li>
+              <small>Numéro de sécurité sociale</small>
+              
+                  <strong>Numéro temporaire (NIA/NTT)</strong>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Coordonnées</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Adresse e-mail</small>
+              
+                  <strong>jane.doe@test.local</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Téléphone</small>
+              
+                  <strong>06 12 34 56 78</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Adresse</small>
+              
+                  <address>12 rue Georges Bizet, 35000 Rennes</address>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Situation</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Inscrit à France Travail depuis</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Identifiant France Travail</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Niveau de formation</small>
+              
+                  <strong>Formation de niveau BAC</strong>
+              
+          </li>
+          <li>
+              
+                  <small>Autres</small>
+              
+          </li>
+      </ul>
+  </div>
+  '''
+# ---
+# name: TestDirectHireFullProcess.test_hire_as_company[personal-infos]
+  '''
+  <div class="personal-infos">
+      <h2>Informations personnelles</h2>
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">État civil</h3>
+          </div>
+          
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Civilité</small>
+              <strong>Monsieur</strong>
+          </li>
+          <li>
+              <small>Prénom</small>
+              <strong>Johannes</strong>
+          </li>
+          <li>
+              <small>Nom</small>
+              <strong>BRAHMS</strong>
+          </li>
+          <li>
+              <small>Date de naissance</small>
+              
+                  <strong>20/12/1978</strong>
+              
+          </li>
+          <li>
+              <small>Pays de naissance</small>
+              
+                  <strong>France</strong>
+              
+          </li>
+          
+              <li>
+  
+                  <small>Commune de naissance</small>
+                  
+                      <strong>Geispolsheim</strong>
+                  
+              </li>
+          
+          <li>
+              <small>Numéro de sécurité sociale</small>
+              
+                  <strong><span>1</span><span class="ms-1">78</span><span class="ms-1">12</span><span class="ms-1">29</span><span class="ms-1">782</span><span class="ms-1">005</span><span class="ms-1">08</span></strong>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Coordonnées</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Adresse e-mail</small>
+              
+                  <strong>johannes@brahms.com</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="johannes@brahms.com" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Téléphone</small>
+              
+                  <strong>01 23 45 67 89</strong>
+                  
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0123456789" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+      <i aria-hidden="true" class="ri-file-copy-line fw-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+              
+          </li>
+          <li>
+              <small>Adresse</small>
+              
+                  <address>37 B Rue du Général De Gaulle, 67118 Geispolsheim</address>
+              
+          </li>
+      </ul>
+  
+      <hr/>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">Situation</h3>
+          </div>
+      </div>
+  
+      <ul class="list-data mb-3">
+          <li>
+              <small>Inscrit à France Travail depuis</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Identifiant France Travail</small>
+              
+                  <i class="text-disabled">Non renseigné</i>
+              
+          </li>
+          <li>
+              <small>Niveau de formation</small>
+              
+                  <strong>Formation de niveau BAC</strong>
+              
+          </li>
+          <li>
+              
+                  <small>Autres</small>
+              
+          </li>
+      </ul>
+  </div>
+  '''
+# ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
     'num_queries': 28,

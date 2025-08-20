@@ -3,28 +3,33 @@
 {% load components %}
 {% load django_bootstrap5 %}
 
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__info=c_navinfo__info|default:"" %}
+        {% fragment as c_navinfo__info %}
+            Mis à jour le {{ profile.user.last_checked_at|date:"d/m/Y" }}
+        {% endfragment %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>
-                Informations personnelles de {{ job_seeker.get_full_name }}
-                {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
-            </h1>
-            <p>Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}</p>
+            <h1>Déclarer une embauche</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
 
-{% block content_extend %}
-    <div class="c-box my-4">
-        <h2>
-            Informations personnelles
-            <a class="btn btn-outline-primary float-end"
-               href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path|urlencode %}">Mettre à jour</a>
-        </h2>
-
-        {% include "apply/includes/profile_infos.html" %}
-
-        {% itou_buttons_form primary_url=next_url primary_label="Poursuivre l'embauche" secondary_url=back_url show_mandatory_fields_mention=False %}
-    </div>
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                    <div class="c-box mb-3 mb-md-4">
+                        {% include "apply/includes/profile_infos.html" %}
+                        {% itou_buttons_form primary_url=next_url primary_label="Poursuivre l'embauche" secondary_url=back_url show_mandatory_fields_mention=False %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
