@@ -504,6 +504,9 @@ STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIS
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
+# Slack notifications sent by check_inconsistencies cronjobs.
+SLACK_INCONSISTENCIES_WEBHOOK_URL = os.getenv("SLACK_INCONSISTENCIES_WEBHOOK_URL")
+
 # Production instances (`PROD`, `DEMO`, `PENTEST`, ...) share the same redis but different DB
 redis_url = os.environ["REDIS_URL"]
 redis_db = os.environ["REDIS_DB"]

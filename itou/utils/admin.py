@@ -90,11 +90,15 @@ class ItouStackedInline(StackedInline, ItouTabularInline):
 class InconsistencyCheckMixin:
     INCONSISTENCY_CHECKS = []
 
-    def check_inconsistencies(self, request, queryset, message_when_no_inconsistency=True):
+    def compute_inconsistencies(self, queryset):
         inconsistencies = {}
         for title, check in self.INCONSISTENCY_CHECKS:
             for item in check(queryset):
                 inconsistencies.setdefault(item, []).append(title)
+        return inconsistencies
+
+    def check_inconsistencies(self, request, queryset, message_when_no_inconsistency=True):
+        inconsistencies = self.compute_inconsistencies(queryset)
         if inconsistencies:
             s = pluralizefr(len(inconsistencies))
             title = f"{len(inconsistencies)} objet{s} incohérent{s}"
