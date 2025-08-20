@@ -44,6 +44,7 @@
   "0 2 * * MON $ROOT/clevercloud/run_management_command.sh populate_metabase_matomo --wet-run",
 
   "0 0 1 * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
+  "0 0 1 * * $ROOT/clevercloud/run_management_command.sh sync_cities --wet-run",
   "0 0 3 * * $ROOT/clevercloud/run_management_command.sh delete_old_nir_modification_requests --wet-run",
   "0 0 15 * * $ROOT/clevercloud/run_management_command.sh sync_romes_and_appellations --wet-run",
   "0 22 1 * * $ROOT/clevercloud/run_management_command.sh remove_unknown_emails_from_brevo --wet-run"
