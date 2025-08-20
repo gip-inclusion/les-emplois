@@ -670,23 +670,24 @@ def test_populate_prolongations():
 
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM prolongations ORDER BY id")
-        rows = cursor.fetchall()
-        assert rows == [
-            (
-                prolongation.id,
-                prolongation.approval_id,
-                prolongation.start_at,
-                prolongation.end_at,
-                prolongation.get_reason_display(),
-                prolongation.declared_by_id,
-                prolongation.declared_by_siae_id,
-                prolongation.validated_by_id,
-                prolongation.prescriber_organization_id,
-                prolongation.created_at.date(),
-                prolongation_request.pk,
-                datetime.date(2023, 2, 1),
-            ),
-        ]
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": prolongation.id,
+            "id_pass_agrément": prolongation.approval_id,
+            "date_début": prolongation.start_at,
+            "date_fin": prolongation.end_at,
+            "motif": prolongation.get_reason_display(),
+            "id_utilisateur_déclarant": prolongation.declared_by_id,
+            "id_structure_déclarante": prolongation.declared_by_siae_id,
+            "id_utilisateur_prescripteur": prolongation.validated_by_id,
+            "id_organisation_prescripteur": prolongation.prescriber_organization_id,
+            "date_de_création": prolongation.created_at.date(),
+            "id_demande_de_prolongation": prolongation_request.pk,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+        },
+    ]
 
 
 @freeze_time("2023-02-02")
@@ -718,27 +719,28 @@ def test_populate_prolongation_requests():
 
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM demandes_de_prolongation ORDER BY id")
-        rows = cursor.fetchall()
-        assert len(rows) == 2
-        assert rows[0] == (
-            prolongation_request.id,
-            prolongation_request.approval_id,
-            prolongation_request.start_at,
-            prolongation_request.end_at,
-            prolongation_request.get_reason_display(),
-            prolongation_request.declared_by_id,
-            prolongation_request.declared_by_siae_id,
-            prolongation_request.validated_by_id,
-            prolongation_request.prescriber_organization_id,
-            prolongation.pk,
-            prolongation_request.get_status_display(),
-            str(deny_information.reason),
-            prolongation_request.created_at.date(),
-            prolongation_request.processed_at,
-            prolongation_request.processed_by_id,
-            prolongation_request.reminder_sent_at,
-            datetime.date(2023, 2, 1),
-        )
+        rows = dictfetchall(cursor)
+
+    assert len(rows) == 2
+    assert rows[0] == {
+        "id": prolongation_request.id,
+        "id_pass_agrément": prolongation_request.approval_id,
+        "date_début": prolongation_request.start_at,
+        "date_fin": prolongation_request.end_at,
+        "motif": prolongation_request.get_reason_display(),
+        "id_utilisateur_déclarant": prolongation_request.declared_by_id,
+        "id_structure_déclarante": prolongation_request.declared_by_siae_id,
+        "id_utilisateur_prescripteur": prolongation_request.validated_by_id,
+        "id_organisation_prescripteur": prolongation_request.prescriber_organization_id,
+        "id_prolongation": prolongation.pk,
+        "état": prolongation_request.get_status_display(),
+        "motif_de_refus": str(deny_information.reason),
+        "date_de_demande": prolongation_request.created_at.date(),
+        "date_traitement": prolongation_request.processed_at,
+        "id_utilisateur_traitant": prolongation_request.processed_by_id,
+        "date_envoi_rappel": prolongation_request.reminder_sent_at,
+        "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+    }
 
 
 @pytest.mark.django_db(transaction=True)
