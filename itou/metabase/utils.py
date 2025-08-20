@@ -6,25 +6,18 @@ from django.conf import settings
 from django.utils import timezone
 
 
-def convert_boolean_to_int(b):
+def convert_boolean_to_int(func, *args, **kwargs):
     # True => 1, False => 0, None => None.
+    b = func(*args, **kwargs)
     return None if b is None else int(b)
 
 
-def convert_datetime_to_local_date(dt):
+def convert_datetime_to_local_date(func, *args, **kwargs):
+    dt = func(*args, **kwargs)
     if isinstance(dt, datetime.datetime):
         # Datetimes are stored in UTC.
         return timezone.localdate(dt)
     return dt
-
-
-def compose(f, g):
-    # Compose two lambda methods.
-    # https://stackoverflow.com/questions/16739290/composing-functions-in-python
-    # I had to use this to solve a cryptic
-    # `RecursionError: maximum recursion depth exceeded` error
-    # when composing convert_boolean_to_int and c["fn"].
-    return lambda *a, **kw: f(g(*a, **kw))
 
 
 def build_dbt_daily():
