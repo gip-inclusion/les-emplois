@@ -66,7 +66,7 @@
                                             <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
                                             <td>{{ prolongation_request.declared_by_siae|default:"-" }}</td>
                                             <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
-                                            <td>{{ prolongation_request.validated_by.get_full_name }}</td>
+                                            <td>{{ prolongation_request.assigned_to.get_full_name }}</td>
                                             <td>{% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-xs" %}</td>
                                             <td class="text-end w-50px">
                                                 <a class="btn btn-sm btn-link btn-ico-only"

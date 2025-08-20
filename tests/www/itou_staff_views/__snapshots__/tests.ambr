@@ -2312,7 +2312,6 @@
                  "approvals_prolongation"."reason_explanation",
                  "approvals_prolongation"."declared_by_id",
                  "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
                  "approvals_prolongation"."prescriber_organization_id",
                  "approvals_prolongation"."created_at",
                  "approvals_prolongation"."created_by_id",
@@ -2322,7 +2321,8 @@
                  "approvals_prolongation"."require_phone_interview",
                  "approvals_prolongation"."contact_email",
                  "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id"
+                 "approvals_prolongation"."request_id",
+                 "approvals_prolongation"."validated_by_id"
           FROM "approvals_prolongation"
           WHERE "approvals_prolongation"."approval_id" IN (%s)
           ORDER BY "approvals_prolongation"."start_at" DESC

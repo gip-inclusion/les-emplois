@@ -58,7 +58,7 @@ def test_empty_list_view(snapshot, client):
 
 def test_list_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(reverse("approvals:prolongation_requests_list"))
@@ -79,7 +79,7 @@ def test_list_view_no_siae(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(
         for_snapshot=True, declared_by_siae=None, declared_by=EmployerFactory()
     )
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
     assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
@@ -96,7 +96,7 @@ def test_list_view_only_pending_filter(client):
         status=factory.Iterator([ProlongationRequestStatus.GRANTED, ProlongationRequestStatus.DENIED]),
         prescriber_organization=pending_prolongation_request.prescriber_organization,
     )
-    client.force_login(pending_prolongation_request.validated_by)
+    client.force_login(pending_prolongation_request.assigned_to)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
     assert set(response.context["pager"].object_list) == {
@@ -115,7 +115,7 @@ def test_show_view_access(client):
     url = reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     assertRedirects(client.get(url), reverse("account_login") + f"?next={url}")
 
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
     # When the prolongation request is for the current prescriber organization
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
@@ -137,7 +137,7 @@ def test_show_view_access(client):
 
 def test_show_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
@@ -150,7 +150,7 @@ def test_show_view_no_siae(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(
         declared_by_siae=None, declared_by=EmployerFactory()
     )
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
@@ -160,7 +160,7 @@ def test_show_view_no_siae(client):
 
 def test_grant_view(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(approval__user__for_snapshot=True)
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.post(
         reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}),
@@ -179,7 +179,7 @@ def test_grant_view_already_granted(client):
         approval__user__for_snapshot=True,
         status=ProlongationRequestStatus.GRANTED,
     )
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     # Someone already granted the prolongation (maybe me, maybe a colleague) and I try again
     response = client.post(
@@ -198,7 +198,7 @@ def test_grant_view_invalid_dates(client):
         approval=prolongation.approval,
         start_at=prolongation.end_at - relativedelta(days=1),
     )
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.post(
         reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}),
@@ -217,7 +217,7 @@ def test_grant_view_invalid_dates(client):
 
 def test_grant_view_is_not_accessible_by_get_method(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory()
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.get(
         reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk})
@@ -228,7 +228,7 @@ def test_grant_view_is_not_accessible_by_get_method(client):
 @pytest.mark.parametrize("reason", ProlongationRequestDenyReason)
 def test_deny_view_for_reasons(snapshot, client, reason):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     # Reverse all needed URL
     start_url = reverse(
@@ -309,7 +309,7 @@ def test_snapshot_by_status(client, snapshot, status):
         processed=True,
         status=status,
     )
-    client.force_login(prolongation_request.validated_by)
+    client.force_login(prolongation_request.assigned_to)
 
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})

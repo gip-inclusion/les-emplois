@@ -123,7 +123,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongationrequests_created",  # ProlongationRequest.created_by
         "prolongationrequests_declared",  # ProlongationRequest.declared_by
         "prolongationrequests_updated",  # ProlongationRequest.updated_by
-        "prolongationrequests_validated",  # ProlongationRequest.validated_by
+        "prolongationrequests_assigned",  # ProlongationRequest.assigned_to
         "prolongations_created",  # Prolongation.created_by
         "prolongations_declared",  # Prolongation.declared_by
         "prolongations_updated",  # Prolongation.updated_by

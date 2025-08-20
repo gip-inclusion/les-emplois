@@ -1451,16 +1451,6 @@ class CommonProlongation(models.Model):
         on_delete=models.RESTRICT,  # For traceability and accountability, people's organization can change
     )
 
-    # It is assumed that an authorized prescriber has validated the prolongation beforehand.
-    validated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name="prescripteur habilité qui a autorisé cette prolongation",
-        null=True,
-        blank=True,
-        on_delete=models.RESTRICT,  # For traceability and accountability
-        related_name="%(class)ss_validated",
-    )
-
     prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
         verbose_name="organisation du prescripteur habilité",
@@ -1557,13 +1547,6 @@ class CommonProlongation(models.Model):
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
-        if (
-            hasattr(self, "validated_by")
-            and self.validated_by
-            and not self.validated_by.is_prescriber_with_authorized_org_memberships
-        ):
-            raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
-
         # Avoid blocking updates in admin by limiting this check to only new instances.
         if not self.pk and self.start_at != self.approval.end_at:
             raise ValidationError(
@@ -1617,6 +1600,15 @@ class ProlongationRequest(CommonProlongation):
         max_length=32,
     )
 
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="prescripteur habilité qui a reçu la demande de prolongation",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="%(class)ss_assigned",
+    )
+
     processed_at = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
     processed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -1648,17 +1640,17 @@ class ProlongationRequest(CommonProlongation):
             ),
         ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        field = self._meta.get_field("validated_by")
-        field.verbose_name = "prescripteur habilité qui a reçu la demande de prolongation"
-
     def __str__(self):
         return f"{self.approval} — {self.get_status_display()} — {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
 
+    def clean(self):
+        super().clean()
+        if self.assigned_to and not self.assigned_to.is_prescriber_with_authorized_org_memberships:
+            raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
+
     def notify_authorized_prescriber(self):
         notifications.ProlongationRequestCreatedForPrescriberNotification(
-            self.validated_by, self.prescriber_organization, prolongation_request=self
+            self.assigned_to, self.prescriber_organization, prolongation_request=self
         ).send()
 
     def grant(self, user):
@@ -1771,6 +1763,15 @@ class Prolongation(CommonProlongation):
         blank=True,
     )
 
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="prescripteur habilité qui a autorisé cette prolongation",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+        related_name="%(class)ss_validated",
+    )
+
     objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
 
     class Meta(CommonProlongation.Meta):
@@ -1865,6 +1866,11 @@ class Prolongation(CommonProlongation):
         obj.validated_by = prolongation_request.processed_by
 
         return obj
+
+    def clean(self):
+        super().clean()
+        if self.validated_by and not self.validated_by.is_prescriber_with_authorized_org_memberships:
+            raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
 
 class PoleEmploiApprovalManager(models.Manager):

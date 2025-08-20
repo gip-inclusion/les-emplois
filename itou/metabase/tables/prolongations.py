@@ -11,6 +11,7 @@ TABLE = MetabaseTable(name="prolongations")
 TABLE.add_columns(
     get_common_prolongation_columns(model=Prolongation)
     + [
+        get_column_from_field(get_model_field(Prolongation, "validated_by"), name="id_utilisateur_prescripteur"),
         {
             "name": "date_de_création",
             "type": "date",

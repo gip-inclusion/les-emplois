@@ -699,7 +699,7 @@ def test_populate_prolongation_requests():
 
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
     with transaction.atomic():
-        prolongation_request.deny(prolongation_request.validated_by, deny_information)
+        prolongation_request.deny(prolongation_request.assigned_to, deny_information)
 
     ProlongationFactory(with_request=True)  # add another one to ensure we don't fail without a deny_information
 
@@ -730,7 +730,7 @@ def test_populate_prolongation_requests():
         "motif": prolongation_request.get_reason_display(),
         "id_utilisateur_déclarant": prolongation_request.declared_by_id,
         "id_structure_déclarante": prolongation_request.declared_by_siae_id,
-        "id_utilisateur_prescripteur": prolongation_request.validated_by_id,
+        "id_utilisateur_prescripteur": prolongation_request.assigned_to_id,
         "id_organisation_prescripteur": prolongation_request.prescriber_organization_id,
         "id_prolongation": prolongation.pk,
         "état": prolongation_request.get_status_display(),

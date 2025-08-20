@@ -111,7 +111,7 @@ class TestApprovalProlongation:
         assert prolongation_request.created_by == self.employer
         assert prolongation_request.declared_by == self.employer
         assert prolongation_request.declared_by_siae == self.job_application.to_company
-        assert prolongation_request.validated_by == self.prescriber
+        assert prolongation_request.assigned_to == self.prescriber
         assert prolongation_request.reason == post_data["reason"]
         assert not prolongation_request.report_file
 

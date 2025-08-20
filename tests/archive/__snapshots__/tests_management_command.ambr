@@ -1115,10 +1115,10 @@
           LEFT OUTER JOIN "job_applications_jobapplication" T18 ON ("users_user"."id" = T18."transferred_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("users_user"."id" = "job_applications_jobapplicationtransitionlog"."user_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" ON ("users_user"."id" = "approvals_prolongationrequest"."processed_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T21 ON ("users_user"."id" = T21."created_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."declared_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."updated_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."validated_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T21 ON ("users_user"."id" = T21."assigned_to_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."created_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."updated_by_id")
           LEFT OUTER JOIN "approvals_prolongation" ON ("users_user"."id" = "approvals_prolongation"."created_by_id")
           LEFT OUTER JOIN "approvals_prolongation" T26 ON ("users_user"."id" = T26."declared_by_id")
           LEFT OUTER JOIN "approvals_prolongation" T27 ON ("users_user"."id" = T27."updated_by_id")
@@ -2156,29 +2156,6 @@
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
           FROM "approvals_prolongationrequest"
-          WHERE "approvals_prolongationrequest"."validated_by_id" IN (%s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s,
-                                                                      %s)
-          ORDER BY "approvals_prolongationrequest"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongationrequest"."id"
-          FROM "approvals_prolongationrequest"
           WHERE "approvals_prolongationrequest"."created_by_id" IN (%s,
                                                                     %s,
                                                                     %s,
@@ -2225,6 +2202,29 @@
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
           FROM "approvals_prolongationrequest"
+          WHERE "approvals_prolongationrequest"."assigned_to_id" IN (%s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s,
+                                                                     %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id"
+          FROM "approvals_prolongationrequest"
           WHERE "approvals_prolongationrequest"."processed_by_id" IN (%s,
                                                                       %s,
                                                                       %s,
@@ -2254,7 +2254,6 @@
                  "approvals_prolongation"."reason_explanation",
                  "approvals_prolongation"."declared_by_id",
                  "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
                  "approvals_prolongation"."prescriber_organization_id",
                  "approvals_prolongation"."created_at",
                  "approvals_prolongation"."created_by_id",
@@ -2264,7 +2263,8 @@
                  "approvals_prolongation"."require_phone_interview",
                  "approvals_prolongation"."contact_email",
                  "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id"
+                 "approvals_prolongation"."request_id",
+                 "approvals_prolongation"."validated_by_id"
           FROM "approvals_prolongation"
           WHERE "approvals_prolongation"."declared_by_id" IN (%s,
                                                               %s,
@@ -2295,7 +2295,6 @@
                  "approvals_prolongation"."reason_explanation",
                  "approvals_prolongation"."declared_by_id",
                  "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
                  "approvals_prolongation"."prescriber_organization_id",
                  "approvals_prolongation"."created_at",
                  "approvals_prolongation"."created_by_id",
@@ -2305,48 +2304,8 @@
                  "approvals_prolongation"."require_phone_interview",
                  "approvals_prolongation"."contact_email",
                  "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id"
-          FROM "approvals_prolongation"
-          WHERE "approvals_prolongation"."validated_by_id" IN (%s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s)
-          ORDER BY "approvals_prolongation"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongation"."id",
-                 "approvals_prolongation"."approval_id",
-                 "approvals_prolongation"."start_at",
-                 "approvals_prolongation"."end_at",
-                 "approvals_prolongation"."reason",
-                 "approvals_prolongation"."reason_explanation",
-                 "approvals_prolongation"."declared_by_id",
-                 "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
-                 "approvals_prolongation"."prescriber_organization_id",
-                 "approvals_prolongation"."created_at",
-                 "approvals_prolongation"."created_by_id",
-                 "approvals_prolongation"."updated_at",
-                 "approvals_prolongation"."updated_by_id",
-                 "approvals_prolongation"."report_file_id",
-                 "approvals_prolongation"."require_phone_interview",
-                 "approvals_prolongation"."contact_email",
-                 "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id"
+                 "approvals_prolongation"."request_id",
+                 "approvals_prolongation"."validated_by_id"
           FROM "approvals_prolongation"
           WHERE "approvals_prolongation"."created_by_id" IN (%s,
                                                              %s,
@@ -2377,7 +2336,6 @@
                  "approvals_prolongation"."reason_explanation",
                  "approvals_prolongation"."declared_by_id",
                  "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
                  "approvals_prolongation"."prescriber_organization_id",
                  "approvals_prolongation"."created_at",
                  "approvals_prolongation"."created_by_id",
@@ -2387,7 +2345,8 @@
                  "approvals_prolongation"."require_phone_interview",
                  "approvals_prolongation"."contact_email",
                  "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id"
+                 "approvals_prolongation"."request_id",
+                 "approvals_prolongation"."validated_by_id"
           FROM "approvals_prolongation"
           WHERE "approvals_prolongation"."updated_by_id" IN (%s,
                                                              %s,
@@ -2398,6 +2357,47 @@
                                                              %s,
                                                              %s,
                                                              %s)
+          ORDER BY "approvals_prolongation"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongation"."id",
+                 "approvals_prolongation"."approval_id",
+                 "approvals_prolongation"."start_at",
+                 "approvals_prolongation"."end_at",
+                 "approvals_prolongation"."reason",
+                 "approvals_prolongation"."reason_explanation",
+                 "approvals_prolongation"."declared_by_id",
+                 "approvals_prolongation"."declared_by_siae_id",
+                 "approvals_prolongation"."prescriber_organization_id",
+                 "approvals_prolongation"."created_at",
+                 "approvals_prolongation"."created_by_id",
+                 "approvals_prolongation"."updated_at",
+                 "approvals_prolongation"."updated_by_id",
+                 "approvals_prolongation"."report_file_id",
+                 "approvals_prolongation"."require_phone_interview",
+                 "approvals_prolongation"."contact_email",
+                 "approvals_prolongation"."contact_phone",
+                 "approvals_prolongation"."request_id",
+                 "approvals_prolongation"."validated_by_id"
+          FROM "approvals_prolongation"
+          WHERE "approvals_prolongation"."validated_by_id" IN (%s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s,
+                                                               %s)
           ORDER BY "approvals_prolongation"."start_at" DESC
         ''',
       }),

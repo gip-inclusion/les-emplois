@@ -50,13 +50,13 @@ def test_check_require_phone_interview_constraint(email, phone, expected):
 def test_grant():
     prolongation_request = ProlongationRequestFactory()
 
-    new_prolongation = prolongation_request.grant(prolongation_request.validated_by)
+    new_prolongation = prolongation_request.grant(prolongation_request.assigned_to)
 
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.GRANTED
-    assert prolongation_request.processed_by == prolongation_request.validated_by
+    assert prolongation_request.processed_by == prolongation_request.assigned_to
     assert prolongation_request.processed_at == timezone.now()
-    assert prolongation_request.updated_by == prolongation_request.validated_by
+    assert prolongation_request.updated_by == prolongation_request.assigned_to
     assert list(prolongation_request.approval.prolongation_set.all()) == [new_prolongation]
 
 
@@ -66,13 +66,13 @@ def test_deny(django_capture_on_commit_callbacks, mailoutbox):
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
     with django_capture_on_commit_callbacks(execute=True):
-        prolongation_request.deny(prolongation_request.validated_by, deny_information)
+        prolongation_request.deny(prolongation_request.assigned_to, deny_information)
 
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
-    assert prolongation_request.processed_by == prolongation_request.validated_by
+    assert prolongation_request.processed_by == prolongation_request.assigned_to
     assert prolongation_request.processed_at == timezone.now()
-    assert prolongation_request.updated_by == prolongation_request.validated_by
+    assert prolongation_request.updated_by == prolongation_request.assigned_to
     assert prolongation_request.approval.prolongation_set.count() == 0
     assert prolongation_request.deny_information.reason == deny_information.reason
     assert prolongation_request.deny_information.reason_explanation == deny_information.reason_explanation
@@ -157,9 +157,9 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
         with django_capture_on_commit_callbacks(execute=True):
             command.handle(command="email_reminder", wet_run=True)
 
-    assert len(mailoutbox) == 11  # prolongation_request.validated_by and 10 coworkers
+    assert len(mailoutbox) == 11  # prolongation_request.assigned_to and 10 coworkers
 
-    assert set(email.to[0] for email in mailoutbox) == {prolongation_request.validated_by.email} | {
+    assert set(email.to[0] for email in mailoutbox) == {prolongation_request.assigned_to.email} | {
         member.email for member in admin_prescribers
     } | {regular_prescribers[-1].email}
     for email in mailoutbox:

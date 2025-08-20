@@ -47,11 +47,11 @@
                                         jusqu'au
                                         <span class="badge rounded-pill bg-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                                     </p>
-                                    {% if form.instance.validated_by.email %}
+                                    {% if form.instance.assigned_to.email %}
                                         <p class="card-text">
                                             Un e-mail sera envoyé au prescripteur habilité désigné pour autoriser la prolongation :
-                                            <b>{{ form.instance.validated_by.get_full_name }}</b>
-                                            ({{ form.instance.validated_by.email }})
+                                            <b>{{ form.instance.assigned_to.get_full_name }}</b>
+                                            ({{ form.instance.assigned_to.email }})
                                         </p>
                                     {% endif %}
                                     <hr>

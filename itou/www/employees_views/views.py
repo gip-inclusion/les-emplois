@@ -82,7 +82,7 @@ class EmployeeDetailView(DetailView):
                 Prefetch(
                     "approval__prolongationrequest_set",
                     queryset=ProlongationRequest.objects.select_related(
-                        "declared_by", "validated_by", "processed_by", "prescriber_organization"
+                        "declared_by", "assigned_to", "processed_by", "prescriber_organization"
                     ),
                 ),
             )
