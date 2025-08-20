@@ -17,6 +17,7 @@ from django.utils.html import format_html
 from django.views.decorators.http import require_POST, require_safe
 from django.views.generic import DetailView, TemplateView, View
 
+from itou.asp.models import Country
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -49,6 +50,22 @@ from itou.www.job_seekers_views.forms import (
 
 
 logger = logging.getLogger(__name__)
+
+
+def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
+    other_infos_keys = [
+        "resourceless",
+        "unemployed_since",
+        "rqth_employee",
+        "oeth_employee",
+        "rsa_allocation_since",
+        "ass_allocation_since",
+        "aah_allocation_since",
+    ]
+    return {
+        "show_birth_place": jobseeker_profile.birth_country_id == Country.FRANCE_ID,
+        "other_infos": [key for key in other_infos_keys if getattr(jobseeker_profile, key)],
+    }
 
 
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
@@ -875,7 +892,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            **jobseeker_personal_infos_display_kwargs(self.profile),
+        }
 
 
 class UpdateJobSeekerStartView(View):
@@ -1193,7 +1214,11 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         return self.job_seeker_session.get("config").get("from_url")
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            **jobseeker_personal_infos_display_kwargs(self.profile),
+        }
 
 
 class CheckJobSeekerInformations(ApplicationBaseView):
@@ -1259,6 +1284,8 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
             "next_url": reverse(
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
+            **jobseeker_personal_infos_display_kwargs(self.job_seeker.jobseeker_profile),
+            "allow_modify_job_seeker": True,
         }
 
 
