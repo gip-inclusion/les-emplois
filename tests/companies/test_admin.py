@@ -12,6 +12,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
+from itou.users.models import User
 from itou.utils.models import PkSupportRemark
 from tests.common_apps.organizations.tests import (
     assert_set_admin_role_creation,
@@ -179,6 +180,47 @@ class TestCompanyAdmin:
             f"Creating companies.CompanyMembership of organization_id={company.pk} "
             f"for user_id={employer.pk} is_admin=True."
         ) in caplog.messages
+
+    def test_reactivate_member(self, admin_client, caplog):
+        company = CompanyFactory(with_membership=True)
+        membership = company.memberships.first()
+        admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+        company.deactivate_membership(membership, updated_by=admin_user)
+        change_url = reverse("admin:companies_company_change", args=[company.pk])
+
+        response = admin_client.get(change_url)
+        assertContains(response, membership.user.get_full_name())
+
+        response = admin_client.post(
+            change_url,
+            data={
+                "id": company.id,
+                "siret": company.siret,
+                "kind": company.kind.value,
+                "name": company.name,
+                "phone": company.phone,
+                "email": company.email,
+                "memberships-TOTAL_FORMS": "1",
+                "memberships-INITIAL_FORMS": "1",
+                "memberships-MIN_NUM_FORMS": "0",
+                "memberships-MAX_NUM_FORMS": "1000",
+                "memberships-0-id": membership.pk,
+                "memberships-0-company": company.pk,
+                "memberships-0-user": membership.user.pk,
+                "memberships-0-is_active": "on",
+                "job_description_through-TOTAL_FORMS": "0",
+                "job_description_through-INITIAL_FORMS": "0",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
+        assertRedirects(response, change_url)
+        assert membership.user in company.members.all()
+        assert (
+            f"Reactivating companies.CompanyMembership of organization_id={company.pk} "
+            f"for user_id={membership.user_id} is_admin=False." in caplog.messages
+        )
 
 
 @freeze_time("2024-05-17T11:11:11+02:00")
